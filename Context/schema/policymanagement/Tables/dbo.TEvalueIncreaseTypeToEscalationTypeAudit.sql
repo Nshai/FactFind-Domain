@@ -1,0 +1,14 @@
+CREATE TABLE [dbo].[TEvalueIncreaseTypeToEscalationTypeAudit]
+(
+[AuditId] [int] NOT NULL IDENTITY(1, 1),
+[RefEvalueIncreaseTypeId] [int] NOT NULL,
+[RefEscalationTypeId] [int] NOT NULL,
+[ConcurrencyId] [int] NOT NULL,
+[EvalueIncreaseTypeToEscalationTypeId] [int] NOT NULL,
+[StampAction] [char] (1) COLLATE Latin1_General_CI_AS NOT NULL,
+[StampDateTime] [datetime] NULL,
+[StampUser] [varchar] (255) COLLATE Latin1_General_CI_AS NULL
+)
+GO
+ALTER TABLE [dbo].[TEvalueIncreaseTypeToEscalationTypeAudit] ADD CONSTRAINT [PK_TEvalueIncreaseTypeToEscalationTypeAudit] PRIMARY KEY CLUSTERED  ([AuditId])
+GO

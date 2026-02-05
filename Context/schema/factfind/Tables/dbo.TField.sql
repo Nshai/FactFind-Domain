@@ -1,0 +1,40 @@
+CREATE TABLE [dbo].[TField]
+(
+[FieldId] [int] NOT NULL IDENTITY(1, 1),
+[ConcurrencyId] [int] NOT NULL CONSTRAINT [DF_TField_ConcurrencyId] DEFAULT ((1)),
+[EntityId] [int] NULL,
+[Identifier] [varchar] (128) COLLATE Latin1_General_CI_AS NULL,
+[Label] [varchar] (512) COLLATE Latin1_General_CI_AS NULL,
+[Type] [varchar] (32) COLLATE Latin1_General_CI_AS NULL,
+[TableName] [varchar] (64) COLLATE Latin1_General_CI_AS NULL,
+[Path] [varchar] (512) COLLATE Latin1_General_CI_AS NULL,
+[RefPath] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[Regex] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[ErrorMessage] [varchar] (1000) COLLATE Latin1_General_CI_AS NULL,
+[Height] [smallint] NULL,
+[Width] [smallint] NULL,
+[MaxLength] [smallint] NULL,
+[Position] [smallint] NULL,
+[PopupUrl] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[PopupHeight] [smallint] NULL,
+[PopupWidth] [smallint] NULL,
+[Required] [bit] NULL,
+[Style] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[PdfSentenceTrigger] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[PdfSentence] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[ShowInGrid] [bit] NULL,
+[Editable] [bit] NULL,
+[CRMContactTypeId] [int] NULL,
+[MoveableFg] [bit] NULL,
+[Nab] [bit] NULL,
+[IsJoint] [bit] NULL,
+[PdfHide] [bit] NULL,
+[ExpandInPdf] [bit] NULL,
+[HideFromPortalUserFg] [bit] NOT NULL CONSTRAINT [DF_TField_HideFromPortalUserFg] DEFAULT ((0)),
+[ManageOwnersFg] [bit] NOT NULL CONSTRAINT [DF_TField_ManageOwnersFg] DEFAULT ((0)),
+[OnBlur] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[Calculated] [bit] NULL
+)
+GO
+ALTER TABLE [dbo].[TField] ADD CONSTRAINT [PK_TField] PRIMARY KEY NONCLUSTERED  ([FieldId]) WITH (FILLFACTOR=80)
+GO

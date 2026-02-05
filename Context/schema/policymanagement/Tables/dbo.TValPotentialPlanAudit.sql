@@ -1,0 +1,42 @@
+CREATE TABLE [dbo].[TValPotentialPlanAudit]
+(
+[AuditId] [int] NOT NULL IDENTITY(1, 1) NOT FOR REPLICATION,
+[ValuationProviderId] [int] NULL,
+[PolicyProviderId] [int] NULL,
+[PolicyProviderName] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[IndigoClientId] [int] NULL,
+[PolicyBusinessId] [int] NULL,
+[SequentialRef] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[PolicyDetailId] [int] NULL,
+[PolicyNumber] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[FormattedPolicyNumber] [varchar] (60) COLLATE Latin1_General_CI_AS NULL,
+[PortalReference] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[FormattedPortalReference] [varchar] (60) COLLATE Latin1_General_CI_AS NULL,
+[AgencyNumber] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[RefPlanType2ProdSubTypeId] [int] NULL,
+[ProviderPlanType] 	[varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[NINumber]	[varchar] (50) COLLATE Latin1_General_CI_AS NULL, 
+[DOB]	[datetime] NULL,
+[LastName] [varchar] (255) COLLATE Latin1_General_CI_AS NULL, 
+[Postcode]	 [varchar] (20) COLLATE Latin1_General_CI_AS NULL, 
+[PolicyStatusId] [int] NULL,
+[PolicyStartDate] [datetime] NULL,
+[PolicyOwnerCRMContactID] [int] NULL,
+[SellingAdviserCRMContactID] [int] NULL,
+[SellingAdviserStatus] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[ServicingAdviserCRMContactID] [int] NULL,
+[ServicingAdviserStatus] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[EligibilityMask] [int] NULL,
+[EligibilityMaskRequiresUpdating] [bit] NULL,
+[ExtendValuationsByServicingAdviser] [bit] NULL,
+[IsExcluded] [bit] CONSTRAINT [DF_TValPotentialPlanAudit_IsExcluded] Default 0,
+[IsTopup] [bit] CONSTRAINT [DF_TValPotentialPlanAudit_IsTopup] Default 0,
+[ConcurrencyId] [int] NULL,
+[ValPotentialPlanId] [int] NULL,
+[StampAction] [char] (1) COLLATE Latin1_General_CI_AS NULL,
+[StampDateTime] [datetime] NULL CONSTRAINT [DF_Tmp_TValPotentialPlanAudit_StampDateTime] DEFAULT (getdate()),
+[StampUser] [varchar] (255) COLLATE Latin1_General_CI_AS NULL
+)
+GO
+ALTER TABLE [dbo].[TValPotentialPlanAudit] ADD CONSTRAINT [PK_TValPotentialPlanAudit] PRIMARY KEY CLUSTERED  ([AuditId])
+GO

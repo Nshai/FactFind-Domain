@@ -1,0 +1,53 @@
+CREATE TABLE [dbo].[TGroupSchemeCategory]
+(
+[GroupSchemeCategoryId] [int] NOT NULL IDENTITY(1, 1),
+[GroupSchemeId] [int] NOT NULL,
+[TenantId] [int] NOT NULL,
+[CategoryName] [varchar] (100) NOT NULL,
+[MinServiceRequirementAmount] [int] NULL,
+[MinServiceRequirementType] [tinyint] NULL,
+[EligibilityAgeFrom] [tinyint] NULL,
+[EligibilityAgeTo] [tinyint] NULL,
+[StandardRetirementAgeMale] [tinyint] NULL,
+[StandardRetirementAgeFemale] [tinyint] NULL,
+[EmployeeContribution] [money] NULL,
+[EmployerContribution] [money] NULL,
+[BasisOfSalary] [tinyint] NULL,
+[BasisOfSalaryOther] [varchar] (50) NULL,
+[BasisOfSalaryAsAt] [tinyint] NULL,
+[FreeCoverAmount] [money] NULL,
+[FreeCoverAmountType] [tinyint] NULL,
+[CoverAmount] [money] NULL,
+[CoverAmountType] [tinyint] NULL,
+[CoverAmountNotes] [varchar] (255) NULL,
+[CoverToAge] [tinyint] NULL,
+[MethodOfCosting] [tinyint] NULL,
+[RateGuaranteeExpires] [datetime] NULL,
+[DeferredPeriod] [tinyint] NULL,
+[DeferredPeriodType] [tinyint] NULL,
+[ClaimEscalationRate] [decimal] (10, 2) NULL,
+[IncreasesAt] [tinyint] NULL,
+[LimitedClaimPeriod] [smallint] NULL,
+[LimitedClaimPeriodType] [tinyint] NULL,
+[DisabilityDefinition] [varchar] (1000) NULL,
+[IsPensionContributionCovered] [bit] NULL,
+[PensionContributionCoveredEmployeeAmount] [money] NULL,
+[PensionContributionCoveredEmployerAmount] [money] NULL,
+[PSTRNumber] [varchar] (50) NULL,
+[TemporaryAbsence] [tinyint] NULL,
+[IsSpousesBenefitsIncluded] [bit] NULL,
+[SpousesCoverAmount] [money] NULL,
+[SpousesCoverToAge] [tinyint] NULL,
+[SpousesMethodOfCosting] [tinyint] NULL,
+[IsArchived] [bit] NOT NULL CONSTRAINT [DF_TGroupSchemeCategory_IsArchived] DEFAULT ((0)),
+[IsDefault] [bit] NOT NULL CONSTRAINT [DF_TGroupSchemeCategory_IsDefault] DEFAULT ((0)),
+[IsCalculateContribution] [bit] NOT NULL CONSTRAINT [DF_TGroupSchemeCategory_IsCalculateContribution] DEFAULT ((0)),
+[ConcurrencyId] [int] NOT NULL CONSTRAINT [DF_TGroupSchemeCategory_ConcurrencyId] DEFAULT ((1)),
+[FeeModelId] [int] NULL,
+[Discriminator] [char] (2) NULL
+)
+GO
+ALTER TABLE [dbo].[TGroupSchemeCategory] ADD CONSTRAINT [PK_TGroupSchemeCategory] PRIMARY KEY CLUSTERED  ([GroupSchemeCategoryId])
+GO
+ALTER TABLE [dbo].[TGroupSchemeCategory] ADD CONSTRAINT [FK_TGroupSchemeCategory_GroupSchemeId_TGroupScheme] FOREIGN KEY ([GroupSchemeId]) REFERENCES [dbo].[TGroupScheme] ([GroupSchemeId])
+GO

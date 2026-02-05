@@ -1,0 +1,93 @@
+CREATE TABLE [dbo].[TPensionInfo]
+(
+[PensionInfoId] [int] NOT NULL IDENTITY(1, 1),
+[PolicyBusinessId] [int] NOT NULL,
+[SRA] [int] NULL,
+[PensionableSalary] [money] NULL,
+[RefReturnDeathTypeId] [int] NULL,
+[ReturnOnDeathRate] [decimal] (5, 2) NULL,
+[ProtectedRightsOnly] [bit] NULL,
+[QualifiesDSSIncentive] [bit] NULL,
+[RefLifeCoverId] [int] NULL,
+[RebatePaid] [bit] NULL,
+[ContributionUpdated] [bit] NULL,
+[IsCurrent] [bit] NULL,
+[RefSchemeSetUpId] [int] NULL,
+[HasWidowsPension] [bit] NULL,
+[HasProtectionAgainstInflation] [bit] NULL,
+[ProvidesTaxFreeLumpSum] [bit] NULL,
+[ContractedOutOfS2P] [bit] NULL,
+[ExpectedYearsOfService] [tinyint] NULL,
+[NumberOfYearsCompleted] [tinyint] NULL,
+[IsIndexed] [bit] NULL,
+[RefSchemeBasisId] [int] NULL,
+[FinalSalary] [money] NULL,
+[RefContributionPercentageId] [int] NULL,
+[SpousePensionPayableOnDeath] [money] NULL,
+[ServiceBenefitSpouseEntitled] [money] NULL,
+[BenefitsPayableOnDeath] [money] NULL,
+[DeathBenefit] [money] NULL,
+[IsInTrust] [bit] NULL,
+[IsNRADeffered] [bit] NULL,
+[ConcurrencyId] [int] NOT NULL CONSTRAINT [DF_TPensionInfo_ConcurrencyId] DEFAULT ((1)),
+[AccrualRate] [int] NULL,
+[NICSaving] [tinyint] NULL,
+[PercentageReinvestedToPension] [decimal] (5, 2) NULL,
+[NICSavingemployee] [tinyint] NULL,
+[SECommencementDate] [datetime] NULL,
+[IsContributionsPaid] [bit] NULL,
+[GMPAmount] [money] NULL,
+[ProspectivePensionAtRetirement] [money] NULL,
+[ProspectiveLumpSumAtRetirement] [money] NULL,
+[PostSacrificeSalary] [money] NULL,
+[SelectedRetirementAge] [int] NULL,
+[EarlyRetirementFactorNotes] [varchar] (1000) null,
+[DependantBenefits] [varchar] (100) null,
+[IndexationNotes] [varchar] (1000) null,
+[EnhancedTaxFreeCash] [varchar] (100) null,
+[GuaranteedAnnuityRate] [varchar] (100) null,
+[ApplicablePenalties] [varchar] (100) null,
+[EfiLoyaltyTerminalBonus] [varchar] (100) null,
+[GuaranteedGrowthRate] [varchar] (100) null,
+[OptionsAvailableAtRetirement] [varchar] (1000) null,
+[OtherBenefitsAndMaterialFeatures] [varchar] (1000) null,
+[ProspectivePensionAtRetirementLumpSumTaken] [money] NULL,
+[LifetimeAllowanceUsed] [decimal] (5, 2) NULL,
+[PlanMigrationRef] [varchar] (255)  NULL,
+[IndigoClientId] [int] NULL,
+[EmployerContributionDetail] [VARCHAR](4000) NULL,
+[IsLifeStylingStrategy] [BIT] NULL,
+[LifeStylingStrategyDetail] [VARCHAR](4000) NULL,
+[YearsPurchaseAvailability] [bit] NULL,
+[YearsPurchaseAvailabilityDetails] [varchar] (4000) NULL,
+[AffinityContributionAvailability] [bit] NULL,
+[AffinityContributionAvailabilityDetails] [varchar] (4000) NULL,
+[CashEquivalentTransferValue] [money] NULL,
+[TransferExpiryDate] [date] NULL,
+[EmploymentDetailId] [int] NULL,
+[CrystallisationStatus] [varchar](20) NULL CONSTRAINT CHK_CrystallisationStatus CHECK(CrystallisationStatus IN('Uncrystallised', 'Part Crystallised', 'Crystallised')),
+[PensionSharingPercentage] [decimal](5, 2) NULL,
+[PensionAttachmentOrder] [nvarchar](100) NULL,
+[TaxedPensionAmount] [money] NULL,
+[UntaxedPensionAmount] [money] NULL,
+[CentrelinkDeductibleAmount] [money] NULL,
+[TaxFreePercentageOfIncome] [decimal](5, 2) NULL,
+[HistoricalCrystallisedPercentage] [decimal] (10, 2) NULL,
+[CurrentCrystallisedPercentage] [decimal] (10, 2) NULL,
+[CrystallisedPercentage] [decimal] (10, 2) NULL,
+[UncrystallisedPercentage] [decimal] (10, 2) NULL,
+[PensionArrangement] [varchar] (100) NULL
+)
+GO
+ALTER TABLE [dbo].[TPensionInfo] ADD CONSTRAINT [PK_TPensionInfo] PRIMARY KEY NONCLUSTERED  ([PensionInfoId])
+GO
+CREATE NONCLUSTERED INDEX [IDX_TPensionInfo_PolicyBusinessId] ON [dbo].[TPensionInfo] ([PolicyBusinessId])
+GO
+CREATE NONCLUSTERED INDEX [IDX_TPensionInfo_RefReturnDeathTypeId] ON [dbo].[TPensionInfo] ([RefReturnDeathTypeId])
+GO
+ALTER TABLE [dbo].[TPensionInfo] WITH CHECK ADD CONSTRAINT [FK_TPensionInfo_PolicyBusinessId_PolicyBusinessId] FOREIGN KEY ([PolicyBusinessId]) REFERENCES [dbo].[TPolicyBusiness] ([PolicyBusinessId])
+GO
+ALTER TABLE [dbo].[TPensionInfo] WITH CHECK ADD CONSTRAINT [FK_TPensionInfo_RefReturnDeathTypeId_RefReturnDeathTypeId] FOREIGN KEY ([RefReturnDeathTypeId]) REFERENCES [dbo].[TRefReturnDeathType] ([RefReturnDeathTypeId])
+GO
+CREATE NONCLUSTERED INDEX [IDX_TPensionInfo_PlanMigrationRef] ON [dbo].[TPensionInfo] ([PlanMigrationRef])
+GO

@@ -1,0 +1,42 @@
+CREATE TABLE [dbo].[TMortgageAudit]
+(
+[AuditId] [int] NOT NULL IDENTITY(1, 1),
+[Applicant] [int] NOT NULL,
+[Joint] [bit] NULL,
+[FirstTimeBuyer] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_FirstTimeBuyer] DEFAULT ((0)),
+[HomeMover] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_HomeMover] DEFAULT ((0)),
+[InvestmentProperty] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_InvestmentProperty] DEFAULT ((0)),
+[Remortgage] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_Remortgage] DEFAULT ((0)),
+[FurtherAdvance] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_FurtherAdvance] DEFAULT ((0)),
+[SecondHome] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_SecondHome] DEFAULT ((0)),
+[Refinancing] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_Refinancing] DEFAULT ((0)),
+[Other] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[Amount] [money] NOT NULL CONSTRAINT [DF_TMortgageAudit_Amount] DEFAULT ((0.00)),
+[Term] [int] NULL,
+[TypeRequired] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[UpperLimitMortgageCost] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_UpperLimitMortgageCost] DEFAULT ((0)),
+[FixedPeriodRequired] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_FixedPeriodRequired] DEFAULT ((0)),
+[Cashback] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_Cashback] DEFAULT ((0)),
+[DiscountedRate] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_DiscountedRate] DEFAULT ((0)),
+[SettlementCosts] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_SettlementCosts] DEFAULT ((0)),
+[NoTieIn] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_NoTieIn] DEFAULT ((0)),
+[NoHighLendingFee] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_NoHighLendingFee] DEFAULT ((0)),
+[AddFeeOrLoan] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_AddFeeOrLoan] DEFAULT ((0)),
+[VariablePayments] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_VariablePayments] DEFAULT ((0)),
+[IndependantQuotes] [bit] NOT NULL CONSTRAINT [DF_TMortgageAudit_IndependantQuotes] DEFAULT ((0)),
+[Address] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[PropertyValue] [money] NOT NULL CONSTRAINT [DF_TMortgageAudit_PropertyValue] DEFAULT ((0.00)),
+[Tenancy] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[LeaseYears] [int] NULL,
+[PropertyType] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[CurrentAddressTime] [int] NULL,
+[OtherAddressDetails] [varchar] (1000) COLLATE Latin1_General_CI_AS NULL,
+[ConcurrencyId] [int] NOT NULL,
+[MortgageId] [int] NOT NULL,
+[StampAction] [char] (1) COLLATE Latin1_General_CI_AS NOT NULL,
+[StampDateTime] [datetime] NULL CONSTRAINT [DF_TMortgageAudit_StampDateTime] DEFAULT (getdate()),
+[StampUser] [varchar] (255) COLLATE Latin1_General_CI_AS NULL
+)
+GO
+ALTER TABLE [dbo].[TMortgageAudit] ADD CONSTRAINT [PK_TMortgageAudit] PRIMARY KEY CLUSTERED  ([AuditId]) WITH (FILLFACTOR=80)
+GO

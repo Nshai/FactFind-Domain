@@ -1,0 +1,24 @@
+Use crm
+Go
+
+INSERT INTO [TActivityEntityType]
+           ([ActivityEntityTypeName]
+           ,[ConcurrencyId])
+VALUES ('Client',1)
+
+INSERT INTO [TActivityEntityType]
+           ([ActivityEntityTypeName]
+           ,[ConcurrencyId])
+VALUES ('Lead',1)     
+
+INSERT INTO [TActivityEntityType]
+           ([ActivityEntityTypeName]
+           ,[ConcurrencyId])
+VALUES ('Adviser',1)
+
+INSERT INTO [TActivityEntityType]
+           ([ActivityEntityTypeName]
+           ,[ConcurrencyId])
+VALUES ('Account',1)
+
+

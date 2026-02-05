@@ -1,0 +1,9 @@
+CREATE TABLE [dbo].[TRefBank]
+(
+[RefBankId] [int] NOT NULL IDENTITY(1, 1) NOT FOR REPLICATION,
+[Name] [varchar] (255) COLLATE Latin1_General_CI_AS NOT NULL,
+[ConcurrencyId] [int] NOT NULL CONSTRAINT [DF_TRefBank_ConcurrencyId] DEFAULT ((1))
+)
+GO
+ALTER TABLE [dbo].[TRefBank] ADD CONSTRAINT [PK_TRefBank] PRIMARY KEY NONCLUSTERED  ([RefBankId]) WITH (FILLFACTOR=80)
+GO

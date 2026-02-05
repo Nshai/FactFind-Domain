@@ -1,0 +1,4591 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "monolith-factfind",
+    "version": "v2"
+  },
+  "host": "monolith-factfind.sys-ie-04.intelliflo.systems",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/v2/clients/{clientId}/dependants": {
+      "get": {
+        "tags": [
+          "dependants",
+          "beta"
+        ],
+        "summary": "Returns a list of dependants for a given client.",
+        "operationId": "ListClientDependants",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "description": "Number of records to skip. Must be greater than or equal to zero",
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "description": "The number of records to retrieve (default 100, max 500)",
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DependantCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "dependants",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "dependants",
+          "beta"
+        ],
+        "summary": "Creates a dependant for a given client.",
+        "operationId": "CreateClientDependant",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Dependant document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Dependant"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Dependant"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "dependants",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/dependants/{dependantId}": {
+      "get": {
+        "tags": [
+          "dependants",
+          "beta"
+        ],
+        "summary": "Returns a dependant for a given client and dependant.",
+        "operationId": "GetClientDependant",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "dependantId",
+            "description": "Dependant identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Dependant"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "dependants",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "dependants",
+          "beta"
+        ],
+        "summary": "Updates a dependant for a given client.",
+        "operationId": "UpdateClientDependant",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "dependantId",
+            "description": "Dependant identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Dependant document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Dependant"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Dependant"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "dependants",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      },
+      "delete": {
+        "tags": [
+          "dependants",
+          "beta"
+        ],
+        "summary": "Deletes a dependant for a given client.",
+        "operationId": "DeleteClientDependant",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "dependantId",
+            "description": "Dependant identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "dependants",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/disclosures": {
+      "get": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "List disclosures for a given client.",
+        "description": "Allows an API consumer to list disclosures for a given client.",
+        "operationId": "ListClientDisclosures",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "description": "Number of records to skip. Must be greater than or equal to zero",
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "description": "The number of records to retrieve (default 100, max 500)",
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DisclosureCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "BadRequest"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (invalid scope)"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "disclosures",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "Creates a disclosure for a given client.",
+        "operationId": "CreateClientDisclosure",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Disclosure document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DisclosureDocument"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/DisclosureDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (invalid scope)"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "disclosures",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/disclosures/{disclosureId}": {
+      "put": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "Updates a disclosure for a given client.",
+        "operationId": "UpdateClientDisclosure",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "disclosureId",
+            "description": "Disclosure identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Disclosure document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DisclosureDocument"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DisclosureDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (invalid scope)"
+          },
+          "404": {
+            "description": "Not Found (Client, disclosure does not exists)"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "disclosures",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      },
+      "delete": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "Deletes a disclosure for a given client.",
+        "operationId": "DeleteClientDisclosure",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client Id - The special value \"me\" can be used to indicate the authenticated user",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "disclosureId",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "NoContent"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (invalid scope)"
+          },
+          "404": {
+            "description": "Client, disclosure does not exists"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "disclosures",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/employments": {
+      "get": {
+        "tags": [
+          "employments"
+        ],
+        "summary": "Get a list of employments for a given client.",
+        "description": "Get a list of client's employments. Some specific filtering is optionally supported.\r\nThe following field is supported for in\r\nid\r\nExamples: top=5&skip=22&filter= id in '(987,654,126)",
+        "operationId": "ListClientEmployments",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client Id - The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "Supports filtering by id (in), e.g.: filter=id in (123, 124)",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "description": "Number of records to skip. Must be greater than or equal to zero",
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "description": "The number of records to retrieve (default 100, max 500)",
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/EmploymentCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "employments",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "employments"
+        ],
+        "summary": "Create an employment for a given client.",
+        "operationId": "CreateClientEmployment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Employment document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateEmployment"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Employment"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "employments",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/employments/{employmentId}": {
+      "get": {
+        "tags": [
+          "employments"
+        ],
+        "summary": "Get an employment for a given client.",
+        "operationId": "GetClientEmployment",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client Id - The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "employmentId",
+            "description": "Employment identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Employment"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "employments",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "employments"
+        ],
+        "summary": "Updates an employment for a given client.",
+        "operationId": "UpdateClientEmployment",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "employmentId",
+            "description": "Employment identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Employment document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Employment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Employment"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "employments",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      },
+      "delete": {
+        "tags": [
+          "employments"
+        ],
+        "summary": "Deletes a given employment.",
+        "operationId": "DeleteClientEmployment",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "employmentId",
+            "description": "Employment identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Employment deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "employments",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/expenditures": {
+      "post": {
+        "tags": [
+          "expenditures",
+          "beta"
+        ],
+        "summary": "Creates an expenditure record for a client.",
+        "operationId": "CreateClientExpenditure",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "header",
+            "name": "Prefer",
+            "description": "Used to indicate which format the expenditure categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+            "type": "string",
+            "enum": [
+              "x-iflo-apiversion=1",
+              "x-iflo-apiversion=2"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Details of the expenditure to be created.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Expenditure"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Expenditure"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              },
+              "Preference-Applied": {
+                "description": "Used to indicate which format the expenditure categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "expenditures",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      },
+      "get": {
+        "tags": [
+          "expenditures",
+          "beta"
+        ],
+        "summary": "Returns a list of expenditure records for a client. The returned list may be filtered.",
+        "operationId": "ListClientExpenditures",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "The returned list of questions can be filtered using one or more of the following supported fields and operators:\r\n            \r\n* `id` (`in`)\r\n* `frequency` (`in`, `eq`, `ne`)\r\n            \r\nUsage examples:\r\n* `filter=id in (1,2)`\r\n* `filter=frequency eq 'Monthly' or frequency in ('Weekly','Monthly')`.\r\n            \r\nFor further details of how to use the filter parameter see [QueryLang](docs/ApiQueryLang).",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Prefer",
+            "description": "Used to indicate which format the expenditure categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+            "type": "string",
+            "enum": [
+              "x-iflo-apiversion=1",
+              "x-iflo-apiversion=2"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "description": "Optional. Number of records to skip. Must be greater than or equal to zero. Defaults to zero if not specified.",
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "description": "Optional. The number of records to retrieve (max 500). Defaults to 100 if not specified.",
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ExpenditureCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Preference-Applied": {
+                "description": "Used to indicate which format the expenditure categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "expenditures",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/expenditures/{expenditureId}": {
+      "put": {
+        "tags": [
+          "expenditures",
+          "beta"
+        ],
+        "summary": "Updates a client's expenditure record.",
+        "operationId": "UpdateClientExpenditure",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "expenditureId",
+            "description": "The identifier for the expenditure record to update.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "header",
+            "name": "Prefer",
+            "description": "Used to indicate which format the expenditure categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+            "type": "string",
+            "enum": [
+              "x-iflo-apiversion=1",
+              "x-iflo-apiversion=2"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The updated details for the expenditure.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Expenditure"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Expenditure"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Preference-Applied": {
+                "description": "Used to indicate which format the expenditure categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "expenditures",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      },
+      "get": {
+        "tags": [
+          "expenditures",
+          "beta"
+        ],
+        "summary": "Retrieves a client's expenditure record.",
+        "operationId": "GetClientExpenditure",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "expenditureId",
+            "description": "The id of the expenditure record.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "header",
+            "name": "Prefer",
+            "description": "Used to indicate which format the expenditure categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+            "type": "string",
+            "enum": [
+              "x-iflo-apiversion=1",
+              "x-iflo-apiversion=2"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Expenditure"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Preference-Applied": {
+                "description": "Used to indicate which format the expenditure categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "expenditures",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      },
+      "delete": {
+        "tags": [
+          "expenditures",
+          "beta"
+        ],
+        "summary": "Deletes a client's expenditure record.",
+        "operationId": "DeleteClientExpenditure",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "expenditureId",
+            "description": "The identifier of the expenditure record.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "expenditures",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/incomes": {
+      "get": {
+        "tags": [
+          "incomes",
+          "beta"
+        ],
+        "summary": "Returns a list of incomes for a given client.",
+        "operationId": "ListClientIncomes",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "The returned list of questions can be filtered using one or more of the following supported fields and operators:\r\n            \r\n* `id` (`in`)\r\n* `employment.id` (`in`, `eq`)\r\n* `frequency` (`in`, `eq`)\r\n* `lastupdated` (`eq`,`ne`,`in`,`gt`,`ge`,`lt`,`le`)\r\n            \r\nUsage examples:\r\n* `filter=id in (1,2)`\r\n* `filter=employment.id eq 22 and id in (1,2)`\r\n* `filter=frequency eq 'Single' or frequency in ('Single','Monthly')`.\r\n            \r\nFor further details of how to use the filter parameter see [QueryLang](docs/ApiQueryLang).",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Prefer",
+            "description": "Used to indicate which format the income categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+            "type": "string",
+            "enum": [
+              "x-iflo-apiversion=1",
+              "x-iflo-apiversion=2"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "description": "Optional. Number of records to skip. Must be greater than or equal to zero. Defaults to zero if not specified.",
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "description": "Optional. The number of records to retrieve (max 500). Defaults to 100 if not specified.",
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/IncomeCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Preference-Applied": {
+                "description": "Used to indicate which format the income categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "incomes",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "incomes",
+          "beta"
+        ],
+        "summary": "Creates an income record for a client.",
+        "operationId": "CreateClientIncome",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "header",
+            "name": "Prefer",
+            "description": "Used to indicate which format the income categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+            "type": "string",
+            "enum": [
+              "x-iflo-apiversion=1",
+              "x-iflo-apiversion=2"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The created income record.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateIncome"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Income"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              },
+              "Preference-Applied": {
+                "description": "Used to indicate which format the income categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "incomes",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ],
+          "events": {
+            "IncomeCreated": {
+              "$ref": "#/x-intelliflo-events/IncomeCreated"
+            }
+          }
+        }
+      }
+    },
+    "/v2/clients/{clientId}/incomes/{incomeId}": {
+      "get": {
+        "tags": [
+          "incomes",
+          "beta"
+        ],
+        "summary": "Returns the income for a given client and income.",
+        "operationId": "GetClientIncome",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "incomeId",
+            "description": "The identifier for the income record.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "header",
+            "name": "Prefer",
+            "description": "Used to indicate which format the income categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+            "type": "string",
+            "enum": [
+              "x-iflo-apiversion=1",
+              "x-iflo-apiversion=2"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Income"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Preference-Applied": {
+                "description": "Used to indicate which format the income categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "incomes",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "incomes",
+          "beta"
+        ],
+        "summary": "Updates a client's income record.",
+        "operationId": "UpdateClientIncome",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "incomeId",
+            "description": "The identifier for the income record.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "header",
+            "name": "Prefer",
+            "description": "Used to indicate which format the income categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+            "type": "string",
+            "enum": [
+              "x-iflo-apiversion=1",
+              "x-iflo-apiversion=2"
+            ]
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The updated income record.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Income"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Income"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Preference-Applied": {
+                "description": "Used to indicate which format the income categories are returned in. Valid options are: 'x-iflo-apiversion=1' or 'x-iflo-apiversion=2'. If not specified the default is 'x-iflo-apiversion=1'",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "incomes",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ],
+          "events": {
+            "IncomeChanged": {
+              "$ref": "#/x-intelliflo-events/IncomeChanged"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "incomes",
+          "beta"
+        ],
+        "summary": "Deletes a client's income record.",
+        "operationId": "DeleteClientIncome",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "incomeId",
+            "description": "The identifier for the income record.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "incomes",
+          "service": "factfind",
+          "apiType": "Public",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/notes": {
+      "get": {
+        "tags": [
+          "notes",
+          "beta"
+        ],
+        "summary": "Returns the notes for a given client.",
+        "operationId": "GetClientNotes",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "discriminator",
+            "description": "Discriminator",
+            "type": "string",
+            "enum": [
+              "Profile",
+              "Employment",
+              "AssetLiabilities",
+              "Budget",
+              "Mortgage",
+              "Protection",
+              "Retirement",
+              "Investment",
+              "EstatePlanning",
+              "Summary"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/NotesDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (invalid scope)"
+          },
+          "404": {
+            "description": "Not Found (Client, notes does not exists)"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "notes",
+          "service": "factfind",
+          "apiType": "Public",
+          "hideDocumentation": true,
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data.notes"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "notes",
+          "beta"
+        ],
+        "summary": "Updates the notes for a given client.",
+        "operationId": "UpdateOrCreateClientNotes",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "Client identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Notes document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NotesDocument"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/NotesDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (invalid scope)"
+          },
+          "404": {
+            "description": "Not Found (Client, notes does not exists)"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "notes",
+          "service": "factfind",
+          "apiType": "Public",
+          "hideDocumentation": true,
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_data.notes"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/plans/{planId}/contributions/{contributionId}/expenditures": {
+      "post": {
+        "tags": [
+          "expenditures",
+          "beta"
+        ],
+        "summary": "Creates a client expenditure record linked to a plan contribution record.",
+        "operationId": "CreateContributionExpenditure",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "contributionId",
+            "description": "The identifier of the contribution to link to expenditure.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "planId",
+            "description": "The identifier of the plan to link to the expenditure.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "The updated details for the expenditure.",
+            "schema": {
+              "$ref": "#/definitions/ContributionExpenditure"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Expenditure"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "expenditures",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      }
+    },
+    "/v2/clients/{clientId}/plans/{planId}/withdrawals/{withdrawalId}/incomes": {
+      "post": {
+        "tags": [
+          "incomes",
+          "beta"
+        ],
+        "summary": "Create a withdrawal income for a client.",
+        "operationId": "CreateClientPlanWithdrawalIncome",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "clientId",
+            "description": "The client identifier. The special value \"me\" can be used to indicate the authenticated user.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "planId",
+            "description": "The identifier for the plan.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "path",
+            "name": "withdrawalId",
+            "description": "The identifier for the withdrawal.",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Income"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "incomes",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "client_financial_data"
+          ]
+        }
+      }
+    },
+    "/v2/disclosures/documentTypes": {
+      "get": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "List Document Types for a tenant",
+        "operationId": "ListTenantDocumentTypes",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "Supported Filters:\r\n    id(in)\r\n    name(eq),\r\n    properties.isArchived(eq),\r\n    See[QueryLang] (docs/ApiQueryLang) for further usage details.",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "orderBy",
+            "description": "Supported Sort Properties:\r\n    id(asc or desc),\r\n    name(asc or desc),\r\n    properties.isArchived(asc or desc),\r\n    Default: name desc",
+            "type": "string",
+            "default": "name desc"
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "description": "Number of records to skip. Must be greater than or equal to zero\r\n    Default value : 0",
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "in": "query",
+            "name": "tenantId",
+            "description": "Tenant identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "description": "The number of records to retrieve (default 100, max 500)\r\n    Default value : 100",
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocumentCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "documenttypes",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "Add a new Document Type for a tenant",
+        "operationId": "CreateTenantDocumentType",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "tenantId",
+            "description": "Tenant identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "DocumentType document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "documenttypes",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      }
+    },
+    "/v2/disclosures/documentTypes/{documentTypeId}": {
+      "get": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "Get Document Type by Id for a tenant",
+        "operationId": "GetTenantDocumentType",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "documentTypeId",
+            "description": "Document Type identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "tenantId",
+            "description": "Tenant identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "documenttypes",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "Update an existing Document Type for a tenant",
+        "operationId": "UpdateTenantDocumentType",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "documentTypeId",
+            "description": "Document Type identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "tenantId",
+            "description": "Tenant identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "DocumentType document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "documenttypes",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      },
+      "delete": {
+        "tags": [
+          "disclosures"
+        ],
+        "summary": "Delete an existing Document Type for a tenant",
+        "operationId": "DeleteTenantDocumentType",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "documentTypeId",
+            "description": "Document Type identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "tenantId",
+            "description": "Tenant identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "NoContent"
+          },
+          "400": {
+            "description": "Validation errors"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "documenttypes",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      }
+    },
+    "/v2/expenditures/refdata/categories": {
+      "get": {
+        "tags": [
+          "expenditures"
+        ],
+        "summary": "Retrieves List of all/matched categories based on the filter provided.",
+        "operationId": "ListExpenditureCategories",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "List can be filtered using one or more supported fields and operators below.\r\nSupported Filters:\r\n* `group  ` (`eq`)\r\n* `party_types ` (`in`)\r\nUsage examples:\r\n* `?filter=group eq 'Basic Quality of Living' or party_types in ('Person') `.\r\nSee [QueryLang](docs/ApiQueryLang) for further details of how to use the filtering and sorting parameters.",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "skip",
+            "description": "Number of records to skip. Must be greater than or equal to zero (default).",
+            "type": "integer",
+            "format": "int32",
+            "default": 0
+          },
+          {
+            "in": "query",
+            "name": "tenantId",
+            "description": "Tenant to which user belongs to.",
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "description": "The number of records to retrieve (default 100, max 500).",
+            "type": "integer",
+            "format": "int32",
+            "default": 100
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocumentCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "categories",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      }
+    },
+    "/v2/expenditures/refdata/categorygroups": {
+      "get": {
+        "tags": [
+          "expenditures"
+        ],
+        "summary": "Returns a list of expenditure category groups.",
+        "operationId": "ListExpenditureCategoryGroups",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocumentCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "categorygroups",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "expenditures"
+        ],
+        "summary": "Creates a new Expenditure Category Group.",
+        "operationId": "CreateExpenditureCategoryGroup",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Expenditure Group Category document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              },
+              "Location": {
+                "description": "Location of newly created resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "categorygroups",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      }
+    },
+    "/v2/expenditures/refdata/categorygroups/{categoryGroupId}": {
+      "put": {
+        "tags": [
+          "expenditures"
+        ],
+        "summary": "Updates an existing Expenditure Category Group.",
+        "operationId": "UpdateExpenditureCategoryGroup",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "categoryGroupId",
+            "description": "Expenditure Category Group identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Expenditure Category Group document",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocument"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "categorygroups",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      },
+      "delete": {
+        "tags": [
+          "expenditures"
+        ],
+        "summary": "Deletes Expenditure Category Group.",
+        "operationId": "DeleteExpenditureCategoryGroup",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "categoryGroupId",
+            "description": "Expenditure Category Group identifier",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "categorygroups",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      }
+    },
+    "/v2/incomes/refdata/{type}": {
+      "get": {
+        "tags": [
+          "refdata"
+        ],
+        "summary": "Get the list of Reference Data.",
+        "operationId": "ListRefdata",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept",
+            "type": "string"
+          },
+          {
+            "in": "header",
+            "name": "Authorization",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "List can be filtered using one or more supported fields and operators below.\r\nSupported Filters:\r\n* `regioncode` (`in`, `eq`)\r\nUsage examples:\r\n* `filter=regioncode eq 'gb' or regioncode in ('gb','au')`.\r\nSee [QueryLang](docs/ApiQueryLang) for further details of how to use the filtering and sorting parameters.",
+            "type": "string"
+          },
+          {
+            "in": "path",
+            "name": "type",
+            "description": "Type of the reference data you want to retrieve. Supported types :categories",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ReferenceDataDocumentCollection"
+            },
+            "headers": {
+              "Content-Type": {
+                "description": "Content type for the returned resource",
+                "type": "string"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "Bearer",
+                "type": "string"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "x-intelliflo-api": {
+          "resource": "refdata",
+          "service": "factfind",
+          "apiType": "Internal",
+          "scopes": [
+            "openid",
+            "myprofile",
+            "firm_data"
+          ]
+        }
+      }
+    }
+  },
+  "definitions": {
+    "BaseEmployment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "startsOn": {
+          "format": "date-time",
+          "description": "Start Date of the employment",
+          "default": null,
+          "type": "string"
+        },
+        "endsOn": {
+          "format": "date-time",
+          "description": "End Date of the employment",
+          "default": null,
+          "type": "string"
+        },
+        "occupation": {
+          "description": "Description of the occupation of the employment",
+          "default": null,
+          "maxLength": 512,
+          "type": "string"
+        },
+        "intendedRetirementAge": {
+          "format": "int32",
+          "description": "Intended Retirement Age",
+          "default": null,
+          "maximum": 99,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "employer": {
+          "description": "Employer's name.",
+          "default": null,
+          "maxLength": 512,
+          "type": "string"
+        },
+        "address": {
+          "$ref": "#/definitions/EmploymentAddressValue"
+        },
+        "employmentBusinessType": {
+          "description": "Employment Business type, settable for business types: Sole Trader, Private Limited Company, Partnership, Limited Liability Partnership",
+          "default": null,
+          "enum": [
+            "SoleTrader",
+            "PrivateLimitedCompany",
+            "Partnership",
+            "LimitedLiabilityPartnership"
+          ],
+          "type": "string"
+        },
+        "inProbation": {
+          "description": "In Probation flag, settable for statuses: Employed, MaternityLeave, LongTermIllness",
+          "default": null,
+          "type": "boolean"
+        },
+        "probationPeriodInMonths": {
+          "format": "int32",
+          "description": "Settable when InProbation is set to 'true' and for statuses: Employed, MaternityLeave, LongTermIllness",
+          "default": null,
+          "maximum": 99,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "client": {
+          "$ref": "#/definitions/ClientRef"
+        },
+        "incomes_href": {
+          "description": "Incomes reference",
+          "type": "string",
+          "readOnly": true
+        },
+        "industryType": {
+          "description": "IndustryType.",
+          "default": null,
+          "maxLength": 100,
+          "type": "string"
+        },
+        "employmentStatusDescription": {
+          "description": "Employment Status Description.",
+          "default": null,
+          "maxLength": 1000,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "BaseIncome": {
+      "required": [
+        "category",
+        "frequency"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "description": "ID of Income.",
+          "type": "integer",
+          "readOnly": true
+        },
+        "href": {
+          "description": "Income Href.",
+          "type": "string",
+          "readOnly": true
+        },
+        "category": {
+          "description": "Category of Income.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "description": {
+          "description": "Income Description.",
+          "default": null,
+          "maxLength": 512,
+          "type": "string"
+        },
+        "frequency": {
+          "description": "Income Frequency.",
+          "enum": [
+            "Monthly",
+            "Weekly",
+            "Fortnightly",
+            "FourWeekly",
+            "Quarterly",
+            "HalfYearly",
+            "Annually"
+          ],
+          "type": "string"
+        },
+        "gross": {
+          "$ref": "#/definitions/CurrencyValue"
+        },
+        "grossDescription": {
+          "description": "Gross Income Amount Description.",
+          "default": null,
+          "maxLength": 1000,
+          "type": "string"
+        },
+        "net": {
+          "$ref": "#/definitions/CurrencyValue"
+        },
+        "client": {
+          "$ref": "#/definitions/ClientRef"
+        },
+        "includeInAffordability": {
+          "description": "Specifies whether income is included in affordability",
+          "default": null,
+          "type": "boolean"
+        },
+        "startsOn": {
+          "format": "date-time",
+          "description": "Start Date of the income (not settable for employment income).",
+          "default": null,
+          "type": "string"
+        },
+        "endsOn": {
+          "format": "date-time",
+          "description": "End Date of the income (not settable for employment income).",
+          "default": null,
+          "type": "string"
+        },
+        "lastUpdated": {
+          "format": "date-time",
+          "description": "Last Updated date of income.",
+          "default": null,
+          "type": "string"
+        },
+        "jointClient": {
+          "$ref": "#/definitions/ClientRef"
+        },
+        "withdrawal": {
+          "$ref": "#/definitions/WithdrawalRef"
+        },
+        "owners": {
+          "description": "List Of Owners for income.",
+          "default": null,
+          "maxItems": 2,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientRef"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "x-hidden-properties": [
+        "includeInAffordability"
+      ]
+    },
+    "ClientRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "href": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "ContributionExpenditure": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "description": "Type of expenditure.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of expenditure.",
+          "default": null,
+          "maxLength": 255,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CreateEmployment": {
+      "required": [
+        "employmentStatus"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEmployment"
+        },
+        {
+          "properties": {
+            "employmentStatus": {
+              "description": "Employment Status, 'Unknown' Employment Status is not allowed on CreateEmployment",
+              "enum": [
+                "Unknown",
+                "SelfEmployed",
+                "CompanyDirector",
+                "Retired",
+                "Unemployed",
+                "Houseperson",
+                "Student",
+                "MaternityLeave",
+                "LongTermIllness",
+                "ContractWorker",
+                "Employed",
+                "CarerOfaChildUnder16",
+                "CarerOfaPersonOver16",
+                "Other"
+              ],
+              "type": "string"
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "CreateIncome": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseIncome"
+        },
+        {
+          "properties": {
+            "employment": {
+              "$ref": "#/definitions/EmploymentRef"
+            }
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "x-hidden-properties": [
+        "includeInAffordability"
+      ]
+    },
+    "CurrencyValue": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Dependant": {
+      "required": [
+        "name",
+        "relationshipType"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "description": "Dependant identifier",
+          "type": "integer",
+          "readOnly": true
+        },
+        "href": {
+          "description": "Hypermedia link",
+          "type": "string",
+          "readOnly": true
+        },
+        "name": {
+          "description": "Dependant name",
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        "dateOfBirth": {
+          "format": "date-time",
+          "description": "Date of birth - min value: 01/01/1900 - max value: Current Date",
+          "default": null,
+          "type": "string"
+        },
+        "ageCustom": {
+          "format": "int32",
+          "description": "Age Custom - min value: 0 - max value: 250",
+          "default": null,
+          "maximum": 250,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "ageCustomUntil": {
+          "format": "int32",
+          "description": "Age Until Custom - min value: 0 - max value: 250",
+          "default": null,
+          "maximum": 250,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "isLivingWith": {
+          "description": "Specifies whether dependant is living with client(s)",
+          "default": null,
+          "type": "boolean"
+        },
+        "isFinanciallyDependant": {
+          "description": "Specifies whether dependant is financially dependant",
+          "type": "boolean"
+        },
+        "financialDependencyEndsOn": {
+          "format": "date-time",
+          "description": "Financial dependency end date - min value: 01/01/1900 - max value: 31/12/2150",
+          "default": null,
+          "type": "string"
+        },
+        "relationshipType": {
+          "description": "Relationship type with client(s)",
+          "enum": [
+            "Child",
+            "Daughter",
+            "Grandchild",
+            "Grandparent",
+            "Parent",
+            "Son",
+            "Spouse",
+            "StepChild",
+            "Partner",
+            "CivilPartner",
+            "StepParent",
+            "Other"
+          ],
+          "type": "string"
+        },
+        "notes": {
+          "description": "Notes",
+          "default": null,
+          "maxLength": 500,
+          "type": "string"
+        },
+        "clients": {
+          "description": "List of related clients",
+          "maxItems": 2,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientRef"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "DependantCollection": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "first_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "last_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "next_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "prev_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Dependant"
+          }
+        },
+        "count": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DisclosureCollection": {
+      "description": "Disclosure documents collection.",
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "first_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "last_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "next_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "prev_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DisclosureDocument"
+          }
+        },
+        "count": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DisclosureDocument": {
+      "description": "Disclosure document.",
+      "required": [
+        "documentType",
+        "issuedOn"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "description": "Unique Identifier.",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer",
+          "readOnly": true
+        },
+        "documentType": {
+          "description": "Disclosure Document Type.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "issuedOn": {
+          "format": "date-time",
+          "description": "Issued On Date.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Employment": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseEmployment"
+        },
+        {
+          "properties": {
+            "employmentStatus": {
+              "description": "Employment Status, readonly",
+              "default": null,
+              "enum": [
+                "Unknown",
+                "SelfEmployed",
+                "CompanyDirector",
+                "Retired",
+                "Unemployed",
+                "Houseperson",
+                "Student",
+                "MaternityLeave",
+                "LongTermIllness",
+                "ContractWorker",
+                "Employed",
+                "CarerOfaChildUnder16",
+                "CarerOfaPersonOver16",
+                "Other"
+              ],
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "EmploymentAddressValue": {
+      "type": "object",
+      "properties": {
+        "line1": {
+          "description": "Address line 1",
+          "default": null,
+          "maxLength": 255,
+          "type": "string"
+        },
+        "line2": {
+          "description": "Address line 2",
+          "default": null,
+          "maxLength": 255,
+          "type": "string"
+        },
+        "line3": {
+          "description": "Address line 3",
+          "default": null,
+          "maxLength": 255,
+          "type": "string"
+        },
+        "line4": {
+          "description": "Address line 4",
+          "default": null,
+          "maxLength": 255,
+          "type": "string"
+        },
+        "locality": {
+          "description": "The location of the property.",
+          "default": null,
+          "maxLength": 255,
+          "type": "string"
+        },
+        "postalCode": {
+          "description": "Postal Code",
+          "default": null,
+          "maxLength": 255,
+          "type": "string"
+        },
+        "country": {
+          "$ref": "#/definitions/EmploymentCountryValue"
+        },
+        "county": {
+          "$ref": "#/definitions/EmploymentCountyValue"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EmploymentCollection": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "first_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "last_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "next_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "prev_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Employment"
+          }
+        },
+        "count": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EmploymentCountryValue": {
+      "required": [
+        "isoCode"
+      ],
+      "type": "object",
+      "properties": {
+        "isoCode": {
+          "description": "Country code (ISO 3166-1 alpha-2)",
+          "maxLength": 2,
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "description": "Country name",
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "EmploymentCountyValue": {
+      "required": [
+        "code"
+      ],
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Subdivision of country according to the ISO-3166-2 standard.",
+          "maxLength": 6,
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "description": "County name",
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "EmploymentRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "href": {
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "Expenditure": {
+      "required": [
+        "category",
+        "net"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "description": {
+          "description": "Description of expenditure.",
+          "default": null,
+          "maxLength": 255,
+          "type": "string"
+        },
+        "category": {
+          "description": "Type of expenditure.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "net": {
+          "$ref": "#/definitions/CurrencyValue"
+        },
+        "frequency": {
+          "description": "Frequency of expenditure.",
+          "default": "Monthly",
+          "enum": [
+            "Monthly",
+            "Weekly",
+            "Fortnightly",
+            "FourWeekly",
+            "Quarterly",
+            "HalfYearly",
+            "Annually"
+          ],
+          "type": "string"
+        },
+        "contribution_href": {
+          "description": "Read only link to contribution.",
+          "type": "string",
+          "readOnly": true
+        },
+        "startsOn": {
+          "format": "date-time",
+          "description": "Start date of expenditure.",
+          "default": null,
+          "type": "string"
+        },
+        "endsOn": {
+          "format": "date-time",
+          "description": "End date of expenditure.",
+          "default": null,
+          "type": "string"
+        },
+        "owners": {
+          "description": "List Of Owners for expenditure.",
+          "default": null,
+          "maxItems": 2,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientRef"
+          }
+        },
+        "isConsolidated": {
+          "description": "Is consolidated flag",
+          "default": false,
+          "type": "boolean"
+        },
+        "isLiabilityToBeRepaid": {
+          "description": "Is liability to be repaid flag",
+          "default": null,
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "x-hidden-properties": [
+        "isConsolidated",
+        "isLiabilityToBeRepaid"
+      ]
+    },
+    "ExpenditureCollection": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "first_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "last_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "next_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "prev_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Expenditure"
+          }
+        },
+        "count": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Income": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseIncome"
+        },
+        {
+          "properties": {
+            "employment": {
+              "$ref": "#/definitions/EmploymentRef"
+            }
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "x-hidden-properties": [
+        "includeInAffordability"
+      ]
+    },
+    "IncomeChanged": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/definitions/Income"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "format": "uuid",
+          "type": "string",
+          "readOnly": true
+        },
+        "timeStamp": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "raisingComponent": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "readOnly": true
+        },
+        "sourceIp": {
+          "type": "string",
+          "readOnly": true
+        },
+        "tenant": {
+          "type": "string"
+        },
+        "conversation": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "IncomeCollection": {
+      "type": "object",
+      "properties": {
+        "href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "first_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "last_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "next_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "prev_href": {
+          "type": "string",
+          "readOnly": true
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Income"
+          }
+        },
+        "count": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "IncomeCreated": {
+      "type": "object",
+      "properties": {
+        "event": {
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/definitions/Income"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "format": "uuid",
+          "type": "string",
+          "readOnly": true
+        },
+        "timeStamp": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "raisingComponent": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "readOnly": true
+        },
+        "sourceIp": {
+          "type": "string",
+          "readOnly": true
+        },
+        "tenant": {
+          "type": "string"
+        },
+        "conversation": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NotesDocument": {
+      "description": "Notes document.",
+      "required": [
+        "discriminator"
+      ],
+      "type": "object",
+      "properties": {
+        "discriminator": {
+          "description": "Discriminator for identifying the targeted notes field.",
+          "enum": [
+            "Profile",
+            "Employment",
+            "AssetLiabilities",
+            "Budget",
+            "Mortgage",
+            "Protection",
+            "Retirement",
+            "Investment",
+            "EstatePlanning",
+            "Summary"
+          ],
+          "type": "string"
+        },
+        "notes": {
+          "description": "Notes.",
+          "default": null,
+          "maxLength": 15000,
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ReferenceDataDocument": {
+      "required": [
+        "name"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "description": "Unique Identifier.",
+          "maximum": 2147483647,
+          "minimum": 0,
+          "type": "integer",
+          "readOnly": true
+        },
+        "name": {
+          "description": "Name of the ref data.",
+          "maxLength": 255,
+          "minLength": 1,
+          "type": "string"
+        },
+        "type": {
+          "description": "Resource type for the ref data.",
+          "maxLength": 50,
+          "type": "string",
+          "readOnly": true
+        },
+        "property": {
+          "description": "Property on the resource type for the ref data.",
+          "maxLength": 50,
+          "type": "string",
+          "readOnly": true
+        },
+        "regionCode": {
+          "description": "Ref data region code.",
+          "maxLength": 2,
+          "type": "string",
+          "readOnly": true
+        },
+        "properties": {
+          "description": "Custom properties.Key value pairs, Limited to 10 items.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "tenant": {
+          "$ref": "#/definitions/TenantRef"
+        },
+        "archived": {
+          "description": "Archived status of the ref data.",
+          "type": "boolean",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "ReferenceDataDocumentCollection": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ReferenceDataDocument"
+          }
+        },
+        "count": {
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TenantRef": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "description": "Tenant unique identifier.",
+          "type": "integer"
+        },
+        "href": {
+          "description": "Hypermedia link to the tenant.",
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "WithdrawalRef": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "description": "Get the withdrawal identifier.",
+          "type": "integer",
+          "readOnly": true
+        },
+        "href": {
+          "description": "Get the withdrawal reference.",
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "x-intelliflo-events": {
+    "IncomeCreated": {
+      "resource": "incomes",
+      "service": "factfind",
+      "description": "Event is raised any time a income is created.",
+      "schema": {
+        "$ref": "#/definitions/IncomeCreated"
+      },
+      "eventType": "Public",
+      "scopes": [
+        "client_financial_data"
+      ],
+      "topics": [
+        {
+          "name": "IncomeCreated",
+          "description": "Any time a income is created."
+        },
+        {
+          "name": "IncomeCreated/*",
+          "description": "Any time a income is created."
+        }
+      ]
+    },
+    "IncomeChanged": {
+      "resource": "incomes",
+      "service": "factfind",
+      "description": "Event is raised any time a income is changed.",
+      "schema": {
+        "$ref": "#/definitions/IncomeChanged"
+      },
+      "eventType": "Public",
+      "scopes": [
+        "client_financial_data"
+      ],
+      "topics": [
+        {
+          "name": "IncomeChanged",
+          "description": "Any time a income is changed."
+        },
+        {
+          "name": "IncomeChanged/*",
+          "description": "Any time a income is changed."
+        },
+        {
+          "name": "IncomeChanged/{incomeId}",
+          "description": "Any time a income with the specified 'incomeId' is changed."
+        }
+      ]
+    }
+  }
+}

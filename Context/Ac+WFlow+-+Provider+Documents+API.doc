@@ -1,0 +1,934 @@
+Date: Tue, 3 Feb 2026 14:55:19 +0000 (UTC)
+Message-ID: <598524598.9.1770130519858@3c5f28009056>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_8_2032597468.1770130519858"
+
+------=_Part_8_2032597468.1770130519858
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>Ac+WFlow - Provider Documents API</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>Ac+WFlow - Provider Documents API</h1>
+    <div class=3D"Section1">
+        <div class=3D"plugin-tabmeta-details">
+<style>[data-colorid=3Df1gsnlugq8]{color:#707070} html[data-color-mode=3Dda=
+rk] [data-colorid=3Df1gsnlugq8]{color:#8f8f8f}[data-colorid=3Dpipsihpvam]{c=
+olor:#707070} html[data-color-mode=3Ddark] [data-colorid=3Dpipsihpvam]{colo=
+r:#8f8f8f}[data-colorid=3Dx1a77gbnv3]{color:#1d1c1d} html[data-color-mode=
+=3Ddark] [data-colorid=3Dx1a77gbnv3]{color:#e3e2e3}[data-colorid=3Dc5s0m89r=
+cn]{color:#1d1c1d} html[data-color-mode=3Ddark] [data-colorid=3Dc5s0m89rcn]=
+{color:#e3e2e3}[data-colorid=3Dojrgu3v2zn]{color:#707070} html[data-color-m=
+ode=3Ddark] [data-colorid=3Dojrgu3v2zn]{color:#8f8f8f}[data-colorid=3Duncga=
+mks2d]{color:#1d1c1d} html[data-color-mode=3Ddark] [data-colorid=3Duncgamks=
+2d]{color:#e3e2e3}</style>
+<div class=3D"table-wrap">
+<table class=3D"wrapped confluenceTable">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<tbody>
+<tr>
+<th class=3D"confluenceTh">Activity Ticket</th>
+<td class=3D"confluenceTd"><span class=3D"confluence-jim-macro jira-issue" =
+data-jira-key=3D"PA-9866"> <a href=3D"https://intelliflo.atlassian.net/brow=
+se/PA-9866" class=3D"jira-issue-key"><img class=3D"icon" src=3D"https://int=
+elliflo.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avata=
+r/10311?size=3Dmedium">PA-9866</a> - <span class=3D"summary">AIO AC - Provi=
+der Documents API</span> <span class=3D"aui-lozenge aui-lozenge-subtle aui-=
+lozenge-complete jira-macro-single-issue-export-pdf">To Do</span> </span></=
+td>
+</tr>
+<tr>
+<th colspan=3D"1" class=3D"confluenceTh">Epic/Feature</th>
+<td colspan=3D"1" class=3D"confluenceTd"><span class=3D"confluence-jim-macr=
+o jira-issue" data-jira-key=3D"PA-9744"> <a href=3D"https://intelliflo.atla=
+ssian.net/browse/PA-9744" class=3D"jira-issue-key"><img class=3D"icon" src=
+=3D"https://intelliflo.atlassian.net/rest/api/2/universal_avatar/view/type/=
+issuetype/avatar/10318?size=3Dmedium">PA-9744</a> - <span class=3D"summary"=
+>AIO Account Creation &amp; Workflow - Analysis &amp; Design</span> <span c=
+lass=3D"aui-lozenge aui-lozenge-subtle aui-lozenge-complete jira-macro-sing=
+le-issue-export-pdf">To Do</span> </span></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">Document status</th>
+<td class=3D"confluenceTd">
+<div class=3D"content-wrapper">
+<span class=3D"status-macro aui-lozenge aui-lozenge-visual-refresh">DRAFT</=
+span>
+</div></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">Designer</th>
+<td class=3D"confluenceTd"><a class=3D"confluence-userlink user-mention cur=
+rent-user-mention" data-account-id=3D"557058:fa48fc7f-20d7-4e39-b1bd-9f5e48=
+7ea63c" href=3D"https://intelliflo.atlassian.net/wiki/people/557058:fa48fc7=
+f-20d7-4e39-b1bd-9f5e487ea63c?ref=3Dconfluence" target=3D"_blank" data-link=
+ed-resource-id=3D"348718033" data-linked-resource-version=3D"1" data-linked=
+-resource-type=3D"userinfo" data-base-url=3D"https://intelliflo.atlassian.n=
+et/wiki">Najaf Shaikh</a></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">Reviewers</th>
+<td class=3D"confluenceTd"><a class=3D"confluence-userlink user-mention" da=
+ta-account-id=3D"5d2c9b11e161600bfbc9bb6d" href=3D"https://intelliflo.atlas=
+sian.net/wiki/people/5d2c9b11e161600bfbc9bb6d?ref=3Dconfluence" target=3D"_=
+blank" data-base-url=3D"https://intelliflo.atlassian.net/wiki">Christofer A=
+ndersson (Deactivated)</a>&nbsp;<a class=3D"confluence-userlink user-mentio=
+n" data-account-id=3D"621fe68d9c3cce00694b51f1" href=3D"https://intelliflo.=
+atlassian.net/wiki/people/621fe68d9c3cce00694b51f1?ref=3Dconfluence" target=
+=3D"_blank" data-linked-resource-id=3D"348750374" data-linked-resource-vers=
+ion=3D"1" data-linked-resource-type=3D"userinfo" data-base-url=3D"https://i=
+ntelliflo.atlassian.net/wiki">Ajay Patel</a>&nbsp;<a class=3D"confluence-us=
+erlink user-mention" data-account-id=3D"621fe784b7e7c7007156c30b" href=3D"h=
+ttps://intelliflo.atlassian.net/wiki/people/621fe784b7e7c7007156c30b?ref=3D=
+confluence" target=3D"_blank" data-linked-resource-id=3D"348750108" data-li=
+nked-resource-version=3D"1" data-linked-resource-type=3D"userinfo" data-bas=
+e-url=3D"https://intelliflo.atlassian.net/wiki">Toby Tranter</a><a class=3D=
+"confluence-userlink user-mention" data-account-id=3D"621fe94d49c90000701f6=
+618" href=3D"https://intelliflo.atlassian.net/wiki/people/621fe94d49c900007=
+01f6618?ref=3Dconfluence" target=3D"_blank" data-linked-resource-id=3D"3487=
+18124" data-linked-resource-version=3D"1" data-linked-resource-type=3D"user=
+info" data-base-url=3D"https://intelliflo.atlassian.net/wiki">Raj Chhatrali=
+a</a>&nbsp;<a class=3D"confluence-userlink user-mention" data-account-id=3D=
+"621fe703f1e55c0070ee9f98" href=3D"https://intelliflo.atlassian.net/wiki/pe=
+ople/621fe703f1e55c0070ee9f98?ref=3Dconfluence" target=3D"_blank" data-link=
+ed-resource-id=3D"348750220" data-linked-resource-version=3D"1" data-linked=
+-resource-type=3D"userinfo" data-base-url=3D"https://intelliflo.atlassian.n=
+et/wiki">Sergiu Cojocaru</a></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">API version</th>
+<td class=3D"confluenceTd">
+<p>V2 Public</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>
+<style type=3D"text/css">/*<![CDATA[*/
+div.rbtoc1770130519211 {padding: 0px;}
+div.rbtoc1770130519211 ul {list-style: disc;margin-left: 0px;}
+div.rbtoc1770130519211 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style></p>
+<div class=3D"toc-macro rbtoc1770130519211">
+<ul class=3D"toc-indentation">
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-WorkItems">Work Items</a></li=
+>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-Objective">Objective</a></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-ResourceModel">Resource Model=
+</a></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-ResourceSummary">Resource Sum=
+mary</a></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-ResourceExamples">Resource Ex=
+amples</a></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-OperationSummary">Operation S=
+ummary</a></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-Implementation">Implementatio=
+n</a>
+<ul class=3D"toc-indentation">
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-SequenceDiagrams">Sequence Di=
+agrams</a></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-Schema">Schema</a></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-Caching">Caching</a></li>
+</ul></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-EventSubscriptions">Event Sub=
+scriptions</a>
+<ul class=3D"toc-indentation">
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-EDeliveryPublisherReady">EDel=
+iveryPublisherReady</a></li>
+</ul></li>
+<li><a href=3D"#Ac+WFlow-ProviderDocumentsAPI-FullSwaggerDefinitions">Full =
+Swagger Definitions</a></li>
+</ul>
+</div>
+<p></p>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-WorkItems">Work Items</h1>
+<p></p>
+<p></p>
+<div id=3D"refresh-module-1418606684" class=3D"confluence-jim-macro refresh=
+-module-id jira-table ">
+<p></p>
+<div id=3D"jira-issues-1418606684" style=3D"width: 100%;  overflow: auto;" =
+class=3D"jira-issues">
+<table class=3D"aui">
+<tbody>
+<tr></tr>
+<tr>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">Key</th>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">Summary</th>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">T</th>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">Created</th>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">Due</th>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">Assignee</th>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">P</th>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">Status</th>
+<th style=3D"text-align: left; text-transform: capitalize;" class=3D"jira-m=
+acro-table-underline-pdfexport">Resolution</th>
+</tr>
+</tbody>
+</table>
+</div>
+<div class=3D"refresh-issues-bottom">
+<span id=3D"total-issues-count" class=3D"total-issues-count"> <a rel=3D"nof=
+ollow" href=3D"https://intelliflo.atlassian.net/issues/?jql=3Dkey+in+%28%27=
+IP-1%27%29++&amp;src=3Dconfmacro"> <span>No issues found</span> </a> </span=
+>
+</div>
+<p></p>
+</div>
+<p></p>
+<p><br></p>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-Objective">Objective</h1>
+<div class=3D"confluence-information-macro confluence-information-macro-inf=
+ormation">
+<p class=3D"title">Purpose of the document</p><span class=3D"aui-icon aui-i=
+con-small aui-iconfont-info confluence-information-macro-icon"></span>
+<div class=3D"confluence-information-macro-body">
+<p>The purpose of this document is to provide the API design for broker ser=
+vice to facilitates e-delivery documents.</p>
+<p>Also describe the event subscriptions required in&nbsp;custodian broker =
+service manage e-delivery publisher configurations.</p>
+</div>
+</div>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-ResourceModel">Resource Model</h1>
+<p><span data-colorid=3D"pipsihpvam">Insert PlantUml below - see Architectu=
+re and Design Artifacts. New Resources must be in green, modified resources=
+ should be in orange and removed resources should be in red &nbsp;</span></=
+p>
+<p><span class=3D"confluence-embedded-file-wrapper">
+<style>[data-colorid=3Df1gsnlugq8]{color:#707070} html[data-color-mode=3Dda=
+rk] [data-colorid=3Df1gsnlugq8]{color:#8f8f8f}[data-colorid=3Dpipsihpvam]{c=
+olor:#707070} html[data-color-mode=3Ddark] [data-colorid=3Dpipsihpvam]{colo=
+r:#8f8f8f}[data-colorid=3Dx1a77gbnv3]{color:#1d1c1d} html[data-color-mode=
+=3Ddark] [data-colorid=3Dx1a77gbnv3]{color:#e3e2e3}[data-colorid=3Dc5s0m89r=
+cn]{color:#1d1c1d} html[data-color-mode=3Ddark] [data-colorid=3Dc5s0m89rcn]=
+{color:#e3e2e3}[data-colorid=3Dojrgu3v2zn]{color:#707070} html[data-color-m=
+ode=3Ddark] [data-colorid=3Dojrgu3v2zn]{color:#8f8f8f}[data-colorid=3Duncga=
+mks2d]{color:#1d1c1d} html[data-color-mode=3Ddark] [data-colorid=3Duncgamks=
+2d]{color:#e3e2e3}</style><img class=3D"confluence-embedded-image confluenc=
+e-external-resource" src=3D"/wiki/download/attachments/393151014/Custodian%=
+20Document%20Relationship.png.png?api=3Dv2" data-image-src=3D"/wiki/downloa=
+d/attachments/393151014/Custodian%20Document%20Relationship.png.png?api=3Dv=
+2" loading=3D"lazy"></span></p>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-ResourceSummary">Resource Summary</=
+h1>
+<div class=3D"table-wrap">
+<table class=3D"relative-table wrapped confluenceTable" style=3D"width: 79.=
+6674%;">
+<colgroup>
+<col style=3D"width: 18.3602%;">
+<col style=3D"width: 45.4785%;">
+<col style=3D"width: 12.2402%;">
+<col style=3D"width: 23.7945%;">
+</colgroup>
+<tbody>
+<tr>
+<th class=3D"confluenceTh">Resource</th>
+<th class=3D"confluenceTh">Data Classification</th>
+<th class=3D"confluenceTh">Contains PII</th>
+<th colspan=3D"1" class=3D"confluenceTh">Change</th>
+</tr>
+<tr>
+<td colspan=3D"1" class=3D"confluenceTd">ProviderDocument</td>
+<td colspan=3D"1" class=3D"confluenceTd">Confidential</td>
+<td colspan=3D"1" class=3D"confluenceTd">No</td>
+<td colspan=3D"1" class=3D"confluenceTd">New</td>
+</tr>
+<tr>
+<td colspan=3D"1" class=3D"confluenceTd">ProviderDocumentCategory</td>
+<td colspan=3D"1" class=3D"confluenceTd">Confidential</td>
+<td colspan=3D"1" class=3D"confluenceTd">No</td>
+<td colspan=3D"1" class=3D"confluenceTd">New</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-ResourceExamples"><span>Resource Ex=
+amples</span></h1>
+<p><span data-colorid=3D"ojrgu3v2zn">Insert Example Json - For each resourc=
+e create an example json and insert it here within a code macro.&nbsp;</spa=
+n><span data-colorid=3D"f1gsnlugq8">Ensure that the json is prettified, tha=
+t the title is set to the resource name, that the language is set to 'javas=
+cript', enable linenumbers and set the theme to 'FadeToGray'</span></p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeHeader panelHeader pdl" style=3D"border-bottom-width: 1px=
+;">
+<b>ProviderDocument</b>
+</div>
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: FadeToGrey" data-theme=3D"FadeToGrey">{
+=09"id": "string",
+    "date": "2022-04-29T12:17:02.657Z",
+    "name": "string",
+=09"category": "string"=09
+}</pre>
+</div>
+</div>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeHeader panelHeader pdl" style=3D"border-bottom-width: 1px=
+;">
+<b>ProviderDocumentCategory</b>
+</div>
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: FadeToGrey" data-theme=3D"FadeToGrey">{
+=09"id": 1234,
+=09"href": "v2/providerdocuments/categories/1234"
+    "name": "string"
+}</pre>
+</div>
+</div>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-OperationSummary">Operation Summary=
+</h1>
+<div class=3D"table-wrap">
+<table class=3D"relative-table wrapped confluenceTable" style=3D"width: 89.=
+6456%;">
+<colgroup>
+<col style=3D"width: 21.3368%;">
+<col style=3D"width: 5.19831%;">
+<col style=3D"width: 33.2084%;">
+<col style=3D"width: 6.05169%;">
+<col style=3D"width: 34.2184%;">
+</colgroup>
+<tbody>
+<tr>
+<th colspan=3D"1" class=3D"confluenceTh">Operation</th>
+<th colspan=3D"1" class=3D"confluenceTh">Verb</th>
+<th colspan=3D"1" class=3D"confluenceTh">Path</th>
+<th colspan=3D"1" class=3D"confluenceTh">Change</th>
+<th colspan=3D"1" class=3D"confluenceTh">Details</th>
+</tr>
+<tr>
+<td colspan=3D"1" class=3D"confluenceTd">ListProductProviderDocumentCategor=
+ies</td>
+<td colspan=3D"1" class=3D"confluenceTd">GET</td>
+<td colspan=3D"1" class=3D"confluenceTd">
+<p>v2/providerdocuments/categories</p></td>
+<td colspan=3D"1" class=3D"confluenceTd">New</td>
+<td colspan=3D"1" class=3D"confluenceTd">
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3">Description</span></strong></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">Allo=
+ws an API consumer to retrieve a list of product provider document categori=
+es.</span></p>
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3"><span class=3D"legacy-color-text-blue3">Implementation</span></span></s=
+trong></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3"><span data-colorid=3D"uncgamks2d">Suppo=
+rted values are </span></span></span></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3"><span data-colorid=3D"x1a77gbnv3">Confi=
+rmations, Notifications, Statements, and TaxStatements </span></span></span=
+></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3"><span data-colorid=3D"c5s0m89rcn">Add d=
+ata script to add above system categories.</span></span></span></p>
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3"><span class=3D"legacy-color-text-blue3">Response</span></span></strong>=
+</p>
+<ul style=3D"list-style-type: square;">
+<li style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">Sta=
+tus Codes</span>
+<ul style=3D"text-align: left;">
+<li>200 OK on success.</li>
+<li>400 Bad Request (invalid filter/orderby)</li>
+<li>401 Unauthorised</li>
+<li>403 Forbidden (invalid scope)</li>
+</ul></li>
+</ul>
+<ul style=3D"list-style-type: square;">
+<li><span class=3D"legacy-color-text-blue3">Content-type: application/json<=
+/span></li>
+</ul>
+<ul style=3D"list-style-type: square;">
+<li>Response Object : Returns PagedCollection of CustodianDocumentCategory =
+(see swagger definition)</li>
+</ul>
+<p><strong>Scopes</strong></p>
+<ul style=3D"list-style-type: square;">
+<li>client_financial_data</li>
+</ul></td>
+</tr>
+<tr>
+<td colspan=3D"1" class=3D"confluenceTd">GetProductProviderDocumentCategory=
+</td>
+<td colspan=3D"1" class=3D"confluenceTd">GET</td>
+<td colspan=3D"1" class=3D"confluenceTd">v2/providerdocuments/categories/id=
+</td>
+<td colspan=3D"1" class=3D"confluenceTd">New</td>
+<td colspan=3D"1" class=3D"confluenceTd">
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3">Description</span></strong></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">Allo=
+ws an API consumer to retrieve a single product provider document category.=
+</span></p>
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3"><span class=3D"legacy-color-text-blue3">Implementation</span></span></s=
+trong></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3">Fetch the category by given Id.</span><=
+/span></p>
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3"><span class=3D"legacy-color-text-blue3">Response</span></span></strong>=
+</p>
+<ul>
+<li><span class=3D"legacy-color-text-blue3">Status Codes</span>
+<ul style=3D"text-align: left;">
+<li>200 OK on success.</li>
+<li>401 Unauthorised</li>
+<li>403 Forbidden (invalid scope)</li>
+<li>404 Not Found (<span class=3D"legacy-color-text-blue3">category<span>&n=
+bsp;</span></span>does not exist)</li>
+</ul></li>
+</ul>
+<ul>
+<li><span class=3D"legacy-color-text-blue3">Content-type: application/json<=
+/span></li>
+</ul>
+<ul>
+<li>Response Object : Returns ProviderDocumentCategory (see swagger definit=
+ion)</li>
+</ul>
+<p><strong>Scopes</strong></p>
+<ul>
+<li>client_financial_data</li>
+</ul></td>
+</tr>
+<tr>
+<td colspan=3D"1" class=3D"confluenceTd">ListProductProviderDocuments</td>
+<td colspan=3D"1" class=3D"confluenceTd">GET</td>
+<td colspan=3D"1" class=3D"confluenceTd">
+<div class=3D"content-wrapper">
+<p>v2/clients/{clientId}/plans/{planId}/providerdocuments</p>
+<p>Supported properties for filters</p>
+<ul class=3D"ak-ul">
+<li>
+<p>date - support operators (eq, ge, le)</p></li>
+<li>
+<p>category - support operators (eq, in)</p></li>
+</ul>
+<p>Supported sort properties</p>
+<ul class=3D"ak-ul">
+<li>
+<p>name - asc &amp; desc</p></li>
+<li>
+<p>date - asc &amp; desc</p></li>
+<li>
+<p>category - asc &amp; desc</p></li>
+</ul>
+<p><br></p>
+<p>Return type Paged Collection of ProviderDocument</p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: Confluence" data-theme=3D"Confluence">{
+  "href": "string",
+  "first_href": "string",
+  "last_href": "string",
+  "next_href": "string",
+  "prev_href": "string",
+  "items": [
+    {=09=09 =20
+=09"id": "string",
+=09"date": "2022-04-29T12:17:02.657Z",
+=09"name": "string",=09
+=09"category":"string"
+   }],
+  "count": 0
+}</pre>
+</div>
+</div>
+</div></td>
+<td colspan=3D"1" class=3D"confluenceTd">New</td>
+<td colspan=3D"1" class=3D"confluenceTd">
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3">Description</span></strong></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">Allo=
+ws an API consumer to retrieve a list of product provider documents.</span>=
+</p>
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3"><span class=3D"legacy-color-text-blue3">Implementation</span></span></s=
+trong></p>
+<p style=3D"text-align: left;">Retrieve plan via clientSdk for the specifie=
+d client and plan ids.</p>
+<p style=3D"text-align: left;"><u><span class=3D"legacy-color-text-blue3"><=
+span class=3D"legacy-color-text-blue3">Validations</span></span></u></p>
+<ul style=3D"list-style-type: square;">
+<li style=3D"text-align: left;">Validate the plan exists, else return 404.<=
+/li>
+<li style=3D"text-align: left;">Validate filter, orderby query parametrs ar=
+e acceptable, else return 400</li>
+</ul>
+<p style=3D"text-align: left;"><br></p>
+<p style=3D"text-align: left;"><u><span class=3D"legacy-color-text-blue3"><=
+span class=3D"legacy-color-text-blue3">Configuration</span></span></u></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3">Check if the publisher configuration ex=
+ists for the plan's product provider. </span></span></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3"><span class=3D"legacy-color-text-blue3"=
+><span class=3D"legacy-color-text-blue3">Use key '<em>ListProviderDocuments=
+</em>' to fetch the url from configuration.&nbsp;</span></span></span></spa=
+n><span class=3D"legacy-color-text-blue3"><span class=3D"legacy-color-text-=
+blue3">if no configuration or url exists, then return empty collection.</sp=
+an></span></p>
+<p style=3D"text-align: left;"><u><span class=3D"legacy-color-text-blue3"><=
+span class=3D"legacy-color-text-blue3">Relay</span></span></u></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">if c=
+onfiguration url exists, then token replace the clientId, and planId on the=
+ target url using route parameters from request. Also attach the query para=
+meters from the request&nbsp;to the target url to relay the request to the =
+publisher.</span></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">Retu=
+rn response from the publisher to the calling context of the api.</span></p=
+>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">See&=
+nbsp;<a href=3D"https://intelliflo.atlassian.net/wiki/spaces/ARCH/pages/393=
+052269/Ac+WFlow+-+Configuration+for+E-Delivery+Publishers" data-linked-reso=
+urce-id=3D"393052269" data-linked-resource-version=3D"16" data-linked-resou=
+rce-type=3D"page">Ac+WFlow - Configuration for E-Delivery Publishers</a>&nb=
+sp;for more details</span></p>
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3"><span class=3D"legacy-color-text-blue3">Response</span></span></strong>=
+</p>
+<ul>
+<li><span class=3D"legacy-color-text-blue3">Status Codes</span>
+<ul style=3D"text-align: left;">
+<li>200 OK on success.</li>
+<li>400 Bad Request (invalid filter/orderby)</li>
+<li>401 Unauthorised</li>
+<li>403 Forbidden (invalid scope)</li>
+<li>404 Not Found (<span class=3D"legacy-color-text-blue3">&nbsp;client or =
+plan<span>&nbsp;</span></span>does not exist)</li>
+</ul></li>
+</ul>
+<ul>
+<li><span class=3D"legacy-color-text-blue3">Content-type: application/json<=
+/span></li>
+</ul>
+<ul>
+<li>Response Object : Returns PagedCollection of ProviderDocument (see swag=
+ger definition)</li>
+</ul>
+<p><strong>Scopes</strong></p>
+<ul>
+<li>client_financial_data</li>
+</ul></td>
+</tr>
+<tr>
+<td colspan=3D"1" class=3D"confluenceTd">GetProductProviderDocumentObject</=
+td>
+<td colspan=3D"1" class=3D"confluenceTd">GET</td>
+<td colspan=3D"1" class=3D"confluenceTd">v2/clients/id/plans/id/providerdoc=
+uments/id/object</td>
+<td colspan=3D"1" class=3D"confluenceTd">New</td>
+<td colspan=3D"1" class=3D"confluenceTd">
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3">Description</span></strong></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">Allo=
+ws an API consumer to retrieve a product provider document object.</span></=
+p>
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3"><span class=3D"legacy-color-text-blue3">Implementation</span></span></s=
+trong></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3">Retrieve plan via clientSdk for the spe=
+cified client and plan ids.</span></span></p>
+<p style=3D"text-align: left;"><u><span class=3D"legacy-color-text-blue3"><=
+span class=3D"legacy-color-text-blue3">Validations</span></span></u></p>
+<ul>
+<li>Validate the plan exists, else return 404.</li>
+<li>Validate filter, orderby query parametrs are acceptable, else return 40=
+0</li>
+</ul>
+<p style=3D"text-align: left;"><u><span class=3D"legacy-color-text-blue3"><=
+span class=3D"legacy-color-text-blue3">Configuration</span></span></u></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3">Check if the publisher configuration ex=
+ists for the plan's product provider. </span></span></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3"><span class=3D"legacy-color-text-blue3"=
+><span class=3D"legacy-color-text-blue3">Use key '<em>GetProvider</em><em>D=
+ocumentObject</em>' to fetch the url from configuration.&nbsp;</span></span=
+></span></span><span class=3D"legacy-color-text-blue3"><span class=3D"legac=
+y-color-text-blue3">if no configuration or url exists, then return 404.</sp=
+an></span></p>
+<p style=3D"text-align: left;"><u><span class=3D"legacy-color-text-blue3"><=
+span class=3D"legacy-color-text-blue3">Relay</span></span></u></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">if c=
+onfiguration url exists, then token replace the clientId, planId and docume=
+ntId on the target url using the request route params.&nbsp;</span></p>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3">Retu=
+rn response from the publisher to the calling context of the api.</span></p=
+>
+<p style=3D"text-align: left;"><span class=3D"legacy-color-text-blue3"><spa=
+n class=3D"legacy-color-text-blue3">See&nbsp;<a href=3D"https://intelliflo.=
+atlassian.net/wiki/spaces/ARCH/pages/393052269/Ac+WFlow+-+Configuration+for=
++E-Delivery+Publishers" data-linked-resource-id=3D"393052269" data-linked-r=
+esource-version=3D"16" data-linked-resource-type=3D"page">Ac+WFlow - Config=
+uration for E-Delivery Publishers</a>&nbsp;for more details</span></span></=
+p>
+<p style=3D"text-align: left;"><strong><span class=3D"legacy-color-text-blu=
+e3"><span class=3D"legacy-color-text-blue3">Response</span></span></strong>=
+</p>
+<ul>
+<li><span class=3D"legacy-color-text-blue3">Status Codes</span>
+<ul style=3D"text-align: left;">
+<li>200 OK on success.</li>
+<li>401 Unauthorised</li>
+<li>403 Forbidden (invalid scope)</li>
+<li>404 Not Found (<span class=3D"legacy-color-text-blue3">provider or plan=
+ or client or document<span>&nbsp;</span></span>does not exist)</li>
+</ul></li>
+</ul>
+<ul>
+<li><span class=3D"legacy-color-text-blue3">Content-type:&nbsp;application/=
+pdf</span></li>
+</ul>
+<ul>
+<li>Response Object : Returns FileContent&nbsp;</li>
+</ul>
+<p><strong>Scopes</strong></p>
+<ul>
+<li>client_financial_data</li>
+</ul></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-Implementation">Implementation</h1>
+<h2 id=3D"Ac+WFlow-ProviderDocumentsAPI-SequenceDiagrams">Sequence Diagrams=
+</h2>
+<p>The broker service apis act as wrapper for the custodian service impleme=
+nting apis for third party documents. The request to the broker apis should=
+ check whether a publisher profile is stored in the configuration. If profi=
+le does not exists, return not found exception. If profile exist for the re=
+quested resource, read the configuration to correctly relay the request to =
+respective custodian service api, upon getting a response from custodian se=
+rvice return the response to the caller of the broker service.</p>
+<p><span class=3D"confluence-embedded-file-wrapper">
+<style>[data-colorid=3Df1gsnlugq8]{color:#707070} html[data-color-mode=3Dda=
+rk] [data-colorid=3Df1gsnlugq8]{color:#8f8f8f}[data-colorid=3Dpipsihpvam]{c=
+olor:#707070} html[data-color-mode=3Ddark] [data-colorid=3Dpipsihpvam]{colo=
+r:#8f8f8f}[data-colorid=3Dx1a77gbnv3]{color:#1d1c1d} html[data-color-mode=
+=3Ddark] [data-colorid=3Dx1a77gbnv3]{color:#e3e2e3}[data-colorid=3Dc5s0m89r=
+cn]{color:#1d1c1d} html[data-color-mode=3Ddark] [data-colorid=3Dc5s0m89rcn]=
+{color:#e3e2e3}[data-colorid=3Dojrgu3v2zn]{color:#707070} html[data-color-m=
+ode=3Ddark] [data-colorid=3Dojrgu3v2zn]{color:#8f8f8f}[data-colorid=3Duncga=
+mks2d]{color:#1d1c1d} html[data-color-mode=3Ddark] [data-colorid=3Duncgamks=
+2d]{color:#e3e2e3}</style><img class=3D"confluence-embedded-image confluenc=
+e-external-resource" src=3D"/wiki/download/attachments/393151014/Custodian%=
+20Document%20Request%20Response%20Sequence.png.png?api=3Dv2" data-image-src=
+=3D"/wiki/download/attachments/393151014/Custodian%20Document%20Request%20R=
+esponse%20Sequence.png.png?api=3Dv2" loading=3D"lazy"></span></p>
+<h2 id=3D"Ac+WFlow-ProviderDocumentsAPI-Schema">Schema</h2>
+<p>Please see&nbsp;<a href=3D"https://intelliflo.atlassian.net/wiki/spaces/=
+ARCH/pages/393052269/Ac+WFlow+-+Configuration+for+E-Delivery+Publishers" da=
+ta-linked-resource-id=3D"393052269" data-linked-resource-version=3D"16" dat=
+a-linked-resource-type=3D"page">Ac+WFlow - Configuration for E-Delivery Pub=
+lishers</a>&nbsp;for configuration schema.</p>
+<h2 id=3D"Ac+WFlow-ProviderDocumentsAPI-Caching">Caching</h2>
+<p>In order to minimize network hops implement caching strategy for the api=
+s as appropriate.</p>
+<ul style=3D"list-style-type: square;">
+<li>List Documents API - Implement asp.net core out of box support for resp=
+onse caching.</li>
+</ul>
+<ul style=3D"list-style-type: square;">
+<li>Get Document Object - Implement custom object caching using S3 Bucket w=
+ith 1 day deletion policy.</li>
+</ul>
+<p>PS : Name the object using the following convention -&nbsp;e-delivery.{e=
+nvironment}.{domain}/cache/documents<em>/{<a class=3D"createlink" href=3D"h=
+ttps://intelliflo.atlassian.net/wiki/pages/createpage.action?spaceKey=3DARC=
+H&amp;title=3DClient_Id&amp;linkCreation=3Dtrue&amp;fromPageId=3D393151014"=
+>Client_Id</a>}/{Plan_Id}/{Document_Identifier}</em></p>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-EventSubscriptions">Event Subscript=
+ions</h1>
+<h2 id=3D"Ac+WFlow-ProviderDocumentsAPI-EDeliveryPublisherReady"><span clas=
+s=3D"legacy-color-text-default">EDelivery</span>PublisherReady</h2>
+<p><br></p>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeHeader panelHeader pdl" style=3D"border-bottom-width: 1px=
+;">
+<b>CustodianDocumentPublisher</b>
+</div>
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: java; gutter: false; theme: FadeToGrey" data-theme=3D"FadeToGrey">{
+=09"event": "EDeliveryPublisherReady",
+=09"payload": {
+      "provider":{
+=09=09=09"id":1234,
+=09=09=09"href":v2/productproviders/1234",
+=09=09=09"name":"Pershing"
+       },
+      "paths":{
+           "ListProviderDocuments":{
+                "url":"https://microservice-pershing.sys-ie-03.intelliflo.s=
+ystems/v2/clients/{clientId}/plans/{planId}/documents?filter=3D{0}&amp;orde=
+rby=3D{0}&amp;top=3D{0}&amp;skip=3D{0}"     =20
+            },
+ =20
+           "GetProviderDocumentObject":{
+=09=09=09=09"url":"https://microservice-pershing.sys-ie-03.intelliflo.syste=
+ms/v2/clients/{clientId}/plans/{planId}/documents/{documentId}"=09=09=09
+            }
+     }
+}</pre>
+</div>
+</div>
+<p>Handle EDelivery<em>PublisherReady</em> event to parse and get the confi=
+guration in the event payload for the e-delivery publisher.</p>
+<p>Steps</p>
+<ul style=3D"list-style-type: square;">
+<li>Parse the event payload, to fetch configuration object.</li>
+<li>Store the publisher configuration to s3 storage and use memcache for re=
+ad access.</li>
+</ul>
+<p>Implementation</p>
+<ul style=3D"list-style-type: square;">
+<li>Store in S3 with bucket convention e-delivery.{environment}.{domain}/co=
+nfiguration/providers/{providerId}/settings.json</li>
+</ul>
+<p><br></p>
+<h1 id=3D"Ac+WFlow-ProviderDocumentsAPI-FullSwaggerDefinitions">Full Swagge=
+r Definitions</h1>
+<p><br></p>(Open API documentation is only available to view online)
+    </div>
+</body>
+</html>
+------=_Part_8_2032597468.1770130519858--

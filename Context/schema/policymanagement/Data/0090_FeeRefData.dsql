@@ -1,0 +1,101 @@
+SET NUMERIC_ROUNDABORT OFF
+GO
+SET ANSI_PADDING, ANSI_WARNINGS, CONCAT_NULL_YIELDS_NULL, ARITHABORT, QUOTED_IDENTIFIER, ANSI_NULLS, NOCOUNT ON
+GO
+SET DATEFORMAT YMD
+GO
+SET XACT_ABORT ON
+GO
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
+GO
+BEGIN TRANSACTION
+
+-- insert data for policymanagement..TRefAdvisePaidBy
+SET IDENTITY_INSERT policymanagement..TRefAdvisePaidBy ON
+INSERT INTO 
+	policymanagement..TRefAdvisePaidBy
+	(
+	RefAdvisePaidById,
+	Name
+	)
+SELECT
+	[source].RefAdvisePaidById,
+	[source].Name
+FROM
+	(SELECT 
+		1 as RefAdvisePaidById, 'Client' as Name
+	UNION ALL SELECT
+		2, 'Provider') as [Source]
+	LEFT JOIN
+		policymanagement..TRefAdvisePaidBy refTbl on refTbl.RefAdvisePaidById = [Source].RefAdvisePaidById
+	WHERE
+		refTbl.RefAdvisePaidById is null
+SET IDENTITY_INSERT policymanagement..TRefAdvisePaidBy OFF
+
+-- insert data for policymanagement..TRefAdviseFeeType
+SET IDENTITY_INSERT policymanagement..TRefAdviseFeeType ON
+INSERT INTO 
+	policymanagement..TRefAdviseFeeType
+	(
+	RefAdviseFeeTypeId,
+	Name,
+	IsInitial,
+	IsOneOff,
+	IsRecurring
+	)
+SELECT
+	[source].RefAdviseFeeTypeId,
+	[source].Name,
+	[source].IsInitial,
+	[source].IsOneOff,
+	[source].IsRecurring
+FROM
+	(SELECT 
+		1 as RefAdviseFeeTypeId, 'Initial Fee' as Name, 1 as IsInitial, 0 as IsOneOff, 0 as IsRecurring
+	UNION ALL SELECT
+		2, 'On-going Fee', 0, 0, 1
+	UNION ALL SELECT
+		3, 'Ad-hoc Fee', 0, 1, 0) as [Source]
+	LEFT JOIN
+		policymanagement..TRefAdviseFeeType refTbl on refTbl.RefAdviseFeeTypeId = [Source].RefAdviseFeeTypeId
+	WHERE
+		refTbl.RefAdviseFeeTypeId is null
+SET IDENTITY_INSERT policymanagement..TRefAdviseFeeType OFF
+
+-- insert data for policymanagement..TRefAdviseFeeChargingType
+--SET IDENTITY_INSERT policymanagement..TRefAdviseFeeChargingType ON
+--INSERT INTO 
+--	policymanagement..TRefAdviseFeeChargingType
+--	(
+--	RefAdviseFeeChargingTypeId,
+--	Name,
+--	IsUsedAsInitialFee,
+--	IsUsedAsRecurringFee,
+--	IsUsedAsOneOffFee
+--	)
+--SELECT
+--	[source].RefAdviseFeeChargingTypeId,
+--	[source].Name,
+--	[source].IsUsedAsInitialFee,
+--	[source].IsUsedAsRecurringFee,
+--	[source].IsUsedAsOneOffFee
+--FROM
+--	(SELECT 
+--		1 as RefAdviseFeeChargingTypeId, 'Fixed Price' as Name, 1 as IsUsedAsInitialFee, 1 as IsUsedAsRecurringFee, 1 as IsUsedAsOneOffFee
+--	UNION ALL SELECT
+--		2, '% of FUM/AUM', 0, 1, 0
+--	UNION ALL SELECT
+--		3, '% of Investment Contribution', 1, 0, 0
+--	UNION ALL SELECT
+--		4, 'Non-chargeable', 0, 0, 1
+--	UNION ALL SELECT
+--		5, 'Fixed price-Range', 1, 1, 1
+--	) as [Source]
+--	LEFT JOIN
+--		policymanagement..TRefAdviseFeeChargingType refTbl on refTbl.RefAdviseFeeChargingTypeId = [Source].RefAdviseFeeChargingTypeId
+--	WHERE
+--		refTbl.RefAdviseFeeChargingTypeId is null
+--SET IDENTITY_INSERT policymanagement..TRefAdviseFeeChargingType OFF
+
+COMMIT TRANSACTION
+GO

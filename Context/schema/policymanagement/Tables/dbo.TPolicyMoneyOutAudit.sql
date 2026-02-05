@@ -1,0 +1,53 @@
+CREATE TABLE [dbo].[TPolicyMoneyOutAudit]
+(
+[AuditId] [int] NOT NULL IDENTITY(1, 1) NOT FOR REPLICATION,
+[PolicyOwnerId] [int] NULL,
+[PolicyBusinessId] [int] NOT NULL,
+[BeneficiaryCRMContactId] [int] NULL,
+[BeneficiaryPercentage] [decimal] (5, 2) NULL,
+[Amount] [money] NULL,
+[RefBenefitPaymentTypeId] [int] NULL,
+[SalaryMultiple] [tinyint] NULL,
+[RefRiskEventTypeId] [int] NULL,
+[PaymentStartDate] [datetime] NULL,
+[PaymentStopDate] [datetime] NULL,
+[RefFrequencyId] [int] NULL,
+[RefIndexationTypeId] [int] NULL,
+[EscalationPercentage] [decimal] (5, 2) NULL,
+[AssuredCRMContactId1] [int] NULL,
+[AssuredCRMContactId2] [int] NULL,
+[DeferredWeeks] [int] NULL,
+[AssignedCRMContactId] [int] NULL,
+[RefPaymentBasisTypeId] [int] NULL,
+[PaymentBasisPercentage] [decimal] (5, 2) NULL,
+[GuaranteedPeriodMonths] [int] NULL,
+[RefWithdrawalBasisTypeId] [int] NULL,
+[RefWithdrawalTypeId] [int] NULL,
+[RefEscalationTypeId] [int] NULL,
+[ConcurrencyId] [int] NOT NULL,
+[PolicyMoneyOutId] [int] NOT NULL,
+[StampAction] [char] (1) COLLATE Latin1_General_CI_AS NOT NULL,
+[StampDateTime] [datetime] NULL,
+[StampUser] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[TransferToPolicyMoneyInId] [int] NULL,
+[SpousesOrDependentsPercentage] [decimal] (5, 2) NULL,
+[IsOverlap] [bit] NULL,
+[IsWithProportion] [bit] NULL,
+[RefPaymentBasisId] [int] NULL,
+[GuaranteedPeriod] [int] NULL,
+[IsCreatedBySystem] [bit] NULL,
+[WithdrawalMigrationRef] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[Note] [varchar](250) NULL,
+RefTransferTypeId [INT] NULL,
+IsFullTransfer [BIT] NULL,
+RefArrangementTypeId [INT] NULL,
+RefWithdrawalSubTypeId [INT] NULL,
+TaxableValue [decimal] (10, 2) NULL,
+TaxFreeValue [decimal] (10, 2) NULL,
+CrystallizedAmount [decimal] (10, 2) NULL
+)
+GO
+ALTER TABLE [dbo].[TPolicyMoneyOutAudit] ADD CONSTRAINT [PK_TPolicyMoneyOutAudit] PRIMARY KEY CLUSTERED  ([AuditId])
+GO
+CREATE NONCLUSTERED INDEX [IDXAudit_TPolicyMoneyOutAudit_PolicyMoneyOutId_ConcurrencyId] ON [dbo].[TPolicyMoneyOutAudit] ([PolicyMoneyOutId], [ConcurrencyId]) WITH (FILLFACTOR=80)
+GO

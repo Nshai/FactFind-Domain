@@ -1,0 +1,14 @@
+SET QUOTED_IDENTIFIER OFF
+GO
+SET ANSI_NULLS ON
+GO
+CREATE PROCEDURE [dbo].[SpCustomRetrieveAtrRefPortfolioTerm]
+AS
+SELECT
+	*
+FROM 
+	TAtrRefPortfolioTerm T1
+ORDER BY 
+	Term
+FOR XML RAW
+GO

@@ -1,0 +1,951 @@
+Loading workbook...
+
+Available sheets (6):
+  1. Fact Finds
+  2. Product Types
+  3. Income Types
+  4. Expenditure Types
+  5. Other Lists
+  6. PFP
+
+=== Found "Entity" in sheet: Fact Finds (Row 1) ===
+Header row: ('Area', 'Sub-Area', 'Entity', 'Field', 'Office Caption', 'Office Location', 'Field Type', 'Values', 'Mandatory', 'Notes', 'Status', 'To Be\nIngested', 'Full\nFF', 'Client Area', 'Plans Area', 'PFP', 'PFP Caption', 'PFP Location', 'Cashflow', 'Cashflow Caption', 'Cashflow Location', 'API Name', 'API Property Name', 'Multiply\nCFF', 'Multiply\nFFF', 'Vision\nEstimated', 'Vision\nCFF', 'Vision\nFFF', 'FCA', None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None)
+
+Looking for Employment-related rows...
+Entity column index: 2
+
+All unique Area values: ['Assets & Liabilities', 'Attitude To Risk', 'Budget', 'Client Profile', 'Dependants', 'Employments', 'Estate Planning', 'Fact Find', 'General Insurance', 'Goals & Objectives', 'Mortgage', 'Pension', 'Plans', 'Protection', 'Savings & Investments']
+
+All unique Entity values: ['Address', 'Asset', 'Asset - Business', 'Asset - Property', 'Bank Account', 'Beneficiary', 'Client', 'Client CFL', 'Client Marketing', 'Client Pension', 'Client Relationship', 'Client Risk Profile', 'Commission', 'Contact', 'Contribution', 'Credit History', 'DPA Policy', 'Dependant', 'Document', 'Employment', 'Estimated Fact Find', 'Expenditure', 'Expenditure Change', 'Fact Find', 'Fee', 'Fund', 'Gift', 'Gift - Trust', 'Goal', 'Holding', 'Income', 'Income Change', 'Need', 'Note', 'Objective', 'Plan', 'Professional Contact', 'Tags', 'Valuation', 'Vulnerability', 'Withdrawal']
+
+=== Employment-related rows ===
+
+Row 299:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: Owner
+  Office Caption: Owner
+  Office Location: Fact Find/Employment/Employment Details/Table
+  Field Type: List
+  Values: List of Clients
+  Mandatory: Read Only
+  Full
+FF: Yes*
+  API Name: Employments
+  API Property Name: client
+
+Row 300:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: Employment Status
+  Office Caption: Employment Status
+  Office Location: Fact Find/Employment/Employment Details/Table
+  Field Type: List
+  Values: Employment Status List
+  Mandatory: Read Only
+  Full
+FF: Yes*
+  API Name: Employments
+  API Property Name: employmentStatus
+  Multiply
+CFF: Yes
+  Multiply
+FFF: Yes
+  Vision
+Estimated: Yes*
+  Vision
+CFF: Yes*
+  Vision
+FFF: Yes*
+  FCA: Yes
+
+Row 301:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: Occupation
+  Office Caption: Occupation
+  Office Location: Fact Find/Employment/Employment Details/Table
+  Field Type: Text
+  Mandatory: Read Only
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: occupation
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 302:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: Employer Name
+  Office Caption: Employer
+  Office Location: Fact Find/Employment/Employment Details/Table
+  Field Type: Text
+  Mandatory: Read Only
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: employer
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 303:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: Intended Retirement Age
+  Office Caption: Intended Retirement Age
+  Office Location: Fact Find/Employment/Employment Details/Table
+  Field Type: Number
+  Mandatory: Read Only
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: intendedRetirmentAge
+
+Row 304:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: Start Date
+  Office Caption: Start Date
+  Office Location: Fact Find/Employment/Employment Details/Table
+  Field Type: Date
+  Mandatory: Read Only
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: startsOn
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 305:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: End Date
+  Office Caption: End Date
+  Office Location: Fact Find/Employment/Employment Details/Table
+  Field Type: Date
+  Mandatory: Read Only
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: endsOn
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 307:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: Total Continuous Employment Months
+  Office Caption: Continuous Employment (Months)
+  Office Location: Fact Find/Employment/Employment Details/Table
+  Field Type: Number
+  Values: [Calculated]
+  Mandatory: Read Only
+  Notes: Calculated based on difference between Start and End dates or Today.
+  API Name: [Derived]
+
+Row 308:
+  Area: Employments
+  Sub-Area: Employment Details - Summary
+  Entity: Employment
+  Field: In Probation
+  Office Caption: In Probation
+  Office Location: Fact Find/Employment/Employment Details/Employment/Income
+  Field Type: Boolean
+  Mandatory: No
+  Notes: only settable for statuses of Employed,MaternityLeave and LongTermIllness
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: inProbation
+
+Row 309:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Owner
+  Office Caption: Owner
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: List
+  Values: List of Clients
+  Mandatory: Defaulted
+  Full
+FF: Yes*
+  API Name: Employments
+  API Property Name: client
+
+Row 310:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Employment Status
+  Office Caption: Employment Status
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: List
+  Values: Employment Status List
+  Mandatory: Yes
+  Notes: Vision: Client is considered to be Employed and will have an Employment record if they are Working or Semi-Retired.  We want to avoid creating an Employment record if the client has no employment. Also this question would sit at the Fact Find outside of any Employment record.
+Vision List would be Working (i.e. Employed/Self-Employed), Semi-Retired, Unemployed, Retired, Student, Houseperson, Full Time Carer where only Working or Semi-Retired would create an Employment record.
+
+Multiply uses "Full-time Study or Training" = Student, Homemaker = Houseperson, Not Employed = Unemployed 
+  Status: Review
+  To Be
+Ingested: Yes
+  Full
+FF: Yes*
+  PFP: Yes
+  PFP Caption: What is [your/partner's] current employment status?
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: employmentStatus
+  Multiply
+CFF: Yes
+  Multiply
+FFF: Yes
+  Vision
+Estimated: Yes*
+  Vision
+CFF: Yes*
+  Vision
+FFF: Yes*
+  FCA: Yes
+
+Row 311:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Employment Status Description
+  Office Location: [Unknown]
+  Field Type: Text
+  Mandatory: No
+  Notes: Cannot find in Office
+  Status: Unclear
+  API Name: Employments
+  API Property Name: employmentStatusDescription
+
+Row 312:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Employment Type
+  Office Location: [Vision]
+  Field Type: List
+  Values: Vision: Employed, Self-Employed, Sole Trader, Limited Company, Limited Partnership
+  Mandatory: Yes
+  Notes: Vision: If Employment Status = Working or Semi-Retired, this describes the type of employment.
+Multiply includes Company Director and 20% Director in this list.
+  API Name: [N/A]
+  Multiply
+CFF: Yes
+  Multiply
+FFF: Yes
+  Vision
+CFF: Yes*
+  Vision
+FFF: Yes*
+
+Row 313:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Business Type
+  Office Caption: Business Type
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: List
+  Values: Business Type List
+  Mandatory: Yes
+  Notes: Visible When Employment Status = Self-Employed
+  Full
+FF: Yes*
+  API Name: Employments
+  API Property Name: employmentBusinessType
+
+Row 314:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Industry Type
+  Office Location: [Unknown]
+  Field Type: Text
+  Mandatory: No
+  Notes: Cannot find in Office
+  Status: Unclear
+  API Name: Employments
+  API Property Name: industryType
+
+Row 315:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Is Current Employment
+  Office Location: [PFP]
+  Field Type: Boolean
+  Mandatory: Defaulted
+  Notes: Missing from FFF. User is directed to add Current or Previous Employments. Very useful in the absence of employment dates.
+  To Be
+Ingested: Yes
+  Full
+FF: Missing
+  PFP: Yes*
+  PFP Caption: Is this [your/partner's] current status?
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: Derived from employments start and enddates?
+
+Row 316:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Occupation Type
+  Office Location: [Vision]
+  Field Type: List
+  Values: Vision: Manual, Skilled, Professional, Civil Servant, Director, Business Partner
+  Mandatory: No
+  API Name: [N/A]
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 317:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Occupation
+  Office Caption: Occupation
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Text
+  Mandatory: No
+  Notes: As occupation is mainly used for protection it makes sense to adopt the insurance industry standard occupation list.
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: Occupation
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: occupation
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 318:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Employed Type
+  Office Location: [Vision]
+  Field Type: List
+  Values: Vision: Full Time, Part Time
+  Mandatory: Yes
+  API Name: [N/A]
+  Vision
+CFF: Yes*
+  Vision
+FFF: Yes*
+
+Row 319:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Employed Basis
+  Office Location: [Vision]
+  Field Type: List
+  Values: Vision: Agency, Contract, Permanent, Probationary, Temporary
+  Mandatory: Yes
+  API Name: [N/A]
+  Vision
+CFF: Yes*
+  Vision
+FFF: Yes*
+
+Row 320:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Employer Name
+  Office Caption: Employer
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Text
+  Mandatory: No
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: Employer name
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: employer
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 321:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Address Line 1
+  Office Caption: Address Line 1
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Text
+  Mandatory: No
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: Address Line 1
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: address/line1
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 322:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Address Line 2
+  Office Caption: Address Line 2
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Text
+  Mandatory: No
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: Address Line 2
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: address/line2
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 323:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Address Line 3
+  Office Caption: Address Line 3
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Text
+  Mandatory: No
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: Address Line 3
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: address/line3
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 324:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Address Line 4
+  Office Caption: Address Line 4
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Text
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: address/line4
+
+Row 325:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: City
+  Office Caption: City / Town
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Text
+  Mandatory: No
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: City / Town
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: address/locality
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 326:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: County
+  Office Caption: County/state/province
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: List
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: address/county
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 327:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Country
+  Office Caption: Country
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: List
+  Mandatory: Defaulted
+  Full
+FF: Yes*
+  API Name: Employments
+  API Property Name: address/country
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 328:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: PostCode
+  Office Caption: Post Code
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Text
+  Mandatory: No
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: Postcode
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: address/postalCode
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 329:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Start Date
+  Office Caption: Start Date
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Date
+  Mandatory: No
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: Start date
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: startsOn
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 330:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: End Date
+  Office Caption: End Date
+  Office Location: Fact Find/Employment/Employment Details/Employment
+  Field Type: Date
+  Mandatory: No
+  To Be
+Ingested: Yes
+  Full
+FF: Yes
+  PFP: Yes
+  PFP Caption: End date
+  PFP Location: PFP/Profile/You & Your Family/Employment
+  API Name: Employments
+  API Property Name: endsOn
+  Vision
+CFF: Yes
+  Vision
+FFF: Yes
+
+Row 352:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Most Recent Accounts Gross Profit
+  Office Caption: Gross Profit
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Notes: Annual Accounts are Visible When Employment Status = Self-Employed
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 353:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Most Recent Accounts Share of Company Profit
+  Office Caption: Share of Company Profit
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Notes: PLC Only
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 354:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Most Recent Accounts Gross Dividend
+  Office Caption: Gross Dividend
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 355:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Most Recent Accounts Gross Salary
+  Office Caption: Gross Salary
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Notes: PLC Only
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 356:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Most Recent Accounts Year End
+  Office Caption: Year End
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Date
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 357:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Include Most Recent Accounts In Affordability
+  Office Caption: Include In Affordability
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Boolean
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 358:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 2 Accounts Share of Company Profit
+  Office Caption: Share of Company Profit
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Notes: PLC Only
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 359:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 2 Accounts Gross Profit
+  Office Caption: Gross Profit
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 360:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 2 Accounts Gross Dividend
+  Office Caption: Gross Dividend
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 361:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 2 Accounts Gross Salary
+  Office Caption: Gross Salary
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Notes: PLC Only
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 362:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 2 Accounts Year End
+  Office Caption: Year End
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Date
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 363:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 3 Accounts Share of Company Profit
+  Office Caption: Share of Company Profit
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Notes: PLC Only
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 364:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 3 Accounts Gross Profit
+  Office Caption: Gross Profit
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 365:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 3 Accounts Gross Dividend
+  Office Caption: Gross Dividend
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 366:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 3 Accounts Gross Salary
+  Office Caption: Gross Salary
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Currency
+  Mandatory: No
+  Notes: PLC Only
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 367:
+  Area: Employments
+  Sub-Area: Employment Details - Self-Employed
+  Entity: Employment
+  Field: Year 3 Accounts Year End
+  Office Caption: Year End
+  Office Location: Fact Find/Employment/Employment Details/Employment/Accounts
+  Field Type: Date
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: [Unknown]
+
+Row 368:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: In Probation
+  Office Caption: In Probation
+  Office Location: Fact Find/Employment/Employment Details/Employment/Income
+  Field Type: Boolean
+  Mandatory: No
+  Notes: only settable for statuses of Employed,MaternityLeave and LongTermIllness
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: inProbation
+
+Row 369:
+  Area: Employments
+  Sub-Area: Employment Details
+  Entity: Employment
+  Field: Probation Period Months
+  Office Caption: Probation Period (Months)
+  Office Location: Fact Find/Employment/Employment Details/Employment/Income
+  Field Type: Number
+  Mandatory: No
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: probationPeriodMonths
+
+Row 370:
+  Area: Employments
+  Sub-Area: Employment Details - Pension
+  Entity: Employment
+  Field: Is Member of Pension Scheme
+  Office Location: [Multiply]
+  Field Type: Boolean
+  Mandatory: No
+  Notes: Recorded under Pension Eligibility in Full FF
+  API Name: [N/A]
+  Multiply
+CFF: Yes
+  Multiply
+FFF: Yes
+
+Row 371:
+  Area: Employments
+  Sub-Area: Employment Details - Pension
+  Entity: Employment
+  Field: Has Pension Scheme
+  Office Location: [Multiply]
+  Field Type: Boolean
+  Mandatory: No
+  Notes: Recorded under Pension Eligibility in Full FF
+  API Name: [N/A]
+  Multiply
+CFF: Yes
+  Multiply
+FFF: Yes
+
+Row 372:
+  Area: Employments
+  Sub-Area: Employment Details - Pension
+  Entity: Employment
+  Field: Intended Retirement Age
+  Office Caption: Intended Retirement Age
+  Office Location: Fact Find/Employment/Employment Details/Employment/Income
+  Field Type: Number
+  Mandatory: No
+  Notes: Vision: Capture Planned Retirement Age against the Client.
+  Status: Review
+  Full
+FF: Yes
+  API Name: Employments
+  API Property Name: intendedRetirmentAge
+
+Row 373:
+  Area: Employments
+  Sub-Area: Employment Details - Protection
+  Entity: Employment
+  Field: Has Income Protection
+  Office Location: [Multiply]
+  Field Type: Boolean
+  Mandatory: No
+  Notes: Recorded under Protection Plans in Full FF
+  API Name: [N/A]
+  API Property Name: Can be derived from querying Plans by Plan Type
+  Multiply
+CFF: Yes
+  Multiply
+FFF: Yes
+
+Row 374:
+  Area: Employments
+  Sub-Area: Employment Details - Protection
+  Entity: Employment
+  Field: Income Protection For Weeks
+  Office Location: [Multiply]
+  Field Type: Number
+  Mandatory: No
+  Notes: Recorded under Protection Plans in Full FF
+  API Name: [N/A]
+  Multiply
+CFF: Yes
+  Multiply
+FFF: Yes
+
+Row 375:
+  Area: Employments
+  Sub-Area: Employment Details - Protection
+  Entity: Employment
+  Field: Income Protection Salary Percentage
+  Office Location: [Multiply]
+  Field Type: Percentage
+  Mandatory: No
+  Notes: Recorded under Protection Plans in Full FF
+  API Name: [N/A]
+  Multiply
+CFF: Yes
+  Multiply
+FFF: Yes
+
+
+Total Employment rows found: 55

@@ -1,0 +1,10 @@
+
+Create Procedure SpNioCustomOpenSymmetricKeyForPasswordEncryptionWithResult
+As
+
+Exec SpNioCustomOpenSymmetricKeyForPasswordEncryption
+
+Select 1
+
+
+

@@ -1,0 +1,53 @@
+CREATE TABLE [dbo].[TPortfolio]
+(
+    [PortfolioId] [int] NOT NULL IDENTITY(1, 1),
+    [Title] [varchar] (255) NOT NULL,
+    [Description] [text] NULL,
+    [IsPublic] [bit] NULL,
+    [IsGroupRestricted] [bit] NULL,
+    [GroupId] [int] NULL,
+    [IsIncludeSubGroups] [bit] NULL,
+    [IsReadOnly] [bit] NULL,
+    [IsActive] [bit] NULL,
+    [IsLocked] [bit] NULL,
+    [BenchmarkId] [int] NULL,
+    [IsClientPortal] [bit] NULL,
+    [AtrPortfolioGuid] [uniqueidentifier] NULL,
+    [CreatedBy] [int] NULL,
+    [CreatedDate] [datetime] NOT NULL,
+    [Client] [int] NULL,
+    [ConcurrencyId] [int] NOT NULL CONSTRAINT [DF_TPortfolio_ConcurrencyId] DEFAULT ((1)),
+    [Code] [varchar](50) null,
+    [Provider] [varchar](255) null,
+    [ChangeDescription] [nvarchar](max) null,
+    [MarketCommentaryHref] [varchar](255) null,
+    [IsPrivate] [bit] null,
+    [TenantId] [int] null,
+    [AppId] [varchar](100) null,
+    [AllowRebalance] [bit] NOT NULL CONSTRAINT [DF_TPortfolio_AllowRebalance] DEFAULT ((0)),
+    [ExpectedRisk] [varchar](50) null,
+    [ExpectedReturn] [varchar](50) null,
+    [InvestmentAmountLower] [money] null,
+    [InvestmentAmountUpper] [money] null,
+    [Status] [varchar](10) null,
+    [Version] [int] null,
+    [IsSharedWithinGroup] [bit] NOT NULL CONSTRAINT [DF_TPortfolio_IsSharedWithinGroup] DEFAULT ((0)),
+    [Reference] [varchar](50) NULL,
+    [IsLatestVersion] [bit] NOT NULL CONSTRAINT [DF_TPortfolio_IsLatestVersion] DEFAULT ((0)),
+    [RiskReference] [varchar](50) NULL CONSTRAINT [DF_TPortfolio_RiskReference] DEFAULT (NULL),
+    [FactSheetLink] [nvarchar](500) null,
+    [TaxQualified] [varchar] (255) NULL,
+    [InvestmentManagementStyle] [varchar] (255) NULL,
+    [PlatformProvider] [varchar] (255) NULL,
+    [IsDiscretionaryFundManaged] [bit] NULL,
+    [ChargeRate] [money] NULL,
+    [ChargeCurrencyCode] [nvarchar](3) NULL,
+    [ChargeVATRule] [smallint] NULL,
+    [IsExternallyManaged] [bit] NULL,
+    [IsIMPS] [bit] NULL
+)
+GO
+ALTER TABLE [dbo].[TPortfolio] ADD CONSTRAINT [PK_TPortfolio] PRIMARY KEY NONCLUSTERED ([PortfolioId])
+GO
+CREATE NONCLUSTERED INDEX [IDX_TPortfolio_TenantId] ON [dbo].[TPortfolio] ([TenantId] ASC)
+GO

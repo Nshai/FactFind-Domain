@@ -1,0 +1,18 @@
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[TUserGroupAudit](
+	UserGroupId		INT NOT NULL,	
+	UserId			INT NOT NULL,
+	GroupId			INT NOT NULL,
+	RoleId			INT NOT NULL,
+	ConcurrencyId	INT NOT NULL,
+	StampAction		CHAR(1) NOT NULL,
+	StampDateTime	DATETIME NOT NULL,
+	StampUser		VARCHAR(255) NULL,
+) 
+GO
+

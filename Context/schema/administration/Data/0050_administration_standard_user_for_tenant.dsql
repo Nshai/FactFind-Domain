@@ -1,0 +1,105 @@
+
+
+Begin Tran 
+
+Use crm
+go
+
+Declare @crmcontactid bigint
+Select @crmcontactid = 3500000
+
+Select * From crm..Tcrmcontact 
+where crmcontactid= 4670789 
+--order by 1
+
+SET IDENTITY_INSERT [dbo].[TPerson] ON
+
+Declare @PersonId bigint
+Select @PersonId = 2
+
+-- select * From CRM..TPerson
+INSERT INTO CRM..TPerson
+(PersonId, FirstName, LastName,ArchiveFG,IndClientId)
+SELECT @PersonId, 'User', 'One', 0, 10155
+
+SET IDENTITY_INSERT [dbo].[TPerson] OFF
+
+exec SpNAuditPerson @StampUser='0', @PersonId = @PersonId, @StampAction = 'C'
+
+SET IDENTITY_INSERT [dbo].[TCrmcontact] ON
+Insert Into Crm..TCrmcontact
+(CRMContactId, RefCRMContactStatusId, PersonId, CorporateId, TrustId, AdvisorRef, RefSourceOfClientId, SourceValue, 
+	Notes, ArchiveFg, LastName, FirstName, CorporateName, DOB, Postcode, OriginalAdviserCRMId, CurrentAdviserCRMId, 
+	CurrentAdviserName, CRMContactType, IndClientId, FactFindId, InternalContactFG, RefServiceStatusId, 
+	MigrationRef, CreatedDate, ExternalReference, CampaignDataId, AdditionalRef, AdviserAssignedByUserId, _ParentId, 
+	_ParentTable, _ParentDb, _OwnerId, ConcurrencyId, FeeModelId)
+
+Select @crmcontactid, NULL, @PersonId, NULL, NULL, NULL, NULL, NULL, 'internal', 0, 'One', 'User', 
+	NULL, NULL, NULL, 0, 0, NULL, 1, 10155, NULL, 1, NULL, NULL, '2012-10-15 09:46:34.000', NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, NULL
+
+
+SET IDENTITY_INSERT [dbo].[TCrmcontact] OFF
+
+exec SpNAuditCrmcontact @StampUser='0', @CRMContactId = @crmcontactid, @StampAction = 'C'
+
+
+
+Use Administration
+
+
+SET IDENTITY_INSERT [dbo].[TUser] ON
+Insert Into TUser
+(UserId, Identifier, Password, PasswordHistory, Email, Telephone, Status, GroupId, SyncPassword, ExpirePasswordOn, SuperUser, SuperViewer, FinancialPlanningAccess, FailedAccessAttempts, Reference, CRMContactId, 
+SearchData, RecentData, RecentWork, IndigoClientId, SupportUserFg, ActiveRole, CanLogCases, RefUserTypeId, Guid, 
+IsMortgageBenchEnabled, IsMIReportDesigner, IsMIReportManager, ConcurrencyId, PasswordSalt, LockedOutUntilDateTime, EmailConfirmed,
+IsOutLookExtensionUser, AdvisaCentaCoreAccess, AdvisaCentaCorePlusAccess, PensionFreedomPlanner, FeAnalyticsAccess, IsVoyantUser, AdvisaCentaFullAccess, AdvisaCentaFullAccessPlusLifetimePlanner, Timezone )
+------------------------------------------------------------------------------------------------------------------------------------
+Select 28000, 'local2', 'cCLBouB+ERXZCPgVUAyrTNOjbIYExC5dMIuK82Il4/ZGT7VLnhmHovhemMinRIdysFiKKJoQmBmjlQyjYVRZrkNFYzhHcEZyOWloUTV0TlI1ODNIMHhWdmJwMVk1RXZWZ2ZQcVluNVpSYXRGRzdrUlczbmhJdVpacTVCSkE2M0JvU2RFa3VoZUI2STJwaG9RcUllem9vY050d0FrUWdQSWNhdFJ3aWN0TzBCYTBrYmozM1dmenplSHEycitaSmdDUUxMcjJvOW9hdTlnVmptOUNnVU94M0FtSkhhbEJsWmw3U01kVlBMSThLSVhmTjI1K3VXaE9oSTBESWZFSjZ5YnFGRFdNdzZlaEZLeDdOdHhLcmExVW9SRkxvR2FFVUJ4WGtSc2VsSVp4S1pPUU5KNXBFV1dOMmVwTzVhbVYzWTlKNWJXd3JETDZVNm9TT2RYRUFYbmZEUHVrM0pFRXNPdG1WYlJiQ0MxdE9LaU8wMnFOakN1aHNSS0FzOU0vai9SSXo4OWF5MHdxd0E3QlRqWFdQY1VNeVIrYVpqZUo2djQ5VmMzU0ZDK1hPZnkxeGJqbXgvd21ib1R3UW0yeGxZQ2h1MDJ5ZC85TE9NV2pKeVBVUTgyL2g4T3BpSHphZ0RNS01xR0xwSXEvcklVR0s1V3hEWUROZW55ZUtndmp5OWZtWjNIWUxkUXdHT2NLMzdQR0xicEQwaXNpQWZQUWdKUnpBOG92R2I0M25HeEVoa3hjMEhYdnBCR2UyZ1VXeC9zeWtKYTA4d2pzZUtaQk40NkdWYUt5QXlHbzRqUFlxMFpHSXN4V0JkTkllUUpQVmVBM2xaZ1BTWnp3c1JlT0Z1UVNKcTdYTDhmRnJ1R0VIeElncFE5RFVyYnhtU2syemt6K3o3TldLanlRdVhOY3NLcGlDcEFvRWxrV05ueTFKNEVuakw5TGRQUWJZSGN6c0tZMGFLNEVxa0NJQ3dQUnp2aDkxcFpCcUF5VW4wPQ==', '', 'user1@boo.com', '', 'Access Granted - Logged In', 3522, 0, '2020-01-22 10:16:11.000', 1, 1, 1, 0, 'goto,news,links', @crmcontactid, 
+
+'Update forced via the User.SoilUserObject() operation on : 15/10/2012 10:19:59', NULL, NULL, 10155, 0, 10115, 0, 1, 'FF36F1E9-2BCB-449E-AC59-A0EB0090A132',
+
+ 0, 1, 1, 7, 'CEc8GpFr9ihQ5tNR583H0xVvbp1Y5EvVgfPqYn5ZRatFG7kRW3nhIuZZq5BJA63BoSdEkuheB6I2phoQqIezoocNtwAkQgPIcatRwictO0Ba0kbj33WfzzeHq2r+ZJgCQLLr2o9oau9gVjm9CgUOx3AmJHalBlZl7SMdVPLI8KIXfN25+uWhOhI0DIfEJ6ybqFDWMw6ehFKx7NtxKra1UoRFLoGaEUBxXkRselIZxKZOQNJ5pEWWN2epO5amV3Y9J5bWwrDL6U6oSOdXEAXnfDPuk3JEEsOtmVbRbCC1tOKiO02qNjCuhsRKAs9M/j/RIz89ay0wqwA7BTjXWPcUMyR+aZjeJ6v49Vc3SFC+XOfy1xbjmx/wmboTwQm2xlYChu02yd/9LOMWjJyPUQ82/h8OpiHzagDMKMqGLpIq/rIUGK5WxDYDNenyeKgvjy9fmZ3HYLdQwGOcK37PGLbpD0isiAfPQgJRzA8ovGb43nGxEhkxc0HXvpBGe2gUWx/sykJa08wjseKZBN46GVaKyAyGo4jPYq0ZGIsxWBdNIeQJPVeA3lZgPSZzwsReOFuQSJq7XL8fFruGEHxIgpQ9DUrbxmSk2zkz+z7NWKjyQuXNcsKpiCpAoElkWNny1J4EnjL9LdPQbYHczsKY0aK4EqkCICwPRzvh91pZBqAyUn0=', NULL, 1,
+ 1, 1, 1, 1, 1, 1, 1, 1, 'Europe/London'
+ 
+SET IDENTITY_INSERT [dbo].[TUser] OFF
+
+exec SpNAuditUser @StampUser='0', @UserId = 28000, @StampAction = 'C'
+
+Insert Into TUserSession
+(UserId)
+Select 28000
+-- Select * From TUser where superuser=1 and identifier='local2'
+
+----------------------------------------------------------------------------------------------
+Declare @ContactId int 
+Insert Into Crm..TContact
+(IndClientId, CRMContactId, RefContactType, Description, Value, DefaultFg, ConcurrencyId)
+Select 10155, 3500000, 'E-Mail', 'E-Mail', 'local2@intelliflo.com', 1, 1
+
+select @ContactId = SCOPE_IDENTITY()
+exec Crm..SpNAuditContact @StampUser=0, @ContactId = @ContactId, @StampAction = 'C'
+
+Insert Into administration..TMembership
+(UserId, RoleId, ConcurrencyId)
+Values(28000, 10112, 1)
+
+
+update PolicyManagement..TApplicationLink set AllowAccess=1 where RefApplicationId = 7
+
+Set Identity_INsert TTenantEmailConfig ON
+Insert Into TTenantEmailConfig
+(TenantEmailConfigId, RefEmailDuplicateConfigId, RefEmailStorageConfigId, RefEmailAttachmentConfigId, TenantId, IsAuthenticateSPF, IsAuthenticateSenderId, IsAuthenticateDomainKey, MaximumEmailSize, ConcurrencyId)
+select 1, 3, 2, 1, 10155, 0, 0, 0, 20, 1
+Set Identity_INsert TTenantEmailConfig OFF
+
+Set Identity_INsert TOutlookExtensionUserOption ON
+Insert Into TOutlookExtensionUserOption
+(OutlookExtensionUserOptionId, UserId, SyncDiaryAppointments, IsSetupNotificationSent, ConcurrencyId)
+Values(1, 28000, 1, 1, 1)
+Set Identity_INsert TOutlookExtensionUserOption OFF
+
+
+--Rollback tran
+commit tran
+

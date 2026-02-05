@@ -1,0 +1,87 @@
+USE PolicyManagement;
+
+DECLARE @ScriptGUID UNIQUEIDENTIFIER
+		, @Comments VARCHAR(255)
+		, @CorporateName VARCHAR(255) = 'Quilter Cheviot Limited'
+		, @RefProdProviderId INT
+		, @CorporateId INT
+		, @CRMContactId INT
+
+/*
+Summary
+DEF-16163 - Unarchive Quilter Cheviot
+
+DatabaseName        TableName      Expected Rows
+PolicyManagement	TRefProdProvider	1
+CRM					TCRMContact			1
+CRM					TCorporate			1
+*/
+
+SELECT 
+	@ScriptGUID = 'F9AC6A0F-2D3C-4552-849F-5C77551F0D0D', 
+	@Comments = 'DEF-16163 - Unarchive Quilter Cheviot'
+
+IF EXISTS (SELECT 1 FROM TExecutedDataScript WHERE ScriptGUID = @ScriptGUID)
+	RETURN;
+
+SET NOCOUNT ON
+SET XACT_ABORT ON
+
+SET @RefProdProviderId = (
+	SELECT TOP 1 RefProdProviderId 
+	FROM TRefProdProvider p 
+	JOIN CRM..TCRMContact c ON p.CRMContactId = c.CRMContactId 
+	WHERE c.CorporateName = @CorporateName
+	)
+
+SET @CRMContactId = (
+	SELECT TOP 1 CRMContactId
+FROM CRM.dbo.TCRMContact a
+	WHERE CorporateName = @CorporateName AND a.CRMContactType = 1
+)
+
+SET @CorporateId = (
+	SELECT TOP 1 CorporateId
+	FROM CRM.dbo.TCRMContact
+	WHERE CRMContactId = @CRMContactId 
+)
+
+IF @RefProdProviderId IS NOT NULL AND @CorporateId IS NOT NULL AND @CRMContactId IS NOT NULL
+BEGIN TRY
+
+    BEGIN TRANSACTION
+
+	EXEC SpNAuditRefProdProvider 0, @RefProdProviderId, 'U'
+
+    UPDATE TRefProdProvider
+	SET RetireFg = 0
+	WHERE RefProdProviderId = @RefProdProviderId
+
+	EXEC CRM.dbo.SpNAuditCRMContact 0, @CRMContactId, 'U'
+
+	UPDATE CRM.dbo.TCRMContact
+	SET ArchiveFg = 0
+	WHERE CRMContactId = @CRMContactId
+
+	EXEC CRM.dbo.SpNAuditCorporate 0, @CorporateId, 'U'
+
+	UPDATE CRM.dbo.TCorporate
+	SET ArchiveFg = 0
+	WHERE CorporateId = @CorporateId
+
+    INSERT TExecutedDataScript (ScriptGUID, Comments) VALUES (@ScriptGUID, @Comments)
+
+    COMMIT TRANSACTION
+
+END TRY
+BEGIN CATCH
+    
+	IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION
+	;THROW
+
+END CATCH
+
+SET XACT_ABORT OFF
+SET NOCOUNT OFF
+
+RETURN;

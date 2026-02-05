@@ -1,0 +1,12 @@
+CREATE TABLE [dbo].[TRefXSLType]
+(
+[RefXSLTypeId] [int] NOT NULL IDENTITY(1, 1),
+[Identifier] [varchar] (255) COLLATE Latin1_General_CI_AS NOT NULL,
+[IsArchived] [bit] NOT NULL CONSTRAINT [DF_TRefXSLType_IsArchived] DEFAULT ((0)),
+[ConcurrencyId] [int] NOT NULL CONSTRAINT [DF_TRefXSLType_ConcurrencyId] DEFAULT ((1))
+)
+GO
+ALTER TABLE [dbo].[TRefXSLType] ADD CONSTRAINT [PK_TRefXSLType] PRIMARY KEY NONCLUSTERED  ([RefXSLTypeId]) WITH (FILLFACTOR=80)
+GO
+CREATE CLUSTERED INDEX [IDX_TRefXSLType] ON [dbo].[TRefXSLType] ([RefXSLTypeId]) WITH (FILLFACTOR=80)
+GO

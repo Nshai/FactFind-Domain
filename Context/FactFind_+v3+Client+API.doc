@@ -1,0 +1,537 @@
+Date: Tue, 3 Feb 2026 14:53:39 +0000 (UTC)
+Message-ID: <600252467.3.1770130419577@052f9fdb1be5>
+Subject: Exported From Confluence
+MIME-Version: 1.0
+Content-Type: multipart/related; 
+	boundary="----=_Part_2_1552399770.1770130419576"
+
+------=_Part_2_1552399770.1770130419576
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Location: file:///C:/exported.html
+
+<html xmlns:o=3D'urn:schemas-microsoft-com:office:office'
+      xmlns:w=3D'urn:schemas-microsoft-com:office:word'
+      xmlns:v=3D'urn:schemas-microsoft-com:vml'
+      xmlns=3D'urn:w3-org-ns:HTML'>
+<head>
+    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dutf-8=
+">
+    <title>FactFind: v3 Client API</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:TargetScreenSize>1024x640</o:TargetScreenSize>
+            <o:PixelsPerInch>72</o:PixelsPerInch>
+            <o:AllowPNG/>
+        </o:OfficeDocumentSettings>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>90</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+                <!--
+        @page Section1 {
+            size: 8.5in 11.0in;
+            margin: 1.0in;
+            mso-header-margin: .5in;
+            mso-footer-margin: .5in;
+            mso-paper-source: 0;
+        }
+
+        table {
+            border: solid 1px;
+            border-collapse: collapse;
+        }
+
+        table td, table th {
+            border: solid 1px;
+            padding: 5px;
+        }
+
+        td {
+            page-break-inside: avoid;
+        }
+
+        tr {
+            page-break-after: avoid;
+        }
+
+        div.Section1 {
+            page: Section1;
+        }
+
+        /* Confluence print stylesheet. Common to all themes for print medi=
+a */
+/* Full of !important until we improve batching for print CSS */
+
+@media print {
+    #main {
+        padding-bottom: 1em !important; /* The default padding of 6em is to=
+o much for printouts */
+    }
+
+    body {
+        font: var(--ds-font-body-small, Arial, Helvetica, FreeSans, sans-se=
+rif);
+    }
+
+    body, #full-height-container, #main, #page, #content, .has-personal-sid=
+ebar #content {
+        background: var(--ds-surface, #fff) !important;
+        color: var(--ds-text, #000) !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    a, a:link, a:visited, a:focus, a:hover, a:active {
+        color: var(--ds-text, #000);
+    }
+
+    #content h1,
+    #content h2,
+    #content h3,
+    #content h4,
+    #content h5,
+    #content h6 {
+        page-break-after: avoid;
+    }
+
+    pre {
+        font: var(--ds-font-code, Monaco, "Courier New", monospace);
+    }
+
+    #header,
+    .aui-header-inner,
+    #navigation,
+    #sidebar,
+    .sidebar,
+    #personal-info-sidebar,
+    .ia-fixed-sidebar,
+    .page-actions,
+    .navmenu,
+    .ajs-menu-bar,
+    .noprint,
+    .inline-control-link,
+    .inline-control-link a,
+    a.show-labels-editor,
+    .global-comment-actions,
+    .comment-actions,
+    .quick-comment-container,
+    #addcomment {
+        display: none !important;
+    }
+
+    /* CONF-28544 cannot print multiple pages in IE */
+    #splitter-content {
+        position: relative !important;
+    }
+
+    .comment .date::before {
+        content: none !important; /* remove middot for print view */
+    }
+
+    h1.pagetitle img {
+        height: auto;
+        width: auto;
+    }
+
+    .print-only {
+        display: block;
+    }
+
+    #footer {
+        position: relative !important; /* CONF-17506 Place the footer at en=
+d of the content */
+        margin: 0;
+        padding: 0;
+        background: none;
+        clear: both;
+    }
+
+    #poweredby {
+        border-top: none;
+        background: none;
+    }
+
+    #poweredby li.print-only {
+        display: list-item;
+        font-style: italic;
+    }
+
+    #poweredby li.noprint {
+        display: none;
+    }
+
+    /* no width controls in print */
+    .wiki-content .table-wrap,
+    .wiki-content p,
+    .panel .codeContent,
+    .panel .codeContent pre,
+    .image-wrap {
+        overflow: visible !important;
+    }
+
+    /* TODO - should this work? */
+    #children-section,
+    #comments-section .comment,
+    #comments-section .comment .comment-body,
+    #comments-section .comment .comment-content,
+    #comments-section .comment p {
+        page-break-inside: avoid;
+    }
+
+    #page-children a {
+        text-decoration: none;
+    }
+
+    /**
+     hide twixies
+
+     the specificity here is a hack because print styles
+     are getting loaded before the base styles. */
+    #comments-section.pageSection .section-header,
+    #comments-section.pageSection .section-title,
+    #children-section.pageSection .section-header,
+    #children-section.pageSection .section-title,
+    .children-show-hide {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .children-show-hide.icon {
+        display: none;
+    }
+
+    /* personal sidebar */
+    .has-personal-sidebar #content {
+        margin-right: 0px;
+    }
+
+    .has-personal-sidebar #content .pageSection {
+        margin-right: 0px;
+    }
+
+    .no-print, .no-print * {
+        display: none !important;
+    }
+}
+-->
+    </style>
+</head>
+<body>
+    <h1>FactFind: v3 Client API</h1>
+    <div class=3D"Section1">
+        <div class=3D"plugin-tabmeta-details">
+<style>[data-colorid=3Dx45256a3ez]{color:#707070} html[data-color-mode=3Dda=
+rk] [data-colorid=3Dx45256a3ez]{color:#8f8f8f}[data-colorid=3Dlv6ux61rna]{c=
+olor:#707070} html[data-color-mode=3Ddark] [data-colorid=3Dlv6ux61rna]{colo=
+r:#8f8f8f}</style>
+<div class=3D"table-wrap">
+<table data-layout=3D"default" class=3D"confluenceTable">
+<tbody>
+<tr>
+<th class=3D"confluenceTh">
+<p>Activity Ticket</p></th>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">
+<p>Epic/Feature</p></th>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">
+<p>Document status</p></th>
+<td class=3D"confluenceTd">
+<p><span class=3D"status-macro aui-lozenge aui-lozenge-visual-refresh">DRAF=
+T</span></p></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">
+<p>Designer</p></th>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">
+<p>Reviewers</p></th>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+<tr>
+<th class=3D"confluenceTh">
+<p>API version</p></th>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<style type=3D"text/css">/*<![CDATA[*/
+div.rbtoc1770130419502 {padding: 0px;}
+div.rbtoc1770130419502 ul {list-style: disc;margin-left: 0px;}
+div.rbtoc1770130419502 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style>
+<div class=3D"toc-macro rbtoc1770130419502">
+<ul class=3D"toc-indentation">
+<li><a href=3D"#FactFind:v3ClientAPI-WorkItems">Work Items</a></li>
+<li><a href=3D"#FactFind:v3ClientAPI-ResourceModel">Resource Model</a></li>
+<li><a href=3D"#FactFind:v3ClientAPI-ResourceSummary">Resource Summary</a><=
+/li>
+<li><a href=3D"#FactFind:v3ClientAPI-OperationSummary">Operation Summary</a=
+></li>
+<li><a href=3D"#FactFind:v3ClientAPI-ResourceExamples">Resource Examples</a=
+></li>
+<li><a href=3D"#FactFind:v3ClientAPI-FullSwaggerDefinitions">Full Swagger D=
+efinitions</a></li>
+<li><a href=3D"#FactFind:v3ClientAPI-SequenceDiagrams">Sequence Diagrams</a=
+></li>
+<li><a href=3D"#FactFind:v3ClientAPI-Events">Events</a>
+<ul class=3D"toc-indentation">
+<li><a href=3D"#FactFind:v3ClientAPI-Events.1">Events</a></li>
+</ul></li>
+<li><a href=3D"#FactFind:v3ClientAPI-Addothertopicsordetailwhereneeded...">=
+Add other topics or detail where needed...</a></li>
+</ul>
+</div>
+<h1 id=3D"FactFind:v3ClientAPI-WorkItems">Work Items</h1>
+<p></p>
+<div class=3D"jim-error-message jim-error-message-table">
+<table class=3D"aui">
+<tbody>
+<tr></tr>
+<tr>
+<th>key</th>
+<th>summary</th>
+<th>type</th>
+<th>created</th>
+<th>due</th>
+<th>assignee</th>
+<th>priority</th>
+<th>status</th>
+<th>resolution</th>
+</tr>
+<tr>
+<td colspan=3D"9">
+<div class=3D"aui-message aui-message-warning">
+<p class=3D"message"><span class=3D"icon-in-pdf"></span> Unable to locate J=
+ira server for this macro. It may be due to Application Link configuration.=
+</p>
+</div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br></p>
+<h1 id=3D"FactFind:v3ClientAPI-ResourceModel">Resource Model</h1>
+<p><span data-colorid=3D"x45256a3ez">Insert yUML below - see Architecture a=
+nd Design Artifacts. New Resources must be in green, modified resources sho=
+uld be in orange and removed resources should be in red &nbsp;</span><img c=
+lass=3D"wysiwyg-unknown-macro" src=3D"https://intelliflo.atlassian.net/wiki=
+/plugins/servlet/confluence/placeholder/unknown-macro?name=3Dyuml_class_dia=
+gram&amp;locale=3Den_GB&amp;version=3D2"></p>
+<h1 id=3D"FactFind:v3ClientAPI-ResourceSummary">Resource Summary</h1>
+<div class=3D"table-wrap">
+<table data-layout=3D"full-width" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 187.23px;">
+<col style=3D"width: 463.76px;">
+<col style=3D"width: 124.82px;">
+<col style=3D"width: 242.64px;">
+</colgroup>
+<tbody>
+<tr>
+<th class=3D"confluenceTh">
+<p>Resource</p></th>
+<th class=3D"confluenceTh">
+<p>Data Classification</p></th>
+<th class=3D"confluenceTh">
+<p>Contains PII</p></th>
+<th class=3D"confluenceTh">
+<p>Change</p></th>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p></p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id=3D"FactFind:v3ClientAPI-OperationSummary">Operation Summary</h1>
+<div class=3D"table-wrap">
+<table data-layout=3D"full-width" class=3D"confluenceTable">
+<colgroup>
+<col style=3D"width: 183.46px;">
+<col style=3D"width: 133.43px;">
+<col style=3D"width: 461.61px;">
+<col style=3D"width: 242.64px;">
+</colgroup>
+<tbody>
+<tr>
+<th class=3D"confluenceTh">
+<p>Operation</p></th>
+<th class=3D"confluenceTh">
+<p>Verb</p></th>
+<th class=3D"confluenceTh">
+<p>Path</p></th>
+<th class=3D"confluenceTh">
+<p>Change</p></th>
+</tr>
+<tr>
+<td class=3D"confluenceTd">
+<p></p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+<td class=3D"confluenceTd">
+<p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id=3D"FactFind:v3ClientAPI-ResourceExamples">Resource Examples</h1>
+<p><span data-colorid=3D"lv6ux61rna">Insert Example Json - For each resourc=
+e create an example json and insert it here within a code macro.&nbsp;Ensur=
+e that the json is prettified, that the title is set to the resource name, =
+that the language is set to 'javascript', enable linenumbers and set the th=
+eme to 'FadeToGray'</span></p>
+<h1 id=3D"FactFind:v3ClientAPI-FullSwaggerDefinitions">Full Swagger Definit=
+ions</h1>
+<p></p>
+<div class=3D"plugin_attachments_container">
+<div class=3D"plugin_attachments_table_container">
+<fieldset class=3D"hidden">
+<input type=3D"hidden" class=3D"plugin_attachments_macro_render_param" name=
+=3D"pageId" value=3D"2401206284"> <input type=3D"hidden" class=3D"plugin_at=
+tachments_macro_render_param" name=3D"pageSize" value=3D"500"> <input type=
+=3D"hidden" class=3D"plugin_attachments_macro_render_param" name=3D"totalPa=
+ges" value=3D"1"> <input type=3D"hidden" name=3D"deleteConfirmMessage" valu=
+e=3D"Are you sure you want to send the attached file " to=3D"" the=3D"" onl=
+y=3D"" a=3D"" space=3D"" administrator=3D"" can=3D"" undo=3D"" this=3D""> <=
+input type=3D"hidden" class=3D"plugin_attachments_macro_render_param" name=
+=3D"preview" value=3D"false"> <input type=3D"hidden" class=3D"plugin_attach=
+ments_macro_render_param" name=3D"patterns" value=3D"*.json"> <input type=
+=3D"hidden" name=3D"outputType" value=3D"word">
+</fieldset>
+<table class=3D"attachments aui" data-sort-by=3D"date" data-sort-order=3D""=
+ data-tablesorter-headers=3D"{&quot;0&quot;: {&quot;sorter&quot;: false}}">
+<tbody>
+<tr class=3D"header-row">
+<th class=3D"expand-column attachment-summary-toggle">&nbsp;</th>
+<th class=3D"filename-column">File</th>
+<th class=3D"modified-column">Modified</th>
+</tr>
+</tbody>
+<tbody>
+</tbody>
+</table>
+</div>
+<div class=3D"plugin_attachments_upload_container">
+<div class=3D"attachments-table-drop-zone">
+<div class=3D"drop-zone-empty-text">
+No files shared here yet.
+</div>
+<li class=3D"drop-zone-text">
+<div class=3D"drop-zone-image"></div><span>Drag and drop to upload or <a cl=
+ass=3D"aui-button aui-button-link browse-files">browse for files</a></span>=
+ <img src=3D"999c4a54a1d631b9463deb289934c49e59d234389606206787c86a080c2c2e=
+cc" class=3D"plugin_attachments_dropzone_uploadwaiticon" width=3D"16" heigh=
+t=3D"16"></li>
+<form method=3D"POST" class=3D"plugin_attachments_uploadform aui hidden" ac=
+tion=3D"/wiki/pages/plugins/attachments/doattachfile.action?pageId=3D240120=
+6284" enctype=3D"multipart/form-data">
+<input type=3D"hidden" name=3D"atl_token" value=3D"ed240ecaaadc03eacbdaab6e=
+ba8226be9cf2623f">
+<div class=3D"field-group">
+<label>Upload file</label> <input type=3D"file" name=3D"file_0" size=3D"30"=
+>
+</div>
+<div class=3D"field-group">
+<label>File description</label> <input type=3D"text" class=3D"blank-search =
+text" name=3D"comment_0" size=3D"20" placeholder=3D"Comment"> <input type=
+=3D"hidden" name=3D"labels" value=3D"$macroParams.labels">
+</div>
+<div class=3D"field-group">
+<input type=3D"submit" class=3D"submit aui-button" name=3D"confirm" value=
+=3D"Upload">
+</div><iframe class=3D"plugin_attachments_uploadiframe hidden" name=3D"KyFY=
+dCSbP6uBcLYiwoS64TtEciTzxUVu9FRu8H69BNuTmCN5tc6zdYXYwV2TjVXx" src=3D""></if=
+rame>
+</form>
+</div>
+</div>
+<div>
+</div>
+</div>
+<h1 id=3D"FactFind:v3ClientAPI-SequenceDiagrams">Sequence Diagrams</h1>
+<p></p>
+<h1 id=3D"FactFind:v3ClientAPI-Events">Events</h1>
+<p></p>
+<h5 id=3D"FactFind:v3ClientAPI-Events.1"><strong>Events</strong></h5>
+<div class=3D"code panel pdl" style=3D"border-width: 1px;">
+<div class=3D"codeContent panelContent pdl">
+<pre class=3D"syntaxhighlighter-pre" data-syntaxhighlighter-params=3D"brush=
+: js; gutter: false; theme: Confluence" data-theme=3D"Confluence"></pre>
+</div>
+</div>
+<p><br></p>
+<h1 id=3D"FactFind:v3ClientAPI-Addothertopicsordetailwhereneeded...">Add ot=
+her topics or detail where needed...</h1>
+<p></p>
+    </div>
+</body>
+</html>
+------=_Part_2_1552399770.1770130419576
+Content-Type: application/octet-stream
+Content-Transfer-Encoding: base64
+Content-Location: file:///C:/999c4a54a1d631b9463deb289934c49e59d234389606206787c86a080c2c2ecc
+
+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
+fySDhGYQdDWGQyUhADs=
+------=_Part_2_1552399770.1770130419576--

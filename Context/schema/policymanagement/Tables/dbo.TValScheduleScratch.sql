@@ -1,0 +1,43 @@
+CREATE TABLE [dbo].[TValScheduleScratch]
+(
+[ValScheduleScratchId] [int] NOT NULL IDENTITY(1, 1),
+[ValScheduleId] [int] NOT NULL,
+[Guid] [varchar] (50) COLLATE Latin1_General_CI_AS NOT NULL,
+[ScheduledLevel] [varchar] (255) COLLATE Latin1_General_CI_AS NOT NULL,
+[ProcessOrder] [varchar] (20) COLLATE Latin1_General_CI_AS NOT NULL,
+[IndigoClientId] [int] NOT NULL,
+[RefProdProviderId] [int] NOT NULL,
+[ClientCRMContactId] [int] NULL,
+[UserCredentialOption] [varchar] (255) COLLATE Latin1_General_CI_AS NOT NULL,
+[PortalCRMContactId] [int] NULL,
+[UserId] [int] NULL,
+[Frequency] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[IsLocked] [bit] NULL,
+[UserNameForFileAccess] [varchar] (100) COLLATE Latin1_General_CI_AS NULL,
+[PasswordForFileAccess] [varchar] (100) COLLATE Latin1_General_CI_AS NULL,
+[Password2ForFileAccess] [varbinary] (4000) NULL,
+[BulkValuationType] [varchar] (100) COLLATE Latin1_General_CI_AS NULL,
+[ScheduleDelay] [int] NULL,
+[AlwaysAvailableFg] [bit] NULL,
+[DayOfTheWeek] [varchar] (20) COLLATE Latin1_General_CI_AS NULL,
+[StartHour] [tinyint] NULL,
+[EndHour] [tinyint] NULL,
+[StartMinute] [tinyint] NULL,
+[EndMinute] [tinyint] NULL,
+[ValScheduleItemId] [int] NULL,
+[ValQueueId] [int] NULL,
+[NextOccurrence] [datetime] NULL,
+[LastOccurrence] [datetime] NULL,
+[RefValScheduleItemStatusId] [int] NULL,
+[SaveAsFilePathAndName] [varchar] (255) COLLATE Latin1_General_CI_AS NULL,
+[PolicyBusinessId] [int] NULL,
+[AcquiredBy] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
+[AcquiredAt] [datetime] NULL,
+[AcquiredExpireTime] [datetime] NULL,
+[IsProcessed] [bit] NOT NULL CONSTRAINT [DF_TValScheduleScratch_IsProcessed] DEFAULT ((0)),
+[SubmitSequenceByProvider] [int] NULL,
+[SubmitAtOrAfter] [datetime] NULL
+)
+GO
+ALTER TABLE [dbo].[TValScheduleScratch] ADD CONSTRAINT [PK_TValScheduleScratch] PRIMARY KEY NONCLUSTERED  ([ValScheduleScratchId])
+GO
