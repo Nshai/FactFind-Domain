@@ -1,6 +1,0 @@
--- Drop Procedure SpNioCustomOpenSymmetricKeyForPasswordEncryption
-Create Procedure SpNioCustomOpenSymmetricKeyForPasswordEncryption
-As
-
-OPEN SYMMETRIC KEY SymmetricKeyForPasswordEncryption DECRYPTION BY CERTIFICATE CertificateForPasswordEncryption;
-

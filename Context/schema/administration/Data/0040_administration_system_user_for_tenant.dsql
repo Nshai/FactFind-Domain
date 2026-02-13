@@ -1,5 +1,0 @@
-USE Administration
-GO
-
----------- ADD A SYSTEM USER FOR PRESETUP TENANT ID
-EXEC nio_SpCustomAddSystemUserForTenant 10155

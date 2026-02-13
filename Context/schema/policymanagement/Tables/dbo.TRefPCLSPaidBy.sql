@@ -1,9 +1,0 @@
-CREATE TABLE [dbo].[TRefPCLSPaidBy]
-(
-[RefPCLSPaidById] [int] NOT NULL IDENTITY(1, 1) NOT FOR REPLICATION,
-[RefPCLSPaidByName] [varchar] (50) COLLATE Latin1_General_CI_AS NULL,
-[ConcurrencyId] [int] NOT NULL CONSTRAINT [TRefPCLSPaidBy_ConcurrencyId] DEFAULT ((1))
-)
-GO
-ALTER TABLE [dbo].[TRefPCLSPaidBy] ADD CONSTRAINT [PK_TRefPCLSPaidBy] PRIMARY KEY CLUSTERED  ([RefPCLSPaidById])
-GO
