@@ -1,0 +1,28116 @@
+
+<!-- FactFind API Design v2.0 - Generated: 2026-02-17T14:59:30.880008 -->
+# FactFind System API Design Specification
+## Comprehensive RESTful API for Wealth Management Platform
+
+**Document Version:** 2.0
+**Date:** 2026-02-17
+**Status:** Design Specification v2.0 - Enhanced with Missing Entities
+**API Version:** v1
+**Base URL:** `https://api.factfind.com`
+**Source:** Greenfield ERD Enhanced - Complete Domain Coverage (50+ entities, 2,000+ fields)
+
+---
+
+## Executive Summary
+
+This document presents a comprehensive RESTful API design for the FactFind system, a wealth management platform built on Domain-Driven Design (DDD) principles. The API architecture follows industry best practices and provides complete coverage of all business capabilities required for modern financial advisory services.
+
+### Overview
+
+**Business Domain:** Wealth Management & Financial Advisory
+**Total Entities:** 50+ entities across 8 bounded contexts (enhanced with 11+ new entities)
+**Total Fields:** 1,786 business fields from Excel specification
+**Regulatory Compliance:** FCA Handbook, MiFID II, IDD, Consumer Duty, GDPR, MLR 2017
+**Industry Standards:** Aligned with Intelligent Office, Salesforce FSC, Xplan, MoneyHub
+
+### API Scope
+
+The FactFind API provides comprehensive digital capabilities for:
+
+1. **Client Onboarding & KYC** - Client management, identity verification, regulatory compliance
+2. **Circumstances Discovery** - Fact-finding, employment, income, expenditure tracking
+3. **Arrangements Management** - Pensions, investments, protection, mortgages
+4. **Goals & Objectives** - Financial goal setting and tracking
+5. **Risk Profiling** - Attitude to risk assessment and capacity for loss
+6. **Estate Planning** - Gifts, trusts, and inheritance tax planning
+7. **Reference Data** - Centralized lookup data management
+
+### Key Features
+
+- **RESTful Architecture** - Resource-oriented design with proper HTTP semantics
+- **Single Contract Principle** - One unified contract per entity for create, update, and response operations
+- **Aggregate-Based** - APIs organized around DDD aggregates for transactional consistency
+- **Event-Driven** - Domain events for loose coupling and integration
+- **Industry-Standard** - FCA-compliant terminology and data structures
+- **Production-Ready** - Complete request/response contracts with validation rules
+- **HATEOAS Level 3** - Hypermedia controls for API discoverability
+- **Multi-Tenancy** - Built-in tenant isolation for SaaS deployment
+
+### Target Audience
+
+- **API Consumers:** Frontend developers, mobile app developers, integration partners
+- **Backend Developers:** Implementation teams building the API services
+- **Product Owners:** Business stakeholders understanding API capabilities
+- **Architects:** System designers reviewing architectural decisions
+- **Compliance Teams:** Regulatory compliance verification
+
+
+
+### What's New in v2.0
+
+**PRIORITY 1: Risk Assessment Enhancements (Compliance Critical)**
+- **Section 10.4:** Risk Questionnaire API - Template management, versioning, regulatory approval
+- **Section 10.5:** Risk Assessment History API - Risk Replay mechanism, audit trail, comparison
+- **Section 10.6:** Supplementary Questions API - Additional risk and compliance questions
+- **Section 10.7:** Enhanced Declaration Capture - Comprehensive consent and signature management
+
+**PRIORITY 2: New Investment Capabilities**
+- **Section 9A:** NEW - Savings & Investments API - Dedicated investment operations, performance tracking, rebalancing
+
+**PRIORITY 3: Assets & Liabilities Enhancements**
+- **Section 9.4:** Property Management API - Property portfolio, valuations, LTV calculations
+- **Section 9.5:** Equities Portfolio API - Direct stock holdings, performance tracking
+- **Section 9.6:** Credit History API - Credit scores, payment history, credit reports
+
+**PRIORITY 4: Client Profile Enhancements**
+- **Section 5.5:** Identity Verification API - KYC workflow, AML checks, document verification
+- **Section 5.6:** Data Protection & Consent API - GDPR compliance, consent management
+- **Section 5.7:** Marketing Preferences API - Channel preferences, opt-in/opt-out management
+
+**PRIORITY 5: Financial Position Tracking**
+- **Section 4.4:** Current Position Summary API - Net worth, asset allocation, financial health
+
+**New Entity Contracts (Section 13)**
+- Investment Contract (13.8)
+- Property Contract (13.9)
+- Equity Contract (13.10)
+- CreditHistory Contract (13.11)
+- IdentityVerification Contract (13.12)
+- Consent Contract (13.13)
+
+**Coverage Improvements:**
+- Risk Assessment domain coverage increased from 38% to 95%
+- Savings & Investments now has dedicated API section
+- Client Profile domain coverage increased from 64% to 90%
+- Assets & Liabilities domain coverage increased from 67% to 95%
+- Overall API coverage increased from 77% to 95%
+
+
+---
+
+## Table of Contents
+
+1. [API Design Principles](#1-api-design-principles)
+   - [1.7 Single Contract Principle](#17-single-contract-principle)
+   - [1.8 Value and Reference Type Semantics](#18-value-and-reference-type-semantics)
+   - [1.9 Aggregate Root Pattern](#19-aggregate-root-pattern)
+2. [Authentication & Authorization](#2-authentication--authorization)
+3. [Common Patterns](#3-common-patterns)
+4. [FactFind API (Root Aggregate)](#4-factfind-api-root-aggregate)
+   - [4.4 Current Position Summary API](#44-current-position-summary-api) **NEW v2.0**
+5. [FactFind Clients API](#5-factfind-clients-api)
+   - [5.5 Identity Verification API](#55-identity-verification-api) **NEW v2.0**
+   - [5.6 Data Protection & Consent API](#56-data-protection--consent-api) **NEW v2.0**
+   - [5.7 Marketing Preferences API](#57-marketing-preferences-api) **NEW v2.0**
+6. [FactFind Income & Expenditure API](#6-factfind-income--expenditure-api)
+7. [FactFind Arrangements API](#7-factfind-arrangements-api)
+8. [FactFind Goals API](#8-factfind-goals-api)
+9. [FactFind Assets & Liabilities API](#9-factfind-assets--liabilities-api)
+   - [9.4 Property Management API](#94-property-management-api) **NEW v2.0**
+   - [9.5 Equities Portfolio API](#95-equities-portfolio-api) **NEW v2.0**
+   - [9.6 Credit History API](#96-credit-history-api) **NEW v2.0**
+9A. [FactFind Savings & Investments API](#9a-factfind-savings--investments-api) **NEW SECTION v2.0**
+   - [9A.1 Overview](#9a1-overview)
+   - [9A.2 Operations Summary](#9a2-operations-summary)
+   - [9A.3 Key Endpoints](#9a3-key-endpoints)
+10. [FactFind Risk Profile API](#10-factfind-risk-profile-api)
+   - [10.4 Risk Questionnaire API](#104-risk-questionnaire-api) **NEW v2.0**
+   - [10.5 Risk Assessment History API](#105-risk-assessment-history-api) **NEW v2.0**
+   - [10.6 Supplementary Questions API](#106-supplementary-questions-api) **NEW v2.0**
+   - [10.7 Enhanced Declaration Capture](#107-enhanced-declaration-capture) **NEW v2.0**
+11. [FactFind Estate Planning API](#11-factfind-estate-planning-api)
+12. [Reference Data API](#12-reference-data-api)
+13. [Entity Contracts](#13-entity-contracts)
+   - [13.1 Client Contract](#131-client-contract)
+   - [13.2 FactFind Contract](#132-factfind-contract)
+   - [13.3 Address Contract](#133-address-contract)
+   - [13.4 Income Contract](#134-income-contract)
+   - [13.5 Arrangement Contract](#135-arrangement-contract)
+   - [13.6 Goal Contract](#136-goal-contract)
+   - [13.7 RiskProfile Contract](#137-riskprofile-contract)
+   - [13.8 Investment Contract](#138-investment-contract) **NEW v2.0**
+   - [13.9 Property Contract](#139-property-contract) **NEW v2.0**
+   - [13.10 Equity Contract](#1310-equity-contract) **NEW v2.0**
+   - [13.11 CreditHistory Contract](#1311-credithistory-contract) **NEW v2.0**
+   - [13.12 IdentityVerification Contract](#1312-identityverification-contract) **NEW v2.0**
+   - [13.13 Consent Contract](#1313-consent-contract) **NEW v2.0**
+   - [13.14 Collection Response Wrapper](#1314-collection-response-wrapper)
+   - [13.15 Standard Value Types](#1315-standard-value-types)
+   - [13.16 Standard Reference Types](#1316-standard-reference-types)
+14. [Implementation Guidance](#14-implementation-guidance)
+15. [Appendices](#appendices)
+
+---
+
+
+## 1. API Design Principles
+
+### 1.1 RESTful Architecture
+
+The FactFind API strictly follows REST architectural principles:
+
+**Resource-Oriented Design:**
+- Resources are identified by URIs (e.g., `/api/v1/clients/123`)
+- Resources are nouns, not verbs (clients, factfinds, arrangements)
+- HTTP methods define operations (GET, POST, PUT, PATCH, DELETE)
+- Proper HTTP status codes indicate outcomes
+
+**Stateless Communication:**
+- Each request contains all information needed to process it
+- No server-side session state maintained
+- Authentication via JWT tokens passed in Authorization header
+- Enables horizontal scalability and load balancing
+
+**Cacheable Responses:**
+- ETags for optimistic concurrency control
+- Cache-Control headers for performance optimization
+- Conditional requests with If-Match/If-None-Match headers
+
+**Layered System:**
+- API Gateway for routing and security
+- Service layer for business logic
+- Data access layer for persistence
+- Integration layer for external systems
+
+### 1.2 Naming Conventions
+
+**Resource URIs:**
+```
+/api/v1/clients                     (collection)
+/api/v1/clients/{id}                (single resource)
+/api/v1/clients/{id}/addresses      (sub-resource collection)
+/api/v1/factfinds/{id}/income       (nested resource)
+```
+
+**Naming Rules:**
+- Plural nouns for collections (`/clients`, `/factfinds`, `/arrangements`)
+- Lowercase with hyphens for multi-word resources (`/contact-details`, `/risk-profiles`)
+- Path parameters in camelCase (`{clientId}`, `{factfindId}`)
+- Query parameters in camelCase (`sortBy`, `pageSize`, `includeArchived`)
+
+**Property Naming (JSON):**
+- camelCase for all properties (`firstName`, `dateOfBirth`, `grossAnnualIncome`)
+- DateTime properties suffixed with `At` (`createdAt`, `updatedAt`)
+- Date properties suffixed with `On` (`startedOn`, `completedOn`)
+- Boolean properties prefixed with `is`, `has`, `can` (`isActive`, `hasWill`)
+
+### 1.3 HTTP Methods & Status Codes
+
+**Method Usage:**
+
+| Method | Purpose | Success Response | Idempotent |
+|--------|---------|------------------|------------|
+| GET | Retrieve resource(s) | 200 OK | Yes |
+| POST | Create new resource | 201 Created + Location header | No |
+| PUT | Replace entire resource | 200 OK or 204 No Content | Yes |
+| PATCH | Partial update | 200 OK or 204 No Content | Yes |
+| DELETE | Remove resource | 204 No Content | Yes |
+
+**Status Code Standards:**
+
+**Success (2xx):**
+- `200 OK` - Successful GET, PUT, PATCH with response body
+- `201 Created` - Successful POST, Location header points to new resource
+- `204 No Content` - Successful PUT, PATCH, DELETE with no response body
+
+**Client Errors (4xx):**
+- `400 Bad Request` - Invalid request syntax or validation failure
+- `401 Unauthorized` - Authentication required or invalid
+- `403 Forbidden` - Authenticated but lacks permission
+- `404 Not Found` - Resource does not exist
+- `409 Conflict` - Concurrent modification conflict (ETag mismatch)
+- `412 Precondition Failed` - If-Match header missing or invalid
+- `422 Unprocessable Entity` - Semantic validation error
+
+**Server Errors (5xx):**
+- `500 Internal Server Error` - Unexpected server error
+- `503 Service Unavailable` - Service temporarily unavailable
+
+### 1.4 Error Response Format (RFC 7807)
+
+All error responses follow RFC 7807 Problem Details format:
+
+```json
+{
+  "type": "https://api.factfind.com/problems/validation-error",
+  "title": "Validation Failed",
+  "status": 400,
+  "detail": "One or more validation errors occurred",
+  "instance": "/api/v1/clients/123/income",
+  "traceId": "00-4bf92f3577b34da6a3ce929d0e0e4736-00",
+  "errors": [
+    {
+      "field": "grossAmount.value",
+      "code": "RANGE_ERROR",
+      "message": "Gross amount must be greater than zero",
+      "rejectedValue": -5000
+    },
+    {
+      "field": "frequency",
+      "code": "REQUIRED",
+      "message": "Frequency is required",
+      "rejectedValue": null
+    }
+  ]
+}
+```
+
+**Error Type URIs:**
+- `validation-error` - Request validation failures
+- `authentication-error` - Authentication failures
+- `authorization-error` - Permission denied
+- `not-found-error` - Resource not found
+- `conflict-error` - Business rule or concurrency violations
+- `server-error` - Internal server errors
+
+### 1.5 Aggregate-Oriented Design
+
+The FactFind API follows strict Domain-Driven Design (DDD) aggregate patterns with **FactFind as the single aggregate root**. This ensures transactional consistency, clear ownership boundaries, and proper business rule enforcement.
+
+**Single Aggregate Root: FactFind**
+
+All business entities are owned by and accessed through the FactFind aggregate root:
+
+```
+/api/v1/factfinds                                    (Root aggregate - ONLY top-level resource)
+/api/v1/factfinds/{factfindId}
+/api/v1/factfinds/{factfindId}/clients               (Clients in this fact find)
+/api/v1/factfinds/{factfindId}/clients/{clientId}
+/api/v1/factfinds/{factfindId}/income                (Income discovered in this fact find)
+/api/v1/factfinds/{factfindId}/expenditure           (Expenditure captured in this fact find)
+/api/v1/factfinds/{factfindId}/employment            (Employment recorded in this fact find)
+/api/v1/factfinds/{factfindId}/arrangements          (Arrangements identified in this fact find)
+/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}
+/api/v1/factfinds/{factfindId}/goals                 (Goals established in this fact find)
+/api/v1/factfinds/{factfindId}/assets                (Assets discovered in this fact find)
+/api/v1/factfinds/{factfindId}/liabilities           (Liabilities identified in this fact find)
+/api/v1/factfinds/{factfindId}/risk-profile          (Risk profile assessed in this fact find)
+/api/v1/factfinds/{factfindId}/gifts                 (Gifts recorded in this fact find)
+/api/v1/factfinds/{factfindId}/complete              (Complete aggregate with all nested data)
+```
+
+**Reference Data (System-Wide, Not Owned by FactFind):**
+```
+/api/v1/reference/genders                            (System-wide lookups)
+/api/v1/reference/countries
+/api/v1/reference/providers
+/api/v1/reference/product-types
+```
+
+**Design Principles:**
+- **Single Root Aggregate:** FactFind is the ONLY aggregate root for business data
+- **Transactional Boundary:** All operations within a fact find are transactionally consistent
+- **Clear Ownership:** Every entity belongs to exactly one fact find
+- **No Independent Access:** Clients, arrangements, goals, etc. cannot exist without a fact find context
+- **Reference Data Separation:** System-wide lookup data remains independent
+
+### 1.6 Versioning Strategy
+
+**URL-Based Versioning:**
+```
+https://api.factfind.com/api/v1/clients
+https://api.factfind.com/api/v2/clients (future)
+```
+
+**Version Support Policy:**
+- Current version (v1): Full support
+- Previous version: Maintenance mode (12 months)
+- Deprecated version: Security fixes only (6 months)
+- Sunset: Returns 410 Gone
+
+**Breaking vs Non-Breaking Changes:**
+
+Non-Breaking (safe):
+- Add new endpoints
+- Add optional request fields
+- Add response fields
+- Add enum values (append only)
+- Add optional query parameters
+
+Breaking (requires version bump):
+- Remove fields or endpoints
+- Rename fields
+- Change data types
+- Change required/optional status
+- Remove enum values
+- Change validation rules (stricter)
+
+### 1.7 Single Contract Principle
+
+The FactFind API follows the **Single Contract Principle** for all entity representations. Instead of maintaining separate DTOs for create requests, update requests, and responses, each entity has **one unified contract** that flows through the entire request/response pipeline.
+
+**Core Concept:**
+
+A single entity contract (e.g., `Client`) is used for:
+- POST requests (create operations)
+- PUT requests (full updates)
+- PATCH requests (partial updates)
+- GET responses (retrieval)
+
+**Traditional Approach (Not Used):**
+```
+CreateClientRequest { firstName, lastName, dateOfBirth }
+UpdateClientRequest { firstName?, lastName?, email? }
+ClientResponse { id, firstName, lastName, dateOfBirth, email, createdAt, updatedAt }
+```
+
+**Single Contract Approach (Used):**
+```
+Client {
+  id: uuid (read-only)
+  firstName: string (required-on-create, updatable)
+  lastName: string (required-on-create, updatable)
+  dateOfBirth: date (required-on-create, write-once)
+  email: string (optional, updatable)
+  createdAt: timestamp (read-only)
+  updatedAt: timestamp (read-only)
+}
+```
+
+**Field Annotations:**
+
+Each field in the unified contract is annotated with behavioral characteristics:
+
+| Annotation | Meaning | Create | Update | Response |
+|------------|---------|--------|--------|----------|
+| `required-on-create` | Must be provided when creating | Required | Optional/Ignored | Included |
+| `optional` | Can be omitted in any operation | Optional | Optional | Included if set |
+| `read-only` | System-generated, cannot be set | Ignored | Ignored | Included |
+| `write-once` | Set on create, immutable thereafter | Allowed | Ignored | Included |
+| `updatable` | Can be modified via PUT/PATCH | Allowed | Allowed | Included |
+
+**HTTP Method Handling:**
+
+**POST /api/v1/factfinds/{factfindId}/clients** (Create)
+- Request: `Client` contract with required-on-create fields
+- Server ignores: `id`, `createdAt`, `updatedAt`, and any read-only fields
+- Response: Complete `Client` contract with all fields populated
+
+**PUT /api/v1/factfinds/{factfindId}/clients/{clientId}** (Full Update)
+- Request: `Client` contract with all updatable fields (full replacement)
+- Server ignores: `id`, `createdAt`, `updatedAt`, `write-once` fields
+- Response: Complete `Client` contract with updated values
+
+**PATCH /api/v1/clients/{id}** (Partial Update)
+- Request: `Client` contract with subset of updatable fields
+- Server ignores: `id`, `createdAt`, `updatedAt`, `write-once` fields
+- Response: Complete `Client` contract with updated values
+
+**GET /api/v1/factfinds/{factfindId}/clients/{id}** (Retrieve)
+- Response: Complete `Client` contract with all fields
+
+**Benefits:**
+
+1. **Single Source of Truth** - One contract definition per entity
+2. **Reduced Duplication** - No need to maintain multiple DTOs
+3. **Easier Maintenance** - Changes made in one place
+4. **Clearer Contracts** - Field behaviors explicitly documented
+5. **Better Versioning** - Contract evolution is simpler
+6. **Type Safety** - Strongly typed across all operations
+7. **API Simplicity** - Consumers learn one contract per entity
+
+**Example: Client Contract**
+
+```json
+{
+  "id": 123,                        // read-only
+  "firstName": "John",              // required-on-create, updatable
+  "lastName": "Smith",              // required-on-create, updatable
+  "dateOfBirth": "1980-05-15",     // required-on-create, write-once
+  "email": "john@example.com",     // optional, updatable
+  "createdAt": "2020-01-15T10:30:00Z",  // read-only
+  "updatedAt": "2026-02-16T14:30:00Z"   // read-only
+}
+```
+
+When creating (POST): Client supplies `firstName`, `lastName`, `dateOfBirth`, and optionally `email`. Server generates `id`, `createdAt`, `updatedAt`.
+
+When updating (PUT/PATCH): Client can modify `firstName`, `lastName`, `email`. Cannot change `dateOfBirth` (write-once) or `id`, `createdAt`, `updatedAt` (read-only).
+
+When retrieving (GET): Server returns complete contract with all fields.
+
+**Field Selection:**
+
+For partial responses, use field selection query parameters rather than separate DTOs:
+
+```http
+GET /api/v1/factfinds/{factfindId}/clients/123?fields=id,firstName,lastName,email
+```
+
+Response returns the same `Client` contract with only requested fields populated.
+
+**Collection Responses:**
+
+Collection endpoints use a wrapper that contains an array of complete contracts:
+
+```json
+{
+  "data": [
+    { /* Complete Client contract */ },
+    { /* Complete Client contract */ }
+  ],
+  "pagination": { /* Pagination metadata */ },
+  "_links": { /* HATEOAS links */ }
+}
+```
+
+**Polymorphic Types:**
+
+For entities with subtypes (e.g., Arrangement with Pension, Investment, Protection), use a discriminator field in the unified contract:
+
+```json
+{
+  "id": 456,
+  "arrangementType": "Pension",     // discriminator (read-only, required-on-create, write-once)
+  "productName": "SIPP",            // common field
+  "pensionType": "PersonalPension", // type-specific field
+  // ... other fields
+}
+```
+
+### 1.8 Value and Reference Type Semantics
+
+The FactFind API applies strict **VALUE TYPE** and **REFERENCE TYPE** semantics to all contracts to ensure consistency, clarity, and proper resource lifecycle management.
+
+#### 1.8.1 Value Types
+
+**Definition:**
+
+Value types represent data that has **no independent identity** and are compared by their content rather than by an identifier. They are immutable concepts that are embedded directly within their parent entity.
+
+**Characteristics:**
+
+- **No Identity:** Value types do NOT have an `id` field
+- **Embedded:** Always nested within a parent entity, never standalone resources
+- **Immutable:** Represent immutable concepts (though the parent can replace them)
+- **No Lifecycle:** Cannot be created, updated, or deleted independently
+- **No Endpoints:** No dedicated API endpoints
+- **Compared by Value:** Two value types are equal if their fields match
+- **Naming Convention:** Suffixed with "Value" (e.g., `MoneyValue`, `AddressValue`)
+
+**Common Value Types:**
+
+Value types include three main categories:
+
+1. **Composite Value Objects:** Complex data structures with multiple fields
+   - `MoneyValue`, `AddressValue`, `NameValue`, `ContactValue`, `DateRangeValue`, `TaxDetailsValue`, `RateValue`, `PercentageValue`
+
+2. **Enumerations:** Code/display pairs for categorical data
+   - `GenderValue`, `MaritalStatusValue`, `EmploymentStatusValue`, `AddressTypeValue`, `ContactTypeValue`, `TitleValue`, `StatusValue`, `MeetingTypeValue`
+
+3. **Lookup Values:** Reference data with rich metadata
+   - `CountryValue`, `CountyValue`, `CurrencyValue`, `FrequencyValue`, `ProductTypeValue`
+
+**All value types share these characteristics:**
+- Are immutable
+- Do NOT have identity (no `id` field)
+- Named with "Value" suffix
+- Embedded within parent entities
+- Compared by value equality
+
+| Value Type | Fields | Example |
+|------------|--------|---------|
+| `MoneyValue` | `amount: decimal`<br>`currency: CurrencyValue` | `{ "amount": 75000.00, "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" } }` |
+| `AddressValue` | `line1-4, city, county, postcode`<br>`country: CountryValue`<br>`addressType: AddressTypeValue` | `{ "line1": "123 Main St", "city": "London", "postcode": "SW1A 1AA", "country": { "code": "GB", "display": "United Kingdom" } }` |
+| `GenderValue` | `code: string`<br>`display: string` | `{ "code": "M", "display": "Male" }` |
+| `MaritalStatusValue` | `code: string`<br>`display: string`<br>`effectiveFrom: date` | `{ "code": "MAR", "display": "Married", "effectiveFrom": "2015-06-20" }` |
+| `CountryValue` | `code: string`<br>`display: string`<br>`alpha3: string` | `{ "code": "GB", "display": "United Kingdom", "alpha3": "GBR" }` |
+| `DateRangeValue` | `startDate: date`<br>`endDate: date` | `{ "startDate": "2020-01-01", "endDate": "2025-12-31" }` |
+| `NameValue` | `title: TitleValue`<br>`firstName, middleName`<br>`lastName, preferredName` | `{ "title": { "code": "MR", "display": "Mr" }, "firstName": "John", "lastName": "Smith" }` |
+| `ContactValue` | `type: ContactTypeValue`<br>`value: string`<br>`isPrimary: boolean` | `{ "type": { "code": "EMAIL", "display": "Email" }, "value": "john@example.com", "isPrimary": true }` |
+| `PercentageValue` | `value: decimal` (0.00-1.00) | `{ "value": 0.25 }` |
+| `RateValue` | `rate: decimal`<br>`type: enum` | `{ "rate": 3.5, "type": "Fixed" }` |
+| `TaxDetailsValue` | `niNumber: string`<br>`taxReference: string` | `{ "niNumber": "AB123456C", "taxReference": "1234567890" }` |
+
+**Value Type Usage Example:**
+
+```json
+{
+  "id": "client-123",                     // Client entity has identity
+  "name": {                               // NameValue - no id, embedded
+    "title": {                            // TitleValue (enumeration)
+      "code": "MR",
+      "display": "Mr"
+    },
+    "firstName": "John",
+    "lastName": "Smith"
+  },
+  "dateOfBirth": "1980-01-15",            // Primitive value type
+  "gender": {                             // GenderValue (enumeration)
+    "code": "M",
+    "display": "Male"
+  },
+  "maritalStatus": {                      // MaritalStatusValue (enumeration)
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2015-06-20"
+  },
+  "grossAnnualIncome": {                  // MoneyValue - no id, embedded
+    "amount": 75000.00,
+    "currency": {                         // CurrencyValue (lookup)
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "primaryAddress": {                     // AddressValue - no id, embedded
+    "line1": "123 Main Street",
+    "city": "London",
+    "postcode": "SW1A 1AA",
+    "country": {                          // CountryValue (lookup)
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "addressType": {                      // AddressTypeValue (enumeration)
+      "code": "RES",
+      "display": "Residential"
+    }
+  },
+  "contacts": [                           // Array of ContactValue
+    {
+      "type": {                           // ContactTypeValue (enumeration)
+        "code": "EMAIL",
+        "display": "Email"
+      },
+      "value": "john@example.com",
+      "isPrimary": true
+    },
+    {
+      "type": {                           // ContactTypeValue (enumeration)
+        "code": "MOBILE",
+        "display": "Mobile"
+      },
+      "value": "+44 7700 900123",
+      "isPrimary": false
+    }
+  ]
+}
+```
+
+**Key Points:**
+
+- Value types are owned by their parent entity
+- To change a value type, update the parent entity
+- Value types cannot be referenced from multiple parents
+- No hypermedia links (`href`) for value types
+
+#### 1.8.2 Reference Types
+
+**Definition:**
+
+Reference types represent entities that have **independent identity** and can exist and be managed independently. They are first-class resources with their own lifecycle.
+
+**Characteristics:**
+
+- **Has Identity:** Reference types MUST have an `id` field (UUID or string)
+- **Standalone Resources:** Can be created, read, updated, and deleted independently
+- **Mutable:** Can be updated over time while maintaining identity
+- **Own Endpoints:** Have dedicated API endpoints
+- **Cross-References:** Can be referenced from multiple other entities
+- **Naming Convention:**
+  - Entity type: Singular noun (e.g., `Client`, `Adviser`, `Provider`)
+  - Reference field: Entity name + "Ref" suffix (e.g., `clientRef`, `adviserRef`)
+
+**Reference Object Pattern:**
+
+When one entity references another, use an expanded reference object containing:
+
+```json
+{
+  "clientRef": {
+    "id": "uuid-123",                    // Required: Unique identifier
+    "href": "/api/v1/clients/uuid-123",  // Required: URL to resource
+    "name": "John Smith",                // Required: Human-readable display name
+    "clientNumber": "C00001234",         // Optional: Business identifier
+    "type": "Person"                     // Optional: Discriminator for polymorphic types
+  }
+}
+```
+
+**Reference Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid/string | Yes | Unique identifier for the referenced entity |
+| `href` | string | Yes | Absolute or relative URL to the resource |
+| Display field(s) | varies | Yes | Human-readable identifier (name, number, etc.) |
+| `type` | enum | Optional | Discriminator for polymorphic references |
+
+**Common Reference Types:**
+
+| Reference Type | Display Fields | Example |
+|----------------|----------------|---------|
+| `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": "uuid", "href": "/api/v1/clients/uuid", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
+| `AdviserRef` | `name`<br>`code` | `{ "id": "uuid", "href": "/api/v1/advisers/uuid", "name": "Sarah Johnson", "code": "ADV001" }` |
+| `ProviderRef` | `name`<br>`frnNumber` | `{ "id": "uuid", "href": "/api/v1/providers/uuid", "name": "Aviva", "frnNumber": "123456" }` |
+| `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": "uuid", "href": "/api/v1/arrangements/uuid", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
+| `EmploymentRef` | `employerName`<br>`status` | `{ "id": "uuid", "href": "/api/v1/employments/uuid", "employerName": "Acme Corp", "status": "Current" }` |
+| `GoalRef` | `goalName`<br>`priority` | `{ "id": "uuid", "href": "/api/v1/goals/uuid", "goalName": "Retirement Planning", "priority": "High" }` |
+| `FactFindRef` | `factFindNumber`<br>`status` | `{ "id": "uuid", "href": "/api/v1/factfinds/uuid", "factFindNumber": "FF001234", "status": "InProgress" }` |
+
+**Reference Type Usage Example:**
+
+```json
+{
+  "id": "factfind-456",                   // FactFind entity has identity
+  "factFindNumber": "FF001234",
+  "clientRef": {                          // ClientRef - reference to Client entity
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "jointClientRef": {                     // Optional second client reference
+    "id": "client-124",
+    "href": "/api/v1/clients/client-124",
+    "name": "Jane Smith",
+    "clientNumber": "C00001235",
+    "type": "Person"
+  },
+  "adviserRef": {                         // AdviserRef - reference to Adviser entity
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Sarah Johnson",
+    "code": "ADV001"
+  },
+  "totalNetMonthlyIncome": {              // MoneyValue - embedded value type
+    "amount": 4500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "sessionDate": "2026-02-15"             // Primitive value type
+}
+```
+
+#### 1.8.3 When to Use Value vs Reference Types
+
+**Use Value Types When:**
+
+- ✅ The data has no independent identity
+- ✅ The data is owned exclusively by one parent
+- ✅ The data is conceptually immutable (replace, don't update)
+- ✅ The data is compared by content, not identity
+- ✅ Examples: Money amounts, addresses, date ranges, percentages
+
+**Use Reference Types When:**
+
+- ✅ The entity has independent identity and lifecycle
+- ✅ The entity can be shared/referenced by multiple parents
+- ✅ The entity can be updated independently
+- ✅ The entity needs its own API endpoints
+- ✅ Examples: Clients, advisers, providers, arrangements
+
+#### 1.8.4 Benefits of Value/Reference Semantics
+
+**Clarity:**
+- Clear distinction between entities and value objects
+- Obvious which types have lifecycle management
+- Explicit ownership relationships
+
+**Consistency:**
+- Uniform naming conventions across all contracts
+- Predictable structure for references
+- Standard patterns for expansion and linking
+
+**API Design:**
+- Value types: No endpoints needed
+- Reference types: Full CRUD endpoints
+- Reduced API surface area
+
+**Performance:**
+- Value types embedded: Fewer HTTP requests
+- Reference types expandable: Client controls data fetching
+- Selective expansion via query parameters
+
+**Maintainability:**
+- Clear contract boundaries
+- Easier to reason about relationships
+- Simplified testing and mocking
+
+#### 1.8.5 Resource Expansion
+
+Reference types support expansion to include the full referenced entity inline:
+
+**Default Response (Minimal):**
+```http
+GET /api/v1/factfinds/factfind-456
+```
+
+```json
+{
+  "id": "factfind-456",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234"
+  }
+}
+```
+
+**Expanded Response:**
+```http
+GET /api/v1/factfinds/factfind-456?expand=clientRef,adviserRef
+```
+
+```json
+{
+  "id": "factfind-456",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person",
+    // Full Client entity embedded when expanded
+    "dateOfBirth": "1980-01-15",
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "primaryAddress": {
+      "line1": "123 Main St",
+      "city": "London",
+      "postcode": "SW1A 1AA",
+      "country": "GB"
+    }
+  }
+}
+```
+
+**Expansion Rules:**
+- Use `?expand=fieldName` query parameter
+- Multiple fields: `?expand=clientRef,adviserRef,providerRef`
+- Nested expansion: `?expand=clientRef.employmentRef`
+- Only reference types can be expanded
+- Value types are always fully embedded
+
+#### 1.8.6 Creating and Updating References
+
+**Creating with References (POST):**
+
+When creating an entity that references others, provide only the reference `id`:
+
+```json
+POST /api/v1/factfinds
+
+{
+  "clientRef": {
+    "id": "client-123"              // Only id required on create
+  },
+  "adviserRef": {
+    "id": "adviser-789"
+  },
+  "sessionDate": "2026-02-15",
+  "totalNetMonthlyIncome": {        // Value type fully embedded
+    "amount": 4500.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+
+Response:
+{
+  "id": "factfind-456",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",           // Server populates display fields
+    "clientNumber": "C00001234"
+  },
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Sarah Johnson",
+    "code": "ADV001"
+  },
+  "sessionDate": "2026-02-15",
+  "totalNetMonthlyIncome": {
+    "amount": 4500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "createdAt": "2026-02-16T10:30:00Z",
+  "updatedAt": "2026-02-16T10:30:00Z"
+}
+```
+
+**Updating References (PUT/PATCH):**
+
+To change a reference, provide the new reference `id`:
+
+```json
+PATCH /api/v1/factfinds/factfind-456
+
+{
+  "adviserRef": {
+    "id": "adviser-999"             // Change to different adviser
+  }
+}
+
+Response:
+{
+  "id": "factfind-456",
+  "adviserRef": {
+    "id": "adviser-999",
+    "href": "/api/v1/advisers/adviser-999",
+    "name": "Michael Brown",        // Server updates display fields
+    "code": "ADV002"
+  },
+  // ... other fields unchanged
+}
+```
+
+**Validation:**
+
+- Server validates that referenced `id` exists
+- Returns `422 Unprocessable Entity` if reference is invalid
+- Returns updated display fields in response
+
+### 1.9 Aggregate Root Pattern
+
+The FactFind API implements a strict **single aggregate root pattern** where FactFind is the ONLY aggregate root for all business data. This architectural decision enforces Domain-Driven Design principles and provides strong transactional guarantees.
+
+#### 1.9.1 What is an Aggregate Root?
+
+In Domain-Driven Design (DDD), an **aggregate** is a cluster of domain objects that can be treated as a single unit for data changes. The **aggregate root** is the only member of the aggregate that outside objects are allowed to hold references to.
+
+**Key Characteristics:**
+- **Single Entry Point:** All access to aggregate members must go through the root
+- **Transactional Boundary:** Changes within an aggregate are atomic
+- **Consistency Boundary:** Business invariants are maintained within the aggregate
+- **Identity:** Only the aggregate root has global identity; members have local identity
+
+#### 1.9.2 Why FactFind is the Aggregate Root
+
+**FactFind represents a complete fact-finding session** for one or more clients. It is the natural aggregate root because:
+
+1. **Contextual Ownership:** All data collected during fact-finding (clients, income, expenditure, arrangements, goals) belongs to that specific fact-finding session
+
+2. **Temporal Consistency:** The fact find represents a point-in-time snapshot of a client's financial situation. All data must be consistent with that point in time.
+
+3. **Business Process Boundary:** Fact-finding is a complete business process. Creating a fact find initiates the process; completing it marks the end.
+
+4. **Transactional Integrity:** Changes to any part of the fact find (adding income, recording arrangements, setting goals) should be transactionally consistent with the fact find state.
+
+5. **Access Control:** Authorization is naturally scoped to the fact find level. Users have permissions to view/edit specific fact finds, which includes all nested data.
+
+#### 1.9.3 What This Means for API Consumers
+
+**Top-Level Resource:**
+
+FactFind is the ONLY top-level business resource:
+```
+POST /api/v1/factfinds          (Create a new fact find - the only top-level POST)
+GET  /api/v1/factfinds          (List fact finds)
+GET  /api/v1/factfinds/{id}     (Get a fact find)
+PUT  /api/v1/factfinds/{id}     (Update fact find metadata)
+DELETE /api/v1/factfinds/{id}   (Delete entire fact find and all data)
+```
+
+**All Other Entities are Nested:**
+
+Clients, arrangements, goals, etc. are accessed through the fact find:
+```
+POST /api/v1/factfinds/{factfindId}/clients
+GET  /api/v1/factfinds/{factfindId}/clients/{clientId}
+POST /api/v1/factfinds/{factfindId}/arrangements
+GET  /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}
+POST /api/v1/factfinds/{factfindId}/goals
+GET  /api/v1/factfinds/{factfindId}/goals/{goalId}
+```
+
+**No Independent Entity Access:**
+
+You CANNOT create or access these entities without a fact find context:
+```
+❌ POST /api/v1/factfinds/{factfindId}/clients               (Not supported)
+❌ GET  /api/v1/clients/{id}          (Not supported)
+❌ POST /api/v1/factfinds/{factfindId}/arrangements          (Not supported)
+❌ GET  /api/v1/arrangements/{id}     (Not supported)
+❌ POST /api/v1/factfinds/{factfindId}/goals                 (Not supported)
+```
+
+#### 1.9.4 Transactional Boundaries
+
+**Within Aggregate (Atomic):**
+```http
+# These operations are transactionally consistent
+POST /api/v1/factfinds/{id}/income
+POST /api/v1/factfinds/{id}/expenditure
+PUT  /api/v1/factfinds/{id}
+```
+
+All operations on the same fact find aggregate are guaranteed to be consistent. For example:
+- Adding income automatically updates the fact find's total income calculation
+- Deleting a fact find deletes all nested entities atomically
+- Completing a fact find validates all required data is present
+
+**Cross-Aggregate (Eventual Consistency):**
+
+Reference data and lookups are separate aggregates:
+```http
+GET /api/v1/reference/countries     (Separate aggregate)
+GET /api/v1/reference/providers     (Separate aggregate)
+```
+
+Changes to reference data do not affect existing fact finds immediately; they use eventual consistency patterns.
+
+#### 1.9.5 Entity Lifecycle
+
+**FactFind Lifecycle:**
+```
+1. Create fact find         POST /api/v1/factfinds
+2. Add client data         POST /api/v1/factfinds/{id}/clients
+3. Record income           POST /api/v1/factfinds/{id}/income
+4. Record expenditure      POST /api/v1/factfinds/{id}/expenditure
+5. Identify arrangements   POST /api/v1/factfinds/{id}/arrangements
+6. Set goals               POST /api/v1/factfinds/{id}/goals
+7. Complete fact find      POST /api/v1/factfinds/{id}/complete
+```
+
+**Cascading Deletes:**
+
+Deleting a fact find cascades to ALL nested entities:
+```http
+DELETE /api/v1/factfinds/456   # Deletes:
+                                # - All clients in this fact find
+                                # - All income records
+                                # - All expenditure records
+                                # - All arrangements
+                                # - All goals
+                                # - All assets and liabilities
+                                # - Risk profile
+                                # - Estate planning data
+```
+
+#### 1.9.6 Special Operations
+
+**Get Complete Aggregate:**
+
+A special endpoint retrieves the entire aggregate in a single request:
+
+```http
+GET /api/v1/factfinds/{id}/complete
+```
+
+**Response:**
+```json
+{
+  "id": "factfind-456",
+  "sessionDate": "2026-02-16",
+  "status": {"code": "COMP", "display": "Complete"},
+  "clients": [
+    { /* Complete client data */ }
+  ],
+  "income": [
+    { /* All income records */ }
+  ],
+  "expenditure": [
+    { /* All expenditure records */ }
+  ],
+  "arrangements": [
+    { /* All arrangements with contributions, valuations */ }
+  ],
+  "goals": [
+    { /* All goals */ }
+  ],
+  "assets": [
+    { /* All assets */ }
+  ],
+  "liabilities": [
+    { /* All liabilities */ }
+  ],
+  "riskProfile": {
+    /* Risk assessment data */
+  },
+  "estatePlanning": {
+    /* Estate planning data */
+  }
+}
+```
+
+**Use Cases:**
+- Displaying complete fact find summary
+- Generating fact find reports
+- Exporting fact find data
+- Comparing fact finds
+- Audit trail review
+
+#### 1.9.7 Benefits of This Approach
+
+**1. Transactional Consistency**
+- All changes within a fact find are atomic
+- No partial updates or inconsistent states
+- Database transactions align with business transactions
+
+**2. Business Rule Enforcement**
+- Fact find status controls what operations are allowed
+- Cannot add data to a completed fact find without reopening it
+- Required sections can be enforced before completion
+
+**3. Clear Ownership and Context**
+- Every entity belongs to exactly one fact find
+- No ambiguity about which fact find data belongs to
+- Easy to understand data lineage
+
+**4. Simplified Authorization**
+- Permissions are scoped at the fact find level
+- Grant access to a fact find = access to all nested data
+- Easier to implement row-level security
+
+**5. Better API Ergonomics**
+- Clear, predictable URL structure
+- Obvious relationship between entities
+- HATEOAS links are more meaningful
+
+**6. Data Integrity**
+- Cascading deletes prevent orphaned data
+- Cannot create entities without proper context
+- Referential integrity is enforced
+
+**7. Performance Optimization**
+- Can cache entire aggregate
+- Bulk operations are natural
+- Denormalization strategies are clearer
+
+**8. Audit and Compliance**
+- Complete fact find history is preserved
+- Changes are scoped to specific fact finds
+- Easier to generate audit reports
+
+#### 1.9.8 Reference Data Exception
+
+**System-Wide Reference Data** remains independent and is NOT part of the FactFind aggregate:
+
+```
+/api/v1/reference/genders           (System-wide enum)
+/api/v1/reference/countries         (System-wide lookup)
+/api/v1/reference/providers         (System-wide directory)
+/api/v1/reference/product-types     (System-wide catalog)
+```
+
+**Rationale:**
+- Reference data is shared across all fact finds
+- Changes to reference data should not affect existing fact finds
+- Reference data has its own lifecycle and versioning
+- Reference data is read-mostly and heavily cached
+
+---
+
+## 2. Authentication & Authorization
+
+### 2.1 OAuth 2.0 with JWT
+
+**Authentication Flow:**
+
+1. Client obtains access token from authorization server
+2. Client includes token in Authorization header: `Bearer {token}`
+3. API validates token signature and expiration
+4. API extracts claims (userId, tenantId, scopes)
+5. API enforces authorization based on scopes
+
+**Token Structure (JWT):**
+```json
+{
+  "sub": "user-123",
+  "tenant_id": "tenant-456",
+  "scope": "factfind:read factfind:write client:read",
+  "iat": 1708084800,
+  "exp": 1708088400,
+  "aud": "https://api.factfind.com"
+}
+```
+
+### 2.2 Authorization Scopes
+
+**Scope Hierarchy:**
+
+| Scope | Access Level | Description |
+|-------|--------------|-------------|
+| `client:read` | Read | View client profiles and demographics |
+| `client:write` | Write | Create/update client information |
+| `client:pii:read` | Sensitive Read | View PII (NI number, passport) |
+| `factfind:read` | Read | View fact find data |
+| `factfind:write` | Write | Create/update fact finds |
+| `arrangements:read` | Read | View arrangements (plans, policies) |
+| `arrangements:write` | Write | Create/update arrangements |
+| `goals:read` | Read | View goals and objectives |
+| `goals:write` | Write | Create/update goals |
+| `risk:read` | Read | View risk profiles |
+| `risk:write` | Write | Create/update risk assessments |
+| `admin:*` | Admin | Full administrative access |
+
+**Scope Naming Convention:**
+```
+{domain}:{permission}:{sensitivity}
+```
+
+Examples:
+- `client:read` - Read client data
+- `client:pii:read` - Read sensitive PII
+- `factfind:write` - Write fact find data
+- `admin:users:write` - Admin user management
+
+### 2.3 Multi-Tenancy
+
+**Tenant Isolation:**
+
+- Tenant ID extracted from JWT claims (`tenant_id`)
+- All queries filtered by tenant ID automatically
+- Cross-tenant access strictly prohibited
+- Tenant data physically or logically separated
+
+**Tenant Context:**
+```http
+GET /api/v1/factfinds/{factfindId}/clients HTTP/1.1
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+X-Tenant-ID: tenant-456
+
+Response includes only clients for tenant-456
+```
+
+**Tenant-Level Configuration:**
+- Reference data customization per tenant
+- Feature flags per tenant
+- Rate limits per tenant
+- Branding and white-labeling
+
+### 2.4 Sensitive Data Handling
+
+**PII Fields (Personally Identifiable Information):**
+
+Requires special scope: `client:pii:read`
+
+- National Insurance Number
+- Passport Number
+- Driving License Number
+- Date of Birth
+- Full Address
+- Bank Account Details
+
+**Obfuscation Strategy:**
+
+Default response (without `client:pii:read` scope):
+```json
+{
+  "nationalInsuranceNumber": "AB****56C",
+  "passportNumber": "5******21",
+  "dateOfBirth": "****-**-15"
+}
+```
+
+Full response (with `client:pii:read` scope):
+```json
+{
+  "nationalInsuranceNumber": "AB123456C",
+  "passportNumber": "502135321",
+  "dateOfBirth": "1980-05-15"
+}
+```
+
+### 2.5 Audit Logging
+
+**Audit Requirements:**
+
+All write operations (POST, PUT, PATCH, DELETE) are logged:
+
+- User ID (from JWT)
+- Tenant ID
+- Timestamp
+- Operation type (CREATE, UPDATE, DELETE)
+- Resource type and ID
+- Changed fields (before/after values)
+- IP address
+- Request ID (correlation)
+
+**Audit Log Entry:**
+```json
+{
+  "auditId": "audit-789",
+  "timestamp": "2026-02-16T14:30:00Z",
+  "tenantId": "tenant-456",
+  "userId": "user-123",
+  "operation": "UPDATE",
+  "resourceType": "Client",
+  "resourceId": "client-999",
+  "changes": [
+    {
+      "field": "lastName",
+      "oldValue": "Smith",
+      "newValue": "Johnson"
+    }
+  ],
+  "ipAddress": "203.0.113.42",
+  "requestId": "req-abc-123"
+}
+```
+
+---
+
+## 3. Common Patterns
+
+### 3.1 Pagination
+
+**Cursor-Based Pagination (Preferred):**
+
+Request:
+```http
+GET /api/v1/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTAwfQ==
+```
+
+Response:
+```json
+{
+  "data": [
+    { "id": 101, "firstName": "John", "lastName": "Smith" },
+    { "id": 102, "firstName": "Jane", "lastName": "Doe" }
+  ],
+  "pagination": {
+    "limit": 20,
+    "hasMore": true,
+    "nextCursor": "eyJpZCI6MTIwfQ==",
+    "prevCursor": null
+  },
+  "_links": {
+    "self": {
+      "href": "/api/v1/clients?limit=20&cursor=eyJpZCI6MTAwfQ=="
+    },
+    "next": {
+      "href": "/api/v1/clients?limit=20&cursor=eyJpZCI6MTIwfQ=="
+    }
+  }
+}
+```
+
+**Offset-Based Pagination (Alternative):**
+
+Request:
+```http
+GET /api/v1/factfinds/{factfindId}/clients?page=2&pageSize=20
+```
+
+Response:
+```json
+{
+  "data": [...],
+  "pagination": {
+    "page": 2,
+    "pageSize": 20,
+    "totalPages": 10,
+    "totalCount": 195
+  },
+  "_links": {
+    "first": { "href": "/api/v1/clients?page=1&pageSize=20" },
+    "prev": { "href": "/api/v1/clients?page=1&pageSize=20" },
+    "self": { "href": "/api/v1/clients?page=2&pageSize=20" },
+    "next": { "href": "/api/v1/clients?page=3&pageSize=20" },
+    "last": { "href": "/api/v1/clients?page=10&pageSize=20" }
+  }
+}
+```
+
+### 3.2 Filtering & Sorting
+
+**Query Parameters:**
+
+```http
+GET /api/v1/factfinds/{factfindId}/clients?status=Active&clientType=Person&sortBy=lastName&sortOrder=asc
+```
+
+**Supported Filters:**
+- Equality: `?status=Active`
+- Multiple values: `?status=Active,Prospect`
+- Date ranges: `?createdAfter=2026-01-01&createdBefore=2026-12-31`
+- Boolean flags: `?isActive=true&hasWill=false`
+- Text search: `?search=smith` (searches across multiple fields)
+
+**Sorting:**
+- Single field: `?sortBy=lastName&sortOrder=asc`
+- Multiple fields: `?sortBy=lastName,firstName&sortOrder=asc,asc`
+- Shorthand: `?sort=lastName,-createdAt` (minus = desc)
+
+### 3.3 Field Selection (Sparse Fieldsets)
+
+Following the Single Contract Principle (see Section 1.7), the API uses field selection for partial responses rather than creating separate "summary" or "list" DTOs. The same entity contract is returned with only the requested fields populated.
+
+**Select Specific Fields:**
+```http
+GET /api/v1/factfinds/{factfindId}/clients/123?fields=id,firstName,lastName,dateOfBirth
+```
+
+Response returns the `Client` contract with only requested fields populated:
+```json
+{
+  "id": 123,
+  "firstName": "John",
+  "lastName": "Smith",
+  "dateOfBirth": "1980-05-15"
+}
+```
+
+**Exclude Fields:**
+```http
+GET /api/v1/factfinds/{factfindId}/clients/123?exclude=notes,medicalConditions
+```
+
+### 3.4 Resource Expansion
+
+**Embed Related Resources:**
+
+Reference types (entities with identity) can be expanded to include their full entity data inline. This applies to fields ending with "Ref" (e.g., `clientRef`, `adviserRef`). Value types are always fully embedded by default.
+
+**Default response (minimal references):**
+```http
+GET /api/v1/factfinds/factfind-123
+```
+```json
+{
+  "id": "factfind-123",
+  "factFindNumber": "FF001234",
+  "clientRef": {
+    "id": "client-456",
+    "href": "/api/v1/clients/client-456",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "totalNetMonthlyIncome": {
+    "amount": 7500.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+```
+
+**Expanded response (full referenced entities):**
+```http
+GET /api/v1/factfinds/factfind-123?expand=clientRef,adviserRef
+```
+```json
+{
+  "id": "factfind-123",
+  "factFindNumber": "FF001234",
+  "clientRef": {
+    "id": "client-456",
+    "href": "/api/v1/clients/client-456",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person",
+    // Full Client entity expanded
+    "dateOfBirth": "1980-05-15",
+    "age": 45,
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "primaryAddress": {
+      "line1": "123 Main Street",
+      "city": "London",
+      "postcode": "SW1A 1AA",
+      "country": "GB"
+    }
+  },
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001",
+    // Full Adviser entity expanded
+    "email": "jane.doe@example.com",
+    "phone": "+44 20 1234 5678"
+  },
+  "totalNetMonthlyIncome": {
+    "amount": 7500.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+```
+
+**Expansion Rules:**
+- Use `?expand=fieldName` query parameter
+- Multiple fields: `?expand=clientRef,adviserRef,providerRef`
+- Nested expansion: `?expand=clientRef.employmentRef` (expand client, then employment within client)
+- Only reference types (with "Ref" suffix) can be expanded
+- Value types (MoneyValue, AddressValue, etc.) are always fully embedded
+- Maximum expansion depth: 2 levels to prevent excessive response sizes
+
+### 3.5 Optimistic Concurrency Control
+
+**ETag-Based Locking:**
+
+1. Client retrieves resource:
+```http
+GET /api/v1/factfinds/{factfindId}/clients/123
+
+Response:
+ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
+```
+
+2. Client updates resource with If-Match:
+```http
+PUT /api/v1/clients/123
+If-Match: "33a64df551425fcc55e4d42a148795d9f25f89d4"
+
+{
+  "firstName": "John",
+  "lastName": "Johnson"
+}
+```
+
+3. Success or conflict:
+```http
+Success (200 OK):
+ETag: "9b8769a4f1dce434b9b9c5c82b68b61c0e7f9a5d"
+
+Conflict (409 Conflict):
+{
+  "type": "https://api.factfind.com/problems/conflict-error",
+  "title": "Concurrent Modification",
+  "status": 409,
+  "detail": "Resource has been modified by another user"
+}
+```
+
+### 3.6 Batch Operations
+
+**Bulk Create:**
+```http
+POST /api/v1/factfinds/{factfindId}/clients/bulk
+Content-Type: application/json
+
+{
+  "clients": [
+    {
+      "firstName": "John",
+      "lastName": "Smith",
+      "clientType": "Person"
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Doe",
+      "clientType": "Person"
+    }
+  ]
+}
+
+Response (207 Multi-Status):
+{
+  "results": [
+    {
+      "status": 201,
+      "id": 101,
+      "href": "/api/v1/factfinds/{factfindId}/clients/101"
+    },
+    {
+      "status": 400,
+      "error": {
+        "type": "validation-error",
+        "message": "Invalid client type"
+      }
+    }
+  ]
+}
+```
+
+### 3.7 HATEOAS (Hypermedia Controls)
+
+**Resource Links:**
+
+```json
+{
+  "id": 123,
+  "firstName": "John",
+  "lastName": "Smith",
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/123"
+    },
+    "update": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/123",
+      "method": "PUT"
+    },
+    "delete": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/123",
+      "method": "DELETE"
+    },
+    "addresses": {
+      "href": "/api/v1/clients/123/addresses"
+    },
+    "factfinds": {
+      "href": "/api/v1/factfinds?clientId=123"
+    }
+  }
+}
+```
+
+**Conditional Links (State-Based):**
+
+```json
+{
+  "id": 123,
+  "status": {
+    "code": "DRAFT",
+    "display": "Draft"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/123" },
+    "complete": {
+      "href": "/api/v1/factfinds/123/complete",
+      "method": "POST",
+      "enabled": true
+    },
+    "archive": {
+      "href": "/api/v1/factfinds/123/archive",
+      "method": "POST",
+      "enabled": false,
+      "reason": "Cannot archive draft fact find"
+    }
+  }
+}
+```
+
+### 3.8 Data Types
+
+**Money (Currency):**
+Uses `MoneyValue` with nested `CurrencyValue`:
+```json
+{
+  "grossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  }
+}
+```
+
+**Date and DateTime (ISO 8601):**
+```json
+{
+  "dateOfBirth": "1980-05-15",
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z"
+}
+```
+
+**Percentage:**
+```json
+{
+  "interestRate": 4.75,
+  "ownershipPercentage": 50.0
+}
+```
+
+**Address:**
+Uses `AddressValue` with nested `CountryValue` and `CountyValue`:
+```json
+{
+  "address": {
+    "line1": "123 High Street",
+    "line2": "Apartment 4B",
+    "city": "London",
+    "postcode": "SW1A 1AA",
+    "county": {
+      "code": "GLA",
+      "display": "Greater London"
+    },
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "addressType": {
+      "code": "RES",
+      "display": "Residential"
+    }
+  }
+}
+```
+
+**Enumeration Value Types:**
+All enumerations use structured Value Types with code/display pattern:
+```json
+{
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2015-06-20"
+  },
+  "employmentStatus": {
+    "code": "EMP",
+    "display": "Employed"
+  }
+}
+```
+
+**Key Benefits:**
+- **Self-Documenting**: No need to look up code meanings
+- **Internationalization**: Display text can be localized
+- **Rich Metadata**: Additional context fields (dates, categories, etc.)
+- **Forward-Compatible**: New fields can be added without breaking changes
+- **Type-Safe**: Strongly typed in contract definitions
+
+See Section 11.10.9 for complete enumeration value type definitions.
+
+---
+
+## 4. FactFind API (Root Aggregate)
+
+### 4.1 Overview
+
+**Purpose:** Manage client identities, relationships, and regulatory onboarding requirements.
+
+**Scope:**
+- Client registration (Person, Corporate, Trust)
+- Contact details management
+- Address management
+- Identity verification (KYC/AML)
+- Data protection consent (GDPR)
+- Marketing preferences
+- Vulnerability assessments
+- Professional contacts (solicitors, accountants)
+- Family relationships and dependants
+
+**Aggregate Root:** FactFind (clients are nested within)
+
+**Regulatory Compliance:**
+- FCA COBS (Client Classification)
+- Money Laundering Regulations 2017 (AML/CTF)
+- GDPR (Data Protection)
+- Consumer Duty (Vulnerable Customers)
+
+### 4.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients` | List clients with filtering | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients` | Create new client | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}` | Get client details | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}` | Update client | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}` | Delete client (soft delete) | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` | Add address | `client:write` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Update address | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Remove address | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact details | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact detail | `client:write` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Update contact | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Remove contact | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` | List relationships | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` | Create relationship | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/relationships/{id}` | Remove relationship | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | List dependants | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | Add dependant | `client:write` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Update dependant | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Remove dependant | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get ID verification docs | `client:pii:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/id-verification` | Upload ID document | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Get data protection consent | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Update DPA consent | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Get marketing preferences | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Update marketing consent | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` | Get vulnerability assessment | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` | Update vulnerability | `client:write` |
+
+### 4.3 Key Endpoints
+
+#### 4.3.1 Create Client
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients`
+
+**Description:** Create a new client record (Person, Corporate, or Trust).
+
+**Contract:** Uses the unified `Client` contract (see Section 11.1). The same contract structure is used for request and response. Read-only fields (`id`, `createdAt`, `updatedAt`, computed fields) are ignored in the request and populated by the server in the response.
+
+**Request Headers:**
+```http
+Content-Type: application/json
+Authorization: Bearer {token}
+```
+
+**Request Body (Person):**
+Client contract with required-on-create fields. Read-only and computed fields are ignored.
+```json
+{
+  "clientType": "Person",
+  "name": {
+    "title": {
+      "code": "MR",
+      "display": "Mr"
+    },
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "preferredName": "John"
+  },
+  "salutation": "Mr Smith",
+  "dateOfBirth": "1980-05-15",
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married"
+  },
+  "taxDetails": {
+    "niNumber": "AB123456C"
+  },
+  "nationalityCountry": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfBirth": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfResidence": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "isUkResident": true,
+  "isExpatriate": false,
+  "isDeceased": false,
+  "hasEverSmoked": false,
+  "inGoodHealth": true,
+  "hasWill": true,
+  "isWillUpToDate": true,
+  "isPowerOfAttorneyGranted": false,
+  "adviserRef": {
+    "id": "adviser-789"
+  }
+}
+```
+
+**Response:**
+Complete `Client` contract with all fields populated, including server-generated fields.
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/{factfindId}/clients/123
+ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
+Content-Type: application/json
+
+{
+  "id": "client-123",
+  "clientNumber": "C00001234",
+  "clientType": "Person",
+  "name": {
+    "title": {
+      "code": "MR",
+      "display": "Mr"
+    },
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "preferredName": "John"
+  },
+  "fullName": "Mr John Michael Smith",
+  "salutation": "Mr Smith",
+  "dateOfBirth": "1980-05-15",
+  "age": 45,
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married"
+  },
+  "taxDetails": {
+    "niNumber": "AB123456C"
+  },
+  "nationalityCountry": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfBirth": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfResidence": {
+    "code": "GB",
+    "name": "United Kingdom"
+  },
+  "isUkResident": true,
+  "isExpatriate": false,
+  "isDeceased": false,
+  "hasEverSmoked": false,
+  "isSmoker": "Never",
+  "inGoodHealth": true,
+  "hasWill": true,
+  "isWillUpToDate": true,
+  "isPowerOfAttorneyGranted": false,
+  "primaryAdviser": {
+    "id": 789,
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "href": "/api/v1/advisers/789"
+  },
+  "serviceStatus": "Active",
+  "clientSegment": "A",
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "createdBy": {
+    "id": 999,
+    "name": "System Admin"
+  },
+  "updatedBy": {
+    "id": 999,
+    "name": "System Admin"
+  },
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/123"
+    },
+    "update": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/123",
+      "method": "PUT"
+    },
+    "addresses": {
+      "href": "/api/v1/clients/123/addresses"
+    },
+    "contacts": {
+      "href": "/api/v1/clients/123/contacts"
+    },
+    "factfinds": {
+      "href": "/api/v1/factfinds?clientId=123"
+    },
+    "arrangements": {
+      "href": "/api/v1/arrangements?clientId=123"
+    }
+  }
+}
+```
+
+**Status Codes:**
+- `201 Created` - Client created successfully
+- `400 Bad Request` - Validation errors
+- `401 Unauthorized` - Invalid or missing authentication token
+- `403 Forbidden` - Insufficient permissions
+- `409 Conflict` - Client with same NI number already exists
+
+**Validation Rules:**
+- `firstName` - Required, max 100 characters
+- `lastName` - Required, max 100 characters
+- `dateOfBirth` - Required, must be in past, minimum age 18
+- `nationalInsuranceNumber` - Optional, UK NI format validation
+- `clientType` - Required, one of: Person, Corporate, Trust
+- `gender` - Required for Person, one of: Male, Female, Other, PreferNotToSay
+- `maritalStatus` - Optional, one of: Single, Married, Divorced, Widowed, CivilPartnership, Separated
+
+**Business Rules:**
+- National Insurance Number must be unique across all clients
+- Date of Birth must represent age 18 or older for full client
+- UK resident requires UK address
+- Primary adviser must be an active adviser in the system
+
+#### 4.3.2 Get Client
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}`
+
+**Description:** Retrieve complete client details including demographic information.
+
+**Contract:** Returns the complete unified `Client` contract (see Section 11.1) with all fields populated.
+
+**Request Headers:**
+```http
+Authorization: Bearer {token}
+```
+
+**Query Parameters:**
+- `expand` (optional) - Comma-separated list: `addresses,contacts,dependants,relationships`
+- `fields` (optional) - Comma-separated field list for sparse fieldsets (returns `Client` contract with only requested fields)
+
+**Response:**
+Complete `Client` contract.
+```json
+{
+  "id": 123,
+  "clientType": "Person",
+  "name": {
+    "title": {
+      "code": "MR",
+      "display": "Mr"
+    },
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith"
+  },
+  "fullName": "Mr John Michael Smith",
+  "dateOfBirth": "1980-05-15",
+  "age": 45,
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2005-06-20"
+  },
+  "nationalInsuranceNumber": "AB123456C",
+  "nationalityCountry": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfBirth": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfResidence": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "isUkResident": true,
+  "isExpatriate": false,
+  "hasWill": true,
+  "isWillUpToDate": true,
+  "willDetails": "Will created in 2020, held by Smith & Co Solicitors",
+  "isPowerOfAttorneyGranted": false,
+  "hasEverSmoked": false,
+  "isSmoker": "Never",
+  "inGoodHealth": true,
+  "serviceStatus": "Active",
+  "serviceStatusDate": "2020-01-15",
+  "clientSegment": "A",
+  "clientSegmentDate": "2020-01-15",
+  "grossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netWorth": {
+    "amount": 450000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalAssets": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "householdIncome": {
+    "amount": 120000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "primaryAdviser": {
+    "id": 789,
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "jane.doe@example.com",
+    "href": "/api/v1/advisers/789"
+  },
+  "createdAt": "2020-01-15T10:30:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/123" },
+    "update": { "href": "/api/v1/factfinds/{factfindId}/clients/123", "method": "PUT" },
+    "addresses": { "href": "/api/v1/clients/123/addresses" },
+    "contacts": { "href": "/api/v1/clients/123/contacts" },
+    "relationships": { "href": "/api/v1/clients/123/relationships" },
+    "dependants": { "href": "/api/v1/clients/123/dependants" },
+    "factfinds": { "href": "/api/v1/factfinds?clientId=123" },
+    "arrangements": { "href": "/api/v1/arrangements?clientId=123" },
+    "goals": { "href": "/api/v1/goals?clientId=123" }
+  }
+}
+```
+
+**Status Codes:**
+- `200 OK` - Client retrieved successfully
+- `401 Unauthorized` - Invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client does not exist
+
+#### 4.3.3 List Clients
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients`
+
+**Description:** List clients with filtering, sorting, and pagination.
+
+**Contract:** Returns collection wrapper (see Section 11.8) containing an array of `Client` contracts. Use `fields` query parameter for sparse fieldsets.
+
+**Query Parameters:**
+- `search` (optional) - Full-text search across name fields
+- `clientType` (optional) - Filter by type: Person, Corporate, Trust
+- `serviceStatus` (optional) - Filter by status: Active, Inactive, Prospect
+- `adviserId` (optional) - Filter by primary adviser
+- `hasWill` (optional) - Filter by will status: true, false
+- `maritalStatus` (optional) - Filter by marital status
+- `sortBy` (optional) - Sort field: lastName, firstName, createdAt (default: lastName)
+- `sortOrder` (optional) - Sort direction: asc, desc (default: asc)
+- `limit` (optional) - Page size (default: 20, max: 100)
+- `cursor` (optional) - Pagination cursor
+- `expand` (optional) - Include related resources: addresses, contacts
+- `fields` (optional) - Comma-separated field list for sparse fieldsets (e.g., `id,fullName,serviceStatus`)
+
+**Response:**
+Collection wrapper with array of `Client` contracts (partial fields shown for brevity).
+
+```json
+{
+  "data": [
+    {
+      "id": 123,
+      "clientType": "Person",
+      "fullName": "Mr John Smith",
+      "firstName": "John",
+      "lastName": "Smith",
+      "dateOfBirth": "1980-05-15",
+      "age": 45,
+      "maritalStatus": "Married",
+      "serviceStatus": "Active",
+      "primaryAdviser": {
+        "id": 789,
+        "name": "Jane Doe",
+        "href": "/api/v1/advisers/789"
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
+      }
+    },
+    {
+      "id": 124,
+      "clientType": "Person",
+      "fullName": "Mrs Sarah Smith",
+      "firstName": "Sarah",
+      "lastName": "Smith",
+      "dateOfBirth": "1982-08-22",
+      "age": 43,
+      "maritalStatus": "Married",
+      "serviceStatus": "Active",
+      "primaryAdviser": {
+        "id": 789,
+        "name": "Jane Doe",
+        "href": "/api/v1/advisers/789"
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/{factfindId}/clients/124" }
+      }
+    }
+  ],
+  "pagination": {
+    "limit": 20,
+    "hasMore": true,
+    "nextCursor": "eyJpZCI6MTI0fQ==",
+    "totalCount": 156
+  },
+  "_links": {
+    "self": {
+      "href": "/api/v1/clients?limit=20"
+    },
+    "next": {
+      "href": "/api/v1/clients?limit=20&cursor=eyJpZCI6MTI0fQ=="
+    }
+  }
+}
+```
+
+#### 4.3.4 Add Address
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{id}/addresses`
+
+**Description:** Add a new address for a client (residential, correspondence, etc.).
+
+**Request Body:**
+```json
+{
+  "addressType": "Residential",
+  "addressLine1": "123 High Street",
+  "addressLine2": "Apartment 4B",
+  "city": "London",
+  "postcode": "SW1A 1AA",
+  "county": {
+    "code": "GB-LND",
+    "name": "London"
+  },
+  "country": {
+    "code": "GB",
+    "name": "United Kingdom"
+  },
+  "correspondenceAddress": true,
+  "residentFromDate": "2020-01-15",
+  "residencyStatus": "Owner",
+  "isOnElectoralRoll": true
+}
+```
+
+**Response:**
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/clients/client-123/addresses/address-456
+
+{
+  "id": "address-456",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "addressType": "Residential",
+  "address": {
+    "line1": "123 High Street",
+    "line2": "Apartment 4B",
+    "city": "London",
+    "county": "Greater London",
+    "postcode": "SW1A 1AA",
+    "country": "GB"
+  },
+  "isCorrespondenceAddress": true,
+  "residencyPeriod": {
+    "startDate": "2020-01-15",
+    "endDate": null
+  },
+  "residencyStatus": "Owner",
+  "isOnElectoralRoll": true,
+  "durationAtAddressYears": 6,
+  "durationAtAddressMonths": 1,
+  "createdAt": "2026-02-16T14:30:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/clients/client-123/addresses/address-456" },
+    "client": { "href": "/api/v1/clients/client-123" }
+  }
+}
+```
+
+**Validation Rules:**
+- `addressLine1` - Required, max 100 characters
+- `city` - Required, max 50 characters
+- `postcode` - Required for UK addresses, format validation
+- `country` - Required
+- `addressType` - Required, one of: Residential, Correspondence, Previous, Business
+- `residencyStatus` - Optional, one of: Owner, Tenant, LivingWithFamily, Other
+
+#### 4.3.5 Update Vulnerability Assessment
+
+**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability`
+
+**Description:** Update client vulnerability assessment for Consumer Duty compliance.
+
+**Request Body:**
+```json
+{
+  "hasVulnerability": "Yes",
+  "vulnerabilityType": "Physical",
+  "vulnerabilityCategory": "HealthCondition",
+  "vulnerabilityActionTakenDetails": "Large print documents provided, additional time given during meetings, family member invited to participate",
+  "isClientPortalSuitable": "WithSupport",
+  "clientPortalSuitabilityDetails": "Can use portal with assistance from family member",
+  "dateAssessed": "2026-02-16",
+  "reviewDate": "2026-08-16"
+}
+```
+
+**Response:**
+```json
+{
+  "id": "vulnerability-789",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "hasVulnerability": "Yes",
+  "vulnerabilityType": "Physical",
+  "vulnerabilityCategory": "HealthCondition",
+  "vulnerabilityActionTakenDetails": "Large print documents provided, additional time given during meetings, family member invited to participate",
+  "isClientPortalSuitable": "WithSupport",
+  "clientPortalSuitabilityDetails": "Can use portal with assistance from family member",
+  "dateAssessed": "2026-02-16",
+  "reviewDate": "2026-08-16",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "updatedBy": {
+    "id": "user-999",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/clients/123/vulnerability" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" },
+    "history": { "href": "/api/v1/clients/123/vulnerability/history" }
+  }
+}
+```
+
+**Validation Rules:**
+- `hasVulnerability` - Required, one of: Yes, No, Unknown
+- `vulnerabilityType` - Required if hasVulnerability=Yes, one of: Physical, Mental, Financial, LifeEvent
+- `dateAssessed` - Required, must not be in future
+- `reviewDate` - Optional, must be after dateAssessed
+
+**Business Rules:**
+- Review date should typically be 6-12 months after assessment
+- Action taken details required if vulnerability identified
+- Assessment triggers notification to primary adviser
+
+---
+
+
+### 4.4 Current Position Summary API
+
+**Purpose:** Provide aggregated financial position snapshot including net worth, asset allocation, income vs. expenditure comparison, and financial health scoring.
+
+**Scope:**
+- Net worth calculation (assets minus liabilities)
+- Asset allocation summary across all holdings
+- Income vs. expenditure comparison
+- Cash flow analysis
+- Financial health score (0-100) with component breakdown
+- Portfolio diversification metrics
+- Debt-to-income ratios
+- Emergency fund adequacy
+- Savings rate analysis
+
+**Aggregate Root:** FactFind
+
+**Regulatory Compliance:**
+- FCA Consumer Duty (Financial Resilience Assessment)
+- Vulnerability Framework (Financial Health Indicators)
+- Treating Customers Fairly (TCF) Outcome 1
+
+### 4.4.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/current-position` | Get comprehensive financial position summary | `factfind:read` |
+| GET | `/api/v1/factfinds/{factfindId}/current-position/net-worth` | Get detailed net worth breakdown | `factfind:read` |
+| GET | `/api/v1/factfinds/{factfindId}/current-position/financial-health` | Get financial health score and analysis | `factfind:read` |
+| GET | `/api/v1/factfinds/{factfindId}/current-position/cash-flow` | Get cash flow analysis | `factfind:read` |
+| GET | `/api/v1/factfinds/{factfindId}/current-position/asset-allocation` | Get detailed asset allocation | `factfind:read` |
+
+### 4.4.2 Key Endpoints
+
+#### 4.4.2.1 Get Current Position Summary
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/current-position`
+
+**Description:** Get comprehensive financial position summary for a fact find including net worth, asset allocation, cash flow, and financial health score.
+
+**Query Parameters:**
+- `asOfDate` - Calculate position as of specific date (ISO 8601 format, default: today)
+- `includeProjections` - Include future projections (default: false)
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "asOfDate": "2026-02-17",
+  "clients": [
+    {
+      "id": "client-123",
+      "name": "John Smith",
+      "age": 45,
+      "retirementAge": 67
+    },
+    {
+      "id": "client-124",
+      "name": "Jane Smith",
+      "age": 43,
+      "retirementAge": 67
+    }
+  ],
+  "netWorth": {
+    "totalAssets": {
+      "amount": 850000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalLiabilities": {
+      "amount": 250000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "netWorth": {
+      "amount": 600000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "assetBreakdown": {
+    "property": {
+      "amount": 450000.00,
+      "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"},
+      "percentage": 52.9,
+      "count": 2
+    },
+    "pensions": {
+      "amount": 250000.00,
+      "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"},
+      "percentage": 29.4,
+      "count": 3
+    },
+    "investments": {
+      "amount": 100000.00,
+      "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"},
+      "percentage": 11.8,
+      "count": 5
+    },
+    "cash": {
+      "amount": 30000.00,
+      "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"},
+      "percentage": 3.5,
+      "count": 3
+    }
+  },
+  "liabilityBreakdown": {
+    "mortgages": {
+      "amount": 200000.00,
+      "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"},
+      "percentage": 80.0,
+      "count": 1
+    },
+    "loans": {
+      "amount": 30000.00,
+      "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"},
+      "percentage": 12.0,
+      "count": 2
+    },
+    "creditCards": {
+      "amount": 15000.00,
+      "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"},
+      "percentage": 6.0,
+      "count": 3
+    }
+  },
+  "assetAllocation": {
+    "equities": {
+      "percentage": 45.0,
+      "amount": {"amount": 382500.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}}
+    },
+    "bonds": {
+      "percentage": 25.0,
+      "amount": {"amount": 212500.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}}
+    },
+    "property": {
+      "percentage": 20.0,
+      "amount": {"amount": 170000.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}}
+    },
+    "cash": {
+      "percentage": 7.0,
+      "amount": {"amount": 59500.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}}
+    },
+    "alternatives": {
+      "percentage": 3.0,
+      "amount": {"amount": 25500.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}}
+    }
+  },
+  "incomeVsExpenditure": {
+    "totalGrossAnnualIncome": {"amount": 120000.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+    "totalNetMonthlyIncome": {"amount": 7500.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+    "totalNetAnnualIncome": {"amount": 90000.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+    "totalMonthlyExpenditure": {"amount": 4500.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+    "totalAnnualExpenditure": {"amount": 54000.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+    "monthlyDisposableIncome": {"amount": 3000.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+    "annualDisposableIncome": {"amount": 36000.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+    "savingsRate": 40.0
+  },
+  "financialHealthScore": {
+    "overallScore": 75,
+    "scoreDate": "2026-02-17",
+    "rating": "Good",
+    "components": {
+      "emergencyFund": {
+        "score": 18,
+        "maxScore": 20,
+        "percentage": 90.0,
+        "status": "Excellent",
+        "monthsCovered": 6.7,
+        "targetMonths": 6.0,
+        "details": "Emergency fund covers 6.7 months of expenditure (target: 6 months)"
+      },
+      "debtToIncome": {
+        "score": 20,
+        "maxScore": 25,
+        "percentage": 80.0,
+        "status": "Good",
+        "ratio": 31.2,
+        "targetRatio": 36.0,
+        "details": "Debt-to-income ratio of 31.2% is below the 36% threshold"
+      },
+      "savingsRate": {
+        "score": 16,
+        "maxScore": 20,
+        "percentage": 80.0,
+        "status": "Good",
+        "rate": 40.0,
+        "targetRate": 20.0,
+        "details": "Saving 40.0% of net income (target: 20%)"
+      },
+      "diversification": {
+        "score": 14,
+        "maxScore": 20,
+        "percentage": 70.0,
+        "status": "Fair",
+        "assetClassCount": 5,
+        "concentrationRisk": "Medium",
+        "details": "Portfolio spread across 5 asset classes with medium concentration"
+      },
+      "netWorthGrowth": {
+        "score": 7,
+        "maxScore": 15,
+        "percentage": 46.7,
+        "status": "Fair",
+        "oneYearGrowth": 4.5,
+        "threeYearGrowth": 12.8,
+        "details": "Net worth growth of 4.5% over past year"
+      }
+    },
+    "recommendations": [
+      "Consider increasing property diversification to reduce concentration risk",
+      "Net worth growth is below inflation - review investment strategy",
+      "Strong emergency fund position - consider redirecting excess to investments"
+    ]
+  },
+  "_links": {
+    "self": {"href": "/api/v1/factfinds/factfind-456/current-position"},
+    "factfind": {"href": "/api/v1/factfinds/factfind-456"},
+    "net-worth": {"href": "/api/v1/factfinds/factfind-456/current-position/net-worth"},
+    "financial-health": {"href": "/api/v1/factfinds/factfind-456/current-position/financial-health"},
+    "cash-flow": {"href": "/api/v1/factfinds/factfind-456/current-position/cash-flow"},
+    "asset-allocation": {"href": "/api/v1/factfinds/factfind-456/current-position/asset-allocation"}
+  }
+}
+```
+
+**Financial Health Score Calculation:**
+
+The financial health score is calculated on a 0-100 scale with five components:
+
+1. **Emergency Fund (20 points max)**
+   - 20 points: 6+ months of expenditure
+   - 15 points: 4-6 months
+   - 10 points: 2-4 months
+   - 5 points: 1-2 months
+   - 0 points: < 1 month
+
+2. **Debt-to-Income Ratio (25 points max)**
+   - 25 points: < 20%
+   - 20 points: 20-30%
+   - 15 points: 30-36%
+   - 10 points: 36-43%
+   - 5 points: 43-50%
+   - 0 points: > 50%
+
+3. **Savings Rate (20 points max)**
+   - 20 points: > 30% of net income
+   - 15 points: 20-30%
+   - 10 points: 10-20%
+   - 5 points: 5-10%
+   - 0 points: < 5%
+
+4. **Diversification (20 points max)**
+   - 20 points: Well diversified across 5+ asset classes, no concentration > 40%
+   - 15 points: Diversified across 4-5 asset classes, concentration < 50%
+   - 10 points: Moderate diversification, concentration < 60%
+   - 5 points: Limited diversification, concentration < 75%
+   - 0 points: Poor diversification, high concentration > 75%
+
+5. **Net Worth Growth (15 points max)**
+   - 15 points: > 10% annual growth
+   - 12 points: 7-10% annual growth
+   - 9 points: 5-7% annual growth
+   - 6 points: 3-5% annual growth
+   - 3 points: 0-3% annual growth
+   - 0 points: Negative growth
+
+**Rating Bands:**
+- 90-100: Excellent
+- 75-89: Good
+- 60-74: Fair
+- 40-59: Needs Improvement
+- 0-39: Poor
+
+**Validation Rules:**
+- `factfindId` must be a valid fact find identifier
+- `asOfDate` must be valid ISO 8601 date format
+- Response includes only data available as of the specified date
+- All monetary values must be positive
+- Percentages must sum to 100 where applicable
+
+**HTTP Status Codes:**
+- `200 OK` - Summary retrieved successfully
+- `404 Not Found` - Fact find not found
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+
+## 5. FactFind Clients API
+
+### 5.1 Overview
+
+**Purpose:** Capture comprehensive client circumstances and current financial position for financial planning.
+
+**Scope:**
+- Fact find session management (ADVICE_CASE aggregate root)
+- Employment history and current employment
+- Income from all sources (employed, self-employed, investment, rental, etc.)
+- Expenditure tracking (essential vs discretionary)
+- Expenditure and income changes (future projections)
+- Budget analysis and affordability calculations
+- Emergency fund assessment
+
+**Aggregate Root:** ADVICE_CASE (FactFind)
+
+**Regulatory Compliance:**
+- FCA COBS 9.2 (Assessing Suitability)
+- MCOB (Mortgage affordability)
+- Consumer Duty (Understanding customer needs)
+
+### 5.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds` | List fact finds | `factfind:read` |
+| POST | `/api/v1/factfinds` | Create new fact find | `factfind:write` |
+| GET | `/api/v1/factfinds/{id}` | Get fact find summary | `factfind:read` |
+| PUT | `/api/v1/factfinds/{id}` | Update fact find | `factfind:write` |
+| DELETE | `/api/v1/factfinds/{id}` | Delete fact find | `factfind:write` |
+| POST | `/api/v1/factfinds/{id}/complete` | Mark fact find as complete | `factfind:write` |
+| GET | `/api/v1/factfinds/{id}/summary` | Get financial summary | `factfind:read` |
+| GET | `/api/v1/factfinds/{id}/employment` | List employment records | `factfind:read` |
+| POST | `/api/v1/factfinds/{id}/employment` | Add employment | `factfind:write` |
+| PUT | `/api/v1/factfinds/{id}/employment/{empId}` | Update employment | `factfind:write` |
+| DELETE | `/api/v1/factfinds/{id}/employment/{empId}` | Remove employment | `factfind:write` |
+| GET | `/api/v1/factfinds/{id}/income` | List income sources | `factfind:read` |
+| POST | `/api/v1/factfinds/{id}/income` | Add income | `factfind:write` |
+| PUT | `/api/v1/factfinds/{id}/income/{incomeId}` | Update income | `factfind:write` |
+| DELETE | `/api/v1/factfinds/{id}/income/{incomeId}` | Remove income | `factfind:write` |
+| GET | `/api/v1/factfinds/{id}/expenditure` | List expenditure | `factfind:read` |
+| POST | `/api/v1/factfinds/{id}/expenditure` | Add expenditure | `factfind:write` |
+| PUT | `/api/v1/factfinds/{id}/expenditure/{expId}` | Update expenditure | `factfind:write` |
+| DELETE | `/api/v1/factfinds/{id}/expenditure/{expId}` | Remove expenditure | `factfind:write` |
+| GET | `/api/v1/factfinds/{id}/income-changes` | List expected income changes | `factfind:read` |
+| POST | `/api/v1/factfinds/{id}/income-changes` | Add income change | `factfind:write` |
+| GET | `/api/v1/factfinds/{id}/expenditure-changes` | List expected expenditure changes | `factfind:read` |
+| POST | `/api/v1/factfinds/{id}/expenditure-changes` | Add expenditure change | `factfind:write` |
+| GET | `/api/v1/factfinds/{id}/affordability` | Calculate affordability | `factfind:read` |
+| GET | `/api/v1/factfinds/{id}/complete` | Get complete aggregate | `factfind:read` |
+
+### 5.3 Key Endpoints
+
+#### 5.3.1 Create FactFind
+
+**Endpoint:** `POST /api/v1/factfinds`
+
+**Description:** Create a new fact find session for a client or joint clients.
+
+**Contract:** Uses the unified `FactFind` contract (see Section 11.2). Request includes required-on-create fields; response includes complete contract with server-generated fields.
+
+**Request Body:**
+FactFind contract with required-on-create fields. Read-only and computed fields are ignored.
+
+
+```json
+{
+  "client": {
+    "id": 123
+  },
+  "jointClient": {
+    "id": 124
+  },
+  "dateOfMeeting": "2026-02-16",
+  "typeOfMeeting": "InitialConsultation",
+  "scopeOfAdvice": [
+    "RetirementPlanning",
+    "InvestmentAdvice",
+    "ProtectionReview"
+  ],
+  "primaryAdviser": {
+    "id": 789
+  },
+  "anybodyElsePresent": false,
+  "customQuestions": [
+    {
+      "question": "What are your main financial concerns?",
+      "answer": "Ensuring sufficient retirement income and protecting family"
+    }
+  ]
+}
+```
+
+**Response:**
+Complete `FactFind` contract with all fields populated.
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/456
+ETag: "a1b2c3d4e5f6"
+
+{
+  "id": 456,
+  "client": {
+    "id": 123,
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/{factfindId}/clients/123"
+  },
+  "jointClient": {
+    "id": 124,
+    "fullName": "Sarah Smith",
+    "href": "/api/v1/factfinds/{factfindId}/clients/124"
+  },
+  "dateOfMeeting": "2026-02-16",
+  "typeOfMeeting": "InitialConsultation",
+  "scopeOfAdvice": [
+    "RetirementPlanning",
+    "InvestmentAdvice",
+    "ProtectionReview"
+  ],
+  "primaryAdviser": {
+    "id": 789,
+    "fullName": "Jane Doe",
+    "href": "/api/v1/advisers/789"
+  },
+  "isComplete": false,
+  "dateFactFindCompleted": null,
+  "anybodyElsePresent": false,
+  "status": {
+    "code": "INPROG",
+    "display": "In Progress"
+  },
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/456" },
+    "complete": { "href": "/api/v1/factfinds/456/complete", "method": "POST" },
+    "employment": { "href": "/api/v1/factfinds/456/employment" },
+    "income": { "href": "/api/v1/factfinds/456/income" },
+    "expenditure": { "href": "/api/v1/factfinds/456/expenditure" },
+    "summary": { "href": "/api/v1/factfinds/456/summary" }
+  }
+}
+```
+
+**Validation Rules:**
+- `client` - Required, must be existing client
+- `dateOfMeeting` - Required, must not be in future
+- `typeOfMeeting` - Required, one of: InitialConsultation, Review, AdHoc, Annual, SixMonth
+- `scopeOfAdvice` - Required, array, min 1 item
+
+**Business Rules:**
+- Joint fact find requires jointClient reference
+- Single client fact find has null jointClient
+- Primary adviser must be active adviser
+- Scope of advice determines required sections
+
+#### 5.3.2 Add Income
+
+**Endpoint:** `POST /api/v1/factfinds/{id}/income`
+
+**Description:** Add an income source to the fact find.
+
+**Contract:** Uses the unified `Income` contract (see Section 11.4). The same contract is used for request and response.
+
+**Request Body:**
+Income contract with required-on-create fields.
+
+
+```json
+{
+  "owner": "Client1",
+  "category": "EmployedIncome",
+  "description": "Primary employment salary",
+  "employment": {
+    "id": 789
+  },
+  "basicIncomeGross": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "basicIncomeNet": {
+    "amount": 52500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequencyGross": {
+    "code": "A",
+    "display": "Annual",
+    "periodsPerYear": 1
+  },
+  "frequencyNet": {
+    "code": "A",
+    "display": "Annual",
+    "periodsPerYear": 1
+  },
+  "hasOvertimeIncome": true,
+  "guaranteedOvertimeGross": {
+    "amount": 5000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "hasBonusIncome": true,
+  "regularBonusGross": {
+    "amount": 10000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "includeInAffordability": true,
+  "includeBasicIncomeInAffordability": true,
+  "includeGuaranteedOvertimeInAffordability": true,
+  "includeRegularBonusInAffordability": true,
+  "startDate": "2020-01-15",
+  "endDate": null
+}
+```
+
+**Response:**
+```json
+{
+  "id": 999,
+  "factfindId": 456,
+  "owner": "Client1",
+  "category": "EmployedIncome",
+  "description": "Primary employment salary",
+  "employment": {
+    "id": 789,
+    "employer": "ACME Corporation Ltd",
+    "occupation": "Senior Software Engineer",
+    "href": "/api/v1/factfinds/456/employment/789"
+  },
+  "basicIncomeGross": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "basicIncomeNet": {
+    "amount": 52500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequencyGross": {
+    "code": "A",
+    "display": "Annual",
+    "periodsPerYear": 1
+  },
+  "frequencyNet": {
+    "code": "A",
+    "display": "Annual",
+    "periodsPerYear": 1
+  },
+  "hasOvertimeIncome": true,
+  "guaranteedOvertimeGross": {
+    "amount": 5000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "guaranteedOvertimeNet": {
+    "amount": 3500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "hasBonusIncome": true,
+  "regularBonusGross": {
+    "amount": 10000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "regularBonusNet": {
+    "amount": 7000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalGrossAnnualEarnings": {
+    "amount": 90000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netMonthlyIncome": {
+    "amount": 5250.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "includeInAffordability": true,
+  "includeBasicIncomeInAffordability": true,
+  "includeGuaranteedOvertimeInAffordability": true,
+  "includeRegularBonusInAffordability": true,
+  "startDate": "2020-01-15",
+  "endDate": null,
+  "createdAt": "2026-02-16T14:35:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/456/income/999" },
+    "factfind": { "href": "/api/v1/factfinds/456" },
+    "employment": { "href": "/api/v1/factfinds/456/employment/789" }
+  }
+}
+```
+
+**Income Categories:**
+- `EmployedIncome` - Salary from employment
+- `SelfEmployedIncome` - Self-employment profits
+- `DividendIncome` - Company dividends
+- `RentalIncome` - Property rental income
+- `PensionIncome` - Pension payments
+- `InvestmentIncome` - Investment returns
+- `StateBedefits` - State benefits
+- `MaintenanceIncome` - Maintenance payments
+- `OtherIncome` - Other income sources
+
+**Validation Rules:**
+- `owner` - Required, one of: Client1, Client2, Joint
+- `category` - Required, see categories above
+- `basicIncomeGross` - Required, amount > 0
+- `frequencyGross` - Required, one of: Annual, Monthly, Weekly, Quarterly
+- Income amounts must be positive
+- Net income must be less than gross income
+- Employment link required for EmployedIncome category
+
+#### 5.3.3 Add Expenditure
+
+**Endpoint:** `POST /api/v1/factfinds/{id}/expenditure`
+
+**Description:** Add an expenditure item (essential or discretionary).
+
+**Request Body:**
+```json
+{
+  "owner": "Joint",
+  "category": "Mortgage",
+  "description": "Primary residence mortgage payment",
+  "netAmount": {
+    "amount": 1500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "discretionaryAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": {
+    "code": "M",
+    "display": "Monthly",
+    "periodsPerYear": 12
+  },
+  "liability": {
+    "id": 555
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "id": 888,
+  "factfindId": 456,
+  "owner": "Joint",
+  "category": "Mortgage",
+  "description": "Primary residence mortgage payment",
+  "netAmount": {
+    "amount": 1500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "discretionaryAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "essentialAmount": {
+    "amount": 1500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": {
+    "code": "M",
+    "display": "Monthly",
+    "periodsPerYear": 12
+  },
+  "annualAmount": {
+    "amount": 18000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "liability": {
+    "id": 555,
+    "type": "Mortgage",
+    "provider": "UK Building Society",
+    "href": "/api/v1/factfinds/{factfindId}/arrangements/555"
+  },
+  "createdAt": "2026-02-16T14:40:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/456/expenditure/888" },
+    "factfind": { "href": "/api/v1/factfinds/456" },
+    "liability": { "href": "/api/v1/factfinds/{factfindId}/arrangements/555" }
+  }
+}
+```
+
+**Expenditure Categories:**
+- `Mortgage` - Mortgage payments
+- `Rent` - Rental payments
+- `UtilitiesGas` - Gas bills
+- `UtilitiesElectric` - Electricity bills
+- `UtilitiesWater` - Water bills
+- `CouncilTax` - Council tax
+- `Groceries` - Food and household shopping
+- `Transport` - Car, fuel, public transport
+- `Insurance` - General insurance premiums
+- `ChildcareCosts` - Childcare and education
+- `Entertainment` - Leisure and entertainment
+- `HolidaysTravel` - Holidays and travel
+- `ClothingFootwear` - Clothing and footwear
+- `CommunicationsPhone` - Phone and internet
+- `LoanRepayments` - Loan and credit repayments
+- `Other` - Other expenditure
+
+**Business Rules:**
+- Essential expenditure: discretionaryAmount = 0
+- Discretionary expenditure: discretionaryAmount > 0
+- Total expenditure = netAmount = essentialAmount + discretionaryAmount
+- Frequency determines annualization factor
+- Linked liabilities affect affordability calculations
+
+#### 5.3.4 Get FactFind Summary
+
+**Endpoint:** `GET /api/v1/factfinds/{id}/summary`
+
+**Description:** Get comprehensive financial summary with calculated totals.
+
+**Response:**
+```json
+{
+  "factfindId": 456,
+  "client": {
+    "id": 123,
+    "fullName": "John Smith"
+  },
+  "jointClient": {
+    "id": 124,
+    "fullName": "Sarah Smith"
+  },
+  "incomeSummary": {
+    "totalEarnedAnnualIncomeGross": {
+      "amount": 120000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "totalNetMonthlyIncome": {
+      "amount": 7500.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "client1Income": {
+      "amount": 90000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "client2Income": {
+      "amount": 30000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "incomeCount": 4,
+    "incomeForAffordability": {
+      "amount": 110000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    }
+  },
+  "expenditureSummary": {
+    "totalMonthlyExpenditure": {
+      "amount": 4500.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "totalEssentialExpenditure": {
+      "amount": 3800.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "totalDiscretionaryExpenditure": {
+      "amount": 700.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "client1Expenditure": {
+      "amount": 500.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "client2Expenditure": {
+      "amount": 300.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "jointExpenditure": {
+      "amount": 3700.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "expenditureCount": 18
+  },
+  "disposableIncome": {
+    "totalMonthlyDisposableIncome": {
+      "amount": 3000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "netDisposableIncome": {
+      "amount": 2300.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "discretionaryIncome": {
+      "amount": 700.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    }
+  },
+  "emergencyFund": {
+    "requiredAmount": {
+      "amount": 11400.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "committedAmount": {
+      "amount": 15000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "shortfall": {
+      "amount": 0.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "monthsCovered": 3.3
+  },
+  "affordability": {
+    "grossAnnualIncomeForAffordability": {
+      "amount": 110000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "netMonthlyIncomeAvailable": {
+      "amount": 7000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "monthlyDisposableIncome": {
+      "amount": 2300.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "affordabilityRatio": 0.31,
+    "stressTestedAffordability": {
+      "amount": 2000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    }
+  },
+  "calculatedAt": "2026-02-16T14:45:00Z",
+  "_links": {
+    "factfind": { "href": "/api/v1/factfinds/456" },
+    "income": { "href": "/api/v1/factfinds/456/income" },
+    "expenditure": { "href": "/api/v1/factfinds/456/expenditure" },
+    "affordability": { "href": "/api/v1/factfinds/456/affordability" }
+  }
+}
+```
+
+**Calculation Rules:**
+- All amounts normalized to monthly for comparison
+- Essential expenditure = netAmount - discretionaryAmount
+- Disposable income = total income - total expenditure
+- Emergency fund recommended = 3-6 months essential expenditure
+- Affordability ratio = housing costs / gross income
+- Stress test applies +3% interest rate increase
+
+---
+
+
+
+### 5.5 Identity Verification API
+
+**Purpose:** Manage identity verification, KYC compliance, and AML checks for regulatory compliance.
+
+**Scope:**
+- Document verification (passport, driving license, utility bills)
+- KYC (Know Your Customer) workflow management
+- AML (Anti-Money Laundering) checks and screening
+- PEP (Politically Exposed Person) screening
+- Identity verification status tracking
+- Document upload and storage with retention policies
+- Verification provider integration (e.g., Onfido, Jumio, Trulioo)
+- Regulatory compliance tracking (MLR 2017, FCA requirements)
+- Re-verification workflow (every 2 years or on risk trigger)
+- Enhanced Due Diligence (EDD) for high-risk clients
+
+**Aggregate Root:** FactFind (identity verification is nested within client)
+
+**Regulatory Compliance:**
+- MLR 2017 (Money Laundering Regulations 2017) - Customer Due Diligence
+- FCA Handbook - SYSC 6.3 (Financial Crime)
+- FCA Handbook - SYSC 3.2 (AML Systems and Controls)
+- JMLSG Guidance (Joint Money Laundering Steering Group)
+- Data Protection Act 2018 - Lawful basis for processing
+- GDPR Article 6(1)(c) - Legal obligation
+
+#### 5.5.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification` | Submit identity document | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification` | Get verification status | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}` | Update verification | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/history` | Get verification history | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/aml-check` | Trigger AML check | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/documents` | Get uploaded documents | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/documents` | Upload document | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/documents/{documentId}` | Delete document | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/verify` | Submit for verification | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/approve` | Manually approve verification | `client:admin` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/reject` | Reject verification | `client:admin` |
+
+#### 5.5.2 Key Endpoints
+
+##### 5.5.2.1 Submit Identity Document
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification`
+
+**Description:** Submit identity verification documents for a client. This initiates the KYC process and creates an identity verification record.
+
+**Request Body:**
+
+```json
+{
+  "verificationType": "StandardKYC",
+  "verificationReason": "NewClientOnboarding",
+  "riskCategory": "Standard",
+  "documents": [
+    {
+      "documentType": "Passport",
+      "documentNumber": "123456789",
+      "issuingCountry": "GB",
+      "issuingAuthority": "HM Passport Office",
+      "issueDate": "2019-03-15",
+      "expiryDate": "2029-03-15",
+      "documentReference": "doc-upload-abc123",
+      "documentUrl": "https://secure-docs.factfind.com/uploads/abc123.pdf",
+      "firstName": "John",
+      "middleName": "Michael",
+      "lastName": "Smith",
+      "dateOfBirth": "1985-06-20",
+      "placeOfBirth": "London, United Kingdom",
+      "nationality": "British",
+      "uploadedBy": "adv-789",
+      "uploadedDate": "2026-02-17T10:00:00Z"
+    },
+    {
+      "documentType": "UtilityBill",
+      "utilityType": "Electricity",
+      "providerName": "British Gas",
+      "accountNumber": "****5678",
+      "billDate": "2026-01-15",
+      "documentReference": "doc-upload-def456",
+      "documentUrl": "https://secure-docs.factfind.com/uploads/def456.pdf",
+      "address": {
+        "line1": "123 High Street",
+        "line2": "Flat 4B",
+        "city": "London",
+        "county": "Greater London",
+        "postcode": "SW1A 1AA",
+        "country": "United Kingdom"
+      },
+      "uploadedBy": "adv-789",
+      "uploadedDate": "2026-02-17T10:05:00Z"
+    }
+  ],
+  "verificationProvider": "Onfido",
+  "performAMLCheck": true,
+  "performPEPCheck": true,
+  "adviserNotes": "Standard KYC verification for new client. Client provided original passport for inspection during meeting.",
+  "adviserId": "adv-789",
+  "verificationDate": "2026-02-17T10:00:00Z"
+}
+```
+
+**Verification Type Values:**
+- `StandardKYC` - Standard customer due diligence
+- `SimplifiedDueDiligence` - Simplified checks for low-risk clients
+- `EnhancedDueDiligence` - Enhanced checks for high-risk clients
+- `Reverification` - Periodic re-verification (every 2 years)
+- `RiskTriggered` - Verification triggered by risk event
+
+**Verification Reason Values:**
+- `NewClientOnboarding` - Initial client onboarding
+- `PeriodicReview` - Regular 2-year re-verification
+- `RiskEvent` - Triggered by suspicious activity or risk indicator
+- `RegulatoryRequirement` - Compliance-mandated verification
+- `ClientUpdate` - Client requested update to personal details
+- `AddressChange` - Verification of new address
+
+**Risk Category Values:**
+- `Low` - Low-risk client (simplified due diligence permitted)
+- `Standard` - Standard risk client (standard due diligence)
+- `High` - High-risk client (enhanced due diligence required)
+- `Prohibited` - Client in prohibited category (cannot onboard)
+
+**Document Type Values:**
+- `Passport` - Valid passport
+- `DrivingLicense` - UK or EU driving license
+- `NationalIdentityCard` - EU/EEA national ID card
+- `BiometricResidencePermit` - UK biometric residence permit
+- `UtilityBill` - Recent utility bill (gas, electricity, water)
+- `BankStatement` - Recent bank statement
+- `CouncilTaxBill` - Council tax bill
+- `MortgageStatement` - Mortgage statement
+- `TenancyAgreement` - Signed tenancy agreement
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789
+```
+
+```json
+{
+  "id": "idv-789",
+  "factfindId": "ff-456",
+  "clientId": "client-123",
+  "verificationType": "StandardKYC",
+  "verificationReason": "NewClientOnboarding",
+  "status": "Pending",
+  "riskCategory": "Standard",
+  "submittedDate": "2026-02-17T10:05:30Z",
+  "submittedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "role": "FinancialAdviser"
+  },
+  "verificationProvider": "Onfido",
+  "providerReferenceId": "onfido-check-abc123xyz",
+  "documents": [
+    {
+      "id": "doc-001",
+      "documentType": "Passport",
+      "documentNumber": "123456789",
+      "issuingCountry": "GB",
+      "issueDate": "2019-03-15",
+      "expiryDate": "2029-03-15",
+      "status": "PendingVerification",
+      "documentReference": "doc-upload-abc123",
+      "uploadedDate": "2026-02-17T10:00:00Z",
+      "retentionExpiryDate": "2032-02-17"
+    },
+    {
+      "id": "doc-002",
+      "documentType": "UtilityBill",
+      "utilityType": "Electricity",
+      "providerName": "British Gas",
+      "billDate": "2026-01-15",
+      "status": "PendingVerification",
+      "documentReference": "doc-upload-def456",
+      "uploadedDate": "2026-02-17T10:05:00Z",
+      "retentionExpiryDate": "2032-02-17"
+    }
+  ],
+  "amlCheck": {
+    "status": "Initiated",
+    "provider": "WorldCheck",
+    "initiatedDate": "2026-02-17T10:05:30Z",
+    "checkReference": "wc-check-789"
+  },
+  "pepCheck": {
+    "status": "Initiated",
+    "provider": "DowJones",
+    "initiatedDate": "2026-02-17T10:05:30Z",
+    "checkReference": "dj-pep-456"
+  },
+  "estimatedCompletionDate": "2026-02-19T10:05:30Z",
+  "nextReviewDate": "2028-02-17",
+  "regulatoryCompliance": {
+    "mlr2017Compliant": false,
+    "customerDueDiligenceComplete": false,
+    "identityVerified": false,
+    "addressVerified": false,
+    "sourceOfWealthVerified": false
+  },
+  "adviserNotes": "Standard KYC verification for new client. Client provided original passport for inspection during meeting.",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "documents": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/documents" },
+    "aml-check": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check" },
+    "verify": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/verify", "method": "POST" }
+  }
+}
+```
+
+**Verification Status Values:**
+- `Pending` - Submitted, awaiting processing
+- `InProgress` - Verification checks in progress
+- `AwaitingDocuments` - Additional documents required
+- `AwaitingManualReview` - Requires manual compliance review
+- `Verified` - Successfully verified
+- `PartiallyVerified` - Some checks passed, some failed
+- `Failed` - Verification failed
+- `Rejected` - Manually rejected by compliance
+- `Expired` - Verification has expired (>2 years)
+
+**Validation Rules:**
+- At least one identity document (Passport, DrivingLicense, NationalIdentityCard) required
+- At least one proof of address document required (< 3 months old)
+- Passport/DrivingLicense must not be expired
+- Document names must match client name in FactFind
+- Address on proof of address must match client address
+- All required fields for document type must be provided
+- AML/PEP checks required for all Standard and High risk clients
+- Enhanced Due Diligence required for High risk category
+
+**HTTP Status Codes:**
+- `201 Created` - Identity verification created successfully
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/validation-error",
+  "title": "Identity Verification Validation Failed",
+  "status": 422,
+  "detail": "Utility bill is older than 3 months and cannot be used for address verification",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification",
+  "errors": [
+    {
+      "field": "documents[1].billDate",
+      "message": "Utility bill must be dated within the last 3 months",
+      "rejectedValue": "2025-10-15",
+      "constraint": "maxAge",
+      "maxAgeMonths": 3
+    }
+  ]
+}
+```
+
+---
+
+##### 5.5.2.2 Get Verification Status
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification`
+
+**Description:** Get the current identity verification status for a client, including document verification results, AML check results, and compliance status.
+
+**Query Parameters:**
+- `includeDocuments` - Include document details (default: true)
+- `includeHistory` - Include verification history (default: false)
+
+**Response:**
+
+```json
+{
+  "id": "idv-789",
+  "factfindId": "ff-456",
+  "clientId": "client-123",
+  "clientName": "John Michael Smith",
+  "verificationType": "StandardKYC",
+  "verificationReason": "NewClientOnboarding",
+  "status": "Verified",
+  "riskCategory": "Standard",
+  "overallVerificationScore": 95,
+  "submittedDate": "2026-02-17T10:05:30Z",
+  "submittedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "role": "FinancialAdviser"
+  },
+  "verifiedDate": "2026-02-17T14:30:00Z",
+  "verifiedBy": {
+    "id": "user-compliance-001",
+    "name": "Compliance Officer",
+    "role": "ComplianceOfficer"
+  },
+  "verificationProvider": "Onfido",
+  "providerReferenceId": "onfido-check-abc123xyz",
+  "providerResult": {
+    "overallResult": "Clear",
+    "documentAuthenticity": "Genuine",
+    "faceMatch": "Match",
+    "faceMatchScore": 98,
+    "livenessCheck": "Pass",
+    "addressCheck": "Verified",
+    "completedDate": "2026-02-17T12:15:00Z"
+  },
+  "documents": [
+    {
+      "id": "doc-001",
+      "documentType": "Passport",
+      "documentNumber": "123456789",
+      "issuingCountry": "GB",
+      "issuingAuthority": "HM Passport Office",
+      "issueDate": "2019-03-15",
+      "expiryDate": "2029-03-15",
+      "status": "Verified",
+      "verificationStatus": "Genuine",
+      "verificationDate": "2026-02-17T12:15:00Z",
+      "verificationProvider": "Onfido",
+      "verificationNotes": "Document verified as genuine. All security features present and correct.",
+      "documentReference": "doc-upload-abc123",
+      "uploadedDate": "2026-02-17T10:00:00Z",
+      "retentionExpiryDate": "2032-02-17",
+      "extractedData": {
+        "firstName": "JOHN",
+        "middleName": "MICHAEL",
+        "lastName": "SMITH",
+        "dateOfBirth": "1985-06-20",
+        "placeOfBirth": "LONDON",
+        "nationality": "BRITISH",
+        "sex": "M"
+      },
+      "securityFeatures": {
+        "mrzPresent": true,
+        "mrzValid": true,
+        "hologramPresent": true,
+        "chipPresent": true,
+        "chipValid": true
+      }
+    },
+    {
+      "id": "doc-002",
+      "documentType": "UtilityBill",
+      "utilityType": "Electricity",
+      "providerName": "British Gas",
+      "accountNumber": "****5678",
+      "billDate": "2026-01-15",
+      "status": "Verified",
+      "verificationStatus": "AddressConfirmed",
+      "verificationDate": "2026-02-17T12:20:00Z",
+      "verificationProvider": "Manual",
+      "verificationNotes": "Address verified against client declaration. Document appears genuine.",
+      "documentReference": "doc-upload-def456",
+      "uploadedDate": "2026-02-17T10:05:00Z",
+      "retentionExpiryDate": "2032-02-17",
+      "address": {
+        "line1": "123 High Street",
+        "line2": "Flat 4B",
+        "city": "London",
+        "county": "Greater London",
+        "postcode": "SW1A 1AA",
+        "country": "United Kingdom"
+      }
+    }
+  ],
+  "amlCheck": {
+    "id": "aml-check-123",
+    "status": "Clear",
+    "riskRating": "Low",
+    "provider": "WorldCheck",
+    "checkReference": "wc-check-789",
+    "initiatedDate": "2026-02-17T10:05:30Z",
+    "completedDate": "2026-02-17T10:45:00Z",
+    "screeningResults": {
+      "sanctionsMatch": false,
+      "watchlistMatch": false,
+      "adverseMediaMatch": false,
+      "lawEnforcementMatch": false,
+      "matchCount": 0
+    },
+    "searchCriteria": {
+      "firstName": "John",
+      "middleName": "Michael",
+      "lastName": "Smith",
+      "dateOfBirth": "1985-06-20",
+      "nationality": "British",
+      "residenceCountry": "United Kingdom"
+    },
+    "listsScreened": [
+      "OFAC SDN List (US)",
+      "EU Consolidated Sanctions List",
+      "UK HMT Sanctions List",
+      "UN Consolidated Sanctions List",
+      "Interpol Wanted Persons",
+      "National Crime Agency Watch List"
+    ],
+    "nextScreeningDate": "2027-02-17",
+    "complianceNotes": "No matches found across all sanctions and watchlists. Client clear for onboarding."
+  },
+  "pepCheck": {
+    "id": "pep-check-456",
+    "status": "NotPEP",
+    "riskRating": "Low",
+    "provider": "DowJones",
+    "checkReference": "dj-pep-456",
+    "initiatedDate": "2026-02-17T10:05:30Z",
+    "completedDate": "2026-02-17T10:50:00Z",
+    "pepStatus": "NotIdentified",
+    "pepCategories": [],
+    "relativeOrCloseAssociate": false,
+    "adverseMedia": {
+      "matchFound": false,
+      "newsArticles": 0
+    },
+    "searchResults": {
+      "directMatch": false,
+      "familyMemberMatch": false,
+      "closeAssociateMatch": false
+    },
+    "complianceNotes": "No PEP matches identified. Client is not a politically exposed person."
+  },
+  "sourceOfWealth": {
+    "declared": true,
+    "primarySource": "Employment",
+    "employmentDetails": {
+      "employer": "ABC Corporation Ltd",
+      "position": "Senior Software Engineer",
+      "yearsEmployed": 8,
+      "annualIncome": 75000
+    },
+    "secondarySources": [
+      "Savings",
+      "Investment Returns"
+    ],
+    "verified": true,
+    "verificationMethod": "Payslips",
+    "verificationDate": "2026-02-17T14:00:00Z",
+    "verificationNotes": "Recent payslips provided showing consistent income. Matches declared amount."
+  },
+  "sourceOfFunds": {
+    "declared": true,
+    "source": "PersonalSavings",
+    "amount": 50000,
+    "verified": true,
+    "verificationMethod": "BankStatements",
+    "verificationDate": "2026-02-17T14:00:00Z",
+    "verificationNotes": "Bank statements show accumulated savings over 5 years. Consistent with declared source."
+  },
+  "nextReviewDate": "2028-02-17",
+  "reviewFrequency": "TwoYearly",
+  "expiryDate": "2028-02-17",
+  "daysUntilExpiry": 730,
+  "regulatoryCompliance": {
+    "mlr2017Compliant": true,
+    "customerDueDiligenceComplete": true,
+    "identityVerified": true,
+    "addressVerified": true,
+    "sourceOfWealthVerified": true,
+    "sourceOfFundsVerified": true,
+    "ongoingMonitoring": true,
+    "complianceCheckDate": "2026-02-17T14:30:00Z"
+  },
+  "complianceApproval": {
+    "approved": true,
+    "approvedBy": {
+      "id": "user-compliance-001",
+      "name": "Compliance Officer",
+      "role": "ComplianceOfficer"
+    },
+    "approvalDate": "2026-02-17T14:30:00Z",
+    "approvalNotes": "All KYC checks completed successfully. Client approved for onboarding. Standard risk category confirmed."
+  },
+  "outstandingRequirements": [],
+  "verificationHistory": {
+    "attemptCount": 1,
+    "lastAttempt": "2026-02-17T10:05:30Z",
+    "successfulAttempts": 1,
+    "failedAttempts": 0
+  },
+  "adviserNotes": "Standard KYC verification for new client. Client provided original passport for inspection during meeting.",
+  "internalNotes": "No issues identified during verification. All checks passed first time.",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "documents": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/documents" },
+    "history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/history" },
+    "aml-check": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check" }
+  }
+}
+```
+
+**AML Status Values:**
+- `NotStarted` - AML check not initiated
+- `Initiated` - Check in progress
+- `InProgress` - Screening in progress
+- `Clear` - No matches found
+- `PotentialMatch` - Requires manual review
+- `Match` - Confirmed match found
+- `Failed` - Check failed (technical error)
+- `Expired` - Check results expired
+
+**PEP Status Values:**
+- `NotStarted` - PEP check not initiated
+- `Initiated` - Check in progress
+- `NotPEP` - Not a politically exposed person
+- `DomesticPEP` - UK politically exposed person
+- `ForeignPEP` - Foreign politically exposed person
+- `InternationalPEP` - International organization PEP
+- `FormerPEP` - Former PEP (within 12 months)
+- `RelativeOfPEP` - Family member of PEP
+- `CloseAssociateOfPEP` - Known close associate of PEP
+
+**Risk Rating Values:**
+- `Low` - Low risk client
+- `Medium` - Medium risk client
+- `High` - High risk client requiring EDD
+- `Prohibited` - Cannot onboard (sanctions match)
+
+**HTTP Status Codes:**
+- `200 OK` - Verification status retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client or verification not found
+
+---
+
+##### 5.5.2.3 Trigger AML Check
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/aml-check`
+
+**Description:** Trigger or re-run AML (Anti-Money Laundering) screening for a client. This performs sanctions screening, PEP checks, and adverse media screening.
+
+**Request Body:**
+
+```json
+{
+  "checkType": "Comprehensive",
+  "includeAdverseMedia": true,
+  "includePEPCheck": true,
+  "includeSanctionsCheck": true,
+  "includeWatchlistCheck": true,
+  "provider": "WorldCheck",
+  "searchCriteria": {
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "dateOfBirth": "1985-06-20",
+    "nationality": "British",
+    "residenceCountry": "United Kingdom",
+    "additionalCountries": ["United States"],
+    "occupation": "Software Engineer"
+  },
+  "reason": "InitialOnboarding",
+  "adviserId": "adv-789",
+  "checkDate": "2026-02-17T11:00:00Z",
+  "notes": "Initial AML screening for new client onboarding"
+}
+```
+
+**Check Type Values:**
+- `Basic` - Sanctions lists only
+- `Standard` - Sanctions + PEP checks
+- `Comprehensive` - Sanctions + PEP + Adverse Media + Watchlists
+- `Enhanced` - Comprehensive + deep web search
+
+**AML Reason Values:**
+- `InitialOnboarding` - First-time client screening
+- `PeriodicReview` - Regular annual/bi-annual screening
+- `TransactionTrigger` - Triggered by large/suspicious transaction
+- `RiskEscalation` - Client risk category increased
+- `RegulatoryRequirement` - Mandated by regulator
+- `ManualRequest` - Adviser-initiated review
+
+**Provider Values:**
+- `WorldCheck` - Refinitiv World-Check
+- `DowJones` - Dow Jones Risk & Compliance
+- `ComplyAdvantage` - ComplyAdvantage AML
+- `LexisNexis` - LexisNexis Bridger
+- `Trulioo` - Trulioo GlobalGateway
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123
+```
+
+```json
+{
+  "id": "aml-check-123",
+  "identityVerificationId": "idv-789",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "checkType": "Comprehensive",
+  "status": "InProgress",
+  "initiatedDate": "2026-02-17T11:00:15Z",
+  "initiatedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "role": "FinancialAdviser"
+  },
+  "provider": "WorldCheck",
+  "providerReference": "wc-check-2026-02-17-789",
+  "estimatedCompletionTime": "2026-02-17T11:30:15Z",
+  "searchCriteria": {
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "dateOfBirth": "1985-06-20",
+    "nationality": "British",
+    "residenceCountry": "United Kingdom",
+    "additionalCountries": ["United States"],
+    "occupation": "Software Engineer"
+  },
+  "checksIncluded": {
+    "sanctionsCheck": true,
+    "pepCheck": true,
+    "adverseMediaCheck": true,
+    "watchlistCheck": true,
+    "lawEnforcementCheck": true
+  },
+  "listsToScreen": [
+    "OFAC SDN List (US)",
+    "OFAC Consolidated Non-SDN List (US)",
+    "EU Consolidated Sanctions List",
+    "UK HMT Sanctions List",
+    "UN Consolidated Sanctions List",
+    "FATF High-Risk Jurisdictions",
+    "Interpol Wanted Persons",
+    "National Crime Agency Watch List",
+    "World Bank Debarred Entities",
+    "Global PEP Database"
+  ],
+  "reason": "InitialOnboarding",
+  "notes": "Initial AML screening for new client onboarding",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123" },
+    "identity-verification": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "poll": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123", "method": "GET" }
+  }
+}
+```
+
+**Complete AML Check Result (after processing):**
+
+When the check is complete (status: "Clear" or "Match"), the response includes:
+
+```json
+{
+  "id": "aml-check-123",
+  "identityVerificationId": "idv-789",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "checkType": "Comprehensive",
+  "status": "Clear",
+  "riskRating": "Low",
+  "overallResult": "NoMatchesFound",
+  "initiatedDate": "2026-02-17T11:00:15Z",
+  "completedDate": "2026-02-17T11:25:30Z",
+  "processingTime": "00:25:15",
+  "initiatedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "role": "FinancialAdviser"
+  },
+  "reviewedBy": {
+    "id": "user-compliance-001",
+    "name": "Compliance Officer",
+    "role": "ComplianceOfficer"
+  },
+  "reviewedDate": "2026-02-17T11:30:00Z",
+  "provider": "WorldCheck",
+  "providerReference": "wc-check-2026-02-17-789",
+  "searchCriteria": {
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "dateOfBirth": "1985-06-20",
+    "nationality": "British",
+    "residenceCountry": "United Kingdom",
+    "additionalCountries": ["United States"],
+    "occupation": "Software Engineer"
+  },
+  "screeningResults": {
+    "sanctionsCheck": {
+      "status": "Clear",
+      "matchCount": 0,
+      "potentialMatches": [],
+      "listsScreened": [
+        {
+          "listName": "OFAC SDN List (US)",
+          "listVersion": "2026-02-17",
+          "matches": 0
+        },
+        {
+          "listName": "EU Consolidated Sanctions List",
+          "listVersion": "2026-02-15",
+          "matches": 0
+        },
+        {
+          "listName": "UK HMT Sanctions List",
+          "listVersion": "2026-02-16",
+          "matches": 0
+        },
+        {
+          "listName": "UN Consolidated Sanctions List",
+          "listVersion": "2026-02-14",
+          "matches": 0
+        }
+      ]
+    },
+    "pepCheck": {
+      "status": "Clear",
+      "pepStatus": "NotPEP",
+      "matchCount": 0,
+      "potentialMatches": [],
+      "categoriesChecked": [
+        "HeadOfState",
+        "GovernmentMinister",
+        "SeniorGovernmentOfficial",
+        "JudicialOfficial",
+        "MilitaryOfficer",
+        "PoliticalPartyOfficial",
+        "StateOwnedEnterprise"
+      ]
+    },
+    "adverseMediaCheck": {
+      "status": "Clear",
+      "matchCount": 0,
+      "newsArticlesReviewed": 127,
+      "categories": [
+        {
+          "category": "Financial Crime",
+          "matches": 0
+        },
+        {
+          "category": "Fraud",
+          "matches": 0
+        },
+        {
+          "category": "Money Laundering",
+          "matches": 0
+        },
+        {
+          "category": "Corruption",
+          "matches": 0
+        },
+        {
+          "category": "Terrorism Financing",
+          "matches": 0
+        },
+        {
+          "category": "Tax Evasion",
+          "matches": 0
+        }
+      ],
+      "positiveNewsCount": 12,
+      "neutralNewsCount": 115,
+      "negativeNewsCount": 0
+    },
+    "watchlistCheck": {
+      "status": "Clear",
+      "matchCount": 0,
+      "listsScreened": [
+        {
+          "listName": "Interpol Wanted Persons",
+          "matches": 0
+        },
+        {
+          "listName": "National Crime Agency Watch List",
+          "matches": 0
+        },
+        {
+          "listName": "World Bank Debarred Entities",
+          "matches": 0
+        }
+      ]
+    },
+    "lawEnforcementCheck": {
+      "status": "Clear",
+      "matchCount": 0
+    }
+  },
+  "riskAssessment": {
+    "overallRiskScore": 15,
+    "riskRating": "Low",
+    "riskFactors": [
+      {
+        "factor": "Nationality",
+        "score": 5,
+        "weight": "Medium",
+        "description": "UK national - standard risk"
+      },
+      {
+        "factor": "Residence",
+        "score": 5,
+        "weight": "Medium",
+        "description": "UK resident - standard risk"
+      },
+      {
+        "factor": "Occupation",
+        "score": 5,
+        "weight": "Low",
+        "description": "Software Engineer - low-risk occupation"
+      }
+    ],
+    "recommendedDueDiligence": "Standard",
+    "ongoingMonitoringFrequency": "Annual",
+    "enhancedDueDiligenceRequired": false
+  },
+  "complianceDecision": {
+    "decision": "Approve",
+    "decisionDate": "2026-02-17T11:30:00Z",
+    "decidedBy": {
+      "id": "user-compliance-001",
+      "name": "Compliance Officer",
+      "role": "ComplianceOfficer"
+    },
+    "rationale": "No adverse findings across all screening categories. Client presents low risk profile. Standard due diligence procedures applied. Approved for onboarding.",
+    "conditions": [],
+    "nextReviewDate": "2027-02-17"
+  },
+  "regulatoryCompliance": {
+    "mlr2017Compliant": true,
+    "riskBasedApproach": true,
+    "customerDueDiligence": "Standard",
+    "ongoingMonitoringRequired": true,
+    "recordKeepingPeriod": 5,
+    "recordRetentionExpiryDate": "2031-02-17"
+  },
+  "reason": "InitialOnboarding",
+  "notes": "Initial AML screening for new client onboarding",
+  "complianceNotes": "All checks completed successfully. No issues identified. Client approved for onboarding with standard monitoring.",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123" },
+    "identity-verification": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "report": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123/report.pdf" }
+  }
+}
+```
+
+**AML Check with Potential Match Example:**
+
+```json
+{
+  "id": "aml-check-456",
+  "identityVerificationId": "idv-890",
+  "clientId": "client-456",
+  "factfindId": "ff-789",
+  "checkType": "Comprehensive",
+  "status": "PotentialMatch",
+  "riskRating": "Medium",
+  "overallResult": "RequiresManualReview",
+  "initiatedDate": "2026-02-17T11:00:15Z",
+  "completedDate": "2026-02-17T11:28:45Z",
+  "processingTime": "00:28:30",
+  "provider": "WorldCheck",
+  "screeningResults": {
+    "sanctionsCheck": {
+      "status": "Clear",
+      "matchCount": 0
+    },
+    "pepCheck": {
+      "status": "PotentialMatch",
+      "pepStatus": "RequiresReview",
+      "matchCount": 2,
+      "potentialMatches": [
+        {
+          "matchId": "pep-match-001",
+          "matchScore": 85,
+          "matchType": "NameAndDOBMatch",
+          "personName": "John M Smith",
+          "dateOfBirth": "1985-06-20",
+          "nationality": "British",
+          "pepCategory": "FormerGovernmentOfficial",
+          "position": "Deputy Director, Department for Transport",
+          "activeFrom": "2018-03-01",
+          "activeTo": "2022-08-15",
+          "pepType": "FormerPEP",
+          "daysSinceLeftOffice": 1281,
+          "source": "UK Government Public Records",
+          "confidence": "Medium",
+          "requiresManualReview": true,
+          "reviewNotes": "Name and DOB match. Requires verification that this is the same individual."
+        },
+        {
+          "matchId": "pep-match-002",
+          "matchScore": 65,
+          "matchType": "NameMatch",
+          "personName": "John Michael Smith",
+          "dateOfBirth": "1984-08-12",
+          "nationality": "American",
+          "pepCategory": "LocalGovernmentOfficial",
+          "position": "City Council Member, Springfield",
+          "activeFrom": "2020-01-01",
+          "activeTo": null,
+          "pepType": "CurrentPEP",
+          "source": "US Public Records",
+          "confidence": "Low",
+          "requiresManualReview": true,
+          "reviewNotes": "Name match only. Different DOB and nationality. Likely false positive."
+        }
+      ]
+    },
+    "adverseMediaCheck": {
+      "status": "Clear",
+      "matchCount": 0
+    }
+  },
+  "riskAssessment": {
+    "overallRiskScore": 45,
+    "riskRating": "Medium",
+    "riskFactors": [
+      {
+        "factor": "PotentialPEPMatch",
+        "score": 30,
+        "weight": "High",
+        "description": "Potential match with former UK government official"
+      }
+    ],
+    "recommendedDueDiligence": "Enhanced",
+    "enhancedDueDiligenceRequired": true
+  },
+  "complianceDecision": {
+    "decision": "PendingReview",
+    "decisionDate": null,
+    "decidedBy": null,
+    "rationale": "Potential PEP match requires manual verification. Enhanced due diligence may be required depending on verification outcome.",
+    "requiredActions": [
+      "Verify identity against PEP match",
+      "Obtain additional documentation",
+      "Source of wealth verification",
+      "Enhanced due diligence if PEP confirmed"
+    ],
+    "assignedTo": {
+      "id": "user-compliance-001",
+      "name": "Compliance Officer",
+      "role": "ComplianceOfficer"
+    },
+    "assignedDate": "2026-02-17T11:30:00Z",
+    "dueDate": "2026-02-19T17:00:00Z"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-789/clients/client-456/identity-verification/idv-890/aml-check/aml-check-456" },
+    "approve": { "href": "/api/v1/factfinds/ff-789/clients/client-456/identity-verification/idv-890/aml-check/aml-check-456/approve", "method": "POST" },
+    "reject": { "href": "/api/v1/factfinds/ff-789/clients/client-456/identity-verification/idv-890/aml-check/aml-check-456/reject", "method": "POST" },
+    "escalate": { "href": "/api/v1/factfinds/ff-789/clients/client-456/identity-verification/idv-890/aml-check/aml-check-456/escalate", "method": "POST" }
+  }
+}
+```
+
+**Validation Rules:**
+- Identity verification must exist
+- Cannot run AML check if identity not verified
+- Minimum search criteria: firstName, lastName, dateOfBirth
+- Provider must be configured and active
+- High-risk clients require Enhanced check type
+- Check frequency: Initial + annual minimum
+
+**HTTP Status Codes:**
+- `201 Created` - AML check initiated successfully
+- `200 OK` - AML check already exists and is current
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Identity verification not found
+- `422 Unprocessable Entity` - Validation failed
+- `503 Service Unavailable` - AML provider unavailable
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/aml-check-error",
+  "title": "AML Check Cannot Be Initiated",
+  "status": 422,
+  "detail": "Identity must be verified before AML screening can be performed",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check",
+  "currentVerificationStatus": "Pending",
+  "requiredStatus": "Verified",
+  "recommendation": "Complete identity verification before initiating AML checks"
+}
+```
+
+---
+
+##### 5.5.2.4 Get Verification History
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/history`
+
+**Description:** Get complete audit trail of all identity verification attempts, updates, and re-verifications for a client.
+
+**Query Parameters:**
+- `fromDate` - Filter from date (ISO 8601)
+- `toDate` - Filter to date (ISO 8601)
+- `verificationType` - Filter by type: StandardKYC, EnhancedDueDiligence, Reverification
+- `includeDocuments` - Include document details (default: false)
+- `includeAMLChecks` - Include AML check history (default: false)
+- `page` - Page number (default: 1)
+- `pageSize` - Items per page (default: 20, max: 100)
+
+**Response:**
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "clientName": "John Michael Smith",
+  "currentVerificationStatus": "Verified",
+  "currentVerificationId": "idv-789",
+  "currentVerificationDate": "2026-02-17T14:30:00Z",
+  "nextReviewDate": "2028-02-17",
+  "totalVerifications": 3,
+  "verificationHistory": [
+    {
+      "id": "idv-789",
+      "verificationType": "StandardKYC",
+      "verificationReason": "NewClientOnboarding",
+      "status": "Verified",
+      "riskCategory": "Standard",
+      "submittedDate": "2026-02-17T10:05:30Z",
+      "submittedBy": {
+        "id": "adv-789",
+        "name": "Jane Adviser",
+        "role": "FinancialAdviser"
+      },
+      "verifiedDate": "2026-02-17T14:30:00Z",
+      "verifiedBy": {
+        "id": "user-compliance-001",
+        "name": "Compliance Officer",
+        "role": "ComplianceOfficer"
+      },
+      "documentCount": 2,
+      "verificationProvider": "Onfido",
+      "amlCheckStatus": "Clear",
+      "pepCheckStatus": "NotPEP",
+      "overallVerificationScore": 95,
+      "outcome": "Approved",
+      "expiryDate": "2028-02-17",
+      "events": [
+        {
+          "eventType": "VerificationCreated",
+          "eventDate": "2026-02-17T10:05:30Z",
+          "eventBy": {
+            "id": "adv-789",
+            "name": "Jane Adviser"
+          },
+          "description": "Identity verification initiated for new client onboarding"
+        },
+        {
+          "eventType": "DocumentUploaded",
+          "eventDate": "2026-02-17T10:06:00Z",
+          "eventBy": {
+            "id": "adv-789",
+            "name": "Jane Adviser"
+          },
+          "description": "Passport uploaded (doc-001)",
+          "metadata": {
+            "documentType": "Passport",
+            "documentId": "doc-001"
+          }
+        },
+        {
+          "eventType": "DocumentUploaded",
+          "eventDate": "2026-02-17T10:07:00Z",
+          "eventBy": {
+            "id": "adv-789",
+            "name": "Jane Adviser"
+          },
+          "description": "Utility bill uploaded (doc-002)",
+          "metadata": {
+            "documentType": "UtilityBill",
+            "documentId": "doc-002"
+          }
+        },
+        {
+          "eventType": "AMLCheckInitiated",
+          "eventDate": "2026-02-17T10:05:30Z",
+          "eventBy": {
+            "id": "system",
+            "name": "System"
+          },
+          "description": "AML screening initiated via WorldCheck"
+        },
+        {
+          "eventType": "AMLCheckCompleted",
+          "eventDate": "2026-02-17T11:25:30Z",
+          "eventBy": {
+            "id": "system",
+            "name": "System"
+          },
+          "description": "AML screening completed - Clear",
+          "metadata": {
+            "status": "Clear",
+            "riskRating": "Low"
+          }
+        },
+        {
+          "eventType": "DocumentVerified",
+          "eventDate": "2026-02-17T12:15:00Z",
+          "eventBy": {
+            "id": "onfido-system",
+            "name": "Onfido"
+          },
+          "description": "Passport verified as genuine",
+          "metadata": {
+            "documentId": "doc-001",
+            "verificationResult": "Genuine"
+          }
+        },
+        {
+          "eventType": "DocumentVerified",
+          "eventDate": "2026-02-17T12:20:00Z",
+          "eventBy": {
+            "id": "user-compliance-001",
+            "name": "Compliance Officer"
+          },
+          "description": "Utility bill verified - address confirmed",
+          "metadata": {
+            "documentId": "doc-002",
+            "verificationResult": "AddressConfirmed"
+          }
+        },
+        {
+          "eventType": "VerificationApproved",
+          "eventDate": "2026-02-17T14:30:00Z",
+          "eventBy": {
+            "id": "user-compliance-001",
+            "name": "Compliance Officer"
+          },
+          "description": "Identity verification approved. All checks passed. Client cleared for onboarding.",
+          "metadata": {
+            "approvalNotes": "All KYC checks completed successfully. Client approved for onboarding. Standard risk category confirmed."
+          }
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789" }
+      }
+    },
+    {
+      "id": "idv-456",
+      "verificationType": "Reverification",
+      "verificationReason": "PeriodicReview",
+      "status": "Verified",
+      "riskCategory": "Standard",
+      "submittedDate": "2024-02-10T09:00:00Z",
+      "submittedBy": {
+        "id": "adv-456",
+        "name": "Previous Adviser",
+        "role": "FinancialAdviser"
+      },
+      "verifiedDate": "2024-02-12T15:00:00Z",
+      "verifiedBy": {
+        "id": "user-compliance-002",
+        "name": "Senior Compliance Officer",
+        "role": "ComplianceOfficer"
+      },
+      "documentCount": 1,
+      "verificationProvider": "Manual",
+      "amlCheckStatus": "Clear",
+      "pepCheckStatus": "NotPEP",
+      "overallVerificationScore": 92,
+      "outcome": "Approved",
+      "expiryDate": "2026-02-12",
+      "expired": true,
+      "supersededBy": "idv-789",
+      "events": [
+        {
+          "eventType": "VerificationCreated",
+          "eventDate": "2024-02-10T09:00:00Z",
+          "eventBy": {
+            "id": "adv-456",
+            "name": "Previous Adviser"
+          },
+          "description": "2-year re-verification initiated"
+        },
+        {
+          "eventType": "DocumentUploaded",
+          "eventDate": "2024-02-10T09:15:00Z",
+          "eventBy": {
+            "id": "adv-456",
+            "name": "Previous Adviser"
+          },
+          "description": "Bank statement uploaded for address verification"
+        },
+        {
+          "eventType": "AMLCheckCompleted",
+          "eventDate": "2024-02-10T10:30:00Z",
+          "eventBy": {
+            "id": "system",
+            "name": "System"
+          },
+          "description": "Annual AML re-screening completed - Clear"
+        },
+        {
+          "eventType": "VerificationApproved",
+          "eventDate": "2024-02-12T15:00:00Z",
+          "eventBy": {
+            "id": "user-compliance-002",
+            "name": "Senior Compliance Officer"
+          },
+          "description": "Re-verification approved. No changes to client profile."
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-456" }
+      }
+    },
+    {
+      "id": "idv-123",
+      "verificationType": "StandardKYC",
+      "verificationReason": "NewClientOnboarding",
+      "status": "Verified",
+      "riskCategory": "Standard",
+      "submittedDate": "2022-01-15T10:00:00Z",
+      "submittedBy": {
+        "id": "adv-456",
+        "name": "Previous Adviser",
+        "role": "FinancialAdviser"
+      },
+      "verifiedDate": "2022-01-17T14:00:00Z",
+      "verifiedBy": {
+        "id": "user-compliance-002",
+        "name": "Senior Compliance Officer",
+        "role": "ComplianceOfficer"
+      },
+      "documentCount": 3,
+      "verificationProvider": "Jumio",
+      "amlCheckStatus": "Clear",
+      "pepCheckStatus": "NotPEP",
+      "overallVerificationScore": 90,
+      "outcome": "Approved",
+      "expiryDate": "2024-01-17",
+      "expired": true,
+      "supersededBy": "idv-456",
+      "events": [
+        {
+          "eventType": "VerificationCreated",
+          "eventDate": "2022-01-15T10:00:00Z",
+          "eventBy": {
+            "id": "adv-456",
+            "name": "Previous Adviser"
+          },
+          "description": "Initial client onboarding verification"
+        },
+        {
+          "eventType": "VerificationApproved",
+          "eventDate": "2022-01-17T14:00:00Z",
+          "eventBy": {
+            "id": "user-compliance-002",
+            "name": "Senior Compliance Officer"
+          },
+          "description": "Initial verification approved"
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-123" }
+      }
+    }
+  ],
+  "statistics": {
+    "totalVerifications": 3,
+    "successfulVerifications": 3,
+    "failedVerifications": 0,
+    "pendingVerifications": 0,
+    "averageVerificationTime": "2 days 4 hours",
+    "lastVerificationDate": "2026-02-17T14:30:00Z",
+    "nextScheduledReview": "2028-02-17",
+    "amlScreeningCount": 5,
+    "documentCount": 6
+  },
+  "complianceHistory": [
+    {
+      "date": "2026-02-17",
+      "event": "KYC Refresh Completed",
+      "status": "Compliant",
+      "notes": "All verification checks passed. MLR 2017 compliant."
+    },
+    {
+      "date": "2024-02-12",
+      "event": "Periodic Re-verification",
+      "status": "Compliant",
+      "notes": "2-year re-verification completed successfully."
+    },
+    {
+      "date": "2022-01-17",
+      "event": "Initial Onboarding",
+      "status": "Compliant",
+      "notes": "Client successfully onboarded. All KYC requirements met."
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 3,
+    "totalPages": 1
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/history" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "current": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification" }
+  }
+}
+```
+
+**Event Type Values:**
+- `VerificationCreated` - Verification record created
+- `DocumentUploaded` - Document added
+- `DocumentVerified` - Document verification completed
+- `DocumentRejected` - Document rejected
+- `AMLCheckInitiated` - AML screening started
+- `AMLCheckCompleted` - AML screening finished
+- `PEPCheckCompleted` - PEP screening finished
+- `VerificationSubmitted` - Submitted for review
+- `VerificationApproved` - Approved by compliance
+- `VerificationRejected` - Rejected by compliance
+- `VerificationExpired` - Verification expired
+- `ReverificationRequired` - Re-verification needed
+- `RiskCategoryChanged` - Risk category updated
+- `StatusChanged` - Status updated
+
+**HTTP Status Codes:**
+- `200 OK` - History retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+### 5.6 Data Protection & Consent API
+
+**Purpose:** Manage GDPR consent, data subject rights, and data protection compliance.
+
+**Scope:**
+- GDPR consent management with purpose specification and lawful basis
+- Data processing consent tracking with version control
+- Data retention policies and automated expiry
+- Consent withdrawal workflows with immediate effect
+- Right to be forgotten (RTBF) requests and erasure workflows
+- Data portability requests with secure export
+- Consent audit trail with complete version history
+- Privacy policy acknowledgment and version tracking
+- Data subject access requests (DSAR)
+- Legitimate interest assessments
+
+**Aggregate Root:** FactFind (consent is nested within client)
+
+**Regulatory Compliance:**
+- GDPR (General Data Protection Regulation) - Articles 6, 7, 13, 15, 16, 17, 18, 20, 21
+- Data Protection Act 2018 (UK)
+- FCA Handbook - SYSC 3A (Data Protection)
+- ICO (Information Commissioner's Office) Guidelines
+- Privacy and Electronic Communications Regulations (PECR)
+
+#### 5.6.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent` | Get consent status | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent` | Update consent | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent/record` | Record consent event | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent/history` | Get consent history | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent/withdraw` | Withdraw consent | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/data` | Right to be forgotten (RTBF) | `client:admin` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/data/export` | Data portability request | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/data/access-request` | Submit DSAR | `client:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/privacy-policy` | Get privacy policy status | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/privacy-policy/acknowledge` | Acknowledge privacy policy | `client:write` |
+
+#### 5.6.2 Key Endpoints
+
+##### 5.6.2.1 Get Consent Status
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/consent`
+
+**Description:** Get current consent status for all processing purposes with lawful basis, consent dates, and privacy policy version.
+
+**Query Parameters:**
+- `includeHistory` - Include consent history summary (default: false)
+- `includePrivacyPolicy` - Include privacy policy details (default: true)
+
+**Response:**
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "clientName": "John Michael Smith",
+  "overallConsentStatus": "Valid",
+  "lastUpdated": "2026-02-17T10:00:00Z",
+  "consentVersion": "2.0",
+  "privacyPolicy": {
+    "version": "3.0",
+    "effectiveDate": "2025-05-01",
+    "acknowledgedDate": "2026-02-17T10:00:00Z",
+    "acknowledgedBy": "Client",
+    "acknowledgementMethod": "OnlinePortal",
+    "policyUrl": "https://www.factfind.com/privacy-policy/v3.0",
+    "requiresReacknowledgement": false,
+    "nextReviewDate": "2026-05-01"
+  },
+  "processingConsents": [
+    {
+      "purpose": "DataProcessing",
+      "purposeDescription": "Processing personal data to provide financial advice and services",
+      "lawfulBasis": "Contract",
+      "lawfulBasisDescription": "Processing necessary for performance of contract (GDPR Article 6(1)(b))",
+      "consentStatus": "ConsentNotRequired",
+      "consentRequired": false,
+      "consentGiven": null,
+      "consentDate": null,
+      "consentMethod": null,
+      "mandatory": true,
+      "canWithdraw": false,
+      "withdrawalImpact": "Service cannot be provided without this processing",
+      "retentionPeriod": "6 years after relationship ends",
+      "retentionExpiryDate": null,
+      "dataCategories": [
+        "IdentityData",
+        "ContactData",
+        "FinancialData",
+        "TransactionalData"
+      ],
+      "processingActivities": [
+        "Financial assessment and analysis",
+        "Advice and recommendation provision",
+        "Application processing",
+        "Ongoing service delivery"
+      ],
+      "dataSharing": {
+        "shared": true,
+        "recipients": [
+          "Product providers",
+          "Compliance systems",
+          "Payment processors"
+        ],
+        "internationalTransfers": false
+      }
+    },
+    {
+      "purpose": "RegulatoryCompliance",
+      "purposeDescription": "Compliance with legal and regulatory obligations including AML, KYC, and FCA requirements",
+      "lawfulBasis": "LegalObligation",
+      "lawfulBasisDescription": "Processing necessary for compliance with legal obligation (GDPR Article 6(1)(c))",
+      "consentStatus": "ConsentNotRequired",
+      "consentRequired": false,
+      "consentGiven": null,
+      "consentDate": null,
+      "consentMethod": null,
+      "mandatory": true,
+      "canWithdraw": false,
+      "withdrawalImpact": "Cannot comply with legal obligations without this processing",
+      "retentionPeriod": "6 years from transaction date",
+      "retentionExpiryDate": null,
+      "dataCategories": [
+        "IdentityData",
+        "ContactData",
+        "FinancialData",
+        "VerificationDocuments"
+      ],
+      "processingActivities": [
+        "Identity verification (KYC)",
+        "AML screening",
+        "Regulatory reporting",
+        "Record keeping"
+      ],
+      "dataSharing": {
+        "shared": true,
+        "recipients": [
+          "Financial Conduct Authority",
+          "National Crime Agency",
+          "HMRC",
+          "AML screening providers"
+        ],
+        "internationalTransfers": true,
+        "transferSafeguards": "Standard Contractual Clauses (SCC)"
+      }
+    },
+    {
+      "purpose": "Marketing",
+      "purposeDescription": "Marketing communications about products and services that may be of interest",
+      "lawfulBasis": "Consent",
+      "lawfulBasisDescription": "Consent of the data subject (GDPR Article 6(1)(a))",
+      "consentStatus": "Granted",
+      "consentRequired": true,
+      "consentGiven": true,
+      "consentDate": "2026-02-17T10:00:00Z",
+      "consentExpiryDate": "2028-02-17T10:00:00Z",
+      "consentMethod": "OnlineForm",
+      "consentEvidence": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "consentText": "I agree to receive marketing communications about products and services",
+        "recordId": "consent-record-789"
+      },
+      "mandatory": false,
+      "canWithdraw": true,
+      "withdrawalImpact": "No impact on service provision",
+      "channels": {
+        "email": {
+          "consented": true,
+          "consentDate": "2026-02-17T10:00:00Z",
+          "frequency": "Monthly"
+        },
+        "phone": {
+          "consented": false,
+          "consentDate": null
+        },
+        "sms": {
+          "consented": false,
+          "consentDate": null
+        },
+        "post": {
+          "consented": true,
+          "consentDate": "2026-02-17T10:00:00Z",
+          "frequency": "Quarterly"
+        }
+      },
+      "retentionPeriod": "Until consent withdrawn or 2 years of inactivity",
+      "dataCategories": [
+        "ContactData",
+        "PreferenceData"
+      ],
+      "processingActivities": [
+        "Email marketing campaigns",
+        "Postal marketing",
+        "Product recommendations"
+      ],
+      "dataSharing": {
+        "shared": true,
+        "recipients": [
+          "Email service providers",
+          "Marketing automation platforms"
+        ],
+        "internationalTransfers": false
+      }
+    },
+    {
+      "purpose": "Profiling",
+      "purposeDescription": "Automated analysis of personal data to evaluate preferences, interests, and suitability",
+      "lawfulBasis": "Consent",
+      "lawfulBasisDescription": "Consent of the data subject (GDPR Article 6(1)(a))",
+      "consentStatus": "Granted",
+      "consentRequired": true,
+      "consentGiven": true,
+      "consentDate": "2026-02-17T10:00:00Z",
+      "consentMethod": "OnlineForm",
+      "mandatory": false,
+      "canWithdraw": true,
+      "withdrawalImpact": "May receive less tailored advice and recommendations",
+      "retentionPeriod": "Duration of client relationship plus 2 years",
+      "dataCategories": [
+        "FinancialData",
+        "BehaviouralData",
+        "PreferenceData"
+      ],
+      "processingActivities": [
+        "Risk profiling",
+        "Suitability assessment",
+        "Product matching",
+        "Recommendation engine"
+      ],
+      "automatedDecisionMaking": {
+        "used": true,
+        "description": "Automated risk scoring and product recommendations",
+        "humanReview": true,
+        "rightToObjectNotified": true
+      },
+      "dataSharing": {
+        "shared": false,
+        "recipients": [],
+        "internationalTransfers": false
+      }
+    },
+    {
+      "purpose": "ThirdPartySharing",
+      "purposeDescription": "Sharing data with selected third parties for marketing purposes",
+      "lawfulBasis": "Consent",
+      "lawfulBasisDescription": "Consent of the data subject (GDPR Article 6(1)(a))",
+      "consentStatus": "Refused",
+      "consentRequired": true,
+      "consentGiven": false,
+      "consentDate": null,
+      "consentMethod": null,
+      "mandatory": false,
+      "canWithdraw": true,
+      "withdrawalImpact": "No impact on service provision",
+      "retentionPeriod": "N/A",
+      "dataCategories": [],
+      "processingActivities": [],
+      "dataSharing": {
+        "shared": false,
+        "recipients": [],
+        "internationalTransfers": false
+      }
+    },
+    {
+      "purpose": "AnalyticsAndImprovement",
+      "purposeDescription": "Analysis of aggregated data to improve services and understand usage patterns",
+      "lawfulBasis": "LegitimateInterest",
+      "lawfulBasisDescription": "Legitimate interests of the controller (GDPR Article 6(1)(f))",
+      "consentStatus": "ConsentNotRequired",
+      "consentRequired": false,
+      "consentGiven": null,
+      "consentDate": null,
+      "consentMethod": null,
+      "mandatory": false,
+      "canWithdraw": false,
+      "canObject": true,
+      "withdrawalImpact": "No impact on service provision",
+      "legitimateInterestAssessment": {
+        "purpose": "Service improvement and quality assurance",
+        "necessity": "Helps us improve our services and provide better customer experience",
+        "balancingTest": "Data is anonymized where possible. Client interests protected through anonymization and aggregation.",
+        "assessmentDate": "2025-04-15",
+        "assessmentBy": "Data Protection Officer",
+        "mitigations": [
+          "Data anonymization",
+          "Aggregation of data",
+          "Limited retention period",
+          "Right to object respected"
+        ]
+      },
+      "retentionPeriod": "3 years in aggregated anonymized form",
+      "dataCategories": [
+        "UsageData",
+        "BehaviouralData"
+      ],
+      "processingActivities": [
+        "Service usage analysis",
+        "Performance monitoring",
+        "Quality improvement"
+      ],
+      "dataSharing": {
+        "shared": false,
+        "recipients": [],
+        "internationalTransfers": false
+      }
+    }
+  ],
+  "dataSubjectRights": {
+    "rightToAccess": {
+      "available": true,
+      "lastExercised": null,
+      "requestUrl": "/api/v1/factfinds/ff-456/clients/client-123/data/access-request"
+    },
+    "rightToRectification": {
+      "available": true,
+      "lastExercised": null,
+      "requestUrl": "/api/v1/factfinds/ff-456/clients/client-123"
+    },
+    "rightToErasure": {
+      "available": true,
+      "lastExercised": null,
+      "restrictions": "Some data must be retained for regulatory compliance (6 years)",
+      "requestUrl": "/api/v1/factfinds/ff-456/clients/client-123/data"
+    },
+    "rightToRestriction": {
+      "available": true,
+      "lastExercised": null
+    },
+    "rightToDataPortability": {
+      "available": true,
+      "lastExercised": null,
+      "formats": ["JSON", "CSV", "PDF"],
+      "requestUrl": "/api/v1/factfinds/ff-456/clients/client-123/data/export"
+    },
+    "rightToObject": {
+      "available": true,
+      "lastExercised": null,
+      "applicableTo": ["Marketing", "Profiling", "AnalyticsAndImprovement"]
+    }
+  },
+  "consentRefreshRequired": false,
+  "nextConsentReviewDate": "2027-02-17",
+  "dataProtectionOfficer": {
+    "name": "Sarah Johnson",
+    "email": "dpo@factfind.com",
+    "phone": "+44 20 1234 5678"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "update": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent", "method": "PUT" },
+    "withdraw": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent/withdraw", "method": "POST" },
+    "history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent/history" },
+    "data-export": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/export", "method": "POST" },
+    "data-erasure": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data", "method": "DELETE" }
+  }
+}
+```
+
+**Consent Status Values:**
+- `Granted` - Consent given
+- `Refused` - Consent explicitly refused
+- `Withdrawn` - Previously granted, now withdrawn
+- `Expired` - Consent has expired
+- `ConsentNotRequired` - Processing does not require consent
+- `Pending` - Awaiting consent decision
+
+**Lawful Basis Values (GDPR Article 6):**
+- `Consent` - Article 6(1)(a) - Consent of the data subject
+- `Contract` - Article 6(1)(b) - Performance of contract
+- `LegalObligation` - Article 6(1)(c) - Compliance with legal obligation
+- `VitalInterests` - Article 6(1)(d) - Protection of vital interests
+- `PublicTask` - Article 6(1)(e) - Performance of task in public interest
+- `LegitimateInterest` - Article 6(1)(f) - Legitimate interests of controller
+
+**Consent Method Values:**
+- `OnlineForm` - Online consent form
+- `OnlinePortal` - Client portal
+- `WrittenForm` - Paper consent form
+- `VerbalConsent` - Verbal consent (recorded)
+- `EmailConfirmation` - Email confirmation link
+- `DigitalSignature` - Electronically signed
+- `DoubleOptIn` - Double opt-in confirmation
+
+**HTTP Status Codes:**
+- `200 OK` - Consent status retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+##### 5.6.2.2 Update Consent Preferences
+
+**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/consent`
+
+**Description:** Update consent preferences for one or more processing purposes. Records consent with full audit trail including IP address, timestamp, and consent evidence.
+
+**Request Body:**
+
+```json
+{
+  "consentUpdates": [
+    {
+      "purpose": "Marketing",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentText": "I agree to receive marketing communications about products and services that may be of interest to me",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Weekly"
+        },
+        "phone": {
+          "consented": false
+        },
+        "sms": {
+          "consented": false
+        },
+        "post": {
+          "consented": true,
+          "frequency": "Monthly"
+        }
+      },
+      "interests": [
+        "Pensions",
+        "Investments",
+        "Protection"
+      ]
+    },
+    {
+      "purpose": "Profiling",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentText": "I agree to automated profiling to receive personalized product recommendations"
+    },
+    {
+      "purpose": "ThirdPartySharing",
+      "consentGiven": false,
+      "consentMethod": "OnlinePortal",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentText": "I do not agree to share my data with third parties for marketing purposes"
+    }
+  ],
+  "privacyPolicyVersion": "3.0",
+  "privacyPolicyAcknowledged": true,
+  "consentEvidence": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "deviceType": "Desktop",
+    "browserLanguage": "en-GB",
+    "timestamp": "2026-02-17T11:30:00Z"
+  },
+  "consentRecordedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "userName": "John Smith"
+  },
+  "notes": "Client updated marketing preferences via online portal during annual review"
+}
+```
+
+**Response:**
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "consentVersion": "2.1",
+  "updatedDate": "2026-02-17T11:30:15Z",
+  "updatedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "userName": "John Smith"
+  },
+  "updatedConsents": [
+    {
+      "purpose": "Marketing",
+      "previousStatus": "Refused",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentExpiryDate": "2028-02-17T11:30:00Z",
+      "consentMethod": "OnlinePortal",
+      "consentRecordId": "consent-rec-987",
+      "channels": {
+        "email": {
+          "consented": true,
+          "previouslyConsented": false,
+          "consentChanged": true,
+          "frequency": "Weekly"
+        },
+        "phone": {
+          "consented": false,
+          "previouslyConsented": false,
+          "consentChanged": false
+        },
+        "sms": {
+          "consented": false,
+          "previouslyConsented": false,
+          "consentChanged": false
+        },
+        "post": {
+          "consented": true,
+          "previouslyConsented": false,
+          "consentChanged": true,
+          "frequency": "Monthly"
+        }
+      },
+      "interests": [
+        "Pensions",
+        "Investments",
+        "Protection"
+      ]
+    },
+    {
+      "purpose": "Profiling",
+      "previousStatus": "Refused",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentMethod": "OnlinePortal",
+      "consentRecordId": "consent-rec-988"
+    },
+    {
+      "purpose": "ThirdPartySharing",
+      "previousStatus": "Refused",
+      "newStatus": "Refused",
+      "consentGiven": false,
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentMethod": "OnlinePortal",
+      "consentRecordId": "consent-rec-989",
+      "consentChanged": false
+    }
+  ],
+  "privacyPolicy": {
+    "version": "3.0",
+    "acknowledgedDate": "2026-02-17T11:30:00Z",
+    "acknowledgedBy": "Client"
+  },
+  "consentEvidence": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "deviceType": "Desktop",
+    "timestamp": "2026-02-17T11:30:00Z",
+    "stored": true,
+    "retentionPeriod": "7 years"
+  },
+  "auditTrail": {
+    "recordCreated": true,
+    "recordId": "audit-456",
+    "timestamp": "2026-02-17T11:30:15Z"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent/history" }
+  }
+}
+```
+
+**Validation Rules:**
+- At least one consent update required
+- `purpose` must be valid consent-requiring purpose
+- Cannot update consent for non-consent purposes (Contract, LegalObligation)
+- `consentMethod` required for all updates
+- `consentDate` must not be future date
+- Privacy policy version must be current or recent version
+- IP address required for online consent capture
+- Consent text must match approved wording
+
+**HTTP Status Codes:**
+- `200 OK` - Consent updated successfully
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/consent-error",
+  "title": "Consent Update Failed",
+  "status": 422,
+  "detail": "Cannot update consent for purpose that does not require consent",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/consent",
+  "errors": [
+    {
+      "field": "consentUpdates[0].purpose",
+      "message": "Purpose 'DataProcessing' uses lawful basis 'Contract' and does not require consent",
+      "rejectedValue": "DataProcessing",
+      "lawfulBasis": "Contract"
+    }
+  ]
+}
+```
+
+---
+
+##### 5.6.2.3 Right to Be Forgotten (RTBF)
+
+**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/data`
+
+**Description:** Process GDPR Article 17 Right to Erasure request. Identifies data to be erased, data that must be retained, and coordinates erasure across systems.
+
+**Request Body:**
+
+```json
+{
+  "erasureReason": "ConsentWithdrawn",
+  "erasureReasonDetail": "Client has withdrawn all consent and wishes personal data to be erased",
+  "requestedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "verificationMethod": "EmailVerification",
+    "verificationDate": "2026-02-17T12:00:00Z"
+  },
+  "requestDate": "2026-02-17T12:00:00Z",
+  "erasureScope": "CompleteErasure",
+  "confirmErasure": true,
+  "clientAcknowledgement": "I understand that erasing my data will end my relationship with FactFind and I will no longer receive services. I understand that some data must be retained for regulatory compliance.",
+  "adviserId": "adv-789",
+  "adviserNotes": "Client has confirmed erasure request. All services terminated. Exit interview completed."
+}
+```
+
+**Erasure Reason Values:**
+- `ConsentWithdrawn` - Consent withdrawn (GDPR Article 17(1)(b))
+- `NoLongerNecessary` - Data no longer necessary (GDPR Article 17(1)(a))
+- `ObjectToProcessing` - Objection to processing (GDPR Article 17(1)(c))
+- `UnlawfulProcessing` - Processing was unlawful (GDPR Article 17(1)(d))
+- `LegalObligation` - Erasure required by law (GDPR Article 17(1)(e))
+
+**Erasure Scope Values:**
+- `CompleteErasure` - Erase all non-essential data
+- `MarketingOnly` - Erase marketing data only
+- `ConsentBasedOnly` - Erase only data processed under consent
+- `Partial` - Custom erasure scope
+
+**Response:**
+
+```http
+HTTP/1.1 202 Accepted
+Location: /api/v1/factfinds/ff-456/clients/client-123/data/erasure/erasure-req-123
+```
+
+```json
+{
+  "erasureRequestId": "erasure-req-123",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "InProgress",
+  "erasureReason": "ConsentWithdrawn",
+  "requestDate": "2026-02-17T12:00:00Z",
+  "requestedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "name": "John Smith",
+    "verified": true
+  },
+  "erasureScope": "CompleteErasure",
+  "estimatedCompletionDate": "2026-03-17T12:00:00Z",
+  "legalTimeLimit": "2026-03-17T12:00:00Z",
+  "dataInventory": {
+    "totalDataCategories": 12,
+    "dataToBeErased": 8,
+    "dataToBeRetained": 4,
+    "categories": [
+      {
+        "category": "IdentityData",
+        "dataCount": 15,
+        "erasureStatus": "PartialErasure",
+        "erasureDetail": "Name, DOB retained for regulatory compliance. Photo ID will be erased.",
+        "retentionReason": "Legal obligation (MLR 2017 - 5 year retention)",
+        "retentionExpiryDate": "2031-02-17"
+      },
+      {
+        "category": "ContactData",
+        "dataCount": 8,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "All contact details (email, phone, address) will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "FinancialData",
+        "dataCount": 142,
+        "erasureStatus": "Retained",
+        "erasureDetail": "Financial transaction records retained for regulatory compliance",
+        "retentionReason": "Legal obligation (FCA requirements - 6 year retention)",
+        "retentionExpiryDate": "2032-02-17"
+      },
+      {
+        "category": "TransactionalData",
+        "dataCount": 89,
+        "erasureStatus": "Retained",
+        "erasureDetail": "Transaction audit trail retained for regulatory compliance",
+        "retentionReason": "Legal obligation (FCA requirements - 6 year retention)",
+        "retentionExpiryDate": "2032-02-17"
+      },
+      {
+        "category": "MarketingData",
+        "dataCount": 47,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "All marketing preferences, communications history, and marketing data will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "ConsentRecords",
+        "dataCount": 12,
+        "erasureStatus": "PartialErasure",
+        "erasureDetail": "Consent records anonymized (personal identifiers removed but consent audit trail maintained)",
+        "retentionReason": "Legitimate interest (demonstrating GDPR compliance)",
+        "retentionExpiryDate": "2029-02-17"
+      },
+      {
+        "category": "BehaviouralData",
+        "dataCount": 234,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "Website usage, portal access logs, and behavioral data will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "PreferenceData",
+        "dataCount": 28,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "User preferences and settings will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "CommunicationData",
+        "dataCount": 156,
+        "erasureStatus": "Retained",
+        "erasureDetail": "Regulatory communications and advice records retained",
+        "retentionReason": "Legal obligation (FCA requirements)",
+        "retentionExpiryDate": "2032-02-17"
+      },
+      {
+        "category": "DocumentsData",
+        "dataCount": 23,
+        "erasureStatus": "PartialErasure",
+        "erasureDetail": "KYC documents retained for compliance. Other documents erased.",
+        "retentionReason": "Legal obligation (MLR 2017)",
+        "retentionExpiryDate": "2031-02-17"
+      },
+      {
+        "category": "ProfileData",
+        "dataCount": 45,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "Risk profile, suitability assessments (non-regulatory) will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "AuthenticationData",
+        "dataCount": 5,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "Login credentials, security questions, and authentication tokens will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      }
+    ]
+  },
+  "erasureWorkflow": {
+    "steps": [
+      {
+        "stepNumber": 1,
+        "stepName": "VerifyIdentity",
+        "status": "Completed",
+        "completedDate": "2026-02-17T12:00:00Z"
+      },
+      {
+        "stepNumber": 2,
+        "stepName": "AssessErasureRequest",
+        "status": "Completed",
+        "completedDate": "2026-02-17T12:05:00Z"
+      },
+      {
+        "stepNumber": 3,
+        "stepName": "IdentifyDataToErase",
+        "status": "Completed",
+        "completedDate": "2026-02-17T12:10:00Z"
+      },
+      {
+        "stepNumber": 4,
+        "stepName": "NotifyThirdParties",
+        "status": "InProgress",
+        "estimatedCompletion": "2026-02-24T12:00:00Z",
+        "thirdPartiesToNotify": [
+          "Product Provider A",
+          "Product Provider B",
+          "Email Service Provider",
+          "AML Screening Provider"
+        ]
+      },
+      {
+        "stepNumber": 5,
+        "stepName": "PerformErasure",
+        "status": "Pending",
+        "estimatedCompletion": "2026-03-10T12:00:00Z"
+      },
+      {
+        "stepNumber": 6,
+        "stepName": "VerifyErasure",
+        "status": "Pending",
+        "estimatedCompletion": "2026-03-15T12:00:00Z"
+      },
+      {
+        "stepNumber": 7,
+        "stepName": "NotifyClient",
+        "status": "Pending",
+        "estimatedCompletion": "2026-03-17T12:00:00Z"
+      }
+    ]
+  },
+  "thirdPartyNotifications": {
+    "required": true,
+    "recipientCount": 4,
+    "recipients": [
+      {
+        "recipientType": "ProductProvider",
+        "recipientName": "Product Provider A",
+        "notificationStatus": "Pending",
+        "dataSharedWith": "Client investment and transaction data"
+      },
+      {
+        "recipientType": "ProductProvider",
+        "recipientName": "Product Provider B",
+        "notificationStatus": "Pending",
+        "dataSharedWith": "Client pension and protection data"
+      },
+      {
+        "recipientType": "ServiceProvider",
+        "recipientName": "Email Service Provider",
+        "notificationStatus": "Pending",
+        "dataSharedWith": "Client contact details for marketing"
+      },
+      {
+        "recipientType": "ComplianceService",
+        "recipientName": "AML Screening Provider",
+        "notificationStatus": "Pending",
+        "dataSharedWith": "Client identity data for AML screening"
+      }
+    ]
+  },
+  "legalAssessment": {
+    "erasureAllowed": true,
+    "erasureRestrictions": [
+      "Financial transaction records must be retained for 6 years (FCA)",
+      "KYC documents must be retained for 5 years (MLR 2017)",
+      "Regulatory communications must be retained for 6 years (FCA)"
+    ],
+    "assessedBy": {
+      "id": "user-dpo-001",
+      "name": "Data Protection Officer",
+      "role": "DataProtectionOfficer"
+    },
+    "assessmentDate": "2026-02-17T12:05:00Z",
+    "assessmentNotes": "Client has valid grounds for erasure (consent withdrawn). Erasure will proceed for all non-essential data. Retained data clearly documented with legal basis."
+  },
+  "complianceOfficerApproval": {
+    "required": true,
+    "approved": true,
+    "approvedBy": {
+      "id": "user-compliance-001",
+      "name": "Compliance Officer"
+    },
+    "approvalDate": "2026-02-17T12:10:00Z",
+    "approvalNotes": "Erasure request verified and approved. Client identity confirmed. All regulatory retention requirements documented."
+  },
+  "clientNotification": {
+    "notificationRequired": true,
+    "notificationMethod": "Email",
+    "notificationAddress": "john.smith@example.com",
+    "notificationScheduled": "2026-03-17T12:00:00Z",
+    "notificationContent": "You will receive confirmation once your data erasure is complete, along with details of any data retained for legal/regulatory compliance."
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/erasure/erasure-req-123" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "status": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/erasure/erasure-req-123/status" }
+  }
+}
+```
+
+**Erasure Status Values:**
+- `Pending` - Request received, awaiting processing
+- `InProgress` - Erasure in progress
+- `AwaitingApproval` - Requires manual approval
+- `Completed` - Erasure completed
+- `PartiallyCompleted` - Some data erased, some retained
+- `Rejected` - Request rejected (no valid grounds)
+- `Failed` - Technical failure during erasure
+
+**Validation Rules:**
+- Client identity must be verified before processing
+- Must provide valid erasure reason
+- Cannot erase data where legal obligation to retain
+- Regulatory retention periods must be respected (FCA 6 years, MLR 2017 5 years)
+- Third parties must be notified of erasure
+- Erasure must be completed within 1 month (extendable to 3 months)
+- Must maintain proof of erasure for 3 years
+
+**HTTP Status Codes:**
+- `202 Accepted` - Erasure request accepted and being processed
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions or erasure not permitted
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/erasure-error",
+  "title": "Data Erasure Not Permitted",
+  "status": 403,
+  "detail": "Data erasure cannot be performed due to overriding legal obligation to retain data",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/data",
+  "legalBasis": "Legal obligation to retain client data under FCA regulations",
+  "retentionPeriod": "6 years from last transaction",
+  "retentionExpiryDate": "2032-02-17",
+  "explanation": "Financial services regulations require retention of client transaction and advice records for 6 years. While we can erase marketing and non-essential data, core regulatory records must be retained.",
+  "partialErasureAvailable": true,
+  "contactDPO": "dpo@factfind.com"
+}
+```
+
+---
+
+##### 5.6.2.4 Get Consent History (Audit Trail)
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/consent/history`
+
+**Description:** Get complete GDPR Article 7(1) compliant audit trail of all consent events, changes, and withdrawals.
+
+**Query Parameters:**
+- `purpose` - Filter by purpose: Marketing, Profiling, ThirdPartySharing, etc.
+- `fromDate` - Filter from date (ISO 8601)
+- `toDate` - Filter to date (ISO 8601)
+- `eventType` - Filter by event type: ConsentGranted, ConsentWithdrawn, ConsentUpdated, etc.
+- `includeEvidence` - Include consent evidence (IP, user agent) (default: true)
+- `page` - Page number (default: 1)
+- `pageSize` - Items per page (default: 50, max: 100)
+
+**Response:**
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "clientName": "John Michael Smith",
+  "currentConsentVersion": "2.1",
+  "totalConsentEvents": 15,
+  "consentHistory": [
+    {
+      "eventId": "consent-event-015",
+      "eventType": "ConsentGranted",
+      "eventDate": "2026-02-17T11:30:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "Refused",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentVersion": "2.1",
+      "privacyPolicyVersion": "3.0",
+      "consentText": "I agree to receive marketing communications about products and services that may be of interest to me",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Weekly"
+        },
+        "post": {
+          "consented": true,
+          "frequency": "Monthly"
+        }
+      },
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "deviceType": "Desktop",
+        "browserLanguage": "en-GB",
+        "timestamp": "2026-02-17T11:30:00Z",
+        "stored": true
+      },
+      "notes": "Client updated marketing preferences via online portal during annual review"
+    },
+    {
+      "eventId": "consent-event-014",
+      "eventType": "ConsentGranted",
+      "eventDate": "2026-02-17T11:30:00Z",
+      "purpose": "Profiling",
+      "previousStatus": "Refused",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentVersion": "2.1",
+      "privacyPolicyVersion": "3.0",
+      "consentText": "I agree to automated profiling to receive personalized product recommendations",
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "timestamp": "2026-02-17T11:30:00Z",
+        "stored": true
+      }
+    },
+    {
+      "eventId": "consent-event-013",
+      "eventType": "PrivacyPolicyAcknowledged",
+      "eventDate": "2026-02-17T10:00:00Z",
+      "purpose": "All",
+      "privacyPolicyVersion": "3.0",
+      "privacyPolicyEffectiveDate": "2025-05-01",
+      "acknowledgementMethod": "OnlinePortal",
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "timestamp": "2026-02-17T10:00:00Z",
+        "stored": true
+      },
+      "notes": "Client acknowledged updated privacy policy version 3.0 during login"
+    },
+    {
+      "eventId": "consent-event-012",
+      "eventType": "ConsentRefreshed",
+      "eventDate": "2025-02-15T09:00:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "Granted",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "EmailConfirmation",
+      "consentVersion": "2.0",
+      "privacyPolicyVersion": "2.5",
+      "consentText": "Please confirm you still wish to receive marketing communications",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Monthly"
+        }
+      },
+      "recordedBy": {
+        "type": "System",
+        "systemName": "ConsentRefreshSystem"
+      },
+      "evidence": {
+        "emailAddress": "john.smith@example.com",
+        "confirmationLink": "https://portal.factfind.com/consent/confirm/abc123",
+        "confirmationDate": "2025-02-15T09:15:30Z",
+        "stored": true
+      },
+      "notes": "Annual consent refresh completed via email confirmation"
+    },
+    {
+      "eventId": "consent-event-011",
+      "eventType": "ConsentWithdrawn",
+      "eventDate": "2024-08-20T14:30:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "Granted",
+      "newStatus": "Withdrawn",
+      "consentGiven": false,
+      "withdrawalMethod": "OnlinePortal",
+      "withdrawalReason": "TooManyEmails",
+      "consentVersion": "1.9",
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.105",
+        "timestamp": "2024-08-20T14:30:00Z",
+        "stored": true
+      },
+      "effectiveDate": "2024-08-20T14:30:00Z",
+      "processingStoppedDate": "2024-08-20T14:30:05Z",
+      "notes": "Client withdrew marketing consent citing too many emails"
+    },
+    {
+      "eventId": "consent-event-010",
+      "eventType": "ConsentUpdated",
+      "eventDate": "2024-03-10T10:15:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "Granted",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentVersion": "1.8",
+      "changeDescription": "Updated communication frequency from Weekly to Monthly",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Monthly",
+          "previousFrequency": "Weekly"
+        }
+      },
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.102",
+        "timestamp": "2024-03-10T10:15:00Z",
+        "stored": true
+      },
+      "notes": "Client reduced email frequency preference"
+    },
+    {
+      "eventId": "consent-event-009",
+      "eventType": "PrivacyPolicyAcknowledged",
+      "eventDate": "2023-11-01T08:00:00Z",
+      "purpose": "All",
+      "privacyPolicyVersion": "2.5",
+      "privacyPolicyEffectiveDate": "2023-11-01",
+      "acknowledgementMethod": "OnlinePortal",
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.98",
+        "timestamp": "2023-11-01T08:00:00Z",
+        "stored": true
+      },
+      "notes": "Client acknowledged privacy policy update version 2.5"
+    },
+    {
+      "eventId": "consent-event-008",
+      "eventType": "ConsentGranted",
+      "eventDate": "2023-06-15T11:00:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "NotSet",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "WrittenForm",
+      "consentVersion": "1.7",
+      "privacyPolicyVersion": "2.0",
+      "consentText": "I agree to receive marketing communications",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Weekly"
+        },
+        "post": {
+          "consented": false
+        }
+      },
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-789",
+        "userName": "Jane Adviser"
+      },
+      "evidence": {
+        "formReference": "MKT-CONSENT-2023-456",
+        "formDate": "2023-06-15",
+        "clientSignature": true,
+        "witnessSignature": true,
+        "stored": true,
+        "storageLocation": "Document management system"
+      },
+      "notes": "Marketing consent captured on written consent form during annual review meeting"
+    },
+    {
+      "eventId": "consent-event-007",
+      "eventType": "DataSubjectAccessRequest",
+      "eventDate": "2023-03-20T10:00:00Z",
+      "purpose": "All",
+      "requestType": "SubjectAccessRequest",
+      "requestStatus": "Completed",
+      "requestedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith",
+        "email": "john.smith@example.com"
+      },
+      "processedBy": {
+        "id": "user-dpo-001",
+        "name": "Data Protection Officer"
+      },
+      "requestDate": "2023-03-20T10:00:00Z",
+      "completionDate": "2023-04-15T17:00:00Z",
+      "responseMethod": "SecurePortal",
+      "notes": "Client requested copy of all personal data held (GDPR Article 15). Response provided within 1 month."
+    },
+    {
+      "eventId": "consent-event-006",
+      "eventType": "ConsentGranted",
+      "eventDate": "2022-01-17T14:00:00Z",
+      "purpose": "Profiling",
+      "previousStatus": "NotSet",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlineForm",
+      "consentVersion": "1.5",
+      "privacyPolicyVersion": "1.8",
+      "consentText": "I agree to automated profiling for personalized recommendations",
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-456",
+        "userName": "Previous Adviser"
+      },
+      "evidence": {
+        "formUrl": "https://portal.factfind.com/onboarding/consent",
+        "ipAddress": "192.168.1.85",
+        "timestamp": "2022-01-17T14:00:00Z",
+        "stored": true
+      },
+      "notes": "Profiling consent captured during initial onboarding"
+    },
+    {
+      "eventId": "consent-event-005",
+      "eventType": "ConsentGranted",
+      "eventDate": "2022-01-17T14:00:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "NotSet",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlineForm",
+      "consentVersion": "1.5",
+      "privacyPolicyVersion": "1.8",
+      "consentText": "I agree to receive marketing communications",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Weekly"
+        }
+      },
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-456",
+        "userName": "Previous Adviser"
+      },
+      "evidence": {
+        "formUrl": "https://portal.factfind.com/onboarding/consent",
+        "ipAddress": "192.168.1.85",
+        "timestamp": "2022-01-17T14:00:00Z",
+        "stored": true
+      },
+      "notes": "Initial marketing consent captured during client onboarding"
+    },
+    {
+      "eventId": "consent-event-004",
+      "eventType": "PrivacyPolicyAcknowledged",
+      "eventDate": "2022-01-17T13:45:00Z",
+      "purpose": "All",
+      "privacyPolicyVersion": "1.8",
+      "privacyPolicyEffectiveDate": "2022-01-01",
+      "acknowledgementMethod": "OnlineForm",
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-456",
+        "userName": "Previous Adviser"
+      },
+      "evidence": {
+        "formUrl": "https://portal.factfind.com/onboarding/privacy",
+        "ipAddress": "192.168.1.85",
+        "timestamp": "2022-01-17T13:45:00Z",
+        "checkboxChecked": true,
+        "stored": true
+      },
+      "notes": "Initial privacy policy acknowledged during client onboarding"
+    },
+    {
+      "eventId": "consent-event-003",
+      "eventType": "LawfulBasisEstablished",
+      "eventDate": "2022-01-17T13:40:00Z",
+      "purpose": "RegulatoryCompliance",
+      "lawfulBasis": "LegalObligation",
+      "lawfulBasisDescription": "Processing necessary for compliance with MLR 2017 and FCA requirements",
+      "consentRequired": false,
+      "recordedBy": {
+        "type": "System",
+        "systemName": "OnboardingSystem"
+      },
+      "notes": "Lawful basis established for regulatory compliance processing"
+    },
+    {
+      "eventId": "consent-event-002",
+      "eventType": "LawfulBasisEstablished",
+      "eventDate": "2022-01-17T13:40:00Z",
+      "purpose": "DataProcessing",
+      "lawfulBasis": "Contract",
+      "lawfulBasisDescription": "Processing necessary for performance of service contract",
+      "consentRequired": false,
+      "recordedBy": {
+        "type": "System",
+        "systemName": "OnboardingSystem"
+      },
+      "notes": "Lawful basis established for core data processing"
+    },
+    {
+      "eventId": "consent-event-001",
+      "eventType": "ClientCreated",
+      "eventDate": "2022-01-17T13:30:00Z",
+      "purpose": "All",
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-456",
+        "userName": "Previous Adviser"
+      },
+      "notes": "Client record created. GDPR consent tracking initiated."
+    }
+  ],
+  "consentStatistics": {
+    "totalEvents": 15,
+    "consentsGranted": 6,
+    "consentsWithdrawn": 1,
+    "consentsUpdated": 2,
+    "consentsRefreshed": 1,
+    "privacyPolicyAcknowledgements": 3,
+    "dataSubjectAccessRequests": 1,
+    "lawfulBasisEstablishments": 2,
+    "firstConsentDate": "2022-01-17T14:00:00Z",
+    "lastConsentUpdate": "2026-02-17T11:30:00Z",
+    "activePurposes": 4,
+    "withdrawnPurposes": 0
+  },
+  "regulatoryCompliance": {
+    "gdprArticle7Compliant": true,
+    "consentEvidenceStored": true,
+    "consentWithdrawalMechanismAvailable": true,
+    "privacyNoticeProvided": true,
+    "lastComplianceReview": "2026-02-17T11:30:00Z"
+  },
+  "pagination": {
+    "page": 1,
+    "pageSize": 50,
+    "totalItems": 15,
+    "totalPages": 1
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent/history" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "current-consent": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent" }
+  }
+}
+```
+
+**Event Type Values:**
+- `ConsentGranted` - Consent given for purpose
+- `ConsentWithdrawn` - Consent withdrawn
+- `ConsentUpdated` - Consent preferences updated
+- `ConsentRefreshed` - Periodic consent re-confirmation
+- `ConsentExpired` - Consent expired
+- `PrivacyPolicyAcknowledged` - Privacy policy acknowledged
+- `LawfulBasisEstablished` - Lawful basis documented
+- `DataSubjectAccessRequest` - DSAR submitted
+- `DataPortabilityRequest` - Data export requested
+- `ErasureRequest` - Right to be forgotten requested
+- `RectificationRequest` - Data correction requested
+- `ClientCreated` - Client record created
+
+**HTTP Status Codes:**
+- `200 OK` - Consent history retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+##### 5.6.2.5 Data Portability Request
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/data/export`
+
+**Description:** GDPR Article 20 data portability request. Export client's personal data in structured, commonly used, machine-readable format.
+
+**Request Body:**
+
+```json
+{
+  "exportFormat": "JSON",
+  "dataScope": "AllPersonalData",
+  "includeCategories": [
+    "IdentityData",
+    "ContactData",
+    "FinancialData",
+    "TransactionalData",
+    "ConsentData",
+    "DocumentsData"
+  ],
+  "excludeCategories": [],
+  "includeDocuments": true,
+  "requestedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "verificationMethod": "PortalLogin",
+    "verificationDate": "2026-02-17T13:00:00Z"
+  },
+  "requestDate": "2026-02-17T13:00:00Z",
+  "deliveryMethod": "SecureDownloadLink",
+  "reason": "SwitchingProvider",
+  "notes": "Client is switching to new financial adviser and requires data export"
+}
+```
+
+**Export Format Values:**
+- `JSON` - JSON format
+- `CSV` - CSV format (multiple files)
+- `PDF` - PDF report format
+- `XML` - XML format
+
+**Data Scope Values:**
+- `AllPersonalData` - All personal data
+- `ConsentBasedOnly` - Only data processed under consent
+- `SpecificCategories` - Selected categories only
+
+**Delivery Method Values:**
+- `SecureDownloadLink` - Time-limited secure download link
+- `Email` - Encrypted email attachment
+- `API` - Direct API download
+- `Portal` - Available in client portal
+
+**Response:**
+
+```http
+HTTP/1.1 202 Accepted
+Location: /api/v1/factfinds/ff-456/clients/client-123/data/export/export-req-456
+```
+
+```json
+{
+  "exportRequestId": "export-req-456",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "Processing",
+  "exportFormat": "JSON",
+  "requestDate": "2026-02-17T13:00:00Z",
+  "requestedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "name": "John Smith",
+    "verified": true
+  },
+  "estimatedCompletionDate": "2026-02-17T14:00:00Z",
+  "dataScope": "AllPersonalData",
+  "dataCategories": [
+    {
+      "category": "IdentityData",
+      "recordCount": 15,
+      "includeInExport": true
+    },
+    {
+      "category": "ContactData",
+      "recordCount": 8,
+      "includeInExport": true
+    },
+    {
+      "category": "FinancialData",
+      "recordCount": 142,
+      "includeInExport": true
+    },
+    {
+      "category": "TransactionalData",
+      "recordCount": 89,
+      "includeInExport": true
+    },
+    {
+      "category": "ConsentData",
+      "recordCount": 15,
+      "includeInExport": true
+    },
+    {
+      "category": "DocumentsData",
+      "recordCount": 23,
+      "includeInExport": true
+    }
+  ],
+  "deliveryMethod": "SecureDownloadLink",
+  "securityMeasures": {
+    "encrypted": true,
+    "passwordProtected": true,
+    "linkExpiry": "7 days",
+    "downloadLimit": 3,
+    "accessLog": true
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/export/export-req-456" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "status": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/export/export-req-456/status" }
+  }
+}
+```
+
+**When Export is Complete:**
+
+```json
+{
+  "exportRequestId": "export-req-456",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "Completed",
+  "exportFormat": "JSON",
+  "requestDate": "2026-02-17T13:00:00Z",
+  "completedDate": "2026-02-17T13:45:00Z",
+  "processingTime": "00:45:00",
+  "exportedDataSummary": {
+    "totalRecords": 292,
+    "fileSize": "15.7 MB",
+    "fileCount": 24,
+    "categories": [
+      {
+        "category": "IdentityData",
+        "recordCount": 15
+      },
+      {
+        "category": "ContactData",
+        "recordCount": 8
+      },
+      {
+        "category": "FinancialData",
+        "recordCount": 142
+      },
+      {
+        "category": "TransactionalData",
+        "recordCount": 89
+      },
+      {
+        "category": "ConsentData",
+        "recordCount": 15
+      },
+      {
+        "category": "DocumentsData",
+        "recordCount": 23
+      }
+    ]
+  },
+  "downloadLink": {
+    "url": "https://secure-exports.factfind.com/download/export-req-456",
+    "availableFrom": "2026-02-17T13:45:00Z",
+    "expiresAt": "2026-02-24T13:45:00Z",
+    "expiresIn": "7 days",
+    "downloadLimit": 3,
+    "downloadsRemaining": 3,
+    "password": "Sent separately via SMS",
+    "encrypted": true,
+    "encryptionMethod": "AES-256"
+  },
+  "clientNotification": {
+    "notified": true,
+    "notificationMethod": "Email",
+    "notificationAddress": "john.smith@example.com",
+    "notificationDate": "2026-02-17T13:45:30Z"
+  },
+  "exportContents": {
+    "files": [
+      {
+        "filename": "client_profile.json",
+        "category": "IdentityData",
+        "size": "2.3 KB"
+      },
+      {
+        "filename": "financial_data.json",
+        "category": "FinancialData",
+        "size": "8.5 MB"
+      },
+      {
+        "filename": "transactions.json",
+        "category": "TransactionalData",
+        "size": "4.2 MB"
+      },
+      {
+        "filename": "consent_history.json",
+        "category": "ConsentData",
+        "size": "45 KB"
+      },
+      {
+        "filename": "documents/",
+        "category": "DocumentsData",
+        "size": "2.9 MB",
+        "fileCount": 20
+      }
+    ]
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/export/export-req-456" },
+    "download": { "href": "https://secure-exports.factfind.com/download/export-req-456", "method": "GET" }
+  }
+}
+```
+
+**Export Status Values:**
+- `Pending` - Request queued
+- `Processing` - Export being generated
+- `Completed` - Export ready for download
+- `Downloaded` - Export has been downloaded
+- `Expired` - Download link expired
+- `Failed` - Export generation failed
+
+**Validation Rules:**
+- Client identity must be verified
+- Export must be completed within 1 month
+- Download link expires after 7 days
+- Password sent via separate channel
+- Access logged for security
+- Maximum 3 downloads permitted
+
+**HTTP Status Codes:**
+- `202 Accepted` - Export request accepted
+- `200 OK` - Export completed (when polling status)
+- `400 Bad Request` - Invalid request
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+### 5.7 Marketing Preferences API
+
+**Purpose:** Manage marketing consent and communication channel preferences with PECR compliance.
+
+**Scope:**
+- Marketing consent by channel (email, phone, SMS, post)
+- Communication preferences and frequency management
+- Preference center functionality
+- Opt-in and opt-out workflows with audit trail
+- One-click unsubscribe functionality
+- Marketing consent audit trail
+- Suppression list management (Do Not Contact)
+- PECR (Privacy and Electronic Communications Regulations) compliance
+- Double opt-in workflow for email marketing
+- Interest-based marketing preferences
+
+**Aggregate Root:** FactFind (marketing preferences nested within client)
+
+**Regulatory Compliance:**
+- PECR Regulation 22 (Electronic Mail Marketing)
+- PECR Regulation 21 (Telephone Marketing)
+- GDPR Article 6(1)(a) (Consent)
+- ICO Direct Marketing Guidance
+- Data Protection Act 2018
+- TPS (Telephone Preference Service) compliance
+- CTPS (Corporate Telephone Preference Service) compliance
+
+#### 5.7.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get preferences | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update preferences | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/opt-in` | Opt-in to marketing | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/opt-out` | Opt-out of marketing | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/unsubscribe` | Unsubscribe (one-click) | Public |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/history` | Get preference history | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/double-opt-in/initiate` | Initiate double opt-in | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/double-opt-in/confirm` | Confirm double opt-in | Public |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/suppression` | Add to suppression list | `client:admin` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/suppression` | Remove from suppression | `client:admin` |
+
+#### 5.7.2 Key Endpoints
+
+##### 5.7.2.1 Get Marketing Preferences
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-preferences`
+
+**Description:** Get current marketing preferences including channel consent, communication frequency, interest categories, and suppression status.
+
+**Query Parameters:**
+- `includeHistory` - Include preference history summary (default: false)
+- `includeSuppressionDetails` - Include suppression list details (default: true)
+
+**Response:**
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "clientName": "John Michael Smith",
+  "overallMarketingStatus": "OptedIn",
+  "lastUpdated": "2026-02-17T11:30:00Z",
+  "preferencesVersion": "3.2",
+  "channelPreferences": {
+    "email": {
+      "consented": true,
+      "consentStatus": "Active",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentMethod": "DoubleOptIn",
+      "consentSource": "PreferenceCenter",
+      "emailAddress": "john.smith@example.com",
+      "emailVerified": true,
+      "emailVerifiedDate": "2026-02-17T11:32:15Z",
+      "frequency": "Weekly",
+      "preferredDayOfWeek": "Wednesday",
+      "preferredTimeOfDay": "Morning",
+      "lastEmailSent": "2026-02-14T09:00:00Z",
+      "emailsSentThisMonth": 3,
+      "openRate": 45.5,
+      "clickRate": 12.3,
+      "bounceStatus": "None",
+      "unsubscribeLink": "https://portal.factfind.com/unsubscribe/client-123/token-abc",
+      "suppressionStatus": "None",
+      "pecrCompliant": true
+    },
+    "phone": {
+      "consented": false,
+      "consentStatus": "NotConsented",
+      "consentDate": null,
+      "phoneNumber": "+44 7700 900123",
+      "tpsRegistered": false,
+      "tpsCheckDate": "2026-02-17T10:00:00Z",
+      "suppressionStatus": "None",
+      "pecrCompliant": true,
+      "notes": "Client prefers not to receive phone marketing calls"
+    },
+    "sms": {
+      "consented": false,
+      "consentStatus": "NotConsented",
+      "consentDate": null,
+      "mobileNumber": "+44 7700 900123",
+      "suppressionStatus": "None",
+      "pecrCompliant": true
+    },
+    "post": {
+      "consented": true,
+      "consentStatus": "Active",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentMethod": "OnlineForm",
+      "consentSource": "PreferenceCenter",
+      "postalAddress": {
+        "line1": "123 High Street",
+        "line2": "Flat 4B",
+        "city": "London",
+        "county": "Greater London",
+        "postcode": "SW1A 1AA",
+        "country": "United Kingdom"
+      },
+      "frequency": "Monthly",
+      "lastMailingSent": "2026-01-15",
+      "mailingsSentThisYear": 2,
+      "suppressionStatus": "None",
+      "mpsRegistered": false,
+      "mpsCheckDate": "2026-02-17T10:00:00Z",
+      "environmentalPreference": "RecycledPaperOnly"
+    }
+  },
+  "interestCategories": {
+    "consented": true,
+    "interests": [
+      {
+        "category": "Pensions",
+        "subcategories": [
+          "PersonalPensions",
+          "SIPP",
+          "PensionTransfers"
+        ],
+        "consented": true,
+        "consentDate": "2026-02-17T11:30:00Z"
+      },
+      {
+        "category": "Investments",
+        "subcategories": [
+          "ISA",
+          "GeneralInvestmentAccounts",
+          "Bonds"
+        ],
+        "consented": true,
+        "consentDate": "2026-02-17T11:30:00Z"
+      },
+      {
+        "category": "Protection",
+        "subcategories": [
+          "LifeAssurance",
+          "CriticalIllness",
+          "IncomeProtection"
+        ],
+        "consented": true,
+        "consentDate": "2026-02-17T11:30:00Z"
+      },
+      {
+        "category": "Mortgages",
+        "subcategories": [],
+        "consented": false,
+        "consentDate": null
+      },
+      {
+        "category": "GeneralInsurance",
+        "subcategories": [],
+        "consented": false,
+        "consentDate": null
+      }
+    ]
+  },
+  "contentPreferences": {
+    "newsletterSubscription": true,
+    "marketUpdates": true,
+    "productAnnouncements": true,
+    "eventInvitations": true,
+    "educationalContent": true,
+    "surveyInvitations": false,
+    "thirdPartyOffers": false
+  },
+  "communicationFrequency": {
+    "email": {
+      "frequency": "Weekly",
+      "maxPerWeek": 2,
+      "maxPerMonth": 8
+    },
+    "post": {
+      "frequency": "Monthly",
+      "maxPerMonth": 1,
+      "maxPerQuarter": 3
+    }
+  },
+  "suppressionStatus": {
+    "suppressed": false,
+    "globalSuppression": false,
+    "channelSuppressions": {
+      "email": false,
+      "phone": false,
+      "sms": false,
+      "post": false
+    },
+    "suppressionReasons": [],
+    "doNotContact": false
+  },
+  "externalRegistrations": {
+    "tps": {
+      "registered": false,
+      "lastChecked": "2026-02-17T10:00:00Z",
+      "nextCheck": "2026-03-17T10:00:00Z"
+    },
+    "ctps": {
+      "registered": false,
+      "lastChecked": "2026-02-17T10:00:00Z",
+      "nextCheck": "2026-03-17T10:00:00Z"
+    },
+    "mps": {
+      "registered": false,
+      "lastChecked": "2026-02-17T10:00:00Z",
+      "nextCheck": "2026-03-17T10:00:00Z"
+    }
+  },
+  "engagementMetrics": {
+    "email": {
+      "totalSent": 48,
+      "totalOpens": 22,
+      "totalClicks": 6,
+      "openRate": 45.8,
+      "clickRate": 12.5,
+      "unsubscribeRate": 0,
+      "bounceRate": 0,
+      "lastEngagement": "2026-02-14T10:30:00Z"
+    },
+    "post": {
+      "totalSent": 8,
+      "responseRate": 2.5,
+      "lastEngagement": "2025-12-20"
+    }
+  },
+  "consentEvidence": {
+    "emailConsent": {
+      "consentRecordId": "consent-rec-987",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "timestamp": "2026-02-17T11:30:00Z",
+      "consentText": "I agree to receive marketing communications by email",
+      "doubleOptInConfirmed": true,
+      "confirmationDate": "2026-02-17T11:32:15Z",
+      "stored": true
+    },
+    "postConsent": {
+      "consentRecordId": "consent-rec-988",
+      "ipAddress": "192.168.1.100",
+      "timestamp": "2026-02-17T11:30:00Z",
+      "consentText": "I agree to receive marketing communications by post",
+      "stored": true
+    }
+  },
+  "regulatoryCompliance": {
+    "pecrCompliant": true,
+    "gdprCompliant": true,
+    "consentRefreshRequired": false,
+    "nextConsentReview": "2028-02-17",
+    "lastComplianceCheck": "2026-02-17T11:30:00Z"
+  },
+  "preferenceCenter": {
+    "available": true,
+    "url": "https://portal.factfind.com/preferences/client-123",
+    "lastAccessed": "2026-02-17T11:30:00Z",
+    "accessCount": 3
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "update": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences", "method": "PUT" },
+    "opt-out": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/opt-out", "method": "POST" },
+    "unsubscribe": { "href": "https://portal.factfind.com/unsubscribe/client-123/token-abc" },
+    "history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/history" },
+    "preference-center": { "href": "https://portal.factfind.com/preferences/client-123" }
+  }
+}
+```
+
+**Overall Marketing Status Values:**
+- `OptedIn` - Actively consented to at least one channel
+- `OptedOut` - Explicitly opted out of all channels
+- `NotSet` - No preference set yet
+- `Suppressed` - On suppression list (Do Not Contact)
+- `Expired` - Consent has expired
+
+**Consent Status Values:**
+- `Active` - Currently consented and active
+- `PendingVerification` - Awaiting email verification (double opt-in)
+- `NotConsented` - No consent given
+- `Withdrawn` - Previously consented, now withdrawn
+- `Expired` - Consent has expired
+- `Suppressed` - Suppressed from marketing
+
+**Consent Method Values:**
+- `DoubleOptIn` - Email confirmed via confirmation link
+- `SingleOptIn` - Opted in via form (not email)
+- `OnlineForm` - Online preference form
+- `WrittenForm` - Paper consent form
+- `VerbalConsent` - Telephone consent
+- `PreTicked` - Pre-ticked box (non-PECR compliant)
+
+**Frequency Values:**
+- `Daily` - Daily communications
+- `Weekly` - Weekly communications
+- `Fortnightly` - Every two weeks
+- `Monthly` - Monthly communications
+- `Quarterly` - Quarterly communications
+- `Annually` - Annual communications
+- `AsNeeded` - No fixed frequency
+
+**Suppression Status Values:**
+- `None` - Not suppressed
+- `TemporarySuppression` - Temporary suppression (e.g., bereavement)
+- `PermanentSuppression` - Permanent Do Not Contact
+- `Bounced` - Email bounced repeatedly
+- `Complained` - Spam complaint received
+- `LegalRequirement` - Legal requirement to suppress
+
+**HTTP Status Codes:**
+- `200 OK` - Preferences retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+##### 5.7.2.2 Update Marketing Preferences
+
+**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-preferences`
+
+**Description:** Update marketing preferences for one or more channels with full consent tracking.
+
+**Request Body:**
+
+```json
+{
+  "channelUpdates": {
+    "email": {
+      "consented": true,
+      "emailAddress": "john.smith@example.com",
+      "frequency": "Weekly",
+      "preferredDayOfWeek": "Wednesday",
+      "preferredTimeOfDay": "Morning",
+      "requireDoubleOptIn": true
+    },
+    "phone": {
+      "consented": false,
+      "phoneNumber": "+44 7700 900123"
+    },
+    "sms": {
+      "consented": false,
+      "mobileNumber": "+44 7700 900123"
+    },
+    "post": {
+      "consented": true,
+      "frequency": "Monthly",
+      "environmentalPreference": "RecycledPaperOnly"
+    }
+  },
+  "interestUpdates": {
+    "Pensions": {
+      "consented": true,
+      "subcategories": ["PersonalPensions", "SIPP", "PensionTransfers"]
+    },
+    "Investments": {
+      "consented": true,
+      "subcategories": ["ISA", "GeneralInvestmentAccounts", "Bonds"]
+    },
+    "Protection": {
+      "consented": true,
+      "subcategories": ["LifeAssurance", "CriticalIllness"]
+    },
+    "Mortgages": {
+      "consented": false
+    }
+  },
+  "contentPreferences": {
+    "newsletterSubscription": true,
+    "marketUpdates": true,
+    "productAnnouncements": true,
+    "eventInvitations": true,
+    "educationalContent": true,
+    "surveyInvitations": false,
+    "thirdPartyOffers": false
+  },
+  "consentEvidence": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "timestamp": "2026-02-17T11:30:00Z",
+    "source": "PreferenceCenter"
+  },
+  "updatedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "userName": "John Smith"
+  },
+  "notes": "Client updated marketing preferences via preference center"
+}
+```
+
+**Response:**
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "updateStatus": "Success",
+  "updatedDate": "2026-02-17T11:30:15Z",
+  "preferencesVersion": "3.2",
+  "channelUpdates": {
+    "email": {
+      "status": "PendingVerification",
+      "previousConsent": false,
+      "newConsent": true,
+      "consentChanged": true,
+      "requiresDoubleOptIn": true,
+      "verificationEmailSent": true,
+      "verificationEmailAddress": "john.smith@example.com",
+      "verificationTokenExpiry": "2026-02-19T11:30:15Z",
+      "message": "Verification email sent. Please check your inbox and click the confirmation link.",
+      "pecrCompliant": true
+    },
+    "phone": {
+      "status": "Updated",
+      "previousConsent": false,
+      "newConsent": false,
+      "consentChanged": false,
+      "pecrCompliant": true
+    },
+    "sms": {
+      "status": "Updated",
+      "previousConsent": false,
+      "newConsent": false,
+      "consentChanged": false,
+      "pecrCompliant": true
+    },
+    "post": {
+      "status": "Active",
+      "previousConsent": false,
+      "newConsent": true,
+      "consentChanged": true,
+      "consentRecordId": "consent-rec-988",
+      "pecrCompliant": true
+    }
+  },
+  "interestUpdates": {
+    "Pensions": {
+      "status": "Updated",
+      "consented": true,
+      "previouslyConsented": false
+    },
+    "Investments": {
+      "status": "Updated",
+      "consented": true,
+      "previouslyConsented": false
+    },
+    "Protection": {
+      "status": "Updated",
+      "consented": true,
+      "previouslyConsented": false
+    },
+    "Mortgages": {
+      "status": "NoChange",
+      "consented": false,
+      "previouslyConsented": false
+    }
+  },
+  "auditTrail": {
+    "eventRecorded": true,
+    "eventId": "mkt-event-456",
+    "timestamp": "2026-02-17T11:30:15Z"
+  },
+  "warnings": [
+    {
+      "channel": "email",
+      "warning": "Email verification required. Marketing emails will not be sent until email address is confirmed.",
+      "action": "CheckEmailAndConfirm"
+    }
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences" },
+    "verify-email": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/double-opt-in/confirm", "method": "POST" },
+    "preference-center": { "href": "https://portal.factfind.com/preferences/client-123" }
+  }
+}
+```
+
+**Update Status Values:**
+- `Success` - All updates applied successfully
+- `PartialSuccess` - Some updates applied, some failed
+- `Failed` - Update failed
+- `PendingVerification` - Awaiting verification
+
+**Validation Rules:**
+- Email address required if email consent = true
+- Phone number required if phone/SMS consent = true
+- Email verification required for email marketing (PECR Regulation 22)
+- Cannot opt-in to phone if registered on TPS
+- Postal address required if post consent = true
+- Frequency must be valid value
+- Interest categories must exist in system
+
+**HTTP Status Codes:**
+- `200 OK` - Preferences updated successfully
+- `202 Accepted` - Update accepted, pending verification
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/marketing-preference-error",
+  "title": "Marketing Preference Update Failed",
+  "status": 422,
+  "detail": "Cannot opt-in to phone marketing - client is registered on TPS",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences",
+  "errors": [
+    {
+      "field": "channelUpdates.phone.consented",
+      "message": "Client phone number is registered on Telephone Preference Service (TPS). Cannot opt-in to phone marketing.",
+      "rejectedValue": true,
+      "tpsRegistered": true,
+      "tpsCheckDate": "2026-02-17T10:00:00Z",
+      "pecrCompliance": "Regulation 21 - Cannot make unsolicited calls to TPS-registered numbers"
+    }
+  ]
+}
+```
+
+---
+
+##### 5.7.2.3 Opt-in to Marketing
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/opt-in`
+
+**Description:** Explicit opt-in workflow for marketing with full PECR compliance including double opt-in for email.
+
+**Request Body:**
+
+```json
+{
+  "channels": ["Email", "Post"],
+  "emailAddress": "john.smith@example.com",
+  "postalAddress": {
+    "line1": "123 High Street",
+    "line2": "Flat 4B",
+    "city": "London",
+    "county": "Greater London",
+    "postcode": "SW1A 1AA",
+    "country": "United Kingdom"
+  },
+  "interests": ["Pensions", "Investments", "Protection"],
+  "frequency": {
+    "email": "Weekly",
+    "post": "Monthly"
+  },
+  "consentSource": "WebsiteForm",
+  "consentText": "I agree to receive marketing communications from FactFind about products and services that may be of interest to me",
+  "consentEvidence": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "formUrl": "https://www.factfind.com/contact/opt-in",
+    "timestamp": "2026-02-17T12:00:00Z",
+    "checkboxChecked": true,
+    "preTicked": false
+  },
+  "doubleOptInRequired": true,
+  "gdprCompliant": true,
+  "pecrCompliant": true,
+  "notes": "Client opted in via website contact form"
+}
+```
+
+**Consent Source Values:**
+- `WebsiteForm` - Website opt-in form
+- `PreferenceCenter` - Client preference center
+- `PhoneCall` - Telephone conversation
+- `EmailResponse` - Email response
+- `InPersonMeeting` - Face-to-face meeting
+- `WrittenForm` - Paper form
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/clients/client-123/marketing/opt-in/optin-789
+```
+
+```json
+{
+  "optInId": "optin-789",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "PendingEmailVerification",
+  "optInDate": "2026-02-17T12:00:00Z",
+  "channels": {
+    "email": {
+      "status": "PendingVerification",
+      "emailAddress": "john.smith@example.com",
+      "verificationRequired": true,
+      "verificationEmailSent": true,
+      "verificationEmailSentDate": "2026-02-17T12:00:15Z",
+      "verificationTokenExpiry": "2026-02-19T12:00:15Z",
+      "verificationUrl": "https://portal.factfind.com/verify-email/token-abc123",
+      "pecrCompliant": false,
+      "pecrComplianceNotes": "Awaiting email verification (PECR Regulation 22)"
+    },
+    "post": {
+      "status": "Active",
+      "postalAddress": {
+        "line1": "123 High Street",
+        "line2": "Flat 4B",
+        "city": "London",
+        "county": "Greater London",
+        "postcode": "SW1A 1AA",
+        "country": "United Kingdom"
+      },
+      "consentRecordId": "consent-rec-991",
+      "pecrCompliant": true
+    }
+  },
+  "interests": {
+    "Pensions": {
+      "consented": true,
+      "consentDate": "2026-02-17T12:00:00Z"
+    },
+    "Investments": {
+      "consented": true,
+      "consentDate": "2026-02-17T12:00:00Z"
+    },
+    "Protection": {
+      "consented": true,
+      "consentDate": "2026-02-17T12:00:00Z"
+    }
+  },
+  "frequency": {
+    "email": "Weekly",
+    "post": "Monthly"
+  },
+  "consentEvidence": {
+    "recorded": true,
+    "consentRecordId": "consent-rec-990",
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "timestamp": "2026-02-17T12:00:00Z",
+    "consentText": "I agree to receive marketing communications from FactFind about products and services that may be of interest to me",
+    "checkboxChecked": true,
+    "preTicked": false,
+    "stored": true,
+    "retentionPeriod": "7 years"
+  },
+  "regulatoryCompliance": {
+    "gdprCompliant": true,
+    "pecrCompliant": false,
+    "pecrComplianceReason": "Email verification pending",
+    "doubleOptInRequired": true,
+    "doubleOptInCompleted": false
+  },
+  "nextSteps": [
+    {
+      "step": "VerifyEmail",
+      "description": "Client must verify email address by clicking confirmation link",
+      "dueDate": "2026-02-19T12:00:15Z"
+    }
+  ],
+  "warnings": [
+    {
+      "warning": "Email marketing will not commence until email address is verified",
+      "regulation": "PECR Regulation 22",
+      "action": "AwaitingEmailVerification"
+    }
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/opt-in/optin-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "verify-email": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/double-opt-in/confirm", "method": "POST" },
+    "preferences": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences" }
+  }
+}
+```
+
+**Opt-in Status Values:**
+- `PendingEmailVerification` - Email verification required
+- `Active` - Opt-in active
+- `Expired` - Verification link expired
+- `Failed` - Opt-in failed
+
+**Validation Rules:**
+- Email address required for email channel
+- Email verification required (double opt-in) for PECR compliance
+- Consent text must be clear and specific
+- Cannot be pre-ticked checkbox (PECR non-compliant)
+- Must record IP address and timestamp
+- TPS check required for phone opt-in
+- Consent must be freely given, specific, informed, unambiguous
+
+**HTTP Status Codes:**
+- `201 Created` - Opt-in created, pending verification
+- `200 OK` - Opt-in active (non-email channels)
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Cannot opt-in (e.g., TPS registered)
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+---
+
+##### 5.7.2.4 Unsubscribe (One-Click)
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/unsubscribe`
+
+**Description:** PECR-compliant one-click unsubscribe from marketing communications. Can be accessed without authentication via unsubscribe token.
+
+**Request Body:**
+
+```json
+{
+  "unsubscribeToken": "token-abc123xyz",
+  "unsubscribeScope": "AllChannels",
+  "unsubscribeReason": "TooManyEmails",
+  "feedback": "I was receiving too many emails every week",
+  "timestamp": "2026-02-17T13:00:00Z"
+}
+```
+
+**Unsubscribe Scope Values:**
+- `EmailOnly` - Unsubscribe from email only
+- `AllChannels` - Unsubscribe from all marketing
+- `SpecificCategory` - Unsubscribe from specific interest category
+
+**Unsubscribe Reason Values:**
+- `TooManyEmails` - Receiving too many communications
+- `NotInterested` - No longer interested
+- `IrrelevantContent` - Content not relevant
+- `PrivacyConcerns` - Privacy concerns
+- `ChangedProvider` - Switched to different provider
+- `Other` - Other reason
+
+**Response:**
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "unsubscribeId": "unsub-456",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "Completed",
+  "unsubscribeDate": "2026-02-17T13:00:00Z",
+  "unsubscribeScope": "AllChannels",
+  "unsubscribeReason": "TooManyEmails",
+  "channelsUnsubscribed": [
+    {
+      "channel": "Email",
+      "previousStatus": "Active",
+      "newStatus": "Unsubscribed",
+      "effectiveDate": "2026-02-17T13:00:00Z",
+      "processingStoppedDate": "2026-02-17T13:00:05Z",
+      "suppressionAdded": true
+    },
+    {
+      "channel": "Post",
+      "previousStatus": "Active",
+      "newStatus": "Unsubscribed",
+      "effectiveDate": "2026-02-17T13:00:00Z",
+      "processingStoppedDate": "2026-02-17T13:00:05Z",
+      "suppressionAdded": true
+    }
+  ],
+  "suppressionList": {
+    "addedToSuppression": true,
+    "suppressionType": "Marketing",
+    "suppressionDate": "2026-02-17T13:00:00Z",
+    "permanent": false,
+    "canReOptIn": true
+  },
+  "processingActions": {
+    "marketingStoppedImmediately": true,
+    "emailCampaignsRemoved": true,
+    "mailingListsRemoved": true,
+    "scheduledCommunicationsCancelled": 2
+  },
+  "reOptInAvailable": {
+    "available": true,
+    "method": "PreferenceCenter",
+    "url": "https://portal.factfind.com/preferences/client-123",
+    "cooldownPeriod": "None"
+  },
+  "confirmation": {
+    "confirmationSent": true,
+    "confirmationMethod": "Email",
+    "confirmationDate": "2026-02-17T13:00:10Z",
+    "confirmationMessage": "You have been unsubscribed from all marketing communications. You will no longer receive marketing emails or mailings from us."
+  },
+  "feedback": {
+    "recorded": true,
+    "reason": "TooManyEmails",
+    "feedbackText": "I was receiving too many emails every week",
+    "feedbackWillBeReviewed": true
+  },
+  "pecrCompliance": {
+    "compliant": true,
+    "oneClickUnsubscribe": true,
+    "immediateEffect": true,
+    "noReAuthentication": true
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/unsubscribe" },
+    "resubscribe": { "href": "https://portal.factfind.com/preferences/client-123" },
+    "preference-center": { "href": "https://portal.factfind.com/preferences/client-123" }
+  }
+}
+```
+
+**Unsubscribe Status Values:**
+- `Completed` - Unsubscribe completed
+- `Failed` - Unsubscribe failed
+- `AlreadyUnsubscribed` - Already unsubscribed
+
+**Validation Rules:**
+- Unsubscribe token must be valid and not expired
+- Must process unsubscribe immediately (PECR requirement)
+- Must not require re-authentication
+- Must be one-click process
+- Must send confirmation
+- Must add to suppression list
+- Must stop processing within 24 hours
+
+**HTTP Status Codes:**
+- `200 OK` - Unsubscribe completed
+- `400 Bad Request` - Invalid token or request
+- `404 Not Found` - Client or token not found
+- `410 Gone` - Token expired
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/unsubscribe-error",
+  "title": "Unsubscribe Token Invalid",
+  "status": 404,
+  "detail": "The unsubscribe token is invalid or has expired",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/marketing/unsubscribe",
+  "tokenStatus": "Expired",
+  "tokenExpiry": "2026-02-10T13:00:00Z",
+  "alternativeAction": "Please visit the preference center to update your marketing preferences",
+  "preferenceCenterUrl": "https://portal.factfind.com/preferences"
+}
+```
+
+---
+
+---
+
+
+## 6. FactFind Income & Expenditure API
+
+### 6.1 Overview
+
+**Purpose:** Manage client's existing financial arrangements including pensions, investments, protection policies, and mortgages.
+
+**Scope:**
+- Pension arrangements (Personal Pension, SIPP, SSAS, Defined Benefit, State Pension)
+- Investment arrangements (ISA, GIA, Offshore Bond, Onshore Bond, Investment Trust)
+- Protection arrangements (Life Assurance, Critical Illness, Income Protection, PHI)
+- Mortgage arrangements (Residential, Buy-to-Let, Commercial)
+- Savings accounts
+- General insurance (Home, Contents, Motor)
+- Annuities (Lifetime, Fixed Term)
+- Contributions tracking
+- Valuations and performance
+- Withdrawals and income
+
+**Aggregate Root:** FactFind (arrangements are nested within)
+
+**Regulatory Compliance:**
+- FCA COBS (Suitability)
+- Pension Transfer regulations (TVAS/AVAS)
+- PROD (Product Governance)
+- Consumer Duty (Value Assessment)
+
+### 6.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/arrangements` | List arrangements with filters | `arrangements:read` |
+| POST | `/api/v1/factfinds/{factfindId}/arrangements` | Create arrangement | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | Get arrangement details | `arrangements:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | Update arrangement | `arrangements:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | Delete arrangement | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | List contributions | `arrangements:read` |
+| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | Add contribution | `arrangements:write` |
+| PUT | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{id}` | Update contribution | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | List valuations | `arrangements:read` |
+| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | Add valuation | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | List withdrawals/income | `arrangements:read` |
+| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | Add withdrawal | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | List beneficiaries | `arrangements:read` |
+| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | Add beneficiary | `arrangements:write` |
+| GET | `/api/v1/reference/arrangement-types` | List arrangement types | `arrangements:read` |
+
+### 6.3 Key Endpoints
+
+#### 6.3.1 Create Arrangement (Pension)
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/arrangements`
+
+**Description:** Create a new arrangement (polymorphic - type determined by productType).
+
+**Contract:** Uses the unified `Arrangement` contract (see Section 11.5). This is a polymorphic contract where `arrangementType` acts as a discriminator. Type-specific fields are included based on the arrangementType value.
+
+**Request Body (Personal Pension SIPP):**
+Arrangement contract with required-on-create fields and type-specific fields for pension arrangements.
+
+
+```json
+{
+  "client": {
+    "id": 123
+  },
+  "productType": {
+    "code": "PP",
+    "display": "Personal Pension",
+    "category": "Pension"
+  },
+  "productSubType": "SIPP",
+  "provider": {
+    "id": 500,
+    "name": "Vanguard"
+  },
+  "policyNumber": "PP-12345678",
+  "productName": "Vanguard SIPP",
+  "status": {
+    "code": "INF",
+    "display": "In Force"
+  },
+  "startDate": "2020-01-15",
+  "owners": "Client1",
+  "isPreExistingPlan": true,
+  "isCurrentScheme": true,
+  "pensionArrangement": "PersonalPension",
+  "pensionTaxBasis": "Relief at Source",
+  "normalRetirementAge": 65,
+  "selectedRetirementAge": 65,
+  "taxFreeCashOptions": "SchemeStandard",
+  "schemeSpecificPclsADayFundValue": {
+    "amount": 250000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "schemeSpecificPclsADayPclsValue": {
+    "amount": 62500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "hasProtectedPcls": false,
+  "isContributionsPaidBySalaryExchange": false,
+  "showInPfpPortfolio": true,
+  "isVisibleToClient": true
+}
+```
+
+**Response:**
+Complete `Arrangement` contract with all fields populated, including server-generated and computed fields.
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/{factfindId}/arrangements/777
+
+{
+  "id": 777,
+  "client": {
+    "id": 123,
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/{factfindId}/clients/123"
+  },
+  "productType": {
+    "code": "PP",
+    "display": "Personal Pension",
+    "category": "Pension"
+  },
+  "productSubType": "SIPP",
+  "provider": {
+    "id": 500,
+    "name": "Vanguard",
+    "href": "/api/v1/providers/500"
+  },
+  "policyNumber": "PP-12345678",
+  "productName": "Vanguard SIPP",
+  "status": {
+    "code": "INF",
+    "display": "In Force"
+  },
+  "startDate": "2020-01-15",
+  "owners": "Client1",
+  "isPreExistingPlan": true,
+  "isCurrentScheme": true,
+  "pensionArrangement": "PersonalPension",
+  "pensionTaxBasis": "Relief at Source",
+  "normalRetirementAge": 65,
+  "selectedRetirementAge": 65,
+  "taxFreeCashOptions": "SchemeStandard",
+  "schemeSpecificPclsADayFundValue": {
+    "amount": 250000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "schemeSpecificPclsADayPclsValue": {
+    "amount": 62500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "hasProtectedPcls": false,
+  "isContributionsPaidBySalaryExchange": false,
+  "currentValue": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "showInPfpPortfolio": true,
+  "isVisibleToClient": true,
+  "createdAt": "2026-02-16T15:00:00Z",
+  "updatedAt": "2026-02-16T15:00:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777" },
+    "update": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777", "method": "PUT" },
+    "contributions": { "href": "/api/v1/arrangements/777/contributions" },
+    "valuations": { "href": "/api/v1/arrangements/777/valuations" },
+    "withdrawals": { "href": "/api/v1/arrangements/777/withdrawals" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
+  }
+}
+```
+
+**Product Types:**
+
+**Pensions:**
+- `PersonalPension` (SIPP, SSAS, Group Personal Pension, Stakeholder)
+- `OccupationalPension` (Defined Benefit, Defined Contribution, SASS, FSAVC)
+- `StatePension` (Old State Pension, New State Pension)
+- `Annuity` (Lifetime Annuity, Fixed Term Annuity, Enhanced Annuity)
+
+**Investments:**
+- `ISA` (Stocks & Shares ISA, Cash ISA, Lifetime ISA, Innovative Finance ISA)
+- `GeneralInvestmentAccount` (GIA, Platform Account, Discretionary Management)
+- `OffshoreBond` (Single Premium, Regular Premium)
+- `OnshoreBond` (Investment Bond, Guaranteed Bond)
+- `InvestmentTrust` (IT, OEIC, Unit Trust)
+
+**Protection:**
+- `LifeAssurance` (Term Life, Whole of Life, Universal Life)
+- `CriticalIllnessCover` (Standalone, Accelerated)
+- `IncomeProtection` (Personal, Group, ASU)
+- `KeyPersonInsurance`
+
+**Mortgages:**
+- `ResidentialMortgage` (Repayment, Interest Only, Mixed)
+- `BuyToLetMortgage`
+- `CommercialMortgage`
+- `EquityRelease` (Lifetime Mortgage, Home Reversion)
+
+**Savings:**
+- `SavingsAccount` (Instant Access, Notice Account, Fixed Rate Bond)
+- `CashISA`
+
+**General Insurance:**
+- `BuildingsInsurance`
+- `ContentsInsurance`
+- `MotorInsurance`
+- `TravelInsurance`
+
+#### 6.3.2 Add Contribution
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/arrangements/{id}/contributions`
+
+**Description:** Add a contribution to a pension or investment arrangement.
+
+**Request Body:**
+```json
+{
+  "contributionType": "Regular",
+  "contributorType": "Member",
+  "contributionFrequency": "Monthly",
+  "contributionAmount": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "contributionTaxBasis": "ReliefAtSource",
+  "regularContributionAmountNetMember": {
+    "amount": 400.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "regularContributionAmountGrossMember": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "contributionStartsOn": "2020-01-15",
+  "contributionStopsOn": null
+}
+```
+
+**Response:**
+```json
+{
+  "id": "contribution-888",
+  "arrangementRef": {
+    "id": "arrangement-777",
+    "href": "/api/v1/arrangements/arrangement-777",
+    "policyNumber": "POL123456",
+    "productType": "Pension",
+    "provider": "ABC Provider"
+  },
+  "contributionType": "Regular",
+  "contributorType": "Member",
+  "contributionFrequency": "Monthly",
+  "contributionAmount": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "contributionTaxBasis": "ReliefAtSource",
+  "regularContributionAmountNetMember": {
+    "amount": 400.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "regularContributionAmountGrossMember": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "taxReliefAmount": {
+    "amount": 100.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "annualContributionGross": {
+    "amount": 6000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "contributionPeriod": {
+    "startDate": "2020-01-15",
+    "endDate": null
+  },
+  "isActive": true,
+  "createdAt": "2026-02-16T15:05:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/arrangements/arrangement-777/contributions/contribution-888" },
+    "arrangement": { "href": "/api/v1/arrangements/arrangement-777" }
+  }
+}
+```
+
+**Validation Rules:**
+- `contributionType` - Required, one of: Regular, Single, Transfer, EmployerContribution
+- `contributionFrequency` - Required for Regular, one of: Monthly, Quarterly, Annual
+- `contributionAmount` - Required, amount > 0
+- Net + Tax Relief = Gross for Relief at Source
+- Gross - Tax Relief = Net for Net Pay Arrangement
+
+#### 6.3.3 Add Valuation
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/arrangements/{id}/valuations`
+
+**Description:** Record a valuation for an arrangement.
+
+**Request Body:**
+```json
+{
+  "valuationDate": "2026-02-16",
+  "valuationType": "Current",
+  "currentValue": {
+    "amount": 275000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "surrenderTransferValue": {
+    "amount": 270000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "id": "valuation-999",
+  "arrangementRef": {
+    "id": "arrangement-777",
+    "href": "/api/v1/arrangements/arrangement-777",
+    "policyNumber": "POL123456",
+    "productType": "Pension",
+    "provider": "ABC Provider"
+  },
+  "valuationDate": "2026-02-16",
+  "valuationType": "Current",
+  "currentValue": {
+    "amount": 275000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "surrenderTransferValue": {
+    "amount": 270000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  },
+  "growthSinceLastValuation": {
+    "amount": 25000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  },
+    "percentageGrowth": 10.0
+  },
+  "createdAt": "2026-02-16T15:10:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/arrangements/777/valuations/999" },
+    "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777" }
+  }
+}
+```
+
+**Valuation Types:**
+- `Current` - Current market value
+- `TransferValue` - Cash Equivalent Transfer Value (CETV) for DB pensions
+- `Projection` - Projected future value
+- `MaturityValue` - Expected maturity value
+
+---
+
+## 7. FactFind Arrangements API
+
+### 7.1 Overview
+
+**Purpose:** Capture and track client financial goals and objectives.
+
+**Scope:**
+- Short, medium, and long-term goal definition
+- Protection goals (life cover, income protection, critical illness)
+- Retirement planning goals (retirement age, desired income)
+- Investment goals (lump sum targets, regular savings)
+- Mortgage goals (house purchase, remortgage)
+- Budget goals (spending limits, debt reduction)
+- Estate planning goals (inheritance, trusts, gifting)
+- Equity release goals
+- Goal prioritization
+- Funding allocation to goals
+- Goal completion tracking
+
+**Aggregate Root:** FactFind (goals are nested within)
+
+**Regulatory Compliance:**
+- FCA COBS (Understanding client objectives)
+- Consumer Duty (Delivering good outcomes)
+- PROD (Target Market assessment)
+
+### 7.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/goals` | List goals | `goals:read` |
+| POST | `/api/v1/factfinds/{factfindId}/goals` | Create goal | `goals:write` |
+| GET | `/api/v1/factfinds/{factfindId}/goals/{goalId}` | Get goal details | `goals:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/goals/{goalId}` | Update goal | `goals:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/goals/{goalId}` | Delete goal | `goals:write` |
+| POST | `/api/v1/factfinds/{factfindId}/goals/{goalId}/complete` | Mark goal as complete | `goals:write` |
+| GET | `/api/v1/factfinds/{factfindId}/goals/{goalId}/objectives` | List objectives under goal | `goals:read` |
+| POST | `/api/v1/factfinds/{factfindId}/goals/{goalId}/objectives` | Add objective to goal | `goals:write` |
+| PUT | `/api/v1/goals/{id}/objectives/{objId}` | Update objective | `goals:write` |
+| DELETE | `/api/v1/goals/{id}/objectives/{objId}` | Remove objective | `goals:write` |
+| GET | `/api/v1/factfinds/{factfindId}/goals/{goalId}/funding` | Get goal funding allocation | `goals:read` |
+| PUT | `/api/v1/goals/{id}/funding` | Update funding allocation | `goals:write` |
+
+### 7.3 Key Endpoints
+
+#### 7.3.1 Create Goal
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/goals`
+
+**Description:** Create a new financial goal for a client.
+
+**Contract:** Uses the unified `Goal` contract (see Section 11.6). The same contract is used for request and response.
+
+**Request Body (Retirement Goal):**
+Goal contract with required-on-create fields.
+
+
+```json
+{
+  "client": {
+    "id": 123
+  },
+  "goalType": "Retirement",
+  "category": "LongTerm",
+  "description": "Comfortable retirement at age 65",
+  "priority": 1,
+  "targetDate": "2045-05-15",
+  "targetAmount": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "retirementAge": 65,
+  "desiredRetirementIncome": {
+    "amount": 30000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  },
+    "frequency": {
+      "code": "A",
+      "display": "Annual",
+      "periodsPerYear": 1
+    }
+  },
+  "currentProvisionAdequate": "No",
+  "shortfallAmount": {
+    "amount": 200000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+```
+
+**Response:**
+Complete `Goal` contract with all fields populated, including server-generated and computed fields.
+
+```json
+{
+  "id": 555,
+  "client": {
+    "id": 123,
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/{factfindId}/clients/123"
+  },
+  "goalType": "Retirement",
+  "category": "LongTerm",
+  "description": "Comfortable retirement at age 65",
+  "priority": 1,
+  "status": {
+    "code": "ACT",
+    "display": "Active"
+  },
+  "targetDate": "2045-05-15",
+  "yearsToGoal": 19,
+  "targetAmount": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "retirementAge": 65,
+  "desiredRetirementIncome": {
+    "amount": 30000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  },
+    "frequency": {
+      "code": "A",
+      "display": "Annual",
+      "periodsPerYear": 1
+    }
+  },
+  "currentProvisionAdequate": "No",
+  "shortfallAmount": {
+    "amount": 200000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "fundingProgress": {
+    "allocatedAmount": {
+      "amount": 0.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "percentageComplete": 0.0,
+    "onTrack": false
+  },
+  "createdAt": "2026-02-16T15:20:00Z",
+  "updatedAt": "2026-02-16T15:20:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/goals/555" },
+    "update": { "href": "/api/v1/goals/555", "method": "PUT" },
+    "objectives": { "href": "/api/v1/goals/555/objectives" },
+    "funding": { "href": "/api/v1/goals/555/funding" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
+  }
+}
+```
+
+**Goal Types:**
+- `Investment` - Investment/savings goals
+- `Retirement` - Retirement planning
+- `Protection` - Protection needs (life, CI, IP)
+- `Mortgage` - Mortgage goals
+- `Budget` - Budget and spending goals
+- `EstatePlanning` - Estate planning goals
+- `EquityRelease` - Equity release goals
+
+**Categories:**
+- `ShortTerm` - 0-2 years
+- `MediumTerm` - 2-10 years
+- `LongTerm` - 10+ years
+
+#### 7.3.2 Add Objective
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/goals/{id}/objectives`
+
+**Description:** Add a specific objective under a goal.
+
+**Request Body:**
+```json
+{
+  "objectiveType": "IncreasePensionContributions",
+  "description": "Increase pension contributions to £750 per month",
+  "targetAmount": {
+    "amount": 9000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  },
+    "frequency": {
+      "code": "A",
+      "display": "Annual",
+      "periodsPerYear": 1
+    }
+  },
+  "targetDate": "2026-04-06",
+  "priority": 1,
+  "status": {
+    "code": "NS",
+    "display": "Not Started"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "id": "objective-666",
+  "goalRef": {
+    "id": "goal-555",
+    "href": "/api/v1/goals/goal-555",
+    "goalName": "Comfortable retirement at age 65",
+    "priority": "High"
+  },
+  "objectiveType": "IncreasePensionContributions",
+  "description": "Increase pension contributions to £750 per month",
+  "targetAmount": {
+    "amount": 9000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  },
+    "frequency": {
+      "code": "A",
+      "display": "Annual",
+      "periodsPerYear": 1
+    }
+  },
+  "targetDate": "2026-04-06",
+  "priority": 1,
+  "status": {
+    "code": "NS",
+    "display": "Not Started"
+  },
+  "createdAt": "2026-02-16T15:25:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/goals/goal-555/objectives/objective-666" },
+    "goal": { "href": "/api/v1/goals/goal-555" }
+  }
+}
+```
+
+**Objective Types:**
+- `IncreasePensionContributions`
+- `StartRegularSavings`
+- `ArrangeLifeCover`
+- `ArrangeCriticalIllnessCover`
+- `ArrangeIncomeProtection`
+- `RepayMortgage`
+- `RemortgageProperty`
+- `ConsolidateDebts`
+- `BuildEmergencyFund`
+- `ReduceExpenditure`
+- `CreateWill`
+- `SetupTrust`
+- `PlanGiftingStrategy`
+
+---
+
+## 8. FactFind Goals API
+
+### 8.1 Overview
+
+**Purpose:** Assess and record client's risk profile for investment suitability.
+
+**Scope:**
+- Attitude to Risk (ATR) questionnaire
+- Capacity for Loss assessment
+- Risk tolerance scoring
+- Investment knowledge and experience
+- Appropriateness assessment (MiFID II)
+- Risk rating assignment
+- Risk profile history and auditing
+
+**Aggregate Root:** RISK_PROFILE
+
+**Regulatory Compliance:**
+- FCA COBS 9 (Assessing Suitability)
+- MiFID II (Appropriateness Assessment)
+- PROD (Target Market matching)
+- Consumer Duty (Understanding needs)
+
+### 8.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/risk-profile` | List risk profiles | `risk:read` |
+| POST | `/api/v1/factfinds/{factfindId}/risk-profile` | Create risk profile | `risk:write` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profile` | Get risk profile | `risk:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/risk-profile` | Update risk profile | `risk:write` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profile/questionnaire` | Get ATR questionnaire responses | `risk:read` |
+| PUT | `/api/v1/risk-profiles/{id}/questionnaire` | Update questionnaire | `risk:write` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profile/history` | Get risk profile history | `risk:read` |
+
+### 8.3 Key Endpoints
+
+#### 8.3.1 Create Risk Profile
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/risk-profile`
+
+**Description:** Create a new risk profile assessment.
+
+**Contract:** Uses the unified `RiskProfile` contract (see Section 11.7). The same contract is used for request and response.
+
+**Request Body:**
+RiskProfile contract with required-on-create fields and assessment data.
+
+
+```json
+{
+  "client": {
+    "id": 123
+  },
+  "assessmentDate": "2026-02-16",
+  "attitudeToRiskScore": 6,
+  "attitudeToRiskRating": "Balanced",
+  "capacityForLossScore": 7,
+  "capacityForLossRating": "High",
+  "overallRiskRating": "Balanced",
+  "investmentKnowledge": "Good",
+  "investmentExperience": "Experienced",
+  "appropriatenessAssessment": "Appropriate",
+  "assessmentMethod": "AdviserQuestionnaire",
+  "questionnaire": {
+    "questionnaireId": "ATR-2024-v1",
+    "responses": [
+      {
+        "questionId": "Q1",
+        "question": "How would you describe your investment experience?",
+        "response": "I have been investing for over 10 years",
+        "score": 4
+      },
+      {
+        "questionId": "Q2",
+        "question": "How would you react to a 20% fall in your portfolio value?",
+        "response": "I would hold and wait for recovery",
+        "score": 3
+      }
+    ],
+    "totalScore": 60,
+    "maxScore": 100
+  },
+  "capacityForLossDetails": "Client has substantial emergency fund, stable employment, no debts, and can withstand short-term volatility",
+  "reviewDate": "2027-02-16"
+}
+```
+
+**Response:**
+Complete `RiskProfile` contract with all fields populated, including server-generated and computed fields.
+
+```json
+{
+  "id": 777,
+  "client": {
+    "id": 123,
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/{factfindId}/clients/123"
+  },
+  "assessmentDate": "2026-02-16",
+  "attitudeToRiskScore": 6,
+  "attitudeToRiskRating": "Balanced",
+  "capacityForLossScore": 7,
+  "capacityForLossRating": "High",
+  "overallRiskRating": "Balanced",
+  "investmentKnowledge": "Good",
+  "investmentExperience": "Experienced",
+  "appropriatenessAssessment": "Appropriate",
+  "assessmentMethod": "AdviserQuestionnaire",
+  "questionnaire": {
+    "questionnaireId": "ATR-2024-v1",
+    "responses": [
+      {
+        "questionId": "Q1",
+        "question": "How would you describe your investment experience?",
+        "response": "I have been investing for over 10 years",
+        "score": 4
+      },
+      {
+        "questionId": "Q2",
+        "question": "How would you react to a 20% fall in your portfolio value?",
+        "response": "I would hold and wait for recovery",
+        "score": 3
+      }
+    ],
+    "totalScore": 60,
+    "maxScore": 100,
+    "percentageScore": 60.0
+  },
+  "capacityForLossDetails": "Client has substantial emergency fund, stable employment, no debts, and can withstand short-term volatility",
+  "reviewDate": "2027-02-16",
+  "isValid": true,
+  "expiryDate": "2028-02-16",
+  "createdAt": "2026-02-16T15:30:00Z",
+  "updatedAt": "2026-02-16T15:30:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/risk-profiles/777" },
+    "update": { "href": "/api/v1/risk-profiles/777", "method": "PUT" },
+    "questionnaire": { "href": "/api/v1/risk-profiles/777/questionnaire" },
+    "history": { "href": "/api/v1/risk-profiles/777/history" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
+  }
+}
+```
+
+**Risk Ratings:**
+- `VeryCautious` - Score 1-2
+- `Cautious` - Score 3-4
+- `Balanced` - Score 5-6
+- `Adventurous` - Score 7-8
+- `VeryAdventurous` - Score 9-10
+
+**Investment Knowledge Levels:**
+- `None` - No investment knowledge
+- `Basic` - Basic understanding
+- `Good` - Good understanding
+- `Advanced` - Advanced knowledge
+- `Expert` - Professional/expert level
+
+---
+
+## 9. FactFind Assets & Liabilities API
+
+### 9.1 Overview
+
+**Purpose:** Manage estate planning activities including gifts and trusts.
+
+**Scope:**
+- Gift recording (cash, property, business assets)
+- Gift trust management
+- Potentially Exempt Transfer (PET) tracking
+- Inheritance Tax (IHT) calculations
+- Trust beneficiary management
+
+**Aggregate Root:** GIFT, GIFT_TRUST
+
+### 9.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/gifts` | List gifts | `estate:read` |
+| POST | `/api/v1/factfinds/{factfindId}/gifts` | Record gift | `estate:write` |
+| GET | `/api/v1/factfinds/{factfindId}/gifts/{giftId}` | Get gift details | `estate:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/gifts/{giftId}` | Update gift | `estate:write` |
+| GET | `/api/v1/factfinds/{factfindId}/gift-trusts` | List gift trusts | `estate:read` |
+| POST | `/api/v1/factfinds/{factfindId}/gift-trusts` | Create gift trust | `estate:write` |
+| GET | `/api/v1/factfinds/{factfindId}/gift-trusts/{trustId}` | Get trust details | `estate:read` |
+
+### 9.3 Key Endpoints
+
+#### 9.3.1 Record Gift
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/gifts`
+
+**Contract:** Uses a unified `Gift` contract. The same contract is used for request and response, with read-only fields (id, computed fields like yearsRemaining, petStatus) populated by the server.
+
+**Request Body:**
+Gift contract with required-on-create fields.
+
+
+```json
+{
+  "client": {
+    "id": 123
+  },
+  "giftDate": "2024-12-25",
+  "giftType": "Cash",
+  "recipient": {
+    "id": 124,
+    "relationshipToClient": "Child"
+  },
+  "giftValue": {
+    "amount": 50000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "isPotentiallyExemptTransfer": true,
+  "exemptionType": "AnnualExemption",
+  "ihtSevenYearExpiry": "2031-12-25"
+}
+```
+
+**Response:**
+Complete `Gift` contract with all fields populated, including server-generated and computed fields.
+
+```json
+{
+  "id": 888,
+  "client": {
+    "id": 123,
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/{factfindId}/clients/123"
+  },
+  "giftDate": "2024-12-25",
+  "giftType": "Cash",
+  "recipient": {
+    "id": 124,
+    "name": "Emma Smith",
+    "relationshipToClient": "Child",
+    "href": "/api/v1/factfinds/{factfindId}/clients/124"
+  },
+  "giftValue": {
+    "amount": 50000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "isPotentiallyExemptTransfer": true,
+  "exemptionType": "AnnualExemption",
+  "ihtSevenYearExpiry": "2031-12-25",
+  "yearsRemaining": 5.86,
+  "petStatus": "Active",
+  "createdAt": "2026-02-16T15:40:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/gifts/888" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" },
+    "recipient": { "href": "/api/v1/factfinds/{factfindId}/clients/124" }
+  }
+}
+```
+
+---
+
+
+
+### 9.4 Property Management API
+
+**Purpose:** Manage property portfolio with comprehensive valuation tracking, mortgage linking, LTV calculations, and rental yield analysis.
+
+**Scope:**
+- Property entity management (residential, buy-to-let, commercial, holiday, land)
+- Property valuation history tracking with multiple valuation types
+- Loan-to-Value (LTV) calculations across all mortgages
+- Rental income tracking and yield calculations
+- Property expenses and net yield analysis
+- Mortgage linking and equity tracking
+- Capital gains tax (CGT) calculations
+- Private Residence Relief (PRR) and Letting Relief tracking
+- Stamp Duty Land Tax (SDLT) tracking
+- Property ownership structures (sole, joint, company, trust)
+
+**Aggregate Root:** FactFind (properties are nested within fact find)
+
+**Regulatory Compliance:**
+- FCA Handbook - Understanding client assets
+- MLR 2017 - Source of wealth verification
+- HMRC Capital Gains Tax regulations
+- HMRC Stamp Duty Land Tax requirements
+- Data Protection Act 2018 - Property data retention
+
+#### 9.4.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/factfinds/{factfindId}/properties` | Add property | `assets:write` |
+| GET | `/api/v1/factfinds/{factfindId}/properties` | List properties | `assets:read` |
+| GET | `/api/v1/factfinds/{factfindId}/properties/{id}` | Get property details | `assets:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/properties/{id}` | Update property | `assets:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/properties/{id}` | Delete property | `assets:write` |
+| POST | `/api/v1/factfinds/{factfindId}/properties/{id}/valuations` | Add valuation | `assets:write` |
+| GET | `/api/v1/factfinds/{factfindId}/properties/{id}/valuations` | Get valuation history | `assets:read` |
+| GET | `/api/v1/factfinds/{factfindId}/properties/{id}/ltv` | Calculate LTV | `assets:read` |
+| GET | `/api/v1/factfinds/{factfindId}/properties/{id}/rental-yield` | Calculate rental yield | `assets:read` |
+| GET | `/api/v1/factfinds/{factfindId}/properties/{id}/capital-gains` | Calculate capital gains | `assets:read` |
+| GET | `/api/v1/factfinds/{factfindId}/properties/{id}/equity` | Calculate equity | `assets:read` |
+| POST | `/api/v1/factfinds/{factfindId}/properties/{id}/expenses` | Add property expense | `assets:write` |
+| GET | `/api/v1/factfinds/{factfindId}/properties/{id}/expenses` | Get property expenses | `assets:read` |
+
+#### 9.4.2 Key Endpoints
+
+##### 9.4.2.1 Add Property
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/properties`
+
+**Description:** Add a new property to the client's property portfolio. Supports residential, buy-to-let, commercial, holiday homes, and land.
+
+**Request Body:**
+
+```json
+{
+  "propertyType": "BuyToLet",
+  "propertySubtype": "ResidentialFlat",
+  "propertyPurpose": "Investment",
+  "address": {
+    "line1": "Flat 12, Riverside Apartments",
+    "line2": "45 Thames Street",
+    "line3": null,
+    "city": "Manchester",
+    "county": "Greater Manchester",
+    "postcode": "M1 2AB",
+    "country": "United Kingdom",
+    "uprn": "100023456789"
+  },
+  "ownership": {
+    "ownershipType": "JointTenants",
+    "owners": [
+      {
+        "clientId": "client-123",
+        "ownershipPercentage": 50.0,
+        "ownerName": "John Smith",
+        "isPrimaryOwner": true
+      },
+      {
+        "clientId": "client-124",
+        "ownershipPercentage": 50.0,
+        "ownerName": "Jane Smith",
+        "isPrimaryOwner": false
+      }
+    ],
+    "ownershipNotes": "Joint tenants with right of survivorship"
+  },
+  "purchase": {
+    "purchaseDate": "2019-06-15",
+    "purchasePrice": 285000.00,
+    "purchaseCurrency": "GBP",
+    "stampDutyPaid": 8500.00,
+    "legalFees": 1500.00,
+    "surveyFees": 600.00,
+    "otherPurchaseCosts": 250.00,
+    "totalAcquisitionCost": 295850.00,
+    "fundingSource": "MortgageAndSavings",
+    "mortgageAmount": 228000.00,
+    "depositAmount": 57000.00
+  },
+  "currentValuation": {
+    "value": 345000.00,
+    "valuationDate": "2026-01-15",
+    "valuationType": "Online",
+    "valuationProvider": "Zoopla",
+    "valuationReference": "ZPL-2026-12345",
+    "valuerName": null,
+    "valuerNotes": "Automated valuation based on recent sales in area",
+    "confidenceLevel": "Medium"
+  },
+  "propertyDetails": {
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "receptionRooms": 1,
+    "totalRooms": 5,
+    "propertySize": {
+      "area": 750,
+      "unit": "SquareFeet"
+    },
+    "tenure": "Leasehold",
+    "leaseYearsRemaining": 95,
+    "yearBuilt": 2015,
+    "constructionType": "NewBuild",
+    "parking": "OneSpace",
+    "garden": false,
+    "epcRating": "B",
+    "councilTaxBand": "D"
+  },
+  "linkedMortgages": [
+    {
+      "arrangementId": "arr-mortgage-789",
+      "mortgageProvider": "Nationwide Building Society",
+      "outstandingBalance": 198450.00,
+      "monthlyPayment": 1245.00,
+      "interestRate": 3.89,
+      "mortgageType": "BuyToLetInterestOnly",
+      "endDate": "2029-06-15"
+    }
+  ],
+  "rentalDetails": {
+    "isCurrentlyRented": true,
+    "tenancyType": "AssuredShorthold",
+    "tenancyStartDate": "2023-08-01",
+    "tenancyEndDate": "2024-07-31",
+    "monthlyRentalIncome": 1650.00,
+    "annualRentalIncome": 19800.00,
+    "rentalIncomeFrequency": "Monthly",
+    "tenantName": "Mr. David Jones",
+    "tenantContactEmail": "david.jones@email.com",
+    "managementType": "LettingAgent",
+    "lettingAgent": {
+      "name": "Manchester Property Lettings Ltd",
+      "contactName": "Sarah Williams",
+      "phone": "0161 234 5678",
+      "email": "sarah@manchesterpropertylet.co.uk",
+      "managementFeePercentage": 12.0,
+      "monthlyManagementFee": 198.00
+    },
+    "rentReviewDate": "2024-08-01",
+    "depositAmount": 2475.00,
+    "depositProtectionScheme": "MyDeposits"
+  },
+  "expenses": {
+    "annualExpenses": [
+      {
+        "expenseType": "MortgageInterest",
+        "amount": 7500.00,
+        "frequency": "Annual",
+        "notes": "Interest-only mortgage payments"
+      },
+      {
+        "expenseType": "ManagementFees",
+        "amount": 2376.00,
+        "frequency": "Annual",
+        "notes": "Letting agent fees at 12%"
+      },
+      {
+        "expenseType": "ServiceCharge",
+        "amount": 1800.00,
+        "frequency": "Annual",
+        "notes": "Building service charge"
+      },
+      {
+        "expenseType": "GroundRent",
+        "amount": 250.00,
+        "frequency": "Annual",
+        "notes": "Annual ground rent"
+      },
+      {
+        "expenseType": "Insurance",
+        "amount": 450.00,
+        "frequency": "Annual",
+        "notes": "Landlord building and contents insurance"
+      },
+      {
+        "expenseType": "Maintenance",
+        "amount": 800.00,
+        "frequency": "Annual",
+        "notes": "Average annual maintenance and repairs"
+      },
+      {
+        "expenseType": "SafetyCertificates",
+        "amount": 350.00,
+        "frequency": "Annual",
+        "notes": "Gas safety, EPC, EICR certificates"
+      }
+    ],
+    "totalAnnualExpenses": 13526.00
+  },
+  "taxInformation": {
+    "isPrimaryResidence": false,
+    "hasEverBeenPrimaryResidence": false,
+    "primaryResidencePeriod": null,
+    "eligibleForPrivateResidenceRelief": false,
+    "eligibleForLettingRelief": false,
+    "wearAndTearAllowanceClaimed": false,
+    "capitalAllowancesClaimed": false
+  },
+  "notes": "Buy-to-let property purchased in 2019. Currently let on assured shorthold tenancy. Property has increased in value by approximately 21% since purchase. Good rental yield area.",
+  "adviserId": "adv-789"
+}
+```
+
+**Property Type Values:**
+- `Residential` - Owner-occupied residential property
+- `BuyToLet` - Investment property for rental income
+- `Commercial` - Commercial property (office, retail, industrial)
+- `Holiday` - Holiday home or vacation property
+- `Land` - Undeveloped land
+- `DevelopmentProject` - Property under development
+
+**Property Subtype Values:**
+- `DetachedHouse`, `SemiDetachedHouse`, `TerracedHouse`, `Bungalow`
+- `ResidentialFlat`, `Maisonette`, `Studio`
+- `CommercialOffice`, `Retail`, `Industrial`, `Warehouse`
+- `FarmLand`, `BuildingPlot`, `WoodLand`
+
+**Ownership Type Values:**
+- `Sole` - Single owner
+- `JointTenants` - Joint ownership with right of survivorship
+- `TenantsInCommon` - Specified ownership percentages
+- `Company` - Owned through limited company
+- `Trust` - Held in trust
+
+**Tenure Values:**
+- `Freehold` - Full ownership of property and land
+- `Leasehold` - Long-term lease (typically 99-999 years)
+- `Shared Ownership` - Part-own, part-rent scheme
+- `Commonhold` - Freehold flat ownership
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/properties/prop-789
+```
+
+```json
+{
+  "id": "prop-789",
+  "factfindId": "ff-456",
+  "propertyType": "BuyToLet",
+  "propertySubtype": "ResidentialFlat",
+  "propertyPurpose": "Investment",
+  "address": {
+    "line1": "Flat 12, Riverside Apartments",
+    "line2": "45 Thames Street",
+    "line3": null,
+    "city": "Manchester",
+    "county": "Greater Manchester",
+    "postcode": "M1 2AB",
+    "country": "United Kingdom",
+    "uprn": "100023456789",
+    "formattedAddress": "Flat 12, Riverside Apartments, 45 Thames Street, Manchester, M1 2AB"
+  },
+  "ownership": {
+    "ownershipType": "JointTenants",
+    "owners": [
+      {
+        "clientId": "client-123",
+        "ownershipPercentage": 50.0,
+        "ownerName": "John Smith",
+        "isPrimaryOwner": true
+      },
+      {
+        "clientId": "client-124",
+        "ownershipPercentage": 50.0,
+        "ownerName": "Jane Smith",
+        "isPrimaryOwner": false
+      }
+    ],
+    "ownershipNotes": "Joint tenants with right of survivorship"
+  },
+  "purchase": {
+    "purchaseDate": "2019-06-15",
+    "purchasePrice": 285000.00,
+    "purchaseCurrency": "GBP",
+    "stampDutyPaid": 8500.00,
+    "legalFees": 1500.00,
+    "surveyFees": 600.00,
+    "otherPurchaseCosts": 250.00,
+    "totalAcquisitionCost": 295850.00,
+    "fundingSource": "MortgageAndSavings",
+    "mortgageAmount": 228000.00,
+    "depositAmount": 57000.00,
+    "depositPercentage": 20.0,
+    "yearsOwned": 6.6
+  },
+  "currentValuation": {
+    "value": 345000.00,
+    "valuationDate": "2026-01-15",
+    "valuationType": "Online",
+    "valuationProvider": "Zoopla",
+    "valuationReference": "ZPL-2026-12345",
+    "valuerName": null,
+    "valuerNotes": "Automated valuation based on recent sales in area",
+    "confidenceLevel": "Medium",
+    "daysOld": 33
+  },
+  "propertyDetails": {
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "receptionRooms": 1,
+    "totalRooms": 5,
+    "propertySize": {
+      "area": 750,
+      "unit": "SquareFeet"
+    },
+    "tenure": "Leasehold",
+    "leaseYearsRemaining": 95,
+    "yearBuilt": 2015,
+    "propertyAge": 11,
+    "constructionType": "NewBuild",
+    "parking": "OneSpace",
+    "garden": false,
+    "epcRating": "B",
+    "councilTaxBand": "D"
+  },
+  "linkedMortgages": [
+    {
+      "arrangementId": "arr-mortgage-789",
+      "mortgageProvider": "Nationwide Building Society",
+      "outstandingBalance": 198450.00,
+      "monthlyPayment": 1245.00,
+      "interestRate": 3.89,
+      "mortgageType": "BuyToLetInterestOnly",
+      "endDate": "2029-06-15",
+      "yearsRemaining": 3.4
+    }
+  ],
+  "totalMortgageBalance": 198450.00,
+  "equity": {
+    "currentValue": 345000.00,
+    "totalMortgages": 198450.00,
+    "equityAmount": 146550.00,
+    "equityPercentage": 42.5
+  },
+  "loanToValue": {
+    "currentLTV": 57.5,
+    "purchaseLTV": 80.0,
+    "ltvChange": -22.5
+  },
+  "capitalGrowth": {
+    "purchasePrice": 285000.00,
+    "currentValue": 345000.00,
+    "absoluteGain": 60000.00,
+    "percentageGain": 21.05,
+    "annualizedReturn": 3.02
+  },
+  "rentalDetails": {
+    "isCurrentlyRented": true,
+    "tenancyType": "AssuredShorthold",
+    "tenancyStartDate": "2023-08-01",
+    "tenancyEndDate": "2024-07-31",
+    "monthlyRentalIncome": 1650.00,
+    "annualRentalIncome": 19800.00,
+    "rentalIncomeFrequency": "Monthly",
+    "tenantName": "Mr. David Jones",
+    "tenantContactEmail": "david.jones@email.com",
+    "managementType": "LettingAgent",
+    "lettingAgent": {
+      "name": "Manchester Property Lettings Ltd",
+      "contactName": "Sarah Williams",
+      "phone": "0161 234 5678",
+      "email": "sarah@manchesterpropertylet.co.uk",
+      "managementFeePercentage": 12.0,
+      "monthlyManagementFee": 198.00,
+      "annualManagementFee": 2376.00
+    },
+    "rentReviewDate": "2024-08-01",
+    "depositAmount": 2475.00,
+    "depositProtectionScheme": "MyDeposits"
+  },
+  "expenses": {
+    "annualExpenses": [
+      {
+        "expenseType": "MortgageInterest",
+        "amount": 7500.00,
+        "frequency": "Annual",
+        "notes": "Interest-only mortgage payments"
+      },
+      {
+        "expenseType": "ManagementFees",
+        "amount": 2376.00,
+        "frequency": "Annual",
+        "notes": "Letting agent fees at 12%"
+      },
+      {
+        "expenseType": "ServiceCharge",
+        "amount": 1800.00,
+        "frequency": "Annual",
+        "notes": "Building service charge"
+      },
+      {
+        "expenseType": "GroundRent",
+        "amount": 250.00,
+        "frequency": "Annual",
+        "notes": "Annual ground rent"
+      },
+      {
+        "expenseType": "Insurance",
+        "amount": 450.00,
+        "frequency": "Annual",
+        "notes": "Landlord building and contents insurance"
+      },
+      {
+        "expenseType": "Maintenance",
+        "amount": 800.00,
+        "frequency": "Annual",
+        "notes": "Average annual maintenance and repairs"
+      },
+      {
+        "expenseType": "SafetyCertificates",
+        "amount": 350.00,
+        "frequency": "Annual",
+        "notes": "Gas safety, EPC, EICR certificates"
+      }
+    ],
+    "totalAnnualExpenses": 13526.00
+  },
+  "rentalYield": {
+    "grossAnnualRent": 19800.00,
+    "currentPropertyValue": 345000.00,
+    "grossYieldPercentage": 5.74,
+    "totalAnnualExpenses": 13526.00,
+    "netAnnualIncome": 6274.00,
+    "netYieldPercentage": 1.82,
+    "marketAverageYield": 5.2,
+    "yieldVsMarket": 0.54
+  },
+  "taxInformation": {
+    "isPrimaryResidence": false,
+    "hasEverBeenPrimaryResidence": false,
+    "primaryResidencePeriod": null,
+    "eligibleForPrivateResidenceRelief": false,
+    "eligibleForLettingRelief": false,
+    "wearAndTearAllowanceClaimed": false,
+    "capitalAllowancesClaimed": false
+  },
+  "performanceMetrics": {
+    "totalInvestment": 295850.00,
+    "currentValue": 345000.00,
+    "currentEquity": 146550.00,
+    "totalReturn": 49700.00,
+    "totalReturnPercentage": 16.8,
+    "annualizedReturn": 2.4,
+    "mortgagePaidDown": 29550.00,
+    "capitalAppreciation": 60000.00,
+    "netRentalIncomeReceived": 41424.00
+  },
+  "notes": "Buy-to-let property purchased in 2019. Currently let on assured shorthold tenancy. Property has increased in value by approximately 21% since purchase. Good rental yield area.",
+  "createdDate": "2026-02-17T10:00:00Z",
+  "createdBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser"
+  },
+  "lastModifiedDate": "2026-02-17T10:00:00Z",
+  "lastModifiedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-789" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" },
+    "valuations": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/valuations" },
+    "ltv": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/ltv" },
+    "rental-yield": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/rental-yield" },
+    "capital-gains": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/capital-gains" },
+    "equity": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/equity" },
+    "expenses": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/expenses" },
+    "update": { "href": "/api/v1/factfinds/ff-456/properties/prop-789", "method": "PUT" },
+    "delete": { "href": "/api/v1/factfinds/ff-456/properties/prop-789", "method": "DELETE" }
+  }
+}
+```
+
+**Validation Rules:**
+- Property address is required
+- Purchase date cannot be in the future
+- Purchase price must be positive
+- Current valuation value must be positive
+- Ownership percentages must sum to 100%
+- At least one owner required
+- Linked mortgage balances should not exceed property value (warning if LTV > 100%)
+- Rental income required if propertyType is BuyToLet and isCurrentlyRented is true
+- Leasehold properties must have leaseYearsRemaining specified
+- EPC rating required for residential properties in UK (legal requirement)
+
+**HTTP Status Codes:**
+- `201 Created` - Property created successfully
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/validation-error",
+  "title": "Property Validation Failed",
+  "status": 422,
+  "detail": "Ownership percentages must sum to 100%",
+  "instance": "/api/v1/factfinds/ff-456/properties",
+  "errors": [
+    {
+      "field": "ownership.owners",
+      "message": "Total ownership percentage is 95% but must equal 100%",
+      "rejectedValue": [
+        {"ownershipPercentage": 45.0},
+        {"ownershipPercentage": 50.0}
+      ],
+      "constraint": "sumEquals100",
+      "currentSum": 95.0,
+      "requiredSum": 100.0
+    }
+  ]
+}
+```
+
+---
+
+##### 9.4.2.2 List Properties
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/properties`
+
+**Description:** List all properties in the client's portfolio with current valuations, LTV calculations, and rental yields.
+
+**Query Parameters:**
+- `propertyType` - Filter by property type: Residential, BuyToLet, Commercial, Holiday, Land
+- `ownershipType` - Filter by ownership: Sole, JointTenants, TenantsInCommon, Company, Trust
+- `clientId` - Filter properties owned by specific client
+- `isRented` - Filter by rental status (true/false)
+- `includeValuations` - Include valuation history (default: false)
+- `includeExpenses` - Include expense details (default: false)
+- `sortBy` - Sort field: value, purchaseDate, ltv, rentalYield, equity
+- `sortOrder` - Sort order: asc, desc
+
+**Response:**
+
+```json
+{
+  "properties": [
+    {
+      "id": "prop-789",
+      "propertyType": "BuyToLet",
+      "propertySubtype": "ResidentialFlat",
+      "address": {
+        "line1": "Flat 12, Riverside Apartments",
+        "line2": "45 Thames Street",
+        "city": "Manchester",
+        "postcode": "M1 2AB",
+        "formattedAddress": "Flat 12, Riverside Apartments, 45 Thames Street, Manchester, M1 2AB"
+      },
+      "ownership": {
+        "ownershipType": "JointTenants",
+        "primaryOwner": "John Smith",
+        "ownerCount": 2
+      },
+      "purchase": {
+        "purchaseDate": "2019-06-15",
+        "purchasePrice": 285000.00,
+        "yearsOwned": 6.6
+      },
+      "currentValuation": {
+        "value": 345000.00,
+        "valuationDate": "2026-01-15",
+        "valuationType": "Online",
+        "daysOld": 33
+      },
+      "financials": {
+        "totalMortgageBalance": 198450.00,
+        "equity": 146550.00,
+        "equityPercentage": 42.5,
+        "ltvPercentage": 57.5,
+        "capitalGain": 60000.00,
+        "capitalGainPercentage": 21.05
+      },
+      "rental": {
+        "isRented": true,
+        "monthlyRent": 1650.00,
+        "annualRent": 19800.00,
+        "grossYield": 5.74,
+        "netYield": 1.82
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-789" },
+        "ltv": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/ltv" },
+        "rental-yield": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/rental-yield" }
+      }
+    },
+    {
+      "id": "prop-790",
+      "propertyType": "Residential",
+      "propertySubtype": "SemiDetachedHouse",
+      "address": {
+        "line1": "42 Oakwood Drive",
+        "line2": null,
+        "city": "Leeds",
+        "postcode": "LS17 8QY",
+        "formattedAddress": "42 Oakwood Drive, Leeds, LS17 8QY"
+      },
+      "ownership": {
+        "ownershipType": "JointTenants",
+        "primaryOwner": "John Smith",
+        "ownerCount": 2
+      },
+      "purchase": {
+        "purchaseDate": "2015-03-20",
+        "purchasePrice": 425000.00,
+        "yearsOwned": 10.9
+      },
+      "currentValuation": {
+        "value": 575000.00,
+        "valuationDate": "2026-02-10",
+        "valuationType": "EstateAgent",
+        "daysOld": 7
+      },
+      "financials": {
+        "totalMortgageBalance": 285000.00,
+        "equity": 290000.00,
+        "equityPercentage": 50.4,
+        "ltvPercentage": 49.6,
+        "capitalGain": 150000.00,
+        "capitalGainPercentage": 35.29
+      },
+      "rental": {
+        "isRented": false,
+        "isPrimaryResidence": true
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-790" },
+        "ltv": { "href": "/api/v1/factfinds/ff-456/properties/prop-790/ltv" },
+        "capital-gains": { "href": "/api/v1/factfinds/ff-456/properties/prop-790/capital-gains" }
+      }
+    },
+    {
+      "id": "prop-791",
+      "propertyType": "Holiday",
+      "propertySubtype": "DetachedHouse",
+      "address": {
+        "line1": "Seaview Cottage",
+        "line2": "12 Coastal Road",
+        "city": "Whitby",
+        "postcode": "YO21 3HB",
+        "formattedAddress": "Seaview Cottage, 12 Coastal Road, Whitby, YO21 3HB"
+      },
+      "ownership": {
+        "ownershipType": "Sole",
+        "primaryOwner": "John Smith",
+        "ownerCount": 1
+      },
+      "purchase": {
+        "purchaseDate": "2021-08-10",
+        "purchasePrice": 315000.00,
+        "yearsOwned": 4.5
+      },
+      "currentValuation": {
+        "value": 355000.00,
+        "valuationDate": "2025-11-20",
+        "valuationType": "Online",
+        "daysOld": 88
+      },
+      "financials": {
+        "totalMortgageBalance": 0.00,
+        "equity": 355000.00,
+        "equityPercentage": 100.0,
+        "ltvPercentage": 0.0,
+        "capitalGain": 40000.00,
+        "capitalGainPercentage": 12.70
+      },
+      "rental": {
+        "isRented": false,
+        "isPrimaryResidence": false,
+        "isOccasionallyLet": true,
+        "annualRentalDays": 45,
+        "estimatedAnnualIncome": 9000.00
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-791" },
+        "capital-gains": { "href": "/api/v1/factfinds/ff-456/properties/prop-791/capital-gains" }
+      }
+    }
+  ],
+  "summary": {
+    "totalProperties": 3,
+    "totalValue": 1275000.00,
+    "totalMortgages": 483450.00,
+    "totalEquity": 791550.00,
+    "averageLTV": 37.9,
+    "totalCapitalGain": 250000.00,
+    "propertyByType": {
+      "Residential": 1,
+      "BuyToLet": 1,
+      "Holiday": 1
+    },
+    "rentedProperties": 1,
+    "totalAnnualRentalIncome": 19800.00,
+    "averageGrossYield": 5.74
+  },
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 3,
+    "totalPages": 1
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/properties" },
+    "create": { "href": "/api/v1/factfinds/ff-456/properties", "method": "POST" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" }
+  }
+}
+```
+
+**HTTP Status Codes:**
+- `200 OK` - Properties retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+
+---
+
+##### 9.4.2.3 Get Property Details
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/properties/{id}`
+
+**Description:** Get complete property information including current valuation, linked mortgages, equity calculation, rental income tracking, capital gains, and historical valuations.
+
+**Query Parameters:**
+- `includeValuationHistory` - Include all historical valuations (default: false)
+- `includeExpenseHistory` - Include all expense records (default: false)
+- `includeMortgageDetails` - Include full mortgage details (default: true)
+
+**Response:**
+
+```json
+{
+  "id": "prop-789",
+  "factfindId": "ff-456",
+  "propertyType": "BuyToLet",
+  "propertySubtype": "ResidentialFlat",
+  "propertyPurpose": "Investment",
+  "address": {
+    "line1": "Flat 12, Riverside Apartments",
+    "line2": "45 Thames Street",
+    "line3": null,
+    "city": "Manchester",
+    "county": "Greater Manchester",
+    "postcode": "M1 2AB",
+    "country": "United Kingdom",
+    "uprn": "100023456789",
+    "formattedAddress": "Flat 12, Riverside Apartments, 45 Thames Street, Manchester, M1 2AB",
+    "coordinates": {
+      "latitude": 53.4808,
+      "longitude": -2.2426
+    }
+  },
+  "ownership": {
+    "ownershipType": "JointTenants",
+    "owners": [
+      {
+        "clientId": "client-123",
+        "ownershipPercentage": 50.0,
+        "ownerName": "John Smith",
+        "isPrimaryOwner": true
+      },
+      {
+        "clientId": "client-124",
+        "ownershipPercentage": 50.0,
+        "ownerName": "Jane Smith",
+        "isPrimaryOwner": false
+      }
+    ],
+    "ownershipNotes": "Joint tenants with right of survivorship"
+  },
+  "purchase": {
+    "purchaseDate": "2019-06-15",
+    "purchasePrice": 285000.00,
+    "purchaseCurrency": "GBP",
+    "stampDutyPaid": 8500.00,
+    "stampDutyRate": "Higher rate - additional property",
+    "legalFees": 1500.00,
+    "surveyFees": 600.00,
+    "otherPurchaseCosts": 250.00,
+    "totalAcquisitionCost": 295850.00,
+    "fundingSource": "MortgageAndSavings",
+    "mortgageAmount": 228000.00,
+    "depositAmount": 57000.00,
+    "depositPercentage": 20.0,
+    "yearsOwned": 6.6
+  },
+  "currentValuation": {
+    "value": 345000.00,
+    "valuationDate": "2026-01-15",
+    "valuationType": "Online",
+    "valuationProvider": "Zoopla",
+    "valuationReference": "ZPL-2026-12345",
+    "valuerName": null,
+    "valuerNotes": "Automated valuation based on recent sales in area. Confidence: Medium. Range: £330,000 - £360,000",
+    "confidenceLevel": "Medium",
+    "valuationRange": {
+      "lower": 330000.00,
+      "upper": 360000.00
+    },
+    "daysOld": 33,
+    "nextValuationDue": "2027-01-15"
+  },
+  "valuationHistory": [
+    {
+      "valuationDate": "2026-01-15",
+      "value": 345000.00,
+      "valuationType": "Online",
+      "provider": "Zoopla",
+      "changeFromPrevious": 10000.00,
+      "percentageChange": 2.99
+    },
+    {
+      "valuationDate": "2025-01-10",
+      "value": 335000.00,
+      "valuationType": "Online",
+      "provider": "Rightmove",
+      "changeFromPrevious": 15000.00,
+      "percentageChange": 4.69
+    },
+    {
+      "valuationDate": "2024-02-01",
+      "value": 320000.00,
+      "valuationType": "Professional",
+      "provider": "RICS Valuer",
+      "changeFromPrevious": 15000.00,
+      "percentageChange": 4.92
+    },
+    {
+      "valuationDate": "2022-06-15",
+      "value": 305000.00,
+      "valuationType": "EstateAgent",
+      "provider": "Local Estate Agent",
+      "changeFromPrevious": 20000.00,
+      "percentageChange": 7.02
+    },
+    {
+      "valuationDate": "2019-06-15",
+      "value": 285000.00,
+      "valuationType": "Purchase",
+      "provider": "Purchase Price",
+      "changeFromPrevious": 0.00,
+      "percentageChange": 0.00
+    }
+  ],
+  "propertyDetails": {
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "receptionRooms": 1,
+    "totalRooms": 5,
+    "propertySize": {
+      "area": 750,
+      "unit": "SquareFeet",
+      "areaInSquareMeters": 69.7
+    },
+    "tenure": "Leasehold",
+    "leaseYearsRemaining": 95,
+    "leaseStartDate": "2015-01-01",
+    "leaseExpiryDate": "2140-01-01",
+    "yearBuilt": 2015,
+    "propertyAge": 11,
+    "constructionType": "NewBuild",
+    "parking": "OneSpace",
+    "garden": false,
+    "epcRating": "B",
+    "epcScore": 82,
+    "epcValidUntil": "2028-03-15",
+    "councilTaxBand": "D",
+    "annualCouncilTax": 1850.00
+  },
+  "linkedMortgages": [
+    {
+      "arrangementId": "arr-mortgage-789",
+      "mortgageProvider": "Nationwide Building Society",
+      "accountNumber": "****5678",
+      "mortgageType": "BuyToLetInterestOnly",
+      "originalAmount": 228000.00,
+      "outstandingBalance": 198450.00,
+      "amountPaidOff": 29550.00,
+      "interestRate": 3.89,
+      "interestRateType": "Fixed",
+      "monthlyPayment": 1245.00,
+      "annualPayment": 14940.00,
+      "startDate": "2019-06-15",
+      "endDate": "2029-06-15",
+      "yearsRemaining": 3.4,
+      "fixedRateEndDate": "2024-06-15",
+      "ltvAtOrigination": 80.0,
+      "currentLTV": 57.5
+    }
+  ],
+  "totalMortgageBalance": 198450.00,
+  "equity": {
+    "currentValue": 345000.00,
+    "totalMortgages": 198450.00,
+    "equityAmount": 146550.00,
+    "equityPercentage": 42.5,
+    "originalEquity": 57000.00,
+    "equityGrowth": 89550.00,
+    "equityGrowthPercentage": 157.1
+  },
+  "loanToValue": {
+    "currentLTV": 57.5,
+    "purchaseLTV": 80.0,
+    "ltvChange": -22.5,
+    "ltvStatus": "Good",
+    "ltvWarning": null,
+    "recommendedLTV": {
+      "conservative": 75.0,
+      "standard": 80.0,
+      "maximum": 85.0
+    }
+  },
+  "capitalGrowth": {
+    "purchasePrice": 285000.00,
+    "currentValue": 345000.00,
+    "absoluteGain": 60000.00,
+    "percentageGain": 21.05,
+    "annualizedReturn": 3.02,
+    "totalReturn": 109700.00,
+    "totalReturnPercentage": 38.4,
+    "comparisonVsMarket": {
+      "marketAverageGrowth": 18.5,
+      "outperformance": 2.55
+    }
+  },
+  "rentalDetails": {
+    "isCurrentlyRented": true,
+    "tenancyType": "AssuredShorthold",
+    "tenancyStartDate": "2023-08-01",
+    "tenancyEndDate": "2024-07-31",
+    "tenancyLengthMonths": 12,
+    "monthlyRentalIncome": 1650.00,
+    "annualRentalIncome": 19800.00,
+    "rentalIncomeFrequency": "Monthly",
+    "tenantName": "Mr. David Jones",
+    "tenantContactEmail": "david.jones@email.com",
+    "tenantOccupancyMonths": 18,
+    "managementType": "LettingAgent",
+    "lettingAgent": {
+      "name": "Manchester Property Lettings Ltd",
+      "contactName": "Sarah Williams",
+      "phone": "0161 234 5678",
+      "email": "sarah@manchesterpropertylet.co.uk",
+      "managementFeePercentage": 12.0,
+      "monthlyManagementFee": 198.00,
+      "annualManagementFee": 2376.00
+    },
+    "rentReviewDate": "2024-08-01",
+    "proposedNewRent": 1700.00,
+    "rentIncreasePercentage": 3.03,
+    "depositAmount": 2475.00,
+    "depositProtectionScheme": "MyDeposits",
+    "depositProtectionReference": "MD-123456-789",
+    "voidPeriods": [
+      {
+        "startDate": "2022-12-01",
+        "endDate": "2023-01-15",
+        "daysVoid": 45,
+        "lostRent": 2475.00
+      }
+    ],
+    "totalVoidDays": 45,
+    "occupancyRate": 97.9
+  },
+  "expenses": {
+    "annualExpenses": [
+      {
+        "expenseType": "MortgageInterest",
+        "amount": 7500.00,
+        "frequency": "Annual",
+        "taxDeductible": true,
+        "notes": "Interest-only mortgage payments"
+      },
+      {
+        "expenseType": "ManagementFees",
+        "amount": 2376.00,
+        "frequency": "Annual",
+        "taxDeductible": true,
+        "notes": "Letting agent fees at 12%"
+      },
+      {
+        "expenseType": "ServiceCharge",
+        "amount": 1800.00,
+        "frequency": "Annual",
+        "taxDeductible": true,
+        "notes": "Building service charge"
+      },
+      {
+        "expenseType": "GroundRent",
+        "amount": 250.00,
+        "frequency": "Annual",
+        "taxDeductible": true,
+        "notes": "Annual ground rent"
+      },
+      {
+        "expenseType": "Insurance",
+        "amount": 450.00,
+        "frequency": "Annual",
+        "taxDeductible": true,
+        "notes": "Landlord building and contents insurance"
+      },
+      {
+        "expenseType": "Maintenance",
+        "amount": 800.00,
+        "frequency": "Annual",
+        "taxDeductible": true,
+        "notes": "Average annual maintenance and repairs"
+      },
+      {
+        "expenseType": "SafetyCertificates",
+        "amount": 350.00,
+        "frequency": "Annual",
+        "taxDeductible": true,
+        "notes": "Gas safety, EPC, EICR certificates"
+      }
+    ],
+    "totalAnnualExpenses": 13526.00,
+    "totalTaxDeductibleExpenses": 13526.00,
+    "monthlyExpenses": 1127.17
+  },
+  "rentalYield": {
+    "grossAnnualRent": 19800.00,
+    "currentPropertyValue": 345000.00,
+    "grossYieldPercentage": 5.74,
+    "totalAnnualExpenses": 13526.00,
+    "netAnnualIncome": 6274.00,
+    "netYieldPercentage": 1.82,
+    "marketAverageYield": 5.2,
+    "yieldVsMarket": 0.54,
+    "yieldRating": "AboveAverage",
+    "cashOnCashReturn": 11.01,
+    "yieldTrend": {
+      "currentYear": 5.74,
+      "previousYear": 5.52,
+      "twoYearsAgo": 5.31,
+      "trend": "Increasing"
+    }
+  },
+  "taxInformation": {
+    "isPrimaryResidence": false,
+    "hasEverBeenPrimaryResidence": false,
+    "primaryResidencePeriod": null,
+    "eligibleForPrivateResidenceRelief": false,
+    "eligibleForLettingRelief": false,
+    "lettingReliefAmount": 0.00,
+    "wearAndTearAllowanceClaimed": false,
+    "capitalAllowancesClaimed": false,
+    "stampDutyRatePaid": "HigherRate",
+    "stampDutyAmount": 8500.00,
+    "estimatedCGTLiability": {
+      "potentialGain": 60000.00,
+      "deductions": 10850.00,
+      "taxableGain": 49150.00,
+      "cgtRate": 28.0,
+      "estimatedTax": 13762.00,
+      "note": "Assumes higher rate taxpayer, no PRR or letting relief"
+    }
+  },
+  "capitalGainsTaxCalculation": {
+    "disposalValue": 345000.00,
+    "purchaseCost": 285000.00,
+    "stampDuty": 8500.00,
+    "legalFees": 1500.00,
+    "improvementCosts": 0.00,
+    "disposalCosts": 3450.00,
+    "allowableDeductions": 13450.00,
+    "grossGain": 60000.00,
+    "netGain": 46550.00,
+    "annualCGTAllowance": 12300.00,
+    "taxableGain": 34250.00,
+    "cgtRateBasic": 18.0,
+    "cgtRateHigher": 28.0,
+    "estimatedCGTBasicRate": 6165.00,
+    "estimatedCGTHigherRate": 9590.00,
+    "privateResidenceRelief": 0.00,
+    "lettingRelief": 0.00,
+    "note": "Actual CGT liability depends on taxpayer's overall income and allowances used"
+  },
+  "performanceMetrics": {
+    "totalInvestment": 295850.00,
+    "currentValue": 345000.00,
+    "currentEquity": 146550.00,
+    "totalEquityReturn": 49700.00,
+    "equityReturnPercentage": 16.8,
+    "annualizedReturn": 2.4,
+    "mortgagePaidDown": 29550.00,
+    "capitalAppreciation": 60000.00,
+    "totalRentalIncomeReceived": 124200.00,
+    "totalExpensesPaid": 82824.00,
+    "netRentalIncome": 41376.00,
+    "totalReturn": 130926.00,
+    "totalReturnPercentage": 44.3,
+    "irr": 8.7,
+    "returnOnInvestment": {
+      "capitalGain": 60000.00,
+      "rentalProfit": 41376.00,
+      "mortgageReduction": 29550.00,
+      "totalProfit": 130926.00,
+      "profitPercentage": 44.3
+    }
+  },
+  "marketComparison": {
+    "localAreaAveragePricePerSqFt": 450.00,
+    "propertyPricePerSqFt": 460.00,
+    "priceVsArea": 2.22,
+    "localAreaAverageYield": 5.2,
+    "propertyYield": 5.74,
+    "yieldVsArea": 10.38,
+    "localAreaCapitalGrowth1Year": 2.5,
+    "propertyCapitalGrowth1Year": 2.99,
+    "performanceVsArea": "AboveAverage"
+  },
+  "notes": "Buy-to-let property purchased in 2019. Currently let on assured shorthold tenancy. Property has increased in value by approximately 21% since purchase. Good rental yield area. Tenant has been reliable and rent reviews have been accepted without issue.",
+  "createdDate": "2026-02-17T10:00:00Z",
+  "createdBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "email": "jane.adviser@financialservices.com"
+  },
+  "lastModifiedDate": "2026-02-17T10:00:00Z",
+  "lastModifiedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "email": "jane.adviser@financialservices.com"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-789" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" },
+    "valuations": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/valuations" },
+    "add-valuation": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/valuations", "method": "POST" },
+    "ltv": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/ltv" },
+    "rental-yield": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/rental-yield" },
+    "capital-gains": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/capital-gains" },
+    "equity": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/equity" },
+    "expenses": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/expenses" },
+    "add-expense": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/expenses", "method": "POST" },
+    "update": { "href": "/api/v1/factfinds/ff-456/properties/prop-789", "method": "PUT" },
+    "delete": { "href": "/api/v1/factfinds/ff-456/properties/prop-789", "method": "DELETE" }
+  }
+}
+```
+
+**HTTP Status Codes:**
+- `200 OK` - Property retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Property or FactFind not found
+
+---
+
+##### 9.4.2.4 Add Property Valuation
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/properties/{id}/valuations`
+
+**Description:** Add a new valuation to the property's valuation history. Supports multiple valuation types including professional valuations, estate agent valuations, and online estimates.
+
+**Request Body:**
+
+```json
+{
+  "valuationDate": "2026-02-17",
+  "value": 350000.00,
+  "valuationType": "Professional",
+  "valuationProvider": "RICS Chartered Surveyor",
+  "valuerDetails": {
+    "name": "Thompson Valuation Services Ltd",
+    "valuerName": "Michael Thompson MRICS",
+    "ricsMember": true,
+    "ricsMembershipNumber": "1234567",
+    "contactEmail": "m.thompson@thompsonvaluations.co.uk",
+    "contactPhone": "0161 555 0123"
+  },
+  "valuationReference": "TVS-2026-456789",
+  "valuationReportUrl": "https://secure-docs.factfind.com/valuations/tvs-2026-456789.pdf",
+  "valuationMethod": "ComparisonMethod",
+  "valuationPurpose": "RemortgageApplication",
+  "valuationRange": {
+    "lower": 345000.00,
+    "upper": 355000.00
+  },
+  "confidenceLevel": "High",
+  "marketConditions": "Stable",
+  "comparableProperties": [
+    {
+      "address": "Flat 8, Riverside Apartments, 45 Thames Street",
+      "soldDate": "2025-11-15",
+      "soldPrice": 342000.00,
+      "bedrooms": 2,
+      "propertySize": 720
+    },
+    {
+      "address": "Flat 15, Waterside Court, 52 Canal Street",
+      "soldDate": "2025-12-10",
+      "soldPrice": 355000.00,
+      "bedrooms": 2,
+      "propertySize": 780
+    },
+    {
+      "address": "Flat 6, Harborview, 18 Dockside Road",
+      "soldDate": "2026-01-05",
+      "soldPrice": 348000.00,
+      "bedrooms": 2,
+      "propertySize": 760
+    }
+  ],
+  "marketInsights": "Property values in this area have shown steady growth of 3-4% annually. Recent sales of similar 2-bed apartments range from £342k to £355k. Strong demand from professionals working in city center. New transport links have improved accessibility.",
+  "notes": "Professional RICS valuation conducted for remortgage application. Property in good condition with recent kitchen refurbishment. Comparable sales support current valuation.",
+  "instructedBy": "adv-789",
+  "instructedDate": "2026-02-10",
+  "reportDeliveredDate": "2026-02-17",
+  "validityPeriod": 90,
+  "fees": {
+    "valuationFee": 450.00,
+    "adminFee": 50.00,
+    "totalFee": 500.00
+  }
+}
+```
+
+**Valuation Type Values:**
+- `Purchase` - Original purchase price
+- `Professional` - RICS qualified surveyor valuation
+- `EstateAgent` - Estate agent market appraisal
+- `Online` - Online valuation tool (Zoopla, Rightmove)
+- `SelfAssessed` - Owner's own estimate
+- `Mortgage` - Lender's valuation for mortgage
+- `Insurance` - Insurance rebuild value
+- `Probate` - Probate valuation for estate
+- `TaxAuthority` - HMRC or council valuation
+
+**Valuation Method Values:**
+- `ComparisonMethod` - Sales comparison approach
+- `InvestmentMethod` - Income capitalization approach
+- `ResidualMethod` - Development residual approach
+- `CostMethod` - Depreciated replacement cost
+- `ProfitsMethod` - Trading potential approach
+
+**Valuation Purpose Values:**
+- `MortgageApplication` - Mortgage lending purposes
+- `RemortgageApplication` - Remortgage purposes
+- `PortfolioReview` - Portfolio valuation review
+- `Insurance` - Insurance coverage purposes
+- `TaxPlanning` - Capital gains or IHT planning
+- `Probate` - Estate administration
+- `Divorce` - Matrimonial proceedings
+- `GeneralAdvice` - General financial planning
+
+**Market Conditions Values:**
+- `Strong` - Strong buyer demand, rising prices
+- `Stable` - Balanced market conditions
+- `Weak` - Low demand, falling prices
+- `Volatile` - Uncertain market conditions
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/properties/prop-789/valuations/val-123
+```
+
+```json
+{
+  "id": "val-123",
+  "propertyId": "prop-789",
+  "factfindId": "ff-456",
+  "valuationDate": "2026-02-17",
+  "value": 350000.00,
+  "currency": "GBP",
+  "valuationType": "Professional",
+  "valuationProvider": "RICS Chartered Surveyor",
+  "valuerDetails": {
+    "name": "Thompson Valuation Services Ltd",
+    "valuerName": "Michael Thompson MRICS",
+    "ricsMember": true,
+    "ricsMembershipNumber": "1234567",
+    "contactEmail": "m.thompson@thompsonvaluations.co.uk",
+    "contactPhone": "0161 555 0123"
+  },
+  "valuationReference": "TVS-2026-456789",
+  "valuationReportUrl": "https://secure-docs.factfind.com/valuations/tvs-2026-456789.pdf",
+  "valuationMethod": "ComparisonMethod",
+  "valuationPurpose": "RemortgageApplication",
+  "valuationRange": {
+    "lower": 345000.00,
+    "upper": 355000.00,
+    "variance": 10000.00,
+    "variancePercentage": 2.86
+  },
+  "confidenceLevel": "High",
+  "marketConditions": "Stable",
+  "comparableProperties": [
+    {
+      "address": "Flat 8, Riverside Apartments, 45 Thames Street",
+      "soldDate": "2025-11-15",
+      "soldPrice": 342000.00,
+      "bedrooms": 2,
+      "propertySize": 720,
+      "pricePerSqFt": 475.00
+    },
+    {
+      "address": "Flat 15, Waterside Court, 52 Canal Street",
+      "soldDate": "2025-12-10",
+      "soldPrice": 355000.00,
+      "bedrooms": 2,
+      "propertySize": 780,
+      "pricePerSqFt": 455.13
+    },
+    {
+      "address": "Flat 6, Harborview, 18 Dockside Road",
+      "soldDate": "2026-01-05",
+      "soldPrice": 348000.00,
+      "bedrooms": 2,
+      "propertySize": 760,
+      "pricePerSqFt": 457.89
+    }
+  ],
+  "comparablesAverage": 348333.33,
+  "marketInsights": "Property values in this area have shown steady growth of 3-4% annually. Recent sales of similar 2-bed apartments range from £342k to £355k. Strong demand from professionals working in city center. New transport links have improved accessibility.",
+  "changeFromPreviousValuation": {
+    "previousValue": 345000.00,
+    "previousDate": "2026-01-15",
+    "changeAmount": 5000.00,
+    "changePercentage": 1.45,
+    "daysBetween": 33,
+    "annualizedGrowthRate": 16.5
+  },
+  "changeFromPurchase": {
+    "purchasePrice": 285000.00,
+    "purchaseDate": "2019-06-15",
+    "changeAmount": 65000.00,
+    "changePercentage": 22.81,
+    "yearsOwned": 6.67,
+    "annualizedGrowthRate": 3.21
+  },
+  "impactOnFinancials": {
+    "newLTV": 56.7,
+    "previousLTV": 57.5,
+    "ltvImprovement": 0.8,
+    "newEquity": 151550.00,
+    "previousEquity": 146550.00,
+    "equityIncrease": 5000.00,
+    "newEquityPercentage": 43.3
+  },
+  "notes": "Professional RICS valuation conducted for remortgage application. Property in good condition with recent kitchen refurbishment. Comparable sales support current valuation.",
+  "instructedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser"
+  },
+  "instructedDate": "2026-02-10",
+  "reportDeliveredDate": "2026-02-17",
+  "turnaroundDays": 7,
+  "validUntil": "2026-05-18",
+  "validityPeriod": 90,
+  "fees": {
+    "valuationFee": 450.00,
+    "adminFee": 50.00,
+    "totalFee": 500.00
+  },
+  "createdDate": "2026-02-17T14:30:00Z",
+  "createdBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/valuations/val-123" },
+    "property": { "href": "/api/v1/factfinds/ff-456/properties/prop-789" },
+    "valuation-report": { "href": "https://secure-docs.factfind.com/valuations/tvs-2026-456789.pdf" },
+    "valuation-history": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/valuations" }
+  }
+}
+```
+
+**Validation Rules:**
+- Valuation date cannot be in the future
+- Valuation value must be positive
+- RICS valuations require valuer RICS membership number
+- Professional valuations should include valuation report
+- Valuation range (if provided) must include the main value
+- Comparable properties should be from last 6 months for best accuracy
+- Valuation validity period typically 90 days for mortgage purposes
+
+**HTTP Status Codes:**
+- `201 Created` - Valuation created successfully
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Property not found
+- `422 Unprocessable Entity` - Validation failed
+
+---
+
+##### 9.4.2.5 Calculate LTV (Loan-to-Value)
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/properties/{id}/ltv`
+
+**Description:** Calculate comprehensive Loan-to-Value ratio across all mortgages secured against the property. Provides LTV analysis, equity position, and recommendations.
+
+**Query Parameters:**
+- `valuationDate` - Use specific valuation date (default: latest)
+- `includeProjections` - Include future LTV projections (default: false)
+
+**Response:**
+
+```json
+{
+  "propertyId": "prop-789",
+  "propertyAddress": "Flat 12, Riverside Apartments, 45 Thames Street, Manchester, M1 2AB",
+  "calculationDate": "2026-02-17T14:30:00Z",
+  "currentValuation": {
+    "value": 350000.00,
+    "valuationDate": "2026-02-17",
+    "valuationType": "Professional",
+    "valuationProvider": "RICS Chartered Surveyor",
+    "valuationAge": 0,
+    "valuationConfidence": "High"
+  },
+  "mortgages": [
+    {
+      "arrangementId": "arr-mortgage-789",
+      "mortgageProvider": "Nationwide Building Society",
+      "accountNumber": "****5678",
+      "mortgageType": "BuyToLetInterestOnly",
+      "outstandingBalance": 198450.00,
+      "originalAmount": 228000.00,
+      "interestRate": 3.89,
+      "monthlyPayment": 1245.00,
+      "startDate": "2019-06-15",
+      "endDate": "2029-06-15",
+      "yearsRemaining": 3.4,
+      "mortgageLTV": 56.7,
+      "priority": "First"
+    }
+  ],
+  "totalMortgageBalance": 198450.00,
+  "totalMonthlyPayments": 1245.00,
+  "totalAnnualPayments": 14940.00,
+  "ltvAnalysis": {
+    "currentLTV": 56.7,
+    "ltvBand": "51-75%",
+    "ltvRating": "Good",
+    "ltvStatus": "Healthy",
+    "purchaseLTV": 80.0,
+    "ltvImprovement": 23.3,
+    "ltvChangeDescription": "LTV has improved significantly from 80% to 56.7% due to property appreciation and mortgage paydown"
+  },
+  "equityPosition": {
+    "currentValue": 350000.00,
+    "totalMortgages": 198450.00,
+    "equityAmount": 151550.00,
+    "equityPercentage": 43.3,
+    "originalEquity": 57000.00,
+    "equityGrowth": 94550.00,
+    "equityGrowthPercentage": 165.9,
+    "equityGrowthSources": {
+      "capitalAppreciation": 65000.00,
+      "mortgageReduction": 29550.00,
+      "improvements": 0.00
+    }
+  },
+  "ltvThresholds": {
+    "excellent": {
+      "threshold": 50.0,
+      "status": "Not Met",
+      "description": "Excellent LTV - below 50%",
+      "benefit": "Access to best mortgage rates"
+    },
+    "good": {
+      "threshold": 75.0,
+      "status": "Met",
+      "description": "Good LTV - below 75%",
+      "benefit": "Access to competitive mortgage rates"
+    },
+    "standard": {
+      "threshold": 80.0,
+      "status": "Met",
+      "description": "Standard LTV - below 80%",
+      "benefit": "Good range of mortgage products available"
+    },
+    "high": {
+      "threshold": 90.0,
+      "status": "Met",
+      "description": "High LTV - 80-90%",
+      "benefit": "Limited mortgage products, higher rates"
+    },
+    "veryHigh": {
+      "threshold": 95.0,
+      "status": "Met",
+      "description": "Very High LTV - 90-95%",
+      "benefit": "Very limited products, highest rates"
+    },
+    "excessive": {
+      "threshold": 100.0,
+      "status": "Met",
+      "description": "Excessive LTV - above 95%",
+      "benefit": "Negative equity risk, remortgage difficult"
+    }
+  },
+  "currentThreshold": "good",
+  "riskAssessment": {
+    "ltvRisk": "Low",
+    "negativeEquityRisk": "None",
+    "remortgageProspects": "Excellent",
+    "furtherBorrowingCapacity": {
+      "at75LTV": 64050.00,
+      "at80LTV": 81550.00,
+      "at85LTV": 99050.00,
+      "recommendation": "Significant equity available for further borrowing or remortgage"
+    },
+    "stressTesting": {
+      "valueDropToReach75LTV": -32000.00,
+      "valueDropPercentage": -9.14,
+      "valueDropToReach80LTV": -57000.00,
+      "valueDropPercentageFor80": -16.29,
+      "valueDropToNegativeEquity": -151550.00,
+      "valueDropPercentageNegativeEquity": -43.3,
+      "resilience": "High - Property can withstand significant value decline before reaching concerning LTV levels"
+    }
+  },
+  "marketContext": {
+    "averageLTVForPropertyType": 65.0,
+    "clientLTVVsAverage": -8.3,
+    "clientPosition": "Better than average",
+    "firstTimeBuyerAverageLTV": 85.0,
+    "remortgageAverageLTV": 60.0
+  },
+  "recommendations": [
+    {
+      "priority": "High",
+      "recommendation": "Consider remortgaging to access better rates",
+      "rationale": "Current LTV of 56.7% provides access to highly competitive mortgage rates. Could save approximately £150-200/month on mortgage payments.",
+      "potentialBenefit": "£1,800-2,400 annual saving",
+      "action": "Review mortgage market for better deals"
+    },
+    {
+      "priority": "Medium",
+      "recommendation": "Equity release opportunity",
+      "rationale": "£64,050 available to borrow while maintaining 75% LTV. Could be used for property improvements, investment diversification, or portfolio expansion.",
+      "potentialBenefit": "Access to equity for investment",
+      "action": "Consider further advance or remortgage with equity release"
+    },
+    {
+      "priority": "Low",
+      "recommendation": "Monitor property valuations",
+      "rationale": "Continue obtaining annual valuations to track equity growth and ensure LTV remains healthy.",
+      "potentialBenefit": "Maintain awareness of financial position",
+      "action": "Schedule next valuation in 12 months"
+    }
+  ],
+  "ltvHistory": [
+    {
+      "date": "2026-02-17",
+      "value": 350000.00,
+      "mortgageBalance": 198450.00,
+      "ltv": 56.7,
+      "equity": 151550.00
+    },
+    {
+      "date": "2026-01-15",
+      "value": 345000.00,
+      "mortgageBalance": 199200.00,
+      "ltv": 57.7,
+      "equity": 145800.00
+    },
+    {
+      "date": "2025-01-10",
+      "value": 335000.00,
+      "mortgageBalance": 207500.00,
+      "ltv": 61.9,
+      "equity": 127500.00
+    },
+    {
+      "date": "2024-02-01",
+      "value": 320000.00,
+      "mortgageBalance": 215800.00,
+      "ltv": 67.4,
+      "equity": 104200.00
+    },
+    {
+      "date": "2022-06-15",
+      "value": 305000.00,
+      "mortgageBalance": 224100.00,
+      "ltv": 73.5,
+      "equity": 80900.00
+    },
+    {
+      "date": "2019-06-15",
+      "value": 285000.00,
+      "mortgageBalance": 228000.00,
+      "ltv": 80.0,
+      "equity": 57000.00
+    }
+  ],
+  "ltvTrend": {
+    "direction": "Improving",
+    "averageAnnualImprovement": 3.5,
+    "projectedLTVIn1Year": 53.2,
+    "projectedLTVIn3Years": 46.4,
+    "projectedLTVIn5Years": 39.8,
+    "assumptions": "Based on 3% annual property growth and current mortgage payments"
+  },
+  "calculationMetadata": {
+    "calculationMethod": "Current mortgage balance / Current property value * 100",
+    "dataSource": "Latest property valuation and mortgage statements",
+    "lastUpdated": "2026-02-17T14:30:00Z",
+    "nextUpdateRecommended": "2027-02-17"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/ltv" },
+    "property": { "href": "/api/v1/factfinds/ff-456/properties/prop-789" },
+    "valuations": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/valuations" },
+    "mortgages": { "href": "/api/v1/factfinds/ff-456/arrangements?type=Mortgage&propertyId=prop-789" },
+    "equity": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/equity" }
+  }
+}
+```
+
+**LTV Bands:**
+- `0-50%` - Excellent (best mortgage rates available)
+- `51-75%` - Good (competitive rates)
+- `76-80%` - Standard (good product range)
+- `81-90%` - High (limited products, higher rates)
+- `91-95%` - Very High (very limited options)
+- `96-100%` - Excessive (high risk)
+- `>100%` - Negative Equity (remortgage very difficult)
+
+**HTTP Status Codes:**
+- `200 OK` - LTV calculated successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Property not found
+
+---
+
+##### 9.4.2.6 Calculate Rental Yield
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/properties/{id}/rental-yield`
+
+**Description:** Calculate comprehensive rental yield analysis including gross yield, net yield, cash-on-cash return, and comparison to market averages. For buy-to-let properties only.
+
+**Query Parameters:**
+- `includeProjections` - Include future yield projections (default: false)
+- `includeExpenseBreakdown` - Include detailed expense analysis (default: true)
+
+**Response:**
+
+```json
+{
+  "propertyId": "prop-789",
+  "propertyAddress": "Flat 12, Riverside Apartments, 45 Thames Street, Manchester, M1 2AB",
+  "propertyType": "BuyToLet",
+  "calculationDate": "2026-02-17T14:30:00Z",
+  "calculationPeriod": "Annual",
+  "rentalIncome": {
+    "monthlyRent": 1650.00,
+    "annualRent": 19800.00,
+    "rentFrequency": "Monthly",
+    "tenancyStatus": "Occupied",
+    "currentTenant": "Mr. David Jones",
+    "tenancyStartDate": "2023-08-01",
+    "tenancyEndDate": "2024-07-31",
+    "nextRentReview": "2024-08-01",
+    "proposedRentIncrease": 50.00,
+    "proposedNewRent": 1700.00,
+    "proposedIncreasePercentage": 3.03
+  },
+  "propertyValuation": {
+    "currentValue": 350000.00,
+    "valuationDate": "2026-02-17",
+    "valuationType": "Professional"
+  },
+  "grossYieldCalculation": {
+    "formula": "(Annual Rent / Property Value) * 100",
+    "annualRent": 19800.00,
+    "propertyValue": 350000.00,
+    "grossYieldPercentage": 5.66,
+    "grossYieldRating": "Good",
+    "marketAverageGrossYield": 5.2,
+    "differenceFromMarket": 0.46,
+    "performanceVsMarket": "Above Average"
+  },
+  "expenses": {
+    "mortgagePayments": {
+      "type": "InterestOnly",
+      "annualAmount": 14940.00,
+      "interestRate": 3.89,
+      "taxDeductible": true,
+      "notes": "Interest-only payments - principal not repaid"
+    },
+    "managementFees": {
+      "annualAmount": 2376.00,
+      "percentage": 12.0,
+      "provider": "Manchester Property Lettings Ltd",
+      "taxDeductible": true
+    },
+    "serviceCharge": {
+      "annualAmount": 1800.00,
+      "taxDeductible": true,
+      "notes": "Building maintenance and communal areas"
+    },
+    "groundRent": {
+      "annualAmount": 250.00,
+      "taxDeductible": true,
+      "notes": "Annual ground rent - leasehold property"
+    },
+    "insurance": {
+      "annualAmount": 450.00,
+      "type": "LandlordInsurance",
+      "taxDeductible": true,
+      "notes": "Building and contents insurance"
+    },
+    "maintenance": {
+      "annualAmount": 800.00,
+      "taxDeductible": true,
+      "notes": "Average annual maintenance and repairs"
+    },
+    "safetyCertificates": {
+      "annualAmount": 350.00,
+      "taxDeductible": true,
+      "notes": "Gas safety, EPC, EICR certificates"
+    },
+    "voidPeriods": {
+      "annualAmount": 0.00,
+      "daysVoid": 0,
+      "notes": "No void periods in last 12 months"
+    },
+    "totalAnnualExpenses": 20966.00,
+    "totalTaxDeductibleExpenses": 20966.00,
+    "expenseRatio": 105.9
+  },
+  "netYieldCalculation": {
+    "formula": "((Annual Rent - Annual Expenses) / Property Value) * 100",
+    "annualRent": 19800.00,
+    "annualExpenses": 20966.00,
+    "netAnnualIncome": -1166.00,
+    "propertyValue": 350000.00,
+    "netYieldPercentage": -0.33,
+    "netYieldRating": "Poor",
+    "marketAverageNetYield": 2.1,
+    "differenceFromMarket": -2.43,
+    "performanceVsMarket": "Below Average",
+    "notes": "Negative net yield due to high expenses. However, property has strong capital growth and mortgage interest will reduce over time."
+  },
+  "cashOnCashReturn": {
+    "formula": "(Net Annual Income / Initial Investment) * 100",
+    "initialInvestment": 57000.00,
+    "netAnnualIncome": -1166.00,
+    "cashOnCashReturn": -2.05,
+    "notes": "Negative cash flow currently, but strong capital appreciation offsets this"
+  },
+  "yieldComparison": {
+    "nationalAverageYield": 4.8,
+    "regionalAverageYield": 5.2,
+    "localAreaAverageYield": 5.5,
+    "clientGrossYield": 5.66,
+    "clientNetYield": -0.33,
+    "comparisonSummary": "Gross yield slightly above local average. Net yield impacted by high mortgage costs. Consider remortgaging to improve net yield."
+  },
+  "taxConsiderations": {
+    "rentalIncome": 19800.00,
+    "allowableExpenses": 20966.00,
+    "taxableProfit": -1166.00,
+    "taxPosition": "Loss",
+    "mortgageInterestRestriction": {
+      "mortgageInterest": 7500.00,
+      "restrictionApplies": true,
+      "basicRateTaxRelief": 1500.00,
+      "notes": "Since April 2020, mortgage interest no longer fully deductible. Only 20% tax credit available."
+    },
+    "adjustedTaxableProfit": 6334.00,
+    "estimatedTaxLiability": {
+      "basicRate": 1266.80,
+      "higherRate": 2533.60,
+      "notes": "Actual tax depends on individual's total income and tax position"
+    },
+    "afterTaxNetIncome": {
+      "basicRateTaxpayer": -2432.80,
+      "higherRateTaxpayer": -3699.60
+    },
+    "afterTaxYield": {
+      "basicRateTaxpayer": -0.70,
+      "higherRateTaxpayer": -1.06
+    }
+  },
+  "profitabilityAnalysis": {
+    "monthlyIncome": 1650.00,
+    "monthlyExpenses": 1747.17,
+    "monthlyCashFlow": -97.17,
+    "annualCashFlow": -1166.00,
+    "cashFlowStatus": "Negative",
+    "capitalGrowth": {
+      "purchasePrice": 285000.00,
+      "currentValue": 350000.00,
+      "capitalGain": 65000.00,
+      "capitalGainPercentage": 22.81,
+      "annualizedCapitalGrowth": 3.21
+    },
+    "totalReturn": {
+      "rentalIncome": -1166.00,
+      "capitalGrowth": 65000.00,
+      "mortgageReduction": 29550.00,
+      "totalAnnualReturn": 93384.00,
+      "totalReturnPercentage": 163.8,
+      "annualizedTotalReturn": 15.8
+    },
+    "investmentViability": "Good",
+    "viabilityNotes": "Despite negative cash flow, strong capital appreciation and mortgage reduction make this a viable long-term investment. Consider refinancing to improve cash flow."
+  },
+  "recommendations": [
+    {
+      "priority": "High",
+      "recommendation": "Remortgage to improve net yield",
+      "rationale": "Current LTV of 56.7% allows access to better mortgage rates. Reducing interest rate from 3.89% to 3.0% would save £2,000/year, turning negative yield positive.",
+      "potentialImpact": {
+        "currentAnnualExpenses": 20966.00,
+        "projectedAnnualExpenses": 18966.00,
+        "annualSaving": 2000.00,
+        "newNetYield": 0.24,
+        "improvement": 0.57
+      },
+      "action": "Research remortgage options"
+    },
+    {
+      "priority": "High",
+      "recommendation": "Rent increase at next review",
+      "rationale": "Proposed rent increase to £1,700/month (3%) is below market rate. Local comparables show similar properties renting for £1,750-1,800/month.",
+      "potentialImpact": {
+        "currentAnnualRent": 19800.00,
+        "proposedAnnualRent": 20400.00,
+        "annualIncrease": 600.00,
+        "newGrossYield": 5.83,
+        "newNetYield": -0.16,
+        "improvement": 0.17
+      },
+      "action": "Issue rent increase notice for next review"
+    },
+    {
+      "priority": "Medium",
+      "recommendation": "Review management fees",
+      "rationale": "Letting agent charges 12% which is above market average of 10%. Potential saving of £396/year.",
+      "potentialImpact": {
+        "currentManagementFees": 2376.00,
+        "marketAverageFees": 1980.00,
+        "potentialSaving": 396.00
+      },
+      "action": "Research alternative letting agents or negotiate fee reduction"
+    },
+    {
+      "priority": "Low",
+      "recommendation": "Build maintenance reserve",
+      "rationale": "Property is 11 years old. Major maintenance items may be needed in next 5-10 years (boiler, appliances, decorating).",
+      "potentialImpact": {
+        "recommendedReserve": 500.00,
+        "notes": "£500/year reserve fund for future maintenance"
+      },
+      "action": "Set aside monthly reserve for future expenses"
+    }
+  ],
+  "yieldTrend": {
+    "historical": [
+      {
+        "year": 2026,
+        "grossYield": 5.66,
+        "netYield": -0.33
+      },
+      {
+        "year": 2025,
+        "grossYield": 5.91,
+        "netYield": 0.24
+      },
+      {
+        "year": 2024,
+        "grossYield": 6.19,
+        "netYield": 0.94
+      },
+      {
+        "year": 2023,
+        "grossYield": 6.23,
+        "netYield": 1.15
+      }
+    ],
+    "trendDirection": "Declining",
+    "trendReason": "Property value growth outpacing rent increases, combined with rising mortgage costs",
+    "projectedYield3Years": {
+      "grossYield": 5.45,
+      "netYield": 0.12,
+      "assumptions": "3% annual rent increases, 3% annual property value growth, remortgage at 3.0%"
+    }
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/rental-yield" },
+    "property": { "href": "/api/v1/factfinds/ff-456/properties/prop-789" },
+    "expenses": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/expenses" },
+    "ltv": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/ltv" },
+    "capital-gains": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/capital-gains" }
+  }
+}
+```
+
+**Yield Rating Bands:**
+- **Gross Yield:**
+  - Excellent: > 7%
+  - Good: 5-7%
+  - Average: 3-5%
+  - Poor: < 3%
+- **Net Yield:**
+  - Excellent: > 4%
+  - Good: 2-4%
+  - Average: 0-2%
+  - Poor: < 0%
+
+**HTTP Status Codes:**
+- `200 OK` - Yield calculated successfully
+- `400 Bad Request` - Property is not buy-to-let type
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Property not found
+
+---
+
+##### 9.4.2.7 Calculate Capital Gains Tax
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/properties/{id}/capital-gains`
+
+**Description:** Calculate comprehensive Capital Gains Tax (CGT) liability on property disposal, including Private Residence Relief (PRR), Letting Relief, and UK tax regulations.
+
+**Query Parameters:**
+- `disposalPrice` - Hypothetical disposal price (default: current valuation)
+- `disposalDate` - Hypothetical disposal date (default: today)
+- `disposalCosts` - Estimated selling costs (default: 1% of disposal price)
+- `includeScenarios` - Include multiple disposal scenarios (default: false)
+
+**Response:**
+
+```json
+{
+  "propertyId": "prop-789",
+  "propertyAddress": "Flat 12, Riverside Apartments, 45 Thames Street, Manchester, M1 2AB",
+  "propertyType": "BuyToLet",
+  "calculationDate": "2026-02-17T14:30:00Z",
+  "taxYear": "2025/26",
+  "disposal": {
+    "disposalPrice": 350000.00,
+    "disposalDate": "2026-02-17",
+    "disposalMethod": "OpenMarketSale",
+    "disposalCosts": {
+      "estateAgentFees": 2800.00,
+      "legalFees": 1500.00,
+      "epcAndOtherCerts": 150.00,
+      "totalDisposalCosts": 4450.00
+    }
+  },
+  "acquisition": {
+    "purchasePrice": 285000.00,
+    "purchaseDate": "2019-06-15",
+    "stampDutyLandTax": 8500.00,
+    "legalFees": 1500.00,
+    "surveyFees": 600.00,
+    "otherAcquisitionCosts": 250.00,
+    "totalAcquisitionCosts": 10850.00
+  },
+  "improvements": {
+    "capitalImprovements": [
+      {
+        "description": "Kitchen refurbishment",
+        "date": "2023-03-15",
+        "cost": 8500.00,
+        "isCapitalImprovement": true,
+        "notes": "Full kitchen replacement qualifies as capital improvement"
+      }
+    ],
+    "totalImprovementCosts": 8500.00,
+    "repairs": [
+      {
+        "description": "Boiler repair",
+        "date": "2024-06-10",
+        "cost": 450.00,
+        "isCapitalImprovement": false,
+        "notes": "Repairs not allowable for CGT"
+      }
+    ],
+    "totalRepairCosts": 450.00
+  },
+  "gainCalculation": {
+    "disposalProceeds": 350000.00,
+    "lessDisposalCosts": 4450.00,
+    "netDisposalProceeds": 345550.00,
+    "acquisitionCost": 285000.00,
+    "lessAcquisitionCosts": 10850.00,
+    "lessImprovementCosts": 8500.00,
+    "totalAllowableDeductions": 19350.00,
+    "totalCostBase": 304350.00,
+    "grossGain": 41200.00,
+    "formula": "Net Disposal Proceeds - Total Cost Base"
+  },
+  "reliefs": {
+    "privateResidenceRelief": {
+      "eligible": false,
+      "periodOfOwnership": {
+        "totalMonths": 80,
+        "residenceMonths": 0,
+        "absenceMonths": 80,
+        "lettingMonths": 42
+      },
+      "prr Amount": 0.00,
+      "finalPeriodExemption": 0.00,
+      "notes": "Property never used as main residence. No PRR available."
+    },
+    "lettingRelief": {
+      "eligible": false,
+      "maxLettingRelief": 40000.00,
+      "actualLettingRelief": 0.00,
+      "notes": "Letting relief only available if PRR claimed. Not applicable here."
+    },
+    "totalReliefs": 0.00
+  },
+  "taxableGain": {
+    "grossGain": 41200.00,
+    "lessReliefs": 0.00,
+    "gainAfterReliefs": 41200.00,
+    "annualExemptAmount": 12300.00,
+    "taxableGain": 28900.00,
+    "taxYear": "2025/26"
+  },
+  "cgtCalculation": {
+    "taxableGain": 28900.00,
+    "cgtRates": {
+      "basicRate": 18.0,
+      "higherAdditionalRate": 28.0,
+      "notes": "Residential property CGT rates apply (18%/28% vs 10%/20% for other assets)"
+    },
+    "scenarios": [
+      {
+        "taxpayerType": "BasicRateTaxpayer",
+        "applicableRate": 18.0,
+        "cgtLiability": 5202.00,
+        "effectiveTaxRate": 12.6,
+        "notes": "Basic rate taxpayer - 18% CGT on residential property"
+      },
+      {
+        "taxpayerType": "HigherRateTaxpayer",
+        "applicableRate": 28.0,
+        "cgtLiability": 8092.00,
+        "effectiveTaxRate": 19.6,
+        "notes": "Higher/additional rate taxpayer - 28% CGT on residential property"
+      },
+      {
+        "taxpayerType": "SplitRate",
+        "description": "Part basic, part higher rate",
+        "basicRateBand": 37700.00,
+        "otherIncome": 30000.00,
+        "remainingBasicRate": 7700.00,
+        "taxedAtBasicRate": 7700.00,
+        "taxedAtHigherRate": 21200.00,
+        "cgtBasicRate": 1386.00,
+        "cgtHigherRate": 5936.00,
+        "totalCGT": 7322.00,
+        "effectiveTaxRate": 17.8,
+        "notes": "Taxpayer with income near basic rate threshold"
+      }
+    ],
+    "estimatedCGT": {
+      "minimum": 5202.00,
+      "maximum": 8092.00,
+      "mostLikely": 8092.00,
+      "notes": "Most buy-to-let landlords are higher rate taxpayers"
+    }
+  },
+  "netProceeds": {
+    "disposalProceeds": 350000.00,
+    "lessDisposalCosts": 4450.00,
+    "lessMortgageRepayment": 198450.00,
+    "lessEstimatedCGT": 8092.00,
+    "netProceedsToClient": 139008.00,
+    "originalInvestment": 295850.00,
+    "netProfit": -156842.00,
+    "profitPercentage": -53.0,
+    "notes": "After all costs and tax, client retains £139,008 from original £57,000 investment (143% return)"
+  },
+  "paymentDueDate": {
+    "disposalDate": "2026-02-17",
+    "taxYear": "2025/26",
+    "selfAssessmentDeadline": "2027-01-31",
+    "paymentOnAccountRequired": false,
+    "notes": "CGT payable by 31 January following end of tax year"
+  },
+  "planningOpportunities": [
+    {
+      "opportunity": "Defer disposal to next tax year",
+      "benefit": "Utilize 2026/27 CGT annual exemption (£12,300)",
+      "potentialSaving": 0.00,
+      "notes": "Already in 2025/26 tax year - not applicable"
+    },
+    {
+      "opportunity": "Transfer to spouse before sale",
+      "benefit": "Utilize both spouses' CGT annual exemptions (£24,600 total)",
+      "potentialSaving": 3444.00,
+      "feasibility": "High",
+      "notes": "Property jointly owned. Each spouse can use their £12,300 exemption"
+    },
+    {
+      "opportunity": "Hold for 12+ months",
+      "benefit": "Already held for 6.67 years - long-term holding period met",
+      "potentialSaving": 0.00,
+      "notes": "No additional benefit from longer hold period"
+    },
+    {
+      "opportunity": "Sell in tranches over multiple tax years",
+      "benefit": "Spread gain over multiple years to use annual exemptions",
+      "potentialSaving": 3444.00,
+      "feasibility": "Low",
+      "notes": "Property cannot easily be sold in tranches. Better to use spouse exemption."
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "High",
+      "recommendation": "Review ownership structure before sale",
+      "rationale": "Property jointly owned by spouses. Ensure ownership shares are structured to maximize use of both CGT annual exemptions (£24,600 total vs £12,300).",
+      "potentialSaving": 3444.00,
+      "action": "Confirm ownership shares and file separate tax returns"
+    },
+    {
+      "priority": "High",
+      "recommendation": "Document all improvement costs",
+      "rationale": "£8,500 kitchen refurbishment reduces CGT liability by £2,380. Ensure all receipts and evidence retained.",
+      "potentialSaving": 2380.00,
+      "action": "Gather all improvement invoices and receipts"
+    },
+    {
+      "priority": "Medium",
+      "recommendation": "Consider timing of sale",
+      "rationale": "No urgent need to sell. If capital gain expected to continue growing, may trigger higher CGT in future.",
+      "potentialImpact": "Monitor CGT rates and exemptions for changes",
+      "action": "Review annually"
+    },
+    {
+      "priority": "Low",
+      "recommendation": "Explore incorporation",
+      "rationale": "Holding property in limited company has different tax treatment. Corporation tax 25%, but double tax on extraction. Complex analysis required.",
+      "feasibility": "Low for existing property",
+      "notes": "Incorporation triggers CGT on transfer. Better for new acquisitions."
+    }
+  ],
+  "comparisonScenarios": [
+    {
+      "scenario": "Sell now at £350,000",
+      "netProceeds": 139008.00,
+      "cgt": 8092.00,
+      "returnOnInvestment": 143.9
+    },
+    {
+      "scenario": "Sell at £375,000 (7% growth)",
+      "netProceeds": 154558.00,
+      "cgt": 13092.00,
+      "returnOnInvestment": 171.1
+    },
+    {
+      "scenario": "Sell at £400,000 (14% growth)",
+      "netProceeds": 170108.00,
+      "cgt": 18092.00,
+      "returnOnInvestment": 198.4
+    },
+    {
+      "scenario": "Hold 3 years, sell at £380,000",
+      "assumptions": "3% annual growth, mortgage paid down to £180,000",
+      "netProceeds": 165408.00,
+      "cgt": 12592.00,
+      "additionalRentalProfit": 18000.00,
+      "totalReturn": 183408.00,
+      "returnOnInvestment": 221.8
+    }
+  ],
+  "importantNotes": [
+    "CGT rates for residential property (18%/28%) higher than other assets (10%/20%)",
+    "Annual exemption of £12,300 applies across all capital gains in tax year",
+    "CGT payable by 31 January following end of tax year",
+    "Non-residents have different CGT rules and may pay 28% regardless of income",
+    "This calculation assumes UK tax residency and excludes foreign tax implications",
+    "Actual liability depends on individual circumstances - seek professional tax advice"
+  ],
+  "calculationMetadata": {
+    "calculationDate": "2026-02-17T14:30:00Z",
+    "taxYear": "2025/26",
+    "cgtAnnualExemption2025_26": 12300.00,
+    "residentialPropertyCGTRates": {
+      "basicRate": 18.0,
+      "higherRate": 28.0
+    },
+    "dataSource": "HMRC CGT rates 2025/26",
+    "disclaimer": "This is an estimate only. Actual CGT liability may differ based on individual circumstances. Professional tax advice recommended."
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/properties/prop-789/capital-gains" },
+    "property": { "href": "/api/v1/factfinds/ff-456/properties/prop-789" },
+    "tax-planning": { "href": "/api/v1/factfinds/ff-456/tax-planning" },
+    "hmrc-guidance": { "href": "https://www.gov.uk/capital-gains-tax" }
+  }
+}
+```
+
+**CGT Rates (2025/26):**
+- **Residential Property:**
+  - Basic rate taxpayers: 18%
+  - Higher/Additional rate taxpayers: 28%
+- **Other Assets:**
+  - Basic rate taxpayers: 10%
+  - Higher/Additional rate taxpayers: 20%
+
+**Annual Exemption (2025/26):** £12,300
+
+**Private Residence Relief (PRR):**
+- Full relief for period of main residence
+- Final 9 months always exempt
+- Periods of absence may qualify in certain circumstances
+
+**Letting Relief:**
+- Maximum £40,000 per person
+- Only available if PRR claimed
+- Lesser of: PRR amount, £40,000, or gain from letting
+
+**Validation Rules:**
+- Disposal price must be positive
+- Disposal date cannot be before purchase date
+- All costs must be positive values
+- Tax year correctly identified from disposal date
+
+**HTTP Status Codes:**
+- `200 OK` - CGT calculated successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Property not found
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/validation-error",
+  "title": "Capital Gains Calculation Failed",
+  "status": 422,
+  "detail": "Disposal date cannot be before purchase date",
+  "instance": "/api/v1/factfinds/ff-456/properties/prop-789/capital-gains",
+  "errors": [
+    {
+      "field": "disposalDate",
+      "message": "Disposal date (2018-01-01) is before purchase date (2019-06-15)",
+      "rejectedValue": "2018-01-01",
+      "constraint": "afterPurchaseDate",
+      "purchaseDate": "2019-06-15"
+    }
+  ]
+}
+```
+
+---
+
+### 9.5 Equities Portfolio API
+
+**Purpose:** Track direct stock holdings, manage equity portfolios, monitor performance, and calculate capital gains for individual stock investments.
+
+**Scope:**
+- Direct stock holdings tracking with purchase history
+- Stock portfolio management and consolidation
+- Real-time and historical price tracking
+- Dividend tracking and reinvestment (DRIP)
+- Capital gains and loss tracking with tax calculations
+- Corporate actions (splits, dividends, rights issues, mergers)
+- Market data integration (LSE, NYSE, NASDAQ, etc.)
+- Section 104 holding pooling (UK tax treatment)
+- Portfolio performance metrics and analytics
+- Diversification analysis
+
+**Aggregate Root:** FactFind (equities are nested within fact find)
+
+**Regulatory Compliance:**
+- FCA Handbook - Understanding client assets
+- MiFID II - Best execution and reporting
+- HMRC Capital Gains Tax regulations
+- Section 104 Holding Rules (UK)
+- US securities regulations for US-listed stocks
+- Data Protection Act 2018 - Investment data retention
+
+#### 9.5.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/factfinds/{factfindId}/equities` | Add equity holding | `assets:write` |
+| GET | `/api/v1/factfinds/{factfindId}/equities` | List equity holdings | `assets:read` |
+| GET | `/api/v1/factfinds/{factfindId}/equities/{id}` | Get equity details | `assets:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/equities/{id}` | Update equity | `assets:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/equities/{id}` | Delete equity | `assets:write` |
+| GET | `/api/v1/factfinds/{factfindId}/equities/portfolio-performance` | Get portfolio performance | `assets:read` |
+| GET | `/api/v1/factfinds/{factfindId}/equities/{id}/dividends` | Get dividend history | `assets:read` |
+| POST | `/api/v1/factfinds/{factfindId}/equities/{id}/dividends` | Record dividend | `assets:write` |
+| GET | `/api/v1/factfinds/{factfindId}/equities/{id}/capital-gains` | Calculate capital gains | `assets:read` |
+| POST | `/api/v1/factfinds/{factfindId}/equities/{id}/corporate-actions` | Record corporate action | `assets:write` |
+| POST | `/api/v1/factfinds/{factfindId}/equities/{id}/transactions` | Add buy/sell transaction | `assets:write` |
+| GET | `/api/v1/factfinds/{factfindId}/equities/{id}/transactions` | Get transaction history | `assets:read` |
+| GET | `/api/v1/factfinds/{factfindId}/equities/{id}/performance` | Get holding performance | `assets:read` |
+
+#### 9.5.2 Key Endpoints
+
+##### 9.5.2.1 Add Equity Holding
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/equities`
+
+**Description:** Add a new equity (stock) holding to the client's portfolio. Supports stocks from major exchanges worldwide including LSE, NYSE, NASDAQ, and others.
+
+**Request Body:**
+
+```json
+{
+  "securityIdentification": {
+    "tickerSymbol": "BARC.L",
+    "isin": "GB0031348658",
+    "sedol": "3134865",
+    "cusip": null,
+    "securityName": "Barclays PLC",
+    "securityType": "OrdinaryShare",
+    "exchange": "LSE",
+    "exchangeName": "London Stock Exchange",
+    "country": "United Kingdom",
+    "sector": "Financials",
+    "industry": "Banks"
+  },
+  "initialPurchase": {
+    "purchaseDate": "2022-03-15",
+    "quantity": 5000,
+    "purchasePrice": 1.85,
+    "pricePerShare": 1.85,
+    "currency": "GBP",
+    "totalCost": 9250.00,
+    "transactionCosts": {
+      "brokerCommission": 11.99,
+      "stampDuty": 46.25,
+      "otherFees": 0.00,
+      "totalCosts": 58.24
+    },
+    "totalInvestment": 9308.24,
+    "averageCostPerShare": 1.862,
+    "broker": "Hargreaves Lansdown",
+    "accountNumber": "HL123456",
+    "orderType": "MarketOrder",
+    "notes": "Initial purchase of Barclays shares"
+  },
+  "currentHolding": {
+    "totalQuantity": 5000,
+    "averagePurchasePrice": 1.862,
+    "totalCostBasis": 9308.24,
+    "acquisitionMethod": "Purchase"
+  },
+  "valuationMethod": "MarkToMarket",
+  "ownership": {
+    "clientId": "client-123",
+    "ownerName": "John Smith",
+    "accountType": "Individual",
+    "holdingStructure": "DirectOwnership",
+    "taxWrapper": "None"
+  },
+  "dividendPreference": {
+    "reinvestDividends": false,
+    "dividendPaymentMethod": "BankTransfer",
+    "notes": "Dividends paid into linked bank account"
+  },
+  "notes": "Long-term holding in UK banking sector. Part of diversified portfolio strategy.",
+  "adviserId": "adv-789"
+}
+```
+
+**Security Type Values:**
+- `OrdinaryShare` - Common stock/ordinary shares
+- `PreferredShare` - Preferred stock
+- `ADR` - American Depositary Receipt
+- `GDR` - Global Depositary Receipt
+- `REIT` - Real Estate Investment Trust
+- `ETF` - Exchange Traded Fund (if tracking individual equities)
+
+**Exchange Values:**
+- `LSE` - London Stock Exchange
+- `NYSE` - New York Stock Exchange
+- `NASDAQ` - NASDAQ
+- `EURONEXT` - Euronext
+- `XETRA` - Deutsche Börse XETRA
+- `TSE` - Tokyo Stock Exchange
+- `HKEX` - Hong Kong Stock Exchange
+
+**Tax Wrapper Values:**
+- `None` - No tax wrapper (general investment account)
+- `ISA` - Individual Savings Account (UK)
+- `SIPP` - Self-Invested Personal Pension (UK)
+- `401k` - 401(k) retirement plan (US)
+- `IRA` - Individual Retirement Account (US)
+- `Roth IRA` - Roth IRA (US)
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/equities/eq-789
+```
+
+```json
+{
+  "id": "eq-789",
+  "factfindId": "ff-456",
+  "securityIdentification": {
+    "tickerSymbol": "BARC.L",
+    "isin": "GB0031348658",
+    "sedol": "3134865",
+    "cusip": null,
+    "securityName": "Barclays PLC",
+    "securityType": "OrdinaryShare",
+    "exchange": "LSE",
+    "exchangeName": "London Stock Exchange",
+    "country": "United Kingdom",
+    "sector": "Financials",
+    "industry": "Banks",
+    "mic": "XLON"
+  },
+  "currentHolding": {
+    "totalQuantity": 5000,
+    "averagePurchasePrice": 1.862,
+    "totalCostBasis": 9308.24,
+    "costPerShare": 1.862,
+    "acquisitionMethod": "Purchase",
+    "holdingPeriod": {
+      "firstPurchaseDate": "2022-03-15",
+      "daysHeld": 1435,
+      "yearsHeld": 3.93
+    }
+  },
+  "currentMarketValue": {
+    "currentPrice": 2.15,
+    "priceDate": "2026-02-17T16:35:00Z",
+    "currency": "GBP",
+    "priceChange24h": 0.03,
+    "priceChangePercentage24h": 1.42,
+    "totalMarketValue": 10750.00,
+    "dataSource": "LSE",
+    "lastUpdated": "2026-02-17T16:35:00Z"
+  },
+  "unrealizedGainLoss": {
+    "costBasis": 9308.24,
+    "currentValue": 10750.00,
+    "unrealizedGain": 1441.76,
+    "unrealizedGainPercentage": 15.49,
+    "gainPerShare": 0.288,
+    "gainPerSharePercentage": 15.47
+  },
+  "ownership": {
+    "clientId": "client-123",
+    "ownerName": "John Smith",
+    "accountType": "Individual",
+    "holdingStructure": "DirectOwnership",
+    "taxWrapper": "None",
+    "brokerAccount": {
+      "broker": "Hargreaves Lansdown",
+      "accountNumber": "HL123456"
+    }
+  },
+  "dividendInformation": {
+    "dividendYield": 4.65,
+    "annualDividend": 0.10,
+    "dividendFrequency": "Quarterly",
+    "lastDividendAmount": 0.025,
+    "lastDividendDate": "2026-01-15",
+    "exDividendDate": "2026-01-10",
+    "nextDividendEstimate": 0.025,
+    "nextExDividendDate": "2026-04-10",
+    "totalDividendsReceived": 1475.00,
+    "reinvestDividends": false
+  },
+  "performance": {
+    "since Inception": {
+      "return": 1441.76,
+      "returnPercentage": 15.49,
+      "annualizedReturn": 3.76
+    },
+    "ytd": {
+      "return": 125.00,
+      "returnPercentage": 1.18
+    },
+    "1month": {
+      "return": 50.00,
+      "returnPercentage": 0.47
+    },
+    "3months": {
+      "return": 175.00,
+      "returnPercentage": 1.66
+    },
+    "1year": {
+      "return": 550.00,
+      "returnPercentage": 5.39
+    }
+  },
+  "taxInformation": {
+    "taxWrapper": "None",
+    "taxableHolding": true,
+    "cgtExemptionAvailable": true,
+    "section104Pooling": true,
+    "holdingPeriodQualification": "LongTerm"
+  },
+  "riskMetrics": {
+    "beta": 1.25,
+    "volatility30Day": 18.5,
+    "sharpeRatio": 0.72,
+    "maxDrawdown": -12.3,
+    "riskRating": "Medium-High"
+  },
+  "valuationMethod": "MarkToMarket",
+  "notes": "Long-term holding in UK banking sector. Part of diversified portfolio strategy.",
+  "createdDate": "2026-02-17T10:00:00Z",
+  "createdBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser"
+  },
+  "lastModifiedDate": "2026-02-17T10:00:00Z",
+  "lastModifiedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/equities/eq-789" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" },
+    "dividends": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/dividends" },
+    "transactions": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/transactions" },
+    "performance": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/performance" },
+    "capital-gains": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/capital-gains" },
+    "corporate-actions": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/corporate-actions" },
+    "update": { "href": "/api/v1/factfinds/ff-456/equities/eq-789", "method": "PUT" },
+    "delete": { "href": "/api/v1/factfinds/ff-456/equities/eq-789", "method": "DELETE" }
+  }
+}
+```
+
+**Validation Rules:**
+- Either ticker symbol or ISIN must be provided
+- Quantity must be positive
+- Purchase price must be positive
+- Purchase date cannot be in the future
+- Currency must be valid ISO 4217 code
+- Exchange must be recognized exchange code
+- Transaction costs cannot exceed 10% of purchase value (warning threshold)
+
+**HTTP Status Codes:**
+- `201 Created` - Equity holding created successfully
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/validation-error",
+  "title": "Equity Holding Validation Failed",
+  "status": 422,
+  "detail": "Invalid ISIN format",
+  "instance": "/api/v1/factfinds/ff-456/equities",
+  "errors": [
+    {
+      "field": "securityIdentification.isin",
+      "message": "ISIN must be 12 characters (2 letter country code + 10 alphanumeric)",
+      "rejectedValue": "GB003134865",
+      "constraint": "isinFormat",
+      "expectedFormat": "^[A-Z]{2}[A-Z0-9]{10}$"
+    }
+  ]
+}
+```
+
+---
+
+##### 9.5.2.2 List Equity Holdings
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/equities`
+
+**Description:** List all equity holdings in the client's portfolio with current prices, unrealized gains/losses, and portfolio summary.
+
+**Query Parameters:**
+- `exchange` - Filter by exchange (LSE, NYSE, NASDAQ, etc.)
+- `sector` - Filter by sector (Technology, Financials, Healthcare, etc.)
+- `currency` - Filter by currency (GBP, USD, EUR, etc.)
+- `taxWrapper` - Filter by tax wrapper (None, ISA, SIPP, etc.)
+- `clientId` - Filter by specific client
+- `includePerformance` - Include performance metrics (default: true)
+- `sortBy` - Sort field: value, gain, dividendYield, ticker
+- `sortOrder` - Sort order: asc, desc
+
+**Response:**
+
+```json
+{
+  "holdings": [
+    {
+      "id": "eq-789",
+      "ticker": "BARC.L",
+      "securityName": "Barclays PLC",
+      "exchange": "LSE",
+      "sector": "Financials",
+      "holding": {
+        "quantity": 5000,
+        "averageCost": 1.862,
+        "totalCostBasis": 9308.24
+      },
+      "currentValue": {
+        "price": 2.15,
+        "priceDate": "2026-02-17T16:35:00Z",
+        "currency": "GBP",
+        "totalValue": 10750.00,
+        "priceChange24h": 1.42
+      },
+      "gainLoss": {
+        "unrealizedGain": 1441.76,
+        "gainPercentage": 15.49
+      },
+      "dividends": {
+        "yield": 4.65,
+        "annualDividend": 0.10,
+        "totalReceived": 1475.00
+      },
+      "performance": {
+        "ytd": 1.18,
+        "oneYear": 5.39
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/equities/eq-789" }
+      }
+    },
+    {
+      "id": "eq-790",
+      "ticker": "AAPL",
+      "securityName": "Apple Inc.",
+      "exchange": "NASDAQ",
+      "sector": "Technology",
+      "holding": {
+        "quantity": 150,
+        "averageCost": 145.50,
+        "totalCostBasis": 21825.00
+      },
+      "currentValue": {
+        "price": 178.25,
+        "priceDate": "2026-02-17T21:00:00Z",
+        "currency": "USD",
+        "totalValue": 26737.50,
+        "totalValueGBP": 21390.00,
+        "exchangeRate": 1.25,
+        "priceChange24h": 0.85
+      },
+      "gainLoss": {
+        "unrealizedGain": 4912.50,
+        "unrealizedGainGBP": 3929.40,
+        "gainPercentage": 22.51,
+        "currencyGainLoss": -983.10
+      },
+      "dividends": {
+        "yield": 0.52,
+        "annualDividend": 0.92,
+        "totalReceived": 276.00
+      },
+      "performance": {
+        "ytd": 4.25,
+        "oneYear": 18.75
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/equities/eq-790" }
+      }
+    },
+    {
+      "id": "eq-791",
+      "ticker": "VOD.L",
+      "securityName": "Vodafone Group PLC",
+      "exchange": "LSE",
+      "sector": "Telecommunications",
+      "holding": {
+        "quantity": 12000,
+        "averageCost": 0.95,
+        "totalCostBasis": 11400.00
+      },
+      "currentValue": {
+        "price": 0.78,
+        "priceDate": "2026-02-17T16:35:00Z",
+        "currency": "GBP",
+        "totalValue": 9360.00,
+        "priceChange24h": -1.27
+      },
+      "gainLoss": {
+        "unrealizedLoss": -2040.00,
+        "lossPercentage": -17.89
+      },
+      "dividends": {
+        "yield": 7.69,
+        "annualDividend": 0.06,
+        "totalReceived": 2280.00
+      },
+      "performance": {
+        "ytd": -3.15,
+        "oneYear": -12.45
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/equities/eq-791" }
+      }
+    },
+    {
+      "id": "eq-792",
+      "ticker": "MSFT",
+      "securityName": "Microsoft Corporation",
+      "exchange": "NASDAQ",
+      "sector": "Technology",
+      "holding": {
+        "quantity": 100,
+        "averageCost": 285.00,
+        "totalCostBasis": 28500.00
+      },
+      "currentValue": {
+        "price": 415.50,
+        "priceDate": "2026-02-17T21:00:00Z",
+        "currency": "USD",
+        "totalValue": 41550.00,
+        "totalValueGBP": 33240.00,
+        "exchangeRate": 1.25,
+        "priceChange24h": 1.15
+      },
+      "gainLoss": {
+        "unrealizedGain": 13050.00,
+        "unrealizedGainGBP": 10440.00,
+        "gainPercentage": 45.79,
+        "currencyGainLoss": -2610.00
+      },
+      "dividends": {
+        "yield": 0.72,
+        "annualDividend": 3.00,
+        "totalReceived": 600.00
+      },
+      "performance": {
+        "ytd": 6.85,
+        "oneYear": 28.50
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/equities/eq-792" }
+      }
+    }
+  ],
+  "portfolioSummary": {
+    "totalHoldings": 4,
+    "totalCostBasis": 71033.24,
+    "totalCostBasisGBP": 71033.24,
+    "totalMarketValue": 88397.50,
+    "totalMarketValueGBP": 74740.00,
+    "totalUnrealizedGain": 3706.76,
+    "totalUnrealizedGainPercentage": 5.22,
+    "currencyExposure": {
+      "GBP": 31110.00,
+      "USD": 43630.00
+    },
+    "currencyGainLoss": -3593.10,
+    "totalDividendsReceived": 4631.00,
+    "averageYield": 3.40,
+    "topHoldings": [
+      {
+        "ticker": "MSFT",
+        "value": 33240.00,
+        "percentageOfPortfolio": 44.5
+      },
+      {
+        "ticker": "AAPL",
+        "value": 21390.00,
+        "percentageOfPortfolio": 28.6
+      },
+      {
+        "ticker": "BARC.L",
+        "value": 10750.00,
+        "percentageOfPortfolio": 14.4
+      }
+    ],
+    "sectorAllocation": {
+      "Technology": 54630.00,
+      "Financials": 10750.00,
+      "Telecommunications": 9360.00
+    },
+    "sectorAllocationPercentage": {
+      "Technology": 73.1,
+      "Financials": 14.4,
+      "Telecommunications": 12.5
+    },
+    "geographicAllocation": {
+      "UnitedKingdom": 20110.00,
+      "UnitedStates": 54630.00
+    },
+    "geographicAllocationPercentage": {
+      "UnitedKingdom": 26.9,
+      "UnitedStates": 73.1
+    },
+    "performanceMetrics": {
+      "portfolioReturnYTD": 3.85,
+      "portfolioReturn1Year": 12.45,
+      "portfolioReturnSinceInception": 5.22,
+      "bestPerformer": {
+        "ticker": "MSFT",
+        "return": 45.79
+      },
+      "worstPerformer": {
+        "ticker": "VOD.L",
+        "return": -17.89
+      }
+    },
+    "diversificationMetrics": {
+      "numberOfHoldings": 4,
+      "concentrationRisk": "High",
+      "topHoldingPercentage": 44.5,
+      "top3HoldingsPercentage": 87.5,
+      "diversificationScore": 42,
+      "recommendation": "Portfolio highly concentrated in technology sector (73%). Consider diversification into other sectors."
+    }
+  },
+  "marketData": {
+    "lastUpdated": "2026-02-17T21:00:00Z",
+    "dataProvider": "Bloomberg",
+    "delayMinutes": 0,
+    "exchangeRates": {
+      "GBPUSD": 1.2500,
+      "USDGBP": 0.8000,
+      "lastUpdated": "2026-02-17T21:00:00Z"
+    }
+  },
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 4,
+    "totalPages": 1
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/equities" },
+    "create": { "href": "/api/v1/factfinds/ff-456/equities", "method": "POST" },
+    "portfolio-performance": { "href": "/api/v1/factfinds/ff-456/equities/portfolio-performance" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" }
+  }
+}
+```
+
+**HTTP Status Codes:**
+- `200 OK` - Holdings retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+
+---
+
+##### 9.5.2.3 Get Equity Holding Details
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/equities/{id}`
+
+**Description:** Get complete equity holding information including purchase history, current price, unrealized gains/losses, dividend history, corporate actions, and performance metrics.
+
+**Query Parameters:**
+- `includePriceHistory` - Include historical price data (default: false)
+- `includeDividendHistory` - Include all dividend payments (default: true)
+- `includeCorporateActions` - Include corporate action history (default: true)
+- `includeTransactions` - Include all buy/sell transactions (default: true)
+
+**Response:**
+
+```json
+{
+  "id": "eq-789",
+  "factfindId": "ff-456",
+  "securityIdentification": {
+    "tickerSymbol": "BARC.L",
+    "isin": "GB0031348658",
+    "sedol": "3134865",
+    "cusip": null,
+    "securityName": "Barclays PLC",
+    "securityType": "OrdinaryShare",
+    "exchange": "LSE",
+    "exchangeName": "London Stock Exchange",
+    "exchangeMIC": "XLON",
+    "country": "United Kingdom",
+    "sector": "Financials",
+    "industry": "Banks",
+    "subIndustry": "Diversified Banks",
+    "companyDescription": "Barclays PLC is a British universal bank. It is diversified by business, by different types of customers and clients, and by geography.",
+    "companyWebsite": "https://home.barclays",
+    "marketCap": 29500000000,
+    "marketCapCurrency": "GBP",
+    "sharesOutstanding": 13720000000
+  },
+  "holding": {
+    "totalQuantity": 5000,
+    "availableQuantity": 5000,
+    "reservedQuantity": 0,
+    "averagePurchasePrice": 1.862,
+    "totalCostBasis": 9308.24,
+    "costPerShare": 1.862,
+    "acquisitionMethod": "Purchase",
+    "firstPurchaseDate": "2022-03-15",
+    "lastPurchaseDate": "2022-03-15",
+    "purchaseCount": 1,
+    "holdingPeriod": {
+      "daysHeld": 1435,
+      "monthsHeld": 47,
+      "yearsHeld": 3.93
+    }
+  },
+  "transactions": [
+    {
+      "id": "txn-001",
+      "transactionType": "Buy",
+      "transactionDate": "2022-03-15",
+      "quantity": 5000,
+      "price": 1.85,
+      "totalAmount": 9250.00,
+      "currency": "GBP",
+      "brokerCommission": 11.99,
+      "stampDuty": 46.25,
+      "otherFees": 0.00,
+      "totalCosts": 58.24,
+      "netAmount": 9308.24,
+      "broker": "Hargreaves Lansdown",
+      "orderType": "MarketOrder",
+      "notes": "Initial purchase"
+    }
+  ],
+  "currentMarketValue": {
+    "currentPrice": 2.15,
+    "priceDate": "2026-02-17T16:35:00Z",
+    "priceTime": "16:35:00",
+    "currency": "GBP",
+    "priceSource": "LSE",
+    "bidPrice": 2.145,
+    "askPrice": 2.155,
+    "spreadPercentage": 0.47,
+    "dayOpen": 2.12,
+    "dayHigh": 2.18,
+    "dayLow": 2.11,
+    "previousClose": 2.12,
+    "priceChange": 0.03,
+    "priceChangePercentage": 1.42,
+    "volume": 45820000,
+    "averageVolume30Day": 38500000,
+    "totalMarketValue": 10750.00,
+    "lastUpdated": "2026-02-17T16:35:00Z"
+  },
+  "unrealizedGainLoss": {
+    "costBasis": 9308.24,
+    "currentValue": 10750.00,
+    "unrealizedGain": 1441.76,
+    "unrealizedGainPercentage": 15.49,
+    "gainPerShare": 0.288,
+    "breakEvenPrice": 1.862,
+    "currentPriceVsBreakEven": 15.47,
+    "allTimeHigh": 2.89,
+    "distanceFromATH": -25.61,
+    "allTimeLow": 1.12,
+    "distanceFromATL": 91.96
+  },
+  "ownership": {
+    "clientId": "client-123",
+    "ownerName": "John Smith",
+    "accountType": "Individual",
+    "holdingStructure": "DirectOwnership",
+    "taxWrapper": "None",
+    "brokerAccount": {
+      "broker": "Hargreaves Lansdown",
+      "accountNumber": "HL123456",
+      "accountType": "StockAndSharesISA"
+    },
+    "certificateNumber": null,
+    "certificated": false,
+    "crest": true
+  },
+  "dividendInformation": {
+    "dividendYield": 4.65,
+    "annualDividend": 0.10,
+    "dividendPerShare": 0.10,
+    "dividendFrequency": "Quarterly",
+    "dividendPaymentMonths": [3, 6, 9, 12],
+    "lastDividend": {
+      "amount": 0.025,
+      "currency": "GBP",
+      "exDividendDate": "2026-01-10",
+      "recordDate": "2026-01-11",
+      "paymentDate": "2026-01-15",
+      "type": "Ordinary"
+    },
+    "nextDividend": {
+      "estimatedAmount": 0.025,
+      "estimatedExDividendDate": "2026-04-10",
+      "estimatedPaymentDate": "2026-04-15"
+    },
+    "dividendHistory": [
+      {
+        "exDividendDate": "2026-01-10",
+        "amount": 0.025,
+        "type": "Ordinary",
+        "totalReceived": 125.00
+      },
+      {
+        "exDividendDate": "2025-10-10",
+        "amount": 0.025,
+        "type": "Ordinary",
+        "totalReceived": 125.00
+      },
+      {
+        "exDividendDate": "2025-07-10",
+        "amount": 0.025,
+        "type": "Ordinary",
+        "totalReceived": 125.00
+      },
+      {
+        "exDividendDate": "2025-04-10",
+        "amount": 0.025,
+        "type": "Ordinary",
+        "totalReceived": 125.00
+      }
+    ],
+    "totalDividendsReceived": 1475.00,
+    "dividendCoverageRatio": 2.1,
+    "dividendGrowthRate5Year": 3.5,
+    "reinvestDividends": false,
+    "dividendPaymentMethod": "BankTransfer"
+  },
+  "corporateActions": [
+    {
+      "id": "ca-001",
+      "actionType": "Dividend",
+      "actionDate": "2026-01-15",
+      "exDate": "2026-01-10",
+      "description": "Quarterly dividend payment £0.025 per share",
+      "impactOnHolding": {
+        "quantityBefore": 5000,
+        "quantityAfter": 5000,
+        "cashReceived": 125.00
+      }
+    },
+    {
+      "id": "ca-002",
+      "actionType": "StockSplit",
+      "actionDate": "2024-06-15",
+      "exDate": "2024-06-14",
+      "description": "1-for-2 stock consolidation (reverse split)",
+      "splitRatio": "1:2",
+      "impactOnHolding": {
+        "quantityBefore": 10000,
+        "quantityAfter": 5000,
+        "priceBefore": 0.931,
+        "priceAfter": 1.862
+      },
+      "notes": "Holding consolidated from 10,000 shares at £0.931 to 5,000 shares at £1.862"
+    }
+  ],
+  "performance": {
+    "sinceInception": {
+      "return": 1441.76,
+      "returnPercentage": 15.49,
+      "annualizedReturn": 3.76,
+      "daysHeld": 1435
+    },
+    "ytd": {
+      "return": 125.00,
+      "returnPercentage": 1.18,
+      "priceReturn": 1.42,
+      "dividendReturn": -0.24
+    },
+    "1day": {
+      "return": 150.00,
+      "returnPercentage": 1.42
+    },
+    "1week": {
+      "return": 75.00,
+      "returnPercentage": 0.70
+    },
+    "1month": {
+      "return": 50.00,
+      "returnPercentage": 0.47
+    },
+    "3months": {
+      "return": 175.00,
+      "returnPercentage": 1.66
+    },
+    "6months": {
+      "return": 325.00,
+      "returnPercentage": 3.12
+    },
+    "1year": {
+      "return": 550.00,
+      "returnPercentage": 5.39
+    },
+    "3years": {
+      "return": 1225.00,
+      "returnPercentage": 13.16,
+      "annualizedReturn": 4.20
+    },
+    "allTime": {
+      "return": 1441.76,
+      "returnPercentage": 15.49,
+      "annualizedReturn": 3.76
+    }
+  },
+  "riskMetrics": {
+    "beta": 1.25,
+    "alpha": 0.15,
+    "volatility30Day": 18.5,
+    "volatility90Day": 21.2,
+    "volatility1Year": 24.8,
+    "sharpeRatio": 0.72,
+    "sortinoRatio": 0.89,
+    "maxDrawdown": -12.3,
+    "maxDrawdownDate": "2024-08-15",
+    "var95": -3.2,
+    "cvar95": -4.8,
+    "riskRating": "Medium-High",
+    "correlationToFTSE100": 0.85,
+    "correlationToSP500": 0.62
+  },
+  "section104Pooling": {
+    "applicable": true,
+    "pooledHolding": {
+      "totalQuantity": 5000,
+      "totalCost": 9308.24,
+      "averageCostPerShare": 1.862
+    },
+    "sameDayRule": {
+      "applicable": false,
+      "matchedQuantity": 0
+    },
+    "bedAndBreakfastRule": {
+      "applicable": false,
+      "matchedQuantity": 0,
+      "periodDays": 30
+    },
+    "notes": "Section 104 holding pool applies for UK CGT calculation"
+  },
+  "taxInformation": {
+    "taxWrapper": "None",
+    "taxableHolding": true,
+    "cgtExemptionAvailable": true,
+    "dividendTaxApplies": true,
+    "dividendAllowance2025_26": 500.00,
+    "holdingPeriodQualification": "LongTerm",
+    "estimatedCGTLiability": {
+      "unrealizedGain": 1441.76,
+      "estimatedCGTBasicRate": 144.18,
+      "estimatedCGTHigherRate": 288.35,
+      "note": "Assumes full CGT allowance available (£12,300 for 2025/26)"
+    }
+  },
+  "valuationMethod": "MarkToMarket",
+  "benchmarkComparison": {
+    "benchmark": "FTSE 100",
+    "holdingReturn1Year": 5.39,
+    "benchmarkReturn1Year": 4.85,
+    "outperformance": 0.54,
+    "holdingVolatility": 24.8,
+    "benchmarkVolatility": 12.5,
+    "riskAdjustedReturn": 0.22
+  },
+  "analystRatings": {
+    "consensusRating": "Hold",
+    "buyRatings": 5,
+    "holdRatings": 12,
+    "sellRatings": 2,
+    "averageTargetPrice": 2.25,
+    "targetPriceUpside": 4.65,
+    "lastUpdated": "2026-02-10"
+  },
+  "notes": "Long-term holding in UK banking sector. Part of diversified portfolio strategy. Stock underwent 1:2 consolidation in June 2024.",
+  "createdDate": "2026-02-17T10:00:00Z",
+  "createdBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "email": "jane.adviser@financialservices.com"
+  },
+  "lastModifiedDate": "2026-02-17T10:00:00Z",
+  "lastModifiedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "email": "jane.adviser@financialservices.com"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/equities/eq-789" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" },
+    "dividends": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/dividends" },
+    "add-dividend": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/dividends", "method": "POST" },
+    "transactions": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/transactions" },
+    "add-transaction": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/transactions", "method": "POST" },
+    "performance": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/performance" },
+    "capital-gains": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/capital-gains" },
+    "corporate-actions": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/corporate-actions" },
+    "add-corporate-action": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/corporate-actions", "method": "POST" },
+    "market-data": { "href": "https://api.marketdata.com/quote/BARC.L" },
+    "company-info": { "href": "https://home.barclays" },
+    "update": { "href": "/api/v1/factfinds/ff-456/equities/eq-789", "method": "PUT" },
+    "delete": { "href": "/api/v1/factfinds/ff-456/equities/eq-789", "method": "DELETE" }
+  }
+}
+```
+
+**HTTP Status Codes:**
+- `200 OK` - Equity holding retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Equity holding or FactFind not found
+
+---
+
+##### 9.5.2.4 Get Portfolio Performance
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/equities/portfolio-performance`
+
+**Description:** Get comprehensive portfolio performance analysis including total returns, sector allocation, diversification metrics, and risk-adjusted returns.
+
+**Query Parameters:**
+- `period` - Performance period: 1D, 1W, 1M, 3M, 6M, 1Y, YTD, All
+- `includeBenchmark` - Include benchmark comparison (default: true)
+- `benchmark` - Benchmark index: FTSE100, SP500, NASDAQ, MSCIWORLD (default: FTSE100)
+
+**Response:**
+
+```json
+{
+  "factfindId": "ff-456",
+  "portfolioName": "John Smith Equity Portfolio",
+  "calculationDate": "2026-02-17T21:00:00Z",
+  "totalInvestment": {
+    "totalCostBasis": 71033.24,
+    "costBasisGBP": 71033.24,
+    "numberOfHoldings": 4,
+    "firstInvestmentDate": "2022-03-15",
+    "investmentPeriodDays": 1435,
+    "investmentPeriodYears": 3.93
+  },
+  "currentValue": {
+    "totalMarketValue": 88397.50,
+    "totalMarketValueGBP": 74740.00,
+    "lastUpdated": "2026-02-17T21:00:00Z"
+  },
+  "totalReturn": {
+    "unrealizedGain": 3706.76,
+    "unrealizedGainPercentage": 5.22,
+    "realizedGain": 0.00,
+    "totalGain": 3706.76,
+    "totalGainPercentage": 5.22,
+    "dividendsReceived": 4631.00,
+    "totalReturn": 8337.76,
+    "totalReturnPercentage": 11.74,
+    "annualizedReturn": 2.85,
+    "cumulativeReturn": 11.74
+  },
+  "performanceByPeriod": {
+    "1day": {
+      "return": 625.50,
+      "returnPercentage": 0.84
+    },
+    "1week": {
+      "return": 1125.00,
+      "returnPercentage": 1.52
+    },
+    "1month": {
+      "return": 875.00,
+      "returnPercentage": 1.18
+    },
+    "3months": {
+      "return": 1950.00,
+      "returnPercentage": 2.67
+    },
+    "6months": {
+      "return": 3150.00,
+      "returnPercentage": 4.39
+    },
+    "ytd": {
+      "return": 2875.00,
+      "returnPercentage": 3.85
+    },
+    "1year": {
+      "return": 8825.00,
+      "returnPercentage": 12.45
+    },
+    "3years": {
+      "return": 7850.00,
+      "returnPercentage": 11.05,
+      "annualizedReturn": 3.56
+    },
+    "sinceInception": {
+      "return": 8337.76,
+      "returnPercentage": 11.74,
+      "annualizedReturn": 2.85
+    }
+  },
+  "holdingPerformance": [
+    {
+      "ticker": "MSFT",
+      "securityName": "Microsoft Corporation",
+      "costBasis": 28500.00,
+      "currentValue": 33240.00,
+      "return": 10440.00,
+      "returnPercentage": 45.79,
+      "contributionToPortfolio": 44.5,
+      "contributionToReturn": 125.3
+    },
+    {
+      "ticker": "AAPL",
+      "securityName": "Apple Inc.",
+      "costBasis": 21825.00,
+      "currentValue": 21390.00,
+      "return": 3929.40,
+      "returnPercentage": 22.51,
+      "contributionToPortfolio": 28.6,
+      "contributionToReturn": 47.1
+    },
+    {
+      "ticker": "BARC.L",
+      "securityName": "Barclays PLC",
+      "costBasis": 9308.24,
+      "currentValue": 10750.00,
+      "return": 1441.76,
+      "returnPercentage": 15.49,
+      "contributionToPortfolio": 14.4,
+      "contributionToReturn": 17.3
+    },
+    {
+      "ticker": "VOD.L",
+      "securityName": "Vodafone Group PLC",
+      "costBasis": 11400.00,
+      "currentValue": 9360.00,
+      "return": -2040.00,
+      "returnPercentage": -17.89,
+      "contributionToPortfolio": 12.5,
+      "contributionToReturn": -24.5
+    }
+  ],
+  "sectorAllocation": {
+    "sectors": [
+      {
+        "sector": "Technology",
+        "value": 54630.00,
+        "percentage": 73.1,
+        "return": 14369.40,
+        "returnPercentage": 35.7
+      },
+      {
+        "sector": "Financials",
+        "value": 10750.00,
+        "percentage": 14.4,
+        "return": 1441.76,
+        "returnPercentage": 15.5
+      },
+      {
+        "sector": "Telecommunications",
+        "value": 9360.00,
+        "percentage": 12.5,
+        "return": -2040.00,
+        "returnPercentage": -17.9
+      }
+    ],
+    "topSector": "Technology",
+    "mostDiversifiedSector": "Technology"
+  },
+  "geographicAllocation": {
+    "regions": [
+      {
+        "country": "United States",
+        "value": 54630.00,
+        "percentage": 73.1,
+        "holdings": 2
+      },
+      {
+        "country": "United Kingdom",
+        "value": 20110.00,
+        "percentage": 26.9,
+        "holdings": 2
+      }
+    ]
+  },
+  "currencyExposure": {
+    "GBP": {
+      "value": 31110.00,
+      "percentage": 41.6,
+      "unrealizedGain": 941.76
+    },
+    "USD": {
+      "value": 43630.00,
+      "valueGBP": 34890.00,
+      "percentage": 58.4,
+      "unrealizedGain": 14369.40,
+      "currencyGainLoss": -3593.10,
+      "exchangeRate": 1.25
+    }
+  },
+  "dividendAnalysis": {
+    "totalDividendsReceived": 4631.00,
+    "averageYield": 3.40,
+    "highestYield": {
+      "ticker": "VOD.L",
+      "yield": 7.69
+    },
+    "lowestYield": {
+      "ticker": "AAPL",
+      "yield": 0.52
+    },
+    "estimatedAnnualDividends": 1475.00,
+    "dividendGrowthRate": 3.2
+  },
+  "riskMetrics": {
+    "portfolioBeta": 1.12,
+    "portfolioAlpha": 0.18,
+    "volatility30Day": 16.8,
+    "volatility1Year": 19.5,
+    "sharpeRatio": 0.85,
+    "sortinoRatio": 1.05,
+    "maxDrawdown": -8.5,
+    "maxDrawdownDate": "2024-08-15",
+    "var95": -2.8,
+    "cvar95": -4.2,
+    "riskRating": "Medium"
+  },
+  "diversificationMetrics": {
+    "numberOfHoldings": 4,
+    "effectiveNumberOfHoldings": 2.3,
+    "herfindahlIndex": 0.435,
+    "concentrationRisk": "High",
+    "topHoldingPercentage": 44.5,
+    "top3HoldingsPercentage": 87.5,
+    "top5HoldingsPercentage": 100.0,
+    "sectorConcentration": {
+      "topSector": "Technology",
+      "topSectorPercentage": 73.1,
+      "concentrationRisk": "High"
+    },
+    "geographicConcentration": {
+      "topCountry": "United States",
+      "topCountryPercentage": 73.1,
+      "concentrationRisk": "High"
+    },
+    "diversificationScore": 42,
+    "recommendation": "Portfolio concentration is high with 73% in technology stocks. Consider adding holdings in other sectors for better diversification."
+  },
+  "benchmarkComparison": {
+    "benchmark": "FTSE 100",
+    "benchmarkTicker": "^FTSE",
+    "portfolioReturn1Year": 12.45,
+    "benchmarkReturn1Year": 4.85,
+    "outperformance": 7.60,
+    "portfolioReturnYTD": 3.85,
+    "benchmarkReturnYTD": 2.15,
+    "outperformanceYTD": 1.70,
+    "portfolioVolatility": 19.5,
+    "benchmarkVolatility": 12.5,
+    "excessVolatility": 7.0,
+    "informationRatio": 0.62,
+    "trackingError": 12.2,
+    "riskAdjustedReturn": {
+      "portfolioSharpeRatio": 0.85,
+      "benchmarkSharpeRatio": 0.52,
+      "riskAdjustedOutperformance": 0.33
+    }
+  },
+  "taxSummary": {
+    "unrealizedCapitalGains": 3706.76,
+    "estimatedCGTLiability": {
+      "basicRate": 370.68,
+      "higherRate": 741.35
+    },
+    "dividendsReceived": 4631.00,
+    "estimatedDividendTax": {
+      "basicRate": 347.33,
+      "higherRate": 1073.65
+    },
+    "totalEstimatedTaxLiability": {
+      "basicRate": 718.01,
+      "higherRate": 1815.00
+    },
+    "note": "Tax estimates assume full allowances available"
+  },
+  "recommendations": [
+    {
+      "priority": "High",
+      "recommendation": "Reduce concentration in technology sector",
+      "rationale": "73% of portfolio in technology creates significant sector risk. Consider rebalancing to include healthcare, consumer goods, or energy sectors.",
+      "potentialAction": "Sell 25% of MSFT or AAPL holdings and reinvest in other sectors"
+    },
+    {
+      "priority": "High",
+      "recommendation": "Diversify geographic exposure",
+      "rationale": "73% US exposure creates currency and geographic risk. Consider increasing UK or European holdings.",
+      "potentialAction": "Add FTSE 100 or European blue-chip stocks"
+    },
+    {
+      "priority": "Medium",
+      "recommendation": "Review Vodafone holding",
+      "rationale": "VOD.L has underperformed with -17.89% loss. Consider whether to hold or reallocate capital.",
+      "potentialAction": "Assess turnaround prospects or crystallize loss for tax relief"
+    },
+    {
+      "priority": "Low",
+      "recommendation": "Consider dividend growth stocks",
+      "rationale": "Low average yield of 3.4%. Consider adding higher-yielding dividend growth stocks for income.",
+      "potentialAction": "Research FTSE 100 dividend aristocrats"
+    }
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/equities/portfolio-performance" },
+    "holdings": { "href": "/api/v1/factfinds/ff-456/equities" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" },
+    "rebalancing-suggestions": { "href": "/api/v1/factfinds/ff-456/equities/rebalancing" }
+  }
+}
+```
+
+**HTTP Status Codes:**
+- `200 OK` - Portfolio performance retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+
+---
+
+##### 9.5.2.5 Record Dividend
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/equities/{id}/dividends`
+
+**Description:** Record a dividend payment received from an equity holding.
+
+**Request Body:**
+
+```json
+{
+  "dividendType": "Ordinary",
+  "amountPerShare": 0.025,
+  "currency": "GBP",
+  "exDividendDate": "2026-02-10",
+  "recordDate": "2026-02-11",
+  "paymentDate": "2026-02-15",
+  "quantity": 5000,
+  "totalDividend": 125.00,
+  "taxWithheld": 0.00,
+  "netDividendReceived": 125.00,
+  "reinvested": false,
+  "notes": "Q1 2026 dividend payment"
+}
+```
+
+**Dividend Type Values:**
+- `Ordinary` - Regular dividend
+- `Special` - Special/one-time dividend
+- `Interim` - Interim dividend
+- `Final` - Final dividend
+- `Scrip` - Stock dividend
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+```
+
+```json
+{
+  "id": "div-456",
+  "equityId": "eq-789",
+  "ticker": "BARC.L",
+  "dividendType": "Ordinary",
+  "amountPerShare": 0.025,
+  "currency": "GBP",
+  "exDividendDate": "2026-02-10",
+  "recordDate": "2026-02-11",
+  "paymentDate": "2026-02-15",
+  "quantity": 5000,
+  "totalDividend": 125.00,
+  "taxWithheld": 0.00,
+  "netDividendReceived": 125.00,
+  "reinvested": false,
+  "cumulativeDividends": 1600.00,
+  "notes": "Q1 2026 dividend payment",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/dividends/div-456" },
+    "equity": { "href": "/api/v1/factfinds/ff-456/equities/eq-789" },
+    "dividend-history": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/dividends" }
+  }
+}
+```
+
+**HTTP Status Codes:**
+- `201 Created` - Dividend recorded successfully
+- `400 Bad Request` - Invalid request data
+- `422 Unprocessable Entity` - Validation failed
+
+---
+
+##### 9.5.2.6 Calculate Capital Gains
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/equities/{id}/capital-gains`
+
+**Description:** Calculate capital gains tax liability using Section 104 pooling rules for UK shares or FIFO/Average Cost methods for other jurisdictions.
+
+**Query Parameters:**
+- `disposalQuantity` - Number of shares to dispose (required)
+- `disposalPrice` - Price per share for disposal (default: current market price)
+- `disposalDate` - Date of disposal (default: today)
+- `disposalCosts` - Transaction costs (default: 0.1% of proceeds)
+
+**Response:**
+
+```json
+{
+  "equityId": "eq-789",
+  "ticker": "BARC.L",
+  "securityName": "Barclays PLC",
+  "calculationDate": "2026-02-17T21:00:00Z",
+  "taxYear": "2025/26",
+  "calculationMethod": "Section104Pooling",
+  "disposal": {
+    "quantity": 2000,
+    "pricePerShare": 2.15,
+    "disposalProceeds": 4300.00,
+    "disposalDate": "2026-02-17",
+    "brokerCommission": 11.99,
+    "stampDuty": 0.00,
+    "netProceeds": 4288.01
+  },
+  "acquisition": {
+    "method": "Section104Pool",
+    "pooledQuantity": 5000,
+    "pooledCost": 9308.24,
+    "averageCostPerShare": 1.862,
+    "sharesDisposed": 2000,
+    "costOfSharesDisposed": 3724.00,
+    "remainingPoolQuantity": 3000,
+    "remainingPoolCost": 5584.24
+  },
+  "gainCalculation": {
+    "disposalProceeds": 4288.01,
+    "allowableDeductions": 3735.99,
+    "acquisitionCost": 3724.00,
+    "disposalCosts": 11.99,
+    "gain": 552.02
+  },
+  "taxCalculation": {
+    "gain": 552.02,
+    "annualExemption": 12300.00,
+    "exemptionUsed": 552.02,
+    "taxableGain": 0.00,
+    "cgtLiability": 0.00,
+    "note": "Gain fully covered by annual CGT exemption"
+  },
+  "remainingExemption": 11747.98,
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/equities/eq-789/capital-gains" },
+    "equity": { "href": "/api/v1/factfinds/ff-456/equities/eq-789" }
+  }
+}
+```
+
+**HTTP Status Codes:**
+- `200 OK` - Capital gains calculated successfully
+- `400 Bad Request` - Invalid parameters
+- `404 Not Found` - Equity holding not found
+
+---
+
+### 9.6 Credit History API
+
+**Purpose:** Track credit score, payment history, and credit reports for comprehensive credit assessment and lending suitability analysis.
+
+**Scope:**
+- Credit score tracking from multiple agencies (Experian, Equifax, TransUnion)
+- Credit score history and trend analysis
+- Payment history monitoring (on-time, late, missed, defaults)
+- Credit utilization metrics and monitoring
+- Credit report integration and storage
+- Credit inquiry tracking (hard and soft pulls)
+- Derogatory marks tracking (defaults, CCJs, bankruptcies, IVAs)
+- Credit age and mix analysis
+- Credit health indicators and scoring
+- Credit improvement recommendations
+- Lending suitability assessment
+
+**Aggregate Root:** FactFind (credit history is nested within client)
+
+**Regulatory Compliance:**
+- Consumer Credit Act 1974 (as amended)
+- Data Protection Act 2018 - Credit data handling
+- GDPR Article 22 - Automated decision-making
+- FCA Handbook - Creditworthiness assessments
+- ICO Credit Reference Agency Code of Practice
+
+#### 9.6.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-scores` | Add credit score | `credit:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-scores` | Get credit score history | `credit:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-status` | Get current credit status | `credit:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/payment-history` | Record payment event | `credit:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/payment-history` | Get payment history | `credit:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-utilization` | Get credit utilization | `credit:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-health` | Get credit health indicators | `credit:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-report` | Request credit report | `credit:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-report` | Get latest credit report | `credit:read` |
+
+#### 9.6.2 Key Endpoints
+
+##### 9.6.2.1 Add Credit Score
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-scores`
+
+**Description:** Add a credit score record from a credit reference agency. Supports UK credit scoring systems (Experian 0-999, Equifax 0-700, TransUnion 0-710) and US FICO scoring (300-850).
+
+**Request Body:**
+
+```json
+{
+  "creditAgency": "Experian",
+  "scoreValue": 785,
+  "scoreDate": "2026-02-17",
+  "scoreModel": "Experian Credit Score",
+  "scoreRange": {
+    "minimum": 0,
+    "maximum": 999
+  },
+  "scoreBand": "Good",
+  "creditReportReference": "EXP-2026-CR-123456789",
+  "reportUrl": "https://secure-docs.factfind.com/credit-reports/exp-123456789.pdf",
+  "factorsAffectingScore": [
+    {
+      "factor": "PaymentHistory",
+      "impact": "Positive",
+      "description": "100% of payments made on time in last 12 months"
+    },
+    {
+      "factor": "CreditUtilization",
+      "impact": "Positive",
+      "description": "Credit utilization at 28% - below recommended 30% threshold"
+    },
+    {
+      "factor": "CreditAge",
+      "impact": "Positive",
+      "description": "Average account age of 8.5 years demonstrates established credit history"
+    },
+    {
+      "factor": "CreditInquiries",
+      "impact": "Neutral",
+      "description": "2 hard inquiries in last 12 months - within normal range"
+    },
+    {
+      "factor": "DerogatoryMarks",
+      "impact": "Positive",
+      "description": "No defaults, CCJs, or bankruptcies on file"
+    }
+  ],
+  "requestedBy": "adv-789",
+  "requestDate": "2026-02-17",
+  "consentObtained": true,
+  "consentReference": "consent-456",
+  "purpose": "MortgageApplication",
+  "notes": "Credit check performed for mortgage application. Client aware and provided consent."
+}
+```
+
+**Credit Agency Values:**
+- `Experian` - Experian UK (score range 0-999)
+- `Equifax` - Equifax UK (score range 0-700)
+- `TransUnion` - TransUnion UK (score range 0-710)
+- `FICO` - FICO Score USA (score range 300-850)
+- `Experian_US` - Experian USA (score range 300-850)
+- `Equifax_US` - Equifax USA (score range 300-850)
+
+**Score Band Values (UK):**
+- **Experian (0-999):**
+  - VeryPoor: 0-560
+  - Poor: 561-720
+  - Fair: 721-880
+  - Good: 881-960
+  - Excellent: 961-999
+- **Equifax (0-700):**
+  - VeryPoor: 0-279
+  - Poor: 280-379
+  - Fair: 380-419
+  - Good: 420-465
+  - Excellent: 466-700
+- **TransUnion (0-710):**
+  - VeryPoor: 0-550
+  - Poor: 551-565
+  - Fair: 566-603
+  - Good: 604-627
+  - Excellent: 628-710
+
+**Purpose Values:**
+- `MortgageApplication` - Mortgage lending assessment
+- `PersonalLoanApplication` - Personal loan assessment
+- `CreditCardApplication` - Credit card application
+- `FinancialReview` - Regular financial review
+- `IdentityVerification` - Identity verification check
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/clients/client-123/credit-scores/cs-789
+```
+
+```json
+{
+  "id": "cs-789",
+  "factfindId": "ff-456",
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "creditAgency": "Experian",
+  "scoreValue": 785,
+  "scoreDate": "2026-02-17",
+  "scoreModel": "Experian Credit Score",
+  "scoreRange": {
+    "minimum": 0,
+    "maximum": 999
+  },
+  "scoreBand": "Good",
+  "scoreBandRange": {
+    "lower": 721,
+    "upper": 880
+  },
+  "scorePercentile": 68,
+  "scoreComparison": {
+    "ukAverage": 759,
+    "differenceFromAverage": 26,
+    "betterThan": "68% of UK adults"
+  },
+  "creditReportReference": "EXP-2026-CR-123456789",
+  "reportUrl": "https://secure-docs.factfind.com/credit-reports/exp-123456789.pdf",
+  "factorsAffectingScore": [
+    {
+      "factor": "PaymentHistory",
+      "impact": "Positive",
+      "weight": 35,
+      "score": 33,
+      "description": "100% of payments made on time in last 12 months",
+      "recommendation": "Continue making all payments on time"
+    },
+    {
+      "factor": "CreditUtilization",
+      "impact": "Positive",
+      "weight": 30,
+      "score": 27,
+      "description": "Credit utilization at 28% - below recommended 30% threshold",
+      "recommendation": "Maintain utilization below 30%"
+    },
+    {
+      "factor": "CreditAge",
+      "impact": "Positive",
+      "weight": 15,
+      "score": 13,
+      "description": "Average account age of 8.5 years demonstrates established credit history",
+      "recommendation": "Keep oldest accounts open"
+    },
+    {
+      "factor": "CreditMix",
+      "impact": "Neutral",
+      "weight": 10,
+      "score": 7,
+      "description": "Good mix of credit types (mortgage, credit cards, personal loan)",
+      "recommendation": "Diversified credit mix"
+    },
+    {
+      "factor": "CreditInquiries",
+      "impact": "Neutral",
+      "weight": 10,
+      "score": 8,
+      "description": "2 hard inquiries in last 12 months - within normal range",
+      "recommendation": "Limit credit applications to necessary only"
+    }
+  ],
+  "scoreBreakdown": {
+    "paymentHistory": 33,
+    "creditUtilization": 27,
+    "creditAge": 13,
+    "creditMix": 7,
+    "creditInquiries": 8,
+    "totalScore": 88,
+    "normalizedScore": 785
+  },
+  "changeFromPreviousScore": {
+    "previousScore": 768,
+    "previousDate": "2025-02-15",
+    "scoreChange": 17,
+    "scoreChangePercentage": 2.21,
+    "direction": "Improved",
+    "daysBetween": 367
+  },
+  "requestedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser"
+  },
+  "requestDate": "2026-02-17",
+  "consentObtained": true,
+  "consentReference": "consent-456",
+  "purpose": "MortgageApplication",
+  "notes": "Credit check performed for mortgage application. Client aware and provided consent.",
+  "createdDate": "2026-02-17T10:00:00Z",
+  "createdBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/credit-scores/cs-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "credit-report": { "href": "https://secure-docs.factfind.com/credit-reports/exp-123456789.pdf" },
+    "credit-history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/credit-scores" },
+    "credit-status": { "href": "/api/v1/factfinds/ff-456/clients/client-123/credit-status" }
+  }
+}
+```
+
+**Validation Rules:**
+- Score value must be within agency's score range
+- Score date cannot be in the future
+- Consent must be obtained before requesting credit report
+- Credit report reference required for formal credit checks
+- Score band must match agency's banding system
+
+**HTTP Status Codes:**
+- `201 Created` - Credit score recorded successfully
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions or consent not obtained
+- `404 Not Found` - Client or FactFind not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/validation-error",
+  "title": "Credit Score Validation Failed",
+  "status": 422,
+  "detail": "Score value out of range for specified credit agency",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/credit-scores",
+  "errors": [
+    {
+      "field": "scoreValue",
+      "message": "Experian score must be between 0 and 999",
+      "rejectedValue": 1050,
+      "constraint": "scoreRange",
+      "validRange": {
+        "min": 0,
+        "max": 999
+      }
+    }
+  ]
+}
+```
+
+---
+
+---
+
+
+
+
+## 9A. FactFind Savings & Investments API
+
+### 9A.1 Overview
+
+**Purpose:** Dedicated management of savings and investment products with specialized tracking, performance monitoring, and rebalancing capabilities.
+
+**Scope:**
+- ISA management (Stocks & Shares ISA, Cash ISA, Lifetime ISA, Innovative Finance ISA)
+- General Investment Accounts (GIA, Platform Accounts, Discretionary Management)
+- Offshore Bonds (Single Premium, Regular Premium)
+- Onshore Bonds (Investment Bond, Guaranteed Bond)
+- Investment Trusts (IT, OEIC, Unit Trust)
+- Investment performance tracking and analysis
+- Portfolio rebalancing recommendations
+- Asset allocation monitoring and optimization
+- Tax wrapper efficiency analysis
+- Dividend and income tracking
+- Fund holdings and transaction history
+- Capital gains tracking and tax reporting
+
+**Relationship to Arrangements API:**
+
+Savings & Investments API provides specialized operations for investment products that are stored as Arrangements (Section 7). While Arrangements provide the core product data (policy numbers, providers, valuations), this API adds investment-specific capabilities like:
+- Performance analysis across multiple time periods
+- Asset allocation and rebalancing
+- Tax-efficient investment strategies
+- Portfolio consolidation and reporting
+
+**Aggregate Root:** FactFind (investments are nested within)
+
+**Regulatory Compliance:**
+- FCA COBS (Product Governance and Suitability)
+- MiFID II (Investment Services and Best Execution)
+- PROD (Target Market Assessment)
+- ISA Regulations 1998
+- Offshore Funds (Tax) Regulations 2009
+- Consumer Duty (Value Assessment and Fair Outcomes)
+
+### 9A.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/investments` | List all investment products | `investments:read` |
+| POST | `/api/v1/factfinds/{factfindId}/investments` | Create investment product | `investments:write` |
+| GET | `/api/v1/factfinds/{factfindId}/investments/{investmentId}` | Get investment details | `investments:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/investments/{investmentId}` | Update investment | `investments:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/investments/{investmentId}` | Delete investment | `investments:write` |
+| GET | `/api/v1/factfinds/{factfindId}/investments/summary` | Get portfolio summary | `investments:read` |
+| GET | `/api/v1/factfinds/{factfindId}/investments/performance` | Get portfolio performance | `investments:read` |
+| GET | `/api/v1/factfinds/{factfindId}/investments/asset-allocation` | Get asset allocation analysis | `investments:read` |
+| POST | `/api/v1/factfinds/{factfindId}/investments/rebalance` | Generate rebalancing recommendations | `investments:write` |
+| GET | `/api/v1/factfinds/{factfindId}/investments/tax-analysis` | Analyze tax wrapper efficiency | `investments:read` |
+
+### 9A.3 Key Endpoints
+
+#### 9A.3.1 List Investment Products
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/investments`
+
+**Description:** List all investment products for a fact find with optional performance metrics.
+
+**Query Parameters:**
+- `investmentType` - Filter by type: ISA, GIA, OffshoreBond, OnshoreBond, InvestmentTrust
+- `clientId` - Filter by client ID
+- `providerId` - Filter by provider ID
+- `includePerformance` - Include performance metrics (default: false)
+- `asOfDate` - Performance as of date (ISO 8601 format)
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "asOfDate": "2026-02-17",
+  "totalInvestments": 5,
+  "totalValue": {
+    "amount": 250000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "investments": [
+    {
+      "id": "inv-888",
+      "arrangementId": "arr-777",
+      "client": {
+        "id": 123,
+        "name": "John Smith"
+      },
+      "investmentType": "ISA",
+      "isaType": "StocksAndSharesISA",
+      "productName": "Vanguard ISA",
+      "provider": {
+        "id": 500,
+        "name": "Vanguard"
+      },
+      "policyNumber": "ISA-98765432",
+      "currentValue": {
+        "amount": 45000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "valuationDate": "2026-02-16",
+      "performance": {
+        "oneYearReturn": 8.5,
+        "threeYearReturn": 12.3,
+        "fiveYearReturn": 45.2,
+        "sinceInception": 67.8
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/{factfindId}/investments/inv-888" },
+        "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arr-777" }
+      }
+    },
+    {
+      "id": "inv-889",
+      "arrangementId": "arr-778",
+      "client": {
+        "id": 123,
+        "name": "John Smith"
+      },
+      "investmentType": "GIA",
+      "productName": "ABC General Investment Account",
+      "provider": {
+        "id": 501,
+        "name": "ABC Wealth Management"
+      },
+      "policyNumber": "GIA-12345678",
+      "currentValue": {
+        "amount": 125000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "valuationDate": "2026-02-16",
+      "performance": {
+        "oneYearReturn": 10.2,
+        "threeYearReturn": 15.6,
+        "fiveYearReturn": 52.8,
+        "sinceInception": 85.4
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/{factfindId}/investments/inv-889" },
+        "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arr-778" }
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 5,
+    "totalPages": 1
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/{factfindId}/investments" },
+    "create": { "href": "/api/v1/factfinds/{factfindId}/investments", "method": "POST" },
+    "summary": { "href": "/api/v1/factfinds/{factfindId}/investments/summary" },
+    "performance": { "href": "/api/v1/factfinds/{factfindId}/investments/performance" },
+    "asset-allocation": { "href": "/api/v1/factfinds/{factfindId}/investments/asset-allocation" },
+    "rebalance": { "href": "/api/v1/factfinds/{factfindId}/investments/rebalance", "method": "POST" }
+  }
+}
+```
+
+**Investment Types:**
+- `ISA` - Individual Savings Account
+  - `StocksAndSharesISA` - Stocks & Shares ISA
+  - `CashISA` - Cash ISA
+  - `LifetimeISA` - Lifetime ISA (LISA)
+  - `InnovativeFinanceISA` - Innovative Finance ISA
+- `GIA` - General Investment Account
+- `OffshoreBond` - Offshore Investment Bond
+- `OnshoreBond` - Onshore Investment Bond
+- `InvestmentTrust` - Investment Trust, OEIC, Unit Trust
+- `PlatformAccount` - Investment Platform Account
+- `DiscretionaryManaged` - Discretionary Managed Portfolio
+
+**Validation Rules:**
+- `investmentType` filter must match valid investment types
+- `asOfDate` must be valid ISO 8601 date format
+- `includePerformance=true` requires performance data to be available
+
+#### 9A.3.2 Get Portfolio Summary
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/investments/summary`
+
+**Description:** Get aggregated portfolio summary across all investments.
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "asOfDate": "2026-02-17",
+  "totalPortfolioValue": {
+    "amount": 250000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "investmentBreakdown": {
+    "isa": {
+      "count": 2,
+      "value": {
+        "amount": 75000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "percentage": 30.0
+    },
+    "gia": {
+      "count": 2,
+      "value": {
+        "amount": 125000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "percentage": 50.0
+    },
+    "offshoreBond": {
+      "count": 1,
+      "value": {
+        "amount": 50000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "percentage": 20.0
+    }
+  },
+  "assetAllocation": {
+    "equities": 60.0,
+    "bonds": 25.0,
+    "cash": 10.0,
+    "alternatives": 5.0
+  },
+  "taxWrapperEfficiency": {
+    "isaUtilization": 37.5,
+    "availableIsaAllowance": {
+      "amount": 10000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "taxEfficientPercentage": 30.0
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/{factfindId}/investments/summary" },
+    "investments": { "href": "/api/v1/factfinds/{factfindId}/investments" },
+    "performance": { "href": "/api/v1/factfinds/{factfindId}/investments/performance" }
+  }
+}
+```
+
+**Note:** For complete specifications of performance tracking (9A.3.3), asset allocation analysis (9A.3.4), and rebalancing recommendations (9A.3.5), these endpoints provide:
+- Multi-period performance analysis (1M, 3M, 6M, 1Y, 3Y, 5Y, Since Inception)
+- Asset allocation drift monitoring and rebalancing threshold alerts
+- Tax-efficient rebalancing strategies prioritizing ISA wrappers
+- Transaction cost and capital gains tax impact analysis
+- Alternative rebalancing strategies (minimize transactions, minimize costs, tax-efficient)
+
+---
+
+## 10. FactFind Risk Profile API
+
+### 10.1 Overview
+
+**Purpose:** Centralized lookup data for enumeration value types, reference entities, and system configuration.
+
+**Key Concepts:**
+
+The Reference Data API provides access to **Enumeration Value Types** that are used throughout the FactFind API. All enumerations follow a consistent code/display pattern with optional metadata fields.
+
+**Enumeration Value Types Pattern:**
+```json
+{
+  "code": "MACHINE_READABLE_CODE",
+  "display": "Human Readable Label",
+  // ... optional metadata fields
+}
+```
+
+**Benefits:**
+- Self-documenting: No code lookup required
+- Internationalization-ready: Display text can be localized
+- Rich metadata: Dates, categories, symbols, etc.
+- Forward-compatible: Can add fields without breaking changes
+
+**Scope:**
+- Enumeration value types (gender, marital status, employment status, titles, etc.)
+- Lookup value types (countries, counties, currencies, product types, frequencies)
+- Provider directory
+- Adviser directory
+- System configuration
+
+### 10.2 Operations Summary
+
+**Enumeration Value Type Endpoints:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/reference/genders` | Get gender values | Public |
+| GET | `/api/v1/reference/marital-statuses` | Get marital status values | Public |
+| GET | `/api/v1/reference/employment-statuses` | Get employment status values | Public |
+| GET | `/api/v1/reference/titles` | Get title/honorific values | Public |
+| GET | `/api/v1/reference/address-types` | Get address type values | Public |
+| GET | `/api/v1/reference/contact-types` | Get contact type values | Public |
+| GET | `/api/v1/reference/meeting-types` | Get meeting type values | Public |
+| GET | `/api/v1/reference/statuses` | Get generic status values | Public |
+| GET | `/api/v1/reference/residency-statuses` | Get residency status values | Public |
+| GET | `/api/v1/reference/health-statuses` | Get health status values | Public |
+
+**Lookup Value Type Endpoints:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/reference/countries` | Get country values (ISO 3166-1) | Public |
+| GET | `/api/v1/reference/counties` | Get county/region values | Public |
+| GET | `/api/v1/reference/currencies` | Get currency values (ISO 4217) | Public |
+| GET | `/api/v1/reference/frequencies` | Get frequency values | Public |
+| GET | `/api/v1/reference/product-types` | Get product type values | Public |
+
+**Reference Entity Endpoints:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/providers` | List providers | `refdata:read` |
+| GET | `/api/v1/providers/{id}` | Get provider details | `refdata:read` |
+| GET | `/api/v1/advisers` | List advisers | `refdata:read` |
+| GET | `/api/v1/advisers/{id}` | Get adviser details | `refdata:read` |
+
+### 10.3 Key Endpoints
+
+#### 10.3.1 Get Gender Values
+
+**Endpoint:** `GET /api/v1/reference/genders`
+
+**Description:** Returns available gender values as GenderValue types.
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "code": "M",
+      "display": "Male"
+    },
+    {
+      "code": "F",
+      "display": "Female"
+    },
+    {
+      "code": "O",
+      "display": "Other"
+    },
+    {
+      "code": "U",
+      "display": "Unknown"
+    },
+    {
+      "code": "N",
+      "display": "Prefer not to say"
+    }
+  ]
+}
+```
+
+---
+
+#### 10.3.2 Get Marital Status Values
+
+**Endpoint:** `GET /api/v1/reference/marital-statuses`
+
+**Description:** Returns available marital status values as MaritalStatusValue types.
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "code": "SIN",
+      "display": "Single"
+    },
+    {
+      "code": "MAR",
+      "display": "Married"
+    },
+    {
+      "code": "CIV",
+      "display": "Civil Partnership"
+    },
+    {
+      "code": "DIV",
+      "display": "Divorced"
+    },
+    {
+      "code": "WID",
+      "display": "Widowed"
+    },
+    {
+      "code": "SEP",
+      "display": "Separated"
+    },
+    {
+      "code": "COH",
+      "display": "Cohabiting"
+    }
+  ]
+}
+```
+
+---
+
+#### 10.3.3 Get Employment Status Values
+
+**Endpoint:** `GET /api/v1/reference/employment-statuses`
+
+**Description:** Returns available employment status values as EmploymentStatusValue types.
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "code": "EMP",
+      "display": "Employed"
+    },
+    {
+      "code": "SELF",
+      "display": "Self-Employed"
+    },
+    {
+      "code": "DIR",
+      "display": "Company Director"
+    },
+    {
+      "code": "RET",
+      "display": "Retired"
+    },
+    {
+      "code": "UNE",
+      "display": "Unemployed"
+    },
+    {
+      "code": "NW",
+      "display": "Not Working"
+    },
+    {
+      "code": "STU",
+      "display": "Student"
+    },
+    {
+      "code": "HOME",
+      "display": "Homemaker"
+    }
+  ]
+}
+```
+
+---
+
+#### 10.3.4 Get Title Values
+
+**Endpoint:** `GET /api/v1/reference/titles`
+
+**Description:** Returns available title/honorific values as TitleValue types.
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "code": "MR",
+      "display": "Mr"
+    },
+    {
+      "code": "MRS",
+      "display": "Mrs"
+    },
+    {
+      "code": "MS",
+      "display": "Ms"
+    },
+    {
+      "code": "MISS",
+      "display": "Miss"
+    },
+    {
+      "code": "DR",
+      "display": "Dr"
+    },
+    {
+      "code": "PROF",
+      "display": "Professor"
+    },
+    {
+      "code": "REV",
+      "display": "Reverend"
+    },
+    {
+      "code": "SIR",
+      "display": "Sir"
+    },
+    {
+      "code": "LADY",
+      "display": "Lady"
+    },
+    {
+      "code": "LORD",
+      "display": "Lord"
+    }
+  ]
+}
+```
+
+---
+
+#### 10.3.5 Get Country Values
+
+**Endpoint:** `GET /api/v1/reference/countries`
+
+**Description:** Returns available country values as CountryValue types using ISO 3166-1 standard.
+
+**Query Parameters:**
+- `region` (optional) - Filter by region (e.g., "Europe", "Asia")
+- `search` (optional) - Search by country name
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    {
+      "code": "US",
+      "display": "United States",
+      "alpha3": "USA"
+    },
+    {
+      "code": "FR",
+      "display": "France",
+      "alpha3": "FRA"
+    },
+    {
+      "code": "DE",
+      "display": "Germany",
+      "alpha3": "DEU"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 50,
+    "totalItems": 249,
+    "totalPages": 5
+  }
+}
+```
+
+---
+
+#### 10.3.6 Get Currency Values
+
+**Endpoint:** `GET /api/v1/reference/currencies`
+
+**Description:** Returns available currency values as CurrencyValue types using ISO 4217 standard.
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    },
+    {
+      "code": "USD",
+      "display": "US Dollar",
+      "symbol": "$"
+    },
+    {
+      "code": "EUR",
+      "display": "Euro",
+      "symbol": "€"
+    },
+    {
+      "code": "CHF",
+      "display": "Swiss Franc",
+      "symbol": "CHF"
+    },
+    {
+      "code": "JPY",
+      "display": "Japanese Yen",
+      "symbol": "¥"
+    },
+    {
+      "code": "AUD",
+      "display": "Australian Dollar",
+      "symbol": "A$"
+    },
+    {
+      "code": "CAD",
+      "display": "Canadian Dollar",
+      "symbol": "C$"
+    }
+  ]
+}
+```
+
+---
+
+#### 10.3.7 Get Frequency Values
+
+**Endpoint:** `GET /api/v1/reference/frequencies`
+
+**Description:** Returns available frequency values as FrequencyValue types for payments and contributions.
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "code": "M",
+      "display": "Monthly",
+      "periodsPerYear": 12
+    },
+    {
+      "code": "Q",
+      "display": "Quarterly",
+      "periodsPerYear": 4
+    },
+    {
+      "code": "S",
+      "display": "Semi-Annual",
+      "periodsPerYear": 2
+    },
+    {
+      "code": "A",
+      "display": "Annual",
+      "periodsPerYear": 1
+    },
+    {
+      "code": "W",
+      "display": "Weekly",
+      "periodsPerYear": 52
+    },
+    {
+      "code": "F",
+      "display": "Fortnightly",
+      "periodsPerYear": 26
+    },
+    {
+      "code": "SINGLE",
+      "display": "Single Payment",
+      "periodsPerYear": 0
+    }
+  ]
+}
+```
+
+---
+
+#### 10.3.8 Get Product Type Values
+
+**Endpoint:** `GET /api/v1/reference/product-types`
+
+**Description:** Returns available product type values as ProductTypeValue types.
+
+**Query Parameters:**
+- `category` (optional) - Filter by category (e.g., "Pension", "Investment", "Protection")
+
+**Response:**
+```json
+{
+  "items": [
+    {
+      "code": "SIPP",
+      "display": "Self-Invested Personal Pension",
+      "category": "Pension"
+    },
+    {
+      "code": "PP",
+      "display": "Personal Pension",
+      "category": "Pension"
+    },
+    {
+      "code": "GPP",
+      "display": "Group Personal Pension",
+      "category": "Pension"
+    },
+    {
+      "code": "ISA",
+      "display": "ISA",
+      "category": "Investment"
+    },
+    {
+      "code": "GIA",
+      "display": "General Investment Account",
+      "category": "Investment"
+    },
+    {
+      "code": "LIFE",
+      "display": "Life Insurance",
+      "category": "Protection"
+    },
+    {
+      "code": "CIC",
+      "display": "Critical Illness Cover",
+      "category": "Protection"
+    },
+    {
+      "code": "IP",
+      "display": "Income Protection",
+      "category": "Protection"
+    }
+  ]
+}
+```
+
+---
+
+#### 10.3.9 Usage in Client Code
+
+**Frontend Example (TypeScript):**
+
+```typescript
+// Fetch reference data on app initialization
+const genders = await fetch('/api/v1/reference/genders').then(r => r.json());
+const maritalStatuses = await fetch('/api/v1/reference/marital-statuses').then(r => r.json());
+const countries = await fetch('/api/v1/reference/countries').then(r => r.json());
+
+// Populate dropdown
+<select name="gender">
+  {genders.items.map(g => (
+    <option value={g.code}>{g.display}</option>
+  ))}
+</select>
+
+// Submit with Value Type
+const clientData = {
+  name: {
+    title: { code: "MR", display: "Mr" },
+    firstName: "John",
+    lastName: "Smith"
+  },
+  gender: { code: "M", display: "Male" },
+  maritalStatus: { code: "MAR", display: "Married" },
+  // ... other fields
+};
+
+await fetch('/api/v1/clients', {
+  method: 'POST',
+  body: JSON.stringify(clientData)
+});
+```
+
+**Benefits for Clients:**
+1. **Self-Documenting**: API responses include human-readable labels
+2. **No Code Lookups**: Display text embedded in response
+3. **Internationalization**: Server can return localized display text based on Accept-Language header
+4. **Rich Metadata**: Additional fields (symbols, categories, periods) available
+5. **Forward-Compatible**: New metadata fields can be added without breaking existing clients
+- `AssetCategory`
+- `ProductType`
+- `GoalType`
+- `RiskRating`
+- And 100+ more...
+
+---
+
+
+
+### 10.4 Risk Questionnaire API
+
+**Purpose:** Manage risk assessment questionnaire templates, versioning, and administration.
+
+**Scope:**
+- Questionnaire template management with version control
+- Regulatory approval tracking (FCA, MiFID II compliance)
+- Question bank administration with scoring algorithms
+- Risk rating categories and asset allocation recommendations
+- Template distribution and activation workflow
+- Multi-language questionnaire support
+- Regulatory compliance tracking and audit trail
+- Question type support: SingleChoice, MultipleChoice, Slider, Ranking
+
+**Aggregate Root:** FactFind (risk questionnaires are system-level but applied per fact find)
+
+**Regulatory Compliance:**
+- FCA COBS 9.2 (Assessing Suitability - Risk Assessment)
+- MiFID II Article 25 (Assessment of Suitability and Appropriateness)
+- ESMA Guidelines on Suitability Assessment
+- FCA Handbook COBS 9 Annex 2 (Risk Profiling)
+- Consumer Duty (Understanding Customer Risk Tolerance)
+
+#### 10.4.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/risk-questionnaires` | List questionnaire templates | `risk:read` |
+| GET | `/api/v1/risk-questionnaires/{id}` | Get questionnaire details | `risk:read` |
+| POST | `/api/v1/risk-questionnaires` | Create questionnaire template | `risk:admin` |
+| PUT | `/api/v1/risk-questionnaires/{id}` | Update questionnaire template | `risk:admin` |
+| DELETE | `/api/v1/risk-questionnaires/{id}` | Delete questionnaire template | `risk:admin` |
+| POST | `/api/v1/risk-questionnaires/{id}/questions` | Add question to template | `risk:admin` |
+| PUT | `/api/v1/risk-questionnaires/{id}/questions/{questionId}` | Update question | `risk:admin` |
+| DELETE | `/api/v1/risk-questionnaires/{id}/questions/{questionId}` | Remove question | `risk:admin` |
+| GET | `/api/v1/risk-questionnaires/{id}/questions` | Get questions for template | `risk:read` |
+| POST | `/api/v1/risk-questionnaires/{id}/activate` | Activate questionnaire version | `risk:admin` |
+| POST | `/api/v1/risk-questionnaires/{id}/submit-for-approval` | Submit for regulatory approval | `risk:admin` |
+| POST | `/api/v1/risk-questionnaires/{id}/approve` | Approve questionnaire | `risk:admin` |
+| GET | `/api/v1/risk-questionnaires/active` | Get active questionnaire | `risk:read` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-questionnaires/{id}/responses` | Get client responses | `risk:read` |
+| POST | `/api/v1/factfinds/{factfindId}/risk-questionnaires/{id}/responses` | Submit client responses | `risk:write` |
+
+#### 10.4.2 Key Endpoints
+
+##### 10.4.2.1 List Questionnaire Templates
+
+**Endpoint:** `GET /api/v1/risk-questionnaires`
+
+**Description:** List all risk questionnaire templates with version and status information.
+
+**Query Parameters:**
+- `status` - Filter by status: Draft, PendingApproval, Approved, Active, Archived
+- `language` - Filter by language code (ISO 639-1)
+- `includeArchived` - Include archived templates (default: false)
+- `sortBy` - Sort field: version, createdDate, activatedDate
+- `sortOrder` - Sort order: asc, desc
+
+**Response:**
+
+```json
+{
+  "questionnaires": [
+    {
+      "id": "rq-2024-v3",
+      "version": "3.0",
+      "name": "Standard Attitude to Risk Questionnaire 2024",
+      "description": "FCA-compliant ATR questionnaire with 15 questions covering risk capacity, risk tolerance, and investment experience",
+      "status": "Active",
+      "language": {
+        "code": "en-GB",
+        "display": "English (UK)"
+      },
+      "questionCount": 15,
+      "estimatedCompletionTime": 10,
+      "createdDate": "2024-01-15T09:00:00Z",
+      "createdBy": {
+        "id": "user-789",
+        "name": "Compliance Team"
+      },
+      "approvedDate": "2024-02-01T14:30:00Z",
+      "approvedBy": {
+        "id": "user-101",
+        "name": "Head of Compliance"
+      },
+      "activatedDate": "2024-02-15T00:00:00Z",
+      "activeFrom": "2024-02-15",
+      "activeTo": null,
+      "usageCount": 1247,
+      "riskRatingCategories": [
+        "VeryLowRisk",
+        "LowRisk",
+        "MediumRisk",
+        "HighRisk",
+        "VeryHighRisk"
+      ],
+      "scoringMethod": "WeightedAverage",
+      "regulatoryApprovals": [
+        {
+          "regulator": "FCA",
+          "approvalReference": "FCA-2024-ATR-001",
+          "approvalDate": "2024-01-28",
+          "expiryDate": null
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/risk-questionnaires/rq-2024-v3" },
+        "questions": { "href": "/api/v1/risk-questionnaires/rq-2024-v3/questions" },
+        "activate": { "href": "/api/v1/risk-questionnaires/rq-2024-v3/activate", "method": "POST" }
+      }
+    },
+    {
+      "id": "rq-2024-v2",
+      "version": "2.1",
+      "name": "Standard Attitude to Risk Questionnaire 2023",
+      "description": "Previous version - archived after v3.0 activation",
+      "status": "Archived",
+      "language": {
+        "code": "en-GB",
+        "display": "English (UK)"
+      },
+      "questionCount": 12,
+      "estimatedCompletionTime": 8,
+      "createdDate": "2023-01-10T09:00:00Z",
+      "createdBy": {
+        "id": "user-789",
+        "name": "Compliance Team"
+      },
+      "approvedDate": "2023-02-05T14:30:00Z",
+      "approvedBy": {
+        "id": "user-101",
+        "name": "Head of Compliance"
+      },
+      "activatedDate": "2023-02-20T00:00:00Z",
+      "activeFrom": "2023-02-20",
+      "activeTo": "2024-02-14",
+      "usageCount": 3421,
+      "riskRatingCategories": [
+        "VeryLowRisk",
+        "LowRisk",
+        "MediumRisk",
+        "HighRisk",
+        "VeryHighRisk"
+      ],
+      "scoringMethod": "WeightedAverage",
+      "regulatoryApprovals": [
+        {
+          "regulator": "FCA",
+          "approvalReference": "FCA-2023-ATR-002",
+          "approvalDate": "2023-01-30",
+          "expiryDate": "2024-02-14"
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/risk-questionnaires/rq-2024-v2" },
+        "questions": { "href": "/api/v1/risk-questionnaires/rq-2024-v2/questions" }
+      }
+    },
+    {
+      "id": "rq-2024-v4-draft",
+      "version": "4.0-draft",
+      "name": "Enhanced ATR Questionnaire 2025 (Draft)",
+      "description": "Next generation questionnaire with behavioral finance insights",
+      "status": "Draft",
+      "language": {
+        "code": "en-GB",
+        "display": "English (UK)"
+      },
+      "questionCount": 18,
+      "estimatedCompletionTime": 12,
+      "createdDate": "2024-10-01T09:00:00Z",
+      "createdBy": {
+        "id": "user-789",
+        "name": "Compliance Team"
+      },
+      "approvedDate": null,
+      "approvedBy": null,
+      "activatedDate": null,
+      "activeFrom": null,
+      "activeTo": null,
+      "usageCount": 0,
+      "riskRatingCategories": [
+        "VeryLowRisk",
+        "LowRisk",
+        "MediumLowRisk",
+        "MediumRisk",
+        "MediumHighRisk",
+        "HighRisk",
+        "VeryHighRisk"
+      ],
+      "scoringMethod": "WeightedAverageWithBehavioralAdjustments",
+      "regulatoryApprovals": [],
+      "_links": {
+        "self": { "href": "/api/v1/risk-questionnaires/rq-2024-v4-draft" },
+        "questions": { "href": "/api/v1/risk-questionnaires/rq-2024-v4-draft/questions" },
+        "submit-for-approval": { "href": "/api/v1/risk-questionnaires/rq-2024-v4-draft/submit-for-approval", "method": "POST" },
+        "update": { "href": "/api/v1/risk-questionnaires/rq-2024-v4-draft", "method": "PUT" },
+        "delete": { "href": "/api/v1/risk-questionnaires/rq-2024-v4-draft", "method": "DELETE" }
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 3,
+    "totalPages": 1
+  },
+  "_links": {
+    "self": { "href": "/api/v1/risk-questionnaires" },
+    "create": { "href": "/api/v1/risk-questionnaires", "method": "POST" },
+    "active": { "href": "/api/v1/risk-questionnaires/active" }
+  }
+}
+```
+
+**Questionnaire Status Values:**
+- `Draft` - Under development, not ready for use
+- `PendingApproval` - Submitted for regulatory/compliance approval
+- `Approved` - Approved but not yet activated
+- `Active` - Currently in use for new assessments
+- `Archived` - Previously active, now superseded
+
+**Scoring Methods:**
+- `WeightedAverage` - Standard weighted scoring
+- `WeightedAverageWithBehavioralAdjustments` - Includes behavioral finance adjustments
+- `PointBased` - Simple point accumulation
+- `HybridRiskCapacityAndTolerance` - Combines capacity and tolerance scores
+
+**Validation Rules:**
+- Only one questionnaire can be Active per language at a time
+- Questionnaire must be Approved before it can be Activated
+- Archived questionnaires cannot be edited
+- Active questionnaires can only be archived, not deleted
+
+**HTTP Status Codes:**
+- `200 OK` - Questionnaires retrieved successfully
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+##### 10.4.2.2 Get Questionnaire Template Details
+
+**Endpoint:** `GET /api/v1/risk-questionnaires/{id}`
+
+**Description:** Get complete questionnaire template including all questions, answer options, scoring rules, and risk rating mappings.
+
+**Response:**
+
+```json
+{
+  "id": "rq-2024-v3",
+  "version": "3.0",
+  "name": "Standard Attitude to Risk Questionnaire 2024",
+  "description": "FCA-compliant ATR questionnaire with 15 questions covering risk capacity, risk tolerance, and investment experience",
+  "status": "Active",
+  "language": {
+    "code": "en-GB",
+    "display": "English (UK)"
+  },
+  "questionCount": 15,
+  "estimatedCompletionTime": 10,
+  "createdDate": "2024-01-15T09:00:00Z",
+  "createdBy": {
+    "id": "user-789",
+    "name": "Compliance Team"
+  },
+  "lastModifiedDate": "2024-01-28T11:30:00Z",
+  "lastModifiedBy": {
+    "id": "user-789",
+    "name": "Compliance Team"
+  },
+  "approvedDate": "2024-02-01T14:30:00Z",
+  "approvedBy": {
+    "id": "user-101",
+    "name": "Head of Compliance"
+  },
+  "activatedDate": "2024-02-15T00:00:00Z",
+  "activeFrom": "2024-02-15",
+  "activeTo": null,
+  "usageCount": 1247,
+  "introductionText": "This questionnaire will help us understand your attitude towards investment risk. There are no right or wrong answers - we simply want to understand your preferences and comfort level with different investment scenarios. Please answer all questions honestly.",
+  "completionText": "Thank you for completing the questionnaire. Your responses have been recorded and will be reviewed by your adviser.",
+  "questions": [
+    {
+      "id": "q1",
+      "questionNumber": 1,
+      "questionType": "SingleChoice",
+      "category": "RiskCapacity",
+      "questionText": "What is your investment time horizon?",
+      "helpText": "How long do you expect to keep your money invested before you need to access it?",
+      "required": true,
+      "weight": 1.5,
+      "displayOrder": 1,
+      "answerOptions": [
+        {
+          "id": "q1-a1",
+          "optionText": "Less than 1 year",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q1-a2",
+          "optionText": "1-3 years",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q1-a3",
+          "optionText": "3-5 years",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q1-a4",
+          "optionText": "5-10 years",
+          "displayOrder": 4,
+          "score": 4
+        },
+        {
+          "id": "q1-a5",
+          "optionText": "More than 10 years",
+          "displayOrder": 5,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "questionNumber": 2,
+      "questionType": "SingleChoice",
+      "category": "RiskTolerance",
+      "questionText": "If the value of your investment fell by 20% in the first year, what would you do?",
+      "helpText": "This helps us understand your emotional response to investment losses",
+      "required": true,
+      "weight": 2.0,
+      "displayOrder": 2,
+      "answerOptions": [
+        {
+          "id": "q2-a1",
+          "optionText": "Sell all investments immediately to prevent further losses",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q2-a2",
+          "optionText": "Sell some investments to reduce exposure",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q2-a3",
+          "optionText": "Do nothing and wait for recovery",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q2-a4",
+          "optionText": "Invest more to take advantage of lower prices",
+          "displayOrder": 4,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "questionNumber": 3,
+      "questionType": "Slider",
+      "category": "RiskTolerance",
+      "questionText": "What level of risk are you comfortable taking with your investments?",
+      "helpText": "Move the slider to indicate your comfort level (0 = no risk, 10 = maximum risk)",
+      "required": true,
+      "weight": 1.8,
+      "displayOrder": 3,
+      "sliderConfig": {
+        "minValue": 0,
+        "maxValue": 10,
+        "stepSize": 1,
+        "minLabel": "No risk - preserve capital",
+        "maxLabel": "Maximum risk - highest growth potential",
+        "defaultValue": 5
+      }
+    },
+    {
+      "id": "q4",
+      "questionNumber": 4,
+      "questionType": "SingleChoice",
+      "category": "InvestmentExperience",
+      "questionText": "How would you describe your investment knowledge and experience?",
+      "helpText": "Select the option that best describes your level of investment experience",
+      "required": true,
+      "weight": 1.2,
+      "displayOrder": 4,
+      "answerOptions": [
+        {
+          "id": "q4-a1",
+          "optionText": "None - I have no investment experience",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q4-a2",
+          "optionText": "Limited - I have basic understanding of investments",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q4-a3",
+          "optionText": "Good - I understand most investment concepts",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q4-a4",
+          "optionText": "Extensive - I have significant investment experience",
+          "displayOrder": 4,
+          "score": 4
+        },
+        {
+          "id": "q4-a5",
+          "optionText": "Expert - I work in the financial services industry",
+          "displayOrder": 5,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q5",
+      "questionNumber": 5,
+      "questionType": "SingleChoice",
+      "category": "RiskCapacity",
+      "questionText": "What percentage of your total wealth is represented by this investment?",
+      "helpText": "This helps us understand the impact of potential losses on your overall financial position",
+      "required": true,
+      "weight": 1.6,
+      "displayOrder": 5,
+      "answerOptions": [
+        {
+          "id": "q5-a1",
+          "optionText": "More than 75%",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q5-a2",
+          "optionText": "50-75%",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q5-a3",
+          "optionText": "25-50%",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q5-a4",
+          "optionText": "10-25%",
+          "displayOrder": 4,
+          "score": 4
+        },
+        {
+          "id": "q5-a5",
+          "optionText": "Less than 10%",
+          "displayOrder": 5,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q6",
+      "questionNumber": 6,
+      "questionType": "SingleChoice",
+      "category": "RiskCapacity",
+      "questionText": "Do you have an emergency fund covering at least 3-6 months of expenses?",
+      "helpText": "An emergency fund provides financial security and allows you to take more investment risk",
+      "required": true,
+      "weight": 1.3,
+      "displayOrder": 6,
+      "answerOptions": [
+        {
+          "id": "q6-a1",
+          "optionText": "No emergency fund",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q6-a2",
+          "optionText": "Less than 3 months",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q6-a3",
+          "optionText": "3-6 months",
+          "displayOrder": 3,
+          "score": 4
+        },
+        {
+          "id": "q6-a4",
+          "optionText": "More than 6 months",
+          "displayOrder": 4,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q7",
+      "questionNumber": 7,
+      "questionType": "SingleChoice",
+      "category": "RiskTolerance",
+      "questionText": "Which statement best describes your investment objectives?",
+      "helpText": "Select the option that most closely matches your primary investment goal",
+      "required": true,
+      "weight": 1.7,
+      "displayOrder": 7,
+      "answerOptions": [
+        {
+          "id": "q7-a1",
+          "optionText": "Preserve my capital - I cannot afford to lose any money",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q7-a2",
+          "optionText": "Generate income with minimal capital growth",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q7-a3",
+          "optionText": "Balance income and growth with moderate risk",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q7-a4",
+          "optionText": "Achieve capital growth with some income",
+          "displayOrder": 4,
+          "score": 4
+        },
+        {
+          "id": "q7-a5",
+          "optionText": "Maximize growth - I accept higher risk for higher returns",
+          "displayOrder": 5,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q8",
+      "questionNumber": 8,
+      "questionType": "Ranking",
+      "category": "RiskTolerance",
+      "questionText": "Rank these investment options in order of preference (1 = most preferred, 4 = least preferred)",
+      "helpText": "Drag and drop to reorder the options according to your preference",
+      "required": true,
+      "weight": 1.5,
+      "displayOrder": 8,
+      "rankingOptions": [
+        {
+          "id": "q8-opt1",
+          "optionText": "Bank savings account - guaranteed capital, low return (1-2% p.a.)",
+          "displayOrder": 1
+        },
+        {
+          "id": "q8-opt2",
+          "optionText": "Government bonds - very low risk, modest return (2-4% p.a.)",
+          "displayOrder": 2
+        },
+        {
+          "id": "q8-opt3",
+          "optionText": "Balanced portfolio - moderate risk, balanced return (4-7% p.a.)",
+          "displayOrder": 3
+        },
+        {
+          "id": "q8-opt4",
+          "optionText": "Growth equity portfolio - higher risk, higher return potential (7-12% p.a.)",
+          "displayOrder": 4
+        }
+      ],
+      "rankingScoring": {
+        "rank1Score": 5,
+        "rank2Score": 3,
+        "rank3Score": 2,
+        "rank4Score": 1
+      }
+    },
+    {
+      "id": "q9",
+      "questionNumber": 9,
+      "questionType": "SingleChoice",
+      "category": "RiskCapacity",
+      "questionText": "What is your current employment status?",
+      "helpText": "Your employment status affects your ability to recover from investment losses",
+      "required": true,
+      "weight": 1.1,
+      "displayOrder": 9,
+      "answerOptions": [
+        {
+          "id": "q9-a1",
+          "optionText": "Retired with limited income",
+          "displayOrder": 1,
+          "score": 2
+        },
+        {
+          "id": "q9-a2",
+          "optionText": "Employed - stable income",
+          "displayOrder": 2,
+          "score": 4
+        },
+        {
+          "id": "q9-a3",
+          "optionText": "Self-employed - variable income",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q9-a4",
+          "optionText": "Unemployed or not working",
+          "displayOrder": 4,
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "q10",
+      "questionNumber": 10,
+      "questionType": "MultipleChoice",
+      "category": "InvestmentExperience",
+      "questionText": "Which of the following investment types have you held before? (Select all that apply)",
+      "helpText": "This helps us understand your familiarity with different investment types",
+      "required": true,
+      "weight": 1.0,
+      "displayOrder": 10,
+      "multipleChoiceConfig": {
+        "minSelections": 0,
+        "maxSelections": null
+      },
+      "answerOptions": [
+        {
+          "id": "q10-a1",
+          "optionText": "Cash savings accounts only",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q10-a2",
+          "optionText": "Fixed income bonds",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q10-a3",
+          "optionText": "Investment funds (unit trusts, OEICs)",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q10-a4",
+          "optionText": "Individual shares/stocks",
+          "displayOrder": 4,
+          "score": 4
+        },
+        {
+          "id": "q10-a5",
+          "optionText": "Alternative investments (property, commodities, hedge funds)",
+          "displayOrder": 5,
+          "score": 5
+        }
+      ],
+      "multipleChoiceScoring": "AverageSelected"
+    },
+    {
+      "id": "q11",
+      "questionNumber": 11,
+      "questionType": "SingleChoice",
+      "category": "RiskTolerance",
+      "questionText": "How frequently would you want to review your investments?",
+      "helpText": "This indicates your comfort level with market volatility",
+      "required": true,
+      "weight": 0.8,
+      "displayOrder": 11,
+      "answerOptions": [
+        {
+          "id": "q11-a1",
+          "optionText": "Daily - I need to monitor closely",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q11-a2",
+          "optionText": "Weekly",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q11-a3",
+          "optionText": "Monthly",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q11-a4",
+          "optionText": "Quarterly",
+          "displayOrder": 4,
+          "score": 4
+        },
+        {
+          "id": "q11-a5",
+          "optionText": "Annually - I'm comfortable with long-term investing",
+          "displayOrder": 5,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q12",
+      "questionNumber": 12,
+      "questionType": "SingleChoice",
+      "category": "RiskCapacity",
+      "questionText": "Do you expect any major expenses in the next 5 years?",
+      "helpText": "Future expenses may affect your ability to maintain investments during downturns",
+      "required": true,
+      "weight": 1.4,
+      "displayOrder": 12,
+      "answerOptions": [
+        {
+          "id": "q12-a1",
+          "optionText": "Yes, within 1 year",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q12-a2",
+          "optionText": "Yes, within 1-3 years",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q12-a3",
+          "optionText": "Yes, within 3-5 years",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q12-a4",
+          "optionText": "No major expenses expected",
+          "displayOrder": 4,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q13",
+      "questionNumber": 13,
+      "questionType": "SingleChoice",
+      "category": "RiskTolerance",
+      "questionText": "Investment A has a guaranteed return of 3% per year. Investment B could return 15% or lose 10% with equal probability. Which would you choose?",
+      "helpText": "This question assesses your risk/reward preference",
+      "required": true,
+      "weight": 2.0,
+      "displayOrder": 13,
+      "answerOptions": [
+        {
+          "id": "q13-a1",
+          "optionText": "Definitely choose Investment A (guaranteed 3%)",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q13-a2",
+          "optionText": "Probably choose Investment A",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q13-a3",
+          "optionText": "Probably choose Investment B",
+          "displayOrder": 3,
+          "score": 4
+        },
+        {
+          "id": "q13-a4",
+          "optionText": "Definitely choose Investment B (15% or -10%)",
+          "displayOrder": 4,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "q14",
+      "questionNumber": 14,
+      "questionType": "SingleChoice",
+      "category": "RiskCapacity",
+      "questionText": "What is your age?",
+      "helpText": "Age is a factor in determining appropriate investment time horizons",
+      "required": true,
+      "weight": 1.3,
+      "displayOrder": 14,
+      "answerOptions": [
+        {
+          "id": "q14-a1",
+          "optionText": "Under 30",
+          "displayOrder": 1,
+          "score": 5
+        },
+        {
+          "id": "q14-a2",
+          "optionText": "30-44",
+          "displayOrder": 2,
+          "score": 4
+        },
+        {
+          "id": "q14-a3",
+          "optionText": "45-54",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q14-a4",
+          "optionText": "55-64",
+          "displayOrder": 4,
+          "score": 2
+        },
+        {
+          "id": "q14-a5",
+          "optionText": "65 or over",
+          "displayOrder": 5,
+          "score": 1
+        }
+      ]
+    },
+    {
+      "id": "q15",
+      "questionNumber": 15,
+      "questionType": "SingleChoice",
+      "category": "RiskTolerance",
+      "questionText": "When markets are volatile, how do you typically react?",
+      "helpText": "Understanding your emotional response helps us recommend suitable investments",
+      "required": true,
+      "weight": 1.9,
+      "displayOrder": 15,
+      "answerOptions": [
+        {
+          "id": "q15-a1",
+          "optionText": "Very anxious - I lose sleep over investment losses",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "id": "q15-a2",
+          "optionText": "Concerned but manageable",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "id": "q15-a3",
+          "optionText": "Neutral - I understand volatility is normal",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "id": "q15-a4",
+          "optionText": "Calm - I see it as a buying opportunity",
+          "displayOrder": 4,
+          "score": 5
+        }
+      ]
+    }
+  ],
+  "scoringAlgorithm": {
+    "method": "WeightedAverage",
+    "description": "Weighted average of all question scores, with questions weighted by importance",
+    "formula": "TotalScore = Σ(QuestionScore × QuestionWeight) / Σ(QuestionWeight)",
+    "minPossibleScore": 1.0,
+    "maxPossibleScore": 5.0,
+    "normalizationApplied": true
+  },
+  "riskRatingCategories": [
+    {
+      "code": "VeryLowRisk",
+      "display": "Very Low Risk",
+      "description": "Capital preservation is the primary objective. Minimal exposure to equities.",
+      "scoreRange": {
+        "min": 1.0,
+        "max": 1.8
+      },
+      "assetAllocationRecommendation": {
+        "equities": {
+          "min": 0,
+          "max": 10,
+          "target": 5
+        },
+        "bonds": {
+          "min": 40,
+          "max": 60,
+          "target": 50
+        },
+        "cash": {
+          "min": 30,
+          "max": 60,
+          "target": 45
+        },
+        "alternatives": {
+          "min": 0,
+          "max": 5,
+          "target": 0
+        }
+      },
+      "expectedAnnualReturn": {
+        "min": 1.5,
+        "max": 3.0,
+        "target": 2.0
+      },
+      "expectedVolatility": {
+        "min": 1.0,
+        "max": 3.0,
+        "target": 2.0
+      },
+      "suitableProductTypes": [
+        "CashISA",
+        "FixedRateBonds",
+        "NationalSavings",
+        "LowRiskManagedFunds"
+      ]
+    },
+    {
+      "code": "LowRisk",
+      "display": "Low Risk",
+      "description": "Income generation with capital preservation. Low equity exposure.",
+      "scoreRange": {
+        "min": 1.81,
+        "max": 2.6
+      },
+      "assetAllocationRecommendation": {
+        "equities": {
+          "min": 10,
+          "max": 25,
+          "target": 20
+        },
+        "bonds": {
+          "min": 40,
+          "max": 60,
+          "target": 50
+        },
+        "cash": {
+          "min": 15,
+          "max": 35,
+          "target": 25
+        },
+        "alternatives": {
+          "min": 0,
+          "max": 10,
+          "target": 5
+        }
+      },
+      "expectedAnnualReturn": {
+        "min": 2.5,
+        "max": 4.5,
+        "target": 3.5
+      },
+      "expectedVolatility": {
+        "min": 3.0,
+        "max": 6.0,
+        "target": 4.5
+      },
+      "suitableProductTypes": [
+        "CautionsManagedFunds",
+        "CorporateBonds",
+        "BalancedIncomeISA",
+        "DefensivePortfolio"
+      ]
+    },
+    {
+      "code": "MediumRisk",
+      "display": "Medium Risk",
+      "description": "Balanced approach with moderate equity exposure for growth and income.",
+      "scoreRange": {
+        "min": 2.61,
+        "max": 3.4
+      },
+      "assetAllocationRecommendation": {
+        "equities": {
+          "min": 35,
+          "max": 55,
+          "target": 45
+        },
+        "bonds": {
+          "min": 25,
+          "max": 40,
+          "target": 30
+        },
+        "cash": {
+          "min": 5,
+          "max": 20,
+          "target": 15
+        },
+        "alternatives": {
+          "min": 5,
+          "max": 15,
+          "target": 10
+        }
+      },
+      "expectedAnnualReturn": {
+        "min": 4.5,
+        "max": 7.0,
+        "target": 5.5
+      },
+      "expectedVolatility": {
+        "min": 6.0,
+        "max": 10.0,
+        "target": 8.0
+      },
+      "suitableProductTypes": [
+        "BalancedManagedFunds",
+        "MultiAssetISA",
+        "DiversifiedPortfolio",
+        "IncomeAndGrowthFunds"
+      ]
+    },
+    {
+      "code": "HighRisk",
+      "display": "High Risk",
+      "description": "Growth-focused with significant equity exposure. Higher volatility accepted.",
+      "scoreRange": {
+        "min": 3.41,
+        "max": 4.2
+      },
+      "assetAllocationRecommendation": {
+        "equities": {
+          "min": 60,
+          "max": 80,
+          "target": 70
+        },
+        "bonds": {
+          "min": 10,
+          "max": 25,
+          "target": 15
+        },
+        "cash": {
+          "min": 0,
+          "max": 10,
+          "target": 5
+        },
+        "alternatives": {
+          "min": 5,
+          "max": 20,
+          "target": 10
+        }
+      },
+      "expectedAnnualReturn": {
+        "min": 6.5,
+        "max": 10.0,
+        "target": 8.0
+      },
+      "expectedVolatility": {
+        "min": 10.0,
+        "max": 15.0,
+        "target": 12.5
+      },
+      "suitableProductTypes": [
+        "GrowthFunds",
+        "EquityISA",
+        "AggressivePortfolio",
+        "EmergingMarketsFunds"
+      ]
+    },
+    {
+      "code": "VeryHighRisk",
+      "display": "Very High Risk",
+      "description": "Maximum growth potential with very high equity exposure. Significant volatility expected.",
+      "scoreRange": {
+        "min": 4.21,
+        "max": 5.0
+      },
+      "assetAllocationRecommendation": {
+        "equities": {
+          "min": 80,
+          "max": 100,
+          "target": 90
+        },
+        "bonds": {
+          "min": 0,
+          "max": 10,
+          "target": 5
+        },
+        "cash": {
+          "min": 0,
+          "max": 5,
+          "target": 0
+        },
+        "alternatives": {
+          "min": 0,
+          "max": 15,
+          "target": 5
+        }
+      },
+      "expectedAnnualReturn": {
+        "min": 8.0,
+        "max": 15.0,
+        "target": 10.0
+      },
+      "expectedVolatility": {
+        "min": 15.0,
+        "max": 25.0,
+        "target": 20.0
+      },
+      "suitableProductTypes": [
+        "EquityFunds",
+        "SpecialistSectorFunds",
+        "VentureCapitalTrusts",
+        "SingleStockPortfolios"
+      ]
+    }
+  ],
+  "regulatoryApprovals": [
+    {
+      "regulator": "FCA",
+      "approvalReference": "FCA-2024-ATR-001",
+      "approvalDate": "2024-01-28",
+      "approvedBy": "FCA Supervision Team",
+      "expiryDate": null,
+      "conditions": [
+        "Annual review required",
+        "Client must receive risk warnings",
+        "Adviser must document any overrides"
+      ]
+    }
+  ],
+  "complianceNotes": [
+    {
+      "date": "2024-01-28",
+      "author": "Head of Compliance",
+      "note": "Questionnaire reviewed and approved for use. Meets FCA COBS 9.2 requirements for risk assessment."
+    },
+    {
+      "date": "2024-02-01",
+      "author": "Head of Compliance",
+      "note": "Asset allocation recommendations reviewed against current market conditions and approved."
+    }
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/risk-questionnaires/rq-2024-v3" },
+    "questions": { "href": "/api/v1/risk-questionnaires/rq-2024-v3/questions" },
+    "activate": { "href": "/api/v1/risk-questionnaires/rq-2024-v3/activate", "method": "POST" },
+    "update": { "href": "/api/v1/risk-questionnaires/rq-2024-v3", "method": "PUT" }
+  }
+}
+```
+
+**Question Types:**
+- `SingleChoice` - Select one option from a list
+- `MultipleChoice` - Select multiple options from a list
+- `Slider` - Continuous scale input
+- `Ranking` - Rank options in order of preference
+- `FreeText` - Open text response (not scored)
+
+**Question Categories:**
+- `RiskCapacity` - Ability to withstand losses (objective)
+- `RiskTolerance` - Willingness to accept risk (subjective)
+- `InvestmentExperience` - Knowledge and familiarity with investments
+- `BehavioralFinance` - Psychological and emotional factors
+
+**Scoring Methods for Multiple Choice:**
+- `AverageSelected` - Average score of selected options
+- `SumSelected` - Sum of scores of selected options
+- `MaxSelected` - Maximum score among selected options
+- `MinSelected` - Minimum score among selected options
+
+**Validation Rules:**
+- All questions must have unique question numbers
+- Question numbers must be sequential starting from 1
+- All required questions must be answered before scoring
+- Score ranges for risk categories must not overlap
+- Score ranges must cover the full possible score range (min to max)
+- Asset allocation percentages must sum to 100%
+- At least one questionnaire must be Active for each language
+
+**HTTP Status Codes:**
+- `200 OK` - Questionnaire retrieved successfully
+- `404 Not Found` - Questionnaire not found
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+##### 10.4.2.3 Create Questionnaire Template
+
+**Endpoint:** `POST /api/v1/risk-questionnaires`
+
+**Description:** Create a new risk questionnaire template in Draft status.
+
+**Request Body:**
+
+```json
+{
+  "version": "5.0",
+  "name": "Enhanced ATR Questionnaire 2026",
+  "description": "Next generation questionnaire incorporating behavioral finance insights and ESG preferences",
+  "language": {
+    "code": "en-GB"
+  },
+  "estimatedCompletionTime": 15,
+  "introductionText": "This enhanced questionnaire will help us understand your attitude towards investment risk, including your environmental and social preferences. Please answer all questions honestly - there are no right or wrong answers.",
+  "completionText": "Thank you for completing the questionnaire. Your responses have been recorded and will be reviewed by your adviser to create a personalized investment recommendation.",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "SingleChoice",
+      "category": "RiskCapacity",
+      "questionText": "What is your primary investment time horizon?",
+      "helpText": "Consider when you might need to access these funds",
+      "required": true,
+      "weight": 1.5,
+      "displayOrder": 1,
+      "answerOptions": [
+        {
+          "optionText": "Less than 1 year",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "optionText": "1-3 years",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "optionText": "3-5 years",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "optionText": "5-10 years",
+          "displayOrder": 4,
+          "score": 4
+        },
+        {
+          "optionText": "More than 10 years",
+          "displayOrder": 5,
+          "score": 5
+        }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "SingleChoice",
+      "category": "RiskTolerance",
+      "questionText": "During a market downturn, your investment portfolio loses 25% of its value over 3 months. What would you most likely do?",
+      "helpText": "This helps us understand your emotional response to significant losses",
+      "required": true,
+      "weight": 2.0,
+      "displayOrder": 2,
+      "answerOptions": [
+        {
+          "optionText": "Sell everything immediately to stop further losses",
+          "displayOrder": 1,
+          "score": 1
+        },
+        {
+          "optionText": "Reduce exposure by selling 50% of investments",
+          "displayOrder": 2,
+          "score": 2
+        },
+        {
+          "optionText": "Hold current positions and wait for recovery",
+          "displayOrder": 3,
+          "score": 3
+        },
+        {
+          "optionText": "Hold and invest regular monthly contributions",
+          "displayOrder": 4,
+          "score": 4
+        },
+        {
+          "optionText": "Invest additional lump sum to buy at lower prices",
+          "displayOrder": 5,
+          "score": 5
+        }
+      ]
+    }
+  ],
+  "scoringAlgorithm": {
+    "method": "WeightedAverageWithBehavioralAdjustments",
+    "description": "Weighted average with adjustments for behavioral biases and inconsistent responses"
+  },
+  "riskRatingCategories": [
+    {
+      "code": "VeryLowRisk",
+      "display": "Very Low Risk - Capital Preservation",
+      "description": "Focus on capital preservation with minimal volatility",
+      "scoreRange": {
+        "min": 1.0,
+        "max": 1.8
+      },
+      "assetAllocationRecommendation": {
+        "equities": {"min": 0, "max": 10, "target": 5},
+        "bonds": {"min": 45, "max": 60, "target": 55},
+        "cash": {"min": 30, "max": 55, "target": 40},
+        "alternatives": {"min": 0, "max": 5, "target": 0}
+      },
+      "expectedAnnualReturn": {"min": 1.5, "max": 3.0, "target": 2.0},
+      "expectedVolatility": {"min": 1.0, "max": 3.0, "target": 2.0}
+    },
+    {
+      "code": "LowRisk",
+      "display": "Low Risk - Income Focus",
+      "description": "Income generation with low capital volatility",
+      "scoreRange": {
+        "min": 1.81,
+        "max": 2.6
+      },
+      "assetAllocationRecommendation": {
+        "equities": {"min": 10, "max": 25, "target": 20},
+        "bonds": {"min": 45, "max": 60, "target": 50},
+        "cash": {"min": 15, "max": 30, "target": 25},
+        "alternatives": {"min": 0, "max": 10, "target": 5}
+      },
+      "expectedAnnualReturn": {"min": 2.5, "max": 4.5, "target": 3.5},
+      "expectedVolatility": {"min": 3.0, "max": 6.0, "target": 4.5}
+    }
+  ]
+}
+```
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/risk-questionnaires/rq-2026-v5-draft
+ETag: "xyz789abc123"
+```
+
+```json
+{
+  "id": "rq-2026-v5-draft",
+  "version": "5.0",
+  "name": "Enhanced ATR Questionnaire 2026",
+  "description": "Next generation questionnaire incorporating behavioral finance insights and ESG preferences",
+  "status": "Draft",
+  "language": {
+    "code": "en-GB",
+    "display": "English (UK)"
+  },
+  "questionCount": 2,
+  "estimatedCompletionTime": 15,
+  "createdDate": "2026-02-17T10:30:00Z",
+  "createdBy": {
+    "id": "user-789",
+    "name": "Compliance Team"
+  },
+  "lastModifiedDate": "2026-02-17T10:30:00Z",
+  "lastModifiedBy": {
+    "id": "user-789",
+    "name": "Compliance Team"
+  },
+  "usageCount": 0,
+  "_links": {
+    "self": { "href": "/api/v1/risk-questionnaires/rq-2026-v5-draft" },
+    "questions": { "href": "/api/v1/risk-questionnaires/rq-2026-v5-draft/questions" },
+    "add-question": { "href": "/api/v1/risk-questionnaires/rq-2026-v5-draft/questions", "method": "POST" },
+    "submit-for-approval": { "href": "/api/v1/risk-questionnaires/rq-2026-v5-draft/submit-for-approval", "method": "POST" },
+    "update": { "href": "/api/v1/risk-questionnaires/rq-2026-v5-draft", "method": "PUT" },
+    "delete": { "href": "/api/v1/risk-questionnaires/rq-2026-v5-draft", "method": "DELETE" }
+  }
+}
+```
+
+**Validation Rules:**
+- `version` is required and must be unique
+- `name` is required (max 200 characters)
+- `language.code` must be valid ISO 639-1 language code
+- `estimatedCompletionTime` must be positive integer (minutes)
+- Questions must have sequential question numbers starting from 1
+- All answer options must have display order starting from 1
+- Score ranges in risk rating categories must not overlap
+- Asset allocation percentages must sum to 100% (within tolerance of ±0.5%)
+- At least 2 questions required before submission for approval
+- At least 3 risk rating categories required
+
+**HTTP Status Codes:**
+- `201 Created` - Questionnaire created successfully
+- `400 Bad Request` - Invalid request data
+- `403 Forbidden` - Insufficient permissions
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/validation-error",
+  "title": "Questionnaire Validation Failed",
+  "status": 422,
+  "detail": "Asset allocation percentages do not sum to 100%",
+  "instance": "/api/v1/risk-questionnaires",
+  "errors": [
+    {
+      "field": "riskRatingCategories[0].assetAllocationRecommendation",
+      "message": "Asset allocation percentages sum to 95% but must equal 100%",
+      "rejectedValue": {
+        "equities": 5,
+        "bonds": 55,
+        "cash": 30,
+        "alternatives": 5
+      }
+    }
+  ]
+}
+```
+
+---
+
+##### 10.4.2.4 Activate Questionnaire Version
+
+**Endpoint:** `POST /api/v1/risk-questionnaires/{id}/activate`
+
+**Description:** Activate an approved questionnaire for use in new risk assessments. This will deactivate the currently active questionnaire for the same language.
+
+**Request Body:**
+
+```json
+{
+  "activationDate": "2026-03-01",
+  "activationNotes": "Activating new version with enhanced behavioral finance questions. Previous version (v3.0) will be archived.",
+  "notifyAdvisers": true,
+  "migrationStrategy": "ImmediateForNew",
+  "allowExistingToComplete": true
+}
+```
+
+**Activation Strategies:**
+- `ImmediateForNew` - New assessments use new version, existing in-progress assessments continue with old version
+- `ImmediateForAll` - All assessments (including in-progress) use new version
+- `PhaseIn` - Gradual rollout to subset of advisers before full activation
+
+**Response:**
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "activationId": "act-20260217-001",
+  "questionnaireId": "rq-2024-v3",
+  "previouslyActiveQuestionnaireId": "rq-2024-v2",
+  "activationDate": "2026-03-01",
+  "activatedBy": {
+    "id": "user-101",
+    "name": "Head of Compliance"
+  },
+  "activationTimestamp": "2026-02-17T11:00:00Z",
+  "migrationStrategy": "ImmediateForNew",
+  "affectedAssessments": {
+    "inProgress": 47,
+    "toBeCompleted": 47,
+    "newAssessments": "UnlimitedAfterActivationDate"
+  },
+  "previousQuestionnaireArchived": true,
+  "notificationsSent": {
+    "advisers": 125,
+    "complianceOfficers": 5,
+    "systemAdministrators": 3
+  },
+  "activationNotes": "Activating new version with enhanced behavioral finance questions. Previous version (v3.0) will be archived.",
+  "_links": {
+    "self": { "href": "/api/v1/risk-questionnaires/rq-2024-v3/activate" },
+    "questionnaire": { "href": "/api/v1/risk-questionnaires/rq-2024-v3" },
+    "previous-questionnaire": { "href": "/api/v1/risk-questionnaires/rq-2024-v2" },
+    "active": { "href": "/api/v1/risk-questionnaires/active" }
+  }
+}
+```
+
+**Validation Rules:**
+- Questionnaire must have status `Approved`
+- `activationDate` must be today or future date
+- Only one questionnaire can be Active per language at a time
+- Previous active questionnaire will be automatically archived
+- Cannot activate if questionnaire has validation errors
+- Requires `risk:admin` permission
+
+**HTTP Status Codes:**
+- `200 OK` - Questionnaire activated successfully
+- `400 Bad Request` - Invalid activation request
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Questionnaire not found
+- `422 Unprocessable Entity` - Questionnaire not in Approved status
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/activation-error",
+  "title": "Questionnaire Activation Failed",
+  "status": 422,
+  "detail": "Cannot activate questionnaire that is not in Approved status",
+  "instance": "/api/v1/risk-questionnaires/rq-2026-v5-draft/activate",
+  "currentStatus": "Draft",
+  "requiredStatus": "Approved",
+  "recommendation": "Submit questionnaire for approval first using POST /api/v1/risk-questionnaires/{id}/submit-for-approval"
+}
+```
+
+---
+
+##### 10.4.2.5 Submit Client Responses
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/risk-questionnaires/{id}/responses`
+
+**Description:** Submit client responses to a risk questionnaire. System calculates risk score and determines risk rating category.
+
+**Request Body:**
+
+```json
+{
+  "clientId": "client-123",
+  "completedDate": "2026-02-17T14:30:00Z",
+  "completedBy": "Client",
+  "completionMethod": "OnlinePortal",
+  "adviserPresent": true,
+  "adviserId": "adv-789",
+  "responses": [
+    {
+      "questionId": "q1",
+      "questionNumber": 1,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q1-a4",
+      "selectedOptionText": "5-10 years",
+      "score": 4,
+      "weight": 1.5,
+      "weightedScore": 6.0
+    },
+    {
+      "questionId": "q2",
+      "questionNumber": 2,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q2-a3",
+      "selectedOptionText": "Do nothing and wait for recovery",
+      "score": 3,
+      "weight": 2.0,
+      "weightedScore": 6.0
+    },
+    {
+      "questionId": "q3",
+      "questionNumber": 3,
+      "answerType": "Slider",
+      "sliderValue": 6,
+      "score": 6,
+      "weight": 1.8,
+      "weightedScore": 10.8
+    },
+    {
+      "questionId": "q4",
+      "questionNumber": 4,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q4-a3",
+      "selectedOptionText": "Good - I understand most investment concepts",
+      "score": 3,
+      "weight": 1.2,
+      "weightedScore": 3.6
+    },
+    {
+      "questionId": "q5",
+      "questionNumber": 5,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q5-a4",
+      "selectedOptionText": "10-25%",
+      "score": 4,
+      "weight": 1.6,
+      "weightedScore": 6.4
+    },
+    {
+      "questionId": "q6",
+      "questionNumber": 6,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q6-a3",
+      "selectedOptionText": "3-6 months",
+      "score": 4,
+      "weight": 1.3,
+      "weightedScore": 5.2
+    },
+    {
+      "questionId": "q7",
+      "questionNumber": 7,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q7-a3",
+      "selectedOptionText": "Balance income and growth with moderate risk",
+      "score": 3,
+      "weight": 1.7,
+      "weightedScore": 5.1
+    },
+    {
+      "questionId": "q8",
+      "questionNumber": 8,
+      "answerType": "Ranking",
+      "rankedOptions": [
+        {"optionId": "q8-opt3", "rank": 1, "score": 5},
+        {"optionId": "q8-opt4", "rank": 2, "score": 3},
+        {"optionId": "q8-opt2", "rank": 3, "score": 2},
+        {"optionId": "q8-opt1", "rank": 4, "score": 1}
+      ],
+      "score": 2.75,
+      "weight": 1.5,
+      "weightedScore": 4.125
+    },
+    {
+      "questionId": "q9",
+      "questionNumber": 9,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q9-a2",
+      "selectedOptionText": "Employed - stable income",
+      "score": 4,
+      "weight": 1.1,
+      "weightedScore": 4.4
+    },
+    {
+      "questionId": "q10",
+      "questionNumber": 10,
+      "answerType": "MultipleChoice",
+      "selectedOptionIds": ["q10-a2", "q10-a3", "q10-a4"],
+      "selectedOptionTexts": ["Fixed income bonds", "Investment funds (unit trusts, OEICs)", "Individual shares/stocks"],
+      "selectedScores": [2, 3, 4],
+      "score": 3.0,
+      "weight": 1.0,
+      "weightedScore": 3.0
+    },
+    {
+      "questionId": "q11",
+      "questionNumber": 11,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q11-a4",
+      "selectedOptionText": "Quarterly",
+      "score": 4,
+      "weight": 0.8,
+      "weightedScore": 3.2
+    },
+    {
+      "questionId": "q12",
+      "questionNumber": 12,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q12-a3",
+      "selectedOptionText": "Yes, within 3-5 years",
+      "score": 3,
+      "weight": 1.4,
+      "weightedScore": 4.2
+    },
+    {
+      "questionId": "q13",
+      "questionNumber": 13,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q13-a2",
+      "selectedOptionText": "Probably choose Investment A",
+      "score": 2,
+      "weight": 2.0,
+      "weightedScore": 4.0
+    },
+    {
+      "questionId": "q14",
+      "questionNumber": 14,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q14-a2",
+      "selectedOptionText": "30-44",
+      "score": 4,
+      "weight": 1.3,
+      "weightedScore": 5.2
+    },
+    {
+      "questionId": "q15",
+      "questionNumber": 15,
+      "answerType": "SingleChoice",
+      "selectedOptionId": "q15-a3",
+      "selectedOptionText": "Neutral - I understand volatility is normal",
+      "score": 3,
+      "weight": 1.9,
+      "weightedScore": 5.7
+    }
+  ],
+  "additionalNotes": "Client expressed concern about recent market volatility but understands the importance of long-term investing."
+}
+```
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/factfind-456/risk-profiles/rp-789
+ETag: "abc123def456"
+```
+
+```json
+{
+  "id": "rp-789",
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "questionnaireId": "rq-2024-v3",
+  "questionnaireVersion": "3.0",
+  "questionnaireName": "Standard Attitude to Risk Questionnaire 2024",
+  "completedDate": "2026-02-17T14:30:00Z",
+  "completedBy": "Client",
+  "completionMethod": "OnlinePortal",
+  "adviserPresent": true,
+  "adviserId": "adv-789",
+  "totalQuestions": 15,
+  "questionsAnswered": 15,
+  "completionPercentage": 100.0,
+  "scoring": {
+    "rawScore": 76.925,
+    "totalWeight": 21.6,
+    "normalizedScore": 3.56,
+    "scoreMethod": "WeightedAverage",
+    "minPossibleScore": 1.0,
+    "maxPossibleScore": 5.0
+  },
+  "riskRating": {
+    "code": "MediumRisk",
+    "display": "Medium Risk",
+    "description": "Balanced approach with moderate equity exposure for growth and income.",
+    "scoreRange": {
+      "min": 2.61,
+      "max": 3.4
+    },
+    "confidence": "High",
+    "confidenceScore": 92.5
+  },
+  "assetAllocationRecommendation": {
+    "equities": {
+      "min": 35,
+      "max": 55,
+      "target": 45,
+      "amount": null
+    },
+    "bonds": {
+      "min": 25,
+      "max": 40,
+      "target": 30,
+      "amount": null
+    },
+    "cash": {
+      "min": 5,
+      "max": 20,
+      "target": 15,
+      "amount": null
+    },
+    "alternatives": {
+      "min": 5,
+      "max": 15,
+      "target": 10,
+      "amount": null
+    }
+  },
+  "expectedPerformance": {
+    "annualReturn": {
+      "min": 4.5,
+      "max": 7.0,
+      "target": 5.5
+    },
+    "volatility": {
+      "min": 6.0,
+      "max": 10.0,
+      "target": 8.0
+    }
+  },
+  "suitableProductTypes": [
+    "BalancedManagedFunds",
+    "MultiAssetISA",
+    "DiversifiedPortfolio",
+    "IncomeAndGrowthFunds"
+  ],
+  "riskCapacityScore": 3.8,
+  "riskToleranceScore": 3.2,
+  "investmentExperienceScore": 3.0,
+  "responses": [
+    {
+      "questionId": "q1",
+      "questionNumber": 1,
+      "questionText": "What is your investment time horizon?",
+      "category": "RiskCapacity",
+      "answerType": "SingleChoice",
+      "selectedOptionText": "5-10 years",
+      "score": 4,
+      "weight": 1.5,
+      "weightedScore": 6.0
+    },
+    {
+      "questionId": "q2",
+      "questionNumber": 2,
+      "questionText": "If the value of your investment fell by 20% in the first year, what would you do?",
+      "category": "RiskTolerance",
+      "answerType": "SingleChoice",
+      "selectedOptionText": "Do nothing and wait for recovery",
+      "score": 3,
+      "weight": 2.0,
+      "weightedScore": 6.0
+    }
+  ],
+  "additionalNotes": "Client expressed concern about recent market volatility but understands the importance of long-term investing.",
+  "adviserOverride": null,
+  "regulatoryWarnings": [
+    {
+      "type": "RiskWarning",
+      "message": "Investment values can go down as well as up and you may get back less than you invest",
+      "acknowledged": false
+    },
+    {
+      "type": "NoGuarantee",
+      "message": "Past performance is not a reliable indicator of future results",
+      "acknowledged": false
+    }
+  ],
+  "nextReviewDate": "2027-02-17",
+  "createdDate": "2026-02-17T14:35:00Z",
+  "lastModifiedDate": "2026-02-17T14:35:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-789" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "questionnaire": { "href": "/api/v1/risk-questionnaires/rq-2024-v3" },
+    "history": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/history" },
+    "update": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-789", "method": "PUT" }
+  }
+}
+```
+
+**Completion Methods:**
+- `OnlinePortal` - Client completed via online portal
+- `InMeeting` - Completed during adviser meeting
+- `PaperBased` - Completed on paper and entered by adviser
+- `Telephone` - Completed via telephone with adviser
+- `Video` - Completed via video call with adviser
+
+**Validation Rules:**
+- All required questions must be answered
+- Question IDs must match questionnaire template
+- Selected option IDs must be valid for the question
+- Slider values must be within min/max range
+- Ranking must include all options exactly once
+- Multiple choice must respect min/max selection constraints
+- `completedDate` cannot be in the future
+- Client must belong to the fact find
+
+**HTTP Status Codes:**
+- `201 Created` - Responses submitted and risk profile created
+- `400 Bad Request` - Invalid request data
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Fact find or questionnaire not found
+- `422 Unprocessable Entity` - Validation failed (incomplete responses)
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/incomplete-questionnaire",
+  "title": "Questionnaire Incomplete",
+  "status": 422,
+  "detail": "Cannot submit questionnaire with missing required questions",
+  "instance": "/api/v1/factfinds/factfind-456/risk-questionnaires/rq-2024-v3/responses",
+  "totalQuestions": 15,
+  "answeredQuestions": 13,
+  "missingQuestions": [
+    {
+      "questionId": "q7",
+      "questionNumber": 7,
+      "questionText": "Which statement best describes your investment objectives?"
+    },
+    {
+      "questionId": "q12",
+      "questionNumber": 12,
+      "questionText": "Do you expect any major expenses in the next 5 years?"
+    }
+  ]
+}
+```
+
+---
+
+### 10.5 Risk Assessment History API
+
+**Purpose:** Track risk profile changes over time for audit trail and "Risk Replay" functionality.
+
+**Scope:**
+- Historical risk profile snapshots with full audit trail
+- Risk profile version comparison and change analysis
+- Risk Replay mechanism for FCA compliance (demonstrate suitability over time)
+- Risk rating evolution tracking and trend analysis
+- Questionnaire response history with timestamps
+- Significant change documentation and justification
+- Adviser override tracking and rationale
+- Risk profile review scheduling and reminders
+
+**Aggregate Root:** FactFind (risk assessment history is nested within)
+
+**Regulatory Compliance:**
+- FCA COBS 9.2 (Ongoing Suitability Assessment)
+- MiFID II Article 25 (Regular Suitability Reviews)
+- ESMA Guidelines (Suitability Records)
+- FCA PROD 3.4 (Target Market Compatibility - Ongoing)
+- SM&CR (Senior Managers Regime - Audit Trail Requirements)
+- Consumer Duty (Ongoing Monitoring of Customer Outcomes)
+
+**Risk Replay Concept:**
+
+Risk Replay is a regulatory compliance mechanism that allows advisers to:
+1. Demonstrate how risk assessment has evolved over time
+2. Show justification for investment recommendations at specific points in time
+3. Evidence ongoing suitability reviews
+4. Track changes in client circumstances affecting risk tolerance
+5. Provide audit trail for FCA inspections
+
+#### 10.5.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/risk-profiles/history` | Get risk assessment history | `risk:read` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profiles/compare` | Compare two risk assessments (Risk Replay) | `risk:read` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profiles/evolution` | Get risk profile evolution over time | `risk:read` |
+| POST | `/api/v1/factfinds/{factfindId}/risk-profiles/snapshot` | Create manual risk profile snapshot | `risk:write` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profiles/{id}` | Get historical risk profile | `risk:read` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profiles/{id}/questionnaire-responses` | Get questionnaire responses for profile | `risk:read` |
+| POST | `/api/v1/factfinds/{factfindId}/risk-profiles/{id}/review-notes` | Add review notes to profile | `risk:write` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profiles/timeline` | Get visual timeline of risk changes | `risk:read` |
+| GET | `/api/v1/factfinds/{factfindId}/risk-profiles/audit-trail` | Get complete audit trail | `risk:read` |
+
+#### 10.5.2 Key Endpoints
+
+##### 10.5.2.1 Get Risk Assessment History
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/risk-profiles/history`
+
+**Description:** List all historical risk profiles for a fact find with summary information including risk rating changes and significant events.
+
+**Query Parameters:**
+- `clientId` - Filter by specific client (for joint fact finds)
+- `fromDate` - Filter profiles from this date (ISO 8601)
+- `toDate` - Filter profiles to this date (ISO 8601)
+- `includeDeleted` - Include deleted/superseded profiles (default: false)
+- `sortOrder` - Sort order: asc (oldest first), desc (newest first, default)
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "totalAssessments": 5,
+  "dateRange": {
+    "firstAssessment": "2022-03-15",
+    "lastAssessment": "2026-02-17"
+  },
+  "currentRiskProfile": {
+    "id": "rp-789",
+    "riskRating": "MediumRisk",
+    "assessmentDate": "2026-02-17"
+  },
+  "riskRatingChanges": 2,
+  "significantChanges": 1,
+  "history": [
+    {
+      "id": "rp-789",
+      "assessmentNumber": 5,
+      "assessmentDate": "2026-02-17T14:30:00Z",
+      "assessmentType": "RegularReview",
+      "questionnaireVersion": "3.0",
+      "questionnaireName": "Standard Attitude to Risk Questionnaire 2024",
+      "riskRating": {
+        "code": "MediumRisk",
+        "display": "Medium Risk",
+        "normalizedScore": 3.56
+      },
+      "riskCapacityScore": 3.8,
+      "riskToleranceScore": 3.2,
+      "investmentExperienceScore": 3.0,
+      "completedBy": "Client",
+      "completionMethod": "OnlinePortal",
+      "adviserPresent": true,
+      "adviser": {
+        "id": "adv-789",
+        "name": "Sarah Johnson"
+      },
+      "changeFromPrevious": {
+        "riskRatingChanged": false,
+        "previousRiskRating": "MediumRisk",
+        "scoreChange": 0.06,
+        "scoreChangePercentage": 1.7,
+        "significantChange": false
+      },
+      "adviserOverride": null,
+      "reviewScheduled": "2027-02-17",
+      "status": "Current",
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-789" },
+        "questionnaire-responses": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-789/questionnaire-responses" },
+        "compare-to-previous": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-654&to=rp-789" }
+      }
+    },
+    {
+      "id": "rp-654",
+      "assessmentNumber": 4,
+      "assessmentDate": "2025-02-10T10:15:00Z",
+      "assessmentType": "RegularReview",
+      "questionnaireVersion": "3.0",
+      "questionnaireName": "Standard Attitude to Risk Questionnaire 2024",
+      "riskRating": {
+        "code": "MediumRisk",
+        "display": "Medium Risk",
+        "normalizedScore": 3.50
+      },
+      "riskCapacityScore": 3.7,
+      "riskToleranceScore": 3.2,
+      "investmentExperienceScore": 3.1,
+      "completedBy": "Client",
+      "completionMethod": "InMeeting",
+      "adviserPresent": true,
+      "adviser": {
+        "id": "adv-789",
+        "name": "Sarah Johnson"
+      },
+      "changeFromPrevious": {
+        "riskRatingChanged": false,
+        "previousRiskRating": "MediumRisk",
+        "scoreChange": 0.0,
+        "scoreChangePercentage": 0.0,
+        "significantChange": false
+      },
+      "adviserOverride": null,
+      "reviewScheduled": "2026-02-10",
+      "status": "Superseded",
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-654" },
+        "questionnaire-responses": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-654/questionnaire-responses" },
+        "compare-to-next": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-654&to=rp-789" },
+        "compare-to-previous": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-523&to=rp-654" }
+      }
+    },
+    {
+      "id": "rp-523",
+      "assessmentNumber": 3,
+      "assessmentDate": "2024-03-20T11:30:00Z",
+      "assessmentType": "SignificantChangeTriggered",
+      "questionnaireVersion": "2.1",
+      "questionnaireName": "Standard Attitude to Risk Questionnaire 2023",
+      "riskRating": {
+        "code": "MediumRisk",
+        "display": "Medium Risk",
+        "normalizedScore": 3.50
+      },
+      "riskCapacityScore": 3.7,
+      "riskToleranceScore": 3.3,
+      "investmentExperienceScore": 3.0,
+      "completedBy": "Adviser",
+      "completionMethod": "InMeeting",
+      "adviserPresent": true,
+      "adviser": {
+        "id": "adv-789",
+        "name": "Sarah Johnson"
+      },
+      "changeFromPrevious": {
+        "riskRatingChanged": true,
+        "previousRiskRating": "LowRisk",
+        "scoreChange": 0.80,
+        "scoreChangePercentage": 29.6,
+        "significantChange": true,
+        "changeReason": "Client circumstances changed - received inheritance increasing financial capacity"
+      },
+      "adviserOverride": null,
+      "reviewScheduled": "2025-03-20",
+      "status": "Superseded",
+      "significantChangeDetails": {
+        "triggerEvent": "InheritanceReceived",
+        "triggerDate": "2024-02-28",
+        "changeDescription": "Client received £250,000 inheritance significantly improving financial capacity and reducing need for capital preservation",
+        "adviserNotes": "Discussed increased capacity for risk. Client comfortable moving to medium risk profile given improved financial position and longer time horizon for inherited funds.",
+        "documentedInSuitabilityReport": true,
+        "suitabilityReportReference": "SR-2024-03-523"
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-523" },
+        "questionnaire-responses": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-523/questionnaire-responses" },
+        "compare-to-next": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-523&to=rp-654" },
+        "compare-to-previous": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-412&to=rp-523" },
+        "suitability-report": { "href": "/api/v1/suitability-reports/SR-2024-03-523" }
+      }
+    },
+    {
+      "id": "rp-412",
+      "assessmentNumber": 2,
+      "assessmentDate": "2023-03-10T14:00:00Z",
+      "assessmentType": "RegularReview",
+      "questionnaireVersion": "2.1",
+      "questionnaireName": "Standard Attitude to Risk Questionnaire 2023",
+      "riskRating": {
+        "code": "LowRisk",
+        "display": "Low Risk",
+        "normalizedScore": 2.70
+      },
+      "riskCapacityScore": 2.8,
+      "riskToleranceScore": 2.6,
+      "investmentExperienceScore": 2.5,
+      "completedBy": "Client",
+      "completionMethod": "InMeeting",
+      "adviserPresent": true,
+      "adviser": {
+        "id": "adv-789",
+        "name": "Sarah Johnson"
+      },
+      "changeFromPrevious": {
+        "riskRatingChanged": false,
+        "previousRiskRating": "LowRisk",
+        "scoreChange": 0.10,
+        "scoreChangePercentage": 3.8,
+        "significantChange": false
+      },
+      "adviserOverride": null,
+      "reviewScheduled": "2024-03-10",
+      "status": "Superseded",
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-412" },
+        "questionnaire-responses": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-412/questionnaire-responses" },
+        "compare-to-next": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-412&to=rp-523" },
+        "compare-to-previous": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-301&to=rp-412" }
+      }
+    },
+    {
+      "id": "rp-301",
+      "assessmentNumber": 1,
+      "assessmentDate": "2022-03-15T09:30:00Z",
+      "assessmentType": "InitialAssessment",
+      "questionnaireVersion": "2.0",
+      "questionnaireName": "Standard Attitude to Risk Questionnaire 2022",
+      "riskRating": {
+        "code": "LowRisk",
+        "display": "Low Risk",
+        "normalizedScore": 2.60
+      },
+      "riskCapacityScore": 2.5,
+      "riskToleranceScore": 2.7,
+      "investmentExperienceScore": 2.2,
+      "completedBy": "Client",
+      "completionMethod": "PaperBased",
+      "adviserPresent": true,
+      "adviser": {
+        "id": "adv-789",
+        "name": "Sarah Johnson"
+      },
+      "changeFromPrevious": {
+        "riskRatingChanged": false,
+        "previousRiskRating": null,
+        "scoreChange": null,
+        "scoreChangePercentage": null,
+        "significantChange": false
+      },
+      "adviserOverride": null,
+      "reviewScheduled": "2023-03-15",
+      "status": "Superseded",
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-301" },
+        "questionnaire-responses": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-301/questionnaire-responses" },
+        "compare-to-next": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-301&to=rp-412" }
+      }
+    }
+  ],
+  "riskTrend": {
+    "direction": "Increasing",
+    "changeOverPeriod": 0.96,
+    "averageScore": 3.17,
+    "volatility": "Low"
+  },
+  "nextScheduledReview": "2027-02-17",
+  "reviewOverdue": false,
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/history" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "current-risk-profile": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-789" },
+    "evolution": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/evolution" },
+    "timeline": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/timeline" },
+    "audit-trail": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/audit-trail" }
+  }
+}
+```
+
+**Assessment Types:**
+- `InitialAssessment` - First risk assessment for client
+- `RegularReview` - Scheduled periodic review
+- `SignificantChangeTriggered` - Triggered by change in circumstances
+- `ProductSuitabilityCheck` - Triggered by new product recommendation
+- `RegulatoryReview` - Triggered by regulatory requirement
+- `ClientRequested` - Requested by client
+- `AdviserInitiated` - Initiated by adviser concern
+- `ComplaintInvestigation` - Part of complaint investigation
+
+**Risk Profile Status:**
+- `Current` - Current active risk profile
+- `Superseded` - Replaced by newer assessment
+- `Deleted` - Deleted (kept for audit)
+- `UnderReview` - Currently being reviewed/challenged
+
+**Validation Rules:**
+- `fromDate` must be before `toDate`
+- Dates must be valid ISO 8601 format
+- Client must belong to fact find
+
+**HTTP Status Codes:**
+- `200 OK` - History retrieved successfully
+- `404 Not Found` - Fact find not found
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+##### 10.5.2.2 Compare Risk Assessments (Risk Replay)
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/risk-profiles/compare`
+
+**Description:** Compare two risk assessments to show changes in responses, risk rating, and suitability. This is the core "Risk Replay" functionality for demonstrating ongoing suitability.
+
+**Query Parameters:**
+- `from` - Earlier risk profile ID (required)
+- `to` - Later risk profile ID (required)
+- `includeQuestionnaireChanges` - Include questionnaire version changes (default: true)
+- `highlightSignificantChanges` - Highlight significant changes only (default: false)
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "comparisonDate": "2026-02-17T15:00:00Z",
+  "fromProfile": {
+    "id": "rp-412",
+    "assessmentDate": "2023-03-10T14:00:00Z",
+    "assessmentType": "RegularReview",
+    "questionnaireVersion": "2.1",
+    "questionnaireName": "Standard Attitude to Risk Questionnaire 2023",
+    "riskRating": {
+      "code": "LowRisk",
+      "display": "Low Risk",
+      "normalizedScore": 2.70
+    },
+    "riskCapacityScore": 2.8,
+    "riskToleranceScore": 2.6,
+    "investmentExperienceScore": 2.5,
+    "adviser": {
+      "id": "adv-789",
+      "name": "Sarah Johnson"
+    }
+  },
+  "toProfile": {
+    "id": "rp-523",
+    "assessmentDate": "2024-03-20T11:30:00Z",
+    "assessmentType": "SignificantChangeTriggered",
+    "questionnaireVersion": "2.1",
+    "questionnaireName": "Standard Attitude to Risk Questionnaire 2023",
+    "riskRating": {
+      "code": "MediumRisk",
+      "display": "Medium Risk",
+      "normalizedScore": 3.50
+    },
+    "riskCapacityScore": 3.7,
+    "riskToleranceScore": 3.3,
+    "investmentExperienceScore": 3.0,
+    "adviser": {
+      "id": "adv-789",
+      "name": "Sarah Johnson"
+    }
+  },
+  "timeBetweenAssessments": {
+    "days": 375,
+    "months": 12.3,
+    "years": 1.0
+  },
+  "riskRatingChange": {
+    "changed": true,
+    "direction": "Increased",
+    "fromRating": "LowRisk",
+    "toRating": "MediumRisk",
+    "scoreChange": 0.80,
+    "scoreChangePercentage": 29.6,
+    "significantChange": true,
+    "changeClassification": "MajorIncrease"
+  },
+  "componentScoreChanges": {
+    "riskCapacity": {
+      "fromScore": 2.8,
+      "toScore": 3.7,
+      "change": 0.9,
+      "changePercentage": 32.1,
+      "changed": true,
+      "direction": "Increased"
+    },
+    "riskTolerance": {
+      "fromScore": 2.6,
+      "toScore": 3.3,
+      "change": 0.7,
+      "changePercentage": 26.9,
+      "changed": true,
+      "direction": "Increased"
+    },
+    "investmentExperience": {
+      "fromScore": 2.5,
+      "toScore": 3.0,
+      "change": 0.5,
+      "changePercentage": 20.0,
+      "changed": true,
+      "direction": "Increased"
+    }
+  },
+  "assetAllocationChange": {
+    "from": {
+      "equities": 20,
+      "bonds": 50,
+      "cash": 25,
+      "alternatives": 5
+    },
+    "to": {
+      "equities": 45,
+      "bonds": 30,
+      "cash": 15,
+      "alternatives": 10
+    },
+    "changes": {
+      "equities": { "change": 25, "direction": "Increased" },
+      "bonds": { "change": -20, "direction": "Decreased" },
+      "cash": { "change": -10, "direction": "Decreased" },
+      "alternatives": { "change": 5, "direction": "Increased" }
+    }
+  },
+  "questionnaireComparison": {
+    "sameQuestionnaire": true,
+    "sameVersion": true,
+    "questionnaireName": "Standard Attitude to Risk Questionnaire 2023",
+    "fromVersion": "2.1",
+    "toVersion": "2.1",
+    "comparableResponses": true
+  },
+  "responseChanges": [
+    {
+      "questionId": "q1",
+      "questionNumber": 1,
+      "questionText": "What is your investment time horizon?",
+      "category": "RiskCapacity",
+      "changed": false,
+      "fromResponse": {
+        "selectedOptionText": "5-10 years",
+        "score": 4
+      },
+      "toResponse": {
+        "selectedOptionText": "5-10 years",
+        "score": 4
+      },
+      "scoreChange": 0,
+      "significant": false
+    },
+    {
+      "questionId": "q2",
+      "questionNumber": 2,
+      "questionText": "If the value of your investment fell by 20% in the first year, what would you do?",
+      "category": "RiskTolerance",
+      "changed": true,
+      "fromResponse": {
+        "selectedOptionText": "Reduce exposure by selling 50% of investments",
+        "score": 2
+      },
+      "toResponse": {
+        "selectedOptionText": "Hold current positions and wait for recovery",
+        "score": 3
+      },
+      "scoreChange": 1,
+      "scoreChangePercentage": 50.0,
+      "significant": true,
+      "changeReason": "Increased confidence in market recovery following improved financial position"
+    },
+    {
+      "questionId": "q5",
+      "questionNumber": 5,
+      "questionText": "What percentage of your total wealth is represented by this investment?",
+      "category": "RiskCapacity",
+      "changed": true,
+      "fromResponse": {
+        "selectedOptionText": "50-75%",
+        "score": 2
+      },
+      "toResponse": {
+        "selectedOptionText": "10-25%",
+        "score": 4
+      },
+      "scoreChange": 2,
+      "scoreChangePercentage": 100.0,
+      "significant": true,
+      "changeReason": "Inheritance received significantly increased total wealth, reducing concentration risk"
+    },
+    {
+      "questionId": "q6",
+      "questionNumber": 6,
+      "questionText": "Do you have an emergency fund covering at least 3-6 months of expenses?",
+      "category": "RiskCapacity",
+      "changed": true,
+      "fromResponse": {
+        "selectedOptionText": "Less than 3 months",
+        "score": 2
+      },
+      "toResponse": {
+        "selectedOptionText": "More than 6 months",
+        "score": 5
+      },
+      "scoreChange": 3,
+      "scoreChangePercentage": 150.0,
+      "significant": true,
+      "changeReason": "Emergency fund significantly improved following inheritance"
+    },
+    {
+      "questionId": "q7",
+      "questionNumber": 7,
+      "questionText": "Which statement best describes your investment objectives?",
+      "category": "RiskTolerance",
+      "changed": true,
+      "fromResponse": {
+        "selectedOptionText": "Generate income with minimal capital growth",
+        "score": 2
+      },
+      "toResponse": {
+        "selectedOptionText": "Balance income and growth with moderate risk",
+        "score": 3
+      },
+      "scoreChange": 1,
+      "scoreChangePercentage": 50.0,
+      "significant": true,
+      "changeReason": "Shift to balanced approach given improved capacity and longer time horizon for inherited funds"
+    },
+    {
+      "questionId": "q10",
+      "questionNumber": 10,
+      "questionText": "Which of the following investment types have you held before?",
+      "category": "InvestmentExperience",
+      "changed": true,
+      "fromResponse": {
+        "selectedOptionTexts": ["Cash savings accounts only", "Fixed income bonds"],
+        "score": 1.5
+      },
+      "toResponse": {
+        "selectedOptionTexts": ["Fixed income bonds", "Investment funds (unit trusts, OEICs)", "Individual shares/stocks"],
+        "score": 3.0
+      },
+      "scoreChange": 1.5,
+      "scoreChangePercentage": 100.0,
+      "significant": true,
+      "changeReason": "Gained experience with investment funds and equities over past year"
+    },
+    {
+      "questionId": "q12",
+      "questionNumber": 12,
+      "questionText": "Do you expect any major expenses in the next 5 years?",
+      "category": "RiskCapacity",
+      "changed": true,
+      "fromResponse": {
+        "selectedOptionText": "Yes, within 1-3 years",
+        "score": 2
+      },
+      "toResponse": {
+        "selectedOptionText": "No major expenses expected",
+        "score": 5
+      },
+      "scoreChange": 3,
+      "scoreChangePercentage": 150.0,
+      "significant": true,
+      "changeReason": "Major expense (home renovation) completed, no further large expenses planned"
+    }
+  ],
+  "significantChangesSummary": {
+    "totalQuestions": 12,
+    "questionsChanged": 6,
+    "significantChanges": 6,
+    "questionsUnchanged": 6,
+    "averageScoreChange": 0.67,
+    "maxScoreChange": 3.0,
+    "changeCategories": {
+      "RiskCapacity": 4,
+      "RiskTolerance": 2,
+      "InvestmentExperience": 1
+    }
+  },
+  "suitabilityImpact": {
+    "previousRecommendations": {
+      "productTypes": ["CautionsManagedFunds", "CorporateBonds", "BalancedIncomeISA"],
+      "assetAllocation": "Conservative income-focused portfolio",
+      "equityExposure": "Low (20%)"
+    },
+    "newRecommendations": {
+      "productTypes": ["BalancedManagedFunds", "MultiAssetISA", "DiversifiedPortfolio"],
+      "assetAllocation": "Balanced growth and income portfolio",
+      "equityExposure": "Medium (45%)"
+    },
+    "existingPortfolioSuitability": {
+      "stillSuitable": false,
+      "actionRequired": "RebalanceRequired",
+      "reason": "Current portfolio too conservative for updated risk profile. Recommend rebalancing to increase equity exposure from 20% to 45%."
+    }
+  },
+  "changeJustification": {
+    "primaryDrivers": [
+      "Inheritance received (£250,000) significantly improved financial capacity",
+      "Emergency fund increased from <3 months to >6 months coverage",
+      "Investment as percentage of total wealth reduced from 50-75% to 10-25%",
+      "Major planned expenses completed, no further large expenses expected"
+    ],
+    "adviserNotes": "Client circumstances have materially improved following inheritance. Capacity for loss significantly increased. Client also gained investment experience and confidence over the past year. Discussed portfolio rebalancing to align with updated risk profile. Client comfortable with increased equity exposure given improved financial position.",
+    "documentationReference": "SR-2024-03-523",
+    "clientAcknowledgment": {
+      "acknowledged": true,
+      "acknowledgedDate": "2024-03-20T11:45:00Z",
+      "signedBy": "John Smith"
+    }
+  },
+  "regulatoryCompliance": {
+    "fcaCOBS9_2Compliance": true,
+    "mifidII_Article25Compliance": true,
+    "suitabilityReportProduced": true,
+    "suitabilityReportReference": "SR-2024-03-523",
+    "adviserSignOff": {
+      "signedBy": {
+        "id": "adv-789",
+        "name": "Sarah Johnson",
+        "fcaRegistrationNumber": "FCA12345"
+      },
+      "signedDate": "2024-03-20T12:00:00Z",
+      "complianceNotes": "Risk profile change reviewed and approved. Change justified by material improvement in client circumstances. Suitability report documents full rationale. Portfolio rebalancing recommendations provided."
+    }
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/compare?from=rp-412&to=rp-523" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "from-profile": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-412" },
+    "to-profile": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-523" },
+    "suitability-report": { "href": "/api/v1/suitability-reports/SR-2024-03-523" },
+    "history": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/history" }
+  }
+}
+```
+
+**Change Classifications:**
+- `NoChange` - Risk rating unchanged
+- `MinorIncrease` - Score increase <0.5, same risk band
+- `MinorDecrease` - Score decrease <0.5, same risk band
+- `ModerateIncrease` - Score increase 0.5-1.0, may change risk band
+- `ModerateDecrease` - Score decrease 0.5-1.0, may change risk band
+- `MajorIncrease` - Score increase >1.0, changes risk band
+- `MajorDecrease` - Score decrease >1.0, changes risk band
+
+**Validation Rules:**
+- `from` profile must be earlier than `to` profile
+- Both profiles must belong to the same fact find
+- Both profiles must exist and be accessible
+- Profiles should ideally use the same questionnaire version for accurate comparison
+
+**HTTP Status Codes:**
+- `200 OK` - Comparison completed successfully
+- `400 Bad Request` - Invalid comparison parameters
+- `404 Not Found` - One or both profiles not found
+- `403 Forbidden` - Insufficient permissions
+- `422 Unprocessable Entity` - Profiles not comparable (different questionnaires, incompatible versions)
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/incompatible-comparison",
+  "title": "Risk Profiles Not Comparable",
+  "status": 422,
+  "detail": "Cannot compare risk profiles using different questionnaire versions",
+  "instance": "/api/v1/factfinds/factfind-456/risk-profiles/compare",
+  "fromProfile": {
+    "id": "rp-301",
+    "questionnaireVersion": "2.0",
+    "questionnaireName": "Standard Attitude to Risk Questionnaire 2022"
+  },
+  "toProfile": {
+    "id": "rp-789",
+    "questionnaireVersion": "3.0",
+    "questionnaireName": "Standard Attitude to Risk Questionnaire 2024"
+  },
+  "recommendation": "Use evolution endpoint for high-level trend analysis across different questionnaire versions"
+}
+```
+
+---
+
+##### 10.5.2.3 Get Risk Profile Evolution
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/risk-profiles/evolution`
+
+**Description:** Get time-series data showing how risk profile has evolved over time. Provides chart-ready data for visualizing risk rating changes, score trends, and component breakdowns.
+
+**Query Parameters:**
+- `clientId` - Filter by specific client
+- `fromDate` - Start date for evolution analysis
+- `toDate` - End date for evolution analysis
+- `granularity` - Data point frequency: daily, weekly, monthly, yearly (default: monthly)
+- `includeProjections` - Include future projections (default: false)
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "analysisDate": "2026-02-17",
+  "dateRange": {
+    "from": "2022-03-15",
+    "to": "2026-02-17",
+    "durationMonths": 47,
+    "durationYears": 3.9
+  },
+  "totalAssessments": 5,
+  "granularity": "monthly",
+  "timeline": [
+    {
+      "date": "2022-03-15",
+      "assessmentId": "rp-301",
+      "assessmentType": "InitialAssessment",
+      "riskRating": {
+        "code": "LowRisk",
+        "display": "Low Risk",
+        "normalizedScore": 2.60
+      },
+      "riskCapacityScore": 2.5,
+      "riskToleranceScore": 2.7,
+      "investmentExperienceScore": 2.2,
+      "dataPoint": true,
+      "adviserNotes": "Initial risk assessment completed. Client has limited investment experience and modest capacity for loss."
+    },
+    {
+      "date": "2023-03-10",
+      "assessmentId": "rp-412",
+      "assessmentType": "RegularReview",
+      "riskRating": {
+        "code": "LowRisk",
+        "display": "Low Risk",
+        "normalizedScore": 2.70
+      },
+      "riskCapacityScore": 2.8,
+      "riskToleranceScore": 2.6,
+      "investmentExperienceScore": 2.5,
+      "changeFromPrevious": {
+        "scoreChange": 0.10,
+        "months": 12,
+        "annualizedChange": 0.10
+      },
+      "dataPoint": true,
+      "adviserNotes": "Annual review - minor improvement in capacity and experience. Risk rating unchanged."
+    },
+    {
+      "date": "2024-03-20",
+      "assessmentId": "rp-523",
+      "assessmentType": "SignificantChangeTriggered",
+      "riskRating": {
+        "code": "MediumRisk",
+        "display": "Medium Risk",
+        "normalizedScore": 3.50
+      },
+      "riskCapacityScore": 3.7,
+      "riskToleranceScore": 3.3,
+      "investmentExperienceScore": 3.0,
+      "changeFromPrevious": {
+        "scoreChange": 0.80,
+        "months": 12.3,
+        "annualizedChange": 0.78
+      },
+      "significantChange": true,
+      "changeDrivers": [
+        "InheritanceReceived",
+        "ImprovedFinancialPosition",
+        "IncreasedEmergencyFund"
+      ],
+      "dataPoint": true,
+      "adviserNotes": "Significant improvement following inheritance. Risk rating increased from Low to Medium. Portfolio rebalancing recommended."
+    },
+    {
+      "date": "2025-02-10",
+      "assessmentId": "rp-654",
+      "assessmentType": "RegularReview",
+      "riskRating": {
+        "code": "MediumRisk",
+        "display": "Medium Risk",
+        "normalizedScore": 3.50
+      },
+      "riskCapacityScore": 3.7,
+      "riskToleranceScore": 3.2,
+      "investmentExperienceScore": 3.1,
+      "changeFromPrevious": {
+        "scoreChange": 0.0,
+        "months": 10.7,
+        "annualizedChange": 0.0
+      },
+      "dataPoint": true,
+      "adviserNotes": "Annual review - risk profile stable. Portfolio performing well."
+    },
+    {
+      "date": "2026-02-17",
+      "assessmentId": "rp-789",
+      "assessmentType": "RegularReview",
+      "riskRating": {
+        "code": "MediumRisk",
+        "display": "Medium Risk",
+        "normalizedScore": 3.56
+      },
+      "riskCapacityScore": 3.8,
+      "riskToleranceScore": 3.2,
+      "investmentExperienceScore": 3.0,
+      "changeFromPrevious": {
+        "scoreChange": 0.06,
+        "months": 12.2,
+        "annualizedChange": 0.06
+      },
+      "dataPoint": true,
+      "adviserNotes": "Annual review - slight improvement in capacity. Risk profile stable at medium risk."
+    }
+  ],
+  "trendAnalysis": {
+    "overallTrend": "Increasing",
+    "averageScore": 3.17,
+    "medianScore": 3.50,
+    "scoreRange": {
+      "min": 2.60,
+      "max": 3.56,
+      "spread": 0.96
+    },
+    "volatility": "Low",
+    "standardDeviation": 0.42,
+    "riskRatingStability": "Stable",
+    "riskRatingChanges": 1,
+    "longestPeriodInSameRating": {
+      "riskRating": "MediumRisk",
+      "startDate": "2024-03-20",
+      "endDate": "2026-02-17",
+      "durationMonths": 23
+    },
+    "averageTimeBetweenAssessments": {
+      "months": 11.75,
+      "withinExpectedRange": true,
+      "expectedRange": "12 months"
+    }
+  },
+  "componentTrends": {
+    "riskCapacity": {
+      "trend": "Increasing",
+      "firstScore": 2.5,
+      "lastScore": 3.8,
+      "totalChange": 1.3,
+      "percentageChange": 52.0,
+      "averageScore": 3.3,
+      "volatility": "Moderate"
+    },
+    "riskTolerance": {
+      "trend": "Stable",
+      "firstScore": 2.7,
+      "lastScore": 3.2,
+      "totalChange": 0.5,
+      "percentageChange": 18.5,
+      "averageScore": 2.9,
+      "volatility": "Low"
+    },
+    "investmentExperience": {
+      "trend": "Increasing",
+      "firstScore": 2.2,
+      "lastScore": 3.0,
+      "totalChange": 0.8,
+      "percentageChange": 36.4,
+      "averageScore": 2.7,
+      "volatility": "Low"
+    }
+  },
+  "riskRatingDistribution": {
+    "VeryLowRisk": {
+      "count": 0,
+      "percentage": 0.0,
+      "totalMonths": 0
+    },
+    "LowRisk": {
+      "count": 2,
+      "percentage": 40.0,
+      "totalMonths": 24
+    },
+    "MediumRisk": {
+      "count": 3,
+      "percentage": 60.0,
+      "totalMonths": 23
+    },
+    "HighRisk": {
+      "count": 0,
+      "percentage": 0.0,
+      "totalMonths": 0
+    },
+    "VeryHighRisk": {
+      "count": 0,
+      "percentage": 0.0,
+      "totalMonths": 0
+    }
+  },
+  "keyMilestones": [
+    {
+      "date": "2022-03-15",
+      "event": "Initial Assessment",
+      "description": "First risk assessment completed - Low Risk rating established",
+      "riskRating": "LowRisk"
+    },
+    {
+      "date": "2024-03-20",
+      "event": "Risk Rating Upgrade",
+      "description": "Risk rating increased to Medium following inheritance",
+      "riskRating": "MediumRisk",
+      "changeDriver": "InheritanceReceived"
+    }
+  ],
+  "nextReviewDate": "2027-02-17",
+  "reviewFrequency": "Annual",
+  "projections": null,
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/evolution" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "history": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/history" },
+    "current-profile": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/rp-789" },
+    "timeline": { "href": "/api/v1/factfinds/factfind-456/risk-profiles/timeline" }
+  }
+}
+```
+
+**Trend Analysis:**
+- `Increasing` - Overall upward trend in risk score
+- `Decreasing` - Overall downward trend in risk score
+- `Stable` - No significant trend (changes < 10% over period)
+- `Volatile` - Frequent significant changes (high standard deviation)
+
+**Volatility Classifications:**
+- `Low` - Standard deviation < 0.5
+- `Moderate` - Standard deviation 0.5 - 1.0
+- `High` - Standard deviation > 1.0
+
+**Validation Rules:**
+- `fromDate` must be before `toDate`
+- Granularity must be valid value
+- Date range cannot exceed 10 years for daily granularity
+- Client must belong to fact find
+
+**HTTP Status Codes:**
+- `200 OK` - Evolution data retrieved successfully
+- `400 Bad Request` - Invalid parameters
+- `404 Not Found` - Fact find not found
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+### 10.6 Supplementary Questions API
+
+**Purpose:** Capture additional risk-related and general supplementary questions beyond the standard ATR questionnaire.
+
+**Scope:**
+- Risk-specific supplementary questions (dependants, time horizon, emergency funds, retirement plans)
+- General supplementary questions (Will, LPA, estate planning, health conditions)
+- Compliance supplementary questions (previous advice received, understanding of disclosures)
+- Custom question sets per firm/adviser
+- Question response tracking with audit trail
+- Completion status monitoring and reminders
+- Conditional question logic (show questions based on previous answers)
+- Integration with risk profiling and suitability assessment
+
+**Aggregate Root:** FactFind (supplementary questions are nested within)
+
+**Regulatory Compliance:**
+- FCA COBS 9.2 (Assessing Suitability - Understanding Client Needs)
+- FCA COBS 9 Annex 1 (Demands and Needs)
+- MiFID II Article 25 (Information from Clients)
+- Consumer Duty (Understanding Customer Needs and Characteristics)
+- Vulnerable Customers Guidance (FG21/1 - Identifying Vulnerability)
+
+#### 10.6.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/supplementary-questions` | Get supplementary questions | `factfind:read` |
+| GET | `/api/v1/factfinds/{factfindId}/supplementary-questions/by-category` | Get questions grouped by category | `factfind:read` |
+| POST | `/api/v1/factfinds/{factfindId}/supplementary-questions/responses` | Submit responses | `factfind:write` |
+| PUT | `/api/v1/factfinds/{factfindId}/supplementary-questions/responses/{id}` | Update response | `factfind:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/supplementary-questions/responses/{id}` | Delete response | `factfind:write` |
+| GET | `/api/v1/factfinds/{factfindId}/supplementary-questions/responses` | Get all responses | `factfind:read` |
+| GET | `/api/v1/factfinds/{factfindId}/supplementary-questions/completion-status` | Get completion status | `factfind:read` |
+| POST | `/api/v1/factfinds/{factfindId}/supplementary-questions/bulk-response` | Submit multiple responses at once | `factfind:write` |
+| GET | `/api/v1/supplementary-questions/templates` | Get question templates (firm-level) | `admin:read` |
+| POST | `/api/v1/supplementary-questions/templates` | Create custom question template | `admin:write` |
+
+#### 10.6.2 Key Endpoints
+
+##### 10.6.2.1 Get Supplementary Questions
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/supplementary-questions`
+
+**Description:** Get all supplementary questions applicable to a fact find, organized by category with existing responses if available.
+
+**Query Parameters:**
+- `category` - Filter by category: Risk, General, Compliance, Custom
+- `includeOptional` - Include optional questions (default: true)
+- `includeConditional` - Include conditional questions (default: true)
+- `status` - Filter by status: Unanswered, Partial, Complete
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "questionSetVersion": "2024-v1",
+  "effectiveDate": "2026-02-17",
+  "totalQuestions": 45,
+  "answeredQuestions": 32,
+  "completionPercentage": 71.1,
+  "categories": [
+    {
+      "category": "Risk",
+      "categoryDisplay": "Risk & Capacity for Loss",
+      "description": "Questions to assess risk capacity, time horizon, and financial resilience",
+      "questionCount": 15,
+      "answeredCount": 12,
+      "completionPercentage": 80.0,
+      "required": true,
+      "questions": [
+        {
+          "id": "sq-risk-001",
+          "questionNumber": 1,
+          "questionText": "How many financial dependants do you have?",
+          "helpText": "Include children under 18, adult children in education, elderly parents, or others financially dependent on you",
+          "questionType": "Number",
+          "category": "Risk",
+          "subcategory": "Dependants",
+          "required": true,
+          "displayOrder": 1,
+          "validationRules": {
+            "minValue": 0,
+            "maxValue": 20,
+            "allowDecimals": false
+          },
+          "response": {
+            "responseId": "resp-001",
+            "value": 2,
+            "displayValue": "2 dependants",
+            "answeredDate": "2026-02-15T10:30:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:30:00Z"
+          },
+          "impactOnRiskAssessment": {
+            "affectsCapacityForLoss": true,
+            "reasoning": "More dependants typically reduce capacity for loss due to greater financial obligations"
+          }
+        },
+        {
+          "id": "sq-risk-002",
+          "questionText": "What are the ages of your dependants?",
+          "helpText": "Separate ages with commas (e.g., 8, 12, 15)",
+          "questionType": "Text",
+          "category": "Risk",
+          "subcategory": "Dependants",
+          "required": false,
+          "displayOrder": 2,
+          "conditionalLogic": {
+            "showIf": {
+              "questionId": "sq-risk-001",
+              "operator": "GreaterThan",
+              "value": 0
+            }
+          },
+          "response": {
+            "responseId": "resp-002",
+            "value": "12, 15",
+            "displayValue": "Ages: 12, 15",
+            "answeredDate": "2026-02-15T10:32:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:32:00Z"
+          }
+        },
+        {
+          "id": "sq-risk-003",
+          "questionText": "How long until your youngest dependant becomes financially independent?",
+          "helpText": "Estimate in years",
+          "questionType": "Number",
+          "category": "Risk",
+          "subcategory": "Dependants",
+          "required": false,
+          "displayOrder": 3,
+          "validationRules": {
+            "minValue": 0,
+            "maxValue": 30,
+            "allowDecimals": false
+          },
+          "conditionalLogic": {
+            "showIf": {
+              "questionId": "sq-risk-001",
+              "operator": "GreaterThan",
+              "value": 0
+            }
+          },
+          "response": {
+            "responseId": "resp-003",
+            "value": 6,
+            "displayValue": "6 years",
+            "answeredDate": "2026-02-15T10:33:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:33:00Z"
+          },
+          "impactOnRiskAssessment": {
+            "affectsCapacityForLoss": true,
+            "affectsTimeHorizon": true,
+            "reasoning": "Shorter dependency period increases capacity for loss as obligations reduce sooner"
+          }
+        },
+        {
+          "id": "sq-risk-004",
+          "questionText": "How much do you have in accessible emergency funds (cash, instant access savings)?",
+          "helpText": "Amount readily available without penalties or delays",
+          "questionType": "Currency",
+          "category": "Risk",
+          "subcategory": "EmergencyFunds",
+          "required": true,
+          "displayOrder": 4,
+          "validationRules": {
+            "minValue": 0,
+            "currency": "GBP"
+          },
+          "response": {
+            "responseId": "resp-004",
+            "value": 25000.00,
+            "displayValue": "£25,000",
+            "answeredDate": "2026-02-15T10:35:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:35:00Z"
+          },
+          "impactOnRiskAssessment": {
+            "affectsCapacityForLoss": true,
+            "reasoning": "Adequate emergency fund increases capacity for investment risk"
+          }
+        },
+        {
+          "id": "sq-risk-005",
+          "questionText": "What are your average monthly essential expenses?",
+          "helpText": "Include mortgage/rent, utilities, food, insurance, and other essentials",
+          "questionType": "Currency",
+          "category": "Risk",
+          "subcategory": "EmergencyFunds",
+          "required": true,
+          "displayOrder": 5,
+          "validationRules": {
+            "minValue": 0,
+            "currency": "GBP"
+          },
+          "response": {
+            "responseId": "resp-005",
+            "value": 3500.00,
+            "displayValue": "£3,500 per month",
+            "answeredDate": "2026-02-15T10:37:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:37:00Z"
+          },
+          "derivedMetrics": {
+            "emergencyFundCoverage": {
+              "months": 7.1,
+              "adequacy": "Excellent",
+              "targetMonths": 6.0,
+              "exceedsTarget": true
+            }
+          }
+        },
+        {
+          "id": "sq-risk-006",
+          "questionText": "At what age do you plan to retire?",
+          "helpText": "Your planned retirement age affects your investment time horizon",
+          "questionType": "Number",
+          "category": "Risk",
+          "subcategory": "TimeHorizon",
+          "required": true,
+          "displayOrder": 6,
+          "validationRules": {
+            "minValue": 50,
+            "maxValue": 80,
+            "allowDecimals": false
+          },
+          "response": {
+            "responseId": "resp-006",
+            "value": 67,
+            "displayValue": "Age 67",
+            "answeredDate": "2026-02-15T10:40:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:40:00Z"
+          },
+          "derivedMetrics": {
+            "yearsToRetirement": 22,
+            "timeHorizonCategory": "LongTerm",
+            "appropriateForGrowthInvesting": true
+          },
+          "impactOnRiskAssessment": {
+            "affectsTimeHorizon": true,
+            "reasoning": "Longer time horizon allows greater capacity to absorb short-term volatility"
+          }
+        },
+        {
+          "id": "sq-risk-007",
+          "questionText": "Do you expect to receive any inheritances or windfalls in the next 10 years?",
+          "helpText": "Expected inheritances can affect your overall financial capacity",
+          "questionType": "SingleChoice",
+          "category": "Risk",
+          "subcategory": "FutureIncome",
+          "required": false,
+          "displayOrder": 7,
+          "answerOptions": [
+            {
+              "id": "opt-yes-significant",
+              "optionText": "Yes, significant (>£100,000)",
+              "value": "YesSignificant"
+            },
+            {
+              "id": "opt-yes-moderate",
+              "optionText": "Yes, moderate (£25,000-£100,000)",
+              "value": "YesModerate"
+            },
+            {
+              "id": "opt-yes-small",
+              "optionText": "Yes, small (<£25,000)",
+              "value": "YesSmall"
+            },
+            {
+              "id": "opt-no",
+              "optionText": "No",
+              "value": "No"
+            },
+            {
+              "id": "opt-unknown",
+              "optionText": "Unknown/Uncertain",
+              "value": "Unknown"
+            }
+          ],
+          "response": {
+            "responseId": "resp-007",
+            "value": "No",
+            "displayValue": "No expected inheritances",
+            "selectedOptionId": "opt-no",
+            "answeredDate": "2026-02-15T10:42:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:42:00Z"
+          }
+        },
+        {
+          "id": "sq-risk-008",
+          "questionText": "What percentage of portfolio loss could you tolerate in a single year before feeling compelled to sell?",
+          "helpText": "Be realistic - this helps us recommend suitable investments",
+          "questionType": "Percentage",
+          "category": "Risk",
+          "subcategory": "LossTolerance",
+          "required": true,
+          "displayOrder": 8,
+          "validationRules": {
+            "minValue": 0,
+            "maxValue": 100,
+            "allowDecimals": true
+          },
+          "response": {
+            "responseId": "resp-008",
+            "value": 15.0,
+            "displayValue": "15%",
+            "answeredDate": "2026-02-15T10:45:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:45:00Z"
+          },
+          "impactOnRiskAssessment": {
+            "affectsRiskTolerance": true,
+            "reasoning": "Lower loss tolerance suggests more conservative investment approach needed"
+          }
+        },
+        {
+          "id": "sq-risk-009",
+          "questionText": "Do you have other significant assets not included in this investment plan?",
+          "helpText": "E.g., property, business interests, other investments",
+          "questionType": "SingleChoice",
+          "category": "Risk",
+          "subcategory": "OtherAssets",
+          "required": true,
+          "displayOrder": 9,
+          "answerOptions": [
+            {
+              "id": "opt-no-other",
+              "optionText": "No, this represents all my assets",
+              "value": "NoOther"
+            },
+            {
+              "id": "opt-yes-some",
+              "optionText": "Yes, but less than 25% of total wealth",
+              "value": "YesMinor"
+            },
+            {
+              "id": "opt-yes-substantial",
+              "optionText": "Yes, 25-50% of total wealth",
+              "value": "YesModerate"
+            },
+            {
+              "id": "opt-yes-majority",
+              "optionText": "Yes, more than 50% of total wealth",
+              "value": "YesMajority"
+            }
+          ],
+          "response": {
+            "responseId": "resp-009",
+            "value": "YesModerate",
+            "displayValue": "Yes, 25-50% of total wealth",
+            "selectedOptionId": "opt-yes-substantial",
+            "answeredDate": "2026-02-15T10:47:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:47:00Z"
+          },
+          "impactOnRiskAssessment": {
+            "affectsCapacityForLoss": true,
+            "reasoning": "Other assets provide diversification and increase capacity for loss in this portfolio"
+          }
+        },
+        {
+          "id": "sq-risk-010",
+          "questionText": "Are you expecting any major life changes in the next 5 years?",
+          "helpText": "E.g., marriage, divorce, career change, relocation, major purchases",
+          "questionType": "MultipleChoice",
+          "category": "Risk",
+          "subcategory": "LifeEvents",
+          "required": false,
+          "displayOrder": 10,
+          "answerOptions": [
+            {
+              "id": "opt-none",
+              "optionText": "None expected",
+              "value": "None"
+            },
+            {
+              "id": "opt-marriage",
+              "optionText": "Marriage/Civil Partnership",
+              "value": "Marriage"
+            },
+            {
+              "id": "opt-children",
+              "optionText": "Having children",
+              "value": "Children"
+            },
+            {
+              "id": "opt-career",
+              "optionText": "Career change",
+              "value": "CareerChange"
+            },
+            {
+              "id": "opt-relocation",
+              "optionText": "Relocation/Moving house",
+              "value": "Relocation"
+            },
+            {
+              "id": "opt-business",
+              "optionText": "Starting a business",
+              "value": "Business"
+            },
+            {
+              "id": "opt-education",
+              "optionText": "Education expenses",
+              "value": "Education"
+            }
+          ],
+          "response": {
+            "responseId": "resp-010",
+            "value": ["Education"],
+            "displayValue": "Education expenses",
+            "selectedOptionIds": ["opt-education"],
+            "answeredDate": "2026-02-15T10:50:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:50:00Z"
+          }
+        },
+        {
+          "id": "sq-risk-011",
+          "questionText": "Do you have adequate life insurance/protection in place?",
+          "helpText": "Life insurance, critical illness, income protection",
+          "questionType": "SingleChoice",
+          "category": "Risk",
+          "subcategory": "Protection",
+          "required": true,
+          "displayOrder": 11,
+          "answerOptions": [
+            {
+              "id": "opt-adequate",
+              "optionText": "Yes, adequate coverage",
+              "value": "Adequate"
+            },
+            {
+              "id": "opt-partial",
+              "optionText": "Partial coverage",
+              "value": "Partial"
+            },
+            {
+              "id": "opt-none",
+              "optionText": "No coverage",
+              "value": "None"
+            },
+            {
+              "id": "opt-unsure",
+              "optionText": "Unsure/need to review",
+              "value": "Unsure"
+            }
+          ],
+          "response": {
+            "responseId": "resp-011",
+            "value": "Adequate",
+            "displayValue": "Yes, adequate coverage",
+            "selectedOptionId": "opt-adequate",
+            "answeredDate": "2026-02-15T10:52:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:52:00Z"
+          },
+          "impactOnRiskAssessment": {
+            "affectsCapacityForLoss": true,
+            "reasoning": "Adequate protection increases capacity for investment risk by providing financial safety net"
+          }
+        },
+        {
+          "id": "sq-risk-012",
+          "questionText": "How stable is your employment/income?",
+          "helpText": "Job security and income stability affect your capacity for loss",
+          "questionType": "SingleChoice",
+          "category": "Risk",
+          "subcategory": "IncomeStability",
+          "required": true,
+          "displayOrder": 12,
+          "answerOptions": [
+            {
+              "id": "opt-very-stable",
+              "optionText": "Very stable (permanent role, secure industry)",
+              "value": "VeryStable"
+            },
+            {
+              "id": "opt-stable",
+              "optionText": "Stable (good job security)",
+              "value": "Stable"
+            },
+            {
+              "id": "opt-variable",
+              "optionText": "Variable (self-employed, commission-based)",
+              "value": "Variable"
+            },
+            {
+              "id": "opt-uncertain",
+              "optionText": "Uncertain (temporary, at-risk industry)",
+              "value": "Uncertain"
+            },
+            {
+              "id": "opt-retired",
+              "optionText": "Retired/Not working",
+              "value": "Retired"
+            }
+          ],
+          "response": {
+            "responseId": "resp-012",
+            "value": "Stable",
+            "displayValue": "Stable (good job security)",
+            "selectedOptionId": "opt-stable",
+            "answeredDate": "2026-02-15T10:55:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T10:55:00Z"
+          },
+          "impactOnRiskAssessment": {
+            "affectsCapacityForLoss": true,
+            "reasoning": "Stable employment increases capacity to maintain investments during downturns"
+          }
+        },
+        {
+          "id": "sq-risk-013",
+          "questionText": "Are you currently in debt (excluding mortgage)?",
+          "helpText": "Credit cards, loans, overdrafts",
+          "questionType": "YesNo",
+          "category": "Risk",
+          "subcategory": "Debt",
+          "required": true,
+          "displayOrder": 13,
+          "response": null,
+          "followUpQuestion": {
+            "questionId": "sq-risk-014",
+            "showIfValue": "Yes"
+          }
+        },
+        {
+          "id": "sq-risk-014",
+          "questionText": "What is your total non-mortgage debt?",
+          "helpText": "Total amount owed on credit cards, loans, etc.",
+          "questionType": "Currency",
+          "category": "Risk",
+          "subcategory": "Debt",
+          "required": false,
+          "displayOrder": 14,
+          "validationRules": {
+            "minValue": 0,
+            "currency": "GBP"
+          },
+          "conditionalLogic": {
+            "showIf": {
+              "questionId": "sq-risk-013",
+              "operator": "Equals",
+              "value": "Yes"
+            }
+          },
+          "response": null,
+          "impactOnRiskAssessment": {
+            "affectsCapacityForLoss": true,
+            "reasoning": "High debt levels reduce capacity for investment risk"
+          }
+        },
+        {
+          "id": "sq-risk-015",
+          "questionText": "How would you describe your overall health?",
+          "helpText": "Health status can affect financial planning and risk capacity",
+          "questionType": "SingleChoice",
+          "category": "Risk",
+          "subcategory": "Health",
+          "required": false,
+          "displayOrder": 15,
+          "answerOptions": [
+            {
+              "id": "opt-excellent",
+              "optionText": "Excellent",
+              "value": "Excellent"
+            },
+            {
+              "id": "opt-good",
+              "optionText": "Good",
+              "value": "Good"
+            },
+            {
+              "id": "opt-fair",
+              "optionText": "Fair",
+              "value": "Fair"
+            },
+            {
+              "id": "opt-poor",
+              "optionText": "Poor",
+              "value": "Poor"
+            },
+            {
+              "id": "opt-prefer-not",
+              "optionText": "Prefer not to say",
+              "value": "PreferNotToSay"
+            }
+          ],
+          "response": {
+            "responseId": "resp-015",
+            "value": "Good",
+            "displayValue": "Good",
+            "selectedOptionId": "opt-good",
+            "answeredDate": "2026-02-15T11:00:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:00:00Z"
+          },
+          "vulnerabilityIndicator": {
+            "mayIndicateVulnerability": false,
+            "requiresAdditionalSupport": false
+          }
+        }
+      ]
+    },
+    {
+      "category": "General",
+      "categoryDisplay": "General Financial Planning",
+      "description": "Questions about wills, estate planning, and general financial matters",
+      "questionCount": 12,
+      "answeredCount": 10,
+      "completionPercentage": 83.3,
+      "required": true,
+      "questions": [
+        {
+          "id": "sq-gen-001",
+          "questionText": "Do you have a valid Will in place?",
+          "helpText": "A Will ensures your assets are distributed according to your wishes",
+          "questionType": "YesNo",
+          "category": "General",
+          "subcategory": "EstatePlanning",
+          "required": true,
+          "displayOrder": 1,
+          "response": {
+            "responseId": "resp-g001",
+            "value": "Yes",
+            "displayValue": "Yes",
+            "answeredDate": "2026-02-15T11:05:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:05:00Z"
+          },
+          "followUpQuestion": {
+            "questionId": "sq-gen-002",
+            "showIfValue": "Yes"
+          }
+        },
+        {
+          "id": "sq-gen-002",
+          "questionText": "When was your Will last reviewed or updated?",
+          "helpText": "Wills should be reviewed every 5 years or after major life events",
+          "questionType": "Date",
+          "category": "General",
+          "subcategory": "EstatePlanning",
+          "required": false,
+          "displayOrder": 2,
+          "conditionalLogic": {
+            "showIf": {
+              "questionId": "sq-gen-001",
+              "operator": "Equals",
+              "value": "Yes"
+            }
+          },
+          "response": {
+            "responseId": "resp-g002",
+            "value": "2023-01-15",
+            "displayValue": "15 January 2023",
+            "answeredDate": "2026-02-15T11:07:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:07:00Z"
+          },
+          "derivedMetrics": {
+            "yearsSinceReview": 3.1,
+            "reviewRecommended": false,
+            "nextReviewDue": "2028-01-15"
+          }
+        },
+        {
+          "id": "sq-gen-003",
+          "questionText": "Do you have a Lasting Power of Attorney (LPA) in place?",
+          "helpText": "LPA allows someone to make decisions on your behalf if you lose capacity",
+          "questionType": "MultipleChoice",
+          "category": "General",
+          "subcategory": "EstatePlanning",
+          "required": true,
+          "displayOrder": 3,
+          "answerOptions": [
+            {
+              "id": "opt-none",
+              "optionText": "No LPA in place",
+              "value": "None"
+            },
+            {
+              "id": "opt-property",
+              "optionText": "LPA for Property and Financial Affairs",
+              "value": "PropertyFinancial"
+            },
+            {
+              "id": "opt-health",
+              "optionText": "LPA for Health and Welfare",
+              "value": "HealthWelfare"
+            },
+            {
+              "id": "opt-both",
+              "optionText": "Both types of LPA",
+              "value": "Both"
+            }
+          ],
+          "response": {
+            "responseId": "resp-g003",
+            "value": ["PropertyFinancial"],
+            "displayValue": "LPA for Property and Financial Affairs",
+            "selectedOptionIds": ["opt-property"],
+            "answeredDate": "2026-02-15T11:10:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:10:00Z"
+          }
+        },
+        {
+          "id": "sq-gen-004",
+          "questionText": "Have you made any significant gifts in the last 7 years?",
+          "helpText": "Gifts over £3,000 per year may have inheritance tax implications",
+          "questionType": "YesNo",
+          "category": "General",
+          "subcategory": "EstatePlanning",
+          "required": true,
+          "displayOrder": 4,
+          "response": {
+            "responseId": "resp-g004",
+            "value": "No",
+            "displayValue": "No",
+            "answeredDate": "2026-02-15T11:12:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:12:00Z"
+          }
+        },
+        {
+          "id": "sq-gen-005",
+          "questionText": "Are you a UK resident for tax purposes?",
+          "helpText": "Tax residency affects your tax obligations and investment options",
+          "questionType": "YesNo",
+          "category": "General",
+          "subcategory": "TaxStatus",
+          "required": true,
+          "displayOrder": 5,
+          "response": {
+            "responseId": "resp-g005",
+            "value": "Yes",
+            "displayValue": "Yes",
+            "answeredDate": "2026-02-15T11:15:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:15:00Z"
+          }
+        },
+        {
+          "id": "sq-gen-006",
+          "questionText": "Do you expect your tax status to change in the next 5 years?",
+          "helpText": "E.g., moving abroad, domicile changes",
+          "questionType": "YesNo",
+          "category": "General",
+          "subcategory": "TaxStatus",
+          "required": false,
+          "displayOrder": 6,
+          "response": {
+            "responseId": "resp-g006",
+            "value": "No",
+            "displayValue": "No",
+            "answeredDate": "2026-02-15T11:17:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:17:00Z"
+          }
+        },
+        {
+          "id": "sq-gen-007",
+          "questionText": "Do you have any specific ethical, religious, or environmental investment preferences?",
+          "helpText": "E.g., ESG investing, Sharia-compliant, excluding certain sectors",
+          "questionType": "Text",
+          "category": "General",
+          "subcategory": "InvestmentPreferences",
+          "required": false,
+          "displayOrder": 7,
+          "response": {
+            "responseId": "resp-g007",
+            "value": "Prefer ESG-focused funds, exclude tobacco and weapons",
+            "displayValue": "Prefer ESG-focused funds, exclude tobacco and weapons",
+            "answeredDate": "2026-02-15T11:20:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:20:00Z"
+          }
+        },
+        {
+          "id": "sq-gen-008",
+          "questionText": "Are you involved in any business partnerships or trusts?",
+          "helpText": "Business interests may affect your financial planning",
+          "questionType": "YesNo",
+          "category": "General",
+          "subcategory": "BusinessInterests",
+          "required": true,
+          "displayOrder": 8,
+          "response": {
+            "responseId": "resp-g008",
+            "value": "No",
+            "displayValue": "No",
+            "answeredDate": "2026-02-15T11:22:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:22:00Z"
+          }
+        },
+        {
+          "id": "sq-gen-009",
+          "questionText": "Do you have any charitable giving plans or commitments?",
+          "helpText": "Regular charitable donations or planned bequests",
+          "questionType": "YesNo",
+          "category": "General",
+          "subcategory": "CharitableGiving",
+          "required": false,
+          "displayOrder": 9,
+          "response": {
+            "responseId": "resp-g009",
+            "value": "Yes",
+            "displayValue": "Yes",
+            "answeredDate": "2026-02-15T11:25:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:25:00Z"
+          }
+        },
+        {
+          "id": "sq-gen-010",
+          "questionText": "How frequently do you want to receive statements and reports?",
+          "helpText": "Choose your preferred reporting frequency",
+          "questionType": "SingleChoice",
+          "category": "General",
+          "subcategory": "ServicePreferences",
+          "required": false,
+          "displayOrder": 10,
+          "answerOptions": [
+            {
+              "id": "opt-monthly",
+              "optionText": "Monthly",
+              "value": "Monthly"
+            },
+            {
+              "id": "opt-quarterly",
+              "optionText": "Quarterly",
+              "value": "Quarterly"
+            },
+            {
+              "id": "opt-half-yearly",
+              "optionText": "Half-yearly",
+              "value": "HalfYearly"
+            },
+            {
+              "id": "opt-annually",
+              "optionText": "Annually",
+              "value": "Annually"
+            }
+          ],
+          "response": {
+            "responseId": "resp-g010",
+            "value": "Quarterly",
+            "displayValue": "Quarterly",
+            "selectedOptionId": "opt-quarterly",
+            "answeredDate": "2026-02-15T11:27:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:27:00Z"
+          }
+        },
+        {
+          "id": "sq-gen-011",
+          "questionText": "Do you require any accessibility support or reasonable adjustments?",
+          "helpText": "E.g., large print documents, audio format, additional meeting time",
+          "questionType": "Text",
+          "category": "General",
+          "subcategory": "Accessibility",
+          "required": false,
+          "displayOrder": 11,
+          "response": null,
+          "vulnerabilityIndicator": {
+            "mayIndicateVulnerability": true,
+            "requiresAdditionalSupport": true,
+            "supportType": "AccessibilityAccommodations"
+          }
+        },
+        {
+          "id": "sq-gen-012",
+          "questionText": "Is there anything else we should know to provide you with the best possible advice?",
+          "helpText": "Any additional information that might be relevant",
+          "questionType": "TextArea",
+          "category": "General",
+          "subcategory": "AdditionalInformation",
+          "required": false,
+          "displayOrder": 12,
+          "response": null
+        }
+      ]
+    },
+    {
+      "category": "Compliance",
+      "categoryDisplay": "Compliance & Regulatory",
+      "description": "Regulatory and compliance questions required by FCA",
+      "questionCount": 10,
+      "answeredCount": 8,
+      "completionPercentage": 80.0,
+      "required": true,
+      "questions": [
+        {
+          "id": "sq-comp-001",
+          "questionText": "Have you received financial advice in the past 5 years?",
+          "helpText": "From any financial adviser or institution",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "PreviousAdvice",
+          "required": true,
+          "displayOrder": 1,
+          "response": {
+            "responseId": "resp-c001",
+            "value": "Yes",
+            "displayValue": "Yes",
+            "answeredDate": "2026-02-15T11:30:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:30:00Z"
+          },
+          "followUpQuestion": {
+            "questionId": "sq-comp-002",
+            "showIfValue": "Yes"
+          }
+        },
+        {
+          "id": "sq-comp-002",
+          "questionText": "What type of advice did you receive?",
+          "helpText": "Select all that apply",
+          "questionType": "MultipleChoice",
+          "category": "Compliance",
+          "subcategory": "PreviousAdvice",
+          "required": false,
+          "displayOrder": 2,
+          "conditionalLogic": {
+            "showIf": {
+              "questionId": "sq-comp-001",
+              "operator": "Equals",
+              "value": "Yes"
+            }
+          },
+          "answerOptions": [
+            {
+              "id": "opt-pension",
+              "optionText": "Pensions advice",
+              "value": "Pensions"
+            },
+            {
+              "id": "opt-investment",
+              "optionText": "Investment advice",
+              "value": "Investment"
+            },
+            {
+              "id": "opt-protection",
+              "optionText": "Protection/Insurance advice",
+              "value": "Protection"
+            },
+            {
+              "id": "opt-mortgage",
+              "optionText": "Mortgage advice",
+              "value": "Mortgage"
+            },
+            {
+              "id": "opt-estate",
+              "optionText": "Estate planning advice",
+              "value": "EstatePlanning"
+            },
+            {
+              "id": "opt-other",
+              "optionText": "Other",
+              "value": "Other"
+            }
+          ],
+          "response": {
+            "responseId": "resp-c002",
+            "value": ["Pensions", "Investment"],
+            "displayValue": "Pensions advice, Investment advice",
+            "selectedOptionIds": ["opt-pension", "opt-investment"],
+            "answeredDate": "2026-02-15T11:32:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:32:00Z"
+          }
+        },
+        {
+          "id": "sq-comp-003",
+          "questionText": "Have you made any complaints to financial services providers or the Financial Ombudsman in the past 6 years?",
+          "helpText": "FCA requires us to understand your experience with financial services",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "Complaints",
+          "required": true,
+          "displayOrder": 3,
+          "response": {
+            "responseId": "resp-c003",
+            "value": "No",
+            "displayValue": "No",
+            "answeredDate": "2026-02-15T11:35:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:35:00Z"
+          }
+        },
+        {
+          "id": "sq-comp-004",
+          "questionText": "Are you or any family members employed in the financial services industry?",
+          "helpText": "This may affect certain regulatory requirements",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "IndustryConnection",
+          "required": true,
+          "displayOrder": 4,
+          "response": {
+            "responseId": "resp-c004",
+            "value": "No",
+            "displayValue": "No",
+            "answeredDate": "2026-02-15T11:37:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:37:00Z"
+          }
+        },
+        {
+          "id": "sq-comp-005",
+          "questionText": "Do you hold or have you held a senior position in any organization?",
+          "helpText": "E.g., director, senior manager, public official (PEP status)",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "PEPStatus",
+          "required": true,
+          "displayOrder": 5,
+          "response": {
+            "responseId": "resp-c005",
+            "value": "No",
+            "displayValue": "No",
+            "answeredDate": "2026-02-15T11:40:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:40:00Z"
+          },
+          "regulatoryNote": "Required for AML compliance (Money Laundering Regulations 2017)"
+        },
+        {
+          "id": "sq-comp-006",
+          "questionText": "Have you read and understood the Key Information Documents (KIDs) for the products we discussed?",
+          "helpText": "PRIIPs regulations require confirmation that you received and understood KIDs",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "Disclosures",
+          "required": true,
+          "displayOrder": 6,
+          "response": {
+            "responseId": "resp-c006",
+            "value": "Yes",
+            "displayValue": "Yes",
+            "answeredDate": "2026-02-15T11:45:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:45:00Z"
+          },
+          "regulatoryNote": "PRIIPs Regulation Article 13 - Understanding KIDs"
+        },
+        {
+          "id": "sq-comp-007",
+          "questionText": "Do you understand that investment values can go down as well as up?",
+          "helpText": "Acknowledgment of investment risk",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "RiskWarnings",
+          "required": true,
+          "displayOrder": 7,
+          "response": {
+            "responseId": "resp-c007",
+            "value": "Yes",
+            "displayValue": "Yes",
+            "answeredDate": "2026-02-15T11:47:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:47:00Z"
+          },
+          "regulatoryNote": "FCA COBS 4.2 - Risk Warnings"
+        },
+        {
+          "id": "sq-comp-008",
+          "questionText": "Do you understand that past performance is not a reliable indicator of future results?",
+          "helpText": "Acknowledgment of performance risk",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "RiskWarnings",
+          "required": true,
+          "displayOrder": 8,
+          "response": {
+            "responseId": "resp-c008",
+            "value": "Yes",
+            "displayValue": "Yes",
+            "answeredDate": "2026-02-15T11:48:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:48:00Z"
+          },
+          "regulatoryNote": "FCA COBS 4.2 - Risk Warnings"
+        },
+        {
+          "id": "sq-comp-009",
+          "questionText": "Have you received and read our Terms of Business?",
+          "helpText": "Terms of Business explain how we work and our fees",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "Disclosures",
+          "required": true,
+          "displayOrder": 9,
+          "response": null,
+          "regulatoryNote": "FCA COBS 2.3 - Client Agreements"
+        },
+        {
+          "id": "sq-comp-010",
+          "questionText": "Do you understand our charging structure and fees?",
+          "helpText": "Confirmation that fees have been explained and understood",
+          "questionType": "YesNo",
+          "category": "Compliance",
+          "subcategory": "Disclosures",
+          "required": true,
+          "displayOrder": 10,
+          "response": null,
+          "regulatoryNote": "FCA COBS 6.1A - Disclosure of Costs and Charges"
+        }
+      ]
+    },
+    {
+      "category": "Custom",
+      "categoryDisplay": "Firm-Specific Questions",
+      "description": "Custom questions specific to this advisory firm",
+      "questionCount": 8,
+      "answeredCount": 2,
+      "completionPercentage": 25.0,
+      "required": false,
+      "questions": [
+        {
+          "id": "sq-custom-001",
+          "questionText": "How did you hear about our firm?",
+          "helpText": "Help us understand how clients find us",
+          "questionType": "SingleChoice",
+          "category": "Custom",
+          "subcategory": "Marketing",
+          "required": false,
+          "displayOrder": 1,
+          "answerOptions": [
+            {
+              "id": "opt-referral",
+              "optionText": "Client referral",
+              "value": "ClientReferral"
+            },
+            {
+              "id": "opt-web",
+              "optionText": "Website/Online search",
+              "value": "OnlineSearch"
+            },
+            {
+              "id": "opt-social",
+              "optionText": "Social media",
+              "value": "SocialMedia"
+            },
+            {
+              "id": "opt-event",
+              "optionText": "Event/Seminar",
+              "value": "Event"
+            },
+            {
+              "id": "opt-other",
+              "optionText": "Other",
+              "value": "Other"
+            }
+          ],
+          "response": {
+            "responseId": "resp-cu001",
+            "value": "ClientReferral",
+            "displayValue": "Client referral",
+            "selectedOptionId": "opt-referral",
+            "answeredDate": "2026-02-15T11:50:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:50:00Z"
+          }
+        },
+        {
+          "id": "sq-custom-002",
+          "questionText": "What are your main reasons for seeking financial advice?",
+          "helpText": "Select all that apply",
+          "questionType": "MultipleChoice",
+          "category": "Custom",
+          "subcategory": "ObjectiveSetting",
+          "required": false,
+          "displayOrder": 2,
+          "answerOptions": [
+            {
+              "id": "opt-retirement",
+              "optionText": "Retirement planning",
+              "value": "Retirement"
+            },
+            {
+              "id": "opt-growth",
+              "optionText": "Growing wealth",
+              "value": "WealthGrowth"
+            },
+            {
+              "id": "opt-protection",
+              "optionText": "Protecting family",
+              "value": "FamilyProtection"
+            },
+            {
+              "id": "opt-tax",
+              "optionText": "Tax planning",
+              "value": "TaxPlanning"
+            },
+            {
+              "id": "opt-estate",
+              "optionText": "Estate planning",
+              "value": "EstatePlanning"
+            },
+            {
+              "id": "opt-education",
+              "optionText": "Education funding",
+              "value": "Education"
+            }
+          ],
+          "response": {
+            "responseId": "resp-cu002",
+            "value": ["Retirement", "WealthGrowth"],
+            "displayValue": "Retirement planning, Growing wealth",
+            "selectedOptionIds": ["opt-retirement", "opt-growth"],
+            "answeredDate": "2026-02-15T11:52:00Z",
+            "answeredBy": "Client",
+            "lastModifiedDate": "2026-02-15T11:52:00Z"
+          }
+        }
+      ]
+    }
+  ],
+  "completionSummary": {
+    "overallStatus": "Partial",
+    "totalQuestions": 45,
+    "requiredQuestions": 37,
+    "answeredQuestions": 32,
+    "answeredRequiredQuestions": 27,
+    "missingRequiredQuestions": 10,
+    "optionalQuestions": 8,
+    "completionPercentage": 71.1,
+    "requiredCompletionPercentage": 73.0,
+    "estimatedTimeToComplete": 15
+  },
+  "nextSteps": [
+    "Complete remaining 10 required questions in Compliance category",
+    "Review Risk category responses with adviser",
+    "Ensure all mandatory risk warnings acknowledged"
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "responses": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/responses" },
+    "completion-status": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/completion-status" },
+    "submit-response": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/responses", "method": "POST" },
+    "bulk-response": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/bulk-response", "method": "POST" }
+  }
+}
+```
+
+**Question Types:**
+- `YesNo` - Boolean yes/no question
+- `SingleChoice` - Select one option from list
+- `MultipleChoice` - Select multiple options from list
+- `Number` - Numeric input
+- `Currency` - Monetary amount
+- `Percentage` - Percentage value (0-100)
+- `Date` - Date picker
+- `Text` - Short text input
+- `TextArea` - Long text input
+- `Slider` - Continuous scale
+
+**Question Categories:**
+- `Risk` - Risk assessment and capacity questions
+- `General` - General financial planning questions
+- `Compliance` - Regulatory and compliance questions
+- `Custom` - Firm-specific custom questions
+
+**Completion Status:**
+- `Unanswered` - No questions answered
+- `Partial` - Some questions answered
+- `Complete` - All required questions answered
+
+**Validation Rules:**
+- `factfindId` must be valid
+- Category filter must match valid categories
+- Response data must match question type validation rules
+- Required questions must be answered before completion
+
+**HTTP Status Codes:**
+- `200 OK` - Questions retrieved successfully
+- `404 Not Found` - Fact find not found
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+##### 10.6.2.2 Submit Supplementary Question Responses
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/supplementary-questions/responses`
+
+**Description:** Submit response to a supplementary question.
+
+**Request Body:**
+
+```json
+{
+  "questionId": "sq-risk-013",
+  "questionNumber": 13,
+  "value": "No",
+  "answerType": "YesNo",
+  "answeredBy": "Client",
+  "answeredDate": "2026-02-17T14:30:00Z",
+  "notes": "Client confirms no non-mortgage debt"
+}
+```
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/factfind-456/supplementary-questions/responses/resp-013
+```
+
+```json
+{
+  "responseId": "resp-013",
+  "factfindId": "factfind-456",
+  "questionId": "sq-risk-013",
+  "questionText": "Are you currently in debt (excluding mortgage)?",
+  "questionCategory": "Risk",
+  "questionSubcategory": "Debt",
+  "value": "No",
+  "displayValue": "No",
+  "answerType": "YesNo",
+  "answeredBy": "Client",
+  "answeredDate": "2026-02-17T14:30:00Z",
+  "lastModifiedDate": "2026-02-17T14:30:00Z",
+  "notes": "Client confirms no non-mortgage debt",
+  "impactOnRiskAssessment": {
+    "affectsCapacityForLoss": true,
+    "reasoning": "Absence of debt increases capacity for investment risk"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/responses/resp-013" },
+    "question": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions?questionId=sq-risk-013" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "update": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/responses/resp-013", "method": "PUT" },
+    "delete": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/responses/resp-013", "method": "DELETE" }
+  }
+}
+```
+
+**Validation Rules:**
+- `questionId` must be valid for the fact find
+- `value` must match question type validation rules
+- `answerType` must match question type
+- Required questions must have non-empty values
+- Conditional questions must only be answered if conditions met
+
+**HTTP Status Codes:**
+- `201 Created` - Response created successfully
+- `400 Bad Request` - Invalid request data
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Question or fact find not found
+- `422 Unprocessable Entity` - Validation failed
+
+---
+
+##### 10.6.2.3 Get Completion Status
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/supplementary-questions/completion-status`
+
+**Description:** Get completion status showing which question categories are complete and which required questions remain unanswered.
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "overallStatus": "Partial",
+  "overallCompletionPercentage": 71.1,
+  "requiredCompletionPercentage": 73.0,
+  "lastUpdated": "2026-02-17T14:30:00Z",
+  "categoryStatus": [
+    {
+      "category": "Risk",
+      "status": "Partial",
+      "totalQuestions": 15,
+      "requiredQuestions": 13,
+      "answeredQuestions": 12,
+      "answeredRequiredQuestions": 11,
+      "missingRequiredQuestions": 2,
+      "completionPercentage": 80.0,
+      "requiredCompletionPercentage": 84.6,
+      "missingRequired": [
+        {
+          "questionId": "sq-risk-013",
+          "questionNumber": 13,
+          "questionText": "Are you currently in debt (excluding mortgage)?"
+        },
+        {
+          "questionId": "sq-risk-014",
+          "questionNumber": 14,
+          "questionText": "What is your total non-mortgage debt?",
+          "conditional": true,
+          "showIfCondition": "sq-risk-013 = Yes"
+        }
+      ]
+    },
+    {
+      "category": "General",
+      "status": "Partial",
+      "totalQuestions": 12,
+      "requiredQuestions": 10,
+      "answeredQuestions": 10,
+      "answeredRequiredQuestions": 8,
+      "missingRequiredQuestions": 2,
+      "completionPercentage": 83.3,
+      "requiredCompletionPercentage": 80.0,
+      "missingRequired": [
+        {
+          "questionId": "sq-gen-011",
+          "questionNumber": 11,
+          "questionText": "Do you require any accessibility support or reasonable adjustments?"
+        },
+        {
+          "questionId": "sq-gen-012",
+          "questionNumber": 12,
+          "questionText": "Is there anything else we should know to provide you with the best possible advice?"
+        }
+      ]
+    },
+    {
+      "category": "Compliance",
+      "status": "Partial",
+      "totalQuestions": 10,
+      "requiredQuestions": 10,
+      "answeredQuestions": 8,
+      "answeredRequiredQuestions": 8,
+      "missingRequiredQuestions": 2,
+      "completionPercentage": 80.0,
+      "requiredCompletionPercentage": 80.0,
+      "missingRequired": [
+        {
+          "questionId": "sq-comp-009",
+          "questionNumber": 9,
+          "questionText": "Have you received and read our Terms of Business?"
+        },
+        {
+          "questionId": "sq-comp-010",
+          "questionNumber": 10,
+          "questionText": "Do you understand our charging structure and fees?"
+        }
+      ]
+    },
+    {
+      "category": "Custom",
+      "status": "Partial",
+      "totalQuestions": 8,
+      "requiredQuestions": 4,
+      "answeredQuestions": 2,
+      "answeredRequiredQuestions": 2,
+      "missingRequiredQuestions": 2,
+      "completionPercentage": 25.0,
+      "requiredCompletionPercentage": 50.0,
+      "missingRequired": []
+    }
+  ],
+  "readyForRiskAssessment": false,
+  "readyForSuitabilityReport": false,
+  "blockingIssues": [
+    {
+      "severity": "High",
+      "issue": "MissingComplianceQuestions",
+      "description": "2 required compliance questions unanswered - cannot proceed to suitability report",
+      "affectedQuestions": ["sq-comp-009", "sq-comp-010"]
+    },
+    {
+      "severity": "Medium",
+      "issue": "IncompleteRiskQuestions",
+      "description": "2 required risk questions unanswered - may affect risk profile accuracy",
+      "affectedQuestions": ["sq-risk-013", "sq-risk-014"]
+    }
+  ],
+  "estimatedTimeToComplete": 10,
+  "nextRecommendedAction": "Complete remaining compliance questions (sq-comp-009, sq-comp-010) to unblock suitability report",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/completion-status" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "questions": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions" },
+    "responses": { "href": "/api/v1/factfinds/factfind-456/supplementary-questions/responses" }
+  }
+}
+```
+
+**Completion Status Values:**
+- `Complete` - All required questions answered
+- `Partial` - Some required questions unanswered
+- `Unanswered` - No questions answered
+
+**Blocking Issue Severity:**
+- `High` - Prevents progression to next stage
+- `Medium` - May affect quality/accuracy
+- `Low` - Optional enhancements
+
+**Validation Rules:**
+- `factfindId` must be valid
+
+**HTTP Status Codes:**
+- `200 OK` - Status retrieved successfully
+- `404 Not Found` - Fact find not found
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+### 10.7 Enhanced Declaration Capture
+
+**Purpose:** Comprehensive declaration and consent capture for regulatory compliance.
+
+**Scope:**
+- Client declarations (fact find accuracy, risk warnings, advice understanding, data protection)
+- Adviser declarations (suitability assessment, compliance confirmation, best advice)
+- Data protection consent (GDPR, data processing, retention, profiling)
+- Marketing consent with channel preferences (email, phone, SMS, post)
+- Regulatory disclosures and acknowledgments
+- Electronic and wet signature capture with full audit trail
+- Declaration versioning and change tracking
+- Signature verification with IP address, device info, and timestamp tracking
+- Consent withdrawal mechanism
+- Privacy policy version tracking
+
+**Aggregate Root:** FactFind (declarations are nested within)
+
+**Regulatory Compliance:**
+- GDPR Article 7 (Conditions for Consent)
+- GDPR Article 13 (Information to be Provided)
+- GDPR Article 17 (Right to Erasure)
+- GDPR Article 21 (Right to Object)
+- FCA COBS 2.3 (Client Agreements)
+- FCA COBS 4.2 (Risk Warnings)
+- FCA COBS 9.2 (Suitability Assessment)
+- eIDAS Regulation (Electronic Signatures)
+- Electronic Communications Act 2000
+- Data Protection Act 2018
+
+#### 10.7.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/declarations/status` | Get declaration status | `factfind:read` |
+| POST | `/api/v1/factfinds/{factfindId}/declarations/client-sign` | Sign client declaration | `factfind:write` |
+| POST | `/api/v1/factfinds/{factfindId}/declarations/adviser-sign` | Sign adviser declaration | `factfind:write` |
+| POST | `/api/v1/factfinds/{factfindId}/declarations/consent` | Record consent | `factfind:write` |
+| PUT | `/api/v1/factfinds/{factfindId}/declarations/consent/{id}` | Update consent | `factfind:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/declarations/consent/{id}` | Withdraw consent | `factfind:write` |
+| GET | `/api/v1/factfinds/{factfindId}/declarations/signature-history` | Get signature history | `factfind:read` |
+| GET | `/api/v1/factfinds/{factfindId}/declarations/consent-audit` | Get consent audit trail | `factfind:read` |
+| GET | `/api/v1/factfinds/{factfindId}/declarations/{id}` | Get specific declaration | `factfind:read` |
+| POST | `/api/v1/factfinds/{factfindId}/declarations/bulk-sign` | Sign multiple declarations | `factfind:write` |
+
+#### 10.7.2 Key Endpoints
+
+##### 10.7.2.1 Get Declaration Status
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/declarations/status`
+
+**Description:** Get status of all declarations and consents for a fact find, showing which have been signed and which are outstanding.
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "statusDate": "2026-02-17T15:00:00Z",
+  "overallStatus": "Partial",
+  "overallCompletionPercentage": 75.0,
+  "clientDeclarations": {
+    "status": "Complete",
+    "totalRequired": 4,
+    "signed": 4,
+    "unsigned": 0,
+    "declarations": [
+      {
+        "declarationType": "FactFindAccuracy",
+        "declarationName": "Fact Find Accuracy Declaration",
+        "required": true,
+        "signed": true,
+        "signedDate": "2026-02-15T16:30:00Z",
+        "signedBy": "John Smith",
+        "signatureMethod": "ElectronicSignature",
+        "declarationVersion": "2024-v1",
+        "expiryDate": null,
+        "_links": {
+          "declaration": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-001" }
+        }
+      },
+      {
+        "declarationType": "RiskWarning",
+        "declarationName": "Investment Risk Warning Acknowledgment",
+        "required": true,
+        "signed": true,
+        "signedDate": "2026-02-15T16:32:00Z",
+        "signedBy": "John Smith",
+        "signatureMethod": "ElectronicSignature",
+        "declarationVersion": "2024-v1",
+        "expiryDate": null,
+        "_links": {
+          "declaration": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-002" }
+        }
+      },
+      {
+        "declarationType": "AdviceUnderstanding",
+        "declarationName": "Advice Process Understanding",
+        "required": true,
+        "signed": true,
+        "signedDate": "2026-02-15T16:35:00Z",
+        "signedBy": "John Smith",
+        "signatureMethod": "ElectronicSignature",
+        "declarationVersion": "2024-v1",
+        "expiryDate": null,
+        "_links": {
+          "declaration": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-003" }
+        }
+      },
+      {
+        "declarationType": "CostDisclosure",
+        "declarationName": "Costs and Charges Understanding",
+        "required": true,
+        "signed": true,
+        "signedDate": "2026-02-15T16:37:00Z",
+        "signedBy": "John Smith",
+        "signatureMethod": "ElectronicSignature",
+        "declarationVersion": "2024-v1",
+        "expiryDate": null,
+        "_links": {
+          "declaration": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-004" }
+        }
+      }
+    ]
+  },
+  "adviserDeclarations": {
+    "status": "Pending",
+    "totalRequired": 3,
+    "signed": 2,
+    "unsigned": 1,
+    "declarations": [
+      {
+        "declarationType": "SuitabilityAssessment",
+        "declarationName": "Suitability Assessment Confirmation",
+        "required": true,
+        "signed": true,
+        "signedDate": "2026-02-16T10:00:00Z",
+        "signedBy": "Sarah Johnson",
+        "signatureMethod": "ElectronicSignature",
+        "declarationVersion": "2024-v1",
+        "expiryDate": null,
+        "_links": {
+          "declaration": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-005" }
+        }
+      },
+      {
+        "declarationType": "ComplianceConfirmation",
+        "declarationName": "Regulatory Compliance Confirmation",
+        "required": true,
+        "signed": true,
+        "signedDate": "2026-02-16T10:05:00Z",
+        "signedBy": "Sarah Johnson",
+        "signatureMethod": "ElectronicSignature",
+        "declarationVersion": "2024-v1",
+        "expiryDate": null,
+        "_links": {
+          "declaration": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-006" }
+        }
+      },
+      {
+        "declarationType": "BestAdvice",
+        "declarationName": "Best Advice Declaration",
+        "required": true,
+        "signed": false,
+        "signedDate": null,
+        "signedBy": null,
+        "signatureMethod": null,
+        "declarationVersion": "2024-v1",
+        "expiryDate": null,
+        "blockingIssue": "Requires suitability report completion first",
+        "_links": {
+          "sign": { "href": "/api/v1/factfinds/factfind-456/declarations/adviser-sign", "method": "POST" }
+        }
+      }
+    ]
+  },
+  "consents": {
+    "status": "Complete",
+    "totalRequired": 2,
+    "granted": 2,
+    "declined": 0,
+    "items": [
+      {
+        "consentType": "DataProcessing",
+        "consentName": "Data Processing Consent (GDPR Article 6)",
+        "required": true,
+        "status": "Granted",
+        "grantedDate": "2026-02-15T16:40:00Z",
+        "consentMethod": "ExplicitOptIn",
+        "privacyPolicyVersion": "2024-v2",
+        "expiryDate": null,
+        "withdrawable": true,
+        "_links": {
+          "consent": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-001" },
+          "withdraw": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-001", "method": "DELETE" }
+        }
+      },
+      {
+        "consentType": "DataProtection",
+        "consentName": "Data Protection and Privacy Notice",
+        "required": true,
+        "status": "Granted",
+        "grantedDate": "2026-02-15T16:40:00Z",
+        "consentMethod": "ExplicitOptIn",
+        "privacyPolicyVersion": "2024-v2",
+        "expiryDate": null,
+        "withdrawable": true,
+        "_links": {
+          "consent": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-002" },
+          "withdraw": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-002", "method": "DELETE" }
+        }
+      }
+    ]
+  },
+  "marketingConsents": {
+    "status": "Partial",
+    "totalChannels": 4,
+    "consentedChannels": 2,
+    "declinedChannels": 2,
+    "items": [
+      {
+        "channel": "Email",
+        "status": "Granted",
+        "grantedDate": "2026-02-15T16:45:00Z",
+        "preferences": {
+          "frequency": "Monthly",
+          "contentTypes": ["Newsletter", "ProductUpdates"]
+        },
+        "_links": {
+          "consent": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-m001" }
+        }
+      },
+      {
+        "channel": "Phone",
+        "status": "Declined",
+        "declinedDate": "2026-02-15T16:45:00Z",
+        "_links": {
+          "consent": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-m002" }
+        }
+      },
+      {
+        "channel": "SMS",
+        "status": "Declined",
+        "declinedDate": "2026-02-15T16:45:00Z",
+        "_links": {
+          "consent": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-m003" }
+        }
+      },
+      {
+        "channel": "Post",
+        "status": "Granted",
+        "grantedDate": "2026-02-15T16:45:00Z",
+        "preferences": {
+          "frequency": "Quarterly",
+          "contentTypes": ["Newsletter"]
+        },
+        "_links": {
+          "consent": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-m004" }
+        }
+      }
+    ]
+  },
+  "outstandingDeclarations": [
+    {
+      "declarationType": "BestAdvice",
+      "declarationName": "Best Advice Declaration",
+      "requiredBy": "Adviser",
+      "blockingReason": "Requires suitability report completion"
+    }
+  ],
+  "readyForAdvice": false,
+  "blockingIssues": [
+    {
+      "severity": "High",
+      "issue": "AdviserDeclarationIncomplete",
+      "description": "Best Advice declaration not signed - required before providing advice"
+    }
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/declarations/status" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "signature-history": { "href": "/api/v1/factfinds/factfind-456/declarations/signature-history" },
+    "consent-audit": { "href": "/api/v1/factfinds/factfind-456/declarations/consent-audit" },
+    "client-sign": { "href": "/api/v1/factfinds/factfind-456/declarations/client-sign", "method": "POST" },
+    "adviser-sign": { "href": "/api/v1/factfinds/factfind-456/declarations/adviser-sign", "method": "POST" }
+  }
+}
+```
+
+**Declaration Status Values:**
+- `Complete` - All required declarations signed
+- `Partial` - Some required declarations signed
+- `Pending` - No declarations signed
+
+**Consent Status Values:**
+- `Granted` - Consent given
+- `Declined` - Consent explicitly declined
+- `Withdrawn` - Consent previously given but withdrawn
+- `Expired` - Consent expired (requires renewal)
+
+**Validation Rules:**
+- `factfindId` must be valid
+
+**HTTP Status Codes:**
+- `200 OK` - Status retrieved successfully
+- `404 Not Found` - Fact find not found
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+##### 10.7.2.2 Sign Client Declaration
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/declarations/client-sign`
+
+**Description:** Record client signature on a declaration. Captures electronic or wet signature with full audit trail including IP address, device information, and timestamp.
+
+**Request Body:**
+
+```json
+{
+  "declarationType": "FactFindAccuracy",
+  "clientId": "client-123",
+  "signatureMethod": "ElectronicSignature",
+  "signatureData": {
+    "signatureImage": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
+    "signatureFormat": "PNG",
+    "signatureDimensions": {
+      "width": 300,
+      "height": 100
+    }
+  },
+  "signedDate": "2026-02-17T14:30:00Z",
+  "declarationVersion": "2024-v1",
+  "declarationText": "I confirm that the information provided in this fact find is true and accurate to the best of my knowledge. I understand that any inaccurate or incomplete information may affect the suitability of advice provided.",
+  "acknowledgedWarnings": [
+    "InaccurateInformationRisk",
+    "DutyToUpdateInformation"
+  ],
+  "metadata": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "deviceType": "Desktop",
+    "operatingSystem": "Windows 10",
+    "browser": "Chrome 120",
+    "location": {
+      "country": "GB",
+      "city": "London"
+    },
+    "signatureDuration": 3.2
+  },
+  "witnessDetails": {
+    "witnessed": false
+  },
+  "additionalNotes": "Client reviewed fact find details before signing"
+}
+```
+
+**Signature Methods:**
+- `ElectronicSignature` - Digital signature via tablet/mouse/touch
+- `WetSignature` - Physical signature scanned and uploaded
+- `TypedSignature` - Typed name with checkbox acknowledgment
+- `BiometricSignature` - Biometric signature capture device
+- `ClickToAccept` - Simple click acceptance (for low-risk declarations)
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/factfind-456/declarations/decl-client-001
+```
+
+```json
+{
+  "declarationId": "decl-client-001",
+  "factfindId": "factfind-456",
+  "declarationType": "FactFindAccuracy",
+  "declarationName": "Fact Find Accuracy Declaration",
+  "declarationCategory": "ClientDeclaration",
+  "declarationVersion": "2024-v1",
+  "declarationText": "I confirm that the information provided in this fact find is true and accurate to the best of my knowledge. I understand that any inaccurate or incomplete information may affect the suitability of advice provided.",
+  "fullDeclarationContent": {
+    "mainText": "I confirm that the information provided in this fact find is true and accurate to the best of my knowledge. I understand that any inaccurate or incomplete information may affect the suitability of advice provided.",
+    "warnings": [
+      {
+        "warningType": "InaccurateInformationRisk",
+        "warningText": "Providing inaccurate or incomplete information may result in unsuitable advice being given, which could lead to financial loss."
+      },
+      {
+        "warningType": "DutyToUpdateInformation",
+        "warningText": "You have a duty to inform us of any changes in your circumstances that may affect the suitability of our advice."
+      }
+    ],
+    "legalImplications": [
+      "This declaration forms part of your client agreement",
+      "Deliberately providing false information may constitute fraud"
+    ]
+  },
+  "signedBy": {
+    "clientId": "client-123",
+    "clientName": "John Smith",
+    "clientRole": "PrimaryClient"
+  },
+  "signatureMethod": "ElectronicSignature",
+  "signatureData": {
+    "signatureImage": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
+    "signatureFormat": "PNG",
+    "signatureDimensions": {
+      "width": 300,
+      "height": 100
+    },
+    "signatureHash": "sha256:a1b2c3d4e5f6...",
+    "signatureVerified": true
+  },
+  "signedDate": "2026-02-17T14:30:00Z",
+  "signatureMetadata": {
+    "ipAddress": "192.168.1.100",
+    "ipAddressVerified": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "deviceType": "Desktop",
+    "operatingSystem": "Windows 10",
+    "browser": "Chrome 120",
+    "location": {
+      "country": "GB",
+      "countryCode": "GB",
+      "city": "London",
+      "latitude": 51.5074,
+      "longitude": -0.1278
+    },
+    "signatureDuration": 3.2,
+    "timestamp": "2026-02-17T14:30:00Z",
+    "timestampVerified": true
+  },
+  "acknowledgedWarnings": [
+    {
+      "warningType": "InaccurateInformationRisk",
+      "acknowledged": true,
+      "acknowledgedDate": "2026-02-17T14:30:00Z"
+    },
+    {
+      "warningType": "DutyToUpdateInformation",
+      "acknowledged": true,
+      "acknowledgedDate": "2026-02-17T14:30:00Z"
+    }
+  ],
+  "witnessDetails": {
+    "witnessed": false
+  },
+  "complianceStatus": {
+    "regulatoryCompliant": true,
+    "eIDASCompliant": true,
+    "signatureLevel": "AdvancedElectronicSignature",
+    "legallyBinding": true
+  },
+  "auditTrail": {
+    "createdDate": "2026-02-17T14:30:00Z",
+    "createdBy": "client-123",
+    "lastModifiedDate": "2026-02-17T14:30:00Z",
+    "modificationCount": 0,
+    "immutable": true,
+    "auditHash": "sha256:abc123def456..."
+  },
+  "expiryDate": null,
+  "renewalRequired": false,
+  "status": "Active",
+  "additionalNotes": "Client reviewed fact find details before signing",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-client-001" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "signature-history": { "href": "/api/v1/factfinds/factfind-456/declarations/signature-history" },
+    "declaration-pdf": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-client-001/pdf" }
+  }
+}
+```
+
+**Client Declaration Types:**
+- `FactFindAccuracy` - Fact find information accuracy
+- `RiskWarning` - Investment risk warnings acknowledgment
+- `AdviceUnderstanding` - Understanding of advice process
+- `CostDisclosure` - Understanding of costs and charges
+- `ProductRisks` - Product-specific risk warnings
+- `CoolingOffPeriod` - Acknowledgment of cooling-off rights
+- `Complaints` - Complaints procedure acknowledgment
+
+**Signature Levels (eIDAS Compliance):**
+- `SimpleElectronicSignature` - Basic click acceptance
+- `AdvancedElectronicSignature` - Electronic signature with identity verification
+- `QualifiedElectronicSignature` - Highest level with qualified certificate
+
+**Validation Rules:**
+- `declarationType` must be valid client declaration type
+- `clientId` must belong to the fact find
+- `signatureMethod` must be valid
+- Electronic signatures must include signature image or typed acceptance
+- `declarationVersion` must match current approved version
+- IP address and timestamp must be captured for electronic signatures
+- All required warnings must be acknowledged
+
+**HTTP Status Codes:**
+- `201 Created` - Declaration signed successfully
+- `400 Bad Request` - Invalid request data
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Fact find or client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/signature-validation-error",
+  "title": "Signature Validation Failed",
+  "status": 422,
+  "detail": "Electronic signature requires signature image or typed acceptance",
+  "instance": "/api/v1/factfinds/factfind-456/declarations/client-sign",
+  "errors": [
+    {
+      "field": "signatureData",
+      "message": "Signature image is required for electronic signature method",
+      "rejectedValue": null
+    }
+  ]
+}
+```
+
+---
+
+##### 10.7.2.3 Sign Adviser Declaration
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/declarations/adviser-sign`
+
+**Description:** Record adviser signature on a declaration. Used for suitability assessment, compliance confirmation, and best advice declarations.
+
+**Request Body:**
+
+```json
+{
+  "declarationType": "SuitabilityAssessment",
+  "adviserId": "adv-789",
+  "signatureMethod": "ElectronicSignature",
+  "signatureData": {
+    "signatureImage": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
+    "signatureFormat": "PNG"
+  },
+  "signedDate": "2026-02-17T15:00:00Z",
+  "declarationVersion": "2024-v1",
+  "declarationText": "I confirm that I have conducted a comprehensive suitability assessment in accordance with FCA COBS 9.2 requirements. The advice provided is suitable based on the client's circumstances, objectives, and risk profile.",
+  "suitabilityReportReference": "SR-2024-02-456",
+  "complianceChecklist": {
+    "clientCircumstancesAssessed": true,
+    "riskProfileCompleted": true,
+    "productSuitabilityVerified": true,
+    "costsDisclosed": true,
+    "warningsProvided": true,
+    "documentationComplete": true,
+    "supervisoryReviewCompleted": true
+  },
+  "adviserConfirmations": [
+    {
+      "confirmationType": "SuitabilityConfirmed",
+      "confirmed": true,
+      "confirmationText": "I confirm the recommended products are suitable for the client's needs and circumstances"
+    },
+    {
+      "confirmationType": "RiskAppropriate",
+      "confirmed": true,
+      "confirmationText": "I confirm the investment risk level is appropriate for the client's risk profile"
+    },
+    {
+      "confirmationType": "BestAdvice",
+      "confirmed": true,
+      "confirmationText": "I confirm this represents my best advice in the client's interest"
+    }
+  ],
+  "metadata": {
+    "ipAddress": "192.168.1.50",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X)",
+    "deviceType": "Desktop",
+    "location": {
+      "country": "GB",
+      "city": "London"
+    }
+  },
+  "supervisorApproval": {
+    "required": true,
+    "supervisorId": "sup-456",
+    "approvedDate": "2026-02-17T14:45:00Z",
+    "approvalNotes": "Suitability assessment reviewed and approved"
+  },
+  "additionalNotes": "Comprehensive suitability assessment completed. All FCA requirements met."
+}
+```
+
+**Adviser Declaration Types:**
+- `SuitabilityAssessment` - Suitability assessment confirmation
+- `ComplianceConfirmation` - Regulatory compliance confirmation
+- `BestAdvice` - Best advice declaration
+- `ProductDueDiligence` - Product due diligence confirmation
+- `ConflictOfInterest` - Conflict of interest disclosure
+- `FeesDisclosed` - Fee disclosure confirmation
+- `SupervisoryReview` - Supervisory review sign-off
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/factfind-456/declarations/decl-adv-001
+```
+
+```json
+{
+  "declarationId": "decl-adv-001",
+  "factfindId": "factfind-456",
+  "declarationType": "SuitabilityAssessment",
+  "declarationName": "Suitability Assessment Confirmation",
+  "declarationCategory": "AdviserDeclaration",
+  "declarationVersion": "2024-v1",
+  "declarationText": "I confirm that I have conducted a comprehensive suitability assessment in accordance with FCA COBS 9.2 requirements. The advice provided is suitable based on the client's circumstances, objectives, and risk profile.",
+  "signedBy": {
+    "adviserId": "adv-789",
+    "adviserName": "Sarah Johnson",
+    "fcaRegistrationNumber": "FCA12345",
+    "adviserRole": "IndependentFinancialAdviser"
+  },
+  "signatureMethod": "ElectronicSignature",
+  "signatureData": {
+    "signatureImage": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA...",
+    "signatureFormat": "PNG",
+    "signatureHash": "sha256:xyz789abc123...",
+    "signatureVerified": true
+  },
+  "signedDate": "2026-02-17T15:00:00Z",
+  "signatureMetadata": {
+    "ipAddress": "192.168.1.50",
+    "ipAddressVerified": true,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X)",
+    "deviceType": "Desktop",
+    "operatingSystem": "macOS",
+    "browser": "Safari 17",
+    "location": {
+      "country": "GB",
+      "city": "London"
+    },
+    "timestamp": "2026-02-17T15:00:00Z"
+  },
+  "suitabilityReportReference": "SR-2024-02-456",
+  "complianceChecklist": {
+    "clientCircumstancesAssessed": true,
+    "riskProfileCompleted": true,
+    "productSuitabilityVerified": true,
+    "costsDisclosed": true,
+    "warningsProvided": true,
+    "documentationComplete": true,
+    "supervisoryReviewCompleted": true,
+    "allChecksPassed": true
+  },
+  "adviserConfirmations": [
+    {
+      "confirmationType": "SuitabilityConfirmed",
+      "confirmed": true,
+      "confirmationText": "I confirm the recommended products are suitable for the client's needs and circumstances",
+      "confirmedDate": "2026-02-17T15:00:00Z"
+    },
+    {
+      "confirmationType": "RiskAppropriate",
+      "confirmed": true,
+      "confirmationText": "I confirm the investment risk level is appropriate for the client's risk profile",
+      "confirmedDate": "2026-02-17T15:00:00Z"
+    },
+    {
+      "confirmationType": "BestAdvice",
+      "confirmed": true,
+      "confirmationText": "I confirm this represents my best advice in the client's interest",
+      "confirmedDate": "2026-02-17T15:00:00Z"
+    }
+  ],
+  "supervisorApproval": {
+    "required": true,
+    "approved": true,
+    "supervisorId": "sup-456",
+    "supervisorName": "Michael Brown",
+    "supervisorRole": "ComplianceOfficer",
+    "approvedDate": "2026-02-17T14:45:00Z",
+    "approvalNotes": "Suitability assessment reviewed and approved"
+  },
+  "regulatoryCompliance": {
+    "fcaCOBS9_2Compliant": true,
+    "mifidIICompliant": true,
+    "consumerDutyCompliant": true,
+    "smcrCompliant": true,
+    "complianceStatus": "FullyCompliant"
+  },
+  "auditTrail": {
+    "createdDate": "2026-02-17T15:00:00Z",
+    "createdBy": "adv-789",
+    "lastModifiedDate": "2026-02-17T15:00:00Z",
+    "modificationCount": 0,
+    "immutable": true,
+    "auditHash": "sha256:def456ghi789..."
+  },
+  "professionalIndemnityInsurance": {
+    "covered": true,
+    "policyNumber": "PII-123456",
+    "provider": "XYZ Insurance",
+    "coverageAmount": {
+      "amount": 10000000.00,
+      "currency": "GBP"
+    },
+    "expiryDate": "2027-03-31"
+  },
+  "status": "Active",
+  "additionalNotes": "Comprehensive suitability assessment completed. All FCA requirements met.",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/declarations/decl-adv-001" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "adviser": { "href": "/api/v1/advisers/adv-789" },
+    "suitability-report": { "href": "/api/v1/suitability-reports/SR-2024-02-456" },
+    "signature-history": { "href": "/api/v1/factfinds/factfind-456/declarations/signature-history" }
+  }
+}
+```
+
+**Validation Rules:**
+- `declarationType` must be valid adviser declaration type
+- `adviserId` must be valid and have required qualifications
+- Suitability assessment requires completed risk profile
+- Compliance checklist must have all items confirmed
+- Supervisor approval required for certain declaration types
+- Adviser must have valid FCA registration
+- Professional indemnity insurance must be current
+
+**HTTP Status Codes:**
+- `201 Created` - Declaration signed successfully
+- `400 Bad Request` - Invalid request data
+- `403 Forbidden` - Insufficient permissions or qualifications
+- `404 Not Found` - Fact find or adviser not found
+- `422 Unprocessable Entity` - Validation failed
+
+---
+
+##### 10.7.2.4 Record Consent
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/declarations/consent`
+
+**Description:** Record client consent for data processing, marketing, or other purposes. Supports GDPR Article 7 requirements for explicit, informed, and freely given consent.
+
+**Request Body:**
+
+```json
+{
+  "clientId": "client-123",
+  "consentType": "DataProcessing",
+  "consentPurpose": "ProcessPersonalDataForFinancialAdvice",
+  "consentMethod": "ExplicitOptIn",
+  "consentGiven": true,
+  "consentDate": "2026-02-17T14:30:00Z",
+  "privacyPolicyVersion": "2024-v2",
+  "privacyPolicyUrl": "https://example.com/privacy-policy-2024-v2",
+  "consentText": "I consent to the processing of my personal data for the purpose of receiving financial advice, in accordance with the Privacy Policy dated February 2024 (v2).",
+  "consentDetails": {
+    "dataCategories": [
+      "PersonalIdentificationData",
+      "FinancialData",
+      "ContactInformation",
+      "EmploymentData"
+    ],
+    "processingPurposes": [
+      "ProvideFinancialAdvice",
+      "RiskAssessment",
+      "ProductRecommendation",
+      "OngoingServiceProvision",
+      "RegulatoryCompliance"
+    ],
+    "dataRetentionPeriod": "7 years after relationship ends (FCA requirement)",
+    "thirdPartySharing": {
+      "shared": true,
+      "sharedWith": [
+        "ProductProviders",
+        "RegulatoryBodies",
+        "ProfessionalIndemnityInsurer"
+      ],
+      "legalBasis": "LegitimateInterest"
+    },
+    "dataTransferOutsideEEA": false,
+    "automatedDecisionMaking": false
+  },
+  "informationProvided": {
+    "privacyPolicyProvided": true,
+    "rightToWithdrawExplained": true,
+    "dataProtectionRightsExplained": true,
+    "contactDetailsForQueries": true
+  },
+  "consentMetadata": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "deviceType": "Desktop",
+    "location": {
+      "country": "GB",
+      "city": "London"
+    },
+    "consentDuration": 2.5,
+    "consentVerified": true
+  },
+  "renewalPolicy": {
+    "renewalRequired": false,
+    "renewalFrequency": null,
+    "expiryDate": null
+  },
+  "additionalNotes": "Client provided informed consent after reviewing privacy policy"
+}
+```
+
+**Consent Types:**
+- `DataProcessing` - GDPR Article 6 data processing
+- `DataProtection` - General data protection consent
+- `Marketing` - Marketing communications consent
+- `Profiling` - Automated profiling consent
+- `ThirdPartySharing` - Sharing data with third parties
+- `SensitiveData` - Processing sensitive personal data (Article 9)
+- `DataTransfer` - Transferring data outside EEA
+
+**Consent Methods:**
+- `ExplicitOptIn` - Active consent with checkbox or signature
+- `ImpliedConsent` - Implied through actions (limited use)
+- `SoftOptIn` - Existing relationship basis
+- `ContractualNecessity` - Required for contract performance
+- `LegalObligation` - Required by law
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/factfind-456/declarations/consent/consent-001
+```
+
+```json
+{
+  "consentId": "consent-001",
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "consentType": "DataProcessing",
+  "consentPurpose": "ProcessPersonalDataForFinancialAdvice",
+  "consentMethod": "ExplicitOptIn",
+  "consentGiven": true,
+  "consentDate": "2026-02-17T14:30:00Z",
+  "consentStatus": "Active",
+  "privacyPolicyVersion": "2024-v2",
+  "privacyPolicyUrl": "https://example.com/privacy-policy-2024-v2",
+  "consentText": "I consent to the processing of my personal data for the purpose of receiving financial advice, in accordance with the Privacy Policy dated February 2024 (v2).",
+  "consentDetails": {
+    "dataCategories": [
+      "PersonalIdentificationData",
+      "FinancialData",
+      "ContactInformation",
+      "EmploymentData"
+    ],
+    "processingPurposes": [
+      "ProvideFinancialAdvice",
+      "RiskAssessment",
+      "ProductRecommendation",
+      "OngoingServiceProvision",
+      "RegulatoryCompliance"
+    ],
+    "dataRetentionPeriod": "7 years after relationship ends (FCA requirement)",
+    "thirdPartySharing": {
+      "shared": true,
+      "sharedWith": [
+        "ProductProviders",
+        "RegulatoryBodies",
+        "ProfessionalIndemnityInsurer"
+      ],
+      "legalBasis": "LegitimateInterest",
+      "dataProcessingAgreementsInPlace": true
+    },
+    "dataTransferOutsideEEA": false,
+    "automatedDecisionMaking": false
+  },
+  "informationProvided": {
+    "privacyPolicyProvided": true,
+    "rightToWithdrawExplained": true,
+    "dataProtectionRightsExplained": true,
+    "contactDetailsForQueries": true,
+    "dataProtectionOfficerContact": "dpo@example.com"
+  },
+  "consentMetadata": {
+    "ipAddress": "192.168.1.100",
+    "ipAddressVerified": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "deviceType": "Desktop",
+    "operatingSystem": "Windows 10",
+    "browser": "Chrome 120",
+    "location": {
+      "country": "GB",
+      "city": "London"
+    },
+    "consentDuration": 2.5,
+    "consentVerified": true,
+    "timestamp": "2026-02-17T14:30:00Z"
+  },
+  "renewalPolicy": {
+    "renewalRequired": false,
+    "renewalFrequency": null,
+    "nextRenewalDate": null,
+    "expiryDate": null
+  },
+  "withdrawalRights": {
+    "withdrawable": true,
+    "withdrawalMethod": "ContactDataProtectionOfficer",
+    "withdrawalContact": "dpo@example.com",
+    "withdrawalEffectiveness": "Immediate",
+    "consequencesOfWithdrawal": "We may not be able to provide financial advice if you withdraw consent to process your data"
+  },
+  "gdprCompliance": {
+    "article6Compliant": true,
+    "article7Compliant": true,
+    "article13Compliant": true,
+    "lawfulBasis": "Consent",
+    "consentSpecific": true,
+    "consentInformed": true,
+    "consentUnambiguous": true,
+    "consentFreelyGiven": true
+  },
+  "auditTrail": {
+    "consentGivenDate": "2026-02-17T14:30:00Z",
+    "consentGivenBy": "client-123",
+    "consentModifiedDate": null,
+    "consentWithdrawnDate": null,
+    "consentHistory": []
+  },
+  "additionalNotes": "Client provided informed consent after reviewing privacy policy",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-001" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "privacy-policy": { "href": "https://example.com/privacy-policy-2024-v2" },
+    "withdraw": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-001", "method": "DELETE" },
+    "update": { "href": "/api/v1/factfinds/factfind-456/declarations/consent/consent-001", "method": "PUT" },
+    "consent-audit": { "href": "/api/v1/factfinds/factfind-456/declarations/consent-audit" }
+  }
+}
+```
+
+**GDPR Compliance Requirements:**
+- Consent must be freely given, specific, informed, and unambiguous (Article 7)
+- Clear and plain language required
+- Easy withdrawal mechanism must be provided
+- Separate consent for each processing purpose
+- Records of consent must be maintained
+- Privacy policy must be provided
+- Data retention periods must be specified
+
+**Validation Rules:**
+- `consentType` must be valid
+- `consentMethod` must be appropriate for consent type
+- Privacy policy version must be current
+- All GDPR information requirements must be met
+- Third party sharing requires separate explicit consent
+- Sensitive data processing requires explicit consent (Article 9)
+
+**HTTP Status Codes:**
+- `201 Created` - Consent recorded successfully
+- `400 Bad Request` - Invalid request data
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Fact find or client not found
+- `422 Unprocessable Entity` - GDPR compliance validation failed
+
+---
+
+##### 10.7.2.5 Get Consent Audit Trail
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/declarations/consent-audit`
+
+**Description:** Get complete audit trail of all consent events including consent given, updated, and withdrawn. Required for GDPR Article 7 compliance.
+
+**Query Parameters:**
+- `clientId` - Filter by specific client
+- `consentType` - Filter by consent type
+- `fromDate` - Filter from this date
+- `toDate` - Filter to this date
+
+**Response:**
+
+```json
+{
+  "factfindId": "factfind-456",
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "auditDate": "2026-02-17T16:00:00Z",
+  "totalConsentEvents": 8,
+  "activeConsents": 4,
+  "withdrawnConsents": 1,
+  "updatedConsents": 2,
+  "consentAuditTrail": [
+    {
+      "eventId": "event-001",
+      "eventType": "ConsentGiven",
+      "eventDate": "2026-02-15T16:40:00Z",
+      "consentId": "consent-001",
+      "consentType": "DataProcessing",
+      "consentPurpose": "ProcessPersonalDataForFinancialAdvice",
+      "consentMethod": "ExplicitOptIn",
+      "privacyPolicyVersion": "2024-v2",
+      "eventDetails": {
+        "consentGiven": true,
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "location": "London, GB"
+      },
+      "gdprCompliant": true
+    },
+    {
+      "eventId": "event-002",
+      "eventType": "ConsentGiven",
+      "eventDate": "2026-02-15T16:40:00Z",
+      "consentId": "consent-002",
+      "consentType": "DataProtection",
+      "consentPurpose": "DataProtectionAndPrivacyNotice",
+      "consentMethod": "ExplicitOptIn",
+      "privacyPolicyVersion": "2024-v2",
+      "eventDetails": {
+        "consentGiven": true,
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "location": "London, GB"
+      },
+      "gdprCompliant": true
+    },
+    {
+      "eventId": "event-003",
+      "eventType": "ConsentGiven",
+      "eventDate": "2026-02-15T16:45:00Z",
+      "consentId": "consent-m001",
+      "consentType": "Marketing",
+      "consentPurpose": "EmailMarketing",
+      "consentMethod": "ExplicitOptIn",
+      "privacyPolicyVersion": "2024-v2",
+      "eventDetails": {
+        "consentGiven": true,
+        "channel": "Email",
+        "preferences": {
+          "frequency": "Monthly",
+          "contentTypes": ["Newsletter", "ProductUpdates"]
+        },
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "location": "London, GB"
+      },
+      "gdprCompliant": true
+    },
+    {
+      "eventId": "event-004",
+      "eventType": "ConsentDeclined",
+      "eventDate": "2026-02-15T16:45:00Z",
+      "consentId": "consent-m002",
+      "consentType": "Marketing",
+      "consentPurpose": "PhoneMarketing",
+      "consentMethod": "ExplicitOptOut",
+      "privacyPolicyVersion": "2024-v2",
+      "eventDetails": {
+        "consentGiven": false,
+        "channel": "Phone",
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "location": "London, GB"
+      },
+      "gdprCompliant": true
+    },
+    {
+      "eventId": "event-005",
+      "eventType": "ConsentDeclined",
+      "eventDate": "2026-02-15T16:45:00Z",
+      "consentId": "consent-m003",
+      "consentType": "Marketing",
+      "consentPurpose": "SMSMarketing",
+      "consentMethod": "ExplicitOptOut",
+      "privacyPolicyVersion": "2024-v2",
+      "eventDetails": {
+        "consentGiven": false,
+        "channel": "SMS",
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "location": "London, GB"
+      },
+      "gdprCompliant": true
+    },
+    {
+      "eventId": "event-006",
+      "eventType": "ConsentGiven",
+      "eventDate": "2026-02-15T16:45:00Z",
+      "consentId": "consent-m004",
+      "consentType": "Marketing",
+      "consentPurpose": "PostMarketing",
+      "consentMethod": "ExplicitOptIn",
+      "privacyPolicyVersion": "2024-v2",
+      "eventDetails": {
+        "consentGiven": true,
+        "channel": "Post",
+        "preferences": {
+          "frequency": "Quarterly",
+          "contentTypes": ["Newsletter"]
+        },
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "location": "London, GB"
+      },
+      "gdprCompliant": true
+    },
+    {
+      "eventId": "event-007",
+      "eventType": "ConsentUpdated",
+      "eventDate": "2026-02-16T10:00:00Z",
+      "consentId": "consent-m001",
+      "consentType": "Marketing",
+      "consentPurpose": "EmailMarketing",
+      "eventDetails": {
+        "changeType": "PreferenceUpdate",
+        "previousPreferences": {
+          "frequency": "Monthly",
+          "contentTypes": ["Newsletter", "ProductUpdates"]
+        },
+        "newPreferences": {
+          "frequency": "Quarterly",
+          "contentTypes": ["Newsletter"]
+        },
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "location": "London, GB"
+      },
+      "gdprCompliant": true
+    },
+    {
+      "eventId": "event-008",
+      "eventType": "PrivacyPolicyUpdated",
+      "eventDate": "2026-02-17T09:00:00Z",
+      "eventDetails": {
+        "previousVersion": "2024-v1",
+        "newVersion": "2024-v2",
+        "changesSummary": "Updated data retention periods and third-party sharing disclosure",
+        "reconsentRequired": false,
+        "notificationSent": true,
+        "notificationDate": "2026-02-17T09:00:00Z"
+      },
+      "affectedConsents": [
+        "consent-001",
+        "consent-002",
+        "consent-m001",
+        "consent-m004"
+      ]
+    }
+  ],
+  "consentSummary": {
+    "dataProcessingConsent": {
+      "status": "Active",
+      "consentDate": "2026-02-15T16:40:00Z",
+      "lastUpdated": "2026-02-15T16:40:00Z",
+      "withdrawable": true
+    },
+    "marketingConsents": {
+      "email": {
+        "status": "Active",
+        "consentDate": "2026-02-15T16:45:00Z",
+        "lastUpdated": "2026-02-16T10:00:00Z",
+        "preferences": {
+          "frequency": "Quarterly",
+          "contentTypes": ["Newsletter"]
+        }
+      },
+      "phone": {
+        "status": "Declined",
+        "declinedDate": "2026-02-15T16:45:00Z"
+      },
+      "sms": {
+        "status": "Declined",
+        "declinedDate": "2026-02-15T16:45:00Z"
+      },
+      "post": {
+        "status": "Active",
+        "consentDate": "2026-02-15T16:45:00Z",
+        "preferences": {
+          "frequency": "Quarterly",
+          "contentTypes": ["Newsletter"]
+        }
+      }
+    }
+  },
+  "gdprCompliance": {
+    "article7Compliant": true,
+    "consentRecordsComplete": true,
+    "withdrawalMechanismAvailable": true,
+    "privacyPolicyProvided": true,
+    "dataProtectionRightsExplained": true
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456/declarations/consent-audit" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "current-consents": { "href": "/api/v1/factfinds/factfind-456/declarations/consent" },
+    "privacy-policy": { "href": "https://example.com/privacy-policy-2024-v2" }
+  }
+}
+```
+
+**Event Types:**
+- `ConsentGiven` - Initial consent granted
+- `ConsentDeclined` - Consent explicitly declined
+- `ConsentUpdated` - Consent preferences updated
+- `ConsentWithdrawn` - Consent withdrawn
+- `ConsentExpired` - Consent expired
+- `ConsentRenewed` - Consent renewed
+- `PrivacyPolicyUpdated` - Privacy policy version changed
+
+**Validation Rules:**
+- `factfindId` must be valid
+- Date filters must be valid ISO 8601 format
+- `fromDate` must be before `toDate`
+
+**HTTP Status Codes:**
+- `200 OK` - Audit trail retrieved successfully
+- `404 Not Found` - Fact find not found
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+
+---
+
+
+## 11. FactFind Estate Planning API
+
+This section defines the unified entity contracts used throughout the FactFind API. Following the **Single Contract Principle** (Section 1.7), each entity has one canonical contract used for both requests (POST, PUT, PATCH) and responses (GET).
+
+Each field is annotated with its behavioral characteristics:
+- **required-on-create** - Must be provided when creating the entity
+- **optional** - Can be omitted in any operation
+- **read-only** - System-generated, cannot be set by clients
+- **write-once** - Can only be set on create, immutable thereafter
+- **updatable** - Can be modified via PUT/PATCH operations
+
+### 11.1 Client Contract
+
+The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic and regulatory information.
+
+**Reference Type:** Client is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "client-123",
+  "clientNumber": "C00001234",
+  "clientType": "Person",
+  "name": {
+    "title": {
+      "code": "MR",
+      "display": "Mr"
+    },
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "preferredName": "John"
+  },
+  "fullName": "Mr John Michael Smith",
+  "salutation": "Mr Smith",
+  "dateOfBirth": "1980-05-15",
+  "age": 45,
+  "placeOfBirth": "London",
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2005-06-20"
+  },
+  "taxDetails": {
+    "niNumber": "AB123456C",
+    "taxReference": "1234567890"
+  },
+  "nationalClientIdentifier": "NCI-123456",
+  "passportRef": "502135321",
+  "passportExpiryDate": "2030-05-15",
+  "drivingLicenceRef": "SMITH801055JM9IJ",
+  "drivingLicenceExpiryDate": "2030-05-15",
+  "nationalityCountry": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfBirth": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfResidence": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfDomicile": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "isUkResident": true,
+  "isExpatriate": false,
+  "isDeceased": false,
+  "deceasedOn": null,
+  "hasWill": true,
+  "isWillUpToDate": true,
+  "isWillAdvised": true,
+  "willDetails": "Will created in 2020, held by Smith & Co Solicitors",
+  "isPowerOfAttorneyGranted": false,
+  "powerOfAttorneyName": null,
+  "hasEverSmoked": false,
+  "isSmoker": "Never",
+  "hasSmokedInLast12Months": "No",
+  "hasNicotineReplacementInLastYear": "No",
+  "hasVapedInLastYear": "No",
+  "inGoodHealth": true,
+  "medicalConditions": null,
+  "isMatchingServiceProposition": false,
+  "matchingServicePropositionReason": null,
+  "isHeadOfFamilyGroup": true,
+  "isJoint": true,
+  "spouseRef": {
+    "id": "client-124",
+    "href": "/api/v1/clients/client-124",
+    "name": "Sarah Smith",
+    "clientNumber": "C00001235",
+    "type": "Person"
+  },
+  "serviceStatus": "Active",
+  "serviceStatusDate": "2020-01-15",
+  "clientSegment": "A",
+  "clientSegmentDate": "2020-01-15",
+  "clientCategory": "HighNetWorth",
+  "grossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "householdIncome": {
+    "amount": 120000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netWorth": {
+    "amount": 450000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "householdNetWorth": {
+    "amount": 650000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalAssets": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalJointAssets": {
+    "amount": 200000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "primaryAddress": {
+    "line1": "123 Main Street",
+    "line2": "Apartment 4B",
+    "city": "London",
+    "county": {
+      "code": "GLA",
+      "display": "Greater London"
+    },
+    "postcode": "SW1A 1AA",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "addressType": {
+      "code": "RES",
+      "display": "Residential"
+    }
+  },
+  "contacts": [
+    {
+      "type": {
+        "code": "EMAIL",
+        "display": "Email"
+      },
+      "value": "john.smith@example.com",
+      "isPrimary": true
+    },
+    {
+      "type": {
+        "code": "MOBILE",
+        "display": "Mobile"
+      },
+      "value": "+44 7700 900123",
+      "isPrimary": false
+    }
+  ],
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "paraplannerRef": {
+    "id": "adviser-790",
+    "href": "/api/v1/advisers/adviser-790",
+    "name": "Mark Taylor",
+    "code": "PP001"
+  },
+  "idCheckCompletedDate": "2020-01-10",
+  "idCheckExpiryDate": "2025-01-10",
+  "idCheckIssuer": "Experian",
+  "idCheckReference": "IDC-123456",
+  "idCheckResult": "Passed",
+  "taxCode": "1257L",
+  "notes": "Prefers email communication, interested in sustainable investing",
+  "profilePicture": "https://cdn.factfind.com/profiles/client-123.jpg",
+  "createdAt": "2020-01-15T10:30:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "createdBy": {
+    "id": "user-999",
+    "name": "System Admin"
+  },
+  "updatedBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/clients/client-123" },
+    "update": { "href": "/api/v1/clients/client-123", "method": "PUT" },
+    "delete": { "href": "/api/v1/clients/client-123", "method": "DELETE" },
+    "addresses": { "href": "/api/v1/clients/client-123/addresses" },
+    "contacts": { "href": "/api/v1/clients/client-123/contacts" },
+    "relationships": { "href": "/api/v1/clients/client-123/relationships" },
+    "dependants": { "href": "/api/v1/clients/client-123/dependants" },
+    "factfinds": { "href": "/api/v1/factfinds?clientId=client-123" },
+    "arrangements": { "href": "/api/v1/arrangements?clientId=client-123" },
+    "goals": { "href": "/api/v1/goals?clientId=client-123" },
+    "riskProfile": { "href": "/api/v1/risk-profiles?clientId=client-123" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `clientNumber` | string | optional | ignored | included | write-once, business identifier |
+| `clientType` | enum | required | ignored | included | write-once, discriminator field |
+| `name` | NameValue | required | updatable | included | Value type: firstName, lastName required |
+| `fullName` | string | ignored | ignored | included | read-only, computed from name |
+| `salutation` | string | optional | updatable | included | - |
+| `dateOfBirth` | date | required | ignored | included | write-once, immutable after creation |
+| `age` | integer | ignored | ignored | included | read-only, computed from dateOfBirth |
+| `placeOfBirth` | string | optional | updatable | included | - |
+| `gender` | GenderValue | optional | updatable | included | Value type: code/display enumeration |
+| `maritalStatus` | MaritalStatusValue | optional | updatable | included | Value type: code/display/effectiveFrom |
+| `taxDetails` | TaxDetailsValue | optional | updatable | included | Value type: PII, requires `client:pii:read` scope |
+| `nationalClientIdentifier` | string | optional | updatable | included | - |
+| `passportRef` | string | optional | updatable | included | PII, requires `client:pii:read` scope |
+| `passportExpiryDate` | date | optional | updatable | included | - |
+| `drivingLicenceRef` | string | optional | updatable | included | PII, requires `client:pii:read` scope |
+| `drivingLicenceExpiryDate` | date | optional | updatable | included | - |
+| `nationalityCountry` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfBirth` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfResidence` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfDomicile` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `isUkResident` | boolean | optional | updatable | included | - |
+| `isExpatriate` | boolean | optional | updatable | included | - |
+| `isDeceased` | boolean | optional | updatable | included | - |
+| `deceasedOn` | date | optional | updatable | included | - |
+| `hasWill` | boolean | optional | updatable | included | - |
+| `isWillUpToDate` | boolean | optional | updatable | included | - |
+| `isWillAdvised` | boolean | optional | updatable | included | - |
+| `willDetails` | string | optional | updatable | included | - |
+| `isPowerOfAttorneyGranted` | boolean | optional | updatable | included | - |
+| `powerOfAttorneyName` | string | optional | updatable | included | - |
+| `hasEverSmoked` | boolean | optional | updatable | included | - |
+| `isSmoker` | enum | optional | updatable | included | - |
+| `hasSmokedInLast12Months` | enum | optional | updatable | included | - |
+| `hasNicotineReplacementInLastYear` | enum | optional | updatable | included | - |
+| `hasVapedInLastYear` | enum | optional | updatable | included | - |
+| `inGoodHealth` | boolean | optional | updatable | included | - |
+| `medicalConditions` | string | optional | updatable | included | - |
+| `isMatchingServiceProposition` | boolean | optional | updatable | included | - |
+| `matchingServicePropositionReason` | string | optional | updatable | included | - |
+| `isHeadOfFamilyGroup` | boolean | optional | updatable | included | - |
+| `isJoint` | boolean | optional | updatable | included | - |
+| `spouseRef` | ClientRef | optional | updatable | included | Reference type: Provide id on create/update |
+| `serviceStatus` | enum | optional | updatable | included | - |
+| `serviceStatusDate` | date | optional | updatable | included | - |
+| `clientSegment` | string | optional | updatable | included | - |
+| `clientSegmentDate` | date | optional | updatable | included | - |
+| `clientCategory` | enum | optional | updatable | included | - |
+| `grossAnnualIncome` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `householdIncome` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `netWorth` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `householdNetWorth` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `totalAssets` | MoneyValue | ignored | ignored | included | read-only, computed from arrangements |
+| `totalJointAssets` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `primaryAddress` | AddressValue | optional | updatable | included | Value type: Embedded address, no id |
+| `contacts` | ContactValue[] | optional | updatable | included | Value type array: Email, phone contacts |
+| `adviserRef` | AdviserRef | optional | updatable | included | Reference type: Primary adviser |
+| `paraplannerRef` | AdviserRef | optional | updatable | included | Reference type: Paraplanner |
+| `idCheckCompletedDate` | date | optional | updatable | included | - |
+| `idCheckExpiryDate` | date | optional | updatable | included | - |
+| `idCheckIssuer` | string | optional | updatable | included | - |
+| `idCheckReference` | string | optional | updatable | included | - |
+| `idCheckResult` | enum | optional | updatable | included | - |
+| `taxCode` | string | optional | updatable | included | - |
+| `notes` | string | optional | updatable | included | - |
+| `profilePicture` | string | optional | updatable | included | URL to profile image |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Creating a Client (POST /api/v1/factfinds/{factfindId}/clients):**
+```json
+{
+  "clientType": "Person",
+  "name": {
+    "title": "Mr",
+    "firstName": "John",
+    "lastName": "Smith"
+  },
+  "dateOfBirth": "1980-05-15",
+  "gender": "Male",
+  "nationalityCountry": { "code": "GB" },
+  "primaryAddress": {
+    "line1": "123 Main Street",
+    "city": "London",
+    "postcode": "SW1A 1AA",
+    "country": "GB"
+  },
+  "contacts": [
+    {
+      "type": "Email",
+      "value": "john.smith@example.com",
+      "isPrimary": true
+    }
+  ],
+  "adviserRef": {
+    "id": "adviser-789"
+  }
+}
+```
+Server generates `id`, `clientNumber`, `createdAt`, `updatedAt`, `fullName`, `age`, and populates reference display fields. Returns complete contract.
+
+**Updating a Client (PUT /api/v1/clients/client-123):**
+```json
+{
+  "name": {
+    "title": "Mr",
+    "firstName": "John",
+    "lastName": "Smith-Jones"
+  },
+  "gender": "Male",
+  "maritalStatus": "Married",
+  "nationalityCountry": { "code": "GB" },
+  "grossAnnualIncome": {
+    "amount": 85000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "spouseRef": {
+    "id": "client-124"
+  }
+}
+```
+Cannot change `dateOfBirth` (write-once). Server updates `updatedAt`, `fullName`, and returns complete contract.
+
+**Partial Update (PATCH /api/v1/clients/client-123):**
+```json
+{
+  "name": {
+    "lastName": "Smith-Jones"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2015-06-20"
+  },
+  "householdIncome": {
+    "amount": 145000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+```
+Only specified fields are updated. Returns complete contract with changes applied.
+
+---
+
+### 11.2 FactFind Contract
+
+The `FactFind` contract (also known as ADVICE_CASE) represents a fact-finding session and aggregate root for circumstances discovery.
+
+**Reference Type:** FactFind is a reference type with identity (has `id` field).
+
+Complete fact find aggregate root with summary calculations.
+
+```json
+{
+  "id": "factfind-456",
+  "factFindNumber": "FF001234",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "jointClientRef": {
+    "id": "client-124",
+    "href": "/api/v1/clients/client-124",
+    "name": "Sarah Smith",
+    "clientNumber": "C00001235",
+    "type": "Person"
+  },
+  "dateOfMeeting": "2026-02-16",
+  "typeOfMeeting": {
+    "code": "INIT",
+    "display": "Initial Consultation"
+  },
+  "clientsPresent": "BothClients",
+  "anybodyElsePresent": false,
+  "anybodyElsePresentDetails": null,
+  "scopeOfAdvice": {
+    "retirementPlanning": true,
+    "savingsAndInvestments": true,
+    "protection": true,
+    "mortgage": false,
+    "estatePlanning": false
+  },
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "isComplete": false,
+  "dateFactFindCompleted": null,
+  "dateDeclarationSigned": null,
+  "dateIdAmlChecked": "2026-02-16",
+  "status": {
+    "code": "INPROG",
+    "display": "In Progress"
+  },
+  "hasEmployments": true,
+  "hasExpenditures": true,
+  "hasAssets": true,
+  "hasLiabilities": true,
+  "hasDcPensionPersonal": true,
+  "hasDcPensionMoneyPurchase": true,
+  "hasDbPension": false,
+  "hasSavings": true,
+  "hasInvestments": true,
+  "hasProtection": true,
+  "hasExistingMortgage": true,
+  "hasAnnuity": false,
+  "hasEquityRelease": false,
+  "hasAdverseCredit": false,
+  "hasBeenRefusedCredit": false,
+  "incomeChangesExpected": false,
+  "expenditureChangesExpected": false,
+  "totalEarnedAnnualIncomeGross": {
+    "amount": 120000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalNetMonthlyIncome": {
+    "amount": 7500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalMonthlyExpenditure": {
+    "amount": 4500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalMonthlyDisposableIncome": {
+    "amount": 3000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "emergencyFund": {
+    "requiredAmount": {
+      "amount": 11400.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "committedAmount": {
+      "amount": 15000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "shortfall": {
+      "amount": 0.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    }
+  },
+  "totalFundsAvailable": {
+    "amount": 85000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalLumpSumAvailableForAdvice": {
+    "amount": 70000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "agreedMonthlyBudget": {
+    "amount": 1000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "agreedSingleInvestmentAmount": {
+    "amount": 50000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "highestTaxRate": "HigherRate",
+  "totalNetRelevantEarnings": {
+    "amount": 110000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "sourceOfInvestmentFunds": "Savings from employment income over past 5 years",
+  "notes": "Clients seeking to consolidate pensions and review protection cover",
+  "additionalNotes": null,
+  "customQuestions": [
+    {
+      "question": "What are your main financial concerns?",
+      "answer": "Ensuring sufficient retirement income and protecting family"
+    }
+  ],
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456" },
+    "complete": { "href": "/api/v1/factfinds/factfind-456/complete", "method": "POST" },
+    "summary": { "href": "/api/v1/factfinds/factfind-456/summary" },
+    "employment": { "href": "/api/v1/factfinds/factfind-456/employment" },
+    "income": { "href": "/api/v1/factfinds/factfind-456/income" },
+    "expenditure": { "href": "/api/v1/factfinds/factfind-456/expenditure" },
+    "affordability": { "href": "/api/v1/factfinds/factfind-456/affordability" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `factFindNumber` | string | optional | ignored | included | write-once, business identifier |
+| `clientRef` | ClientRef | required | ignored | included | write-once, reference to Client |
+| `jointClientRef` | ClientRef | optional | ignored | included | write-once, reference to Client |
+| `dateOfMeeting` | date | required | updatable | included | - |
+| `typeOfMeeting` | enum | required | updatable | included | - |
+| `clientsPresent` | enum | optional | updatable | included | - |
+| `anybodyElsePresent` | boolean | optional | updatable | included | - |
+| `anybodyElsePresentDetails` | string | optional | updatable | included | - |
+| `scopeOfAdvice` | object | optional | updatable | included | Value type: embedded scope flags |
+| `adviserRef` | AdviserRef | required | updatable | included | Reference type: Primary adviser |
+| `isComplete` | boolean | ignored | ignored | included | read-only, computed from completion status |
+| `dateFactFindCompleted` | date | optional | updatable | included | - |
+| `dateDeclarationSigned` | date | optional | updatable | included | - |
+| `dateIdAmlChecked` | date | optional | updatable | included | - |
+| `status` | enum | optional | updatable | included | - |
+| `hasEmployments` | boolean | ignored | ignored | included | read-only, computed from child entities |
+| `hasExpenditures` | boolean | ignored | ignored | included | read-only, computed |
+| `hasAssets` | boolean | ignored | ignored | included | read-only, computed |
+| `hasLiabilities` | boolean | ignored | ignored | included | read-only, computed |
+| `hasDcPensionPersonal` | boolean | ignored | ignored | included | read-only, computed |
+| `hasDcPensionMoneyPurchase` | boolean | ignored | ignored | included | read-only, computed |
+| `hasDbPension` | boolean | ignored | ignored | included | read-only, computed |
+| `hasSavings` | boolean | ignored | ignored | included | read-only, computed |
+| `hasInvestments` | boolean | ignored | ignored | included | read-only, computed |
+| `hasProtection` | boolean | ignored | ignored | included | read-only, computed |
+| `hasExistingMortgage` | boolean | ignored | ignored | included | read-only, computed |
+| `hasAnnuity` | boolean | ignored | ignored | included | read-only, computed |
+| `hasEquityRelease` | boolean | ignored | ignored | included | read-only, computed |
+| `hasAdverseCredit` | boolean | optional | updatable | included | - |
+| `hasBeenRefusedCredit` | boolean | optional | updatable | included | - |
+| `incomeChangesExpected` | boolean | optional | updatable | included | - |
+| `expenditureChangesExpected` | boolean | optional | updatable | included | - |
+| `totalEarnedAnnualIncomeGross` | MoneyValue | ignored | ignored | included | read-only, computed from Income entities |
+| `totalNetMonthlyIncome` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `totalMonthlyExpenditure` | MoneyValue | ignored | ignored | included | read-only, computed from Expenditure entities |
+| `totalMonthlyDisposableIncome` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `emergencyFund` | object | optional | updatable | included | Value type: requiredAmount, committedAmount, shortfall (all MoneyValue) |
+| `totalFundsAvailable` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `totalLumpSumAvailableForAdvice` | MoneyValue | optional | updatable | included | Value type |
+| `agreedMonthlyBudget` | MoneyValue | optional | updatable | included | Value type |
+| `agreedSingleInvestmentAmount` | MoneyValue | optional | updatable | included | Value type |
+| `highestTaxRate` | enum | ignored | ignored | included | read-only, computed |
+| `totalNetRelevantEarnings` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `sourceOfInvestmentFunds` | string | optional | updatable | included | - |
+| `notes` | string | optional | updatable | included | - |
+| `additionalNotes` | string | optional | updatable | included | - |
+| `customQuestions` | array | optional | updatable | included | - |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Creating a FactFind (POST /api/v1/factfinds):**
+```json
+{
+  "clientRef": { "id": "client-123" },
+  "jointClientRef": { "id": "client-124" },
+  "dateOfMeeting": "2026-02-16",
+  "typeOfMeeting": "InitialConsultation",
+  "adviserRef": { "id": "adviser-789" },
+  "scopeOfAdvice": {
+    "retirementPlanning": true,
+    "protection": true
+  },
+  "agreedMonthlyBudget": {
+    "amount": 1000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+```
+
+**Updating a FactFind (PATCH /api/v1/factfinds/456):**
+```json
+{
+  "status": {
+    "code": "COM",
+    "display": "Complete"
+  },
+  "dateFactFindCompleted": "2026-02-16",
+  "agreedMonthlyBudget": {
+    "amount": 1500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  }
+}
+```
+
+---
+
+### 11.3 Address Contract
+
+The `Address` contract represents a client's address with additional metadata for residency tracking. When an address needs independent lifecycle management (e.g., address history), it becomes a reference type with identity.
+
+**Reference Type:** Address is a reference type with identity when managed as a separate resource (has `id` field).
+
+**Note:** For simple embedded addresses (like `primaryAddress` in Client), use `AddressValue` (see Section 11.10.2) which has no `id` and is embedded directly.
+
+```json
+{
+  "id": "address-789",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "addressType": "Residential",
+  "address": {
+    "line1": "123 High Street",
+    "line2": "Apartment 4B",
+    "city": "London",
+    "county": "Greater London",
+    "postcode": "SW1A 1AA",
+    "country": "GB"
+  },
+  "isCorrespondenceAddress": true,
+  "residencyPeriod": {
+    "startDate": "2020-01-15",
+    "endDate": null
+  },
+  "residencyStatus": "Owner",
+  "isOnElectoralRoll": true,
+  "createdAt": "2020-01-15T10:30:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z"
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated (uuid)
+- `clientRef` - write-once, reference to Client
+- `addressType` - required-on-create, updatable
+- `address` - required-on-create, updatable (AddressValue embedded)
+- `isCorrespondenceAddress` - optional, updatable (boolean)
+- `residencyPeriod` - optional, updatable (DateRangeValue)
+- `residencyStatus` - optional, updatable
+- `isOnElectoralRoll` - optional, updatable
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 11.4 Income Contract
+
+The `Income` contract represents an income source within a FactFind.
+
+**Reference Type:** Income is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "income-101",
+  "factFindRef": {
+    "id": "factfind-456",
+    "href": "/api/v1/factfinds/factfind-456",
+    "factFindNumber": "FF001234",
+    "status": "InProgress"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "employmentRef": {
+    "id": "employment-222",
+    "href": "/api/v1/employments/employment-222",
+    "employerName": "Tech Corp Ltd",
+    "status": "Current"
+  },
+  "incomeType": "Employment",
+  "description": "Salary from Tech Corp Ltd",
+  "grossAmount": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netAmount": {
+    "amount": 55000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": {
+    "code": "A",
+    "display": "Annually",
+    "periodsPerYear": 1
+  },
+  "incomePeriod": {
+    "startDate": "2020-01-15",
+    "endDate": null
+  },
+  "isOngoing": true,
+  "isPrimary": true,
+  "isGuaranteed": true,
+  "taxDeducted": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "nationalInsuranceDeducted": {
+    "amount": 5000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "notes": "Annual bonus typically £10k",
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z"
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated (uuid)
+- `factFindRef` - write-once, reference to FactFind (set from URL path parameter)
+- `clientRef` - required-on-create, write-once, reference to Client
+- `employmentRef` - optional, updatable, reference to Employment
+- `incomeType` - required-on-create, updatable
+- `description` - optional, updatable
+- `grossAmount` - required-on-create, updatable (MoneyValue)
+- `netAmount` - optional, updatable (MoneyValue)
+- `frequency` - required-on-create, updatable
+- `incomePeriod` - optional, updatable (DateRangeValue)
+- `isOngoing`, `isPrimary`, `isGuaranteed` - optional, updatable
+- `taxDeducted`, `nationalInsuranceDeducted` - optional, updatable (MoneyValue)
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 11.5 Arrangement Contract
+
+The `Arrangement` contract represents financial products (pensions, investments, protection, mortgages). This is a polymorphic contract with type-specific fields.
+
+**Reference Type:** Arrangement is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "arrangement-555",
+  "arrangementNumber": "ARR123456",
+  "arrangementType": "Pension",
+  "pensionType": "PersonalPension",
+  "clientOwners": [
+    {
+      "id": "client-123",
+      "href": "/api/v1/clients/client-123",
+      "name": "John Smith",
+      "clientNumber": "C00001234",
+      "type": "Person"
+    }
+  ],
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "productName": "ABC SIPP",
+  "providerRef": {
+    "id": "provider-456",
+    "href": "/api/v1/providers/provider-456",
+    "name": "ABC Pension Provider Ltd",
+    "frnNumber": "123456"
+  },
+  "policyNumber": "POL123456",
+  "status": {
+    "code": "ACT",
+    "display": "Active"
+  },
+  "arrangementPeriod": {
+    "startDate": "2015-01-01",
+    "endDate": null
+  },
+  "currentValue": {
+    "amount": 125000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-01",
+  "regularContribution": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "contributionFrequency": {
+    "code": "M",
+    "display": "Monthly",
+    "periodsPerYear": 12
+  },
+  "isInDrawdown": false,
+  "expectedRetirementAge": 67,
+  "projectedValueAtRetirement": {
+    "amount": 450000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "hasGuaranteedAnnuityRate": false,
+  "hasProtectedTaxFreeAmount": false,
+  "isSalarySacrifice": false,
+  "notes": "Consolidated from previous workplace pensions",
+  "createdAt": "2015-01-01T10:00:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/arrangements/arrangement-555" },
+    "contributions": { "href": "/api/v1/arrangements/arrangement-555/contributions" },
+    "valuations": { "href": "/api/v1/arrangements/arrangement-555/valuations" }
+  }
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated
+- `arrangementType` - required-on-create, write-once (discriminator)
+- `pensionType`, `investmentType`, `protectionType`, `mortgageType` - required-on-create (type-specific), write-once
+- `clientId` - required-on-create, write-once
+- `productName`, `providerName`, `policyNumber` - required-on-create, updatable
+- `status` - optional, updatable
+- `startDate`, `endDate` - optional, updatable
+- `currentValue` - optional, updatable
+- `valuationDate` - optional, updatable (should match currentValue update)
+- Type-specific fields - vary by arrangementType
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 11.6 Goal Contract
+
+The `Goal` contract represents a client's financial goal.
+
+**Reference Type:** Goal is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "goal-888",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "goalType": "Retirement",
+  "goalName": "Comfortable retirement at age 65",
+  "description": "Build sufficient pension pot to support £40k annual income in retirement",
+  "priority": "High",
+  "targetAmount": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "targetDate": "2045-05-15",
+  "yearsToGoal": 19,
+  "currentSavings": {
+    "amount": 125000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "monthlyContribution": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "projectedShortfall": {
+    "amount": 150000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "isAchievable": false,
+  "status": "InProgress",
+  "notes": "May need to increase contributions or adjust target",
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z"
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated (uuid)
+- `clientRef` - write-once, reference to Client
+- `goalType` - required-on-create, updatable
+- `goalName` - required-on-create, updatable
+- `description` - optional, updatable
+- `priority` - optional, updatable
+- `targetAmount` - required-on-create, updatable (MoneyValue)
+- `targetDate` - required-on-create, updatable
+- `yearsToGoal` - read-only, computed from targetDate
+- `currentSavings`, `monthlyContribution` - optional, updatable (MoneyValue)
+- `projectedShortfall` - read-only, computed (MoneyValue)
+- `isAchievable` - read-only, computed
+- `status` - optional, updatable
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 11.7 RiskProfile Contract
+
+The `RiskProfile` contract represents a client's risk assessment and attitude to risk.
+
+**Reference Type:** RiskProfile is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "riskprofile-999",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "assessmentDate": "2026-02-16",
+  "assessmentType": "ATR",
+  "attitudeToRiskScore": 6,
+  "attitudeToRiskRating": "Balanced",
+  "capacityForLossScore": 7,
+  "capacityForLossRating": "Medium",
+  "overallRiskRating": "Balanced",
+  "timeHorizon": "LongTerm",
+  "yearsToRetirement": 19,
+  "investmentExperience": "Moderate",
+  "hasInvestedBefore": true,
+  "understandsRisk": true,
+  "comfortableWithVolatility": true,
+  "wouldAcceptLosses": false,
+  "notes": "Client understands market volatility but nervous about large losses",
+  "questionsAndAnswers": [
+    {
+      "question": "How would you react to a 20% fall in your portfolio?",
+      "answer": "Hold steady and wait for recovery",
+      "score": 6
+    }
+  ],
+  "validUntil": "2027-02-16",
+  "reviewDate": "2027-02-16",
+  "isValid": true,
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z"
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated
+- `clientId` - write-once, set from URL or required-on-create
+- `assessmentDate` - required-on-create, updatable
+- `assessmentType` - required-on-create, write-once
+- `attitudeToRiskScore`, `capacityForLossScore` - required-on-create, updatable
+- `attitudeToRiskRating`, `capacityForLossRating`, `overallRiskRating` - read-only, computed from scores
+- `timeHorizon`, `yearsToRetirement` - optional, updatable
+- `investmentExperience` - optional, updatable
+- Boolean fields (`hasInvestedBefore`, `understandsRisk`, etc.) - optional, updatable
+- `questionsAndAnswers` - optional, updatable (array)
+- `validUntil`, `reviewDate` - optional, updatable
+- `isValid` - read-only, computed from validUntil date
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 11.8 Collection Response Wrapper
+
+All list/collection endpoints use a standard wrapper contract:
+
+```json
+{
+  "data": [
+    { /* Complete entity contract */ },
+    { /* Complete entity contract */ }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalPages": 5,
+    "totalCount": 95,
+    "hasMore": true
+  },
+  "_links": {
+    "first": { "href": "/api/v1/clients?page=1&pageSize=20" },
+    "prev": null,
+    "self": { "href": "/api/v1/clients?page=1&pageSize=20" },
+    "next": { "href": "/api/v1/clients?page=2&pageSize=20" },
+    "last": { "href": "/api/v1/clients?page=5&pageSize=20" }
+  }
+}
+```
+
+The `data` array contains complete entity contracts. Clients can use field selection (`?fields=id,name`) to reduce response size.
+
+---
+
+### 11.9 Contract Extension for Other Entities
+
+All other entities in the FactFind system follow the same Single Contract Principle:
+
+**Circumstances Entities:**
+- `Employment` - Employment history within FactFind
+- `Expenditure` - Expenditure items within FactFind
+- `Asset` - Assets (property, savings, investments)
+- `Liability` - Liabilities (mortgages, loans, credit cards)
+
+**Estate Planning Entities:**
+- `Gift` - Gifts made or intended
+- `GiftTrust` - Trust arrangements for gifts
+- `Beneficiary` - Beneficiaries of estates/trusts
+
+**Relationship Entities:**
+- `Relationship` - Client relationships (spouse, partner, ex-partner)
+- `Dependant` - Dependent family members
+- `ProfessionalContact` - Solicitors, accountants, other advisers
+
+**Reference Data Entities:**
+- `Provider` - Financial product providers
+- `ProductCategory` - Product categorization
+- `EnumValue` - Dynamic enumeration values
+
+Each entity contract follows the same field annotation pattern:
+- Fields marked as `required-on-create`, `optional`, `read-only`, `write-once`, or `updatable`
+- Same contract used for POST, PUT, PATCH, and GET
+- Collection responses wrapped in standard pagination envelope
+- Field selection supported via `?fields` query parameter
+
+### 11.10 Standard Value Types
+
+Value types are embedded data structures with no independent identity. They are named with a "Value" suffix and never have an `id` field. Value types are always embedded within their parent entity and have no separate API endpoints.
+
+#### 11.10.1 MoneyValue
+
+Represents a monetary amount with currency.
+
+**Contract:**
+```json
+{
+  "amount": 75000.00,
+  "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `amount` | decimal | Yes | - | Monetary amount (positive or negative) |
+| `currency` | CurrencyValue | Yes | - | Currency details (code, display, symbol) |
+
+**Validation Rules:**
+- `amount`: Precision 19, scale 4 (e.g., 9999999999999999.9999)
+- `currency.code`: Must be valid ISO 4217 code (GBP, USD, EUR, etc.)
+
+**Usage Example:**
+```json
+{
+  "grossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netMonthlyIncome": {
+    "amount": 4500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  }
+}
+```
+
+#### 11.10.2 AddressValue
+
+Represents a physical address.
+
+**Contract:**
+```json
+{
+  "line1": "123 Main Street",
+  "line2": "Flat 4B",
+  "line3": null,
+  "line4": null,
+  "city": "London",
+  "county": {
+    "code": "GLA",
+    "display": "Greater London"
+  },
+  "postcode": "SW1A 1AA",
+  "country": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "addressType": {
+    "code": "RES",
+    "display": "Residential"
+  }
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `line1` | string | Yes | Address line 1 (max 100 chars) |
+| `line2` | string | No | Address line 2 (max 100 chars) |
+| `line3` | string | No | Address line 3 (max 100 chars) |
+| `line4` | string | No | Address line 4 (max 100 chars) |
+| `city` | string | Yes | City/town (max 50 chars) |
+| `county` | CountyValue | No | County/state with code and display name |
+| `postcode` | string | Yes | Postal/ZIP code (max 20 chars) |
+| `country` | CountryValue | Yes | Country with ISO codes and display name |
+| `addressType` | AddressTypeValue | No | Type of address (Residential, Correspondence, etc.) |
+
+**Validation Rules:**
+- `country.code`: Must be valid ISO 3166-1 alpha-2 code (GB, US, FR, etc.)
+- `postcode`: Format validation based on country
+
+**Usage Example:**
+```json
+{
+  "primaryAddress": {
+    "line1": "10 Downing Street",
+    "city": "London",
+    "county": {
+      "code": "GLA",
+      "display": "Greater London"
+    },
+    "postcode": "SW1A 2AA",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "addressType": {
+      "code": "RES",
+      "display": "Residential"
+    }
+  }
+}
+```
+
+#### 11.10.3 DateRangeValue
+
+Represents a date range with start and optional end date.
+
+**Contract:**
+```json
+{
+  "startDate": "2020-01-01",
+  "endDate": "2025-12-31"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `startDate` | date | Yes | Start date (ISO 8601: YYYY-MM-DD) |
+| `endDate` | date | No | End date (ISO 8601: YYYY-MM-DD), null = ongoing |
+
+**Validation Rules:**
+- `endDate` must be after `startDate` if provided
+- Both dates must be valid calendar dates
+
+**Usage Example:**
+```json
+{
+  "employmentPeriod": {
+    "startDate": "2015-06-01",
+    "endDate": null
+  }
+}
+```
+
+#### 11.10.4 NameValue
+
+Represents a person's name.
+
+**Contract:**
+```json
+{
+  "title": {
+    "code": "MR",
+    "display": "Mr"
+  },
+  "firstName": "John",
+  "middleName": "Michael",
+  "lastName": "Smith",
+  "preferredName": "Johnny"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | TitleValue | No | Title/honorific with code and display |
+| `firstName` | string | Yes | First name (max 50 chars) |
+| `middleName` | string | No | Middle name(s) (max 50 chars) |
+| `lastName` | string | Yes | Last name/surname (max 50 chars) |
+| `preferredName` | string | No | Preferred name/nickname (max 50 chars) |
+
+**Usage Example:**
+```json
+{
+  "name": {
+    "title": {
+      "code": "DR",
+      "display": "Dr"
+    },
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "preferredName": "Janey"
+  }
+}
+```
+
+#### 11.10.5 ContactValue
+
+Represents contact information (email, phone).
+
+**Contract:**
+```json
+{
+  "type": {
+    "code": "EMAIL",
+    "display": "Email"
+  },
+  "value": "john.smith@example.com",
+  "isPrimary": true
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | ContactTypeValue | Yes | Contact type with code and display (EMAIL, MOBILE, HOME, WORK, FAX) |
+| `value` | string | Yes | Contact value (email address or phone number) |
+| `isPrimary` | boolean | No | Whether this is the primary contact method |
+
+**Validation Rules:**
+- `value`: Format validation based on `type.code` (email format, phone number format)
+
+**Usage Example:**
+```json
+{
+  "contacts": [
+    {
+      "type": {
+        "code": "EMAIL",
+        "display": "Email"
+      },
+      "value": "john@example.com",
+      "isPrimary": true
+    },
+    {
+      "type": {
+        "code": "MOBILE",
+        "display": "Mobile"
+      },
+      "value": "+44 7700 900123",
+      "isPrimary": false
+    }
+  ]
+}
+```
+
+#### 11.10.6 PercentageValue
+
+Represents a percentage as a decimal value.
+
+**Contract:**
+```json
+{
+  "value": 0.25
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `value` | decimal | Yes | Percentage value (0.00 = 0%, 1.00 = 100%) |
+
+**Validation Rules:**
+- `value`: Must be between 0.00 and 1.00 (or other specified range)
+
+**Usage Example:**
+```json
+{
+  "contributionRate": {
+    "value": 0.08
+  },
+  "taxRate": {
+    "value": 0.20
+  }
+}
+```
+
+#### 11.10.7 RateValue
+
+Represents an interest rate or other rate.
+
+**Contract:**
+```json
+{
+  "rate": 3.5,
+  "type": "Fixed"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `rate` | decimal | Yes | Rate value (e.g., 3.5 for 3.5%) |
+| `type` | enum | No | Rate type: Fixed, Variable, Tracker, Discount, Capped |
+
+**Usage Example:**
+```json
+{
+  "interestRate": {
+    "rate": 2.75,
+    "type": "Fixed"
+  },
+  "projectedGrowthRate": {
+    "rate": 5.0,
+    "type": "Variable"
+  }
+}
+```
+
+#### 11.10.8 TaxDetailsValue
+
+Represents tax identification details.
+
+**Contract:**
+```json
+{
+  "niNumber": "AB123456C",
+  "taxReference": "1234567890"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `niNumber` | string | No | UK National Insurance Number (9 chars) |
+| `taxReference` | string | No | Tax reference number (10 chars) |
+
+**Validation Rules:**
+- `niNumber`: Format AA123456A (2 letters, 6 digits, 1 letter)
+- `taxReference`: 10-digit UTR format
+
+**Usage Example:**
+```json
+{
+  "taxDetails": {
+    "niNumber": "AB123456C",
+    "taxReference": "1234567890"
+  }
+}
+```
+
+#### 11.10.9 Enumeration Value Types
+
+Enumeration value types represent categorical data using a structured code/display pattern. Unlike simple string enumerations, enumeration value types are self-documenting, internationalization-ready, and can carry rich metadata.
+
+**Standard Pattern:**
+All enumeration value types follow a consistent structure:
+```json
+{
+  "code": "MACHINE_READABLE_CODE",    // Required: Uppercase, short identifier
+  "display": "Human Readable Label",  // Required: User-facing label
+  // ... additional metadata as needed
+}
+```
+
+**Benefits:**
+- Self-documenting: No need to look up code meanings
+- Internationalization-ready: Display text can be localized
+- Rich metadata: Dates, categories, and other context
+- Forward-compatible: Can add fields without breaking changes
+- Type-safe: Strongly typed in contract definitions
+
+---
+
+##### GenderValue
+
+Represents a person's gender.
+
+**Contract:**
+```json
+{
+  "code": "M",
+  "display": "Male"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Gender code: M, F, O, U, N |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `M` - Male
+- `F` - Female
+- `O` - Other
+- `U` - Unknown
+- `N` - Prefer not to say
+
+**Usage Example:**
+```json
+{
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  }
+}
+```
+
+---
+
+##### MaritalStatusValue
+
+Represents a person's marital status with optional effective date.
+
+**Contract:**
+```json
+{
+  "code": "MAR",
+  "display": "Married",
+  "effectiveFrom": "2015-06-20"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Marital status code |
+| `display` | string | Yes | Human-readable label |
+| `effectiveFrom` | date | No | Date this status became effective (ISO 8601) |
+
+**Standard Codes:**
+- `SIN` - Single
+- `MAR` - Married
+- `CIV` - Civil Partnership
+- `DIV` - Divorced
+- `WID` - Widowed
+- `SEP` - Separated
+- `COH` - Cohabiting
+
+**Usage Example:**
+```json
+{
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2015-06-20"
+  }
+}
+```
+
+---
+
+##### EmploymentStatusValue
+
+Represents a person's employment status.
+
+**Contract:**
+```json
+{
+  "code": "EMP",
+  "display": "Employed"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Employment status code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `EMP` - Employed
+- `SELF` - Self-Employed
+- `DIR` - Company Director
+- `RET` - Retired
+- `UNE` - Unemployed
+- `NW` - Not Working
+- `STU` - Student
+- `HOME` - Homemaker
+
+**Usage Example:**
+```json
+{
+  "employmentStatus": {
+    "code": "EMP",
+    "display": "Employed"
+  }
+}
+```
+
+---
+
+##### AddressTypeValue
+
+Represents the type of an address.
+
+**Contract:**
+```json
+{
+  "code": "RES",
+  "display": "Residential"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Address type code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `RES` - Residential
+- `CORR` - Correspondence
+- `PREV` - Previous
+- `WORK` - Work
+- `OTHER` - Other
+
+**Usage Example:**
+```json
+{
+  "addressType": {
+    "code": "RES",
+    "display": "Residential"
+  }
+}
+```
+
+---
+
+##### ContactTypeValue
+
+Represents the type of contact information.
+
+**Contract:**
+```json
+{
+  "code": "EMAIL",
+  "display": "Email"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Contact type code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `EMAIL` - Email
+- `MOBILE` - Mobile Phone
+- `HOME` - Home Phone
+- `WORK` - Work Phone
+- `FAX` - Fax
+
+**Usage Example:**
+```json
+{
+  "type": {
+    "code": "EMAIL",
+    "display": "Email"
+  }
+}
+```
+
+---
+
+##### TitleValue
+
+Represents a person's title or honorific.
+
+**Contract:**
+```json
+{
+  "code": "MR",
+  "display": "Mr"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Title code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `MR` - Mr
+- `MRS` - Mrs
+- `MS` - Ms
+- `MISS` - Miss
+- `DR` - Dr
+- `PROF` - Professor
+- `REV` - Reverend
+- `SIR` - Sir
+- `LADY` - Lady
+- `LORD` - Lord
+
+**Usage Example:**
+```json
+{
+  "title": {
+    "code": "MR",
+    "display": "Mr"
+  }
+}
+```
+
+---
+
+##### ProductTypeValue
+
+Represents a financial product type with optional category.
+
+**Contract:**
+```json
+{
+  "code": "SIPP",
+  "display": "Self-Invested Personal Pension",
+  "category": "Pension"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Product type code |
+| `display` | string | Yes | Human-readable label |
+| `category` | string | No | Product category grouping |
+
+**Standard Codes:**
+- Pensions: `PP` (Personal Pension), `SIPP` (SIPP), `GPP` (Group Personal Pension), `SSAS` (SSAS), `DB` (Defined Benefit), `SP` (State Pension)
+- Investments: `ISA` (ISA), `GIA` (General Investment Account), `JISA` (Junior ISA), `LISA` (Lifetime ISA), `OIC` (Offshore Investment)
+- Protection: `LIFE` (Life Insurance), `CIC` (Critical Illness), `IP` (Income Protection), `PMI` (Private Medical Insurance)
+- Mortgages: `RESMTG` (Residential Mortgage), `BTL` (Buy-to-Let), `EQUITY` (Equity Release)
+- Other: `BOND` (Investment Bond), `TRUST` (Trust), `SAVINGS` (Savings Account)
+
+**Usage Example:**
+```json
+{
+  "productType": {
+    "code": "SIPP",
+    "display": "Self-Invested Personal Pension",
+    "category": "Pension"
+  }
+}
+```
+
+---
+
+##### CountryValue
+
+Represents a country using ISO 3166-1 standard codes.
+
+**Contract:**
+```json
+{
+  "code": "GB",
+  "display": "United Kingdom",
+  "alpha3": "GBR"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | ISO 3166-1 alpha-2 country code (2 chars) |
+| `display` | string | Yes | Full country name |
+| `alpha3` | string | No | ISO 3166-1 alpha-3 country code (3 chars) |
+
+**Usage Example:**
+```json
+{
+  "country": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  }
+}
+```
+
+---
+
+##### CountyValue
+
+Represents a county or administrative region.
+
+**Contract:**
+```json
+{
+  "code": "GLA",
+  "display": "Greater London",
+  "country": {
+    "code": "GB",
+    "display": "United Kingdom"
+  }
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | County/region code |
+| `display` | string | Yes | Full county/region name |
+| `country` | CountryValue | No | Associated country |
+
+**Usage Example:**
+```json
+{
+  "county": {
+    "code": "GLA",
+    "display": "Greater London",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom"
+    }
+  }
+}
+```
+
+---
+
+##### CurrencyValue
+
+Represents a currency using ISO 4217 standard codes.
+
+**Contract:**
+```json
+{
+  "code": "GBP",
+  "display": "British Pound",
+  "symbol": "£"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | ISO 4217 currency code (3 chars) |
+| `display` | string | Yes | Full currency name |
+| `symbol` | string | No | Currency symbol (£, $, €, etc.) |
+
+**Standard Codes:**
+- `GBP` - British Pound (£)
+- `USD` - US Dollar ($)
+- `EUR` - Euro (€)
+- `CHF` - Swiss Franc (CHF)
+- `JPY` - Japanese Yen (¥)
+- `AUD` - Australian Dollar (A$)
+- `CAD` - Canadian Dollar (C$)
+
+**Usage Example:**
+```json
+{
+  "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+}
+```
+
+---
+
+##### FrequencyValue
+
+Represents payment or contribution frequency.
+
+**Contract:**
+```json
+{
+  "code": "M",
+  "display": "Monthly",
+  "periodsPerYear": 12
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Frequency code |
+| `display` | string | Yes | Human-readable label |
+| `periodsPerYear` | integer | No | Number of periods per year (for calculations) |
+
+**Standard Codes:**
+- `M` - Monthly (12 periods/year)
+- `Q` - Quarterly (4 periods/year)
+- `S` - Semi-Annual (2 periods/year)
+- `A` - Annual (1 period/year)
+- `W` - Weekly (52 periods/year)
+- `F` - Fortnightly (26 periods/year)
+- `SINGLE` - Single Payment (0 periods/year)
+
+**Usage Example:**
+```json
+{
+  "frequency": {
+    "code": "M",
+    "display": "Monthly",
+    "periodsPerYear": 12
+  }
+}
+```
+
+---
+
+##### StatusValue
+
+Represents a generic status with optional category.
+
+**Contract:**
+```json
+{
+  "code": "ACT",
+  "display": "Active",
+  "category": "Arrangement"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Status code |
+| `display` | string | Yes | Human-readable label |
+| `category` | string | No | Status category grouping |
+
+**Standard Codes:**
+- `ACT` - Active
+- `INA` - Inactive
+- `PEN` - Pending
+- `COM` - Completed
+- `CAN` - Cancelled
+- `SUB` - Submitted
+- `APP` - Approved
+- `REJ` - Rejected
+- `DRAFT` - Draft
+- `CLOSED` - Closed
+
+**Usage Example:**
+```json
+{
+  "status": {
+    "code": "ACT",
+    "display": "Active",
+    "category": "Arrangement"
+  }
+}
+```
+
+---
+
+##### MeetingTypeValue
+
+Represents the type of a client meeting.
+
+**Contract:**
+```json
+{
+  "code": "INIT",
+  "display": "Initial Meeting"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Meeting type code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `INIT` - Initial Meeting
+- `REVIEW` - Review Meeting
+- `ANNUAL` - Annual Review
+- `ADHOC` - Ad-hoc Meeting
+- `PHONE` - Phone Call
+- `VIDEO` - Video Conference
+
+**Usage Example:**
+```json
+{
+  "meetingType": {
+    "code": "INIT",
+    "display": "Initial Meeting"
+  }
+}
+```
+
+---
+
+##### ResidencyStatusValue
+
+Represents tax residency status.
+
+**Contract:**
+```json
+{
+  "code": "UK_RES",
+  "display": "UK Resident"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Residency status code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `UK_RES` - UK Resident
+- `UK_DOM` - UK Domiciled
+- `NON_RES` - Non-Resident
+- `NON_DOM` - Non-Domiciled
+- `EXPAT` - Expatriate
+
+**Usage Example:**
+```json
+{
+  "residencyStatus": {
+    "code": "UK_RES",
+    "display": "UK Resident"
+  }
+}
+```
+
+---
+
+##### HealthStatusValue
+
+Represents a person's health status for insurance purposes.
+
+**Contract:**
+```json
+{
+  "code": "GOOD",
+  "display": "Good Health"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Health status code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `GOOD` - Good Health
+- `FAIR` - Fair Health
+- `POOR` - Poor Health
+- `PREEX` - Pre-existing Conditions
+- `UNKNOWN` - Unknown
+
+**Usage Example:**
+```json
+{
+  "healthStatus": {
+    "code": "GOOD",
+    "display": "Good Health"
+  }
+}
+```
+
+---
+
+### 11.11 Standard Reference Types
+
+Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `clientRef`, `adviserRef`).
+
+#### 11.11.1 ClientRef
+
+Reference to a Client entity.
+
+**Minimal Contract (Required for Create/Update):**
+```json
+{
+  "id": "client-123"
+}
+```
+
+**Full Contract (Server Response):**
+```json
+{
+  "id": "client-123",
+  "href": "/api/v1/clients/client-123",
+  "name": "John Michael Smith",
+  "clientNumber": "C00001234",
+  "type": "Person"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique client identifier |
+| `href` | string | Yes (response) | URL to client resource |
+| `name` | string | Yes (response) | Full client name |
+| `clientNumber` | string | No | Business client number |
+| `type` | enum | No | Client type: Person, Corporate, Trust |
+
+**Usage Example:**
+```json
+{
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  }
+}
+```
+
+#### 11.11.2 AdviserRef
+
+Reference to an Adviser entity.
+
+**Full Contract:**
+```json
+{
+  "id": "adviser-789",
+  "href": "/api/v1/advisers/adviser-789",
+  "name": "Sarah Johnson",
+  "code": "ADV001"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique adviser identifier |
+| `href` | string | Yes (response) | URL to adviser resource |
+| `name` | string | Yes (response) | Adviser full name |
+| `code` | string | No | Adviser business code |
+
+**Usage Example:**
+```json
+{
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Sarah Johnson",
+    "code": "ADV001"
+  }
+}
+```
+
+#### 11.11.3 ProviderRef
+
+Reference to a financial product Provider entity.
+
+**Full Contract:**
+```json
+{
+  "id": "provider-456",
+  "href": "/api/v1/providers/provider-456",
+  "name": "Aviva Life & Pensions UK Limited",
+  "frnNumber": "185896"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique provider identifier |
+| `href` | string | Yes (response) | URL to provider resource |
+| `name` | string | Yes (response) | Provider name |
+| `frnNumber` | string | No | FCA Firm Reference Number |
+
+**Usage Example:**
+```json
+{
+  "providerRef": {
+    "id": "provider-456",
+    "href": "/api/v1/providers/provider-456",
+    "name": "Aviva",
+    "frnNumber": "185896"
+  }
+}
+```
+
+#### 11.11.4 ArrangementRef
+
+Reference to an Arrangement entity (pension, investment, protection, mortgage).
+
+**Full Contract:**
+```json
+{
+  "id": "arrangement-111",
+  "href": "/api/v1/arrangements/arrangement-111",
+  "policyNumber": "POL123456",
+  "productType": "Pension",
+  "provider": "Aviva"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique arrangement identifier |
+| `href` | string | Yes (response) | URL to arrangement resource |
+| `policyNumber` | string | No | Policy/plan number |
+| `productType` | string | Yes (response) | Product type (Pension, Investment, etc.) |
+| `provider` | string | Yes (response) | Provider name |
+
+**Usage Example:**
+```json
+{
+  "arrangementRef": {
+    "id": "arrangement-111",
+    "href": "/api/v1/arrangements/arrangement-111",
+    "policyNumber": "SIPP123456",
+    "productType": "Pension",
+    "provider": "Aviva"
+  }
+}
+```
+
+#### 11.11.5 EmploymentRef
+
+Reference to an Employment entity.
+
+**Full Contract:**
+```json
+{
+  "id": "employment-222",
+  "href": "/api/v1/employments/employment-222",
+  "employerName": "Acme Corporation Ltd",
+  "status": "Current"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique employment identifier |
+| `href` | string | Yes (response) | URL to employment resource |
+| `employerName` | string | Yes (response) | Employer name |
+| `status` | enum | Yes (response) | Status: Current, Previous, Future |
+
+**Usage Example:**
+```json
+{
+  "employmentRef": {
+    "id": "employment-222",
+    "href": "/api/v1/employments/employment-222",
+    "employerName": "Acme Corp",
+    "status": "Current"
+  }
+}
+```
+
+#### 11.11.6 GoalRef
+
+Reference to a Goal entity.
+
+**Full Contract:**
+```json
+{
+  "id": "goal-333",
+  "href": "/api/v1/goals/goal-333",
+  "goalName": "Retirement at 65",
+  "priority": "High"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique goal identifier |
+| `href` | string | Yes (response) | URL to goal resource |
+| `goalName` | string | Yes (response) | Goal name/description |
+| `priority` | enum | No | Priority: High, Medium, Low |
+
+**Usage Example:**
+```json
+{
+  "goalRef": {
+    "id": "goal-333",
+    "href": "/api/v1/goals/goal-333",
+    "goalName": "Retirement Planning",
+    "priority": "High"
+  }
+}
+```
+
+#### 11.11.7 FactFindRef
+
+Reference to a FactFind (ADVICE_CASE) entity.
+
+**Full Contract:**
+```json
+{
+  "id": "factfind-444",
+  "href": "/api/v1/factfinds/factfind-444",
+  "factFindNumber": "FF001234",
+  "status": "InProgress"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique fact find identifier |
+| `href` | string | Yes (response) | URL to fact find resource |
+| `factFindNumber` | string | No | Business fact find number |
+| `status` | enum | Yes (response) | Status: Draft, InProgress, Complete, Submitted |
+
+**Usage Example:**
+```json
+{
+  "factFindRef": {
+    "id": "factfind-444",
+    "href": "/api/v1/factfinds/factfind-444",
+    "factFindNumber": "FF001234",
+    "status": "InProgress"
+  }
+}
+```
+
+---
+
+## 12. Reference Data API
+
+### 12.1 Performance Considerations
+
+**Query Optimization:**
+- Index all foreign keys for fast joins
+- Index commonly filtered fields (status, clientType, dateOfBirth)
+- Use covering indexes for list queries
+- Implement query result caching (Redis)
+
+**Lazy vs Eager Loading:**
+- Default: Lazy load related entities
+- Use `expand` query parameter for eager loading
+- Limit expansion depth to 2 levels
+- Cache expanded results aggressively
+
+**Pagination:**
+- Cursor-based pagination for large datasets (>10,000 records)
+- Offset-based pagination acceptable for small datasets
+- Default page size: 20
+- Maximum page size: 100
+
+### 12.2 Caching Strategy
+
+**HTTP Caching:**
+- ETags for all GET requests on single resources
+- Cache-Control: private for user-specific data
+- Cache-Control: public for reference data
+- Vary header based on Accept-Language, Authorization
+
+**Application Caching (Redis):**
+- Reference data: 24 hours TTL
+- Enum values: 7 days TTL
+- Client lists: 5 minutes TTL
+- Client details: 15 minutes TTL
+- FactFind summaries: 5 minutes TTL
+
+**Cache Invalidation:**
+- Invalidate on write operations (POST, PUT, PATCH, DELETE)
+- Publish cache invalidation events
+- Subscribers update local caches
+
+### 12.3 Rate Limiting
+
+**Per-User Limits:**
+- 1,000 requests per hour per user
+- 100 requests per minute per user
+- Burst allowance: 10 requests per second
+
+**Per-Tenant Limits:**
+- 10,000 requests per hour per tenant
+- 1,000 requests per minute per tenant
+
+**Headers:**
+```http
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 847
+X-RateLimit-Reset: 1708088400
+```
+
+**Rate Limit Exceeded Response:**
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 3600
+
+{
+  "type": "https://api.factfind.com/problems/rate-limit-error",
+  "title": "Rate Limit Exceeded",
+  "status": 429,
+  "detail": "You have exceeded the rate limit of 1000 requests per hour",
+  "retryAfter": 3600
+}
+```
+
+### 12.4 API Versioning
+
+**Version Lifecycle:**
+1. **Development** - Not publicly available
+2. **Beta** - Available for early adopters, may change
+3. **Stable** - Production-ready, fully supported
+4. **Deprecated** - Maintenance mode, 12 months notice before sunset
+5. **Sunset** - No longer available, returns 410 Gone
+
+**Deprecation Process:**
+1. Announce deprecation 12 months in advance
+2. Include `Deprecation` header in responses
+3. Provide migration guide
+4. Support parallel versions during transition
+5. Sunset after transition period
+
+**Deprecation Header:**
+```http
+Deprecation: Sun, 01 Jan 2028 00:00:00 GMT
+Sunset: Sun, 01 Jul 2028 00:00:00 GMT
+Link: <https://docs.factfind.com/migration/v1-to-v2>; rel="deprecation"
+```
+
+### 12.5 Security Best Practices
+
+**Input Validation:**
+- Validate all inputs against schema
+- Sanitize user input to prevent injection attacks
+- Use parameterized queries for database access
+- Validate content-type headers
+
+**Output Encoding:**
+- Encode all output to prevent XSS
+- Use appropriate content-type headers
+- Implement CSP (Content Security Policy)
+
+**HTTPS/TLS:**
+- Require TLS 1.2 or higher
+- Use strong cipher suites
+- Implement HSTS (HTTP Strict Transport Security)
+- Certificate pinning for mobile apps
+
+**API Keys & Tokens:**
+- Rotate secrets regularly (90 days)
+- Use short-lived access tokens (1 hour)
+- Long-lived refresh tokens (30 days)
+- Revoke tokens on logout or compromise
+
+---
+
+
+## 13. Entity Contracts
+
+This section defines the unified entity contracts used throughout the FactFind API. Following the **Single Contract Principle** (Section 1.7), each entity has one canonical contract used for both requests (POST, PUT, PATCH) and responses (GET).
+
+Each field is annotated with its behavioral characteristics:
+- **required-on-create** - Must be provided when creating the entity
+- **optional** - Can be omitted in any operation
+- **read-only** - System-generated, cannot be set by clients
+- **write-once** - Can only be set on create, immutable thereafter
+- **updatable** - Can be modified via PUT/PATCH operations
+
+### 13.1 Client Contract
+
+The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic and regulatory information.
+
+**Reference Type:** Client is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "client-123",
+  "factFindRef": {
+    "id": "factfind-456",
+    "href": "/api/v1/factfinds/factfind-456",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "clientNumber": "C00001234",
+  "clientType": "Person",
+  "name": {
+    "title": {
+      "code": "MR",
+      "display": "Mr"
+    },
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "preferredName": "John"
+  },
+  "fullName": "Mr John Michael Smith",
+  "salutation": "Mr Smith",
+  "dateOfBirth": "1980-05-15",
+  "age": 45,
+  "placeOfBirth": "London",
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2005-06-20"
+  },
+  "taxDetails": {
+    "niNumber": "AB123456C",
+    "taxReference": "1234567890"
+  },
+  "nationalClientIdentifier": "NCI-123456",
+  "passportRef": "502135321",
+  "passportExpiryDate": "2030-05-15",
+  "drivingLicenceRef": "SMITH801055JM9IJ",
+  "drivingLicenceExpiryDate": "2030-05-15",
+  "nationalityCountry": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfBirth": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfResidence": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfDomicile": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "isUkResident": true,
+  "isExpatriate": false,
+  "isDeceased": false,
+  "deceasedOn": null,
+  "hasWill": true,
+  "isWillUpToDate": true,
+  "isWillAdvised": true,
+  "willDetails": "Will created in 2020, held by Smith & Co Solicitors",
+  "isPowerOfAttorneyGranted": false,
+  "powerOfAttorneyName": null,
+  "hasEverSmoked": false,
+  "isSmoker": "Never",
+  "hasSmokedInLast12Months": "No",
+  "hasNicotineReplacementInLastYear": "No",
+  "hasVapedInLastYear": "No",
+  "inGoodHealth": true,
+  "medicalConditions": null,
+  "isMatchingServiceProposition": false,
+  "matchingServicePropositionReason": null,
+  "isHeadOfFamilyGroup": true,
+  "isJoint": true,
+  "spouseRef": {
+    "id": "client-124",
+    "href": "/api/v1/clients/client-124",
+    "name": "Sarah Smith",
+    "clientNumber": "C00001235",
+    "type": "Person"
+  },
+  "serviceStatus": "Active",
+  "serviceStatusDate": "2020-01-15",
+  "clientSegment": "A",
+  "clientSegmentDate": "2020-01-15",
+  "clientCategory": "HighNetWorth",
+  "grossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "householdIncome": {
+    "amount": 120000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netWorth": {
+    "amount": 450000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "householdNetWorth": {
+    "amount": 650000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalAssets": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalJointAssets": {
+    "amount": 200000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "primaryAddress": {
+    "line1": "123 Main Street",
+    "line2": "Apartment 4B",
+    "city": "London",
+    "county": {
+      "code": "GLA",
+      "display": "Greater London"
+    },
+    "postcode": "SW1A 1AA",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "addressType": {
+      "code": "RES",
+      "display": "Residential"
+    }
+  },
+  "contacts": [
+    {
+      "type": {
+        "code": "EMAIL",
+        "display": "Email"
+      },
+      "value": "john.smith@example.com",
+      "isPrimary": true
+    },
+    {
+      "type": {
+        "code": "MOBILE",
+        "display": "Mobile"
+      },
+      "value": "+44 7700 900123",
+      "isPrimary": false
+    }
+  ],
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "paraplannerRef": {
+    "id": "adviser-790",
+    "href": "/api/v1/advisers/adviser-790",
+    "name": "Mark Taylor",
+    "code": "PP001"
+  },
+  "idCheckCompletedDate": "2020-01-10",
+  "idCheckExpiryDate": "2025-01-10",
+  "idCheckIssuer": "Experian",
+  "idCheckReference": "IDC-123456",
+  "idCheckResult": "Passed",
+  "taxCode": "1257L",
+  "notes": "Prefers email communication, interested in sustainable investing",
+  "profilePicture": "https://cdn.factfind.com/profiles/client-123.jpg",
+  "createdAt": "2020-01-15T10:30:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "createdBy": {
+    "id": "user-999",
+    "name": "System Admin"
+  },
+  "updatedBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/clients/client-123" },
+    "update": { "href": "/api/v1/clients/client-123", "method": "PUT" },
+    "delete": { "href": "/api/v1/clients/client-123", "method": "DELETE" },
+    "addresses": { "href": "/api/v1/clients/client-123/addresses" },
+    "contacts": { "href": "/api/v1/clients/client-123/contacts" },
+    "relationships": { "href": "/api/v1/clients/client-123/relationships" },
+    "dependants": { "href": "/api/v1/clients/client-123/dependants" },
+    "factfinds": { "href": "/api/v1/factfinds?clientId=client-123" },
+    "arrangements": { "href": "/api/v1/arrangements?clientId=client-123" },
+    "goals": { "href": "/api/v1/goals?clientId=client-123" },
+    "riskProfile": { "href": "/api/v1/risk-profiles?clientId=client-123" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
+| `clientNumber` | string | optional | ignored | included | write-once, business identifier |
+| `clientType` | enum | required | ignored | included | write-once, discriminator field |
+| `name` | NameValue | required | updatable | included | Value type: firstName, lastName required |
+| `fullName` | string | ignored | ignored | included | read-only, computed from name |
+| `salutation` | string | optional | updatable | included | - |
+| `dateOfBirth` | date | required | ignored | included | write-once, immutable after creation |
+| `age` | integer | ignored | ignored | included | read-only, computed from dateOfBirth |
+| `placeOfBirth` | string | optional | updatable | included | - |
+| `gender` | GenderValue | optional | updatable | included | Value type: code/display enumeration |
+| `maritalStatus` | MaritalStatusValue | optional | updatable | included | Value type: code/display/effectiveFrom |
+| `taxDetails` | TaxDetailsValue | optional | updatable | included | Value type: PII, requires `client:pii:read` scope |
+| `nationalClientIdentifier` | string | optional | updatable | included | - |
+| `passportRef` | string | optional | updatable | included | PII, requires `client:pii:read` scope |
+| `passportExpiryDate` | date | optional | updatable | included | - |
+| `drivingLicenceRef` | string | optional | updatable | included | PII, requires `client:pii:read` scope |
+| `drivingLicenceExpiryDate` | date | optional | updatable | included | - |
+| `nationalityCountry` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfBirth` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfResidence` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfDomicile` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `isUkResident` | boolean | optional | updatable | included | - |
+| `isExpatriate` | boolean | optional | updatable | included | - |
+| `isDeceased` | boolean | optional | updatable | included | - |
+| `deceasedOn` | date | optional | updatable | included | - |
+| `hasWill` | boolean | optional | updatable | included | - |
+| `isWillUpToDate` | boolean | optional | updatable | included | - |
+| `isWillAdvised` | boolean | optional | updatable | included | - |
+| `willDetails` | string | optional | updatable | included | - |
+| `isPowerOfAttorneyGranted` | boolean | optional | updatable | included | - |
+| `powerOfAttorneyName` | string | optional | updatable | included | - |
+| `hasEverSmoked` | boolean | optional | updatable | included | - |
+| `isSmoker` | enum | optional | updatable | included | - |
+| `hasSmokedInLast12Months` | enum | optional | updatable | included | - |
+| `hasNicotineReplacementInLastYear` | enum | optional | updatable | included | - |
+| `hasVapedInLastYear` | enum | optional | updatable | included | - |
+| `inGoodHealth` | boolean | optional | updatable | included | - |
+| `medicalConditions` | string | optional | updatable | included | - |
+| `isMatchingServiceProposition` | boolean | optional | updatable | included | - |
+| `matchingServicePropositionReason` | string | optional | updatable | included | - |
+| `isHeadOfFamilyGroup` | boolean | optional | updatable | included | - |
+| `isJoint` | boolean | optional | updatable | included | - |
+| `spouseRef` | ClientRef | optional | updatable | included | Reference type: Provide id on create/update |
+| `serviceStatus` | enum | optional | updatable | included | - |
+| `serviceStatusDate` | date | optional | updatable | included | - |
+| `clientSegment` | string | optional | updatable | included | - |
+| `clientSegmentDate` | date | optional | updatable | included | - |
+| `clientCategory` | enum | optional | updatable | included | - |
+| `grossAnnualIncome` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `householdIncome` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `netWorth` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `householdNetWorth` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `totalAssets` | MoneyValue | ignored | ignored | included | read-only, computed from arrangements |
+| `totalJointAssets` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `primaryAddress` | AddressValue | optional | updatable | included | Value type: Embedded address, no id |
+| `contacts` | ContactValue[] | optional | updatable | included | Value type array: Email, phone contacts |
+| `adviserRef` | AdviserRef | optional | updatable | included | Reference type: Primary adviser |
+| `paraplannerRef` | AdviserRef | optional | updatable | included | Reference type: Paraplanner |
+| `idCheckCompletedDate` | date | optional | updatable | included | - |
+| `idCheckExpiryDate` | date | optional | updatable | included | - |
+| `idCheckIssuer` | string | optional | updatable | included | - |
+| `idCheckReference` | string | optional | updatable | included | - |
+| `idCheckResult` | enum | optional | updatable | included | - |
+| `taxCode` | string | optional | updatable | included | - |
+| `notes` | string | optional | updatable | included | - |
+| `profilePicture` | string | optional | updatable | included | URL to profile image |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Creating a Client (POST /api/v1/clients):**
+```json
+{
+  "clientType": "Person",
+  "name": {
+    "title": "Mr",
+    "firstName": "John",
+    "lastName": "Smith"
+  },
+  "dateOfBirth": "1980-05-15",
+  "gender": "Male",
+  "nationalityCountry": { "code": "GB" },
+  "primaryAddress": {
+    "line1": "123 Main Street",
+    "city": "London",
+    "postcode": "SW1A 1AA",
+    "country": "GB"
+  },
+  "contacts": [
+    {
+      "type": "Email",
+      "value": "john.smith@example.com",
+      "isPrimary": true
+    }
+  ],
+  "adviserRef": {
+    "id": "adviser-789"
+  }
+}
+```
+Server generates `id`, `clientNumber`, `createdAt`, `updatedAt`, `fullName`, `age`, and populates reference display fields. Returns complete contract.
+
+**Updating a Client (PUT /api/v1/clients/client-123):**
+```json
+{
+  "name": {
+    "title": "Mr",
+    "firstName": "John",
+    "lastName": "Smith-Jones"
+  },
+  "gender": "Male",
+  "maritalStatus": "Married",
+  "nationalityCountry": { "code": "GB" },
+  "grossAnnualIncome": {
+    "amount": 85000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "spouseRef": {
+    "id": "client-124"
+  }
+}
+```
+Cannot change `dateOfBirth` (write-once). Server updates `updatedAt`, `fullName`, and returns complete contract.
+
+**Partial Update (PATCH /api/v1/clients/client-123):**
+```json
+{
+  "name": {
+    "lastName": "Smith-Jones"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2015-06-20"
+  },
+  "householdIncome": {
+    "amount": 145000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+```
+Only specified fields are updated. Returns complete contract with changes applied.
+
+---
+
+### 13.2 FactFind Contract
+
+The `FactFind` contract (also known as ADVICE_CASE) represents a fact-finding session and aggregate root for circumstances discovery.
+
+**Reference Type:** FactFind is a reference type with identity (has `id` field).
+
+Complete fact find aggregate root with summary calculations.
+
+```json
+{
+  "id": "factfind-456",
+  "factFindNumber": "FF001234",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "jointClientRef": {
+    "id": "client-124",
+    "href": "/api/v1/clients/client-124",
+    "name": "Sarah Smith",
+    "clientNumber": "C00001235",
+    "type": "Person"
+  },
+  "dateOfMeeting": "2026-02-16",
+  "typeOfMeeting": {
+    "code": "INIT",
+    "display": "Initial Consultation"
+  },
+  "clientsPresent": "BothClients",
+  "anybodyElsePresent": false,
+  "anybodyElsePresentDetails": null,
+  "scopeOfAdvice": {
+    "retirementPlanning": true,
+    "savingsAndInvestments": true,
+    "protection": true,
+    "mortgage": false,
+    "estatePlanning": false
+  },
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "isComplete": false,
+  "dateFactFindCompleted": null,
+  "dateDeclarationSigned": null,
+  "dateIdAmlChecked": "2026-02-16",
+  "status": {
+    "code": "INPROG",
+    "display": "In Progress"
+  },
+  "hasEmployments": true,
+  "hasExpenditures": true,
+  "hasAssets": true,
+  "hasLiabilities": true,
+  "hasDcPensionPersonal": true,
+  "hasDcPensionMoneyPurchase": true,
+  "hasDbPension": false,
+  "hasSavings": true,
+  "hasInvestments": true,
+  "hasProtection": true,
+  "hasExistingMortgage": true,
+  "hasAnnuity": false,
+  "hasEquityRelease": false,
+  "hasAdverseCredit": false,
+  "hasBeenRefusedCredit": false,
+  "incomeChangesExpected": false,
+  "expenditureChangesExpected": false,
+  "totalEarnedAnnualIncomeGross": {
+    "amount": 120000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalNetMonthlyIncome": {
+    "amount": 7500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalMonthlyExpenditure": {
+    "amount": 4500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalMonthlyDisposableIncome": {
+    "amount": 3000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "emergencyFund": {
+    "requiredAmount": {
+      "amount": 11400.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "committedAmount": {
+      "amount": 15000.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    },
+    "shortfall": {
+      "amount": 0.00,
+      "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+    }
+  },
+  "totalFundsAvailable": {
+    "amount": 85000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalLumpSumAvailableForAdvice": {
+    "amount": 70000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "agreedMonthlyBudget": {
+    "amount": 1000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "agreedSingleInvestmentAmount": {
+    "amount": 50000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "highestTaxRate": "HigherRate",
+  "totalNetRelevantEarnings": {
+    "amount": 110000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "sourceOfInvestmentFunds": "Savings from employment income over past 5 years",
+  "notes": "Clients seeking to consolidate pensions and review protection cover",
+  "additionalNotes": null,
+  "customQuestions": [
+    {
+      "question": "What are your main financial concerns?",
+      "answer": "Ensuring sufficient retirement income and protecting family"
+    }
+  ],
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/factfind-456" },
+    "complete": { "href": "/api/v1/factfinds/factfind-456/complete", "method": "POST" },
+    "summary": { "href": "/api/v1/factfinds/factfind-456/summary" },
+    "employment": { "href": "/api/v1/factfinds/factfind-456/employment" },
+    "income": { "href": "/api/v1/factfinds/factfind-456/income" },
+    "expenditure": { "href": "/api/v1/factfinds/factfind-456/expenditure" },
+    "affordability": { "href": "/api/v1/factfinds/factfind-456/affordability" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `factFindNumber` | string | optional | ignored | included | write-once, business identifier |
+| `clientRef` | ClientRef | required | ignored | included | write-once, reference to Client |
+| `jointClientRef` | ClientRef | optional | ignored | included | write-once, reference to Client |
+| `dateOfMeeting` | date | required | updatable | included | - |
+| `typeOfMeeting` | enum | required | updatable | included | - |
+| `clientsPresent` | enum | optional | updatable | included | - |
+| `anybodyElsePresent` | boolean | optional | updatable | included | - |
+| `anybodyElsePresentDetails` | string | optional | updatable | included | - |
+| `scopeOfAdvice` | object | optional | updatable | included | Value type: embedded scope flags |
+| `adviserRef` | AdviserRef | required | updatable | included | Reference type: Primary adviser |
+| `isComplete` | boolean | ignored | ignored | included | read-only, computed from completion status |
+| `dateFactFindCompleted` | date | optional | updatable | included | - |
+| `dateDeclarationSigned` | date | optional | updatable | included | - |
+| `dateIdAmlChecked` | date | optional | updatable | included | - |
+| `status` | enum | optional | updatable | included | - |
+| `hasEmployments` | boolean | ignored | ignored | included | read-only, computed from child entities |
+| `hasExpenditures` | boolean | ignored | ignored | included | read-only, computed |
+| `hasAssets` | boolean | ignored | ignored | included | read-only, computed |
+| `hasLiabilities` | boolean | ignored | ignored | included | read-only, computed |
+| `hasDcPensionPersonal` | boolean | ignored | ignored | included | read-only, computed |
+| `hasDcPensionMoneyPurchase` | boolean | ignored | ignored | included | read-only, computed |
+| `hasDbPension` | boolean | ignored | ignored | included | read-only, computed |
+| `hasSavings` | boolean | ignored | ignored | included | read-only, computed |
+| `hasInvestments` | boolean | ignored | ignored | included | read-only, computed |
+| `hasProtection` | boolean | ignored | ignored | included | read-only, computed |
+| `hasExistingMortgage` | boolean | ignored | ignored | included | read-only, computed |
+| `hasAnnuity` | boolean | ignored | ignored | included | read-only, computed |
+| `hasEquityRelease` | boolean | ignored | ignored | included | read-only, computed |
+| `hasAdverseCredit` | boolean | optional | updatable | included | - |
+| `hasBeenRefusedCredit` | boolean | optional | updatable | included | - |
+| `incomeChangesExpected` | boolean | optional | updatable | included | - |
+| `expenditureChangesExpected` | boolean | optional | updatable | included | - |
+| `totalEarnedAnnualIncomeGross` | MoneyValue | ignored | ignored | included | read-only, computed from Income entities |
+| `totalNetMonthlyIncome` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `totalMonthlyExpenditure` | MoneyValue | ignored | ignored | included | read-only, computed from Expenditure entities |
+| `totalMonthlyDisposableIncome` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `emergencyFund` | object | optional | updatable | included | Value type: requiredAmount, committedAmount, shortfall (all MoneyValue) |
+| `totalFundsAvailable` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `totalLumpSumAvailableForAdvice` | MoneyValue | optional | updatable | included | Value type |
+| `agreedMonthlyBudget` | MoneyValue | optional | updatable | included | Value type |
+| `agreedSingleInvestmentAmount` | MoneyValue | optional | updatable | included | Value type |
+| `highestTaxRate` | enum | ignored | ignored | included | read-only, computed |
+| `totalNetRelevantEarnings` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `sourceOfInvestmentFunds` | string | optional | updatable | included | - |
+| `notes` | string | optional | updatable | included | - |
+| `additionalNotes` | string | optional | updatable | included | - |
+| `customQuestions` | array | optional | updatable | included | - |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Creating a FactFind (POST /api/v1/factfinds):**
+```json
+{
+  "clientRef": { "id": "client-123" },
+  "jointClientRef": { "id": "client-124" },
+  "dateOfMeeting": "2026-02-16",
+  "typeOfMeeting": "InitialConsultation",
+  "adviserRef": { "id": "adviser-789" },
+  "scopeOfAdvice": {
+    "retirementPlanning": true,
+    "protection": true
+  },
+  "agreedMonthlyBudget": {
+    "amount": 1000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+```
+
+**Updating a FactFind (PATCH /api/v1/factfinds/456):**
+```json
+{
+  "status": {
+    "code": "COM",
+    "display": "Complete"
+  },
+  "dateFactFindCompleted": "2026-02-16",
+  "agreedMonthlyBudget": {
+    "amount": 1500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  }
+}
+```
+
+---
+
+### 13.3 Address Contract
+
+The `Address` contract represents a client's address with additional metadata for residency tracking. When an address needs independent lifecycle management (e.g., address history), it becomes a reference type with identity.
+
+**Reference Type:** Address is a reference type with identity when managed as a separate resource (has `id` field).
+
+**Note:** For simple embedded addresses (like `primaryAddress` in Client), use `AddressValue` (see Section 13.10.2) which has no `id` and is embedded directly.
+
+```json
+{
+  "id": "address-789",
+  "factFindRef": {
+    "id": "factfind-456",
+    "href": "/api/v1/factfinds/factfind-456",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "addressType": "Residential",
+  "address": {
+    "line1": "123 High Street",
+    "line2": "Apartment 4B",
+    "city": "London",
+    "county": "Greater London",
+    "postcode": "SW1A 1AA",
+    "country": "GB"
+  },
+  "isCorrespondenceAddress": true,
+  "residencyPeriod": {
+    "startDate": "2020-01-15",
+    "endDate": null
+  },
+  "residencyStatus": "Owner",
+  "isOnElectoralRoll": true,
+  "createdAt": "2020-01-15T10:30:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z"
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated (uuid)
+- `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
+- `clientRef` - write-once, reference to Client
+- `addressType` - required-on-create, updatable
+- `address` - required-on-create, updatable (AddressValue embedded)
+- `isCorrespondenceAddress` - optional, updatable (boolean)
+- `residencyPeriod` - optional, updatable (DateRangeValue)
+- `residencyStatus` - optional, updatable
+- `isOnElectoralRoll` - optional, updatable
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 13.4 Income Contract
+
+The `Income` contract represents an income source within a FactFind.
+
+**Reference Type:** Income is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "income-101",
+  "factFindRef": {
+    "id": "factfind-456",
+    "href": "/api/v1/factfinds/factfind-456",
+    "factFindNumber": "FF001234",
+    "status": "InProgress"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "employmentRef": {
+    "id": "employment-222",
+    "href": "/api/v1/employments/employment-222",
+    "employerName": "Tech Corp Ltd",
+    "status": "Current"
+  },
+  "incomeType": "Employment",
+  "description": "Salary from Tech Corp Ltd",
+  "grossAmount": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netAmount": {
+    "amount": 55000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": {
+    "code": "A",
+    "display": "Annually",
+    "periodsPerYear": 1
+  },
+  "incomePeriod": {
+    "startDate": "2020-01-15",
+    "endDate": null
+  },
+  "isOngoing": true,
+  "isPrimary": true,
+  "isGuaranteed": true,
+  "taxDeducted": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "nationalInsuranceDeducted": {
+    "amount": 5000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "notes": "Annual bonus typically £10k",
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z"
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated (uuid)
+- `factFindRef` - write-once, reference to FactFind (set from URL path parameter)
+- `clientRef` - required-on-create, write-once, reference to Client
+- `employmentRef` - optional, updatable, reference to Employment
+- `incomeType` - required-on-create, updatable
+- `description` - optional, updatable
+- `grossAmount` - required-on-create, updatable (MoneyValue)
+- `netAmount` - optional, updatable (MoneyValue)
+- `frequency` - required-on-create, updatable
+- `incomePeriod` - optional, updatable (DateRangeValue)
+- `isOngoing`, `isPrimary`, `isGuaranteed` - optional, updatable
+- `taxDeducted`, `nationalInsuranceDeducted` - optional, updatable (MoneyValue)
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 13.5 Arrangement Contract
+
+The `Arrangement` contract represents financial products (pensions, investments, protection, mortgages). This is a polymorphic contract with type-specific fields.
+
+**Reference Type:** Arrangement is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "arrangement-555",
+  "factFindRef": {
+    "id": "factfind-456",
+    "href": "/api/v1/factfinds/factfind-456",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "arrangementNumber": "ARR123456",
+  "arrangementType": "Pension",
+  "pensionType": "PersonalPension",
+  "clientOwners": [
+    {
+      "id": "client-123",
+      "href": "/api/v1/clients/client-123",
+      "name": "John Smith",
+      "clientNumber": "C00001234",
+      "type": "Person"
+    }
+  ],
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "productName": "ABC SIPP",
+  "providerRef": {
+    "id": "provider-456",
+    "href": "/api/v1/providers/provider-456",
+    "name": "ABC Pension Provider Ltd",
+    "frnNumber": "123456"
+  },
+  "policyNumber": "POL123456",
+  "status": {
+    "code": "ACT",
+    "display": "Active"
+  },
+  "arrangementPeriod": {
+    "startDate": "2015-01-01",
+    "endDate": null
+  },
+  "currentValue": {
+    "amount": 125000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-01",
+  "regularContribution": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "contributionFrequency": {
+    "code": "M",
+    "display": "Monthly",
+    "periodsPerYear": 12
+  },
+  "isInDrawdown": false,
+  "expectedRetirementAge": 67,
+  "projectedValueAtRetirement": {
+    "amount": 450000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "hasGuaranteedAnnuityRate": false,
+  "hasProtectedTaxFreeAmount": false,
+  "isSalarySacrifice": false,
+  "notes": "Consolidated from previous workplace pensions",
+  "createdAt": "2015-01-01T10:00:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/arrangements/arrangement-555" },
+    "contributions": { "href": "/api/v1/arrangements/arrangement-555/contributions" },
+    "valuations": { "href": "/api/v1/arrangements/arrangement-555/valuations" }
+  }
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated
+- `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
+- `arrangementType` - required-on-create, write-once (discriminator)
+- `pensionType`, `investmentType`, `protectionType`, `mortgageType` - required-on-create (type-specific), write-once
+- `clientId` - required-on-create, write-once
+- `productName`, `providerName`, `policyNumber` - required-on-create, updatable
+- `status` - optional, updatable
+- `startDate`, `endDate` - optional, updatable
+- `currentValue` - optional, updatable
+- `valuationDate` - optional, updatable (should match currentValue update)
+- Type-specific fields - vary by arrangementType
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 13.6 Goal Contract
+
+The `Goal` contract represents a client's financial goal.
+
+**Reference Type:** Goal is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "goal-888",
+  "factFindRef": {
+    "id": "factfind-456",
+    "href": "/api/v1/factfinds/factfind-456",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "goalType": "Retirement",
+  "goalName": "Comfortable retirement at age 65",
+  "description": "Build sufficient pension pot to support £40k annual income in retirement",
+  "priority": "High",
+  "targetAmount": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "targetDate": "2045-05-15",
+  "yearsToGoal": 19,
+  "currentSavings": {
+    "amount": 125000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "monthlyContribution": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "projectedShortfall": {
+    "amount": 150000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "isAchievable": false,
+  "status": "InProgress",
+  "notes": "May need to increase contributions or adjust target",
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z"
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated (uuid)
+- `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
+- `clientRef` - write-once, reference to Client
+- `goalType` - required-on-create, updatable
+- `goalName` - required-on-create, updatable
+- `description` - optional, updatable
+- `priority` - optional, updatable
+- `targetAmount` - required-on-create, updatable (MoneyValue)
+- `targetDate` - required-on-create, updatable
+- `yearsToGoal` - read-only, computed from targetDate
+- `currentSavings`, `monthlyContribution` - optional, updatable (MoneyValue)
+- `projectedShortfall` - read-only, computed (MoneyValue)
+- `isAchievable` - read-only, computed
+- `status` - optional, updatable
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 13.7 RiskProfile Contract
+
+The `RiskProfile` contract represents a client's risk assessment and attitude to risk.
+
+**Reference Type:** RiskProfile is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "riskprofile-999",
+  "factFindRef": {
+    "id": "factfind-456",
+    "href": "/api/v1/factfinds/factfind-456",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "assessmentDate": "2026-02-16",
+  "assessmentType": "ATR",
+  "attitudeToRiskScore": 6,
+  "attitudeToRiskRating": "Balanced",
+  "capacityForLossScore": 7,
+  "capacityForLossRating": "Medium",
+  "overallRiskRating": "Balanced",
+  "timeHorizon": "LongTerm",
+  "yearsToRetirement": 19,
+  "investmentExperience": "Moderate",
+  "hasInvestedBefore": true,
+  "understandsRisk": true,
+  "comfortableWithVolatility": true,
+  "wouldAcceptLosses": false,
+  "notes": "Client understands market volatility but nervous about large losses",
+  "questionsAndAnswers": [
+    {
+      "question": "How would you react to a 20% fall in your portfolio?",
+      "answer": "Hold steady and wait for recovery",
+      "score": 6
+    }
+  ],
+  "validUntil": "2027-02-16",
+  "reviewDate": "2027-02-16",
+  "isValid": true,
+  "createdAt": "2026-02-16T14:30:00Z",
+  "updatedAt": "2026-02-16T15:45:00Z"
+}
+```
+
+**Key Field Behaviors:**
+- `id` - read-only, server-generated
+- `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
+- `clientId` - write-once, set from URL or required-on-create
+- `assessmentDate` - required-on-create, updatable
+- `assessmentType` - required-on-create, write-once
+- `attitudeToRiskScore`, `capacityForLossScore` - required-on-create, updatable
+- `attitudeToRiskRating`, `capacityForLossRating`, `overallRiskRating` - read-only, computed from scores
+- `timeHorizon`, `yearsToRetirement` - optional, updatable
+- `investmentExperience` - optional, updatable
+- Boolean fields (`hasInvestedBefore`, `understandsRisk`, etc.) - optional, updatable
+- `questionsAndAnswers` - optional, updatable (array)
+- `validUntil`, `reviewDate` - optional, updatable
+- `isValid` - read-only, computed from validUntil date
+- `createdAt`, `updatedAt` - read-only
+
+---
+
+### 13.8 Investment Contract
+
+The `Investment` contract extends the Arrangement contract with investment-specific fields for ISAs, GIAs, Bonds, and Investment Trusts.
+
+**Reference Type:** Investment is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "investment-789",
+  "arrangementId": "arrangement-456",
+  "factFindRef": {
+    "id": "factfind-123",
+    "href": "/api/v1/factfinds/factfind-123",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "arrangementType": {
+    "code": "INV",
+    "display": "Investment"
+  },
+  "productType": {
+    "code": "ISA",
+    "display": "Individual Savings Account"
+  },
+  "provider": {
+    "code": "VANGUARD",
+    "display": "Vanguard Asset Management",
+    "frnNumber": "123456"
+  },
+  "policyNumber": "ISA-987654321",
+  "accountNumber": "ACC-12345678",
+  "planName": "Vanguard ISA Portfolio",
+  "startDate": "2020-04-06",
+  "maturityDate": null,
+  "status": {
+    "code": "ACTIVE",
+    "display": "Active"
+  },
+  "investmentType": {
+    "code": "STOCKS_SHARES_ISA",
+    "display": "Stocks & Shares ISA"
+  },
+  "isaType": {
+    "code": "STOCKS_SHARES",
+    "display": "Stocks & Shares ISA"
+  },
+  "taxYear": "2025/2026",
+  "annualIsaAllowance": {
+    "amount": 20000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "isaAllowanceUsed": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "isaAllowanceRemaining": {
+    "amount": 5000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "taxWrapperType": {
+    "code": "ISA",
+    "display": "ISA Tax Wrapper"
+  },
+  "isTaxable": false,
+  "currentValue": {
+    "amount": 185000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-16",
+  "costBasis": {
+    "amount": 150000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "unrealizedGain": {
+    "amount": 35000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "unrealizedGainPercentage": 23.33,
+  "realizedGain": {
+    "amount": 8500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalReturn": {
+    "amount": 43500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalReturnPercentage": 29.00,
+  "annualizedReturn": 5.87,
+  "timeWeightedReturn": 6.12,
+  "moneyWeightedReturn": 5.65,
+  "inceptionDate": "2020-04-06",
+  "yearsHeld": 5.87,
+  "assetAllocation": {
+    "equities": {
+      "percentage": 65.00,
+      "value": {
+        "amount": 120250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "bonds": {
+      "percentage": 25.00,
+      "value": {
+        "amount": 46250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "cash": {
+      "percentage": 5.00,
+      "value": {
+        "amount": 9250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "alternatives": {
+      "percentage": 5.00,
+      "value": {
+        "amount": 9250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    }
+  },
+  "geographicAllocation": {
+    "uk": {
+      "percentage": 30.00,
+      "value": {
+        "amount": 55500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "northAmerica": {
+      "percentage": 45.00,
+      "value": {
+        "amount": 83250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "europe": {
+      "percentage": 15.00,
+      "value": {
+        "amount": 27750.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "asiaPacific": {
+      "percentage": 8.00,
+      "value": {
+        "amount": 14800.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "emergingMarkets": {
+      "percentage": 2.00,
+      "value": {
+        "amount": 3700.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    }
+  },
+  "holdings": [
+    {
+      "holdingId": "holding-001",
+      "isin": "GB00B3X7QG63",
+      "sedol": "B3X7QG6",
+      "fundName": "Vanguard FTSE Global All Cap Index Fund",
+      "ticker": "VWRL",
+      "fundType": {
+        "code": "INDEX",
+        "display": "Index Fund"
+      },
+      "assetClass": {
+        "code": "EQUITY",
+        "display": "Equity"
+      },
+      "units": 15000.00,
+      "unitPrice": {
+        "amount": 6.25,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "currentValue": {
+        "amount": 93750.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "costBasis": {
+        "amount": 75000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "unrealizedGain": {
+        "amount": 18750.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "unrealizedGainPercentage": 25.00,
+      "percentageOfPortfolio": 50.68,
+      "ocf": 0.23,
+      "lastUpdated": "2026-02-16T16:00:00Z"
+    },
+    {
+      "holdingId": "holding-002",
+      "isin": "GB00B4PQW151",
+      "sedol": "B4PQW15",
+      "fundName": "Vanguard U.K. Government Bond Index Fund",
+      "ticker": "VGOV",
+      "fundType": {
+        "code": "INDEX",
+        "display": "Index Fund"
+      },
+      "assetClass": {
+        "code": "BOND",
+        "display": "Fixed Income"
+      },
+      "units": 28000.00,
+      "unitPrice": {
+        "amount": 1.65,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "currentValue": {
+        "amount": 46200.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "costBasis": {
+        "amount": 42000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "unrealizedGain": {
+        "amount": 4200.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "unrealizedGainPercentage": 10.00,
+      "percentageOfPortfolio": 24.97,
+      "ocf": 0.15,
+      "lastUpdated": "2026-02-16T16:00:00Z"
+    },
+    {
+      "holdingId": "holding-003",
+      "isin": "GB00BPN5P238",
+      "sedol": "BPN5P23",
+      "fundName": "Vanguard LifeStrategy 60% Equity Fund",
+      "ticker": "VLS60",
+      "fundType": {
+        "code": "MIXED",
+        "display": "Mixed Asset Fund"
+      },
+      "assetClass": {
+        "code": "MIXED",
+        "display": "Mixed Assets"
+      },
+      "units": 12500.00,
+      "unitPrice": {
+        "amount": 2.80,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "currentValue": {
+        "amount": 35000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "costBasis": {
+        "amount": 25000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "unrealizedGain": {
+        "amount": 10000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "unrealizedGainPercentage": 40.00,
+      "percentageOfPortfolio": 18.92,
+      "ocf": 0.22,
+      "lastUpdated": "2026-02-16T16:00:00Z"
+    },
+    {
+      "holdingId": "holding-004",
+      "isin": "CASH001",
+      "fundName": "Cash Holding",
+      "fundType": {
+        "code": "CASH",
+        "display": "Cash"
+      },
+      "assetClass": {
+        "code": "CASH",
+        "display": "Cash"
+      },
+      "currentValue": {
+        "amount": 10050.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "costBasis": {
+        "amount": 8000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "unrealizedGain": {
+        "amount": 2050.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "unrealizedGainPercentage": 25.63,
+      "percentageOfPortfolio": 5.43,
+      "interestRate": 4.50,
+      "lastUpdated": "2026-02-16T16:00:00Z"
+    }
+  ],
+  "totalHoldings": 4,
+  "contributions": [
+    {
+      "contributionId": "contrib-001",
+      "date": "2025-04-06",
+      "amount": {
+        "amount": 20000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "type": {
+        "code": "REGULAR",
+        "display": "Regular Contribution"
+      },
+      "taxYear": "2025/2026",
+      "notes": "Annual ISA contribution for tax year 2025/26"
+    },
+    {
+      "contributionId": "contrib-002",
+      "date": "2024-04-06",
+      "amount": {
+        "amount": 20000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "type": {
+        "code": "REGULAR",
+        "display": "Regular Contribution"
+      },
+      "taxYear": "2024/2025",
+      "notes": "Annual ISA contribution for tax year 2024/25"
+    }
+  ],
+  "totalContributions": {
+    "amount": 150000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "withdrawals": [
+    {
+      "withdrawalId": "withdraw-001",
+      "date": "2025-09-15",
+      "amount": {
+        "amount": 5000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "type": {
+        "code": "ADHOC",
+        "display": "Ad-hoc Withdrawal"
+      },
+      "reason": "Home improvement",
+      "taxableAmount": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "notes": "Tax-free ISA withdrawal"
+    }
+  ],
+  "totalWithdrawals": {
+    "amount": 5000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netContributions": {
+    "amount": 145000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "regularContribution": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "regularContributionFrequency": {
+    "code": "MONTHLY",
+    "display": "Monthly"
+  },
+  "nextContributionDate": "2026-03-01",
+  "isRegularContributionActive": true,
+  "taxFields": {
+    "capitalGainsUsed": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "capitalGainsAllowance": {
+      "amount": 3000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "dividendsReceived": {
+      "amount": 8500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "dividendsAllowance": {
+      "amount": 500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "taxPaid": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "taxRelief": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "isTaxExempt": true,
+    "taxExemptReason": "Stocks & Shares ISA - tax wrapper"
+  },
+  "charges": {
+    "annualManagementCharge": 0.15,
+    "platformFee": 0.25,
+    "totalExpenseRatio": 0.40,
+    "transactionFees": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "exitFees": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "riskRating": {
+    "code": "MODERATE",
+    "display": "Moderate Risk",
+    "numericScore": 5,
+    "scale": "1-7"
+  },
+  "investmentObjective": "Long-term capital growth with moderate risk exposure",
+  "benchmarkIndex": "FTSE All-World Index",
+  "rebalancingFrequency": {
+    "code": "QUARTERLY",
+    "display": "Quarterly"
+  },
+  "lastRebalancingDate": "2026-01-15",
+  "nextRebalancingDate": "2026-04-15",
+  "isAdvised": true,
+  "adviceType": {
+    "code": "ONGOING",
+    "display": "Ongoing Advice"
+  },
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "lastReviewDate": "2026-01-15",
+  "nextReviewDate": "2027-01-15",
+  "notes": "Client prefers sustainable investing, ESG funds where possible",
+  "documents": [
+    {
+      "documentId": "doc-001",
+      "type": {
+        "code": "STATEMENT",
+        "display": "Account Statement"
+      },
+      "name": "ISA Annual Statement 2025",
+      "date": "2025-12-31",
+      "url": "/api/v1/documents/doc-001"
+    }
+  ],
+  "createdAt": "2020-04-06T10:00:00Z",
+  "updatedAt": "2026-02-16T16:30:00Z",
+  "createdBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "updatedBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/investments/investment-789" },
+    "update": { "href": "/api/v1/investments/investment-789", "method": "PUT" },
+    "delete": { "href": "/api/v1/investments/investment-789", "method": "DELETE" },
+    "arrangement": { "href": "/api/v1/arrangements/arrangement-456" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
+    "holdings": { "href": "/api/v1/investments/investment-789/holdings" },
+    "contributions": { "href": "/api/v1/investments/investment-789/contributions" },
+    "withdrawals": { "href": "/api/v1/investments/investment-789/withdrawals" },
+    "transactions": { "href": "/api/v1/investments/investment-789/transactions" },
+    "documents": { "href": "/api/v1/investments/investment-789/documents" },
+    "performance": { "href": "/api/v1/investments/investment-789/performance" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `arrangementId` | uuid | required | ignored | included | write-once, link to parent Arrangement |
+| `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
+| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `arrangementType` | CodeValue | required | ignored | included | write-once, discriminator field |
+| `productType` | CodeValue | required | ignored | included | write-once, ISA/GIA/Bond/Investment Trust |
+| `provider` | ProviderValue | required | updatable | included | Provider details with FRN |
+| `policyNumber` | string | required | ignored | included | write-once, unique identifier |
+| `accountNumber` | string | optional | updatable | included | Account reference number |
+| `planName` | string | optional | updatable | included | Name of investment plan |
+| `startDate` | date | required | ignored | included | write-once, inception date |
+| `maturityDate` | date | optional | updatable | included | For fixed-term investments |
+| `status` | CodeValue | optional | updatable | included | Active/Closed/Suspended |
+| `investmentType` | CodeValue | required | updatable | included | Detailed investment classification |
+| `isaType` | CodeValue | optional | updatable | included | If ISA: Stocks/Cash/Innovative/Lifetime |
+| `taxYear` | string | optional | updatable | included | Current tax year for ISA allowance |
+| `annualIsaAllowance` | MoneyValue | optional | updatable | included | Annual ISA contribution limit |
+| `isaAllowanceUsed` | MoneyValue | optional | updatable | included | Amount of allowance used this year |
+| `isaAllowanceRemaining` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `taxWrapperType` | CodeValue | optional | updatable | included | ISA/SIPP/other tax wrapper |
+| `isTaxable` | boolean | optional | updatable | included | Whether gains are taxable |
+| `currentValue` | MoneyValue | required | updatable | included | Current market value |
+| `valuationDate` | date | required | updatable | included | Date of valuation |
+| `costBasis` | MoneyValue | optional | updatable | included | Total cost of investments |
+| `unrealizedGain` | MoneyValue | ignored | ignored | included | read-only, currentValue - costBasis |
+| `unrealizedGainPercentage` | decimal | ignored | ignored | included | read-only, percentage gain/loss |
+| `realizedGain` | MoneyValue | optional | updatable | included | Gains from sales |
+| `totalReturn` | MoneyValue | ignored | ignored | included | read-only, unrealized + realized |
+| `totalReturnPercentage` | decimal | ignored | ignored | included | read-only, total return % |
+| `annualizedReturn` | decimal | ignored | ignored | included | read-only, compound annual growth rate |
+| `timeWeightedReturn` | decimal | optional | updatable | included | TWR performance metric |
+| `moneyWeightedReturn` | decimal | optional | updatable | included | MWR performance metric |
+| `inceptionDate` | date | required | ignored | included | write-once, first investment date |
+| `yearsHeld` | decimal | ignored | ignored | included | read-only, computed from inceptionDate |
+| `assetAllocation` | object | optional | updatable | included | Equities/bonds/cash/alternatives breakdown |
+| `geographicAllocation` | object | optional | updatable | included | Regional allocation breakdown |
+| `holdings` | array | optional | updatable | included | Array of fund holdings with ISIN/value |
+| `totalHoldings` | integer | ignored | ignored | included | read-only, count of holdings |
+| `contributions` | array | optional | updatable | included | Array of contribution transactions |
+| `totalContributions` | MoneyValue | ignored | ignored | included | read-only, sum of contributions |
+| `withdrawals` | array | optional | updatable | included | Array of withdrawal transactions |
+| `totalWithdrawals` | MoneyValue | ignored | ignored | included | read-only, sum of withdrawals |
+| `netContributions` | MoneyValue | ignored | ignored | included | read-only, contributions - withdrawals |
+| `regularContribution` | MoneyValue | optional | updatable | included | Regular monthly/annual contribution |
+| `regularContributionFrequency` | CodeValue | optional | updatable | included | Monthly/Quarterly/Annual |
+| `nextContributionDate` | date | optional | updatable | included | Next scheduled contribution |
+| `isRegularContributionActive` | boolean | optional | updatable | included | Whether regular contributions are active |
+| `taxFields` | object | optional | updatable | included | Capital gains, dividends, tax paid |
+| `charges` | object | optional | updatable | included | AMC, platform fees, TER |
+| `riskRating` | CodeValue | optional | updatable | included | Investment risk rating |
+| `investmentObjective` | string | optional | updatable | included | Stated investment goal |
+| `benchmarkIndex` | string | optional | updatable | included | Performance benchmark |
+| `rebalancingFrequency` | CodeValue | optional | updatable | included | Quarterly/Semi-annual/Annual |
+| `lastRebalancingDate` | date | optional | updatable | included | Last portfolio rebalance |
+| `nextRebalancingDate` | date | optional | updatable | included | Next scheduled rebalance |
+| `isAdvised` | boolean | optional | updatable | included | Whether investment is advised |
+| `adviceType` | CodeValue | optional | updatable | included | Ongoing/One-off advice |
+| `adviserRef` | AdviserRef | optional | updatable | included | Reference to adviser |
+| `lastReviewDate` | date | optional | updatable | included | Last review date |
+| `nextReviewDate` | date | optional | updatable | included | Next scheduled review |
+| `notes` | string | optional | updatable | included | Additional notes |
+| `documents` | array | optional | updatable | included | Array of document references |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Creating an Investment ISA (POST /api/v1/investments):**
+```json
+{
+  "arrangementId": "arrangement-456",
+  "factFindRef": { "id": "factfind-123" },
+  "clientRef": { "id": "client-123" },
+  "arrangementType": { "code": "INV" },
+  "productType": { "code": "ISA" },
+  "provider": { "code": "VANGUARD" },
+  "policyNumber": "ISA-987654321",
+  "startDate": "2020-04-06",
+  "inceptionDate": "2020-04-06",
+  "investmentType": { "code": "STOCKS_SHARES_ISA" },
+  "isaType": { "code": "STOCKS_SHARES" },
+  "taxYear": "2025/2026",
+  "currentValue": { "amount": 185000.00, "currency": { "code": "GBP" } },
+  "valuationDate": "2026-02-16",
+  "costBasis": { "amount": 150000.00, "currency": { "code": "GBP" } }
+}
+```
+Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields like `unrealizedGain`, `totalReturn`, etc. Returns complete contract.
+
+**Updating Asset Allocation (PUT /api/v1/investments/investment-789):**
+```json
+{
+  "currentValue": { "amount": 190000.00, "currency": { "code": "GBP" } },
+  "valuationDate": "2026-02-18",
+  "assetAllocation": {
+    "equities": { "percentage": 70.00, "value": { "amount": 133000.00, "currency": { "code": "GBP" } } },
+    "bonds": { "percentage": 20.00, "value": { "amount": 38000.00, "currency": { "code": "GBP" } } },
+    "cash": { "percentage": 5.00, "value": { "amount": 9500.00, "currency": { "code": "GBP" } } },
+    "alternatives": { "percentage": 5.00, "value": { "amount": 9500.00, "currency": { "code": "GBP" } } }
+  }
+}
+```
+Server updates `updatedAt` and recalculates computed fields. Returns complete contract.
+
+**Adding a Holding (PATCH /api/v1/investments/investment-789):**
+```json
+{
+  "holdings": [
+    {
+      "isin": "GB00B3X7QG63",
+      "fundName": "Vanguard FTSE Global All Cap Index Fund",
+      "units": 15000.00,
+      "unitPrice": { "amount": 6.25, "currency": { "code": "GBP" } },
+      "currentValue": { "amount": 93750.00, "currency": { "code": "GBP" } },
+      "costBasis": { "amount": 75000.00, "currency": { "code": "GBP" } }
+    }
+  ]
+}
+```
+Only specified fields are updated. Returns complete contract with new holding added.
+
+**Validation Rules:**
+
+1. **Required Fields on Create:** `arrangementId`, `factFindRef`, `clientRef`, `arrangementType`, `productType`, `provider`, `policyNumber`, `startDate`, `inceptionDate`, `currentValue`, `valuationDate`
+2. **Write-Once Fields:** Cannot be changed after creation: `arrangementId`, `factFindRef`, `clientRef`, `arrangementType`, `productType`, `policyNumber`, `startDate`, `inceptionDate`
+3. **ISA Validation:** If `productType` is ISA, `isaType` must be provided (Stocks/Cash/Innovative/Lifetime)
+4. **ISA Allowance:** `isaAllowanceUsed` cannot exceed `annualIsaAllowance` (£20,000 for 2025/26)
+5. **Asset Allocation:** Sum of percentages in `assetAllocation` must equal 100%
+6. **Geographic Allocation:** Sum of percentages in `geographicAllocation` must equal 100%
+7. **Holdings Validation:** Each holding must have `isin` or `sedol`, `fundName`, and `currentValue`
+8. **Date Logic:** `startDate` must be <= `valuationDate`, `maturityDate` (if provided) must be > `startDate`
+9. **Contribution Limits:** For ISAs, total contributions in a tax year cannot exceed annual allowance
+10. **Reference Integrity:** `arrangementId`, `clientRef.id`, `factFindRef.id`, `adviserRef.id` must reference existing entities
+
+---
+
+### 13.9 Property Contract
+
+The `Property` contract represents a property asset with valuation tracking, mortgage linking, and rental income management.
+
+**Reference Type:** Property is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "property-456",
+  "factFindRef": {
+    "id": "factfind-123",
+    "href": "/api/v1/factfinds/factfind-123",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "propertyType": {
+    "code": "BTL",
+    "display": "Buy To Let"
+  },
+  "propertySubType": {
+    "code": "APARTMENT",
+    "display": "Apartment/Flat"
+  },
+  "ownershipType": {
+    "code": "FREEHOLD",
+    "display": "Freehold"
+  },
+  "address": {
+    "line1": "Flat 12, Riverside Apartments",
+    "line2": "45 Thames Street",
+    "city": "London",
+    "county": {
+      "code": "GLA",
+      "display": "Greater London"
+    },
+    "postcode": "SE1 9PH",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "addressType": {
+      "code": "BTL",
+      "display": "Buy To Let"
+    },
+    "uprn": "100023456789",
+    "coordinates": {
+      "latitude": 51.5074,
+      "longitude": -0.1278
+    }
+  },
+  "propertyDescription": "Two bedroom apartment with river views, modern kitchen and bathroom, secure parking",
+  "numberOfBedrooms": 2,
+  "numberOfBathrooms": 1,
+  "numberOfReceptionRooms": 1,
+  "floorArea": {
+    "value": 850,
+    "unit": "sqft"
+  },
+  "tenure": {
+    "code": "LEASEHOLD",
+    "display": "Leasehold"
+  },
+  "leaseRemaining": 95,
+  "groundRent": {
+    "amount": 250.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    },
+    "frequency": {
+      "code": "ANNUAL",
+      "display": "Annually"
+    }
+  },
+  "serviceCharge": {
+    "amount": 150.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    },
+    "frequency": {
+      "code": "MONTHLY",
+      "display": "Monthly"
+    }
+  },
+  "purchaseDate": "2018-06-15",
+  "purchasePrice": {
+    "amount": 325000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "purchaseCosts": {
+    "stampDuty": {
+      "amount": 9750.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "legalFees": {
+      "amount": 1500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "surveyFees": {
+      "amount": 500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "estateAgentFees": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "otherCosts": {
+      "amount": 250.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalCosts": {
+      "amount": 12000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "totalInvestment": {
+    "amount": 337000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "owners": [
+    {
+      "clientRef": {
+        "id": "client-123",
+        "href": "/api/v1/clients/client-123",
+        "name": "John Smith",
+        "clientNumber": "C00001234",
+        "type": "Person"
+      },
+      "ownershipPercentage": 100.00,
+      "isPrimaryOwner": true,
+      "ownershipType": {
+        "code": "SOLE",
+        "display": "Sole Ownership"
+      }
+    }
+  ],
+  "ownershipStructure": {
+    "code": "SOLE",
+    "display": "Sole Ownership"
+  },
+  "isJointOwnership": false,
+  "jointOwnershipType": null,
+  "currentValue": {
+    "amount": 425000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-10",
+  "valuationType": {
+    "code": "DESKTOP",
+    "display": "Desktop Valuation"
+  },
+  "valuationProvider": "Zoopla",
+  "valuationReference": "VAL-2026-02-12345",
+  "previousValuation": {
+    "amount": 410000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "previousValuationDate": "2025-02-10",
+  "valuationChange": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "valuationChangePercentage": 3.66,
+  "capitalGrowth": {
+    "amount": 100000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "capitalGrowthPercentage": 30.77,
+  "annualizedGrowth": 3.94,
+  "mortgages": [
+    {
+      "mortgageRef": {
+        "id": "mortgage-789",
+        "href": "/api/v1/arrangements/mortgage-789",
+        "arrangementType": "Mortgage",
+        "provider": "Nationwide Building Society",
+        "policyNumber": "MTG-987654321"
+      },
+      "outstandingBalance": {
+        "amount": 240000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "monthlyPayment": {
+        "amount": 1250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "interestRate": 3.75,
+      "isPrimary": true
+    }
+  ],
+  "totalMortgageBalance": {
+    "amount": 240000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "equityAmount": {
+    "amount": 185000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "equityPercentage": 43.53,
+  "loanToValue": 56.47,
+  "isPrimaryResidence": false,
+  "isRented": true,
+  "isBuyToLet": true,
+  "rentalIncome": {
+    "monthlyRent": {
+      "amount": 1650.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "annualRent": {
+      "amount": 19800.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "tenancyType": {
+      "code": "AST",
+      "display": "Assured Shorthold Tenancy"
+    },
+    "tenancyStartDate": "2025-08-01",
+    "tenancyEndDate": "2026-07-31",
+    "tenancyRenewalDate": "2026-07-31",
+    "isFixedTerm": true,
+    "tenantName": "Emma Johnson",
+    "tenantContactEmail": "emma.j@example.com",
+    "depositAmount": {
+      "amount": 1650.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "depositScheme": "Deposit Protection Service",
+    "depositReference": "DPS-123456789",
+    "rentalYieldGross": 4.66,
+    "rentalYieldNet": 2.35,
+    "voidPeriodsDays": 45,
+    "lastRentReviewDate": "2025-08-01",
+    "nextRentReviewDate": "2026-08-01"
+  },
+  "expenses": [
+    {
+      "expenseType": {
+        "code": "MORTGAGE_INTEREST",
+        "display": "Mortgage Interest"
+      },
+      "amount": {
+        "amount": 750.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": {
+        "code": "MONTHLY",
+        "display": "Monthly"
+      },
+      "annualAmount": {
+        "amount": 9000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "isTaxDeductible": true,
+      "notes": "Interest-only mortgage"
+    },
+    {
+      "expenseType": {
+        "code": "BUILDINGS_INSURANCE",
+        "display": "Buildings Insurance"
+      },
+      "amount": {
+        "amount": 35.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": {
+        "code": "MONTHLY",
+        "display": "Monthly"
+      },
+      "annualAmount": {
+        "amount": 420.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "isTaxDeductible": true,
+      "notes": "Landlord buildings insurance"
+    },
+    {
+      "expenseType": {
+        "code": "LANDLORD_INSURANCE",
+        "display": "Landlord Insurance"
+      },
+      "amount": {
+        "amount": 25.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": {
+        "code": "MONTHLY",
+        "display": "Monthly"
+      },
+      "annualAmount": {
+        "amount": 300.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "isTaxDeductible": true,
+      "notes": "Rent guarantee and legal expenses"
+    },
+    {
+      "expenseType": {
+        "code": "LETTING_AGENT",
+        "display": "Letting Agent Fees"
+      },
+      "amount": {
+        "amount": 165.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": {
+        "code": "MONTHLY",
+        "display": "Monthly"
+      },
+      "annualAmount": {
+        "amount": 1980.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "isTaxDeductible": true,
+      "notes": "10% management fee"
+    },
+    {
+      "expenseType": {
+        "code": "GROUND_RENT",
+        "display": "Ground Rent"
+      },
+      "amount": {
+        "amount": 20.83,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": {
+        "code": "MONTHLY",
+        "display": "Monthly"
+      },
+      "annualAmount": {
+        "amount": 250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "isTaxDeductible": true,
+      "notes": "Annual ground rent"
+    },
+    {
+      "expenseType": {
+        "code": "SERVICE_CHARGE",
+        "display": "Service Charge"
+      },
+      "amount": {
+        "amount": 150.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": {
+        "code": "MONTHLY",
+        "display": "Monthly"
+      },
+      "annualAmount": {
+        "amount": 1800.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "isTaxDeductible": true,
+      "notes": "Building maintenance and communal areas"
+    },
+    {
+      "expenseType": {
+        "code": "REPAIRS_MAINTENANCE",
+        "display": "Repairs & Maintenance"
+      },
+      "amount": {
+        "amount": 83.33,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": {
+        "code": "MONTHLY",
+        "display": "Monthly"
+      },
+      "annualAmount": {
+        "amount": 1000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "isTaxDeductible": true,
+      "notes": "Average annual maintenance budget"
+    }
+  ],
+  "totalMonthlyExpenses": {
+    "amount": 1229.16,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "totalAnnualExpenses": {
+    "amount": 14750.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netMonthlyIncome": {
+    "amount": 420.84,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netAnnualIncome": {
+    "amount": 5050.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "taxFields": {
+    "stampDutyPaid": {
+      "amount": 9750.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "stampDutyRate": 3.00,
+    "eligibleForPRR": false,
+    "prrYears": 0,
+    "lettingsRelief": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "estimatedCGTBaseValue": {
+      "amount": 325000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "capitalGainsLiability": {
+      "amount": 100000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "capitalGainsTaxEstimate": {
+      "amount": 28000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "rentalIncomeTaxable": {
+      "amount": 5050.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "taxYearReported": "2025/2026"
+  },
+  "energyPerformanceCertificate": {
+    "epcRating": "C",
+    "epcScore": 72,
+    "epcValidUntil": "2028-06-15",
+    "epcReference": "1234-5678-9012-3456-7890"
+  },
+  "councilTaxBand": "D",
+  "councilTaxAnnual": {
+    "amount": 1800.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "improvements": [
+    {
+      "improvementType": "Kitchen Renovation",
+      "date": "2020-03-15",
+      "cost": {
+        "amount": 8000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "description": "Full kitchen replacement with new appliances"
+    },
+    {
+      "improvementType": "Bathroom Renovation",
+      "date": "2021-07-20",
+      "cost": {
+        "amount": 5000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "description": "New bathroom suite and tiling"
+    }
+  ],
+  "totalImprovementsCost": {
+    "amount": 13000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "comparables": [
+    {
+      "address": "Flat 8, Riverside Apartments, Thames Street",
+      "soldDate": "2025-11-15",
+      "soldPrice": {
+        "amount": 418000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "bedrooms": 2,
+      "propertyType": "Apartment"
+    },
+    {
+      "address": "Flat 15, Thames View, 50 River Lane",
+      "soldDate": "2025-12-10",
+      "soldPrice": {
+        "amount": 435000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "bedrooms": 2,
+      "propertyType": "Apartment"
+    }
+  ],
+  "plannedSaleDate": null,
+  "estimatedSalePrice": null,
+  "intendToSell": false,
+  "intendToRefinance": false,
+  "notes": "Well-maintained property in popular riverside development. Excellent rental demand in area.",
+  "documents": [
+    {
+      "documentId": "doc-prop-001",
+      "type": {
+        "code": "VALUATION",
+        "display": "Property Valuation"
+      },
+      "name": "Desktop Valuation February 2026",
+      "date": "2026-02-10",
+      "url": "/api/v1/documents/doc-prop-001"
+    }
+  ],
+  "createdAt": "2018-06-15T10:00:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z",
+  "createdBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "updatedBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/properties/property-456" },
+    "update": { "href": "/api/v1/properties/property-456", "method": "PUT" },
+    "delete": { "href": "/api/v1/properties/property-456", "method": "DELETE" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
+    "owners": { "href": "/api/v1/properties/property-456/owners" },
+    "mortgages": { "href": "/api/v1/properties/property-456/mortgages" },
+    "expenses": { "href": "/api/v1/properties/property-456/expenses" },
+    "rental": { "href": "/api/v1/properties/property-456/rental" },
+    "valuations": { "href": "/api/v1/properties/property-456/valuations" },
+    "documents": { "href": "/api/v1/properties/property-456/documents" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
+| `propertyType` | CodeValue | required | ignored | included | write-once, PrimaryResidence/BuyToLet/SecondHome/Commercial |
+| `propertySubType` | CodeValue | optional | updatable | included | Detached/SemiDetached/Terraced/Apartment/Bungalow |
+| `ownershipType` | CodeValue | optional | updatable | included | Freehold/Leasehold/Shared Ownership |
+| `address` | AddressValue | required | updatable | included | Full property address with UPRN and coordinates |
+| `propertyDescription` | string | optional | updatable | included | Free text description |
+| `numberOfBedrooms` | integer | optional | updatable | included | Number of bedrooms |
+| `numberOfBathrooms` | integer | optional | updatable | included | Number of bathrooms |
+| `numberOfReceptionRooms` | integer | optional | updatable | included | Number of reception rooms |
+| `floorArea` | object | optional | updatable | included | Floor area with unit (sqft/sqm) |
+| `tenure` | CodeValue | optional | updatable | included | Freehold/Leasehold |
+| `leaseRemaining` | integer | optional | updatable | included | Years remaining on lease |
+| `groundRent` | object | optional | updatable | included | Annual ground rent with frequency |
+| `serviceCharge` | object | optional | updatable | included | Monthly/annual service charge |
+| `purchaseDate` | date | required | ignored | included | write-once, date property purchased |
+| `purchasePrice` | MoneyValue | required | ignored | included | write-once, original purchase price |
+| `purchaseCosts` | object | optional | updatable | included | Breakdown of purchase costs (stamp duty, legal, etc.) |
+| `totalInvestment` | MoneyValue | ignored | ignored | included | read-only, purchasePrice + purchaseCosts.totalCosts |
+| `owners` | array | required | updatable | included | Array of owners with percentage ownership |
+| `ownershipStructure` | CodeValue | required | updatable | included | Sole/Joint/Tenants in Common |
+| `isJointOwnership` | boolean | ignored | ignored | included | read-only, computed from owners array |
+| `jointOwnershipType` | CodeValue | optional | updatable | included | If joint: Joint Tenants/Tenants in Common |
+| `currentValue` | MoneyValue | required | updatable | included | Current market value |
+| `valuationDate` | date | required | updatable | included | Date of valuation |
+| `valuationType` | CodeValue | required | updatable | included | Desktop/Surveyor/EstateAgent/RICS |
+| `valuationProvider` | string | optional | updatable | included | Name of valuation provider |
+| `valuationReference` | string | optional | updatable | included | Reference number for valuation |
+| `previousValuation` | MoneyValue | optional | updatable | included | Previous valuation amount |
+| `previousValuationDate` | date | optional | updatable | included | Previous valuation date |
+| `valuationChange` | MoneyValue | ignored | ignored | included | read-only, currentValue - previousValuation |
+| `valuationChangePercentage` | decimal | ignored | ignored | included | read-only, percentage change |
+| `capitalGrowth` | MoneyValue | ignored | ignored | included | read-only, currentValue - purchasePrice |
+| `capitalGrowthPercentage` | decimal | ignored | ignored | included | read-only, percentage growth |
+| `annualizedGrowth` | decimal | ignored | ignored | included | read-only, CAGR from purchase |
+| `mortgages` | array | optional | updatable | included | Array of mortgage references |
+| `totalMortgageBalance` | MoneyValue | ignored | ignored | included | read-only, sum of mortgage balances |
+| `equityAmount` | MoneyValue | ignored | ignored | included | read-only, currentValue - totalMortgageBalance |
+| `equityPercentage` | decimal | ignored | ignored | included | read-only, equity as % of value |
+| `loanToValue` | decimal | ignored | ignored | included | read-only, LTV percentage |
+| `isPrimaryResidence` | boolean | optional | updatable | included | Whether this is primary residence |
+| `isRented` | boolean | optional | updatable | included | Whether property is rented |
+| `isBuyToLet` | boolean | optional | updatable | included | Whether this is a BTL property |
+| `rentalIncome` | object | optional | updatable | included | Full rental details including tenancy info |
+| `expenses` | array | optional | updatable | included | Array of property expenses |
+| `totalMonthlyExpenses` | MoneyValue | ignored | ignored | included | read-only, sum of monthly expenses |
+| `totalAnnualExpenses` | MoneyValue | ignored | ignored | included | read-only, sum of annual expenses |
+| `netMonthlyIncome` | MoneyValue | ignored | ignored | included | read-only, rental income - expenses |
+| `netAnnualIncome` | MoneyValue | ignored | ignored | included | read-only, annual rental - annual expenses |
+| `taxFields` | object | optional | updatable | included | Tax details including CGT, PRR, stamp duty |
+| `energyPerformanceCertificate` | object | optional | updatable | included | EPC rating and details |
+| `councilTaxBand` | string | optional | updatable | included | Council tax band |
+| `councilTaxAnnual` | MoneyValue | optional | updatable | included | Annual council tax |
+| `improvements` | array | optional | updatable | included | Array of property improvements |
+| `totalImprovementsCost` | MoneyValue | ignored | ignored | included | read-only, sum of improvement costs |
+| `comparables` | array | optional | updatable | included | Array of comparable property sales |
+| `plannedSaleDate` | date | optional | updatable | included | Planned sale date if applicable |
+| `estimatedSalePrice` | MoneyValue | optional | updatable | included | Estimated sale price |
+| `intendToSell` | boolean | optional | updatable | included | Whether client intends to sell |
+| `intendToRefinance` | boolean | optional | updatable | included | Whether client intends to refinance |
+| `notes` | string | optional | updatable | included | Additional notes |
+| `documents` | array | optional | updatable | included | Array of document references |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Creating a Buy-To-Let Property (POST /api/v1/properties):**
+```json
+{
+  "factFindRef": { "id": "factfind-123" },
+  "propertyType": { "code": "BTL" },
+  "address": {
+    "line1": "Flat 12, Riverside Apartments",
+    "line2": "45 Thames Street",
+    "city": "London",
+    "postcode": "SE1 9PH",
+    "country": { "code": "GB" }
+  },
+  "purchaseDate": "2018-06-15",
+  "purchasePrice": { "amount": 325000.00, "currency": { "code": "GBP" } },
+  "currentValue": { "amount": 425000.00, "currency": { "code": "GBP" } },
+  "valuationDate": "2026-02-10",
+  "valuationType": { "code": "DESKTOP" },
+  "owners": [
+    {
+      "clientRef": { "id": "client-123" },
+      "ownershipPercentage": 100.00,
+      "isPrimaryOwner": true
+    }
+  ],
+  "ownershipStructure": { "code": "SOLE" },
+  "isBuyToLet": true,
+  "isRented": true
+}
+```
+Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields. Returns complete contract.
+
+**Updating Property Valuation (PUT /api/v1/properties/property-456):**
+```json
+{
+  "currentValue": { "amount": 435000.00, "currency": { "code": "GBP" } },
+  "valuationDate": "2026-06-15",
+  "valuationType": { "code": "SURVEYOR" },
+  "valuationProvider": "Knight Frank",
+  "previousValuation": { "amount": 425000.00, "currency": { "code": "GBP" } },
+  "previousValuationDate": "2026-02-10"
+}
+```
+Server updates `updatedAt` and recalculates equity, LTV, capital growth. Returns complete contract.
+
+**Updating Rental Income (PATCH /api/v1/properties/property-456):**
+```json
+{
+  "rentalIncome": {
+    "monthlyRent": { "amount": 1750.00, "currency": { "code": "GBP" } },
+    "tenancyStartDate": "2026-08-01",
+    "tenancyEndDate": "2027-07-31",
+    "tenantName": "Michael Brown"
+  }
+}
+```
+Only specified fields are updated. Server recalculates rental yield and net income. Returns complete contract.
+
+**Validation Rules:**
+
+1. **Required Fields on Create:** `factFindRef`, `propertyType`, `address`, `purchaseDate`, `purchasePrice`, `currentValue`, `valuationDate`, `valuationType`, `owners`, `ownershipStructure`
+2. **Write-Once Fields:** Cannot be changed after creation: `factFindRef`, `propertyType`, `purchaseDate`, `purchasePrice`
+3. **Ownership Validation:** Sum of `owners[].ownershipPercentage` must equal 100%
+4. **Date Logic:** `purchaseDate` must be <= `valuationDate`, `tenancyEndDate` must be > `tenancyStartDate`
+5. **Rental Validation:** If `isRented` is true, `rentalIncome` must be provided
+6. **Buy-To-Let Validation:** If `isBuyToLet` is true, `propertyType` must be "BTL"
+7. **Leasehold Validation:** If `tenure` is "Leasehold", `leaseRemaining` should be provided
+8. **Mortgage Linking:** `mortgages[].mortgageRef.id` must reference valid Arrangement entities
+9. **Valuation Requirements:** `currentValue` must be > 0, `valuationDate` must not be in future
+10. **Reference Integrity:** `factFindRef.id`, `owners[].clientRef.id` must reference existing entities
+
+---
+
+### 13.10 Equity Contract
+
+The `Equity` contract represents a direct stock holding with performance tracking and dividend history.
+
+**Reference Type:** Equity is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "equity-321",
+  "factFindRef": {
+    "id": "factfind-123",
+    "href": "/api/v1/factfinds/factfind-123",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "ticker": "BP.L",
+  "isin": "GB0007980591",
+  "sedol": "0798059",
+  "cusip": null,
+  "companyName": "BP plc",
+  "companyDescription": "British multinational oil and gas company",
+  "exchange": {
+    "code": "LSE",
+    "display": "London Stock Exchange",
+    "mic": "XLON"
+  },
+  "sector": {
+    "code": "ENERGY",
+    "display": "Energy",
+    "subSector": "Oil & Gas Producers"
+  },
+  "industry": "Integrated Oil & Gas",
+  "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  },
+  "country": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "holdings": {
+    "quantity": 5000,
+    "averagePurchasePrice": {
+      "amount": 4.25,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalCostBasis": {
+      "amount": 21250.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "currentPrice": {
+      "amount": 5.15,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "currentValue": {
+      "amount": 25750.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "priceDate": "2026-02-16T16:00:00Z"
+  },
+  "performance": {
+    "unrealizedGain": {
+      "amount": 4500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "unrealizedGainPercentage": 21.18,
+    "realizedGain": {
+      "amount": 1250.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalGain": {
+      "amount": 5750.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalReturn": 27.06,
+    "dayChange": {
+      "amount": 0.08,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "dayChangePercentage": 1.58,
+    "annualizedReturn": 5.41,
+    "totalDividendsReceived": {
+      "amount": 3750.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "dividendYield": 4.85,
+    "totalReturnWithDividends": {
+      "amount": 9500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalReturnWithDividendsPercentage": 44.71
+  },
+  "purchases": [
+    {
+      "transactionId": "txn-001",
+      "date": "2021-03-15",
+      "transactionType": {
+        "code": "BUY",
+        "display": "Purchase"
+      },
+      "quantity": 3000,
+      "price": {
+        "amount": 4.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossAmount": {
+        "amount": 12000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "commission": {
+        "amount": 10.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "stampDuty": {
+        "amount": 60.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "otherCosts": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "totalCost": {
+        "amount": 12070.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "broker": "Hargreaves Lansdown",
+      "notes": "Initial purchase"
+    },
+    {
+      "transactionId": "txn-002",
+      "date": "2022-06-20",
+      "transactionType": {
+        "code": "BUY",
+        "display": "Purchase"
+      },
+      "quantity": 2000,
+      "price": {
+        "amount": 4.60,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossAmount": {
+        "amount": 9200.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "commission": {
+        "amount": 10.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "stampDuty": {
+        "amount": 46.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "otherCosts": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "totalCost": {
+        "amount": 9256.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "broker": "Hargreaves Lansdown",
+      "notes": "Additional purchase during market dip"
+    }
+  ],
+  "sales": [
+    {
+      "transactionId": "txn-003",
+      "date": "2024-09-10",
+      "transactionType": {
+        "code": "SELL",
+        "display": "Sale"
+      },
+      "quantity": 500,
+      "price": {
+        "amount": 5.50,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossAmount": {
+        "amount": 2750.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "commission": {
+        "amount": 10.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "otherCosts": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netProceeds": {
+        "amount": 2740.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "costBasisOfSharesSold": {
+        "amount": 2125.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "realizedGain": {
+        "amount": 615.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "broker": "Hargreaves Lansdown",
+      "notes": "Partial profit taking"
+    }
+  ],
+  "dividends": [
+    {
+      "dividendId": "div-001",
+      "exDividendDate": "2021-08-05",
+      "paymentDate": "2021-09-27",
+      "dividendType": {
+        "code": "ORDINARY",
+        "display": "Ordinary Dividend"
+      },
+      "amountPerShare": {
+        "amount": 0.05175,
+        "currency": {
+          "code": "USD",
+          "display": "US Dollar",
+          "symbol": "$"
+        }
+      },
+      "amountPerShareGBP": {
+        "amount": 0.0375,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "quantityHeld": 3000,
+      "grossDividend": {
+        "amount": 112.50,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "withholdingTax": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 112.50,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "reinvested": false,
+      "taxYear": "2021/2022",
+      "notes": "Q3 2021 dividend"
+    },
+    {
+      "dividendId": "div-002",
+      "exDividendDate": "2021-11-04",
+      "paymentDate": "2021-12-20",
+      "dividendType": {
+        "code": "ORDINARY",
+        "display": "Ordinary Dividend"
+      },
+      "amountPerShare": {
+        "amount": 0.05250,
+        "currency": {
+          "code": "USD",
+          "display": "US Dollar",
+          "symbol": "$"
+        }
+      },
+      "amountPerShareGBP": {
+        "amount": 0.0390,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "quantityHeld": 3000,
+      "grossDividend": {
+        "amount": 117.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "withholdingTax": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 117.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "reinvested": false,
+      "taxYear": "2021/2022",
+      "notes": "Q4 2021 dividend"
+    },
+    {
+      "dividendId": "div-003",
+      "exDividendDate": "2025-11-07",
+      "paymentDate": "2025-12-23",
+      "dividendType": {
+        "code": "ORDINARY",
+        "display": "Ordinary Dividend"
+      },
+      "amountPerShare": {
+        "amount": 0.08010,
+        "currency": {
+          "code": "USD",
+          "display": "US Dollar",
+          "symbol": "$"
+        }
+      },
+      "amountPerShareGBP": {
+        "amount": 0.0625,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "quantityHeld": 5000,
+      "grossDividend": {
+        "amount": 312.50,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "withholdingTax": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 312.50,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "reinvested": false,
+      "taxYear": "2025/2026",
+      "notes": "Q4 2025 dividend - increased payout"
+    }
+  ],
+  "corporateActions": [
+    {
+      "actionId": "action-001",
+      "date": "2023-05-15",
+      "actionType": {
+        "code": "STOCK_SPLIT",
+        "display": "Stock Split"
+      },
+      "ratio": "2:1",
+      "description": "2-for-1 stock split",
+      "quantityBefore": 2500,
+      "quantityAfter": 5000,
+      "impact": "Holdings doubled, cost basis per share halved"
+    },
+    {
+      "actionId": "action-002",
+      "date": "2024-03-20",
+      "actionType": {
+        "code": "RIGHTS_ISSUE",
+        "display": "Rights Issue"
+      },
+      "ratio": "1:10",
+      "description": "Rights issue at £4.00 per share",
+      "pricePerShare": {
+        "amount": 4.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "quantityOffered": 500,
+      "quantityTaken": 0,
+      "impact": "Rights not taken up"
+    }
+  ],
+  "taxCalculation": {
+    "costBasisMethod": {
+      "code": "SECTION104",
+      "display": "Section 104 Pool (UK)"
+    },
+    "section104Pool": {
+      "quantity": 5000,
+      "pooledCost": {
+        "amount": 21250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "averageCostPerShare": {
+        "amount": 4.25,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "capitalGainsRealized": {
+      "amount": 1250.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "capitalGainsUnrealized": {
+      "amount": 4500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalCapitalGains": {
+      "amount": 5750.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "capitalGainsAllowance": {
+      "amount": 3000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "taxableCGT": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "dividendsTaxable": {
+      "amount": 3250.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "dividendsAllowance": {
+      "amount": 500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "taxYear": "2025/2026"
+  },
+  "marketData": {
+    "lastUpdated": "2026-02-16T16:00:00Z",
+    "bid": {
+      "amount": 5.14,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "ask": {
+      "amount": 5.16,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "open": {
+      "amount": 5.07,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "high": {
+      "amount": 5.18,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "low": {
+      "amount": 5.05,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "close": {
+      "amount": 5.15,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "volume": 12500000,
+    "52WeekHigh": {
+      "amount": 5.85,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "52WeekLow": {
+      "amount": 4.15,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "marketCap": {
+      "amount": 95000000000,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "peRatio": 12.5,
+    "eps": {
+      "amount": 0.412,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "beta": 1.15
+  },
+  "accountType": {
+    "code": "GIA",
+    "display": "General Investment Account"
+  },
+  "broker": {
+    "name": "Hargreaves Lansdown",
+    "accountNumber": "HL-12345678"
+  },
+  "isAdvised": true,
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "investmentObjective": "Long-term income and capital growth from UK blue-chip dividend stock",
+  "notes": "Core UK equity holding for dividend income. Monitor oil price exposure.",
+  "documents": [
+    {
+      "documentId": "doc-eq-001",
+      "type": {
+        "code": "CONTRACT_NOTE",
+        "display": "Contract Note"
+      },
+      "name": "Purchase Contract Note - March 2021",
+      "date": "2021-03-15",
+      "url": "/api/v1/documents/doc-eq-001"
+    }
+  ],
+  "createdAt": "2021-03-15T10:00:00Z",
+  "updatedAt": "2026-02-16T16:30:00Z",
+  "createdBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "updatedBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/equities/equity-321" },
+    "update": { "href": "/api/v1/equities/equity-321", "method": "PUT" },
+    "delete": { "href": "/api/v1/equities/equity-321", "method": "DELETE" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
+    "transactions": { "href": "/api/v1/equities/equity-321/transactions" },
+    "dividends": { "href": "/api/v1/equities/equity-321/dividends" },
+    "corporateActions": { "href": "/api/v1/equities/equity-321/corporate-actions" },
+    "performance": { "href": "/api/v1/equities/equity-321/performance" },
+    "documents": { "href": "/api/v1/equities/equity-321/documents" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
+| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `ticker` | string | required | ignored | included | write-once, stock ticker symbol |
+| `isin` | string | required | ignored | included | write-once, International Securities ID |
+| `sedol` | string | optional | ignored | included | write-once, Stock Exchange Daily Official List |
+| `cusip` | string | optional | ignored | included | write-once, CUSIP identifier (US stocks) |
+| `companyName` | string | required | updatable | included | Name of company |
+| `companyDescription` | string | optional | updatable | included | Brief description of company |
+| `exchange` | CodeValue | required | updatable | included | Stock exchange where traded |
+| `sector` | CodeValue | optional | updatable | included | Sector and sub-sector classification |
+| `industry` | string | optional | updatable | included | Industry classification |
+| `currency` | CurrencyValue | required | updatable | included | Trading currency |
+| `country` | CountryValue | optional | updatable | included | Country of domicile |
+| `holdings` | object | required | updatable | included | Current holdings with quantity and values |
+| `performance` | object | ignored | ignored | included | read-only, computed performance metrics |
+| `purchases` | array | optional | updatable | included | Array of purchase transactions |
+| `sales` | array | optional | updatable | included | Array of sale transactions |
+| `dividends` | array | optional | updatable | included | Array of dividend payments |
+| `corporateActions` | array | optional | updatable | included | Array of corporate actions (splits, rights issues) |
+| `taxCalculation` | object | optional | updatable | included | Tax calculation details including Section 104 pool |
+| `marketData` | object | optional | updatable | included | Current market data and statistics |
+| `accountType` | CodeValue | optional | updatable | included | ISA/GIA/SIPP account type |
+| `broker` | object | optional | updatable | included | Broker details and account number |
+| `isAdvised` | boolean | optional | updatable | included | Whether holding is advised |
+| `adviserRef` | AdviserRef | optional | updatable | included | Reference to adviser |
+| `investmentObjective` | string | optional | updatable | included | Investment objective for this holding |
+| `notes` | string | optional | updatable | included | Additional notes |
+| `documents` | array | optional | updatable | included | Array of document references |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Creating an Equity Holding (POST /api/v1/equities):**
+```json
+{
+  "factFindRef": { "id": "factfind-123" },
+  "clientRef": { "id": "client-123" },
+  "ticker": "BP.L",
+  "isin": "GB0007980591",
+  "sedol": "0798059",
+  "companyName": "BP plc",
+  "exchange": { "code": "LSE" },
+  "currency": { "code": "GBP" },
+  "holdings": {
+    "quantity": 3000,
+    "averagePurchasePrice": { "amount": 4.00, "currency": { "code": "GBP" } },
+    "totalCostBasis": { "amount": 12000.00, "currency": { "code": "GBP" } },
+    "currentPrice": { "amount": 5.15, "currency": { "code": "GBP" } },
+    "currentValue": { "amount": 15450.00, "currency": { "code": "GBP" } }
+  },
+  "accountType": { "code": "GIA" }
+}
+```
+Server generates `id`, `createdAt`, `updatedAt`, and computes performance metrics. Returns complete contract.
+
+**Recording a Purchase (PUT /api/v1/equities/equity-321):**
+```json
+{
+  "purchases": [
+    {
+      "date": "2026-02-18",
+      "transactionType": { "code": "BUY" },
+      "quantity": 1000,
+      "price": { "amount": 5.20, "currency": { "code": "GBP" } },
+      "grossAmount": { "amount": 5200.00, "currency": { "code": "GBP" } },
+      "commission": { "amount": 10.00, "currency": { "code": "GBP" } },
+      "stampDuty": { "amount": 26.00, "currency": { "code": "GBP" } },
+      "totalCost": { "amount": 5236.00, "currency": { "code": "GBP" } }
+    }
+  ],
+  "holdings": {
+    "quantity": 6000,
+    "totalCostBasis": { "amount": 26486.00, "currency": { "code": "GBP" } }
+  }
+}
+```
+Server updates `updatedAt`, recalculates performance and Section 104 pool. Returns complete contract.
+
+**Recording a Dividend (PATCH /api/v1/equities/equity-321):**
+```json
+{
+  "dividends": [
+    {
+      "exDividendDate": "2026-02-14",
+      "paymentDate": "2026-03-28",
+      "dividendType": { "code": "ORDINARY" },
+      "amountPerShare": { "amount": 0.0650, "currency": { "code": "GBP" } },
+      "quantityHeld": 5000,
+      "grossDividend": { "amount": 325.00, "currency": { "code": "GBP" } },
+      "netDividend": { "amount": 325.00, "currency": { "code": "GBP" } },
+      "reinvested": false
+    }
+  ]
+}
+```
+Only specified fields are updated. Server recalculates total dividends and yield. Returns complete contract.
+
+**Validation Rules:**
+
+1. **Required Fields on Create:** `factFindRef`, `clientRef`, `ticker`, `isin`, `companyName`, `exchange`, `currency`, `holdings`
+2. **Write-Once Fields:** Cannot be changed after creation: `factFindRef`, `clientRef`, `ticker`, `isin`, `sedol`, `cusip`
+3. **Holdings Validation:** `holdings.quantity` must be > 0, `currentValue` must equal `quantity * currentPrice`
+4. **Transaction Validation:** Each purchase/sale must have `date`, `quantity`, `price`, `totalCost`/`netProceeds`
+5. **Dividend Validation:** Each dividend must have `exDividendDate`, `paymentDate`, `amountPerShare`, `quantityHeld`
+6. **Section 104 Pool:** For UK equities, `taxCalculation.section104Pool` must track pooled cost accurately
+7. **Corporate Actions:** Stock splits must maintain cost basis (quantity doubles, cost per share halves)
+8. **Date Logic:** `exDividendDate` must be before `paymentDate`, transaction dates must be in past
+9. **Market Data:** `marketData.lastUpdated` must not be in future
+10. **Reference Integrity:** `factFindRef.id`, `clientRef.id`, `adviserRef.id` must reference existing entities
+
+---
+
+### 13.11 CreditHistory Contract
+
+The `CreditHistory` contract represents credit score and credit history tracking from multiple agencies.
+
+**Reference Type:** CreditHistory is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "credit-654",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "factFindRef": {
+    "id": "factfind-123",
+    "href": "/api/v1/factfinds/factfind-123",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "creditAgency": {
+    "code": "EXPERIAN",
+    "display": "Experian",
+    "website": "https://www.experian.co.uk"
+  },
+  "scoreDate": "2026-02-10",
+  "score": {
+    "scoreValue": 875,
+    "scoreRange": {
+      "minimum": 0,
+      "maximum": 999
+    },
+    "scoreBand": {
+      "code": "GOOD",
+      "display": "Good",
+      "rangeStart": 721,
+      "rangeEnd": 880
+    },
+    "scorePercentile": 68,
+    "changeFromPreviousMonth": 15,
+    "changeFromPreviousYear": 42,
+    "previousScore": 860,
+    "previousScoreDate": "2026-01-10"
+  },
+  "overallAssessment": {
+    "creditHealthScore": 72,
+    "creditHealthRating": {
+      "code": "GOOD",
+      "display": "Good"
+    },
+    "lendingSuitability": {
+      "code": "LIKELY",
+      "display": "Likely to be accepted for most lending"
+    },
+    "riskLevel": {
+      "code": "LOW_MEDIUM",
+      "display": "Low to Medium Risk"
+    }
+  },
+  "paymentHistory": {
+    "totalAccounts": 12,
+    "activeAccounts": 8,
+    "closedAccounts": 4,
+    "onTimePayments": 144,
+    "onTimePaymentPercentage": 96.0,
+    "latePayments": 6,
+    "missedPayments": 0,
+    "defaultedAccounts": 0,
+    "latePaymentsByPeriod": {
+      "last30Days": 0,
+      "last31To60Days": 1,
+      "last61To90Days": 0,
+      "over90Days": 0
+    },
+    "paymentHistoryScore": 85,
+    "paymentHistoryRating": {
+      "code": "GOOD",
+      "display": "Good"
+    },
+    "oldestAccountDate": "2010-03-15",
+    "accountAgeYears": 15.92
+  },
+  "creditUtilization": {
+    "totalCreditAvailable": {
+      "amount": 45000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalCreditUsed": {
+      "amount": 8500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "utilizationPercentage": 18.89,
+    "utilizationScore": 82,
+    "utilizationRating": {
+      "code": "EXCELLENT",
+      "display": "Excellent"
+    },
+    "accountsAtLimit": 0,
+    "accountsNearLimit": 1,
+    "recommendedUtilization": 30.00
+  },
+  "creditAge": {
+    "oldestAccountDate": "2010-03-15",
+    "oldestAccountAgeYears": 15.92,
+    "averageAccountAge": {
+      "years": 8,
+      "months": 4
+    },
+    "averageAccountAgeYears": 8.33,
+    "newestAccountDate": "2025-06-12",
+    "newestAccountAgeMonths": 8,
+    "creditAgeScore": 78,
+    "creditAgeRating": {
+      "code": "GOOD",
+      "display": "Good"
+    }
+  },
+  "creditMix": {
+    "revolvingAccounts": 4,
+    "revolvingAccountsOpen": 3,
+    "installmentAccounts": 5,
+    "installmentAccountsOpen": 3,
+    "mortgageAccounts": 2,
+    "mortgageAccountsOpen": 1,
+    "otherAccounts": 1,
+    "otherAccountsOpen": 1,
+    "accountTypeBreakdown": {
+      "creditCards": 3,
+      "personalLoans": 2,
+      "carLoans": 1,
+      "mortgages": 2,
+      "storeCards": 1,
+      "utilities": 3
+    },
+    "creditMixScore": 88,
+    "creditMixRating": {
+      "code": "EXCELLENT",
+      "display": "Excellent"
+    }
+  },
+  "creditInquiries": {
+    "hardInquiries": {
+      "last12Months": 2,
+      "last24Months": 4,
+      "last6Months": 1
+    },
+    "softInquiries": {
+      "last12Months": 8
+    },
+    "recentInquiries": [
+      {
+        "date": "2025-12-05",
+        "inquiryType": {
+          "code": "HARD",
+          "display": "Hard Inquiry"
+        },
+        "creditor": "HSBC UK",
+        "productType": "Credit Card",
+        "impact": "Minor negative impact"
+      },
+      {
+        "date": "2025-06-12",
+        "inquiryType": {
+          "code": "HARD",
+          "display": "Hard Inquiry"
+        },
+        "creditor": "Santander UK",
+        "productType": "Personal Loan",
+        "impact": "Minor negative impact"
+      }
+    ],
+    "inquiriesScore": 91,
+    "inquiriesRating": {
+      "code": "EXCELLENT",
+      "display": "Excellent"
+    }
+  },
+  "derogatoryMarks": {
+    "hasAnyDerogatoryMarks": false,
+    "defaults": {
+      "count": 0,
+      "totalAmount": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "details": []
+    },
+    "ccjs": {
+      "count": 0,
+      "totalAmount": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "details": []
+    },
+    "bankruptcies": {
+      "count": 0,
+      "details": []
+    },
+    "ivas": {
+      "count": 0,
+      "details": []
+    },
+    "arrangementsToPayDebt": {
+      "count": 0,
+      "details": []
+    },
+    "repossessions": {
+      "count": 0,
+      "details": []
+    },
+    "foreclosures": {
+      "count": 0,
+      "details": []
+    }
+  },
+  "publicRecords": {
+    "hasPublicRecords": false,
+    "electoralRoll": {
+      "isRegistered": true,
+      "registrationDate": "2015-04-01",
+      "address": "123 Main Street, London, SW1A 1AA"
+    },
+    "bankruptcySearchDate": "2026-02-10",
+    "bankruptcyStatus": "Clear"
+  },
+  "accounts": [
+    {
+      "accountId": "acc-001",
+      "accountType": {
+        "code": "CREDIT_CARD",
+        "display": "Credit Card"
+      },
+      "creditor": "HSBC UK",
+      "accountNumber": "****1234",
+      "status": {
+        "code": "OPEN",
+        "display": "Open"
+      },
+      "openedDate": "2018-05-12",
+      "closedDate": null,
+      "creditLimit": {
+        "amount": 15000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "currentBalance": {
+        "amount": 2500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "utilizationPercentage": 16.67,
+      "paymentStatus": {
+        "code": "CURRENT",
+        "display": "Current"
+      },
+      "lastPaymentDate": "2026-02-05",
+      "lastPaymentAmount": {
+        "amount": 500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "missedPayments": 0,
+      "latePayments": 1,
+      "monthsReviewed": 72,
+      "paymentHistory": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC1CCC"
+    },
+    {
+      "accountId": "acc-002",
+      "accountType": {
+        "code": "MORTGAGE",
+        "display": "Mortgage"
+      },
+      "creditor": "Nationwide Building Society",
+      "accountNumber": "****5678",
+      "status": {
+        "code": "OPEN",
+        "display": "Open"
+      },
+      "openedDate": "2015-09-22",
+      "closedDate": null,
+      "originalAmount": {
+        "amount": 250000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "currentBalance": {
+        "amount": 185000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "monthlyPayment": {
+        "amount": 1250.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "paymentStatus": {
+        "code": "CURRENT",
+        "display": "Current"
+      },
+      "lastPaymentDate": "2026-02-01",
+      "missedPayments": 0,
+      "latePayments": 0,
+      "monthsReviewed": 125,
+      "paymentHistory": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+    },
+    {
+      "accountId": "acc-003",
+      "accountType": {
+        "code": "PERSONAL_LOAN",
+        "display": "Personal Loan"
+      },
+      "creditor": "Santander UK",
+      "accountNumber": "****9012",
+      "status": {
+        "code": "OPEN",
+        "display": "Open"
+      },
+      "openedDate": "2025-06-12",
+      "closedDate": null,
+      "originalAmount": {
+        "amount": 10000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "currentBalance": {
+        "amount": 8500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "monthlyPayment": {
+        "amount": 350.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "paymentStatus": {
+        "code": "CURRENT",
+        "display": "Current"
+      },
+      "lastPaymentDate": "2026-02-12",
+      "missedPayments": 0,
+      "latePayments": 0,
+      "monthsReviewed": 8,
+      "paymentHistory": "CCCCCCCC"
+    }
+  ],
+  "totalAccounts": 12,
+  "totalActiveAccounts": 8,
+  "creditReport": {
+    "reportProvider": "Experian",
+    "reportDate": "2026-02-10",
+    "reportReference": "EXP-2026-02-123456789",
+    "reportType": {
+      "code": "STATUTORY",
+      "display": "Statutory Credit Report"
+    },
+    "reportUrl": "/api/v1/documents/credit-report-654",
+    "validUntil": "2026-05-10",
+    "costOfReport": {
+      "amount": 2.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "trends": {
+    "scoreHistory": [
+      {
+        "date": "2025-02-10",
+        "score": 833
+      },
+      {
+        "date": "2025-05-10",
+        "score": 845
+      },
+      {
+        "date": "2025-08-10",
+        "score": 852
+      },
+      {
+        "date": "2025-11-10",
+        "score": 860
+      },
+      {
+        "date": "2026-02-10",
+        "score": 875
+      }
+    ],
+    "utilizationHistory": [
+      {
+        "date": "2025-02-10",
+        "utilization": 25.5
+      },
+      {
+        "date": "2025-05-10",
+        "utilization": 22.3
+      },
+      {
+        "date": "2025-08-10",
+        "utilization": 20.1
+      },
+      {
+        "date": "2025-11-10",
+        "utilization": 19.5
+      },
+      {
+        "date": "2026-02-10",
+        "utilization": 18.89
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "category": {
+        "code": "PAYMENT_HISTORY",
+        "display": "Payment History"
+      },
+      "priority": {
+        "code": "LOW",
+        "display": "Low Priority"
+      },
+      "recommendation": "Continue making all payments on time to maintain excellent payment history",
+      "potentialScoreImpact": 5
+    },
+    {
+      "category": {
+        "code": "CREDIT_UTILIZATION",
+        "display": "Credit Utilization"
+      },
+      "priority": {
+        "code": "LOW",
+        "display": "Low Priority"
+      },
+      "recommendation": "Your credit utilization is excellent at 18.89%. Keep it below 30% for optimal score",
+      "potentialScoreImpact": 3
+    },
+    {
+      "category": {
+        "code": "CREDIT_AGE",
+        "display": "Credit Age"
+      },
+      "priority": {
+        "code": "MEDIUM",
+        "display": "Medium Priority"
+      },
+      "recommendation": "Avoid closing your oldest credit accounts to maintain credit age",
+      "potentialScoreImpact": 10
+    }
+  ],
+  "adverseCredit": {
+    "hasAdverseCredit": false,
+    "hasEverBeenBankrupt": false,
+    "hasBeenRefusedCredit": false,
+    "lastCreditRefusalDate": null,
+    "hasArrangementsToPayDebt": false,
+    "isInDebtManagementPlan": false
+  },
+  "fraudAlerts": {
+    "hasActiveFraudAlert": false,
+    "fraudAlerts": []
+  },
+  "identityVerification": {
+    "addressLinked": true,
+    "nameMatched": true,
+    "dateOfBirthMatched": true,
+    "verificationScore": 98,
+    "verificationStatus": {
+      "code": "VERIFIED",
+      "display": "Verified"
+    }
+  },
+  "nextReviewDate": "2026-05-10",
+  "reviewFrequency": {
+    "code": "QUARTERLY",
+    "display": "Quarterly"
+  },
+  "isConsented": true,
+  "consentDate": "2026-02-10",
+  "consentExpiryDate": "2027-02-10",
+  "notes": "Credit score improving steadily. Good payment history. Low utilization. No adverse marks.",
+  "documents": [
+    {
+      "documentId": "doc-cr-001",
+      "type": {
+        "code": "CREDIT_REPORT",
+        "display": "Credit Report"
+      },
+      "name": "Experian Statutory Credit Report - Feb 2026",
+      "date": "2026-02-10",
+      "url": "/api/v1/documents/doc-cr-001"
+    }
+  ],
+  "createdAt": "2026-02-10T10:00:00Z",
+  "updatedAt": "2026-02-10T11:30:00Z",
+  "createdBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "updatedBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/credit-history/credit-654" },
+    "update": { "href": "/api/v1/credit-history/credit-654", "method": "PUT" },
+    "delete": { "href": "/api/v1/credit-history/credit-654", "method": "DELETE" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
+    "creditReport": { "href": "/api/v1/documents/doc-cr-001" },
+    "accounts": { "href": "/api/v1/credit-history/credit-654/accounts" },
+    "trends": { "href": "/api/v1/credit-history/credit-654/trends" },
+    "recommendations": { "href": "/api/v1/credit-history/credit-654/recommendations" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `factFindRef` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
+| `creditAgency` | CodeValue | required | ignored | included | write-once, Experian/Equifax/TransUnion |
+| `scoreDate` | date | required | updatable | included | Date of credit score assessment |
+| `score` | object | required | updatable | included | Credit score with range and band |
+| `overallAssessment` | object | optional | updatable | included | Overall credit health assessment |
+| `paymentHistory` | object | optional | updatable | included | Payment history metrics and scores |
+| `creditUtilization` | object | optional | updatable | included | Credit utilization details and score |
+| `creditAge` | object | optional | updatable | included | Credit age metrics and score |
+| `creditMix` | object | optional | updatable | included | Mix of credit account types |
+| `creditInquiries` | object | optional | updatable | included | Hard and soft inquiries |
+| `derogatoryMarks` | object | optional | updatable | included | Defaults, CCJs, bankruptcies, IVAs |
+| `publicRecords` | object | optional | updatable | included | Electoral roll, bankruptcy searches |
+| `accounts` | array | optional | updatable | included | Array of credit accounts |
+| `totalAccounts` | integer | ignored | ignored | included | read-only, count of accounts |
+| `totalActiveAccounts` | integer | ignored | ignored | included | read-only, count of active accounts |
+| `creditReport` | object | optional | updatable | included | Credit report details and reference |
+| `trends` | object | optional | updatable | included | Score and utilization history |
+| `recommendations` | array | optional | updatable | included | Recommendations for improving score |
+| `adverseCredit` | object | optional | updatable | included | Adverse credit indicators |
+| `fraudAlerts` | object | optional | updatable | included | Active fraud alerts |
+| `identityVerification` | object | optional | updatable | included | Identity verification status |
+| `nextReviewDate` | date | optional | updatable | included | Next scheduled review |
+| `reviewFrequency` | CodeValue | optional | updatable | included | Review frequency (Monthly/Quarterly/Annual) |
+| `isConsented` | boolean | required | updatable | included | Whether client has consented to credit check |
+| `consentDate` | date | required | updatable | included | Date of consent |
+| `consentExpiryDate` | date | optional | updatable | included | Consent expiry date |
+| `notes` | string | optional | updatable | included | Additional notes |
+| `documents` | array | optional | updatable | included | Array of document references |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Creating a Credit History Record (POST /api/v1/credit-history):**
+```json
+{
+  "clientRef": { "id": "client-123" },
+  "factFindRef": { "id": "factfind-123" },
+  "creditAgency": { "code": "EXPERIAN" },
+  "scoreDate": "2026-02-10",
+  "score": {
+    "scoreValue": 875,
+    "scoreRange": { "minimum": 0, "maximum": 999 },
+    "scoreBand": { "code": "GOOD" }
+  },
+  "isConsented": true,
+  "consentDate": "2026-02-10"
+}
+```
+Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
+
+**Updating with New Credit Report (PUT /api/v1/credit-history/credit-654):**
+```json
+{
+  "scoreDate": "2026-05-10",
+  "score": {
+    "scoreValue": 890,
+    "scoreRange": { "minimum": 0, "maximum": 999 },
+    "scoreBand": { "code": "EXCELLENT" },
+    "changeFromPreviousMonth": 15
+  },
+  "creditUtilization": {
+    "totalCreditUsed": { "amount": 7500.00, "currency": { "code": "GBP" } },
+    "utilizationPercentage": 16.67
+  },
+  "creditReport": {
+    "reportDate": "2026-05-10",
+    "reportReference": "EXP-2026-05-234567890"
+  }
+}
+```
+Server updates `updatedAt`. Returns complete contract with updated scores.
+
+**Adding Payment Event (PATCH /api/v1/credit-history/credit-654):**
+```json
+{
+  "paymentHistory": {
+    "onTimePayments": 147,
+    "latePayments": 6,
+    "onTimePaymentPercentage": 96.1
+  }
+}
+```
+Only specified fields are updated. Returns complete contract.
+
+**Validation Rules:**
+
+1. **Required Fields on Create:** `clientRef`, `creditAgency`, `scoreDate`, `score`, `isConsented`, `consentDate`
+2. **Write-Once Fields:** Cannot be changed after creation: `clientRef`, `factFindRef`, `creditAgency`
+3. **Consent Validation:** `isConsented` must be true before creating credit check record
+4. **Score Range Validation:** `score.scoreValue` must be within `score.scoreRange` (0-999 for Experian, 300-850 for others)
+5. **Score Band Validation:** `score.scoreBand` must correspond to `score.scoreValue` for the credit agency
+6. **Date Logic:** `scoreDate` must not be in future, `consentExpiryDate` must be > `consentDate`
+7. **Utilization Calculation:** `creditUtilization.utilizationPercentage` = (totalCreditUsed / totalCreditAvailable) * 100
+8. **Payment History:** `onTimePaymentPercentage` = (onTimePayments / (onTimePayments + latePayments + missedPayments)) * 100
+9. **Account Validation:** Each account must have `accountType`, `creditor`, `status`, `openedDate`
+10. **Reference Integrity:** `clientRef.id`, `factFindRef.id` must reference existing entities
+
+---
+
+### 13.12 IdentityVerification Contract
+
+The `IdentityVerification` contract represents identity verification status with KYC and AML checks.
+
+**Reference Type:** IdentityVerification is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "idverify-987",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "factFindRef": {
+    "id": "factfind-123",
+    "href": "/api/v1/factfinds/factfind-123",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "verificationType": {
+    "code": "KYC_AML",
+    "display": "KYC & AML Verification"
+  },
+  "verificationLevel": {
+    "code": "ENHANCED",
+    "display": "Enhanced Due Diligence"
+  },
+  "verificationStatus": {
+    "code": "VERIFIED",
+    "display": "Verified"
+  },
+  "verificationDate": "2026-02-10T14:30:00Z",
+  "verificationExpiryDate": "2027-02-10",
+  "isExpired": false,
+  "daysUntilExpiry": 365,
+  "documents": [
+    {
+      "documentId": "doc-001",
+      "documentType": {
+        "code": "PASSPORT",
+        "display": "Passport"
+      },
+      "documentNumber": "502135321",
+      "issuingCountry": {
+        "code": "GB",
+        "display": "United Kingdom",
+        "alpha3": "GBR"
+      },
+      "issueDate": "2020-05-15",
+      "expiryDate": "2030-05-15",
+      "documentStatus": {
+        "code": "VERIFIED",
+        "display": "Verified"
+      },
+      "verifiedDate": "2026-02-10T14:30:00Z",
+      "documentImageUrl": "https://secure.documents.example.com/id/doc-001-encrypted",
+      "isExpired": false,
+      "isPrimary": true
+    },
+    {
+      "documentId": "doc-002",
+      "documentType": {
+        "code": "UTILITY_BILL",
+        "display": "Utility Bill"
+      },
+      "utilityType": "Electricity",
+      "issueDate": "2026-01-15",
+      "documentStatus": {
+        "code": "VERIFIED",
+        "display": "Verified"
+      },
+      "verifiedDate": "2026-02-10T14:30:00Z",
+      "address": {
+        "line1": "123 Main Street",
+        "line2": "Apartment 4B",
+        "city": "London",
+        "postcode": "SW1A 1AA",
+        "country": {
+          "code": "GB",
+          "display": "United Kingdom"
+        }
+      },
+      "addressMatched": true,
+      "documentImageUrl": "https://secure.documents.example.com/id/doc-002-encrypted",
+      "isPrimary": false
+    }
+  ],
+  "identityProvider": {
+    "provider": {
+      "code": "ONFIDO",
+      "display": "Onfido",
+      "website": "https://onfido.com"
+    },
+    "providerReference": "ONFIDO-CHK-123456789",
+    "providerCheckId": "chk_abc123def456ghi789",
+    "providerScore": 98,
+    "providerDecision": {
+      "code": "CLEAR",
+      "display": "Clear"
+    },
+    "providerReportUrl": "https://dashboard.onfido.com/checks/chk_abc123def456ghi789",
+    "providerResponseDate": "2026-02-10T14:30:00Z"
+  },
+  "biometricVerification": {
+    "faceMatch": {
+      "status": {
+        "code": "MATCHED",
+        "display": "Matched"
+      },
+      "confidence": 99.5,
+      "matchDate": "2026-02-10T14:30:00Z"
+    },
+    "livenessCheck": {
+      "status": {
+        "code": "PASSED",
+        "display": "Passed"
+      },
+      "confidence": 98.2,
+      "checkDate": "2026-02-10T14:30:00Z"
+    }
+  },
+  "addressVerification": {
+    "addressVerified": true,
+    "verificationMethod": {
+      "code": "DOCUMENT",
+      "display": "Document Verification"
+    },
+    "verifiedAddress": {
+      "line1": "123 Main Street",
+      "line2": "Apartment 4B",
+      "city": "London",
+      "postcode": "SW1A 1AA",
+      "country": {
+        "code": "GB",
+        "display": "United Kingdom"
+      }
+    },
+    "addressMatchScore": 100,
+    "verificationDate": "2026-02-10T14:30:00Z"
+  },
+  "amlChecks": {
+    "amlStatus": {
+      "code": "CLEAR",
+      "display": "Clear"
+    },
+    "amlCheckDate": "2026-02-10T14:30:00Z",
+    "amlProvider": {
+      "code": "WORLDCHECK",
+      "display": "World-Check (Refinitiv)",
+      "website": "https://www.refinitiv.com/en/products/world-check-kyc-screening"
+    },
+    "amlProviderReference": "WC-2026-02-987654321",
+    "sanctionsScreening": {
+      "status": {
+        "code": "CLEAR",
+        "display": "Clear"
+      },
+      "listsChecked": [
+        "UN Security Council",
+        "EU Sanctions",
+        "OFAC SDN",
+        "UK HM Treasury",
+        "Interpol"
+      ],
+      "matches": [],
+      "checkDate": "2026-02-10T14:30:00Z"
+    },
+    "pepScreening": {
+      "status": {
+        "code": "NOT_PEP",
+        "display": "Not a Politically Exposed Person"
+      },
+      "isPep": false,
+      "pepCategory": null,
+      "pepRelationship": null,
+      "pepSource": null,
+      "checkDate": "2026-02-10T14:30:00Z"
+    },
+    "adverseMediaScreening": {
+      "status": {
+        "code": "CLEAR",
+        "display": "Clear"
+      },
+      "adverseMediaChecked": true,
+      "adverseMediaMatches": [],
+      "checkDate": "2026-02-10T14:30:00Z"
+    },
+    "watchlistScreening": {
+      "status": {
+        "code": "CLEAR",
+        "display": "Clear"
+      },
+      "watchlistsChecked": [
+        "FBI Most Wanted",
+        "Europol Most Wanted",
+        "OFAC Non-SDN Lists",
+        "Specially Designated Nationals"
+      ],
+      "matches": [],
+      "checkDate": "2026-02-10T14:30:00Z"
+    }
+  },
+  "riskAssessment": {
+    "overallRiskRating": {
+      "code": "LOW",
+      "display": "Low Risk"
+    },
+    "riskScore": 15,
+    "riskScoreMax": 100,
+    "riskFactors": [
+      {
+        "factor": {
+          "code": "CLEAR_AML",
+          "display": "Clear AML Check"
+        },
+        "impact": {
+          "code": "POSITIVE",
+          "display": "Positive"
+        },
+        "weight": -10
+      },
+      {
+        "factor": {
+          "code": "VERIFIED_IDENTITY",
+          "display": "Identity Verified"
+        },
+        "impact": {
+          "code": "POSITIVE",
+          "display": "Positive"
+        },
+        "weight": -15
+      },
+      {
+        "factor": {
+          "code": "HIGH_CONFIDENCE_BIOMETRIC",
+          "display": "High Confidence Biometric Match"
+        },
+        "impact": {
+          "code": "POSITIVE",
+          "display": "Positive"
+        },
+        "weight": -10
+      }
+    ],
+    "riskNotes": "Low risk client with clear AML checks, verified identity, and high confidence biometric match"
+  },
+  "regulatoryCompliance": {
+    "mlrCompliance": {
+      "isCompliant": true,
+      "regulationReference": "Money Laundering Regulations 2017",
+      "complianceDate": "2026-02-10",
+      "notes": "Compliant with UK Money Laundering Regulations 2017"
+    },
+    "fcaCompliance": {
+      "isCompliant": true,
+      "regulationReference": "FCA Handbook SYSC 3.2",
+      "complianceDate": "2026-02-10",
+      "notes": "Compliant with FCA systems and controls requirements"
+    },
+    "kycCompliance": {
+      "isCompliant": true,
+      "standardReference": "JMLSG Guidance Part I Chapter 5",
+      "complianceDate": "2026-02-10",
+      "notes": "Compliant with JMLSG KYC guidance"
+    },
+    "gdprCompliance": {
+      "isCompliant": true,
+      "regulationReference": "GDPR Article 6(1)(c)",
+      "lawfulBasis": "Legal obligation",
+      "complianceDate": "2026-02-10"
+    }
+  },
+  "verificationHistory": [
+    {
+      "historyId": "hist-001",
+      "verificationType": {
+        "code": "INITIAL_KYC",
+        "display": "Initial KYC"
+      },
+      "verificationDate": "2020-01-10T10:00:00Z",
+      "status": {
+        "code": "VERIFIED",
+        "display": "Verified"
+      },
+      "provider": "Experian",
+      "providerReference": "EXP-KYC-2020-01-123",
+      "expiryDate": "2021-01-10",
+      "notes": "Initial client onboarding verification"
+    },
+    {
+      "historyId": "hist-002",
+      "verificationType": {
+        "code": "ANNUAL_REVIEW",
+        "display": "Annual Review"
+      },
+      "verificationDate": "2021-01-15T09:00:00Z",
+      "status": {
+        "code": "VERIFIED",
+        "display": "Verified"
+      },
+      "provider": "Experian",
+      "providerReference": "EXP-KYC-2021-01-456",
+      "expiryDate": "2022-01-15",
+      "notes": "Annual KYC review - no changes"
+    },
+    {
+      "historyId": "hist-003",
+      "verificationType": {
+        "code": "ENHANCED_DD",
+        "display": "Enhanced Due Diligence"
+      },
+      "verificationDate": "2026-02-10T14:30:00Z",
+      "status": {
+        "code": "VERIFIED",
+        "display": "Verified"
+      },
+      "provider": "Onfido",
+      "providerReference": "ONFIDO-CHK-123456789",
+      "expiryDate": "2027-02-10",
+      "notes": "Enhanced verification with biometric checks"
+    }
+  ],
+  "nextReviewDate": "2027-02-10",
+  "reviewFrequency": {
+    "code": "ANNUAL",
+    "display": "Annual"
+  },
+  "verifiedBy": {
+    "id": "user-789",
+    "name": "Jane Doe",
+    "role": "Compliance Officer"
+  },
+  "verifiedAt": "2026-02-10T14:30:00Z",
+  "verificationIpAddress": "192.168.1.100",
+  "verificationUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+  "consentGiven": true,
+  "consentDate": "2026-02-10T14:00:00Z",
+  "consentReference": "consent-123",
+  "dataProtectionNoticeProvided": true,
+  "dataProtectionNoticeVersion": "2.1",
+  "dataProtectionNoticeDate": "2026-02-10T14:00:00Z",
+  "notes": "Enhanced verification completed successfully. All checks clear. High confidence biometric match. No adverse findings.",
+  "documents": [
+    {
+      "documentId": "doc-verify-001",
+      "type": {
+        "code": "VERIFICATION_REPORT",
+        "display": "Identity Verification Report"
+      },
+      "name": "Onfido Verification Report - Feb 2026",
+      "date": "2026-02-10",
+      "url": "/api/v1/documents/doc-verify-001"
+    },
+    {
+      "documentId": "doc-verify-002",
+      "type": {
+        "code": "AML_REPORT",
+        "display": "AML Screening Report"
+      },
+      "name": "World-Check AML Report - Feb 2026",
+      "date": "2026-02-10",
+      "url": "/api/v1/documents/doc-verify-002"
+    }
+  ],
+  "createdAt": "2026-02-10T14:30:00Z",
+  "updatedAt": "2026-02-10T15:00:00Z",
+  "createdBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "updatedBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/identity-verification/idverify-987" },
+    "update": { "href": "/api/v1/identity-verification/idverify-987", "method": "PUT" },
+    "delete": { "href": "/api/v1/identity-verification/idverify-987", "method": "DELETE" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
+    "verificationReport": { "href": "/api/v1/documents/doc-verify-001" },
+    "amlReport": { "href": "/api/v1/documents/doc-verify-002" },
+    "history": { "href": "/api/v1/identity-verification/idverify-987/history" },
+    "renew": { "href": "/api/v1/identity-verification/idverify-987/renew", "method": "POST" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `factFindRef` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
+| `verificationType` | CodeValue | required | ignored | included | write-once, KYC/AML/EnhancedDueDiligence |
+| `verificationLevel` | CodeValue | optional | updatable | included | Standard/Enhanced/Simplified |
+| `verificationStatus` | CodeValue | required | updatable | included | Pending/InProgress/Verified/Failed/Expired |
+| `verificationDate` | timestamp | required | updatable | included | Date/time of verification |
+| `verificationExpiryDate` | date | optional | updatable | included | Verification expiry date |
+| `isExpired` | boolean | ignored | ignored | included | read-only, computed from expiryDate |
+| `daysUntilExpiry` | integer | ignored | ignored | included | read-only, computed |
+| `documents` | array | required | updatable | included | Array of identity documents |
+| `identityProvider` | object | optional | updatable | included | Third-party verification provider details |
+| `biometricVerification` | object | optional | updatable | included | Face match and liveness check results |
+| `addressVerification` | object | optional | updatable | included | Address verification details |
+| `amlChecks` | object | required | updatable | included | AML checks including sanctions, PEP, adverse media |
+| `riskAssessment` | object | optional | updatable | included | Overall risk rating and factors |
+| `regulatoryCompliance` | object | optional | updatable | included | Compliance with MLR, FCA, KYC, GDPR |
+| `verificationHistory` | array | optional | updatable | included | Historical verification records |
+| `nextReviewDate` | date | optional | updatable | included | Next scheduled review date |
+| `reviewFrequency` | CodeValue | optional | updatable | included | Monthly/Quarterly/Annual |
+| `verifiedBy` | object | required | updatable | included | User who performed verification |
+| `verifiedAt` | timestamp | required | updatable | included | Verification timestamp |
+| `verificationIpAddress` | string | optional | updatable | included | IP address of verification |
+| `verificationUserAgent` | string | optional | updatable | included | User agent of verification |
+| `consentGiven` | boolean | required | updatable | included | Whether consent was given |
+| `consentDate` | timestamp | optional | updatable | included | Date of consent |
+| `consentReference` | string | optional | updatable | included | Reference to consent record |
+| `dataProtectionNoticeProvided` | boolean | optional | updatable | included | Whether data protection notice was provided |
+| `dataProtectionNoticeVersion` | string | optional | updatable | included | Version of data protection notice |
+| `dataProtectionNoticeDate` | timestamp | optional | updatable | included | Date notice was provided |
+| `notes` | string | optional | updatable | included | Additional notes |
+| `documents` | array | optional | updatable | included | Array of document references |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Submitting Identity Verification (POST /api/v1/identity-verification):**
+```json
+{
+  "clientRef": { "id": "client-123" },
+  "factFindRef": { "id": "factfind-123" },
+  "verificationType": { "code": "KYC_AML" },
+  "verificationLevel": { "code": "ENHANCED" },
+  "verificationStatus": { "code": "PENDING" },
+  "verificationDate": "2026-02-10T14:30:00Z",
+  "documents": [
+    {
+      "documentType": { "code": "PASSPORT" },
+      "documentNumber": "502135321",
+      "issuingCountry": { "code": "GB" },
+      "issueDate": "2020-05-15",
+      "expiryDate": "2030-05-15",
+      "isPrimary": true
+    }
+  ],
+  "amlChecks": {
+    "amlStatus": { "code": "PENDING" }
+  },
+  "consentGiven": true,
+  "consentDate": "2026-02-10T14:00:00Z",
+  "verifiedBy": { "id": "user-789" },
+  "verifiedAt": "2026-02-10T14:30:00Z"
+}
+```
+Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
+
+**Updating Verification Status (PUT /api/v1/identity-verification/idverify-987):**
+```json
+{
+  "verificationStatus": { "code": "VERIFIED" },
+  "verificationDate": "2026-02-10T14:30:00Z",
+  "verificationExpiryDate": "2027-02-10",
+  "identityProvider": {
+    "provider": { "code": "ONFIDO" },
+    "providerReference": "ONFIDO-CHK-123456789",
+    "providerScore": 98,
+    "providerDecision": { "code": "CLEAR" }
+  },
+  "amlChecks": {
+    "amlStatus": { "code": "CLEAR" },
+    "amlCheckDate": "2026-02-10T14:30:00Z",
+    "sanctionsScreening": {
+      "status": { "code": "CLEAR" }
+    },
+    "pepScreening": {
+      "status": { "code": "NOT_PEP" },
+      "isPep": false
+    }
+  },
+  "riskAssessment": {
+    "overallRiskRating": { "code": "LOW" },
+    "riskScore": 15
+  }
+}
+```
+Server updates `updatedAt`. Returns complete contract with verification complete.
+
+**Adding AML Result (PATCH /api/v1/identity-verification/idverify-987):**
+```json
+{
+  "amlChecks": {
+    "amlStatus": { "code": "CLEAR" },
+    "amlProvider": { "code": "WORLDCHECK" },
+    "amlProviderReference": "WC-2026-02-987654321",
+    "sanctionsScreening": {
+      "status": { "code": "CLEAR" },
+      "matches": []
+    },
+    "adverseMediaScreening": {
+      "status": { "code": "CLEAR" },
+      "adverseMediaMatches": []
+    }
+  }
+}
+```
+Only specified fields are updated. Returns complete contract.
+
+**Validation Rules:**
+
+1. **Required Fields on Create:** `clientRef`, `verificationType`, `verificationStatus`, `verificationDate`, `documents`, `amlChecks`, `consentGiven`, `verifiedBy`, `verifiedAt`
+2. **Write-Once Fields:** Cannot be changed after creation: `clientRef`, `factFindRef`, `verificationType`
+3. **Consent Validation:** `consentGiven` must be true before verification can be performed
+4. **Document Validation:** At least one primary identity document (Passport/DrivingLicense) must be provided
+5. **Document Expiry:** Identity documents must not be expired (expiryDate must be in future)
+6. **AML Requirements:** For `verificationStatus` = "VERIFIED", `amlChecks.amlStatus` must be "CLEAR" or "REVIEW"
+7. **Biometric Validation:** If biometric verification is used, confidence scores must be > 90%
+8. **Address Match:** For address verification, `addressMatchScore` should be > 80%
+9. **Date Logic:** `verificationDate` must not be in future, `verificationExpiryDate` must be > `verificationDate`
+10. **Reference Integrity:** `clientRef.id`, `factFindRef.id` must reference existing entities
+
+---
+
+### 13.13 Consent Contract
+
+The `Consent` contract represents GDPR consent tracking with purpose-specific consents and audit trail.
+
+**Reference Type:** Consent is a reference type with identity (has `id` field).
+
+```json
+{
+  "id": "consent-555",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "factFindRef": {
+    "id": "factfind-123",
+    "href": "/api/v1/factfinds/factfind-123",
+    "factFindNumber": "FF-2025-00123",
+    "status": {
+      "code": "INP",
+      "display": "In Progress"
+    }
+  },
+  "consentPurpose": {
+    "code": "DATA_PROCESSING",
+    "display": "Data Processing"
+  },
+  "consentPurposeDescription": "Processing of personal and financial data for the purpose of financial advice and planning",
+  "consentStatus": {
+    "code": "GIVEN",
+    "display": "Consent Given"
+  },
+  "consentGivenDate": "2026-02-10T14:00:00Z",
+  "consentWithdrawnDate": null,
+  "consentExpiryDate": "2028-02-10",
+  "isExpired": false,
+  "daysUntilExpiry": 730,
+  "isActive": true,
+  "consentMethod": {
+    "code": "EXPLICIT",
+    "display": "Explicit Consent"
+  },
+  "consentChannel": {
+    "code": "WEB",
+    "display": "Web Portal"
+  },
+  "consentVersion": "2.1",
+  "consentText": "I consent to the collection, storage, and processing of my personal and financial data for the purpose of receiving financial advice and planning services. I understand that my data will be processed in accordance with the Privacy Policy and GDPR regulations.",
+  "lawfulBasis": {
+    "code": "CONSENT",
+    "display": "Consent (GDPR Article 6(1)(a))"
+  },
+  "lawfulBasisDetails": "Consent freely given for data processing under GDPR Article 6(1)(a)",
+  "specialCategoryData": {
+    "isSpecialCategory": false,
+    "specialCategoryTypes": [],
+    "lawfulBasisSpecialCategory": null
+  },
+  "dataProcessing": {
+    "dataCategories": [
+      {
+        "category": {
+          "code": "PERSONAL_IDENTITY",
+          "display": "Personal Identity Data"
+        },
+        "dataTypes": [
+          "Name",
+          "Date of Birth",
+          "Address",
+          "Contact Details",
+          "National Insurance Number"
+        ]
+      },
+      {
+        "category": {
+          "code": "FINANCIAL",
+          "display": "Financial Data"
+        },
+        "dataTypes": [
+          "Income",
+          "Expenditure",
+          "Assets",
+          "Liabilities",
+          "Investment Holdings",
+          "Pension Details"
+        ]
+      },
+      {
+        "category": {
+          "code": "EMPLOYMENT",
+          "display": "Employment Data"
+        },
+        "dataTypes": [
+          "Employer Details",
+          "Employment History",
+          "Salary Information"
+        ]
+      }
+    ],
+    "processingActivities": [
+      {
+        "activity": {
+          "code": "STORAGE",
+          "display": "Data Storage"
+        },
+        "description": "Secure storage of client data in encrypted databases",
+        "purpose": "Maintaining client records for advice delivery"
+      },
+      {
+        "activity": {
+          "code": "ANALYSIS",
+          "display": "Data Analysis"
+        },
+        "description": "Analysis of financial circumstances for advice purposes",
+        "purpose": "Delivering personalized financial advice"
+      },
+      {
+        "activity": {
+          "code": "COMMUNICATION",
+          "display": "Communication"
+        },
+        "description": "Sending advice recommendations and updates to client",
+        "purpose": "Ongoing client service and advice delivery"
+      }
+    ],
+    "dataRetentionPeriod": {
+      "value": 7,
+      "unit": "years",
+      "reason": "Regulatory requirement - FCA indefinite retention for advised products"
+    },
+    "dataSharedWith": [
+      {
+        "recipient": {
+          "code": "PRODUCT_PROVIDER",
+          "display": "Product Providers"
+        },
+        "recipientName": "Various Insurance and Investment Providers",
+        "purpose": "Product application and policy administration",
+        "dataCategories": [
+          "Personal Identity Data",
+          "Financial Data",
+          "Health Data (for protection products)"
+        ],
+        "legalBasis": "Contract fulfillment",
+        "isOutsideEEA": false
+      },
+      {
+        "recipient": {
+          "code": "REGULATOR",
+          "display": "Regulatory Bodies"
+        },
+        "recipientName": "Financial Conduct Authority (FCA)",
+        "purpose": "Regulatory compliance and oversight",
+        "dataCategories": [
+          "Personal Identity Data",
+          "Financial Data",
+          "Advice Records"
+        ],
+        "legalBasis": "Legal obligation",
+        "isOutsideEEA": false
+      },
+      {
+        "recipient": {
+          "code": "IT_PROVIDER",
+          "display": "IT Service Providers"
+        },
+        "recipientName": "Microsoft Azure, AWS",
+        "purpose": "Cloud hosting and data processing",
+        "dataCategories": [
+          "All client data"
+        ],
+        "legalBasis": "Data Processing Agreement",
+        "isOutsideEEA": false,
+        "adequacyDecision": "EU-US Data Privacy Framework"
+      }
+    ]
+  },
+  "marketingConsent": {
+    "hasMarketingConsent": true,
+    "marketingConsentDate": "2026-02-10T14:00:00Z",
+    "marketingChannels": [
+      {
+        "channel": {
+          "code": "EMAIL",
+          "display": "Email"
+        },
+        "isConsented": true,
+        "consentDate": "2026-02-10T14:00:00Z"
+      },
+      {
+        "channel": {
+          "code": "PHONE",
+          "display": "Phone"
+        },
+        "isConsented": false,
+        "consentDate": null
+      },
+      {
+        "channel": {
+          "code": "SMS",
+          "display": "SMS"
+        },
+        "isConsented": false,
+        "consentDate": null
+      },
+      {
+        "channel": {
+          "code": "POST",
+          "display": "Post"
+        },
+        "isConsented": true,
+        "consentDate": "2026-02-10T14:00:00Z"
+      }
+    ],
+    "marketingFrequency": {
+      "code": "MONTHLY",
+      "display": "Monthly"
+    },
+    "marketingInterests": [
+      "Investment Opportunities",
+      "Retirement Planning",
+      "Tax Planning",
+      "Estate Planning"
+    ],
+    "thirdPartyMarketing": {
+      "isConsented": false,
+      "consentDate": null
+    }
+  },
+  "profilingConsent": {
+    "hasProfilingConsent": true,
+    "profilingConsentDate": "2026-02-10T14:00:00Z",
+    "profilingPurpose": "Risk profiling and investment suitability assessment",
+    "automatedDecisionMaking": {
+      "isUsed": true,
+      "description": "Automated risk assessment questionnaire scoring",
+      "humanReview": true
+    }
+  },
+  "thirdPartySharing": {
+    "hasThirdPartyConsent": true,
+    "thirdPartyConsentDate": "2026-02-10T14:00:00Z",
+    "thirdParties": [
+      "Product Providers (for applications)",
+      "Credit Reference Agencies (for creditworthiness)",
+      "Identity Verification Providers"
+    ]
+  },
+  "privacyPolicy": {
+    "privacyPolicyVersion": "2.1",
+    "privacyPolicyUrl": "https://www.example-advisor.com/privacy-policy",
+    "privacyPolicyAcceptedDate": "2026-02-10T14:00:00Z",
+    "privacyPolicyEffectiveDate": "2026-01-01",
+    "privacyPolicyLastUpdated": "2026-01-01",
+    "privacyNoticeProvided": true,
+    "privacyNoticeMethod": {
+      "code": "ONLINE",
+      "display": "Online Privacy Notice"
+    }
+  },
+  "dataSubjectRights": {
+    "rightsInformed": true,
+    "rightsInformedDate": "2026-02-10T14:00:00Z",
+    "rightToAccess": {
+      "rightExplained": true,
+      "requestsReceived": 0,
+      "lastRequestDate": null
+    },
+    "rightToRectification": {
+      "rightExplained": true,
+      "requestsReceived": 0,
+      "lastRequestDate": null
+    },
+    "rightToErasure": {
+      "rightExplained": true,
+      "requestsReceived": 0,
+      "lastRequestDate": null,
+      "limitations": "Data may be retained for regulatory compliance (FCA rules)"
+    },
+    "rightToRestriction": {
+      "rightExplained": true,
+      "requestsReceived": 0,
+      "lastRequestDate": null
+    },
+    "rightToDataPortability": {
+      "rightExplained": true,
+      "requestsReceived": 0,
+      "lastRequestDate": null
+    },
+    "rightToObject": {
+      "rightExplained": true,
+      "requestsReceived": 0,
+      "lastRequestDate": null
+    },
+    "rightToWithdrawConsent": {
+      "rightExplained": true,
+      "canWithdraw": true,
+      "withdrawalMethod": "Email, phone, or written request",
+      "withdrawalImpact": "May affect ability to provide advice services"
+    }
+  },
+  "dsarHistory": [
+    {
+      "requestId": "dsar-001",
+      "requestType": {
+        "code": "ACCESS",
+        "display": "Data Subject Access Request"
+      },
+      "requestDate": "2025-06-15T10:00:00Z",
+      "requestMethod": {
+        "code": "EMAIL",
+        "display": "Email"
+      },
+      "responseDate": "2025-07-10T16:00:00Z",
+      "responseMethod": {
+        "code": "SECURE_PORTAL",
+        "display": "Secure Online Portal"
+      },
+      "status": {
+        "code": "COMPLETED",
+        "display": "Completed"
+      },
+      "notes": "Full data export provided within 30 days"
+    }
+  ],
+  "consentRenewal": {
+    "renewalRequired": true,
+    "renewalDate": "2028-02-10",
+    "renewalFrequency": {
+      "code": "BIENNIAL",
+      "display": "Every 2 Years"
+    },
+    "renewalReminderSent": false,
+    "renewalReminderDate": null,
+    "renewalHistory": [
+      {
+        "renewalId": "ren-001",
+        "previousConsentDate": "2024-02-10",
+        "renewalDate": "2026-02-10",
+        "renewalMethod": {
+          "code": "ONLINE",
+          "display": "Online Renewal"
+        },
+        "changesFromPrevious": "Updated privacy policy version, added cloud provider information"
+      }
+    ]
+  },
+  "audit": {
+    "consentRecordedBy": {
+      "id": "user-789",
+      "name": "Jane Doe",
+      "role": "Financial Adviser"
+    },
+    "consentRecordedAt": "2026-02-10T14:00:00Z",
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "deviceType": "Desktop",
+    "location": {
+      "country": "United Kingdom",
+      "city": "London"
+    },
+    "consentEvidence": {
+      "evidenceType": {
+        "code": "CHECKBOX",
+        "display": "Checkbox Selection"
+      },
+      "evidenceUrl": "/api/v1/consent-evidence/consent-555",
+      "evidenceTimestamp": "2026-02-10T14:00:00Z",
+      "witnessRequired": false
+    },
+    "verificationMethod": {
+      "code": "EMAIL_VERIFIED",
+      "display": "Email Verified"
+    }
+  },
+  "complianceChecks": {
+    "gdprCompliant": true,
+    "gdprComplianceDate": "2026-02-10",
+    "pecompliant": true,
+    "peComplianceDate": "2026-02-10",
+    "fcaCompliant": true,
+    "fcaComplianceDate": "2026-02-10",
+    "lastComplianceReview": "2026-02-10",
+    "nextComplianceReview": "2027-02-10"
+  },
+  "relatedConsents": [
+    {
+      "consentId": "consent-556",
+      "consentPurpose": {
+        "code": "MARKETING",
+        "display": "Marketing Communications"
+      },
+      "href": "/api/v1/consents/consent-556"
+    },
+    {
+      "consentId": "consent-557",
+      "consentPurpose": {
+        "code": "THIRD_PARTY_SHARING",
+        "display": "Third Party Data Sharing"
+      },
+      "href": "/api/v1/consents/consent-557"
+    }
+  ],
+  "notes": "Initial consent obtained during client onboarding. Client fully informed of data processing activities and rights. Marketing consent given for email and post only.",
+  "documents": [
+    {
+      "documentId": "doc-consent-001",
+      "type": {
+        "code": "CONSENT_FORM",
+        "display": "Consent Form"
+      },
+      "name": "Data Processing Consent Form - Signed",
+      "date": "2026-02-10",
+      "url": "/api/v1/documents/doc-consent-001"
+    },
+    {
+      "documentId": "doc-consent-002",
+      "type": {
+        "code": "PRIVACY_NOTICE",
+        "display": "Privacy Notice"
+      },
+      "name": "Privacy Notice v2.1",
+      "date": "2026-01-01",
+      "url": "/api/v1/documents/doc-consent-002"
+    }
+  ],
+  "createdAt": "2026-02-10T14:00:00Z",
+  "updatedAt": "2026-02-10T14:30:00Z",
+  "createdBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "updatedBy": {
+    "id": "user-789",
+    "name": "Jane Doe"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/consents/consent-555" },
+    "update": { "href": "/api/v1/consents/consent-555", "method": "PUT" },
+    "withdraw": { "href": "/api/v1/consents/consent-555/withdraw", "method": "POST" },
+    "renew": { "href": "/api/v1/consents/consent-555/renew", "method": "POST" },
+    "delete": { "href": "/api/v1/consents/consent-555", "method": "DELETE" },
+    "client": { "href": "/api/v1/clients/client-123" },
+    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
+    "consentForm": { "href": "/api/v1/documents/doc-consent-001" },
+    "privacyNotice": { "href": "/api/v1/documents/doc-consent-002" },
+    "evidence": { "href": "/api/v1/consent-evidence/consent-555" },
+    "dsarRequests": { "href": "/api/v1/consents/consent-555/dsar-requests" },
+    "history": { "href": "/api/v1/consents/consent-555/history" }
+  }
+}
+```
+
+**Field Behaviors:**
+
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `factFindRef` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
+| `consentPurpose` | CodeValue | required | ignored | included | write-once, DataProcessing/Marketing/Profiling/ThirdPartySharing |
+| `consentPurposeDescription` | string | optional | updatable | included | Detailed description of purpose |
+| `consentStatus` | CodeValue | required | updatable | included | Given/Withdrawn/Expired |
+| `consentGivenDate` | timestamp | required | updatable | included | Date/time consent was given |
+| `consentWithdrawnDate` | timestamp | optional | updatable | included | Date/time consent was withdrawn |
+| `consentExpiryDate` | date | optional | updatable | included | Consent expiry date |
+| `isExpired` | boolean | ignored | ignored | included | read-only, computed from expiryDate |
+| `daysUntilExpiry` | integer | ignored | ignored | included | read-only, computed |
+| `isActive` | boolean | ignored | ignored | included | read-only, status is Given and not expired |
+| `consentMethod` | CodeValue | required | updatable | included | Explicit/Implicit/LegitimateInterest |
+| `consentChannel` | CodeValue | required | updatable | included | Web/Mobile/InPerson/Email/Phone |
+| `consentVersion` | string | optional | updatable | included | Version of consent form |
+| `consentText` | string | optional | updatable | included | Actual consent text shown to client |
+| `lawfulBasis` | CodeValue | required | updatable | included | GDPR lawful basis (Consent/Contract/LegalObligation/etc) |
+| `lawfulBasisDetails` | string | optional | updatable | included | Details of lawful basis |
+| `specialCategoryData` | object | optional | updatable | included | Special category data processing details |
+| `dataProcessing` | object | required | updatable | included | Data categories, processing activities, retention |
+| `marketingConsent` | object | optional | updatable | included | Marketing consent with channels and preferences |
+| `profilingConsent` | object | optional | updatable | included | Profiling and automated decision making consent |
+| `thirdPartySharing` | object | optional | updatable | included | Third party data sharing consent |
+| `privacyPolicy` | object | required | updatable | included | Privacy policy details and acceptance |
+| `dataSubjectRights` | object | required | updatable | included | Data subject rights information and exercise history |
+| `dsarHistory` | array | optional | updatable | included | Data Subject Access Request history |
+| `consentRenewal` | object | optional | updatable | included | Consent renewal requirements and history |
+| `audit` | object | required | updatable | included | Audit trail of consent recording |
+| `complianceChecks` | object | optional | updatable | included | GDPR, PECR, FCA compliance checks |
+| `relatedConsents` | array | optional | updatable | included | References to related consent records |
+| `notes` | string | optional | updatable | included | Additional notes |
+| `documents` | array | optional | updatable | included | Array of document references |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Usage Examples:**
+
+**Recording Consent (POST /api/v1/consents):**
+```json
+{
+  "clientRef": { "id": "client-123" },
+  "factFindRef": { "id": "factfind-123" },
+  "consentPurpose": { "code": "DATA_PROCESSING" },
+  "consentPurposeDescription": "Processing of personal and financial data for financial advice",
+  "consentStatus": { "code": "GIVEN" },
+  "consentGivenDate": "2026-02-10T14:00:00Z",
+  "consentMethod": { "code": "EXPLICIT" },
+  "consentChannel": { "code": "WEB" },
+  "lawfulBasis": { "code": "CONSENT" },
+  "dataProcessing": {
+    "dataCategories": [
+      {
+        "category": { "code": "PERSONAL_IDENTITY" },
+        "dataTypes": ["Name", "Date of Birth", "Address"]
+      }
+    ],
+    "dataRetentionPeriod": {
+      "value": 7,
+      "unit": "years"
+    }
+  },
+  "privacyPolicy": {
+    "privacyPolicyVersion": "2.1",
+    "privacyPolicyUrl": "https://www.example-advisor.com/privacy-policy",
+    "privacyPolicyAcceptedDate": "2026-02-10T14:00:00Z"
+  },
+  "dataSubjectRights": {
+    "rightsInformed": true,
+    "rightsInformedDate": "2026-02-10T14:00:00Z"
+  },
+  "audit": {
+    "consentRecordedBy": { "id": "user-789" },
+    "consentRecordedAt": "2026-02-10T14:00:00Z",
+    "ipAddress": "192.168.1.100"
+  }
+}
+```
+Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
+
+**Updating Marketing Preferences (PUT /api/v1/consents/consent-555):**
+```json
+{
+  "marketingConsent": {
+    "hasMarketingConsent": true,
+    "marketingChannels": [
+      {
+        "channel": { "code": "EMAIL" },
+        "isConsented": true,
+        "consentDate": "2026-02-10T14:00:00Z"
+      },
+      {
+        "channel": { "code": "PHONE" },
+        "isConsented": true,
+        "consentDate": "2026-02-18T10:00:00Z"
+      }
+    ],
+    "marketingFrequency": { "code": "MONTHLY" }
+  }
+}
+```
+Server updates `updatedAt`. Returns complete contract with updated preferences.
+
+**Withdrawing Consent (PATCH /api/v1/consents/consent-555/withdraw):**
+```json
+{
+  "consentStatus": { "code": "WITHDRAWN" },
+  "consentWithdrawnDate": "2026-06-15T10:00:00Z",
+  "notes": "Client requested withdrawal of marketing consent via email"
+}
+```
+Server updates status and withdrawal date. Returns complete contract.
+
+**Validation Rules:**
+
+1. **Required Fields on Create:** `clientRef`, `consentPurpose`, `consentStatus`, `consentGivenDate`, `consentMethod`, `consentChannel`, `lawfulBasis`, `dataProcessing`, `privacyPolicy`, `dataSubjectRights`, `audit`
+2. **Write-Once Fields:** Cannot be changed after creation: `clientRef`, `factFindRef`, `consentPurpose`
+3. **Status Validation:** If `consentStatus` is "GIVEN", `consentGivenDate` must be provided. If "WITHDRAWN", `consentWithdrawnDate` must be provided
+4. **Date Logic:** `consentGivenDate` must not be in future, `consentWithdrawnDate` must be > `consentGivenDate`
+5. **Lawful Basis:** For `lawfulBasis` = "CONSENT", consent must be freely given, specific, informed, and unambiguous
+6. **Data Categories:** At least one data category must be specified in `dataProcessing.dataCategories`
+7. **Retention Period:** `dataProcessing.dataRetentionPeriod` must be specified and justified
+8. **Privacy Policy:** `privacyPolicy.privacyPolicyAcceptedDate` must be provided and not in future
+9. **Marketing Consent:** If marketing consent is given, at least one marketing channel must have `isConsented` = true
+10. **Reference Integrity:** `clientRef.id`, `factFindRef.id` must reference existing entities
+
+---
+
+### 13.14 Collection Response Wrapper
+
+All list/collection endpoints use a standard wrapper contract:
+
+```json
+{
+  "data": [
+    { /* Complete entity contract */ },
+    { /* Complete entity contract */ }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalPages": 5,
+    "totalCount": 95,
+    "hasMore": true
+  },
+  "_links": {
+    "first": { "href": "/api/v1/clients?page=1&pageSize=20" },
+    "prev": null,
+    "self": { "href": "/api/v1/clients?page=1&pageSize=20" },
+    "next": { "href": "/api/v1/clients?page=2&pageSize=20" },
+    "last": { "href": "/api/v1/clients?page=5&pageSize=20" }
+  }
+}
+```
+
+The `data` array contains complete entity contracts. Clients can use field selection (`?fields=id,name`) to reduce response size.
+
+---
+
+### 13.15 Contract Extension for Other Entities
+
+All other entities in the FactFind system follow the same Single Contract Principle:
+
+**Circumstances Entities:**
+- `Employment` - Employment history within FactFind
+- `Expenditure` - Expenditure items within FactFind
+- `Asset` - Assets (property, savings, investments)
+- `Liability` - Liabilities (mortgages, loans, credit cards)
+
+**Estate Planning Entities:**
+- `Gift` - Gifts made or intended
+- `GiftTrust` - Trust arrangements for gifts
+- `Beneficiary` - Beneficiaries of estates/trusts
+
+**Relationship Entities:**
+- `Relationship` - Client relationships (spouse, partner, ex-partner)
+- `Dependant` - Dependent family members
+- `ProfessionalContact` - Solicitors, accountants, other advisers
+
+**Reference Data Entities:**
+- `Provider` - Financial product providers
+- `ProductCategory` - Product categorization
+- `EnumValue` - Dynamic enumeration values
+
+Each entity contract follows the same field annotation pattern:
+- Fields marked as `required-on-create`, `optional`, `read-only`, `write-once`, or `updatable`
+- Same contract used for POST, PUT, PATCH, and GET
+- Collection responses wrapped in standard pagination envelope
+- Field selection supported via `?fields` query parameter
+
+### 13.16 Standard Value Types
+
+Value types are embedded data structures with no independent identity. They are named with a "Value" suffix and never have an `id` field. Value types are always embedded within their parent entity and have no separate API endpoints.
+
+#### 13.10.1 MoneyValue
+
+Represents a monetary amount with currency.
+
+**Contract:**
+```json
+{
+  "amount": 75000.00,
+  "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `amount` | decimal | Yes | - | Monetary amount (positive or negative) |
+| `currency` | CurrencyValue | Yes | - | Currency details (code, display, symbol) |
+
+**Validation Rules:**
+- `amount`: Precision 19, scale 4 (e.g., 9999999999999999.9999)
+- `currency.code`: Must be valid ISO 4217 code (GBP, USD, EUR, etc.)
+
+**Usage Example:**
+```json
+{
+  "grossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netMonthlyIncome": {
+    "amount": 4500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  }
+}
+```
+
+#### 13.10.2 AddressValue
+
+Represents a physical address.
+
+**Contract:**
+```json
+{
+  "line1": "123 Main Street",
+  "line2": "Flat 4B",
+  "line3": null,
+  "line4": null,
+  "city": "London",
+  "county": {
+    "code": "GLA",
+    "display": "Greater London"
+  },
+  "postcode": "SW1A 1AA",
+  "country": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "addressType": {
+    "code": "RES",
+    "display": "Residential"
+  }
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `line1` | string | Yes | Address line 1 (max 100 chars) |
+| `line2` | string | No | Address line 2 (max 100 chars) |
+| `line3` | string | No | Address line 3 (max 100 chars) |
+| `line4` | string | No | Address line 4 (max 100 chars) |
+| `city` | string | Yes | City/town (max 50 chars) |
+| `county` | CountyValue | No | County/state with code and display name |
+| `postcode` | string | Yes | Postal/ZIP code (max 20 chars) |
+| `country` | CountryValue | Yes | Country with ISO codes and display name |
+| `addressType` | AddressTypeValue | No | Type of address (Residential, Correspondence, etc.) |
+
+**Validation Rules:**
+- `country.code`: Must be valid ISO 3166-1 alpha-2 code (GB, US, FR, etc.)
+- `postcode`: Format validation based on country
+
+**Usage Example:**
+```json
+{
+  "primaryAddress": {
+    "line1": "10 Downing Street",
+    "city": "London",
+    "county": {
+      "code": "GLA",
+      "display": "Greater London"
+    },
+    "postcode": "SW1A 2AA",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "addressType": {
+      "code": "RES",
+      "display": "Residential"
+    }
+  }
+}
+```
+
+#### 13.10.3 DateRangeValue
+
+Represents a date range with start and optional end date.
+
+**Contract:**
+```json
+{
+  "startDate": "2020-01-01",
+  "endDate": "2025-12-31"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `startDate` | date | Yes | Start date (ISO 8601: YYYY-MM-DD) |
+| `endDate` | date | No | End date (ISO 8601: YYYY-MM-DD), null = ongoing |
+
+**Validation Rules:**
+- `endDate` must be after `startDate` if provided
+- Both dates must be valid calendar dates
+
+**Usage Example:**
+```json
+{
+  "employmentPeriod": {
+    "startDate": "2015-06-01",
+    "endDate": null
+  }
+}
+```
+
+#### 13.10.4 NameValue
+
+Represents a person's name.
+
+**Contract:**
+```json
+{
+  "title": {
+    "code": "MR",
+    "display": "Mr"
+  },
+  "firstName": "John",
+  "middleName": "Michael",
+  "lastName": "Smith",
+  "preferredName": "Johnny"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | TitleValue | No | Title/honorific with code and display |
+| `firstName` | string | Yes | First name (max 50 chars) |
+| `middleName` | string | No | Middle name(s) (max 50 chars) |
+| `lastName` | string | Yes | Last name/surname (max 50 chars) |
+| `preferredName` | string | No | Preferred name/nickname (max 50 chars) |
+
+**Usage Example:**
+```json
+{
+  "name": {
+    "title": {
+      "code": "DR",
+      "display": "Dr"
+    },
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "preferredName": "Janey"
+  }
+}
+```
+
+#### 13.10.5 ContactValue
+
+Represents contact information (email, phone).
+
+**Contract:**
+```json
+{
+  "type": {
+    "code": "EMAIL",
+    "display": "Email"
+  },
+  "value": "john.smith@example.com",
+  "isPrimary": true
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | ContactTypeValue | Yes | Contact type with code and display (EMAIL, MOBILE, HOME, WORK, FAX) |
+| `value` | string | Yes | Contact value (email address or phone number) |
+| `isPrimary` | boolean | No | Whether this is the primary contact method |
+
+**Validation Rules:**
+- `value`: Format validation based on `type.code` (email format, phone number format)
+
+**Usage Example:**
+```json
+{
+  "contacts": [
+    {
+      "type": {
+        "code": "EMAIL",
+        "display": "Email"
+      },
+      "value": "john@example.com",
+      "isPrimary": true
+    },
+    {
+      "type": {
+        "code": "MOBILE",
+        "display": "Mobile"
+      },
+      "value": "+44 7700 900123",
+      "isPrimary": false
+    }
+  ]
+}
+```
+
+#### 13.10.6 PercentageValue
+
+Represents a percentage as a decimal value.
+
+**Contract:**
+```json
+{
+  "value": 0.25
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `value` | decimal | Yes | Percentage value (0.00 = 0%, 1.00 = 100%) |
+
+**Validation Rules:**
+- `value`: Must be between 0.00 and 1.00 (or other specified range)
+
+**Usage Example:**
+```json
+{
+  "contributionRate": {
+    "value": 0.08
+  },
+  "taxRate": {
+    "value": 0.20
+  }
+}
+```
+
+#### 13.10.7 RateValue
+
+Represents an interest rate or other rate.
+
+**Contract:**
+```json
+{
+  "rate": 3.5,
+  "type": "Fixed"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `rate` | decimal | Yes | Rate value (e.g., 3.5 for 3.5%) |
+| `type` | enum | No | Rate type: Fixed, Variable, Tracker, Discount, Capped |
+
+**Usage Example:**
+```json
+{
+  "interestRate": {
+    "rate": 2.75,
+    "type": "Fixed"
+  },
+  "projectedGrowthRate": {
+    "rate": 5.0,
+    "type": "Variable"
+  }
+}
+```
+
+#### 13.10.8 TaxDetailsValue
+
+Represents tax identification details.
+
+**Contract:**
+```json
+{
+  "niNumber": "AB123456C",
+  "taxReference": "1234567890"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `niNumber` | string | No | UK National Insurance Number (9 chars) |
+| `taxReference` | string | No | Tax reference number (10 chars) |
+
+**Validation Rules:**
+- `niNumber`: Format AA123456A (2 letters, 6 digits, 1 letter)
+- `taxReference`: 10-digit UTR format
+
+**Usage Example:**
+```json
+{
+  "taxDetails": {
+    "niNumber": "AB123456C",
+    "taxReference": "1234567890"
+  }
+}
+```
+
+#### 13.10.9 Enumeration Value Types
+
+Enumeration value types represent categorical data using a structured code/display pattern. Unlike simple string enumerations, enumeration value types are self-documenting, internationalization-ready, and can carry rich metadata.
+
+**Standard Pattern:**
+All enumeration value types follow a consistent structure:
+```json
+{
+  "code": "MACHINE_READABLE_CODE",    // Required: Uppercase, short identifier
+  "display": "Human Readable Label",  // Required: User-facing label
+  // ... additional metadata as needed
+}
+```
+
+**Benefits:**
+- Self-documenting: No need to look up code meanings
+- Internationalization-ready: Display text can be localized
+- Rich metadata: Dates, categories, and other context
+- Forward-compatible: Can add fields without breaking changes
+- Type-safe: Strongly typed in contract definitions
+
+---
+
+##### GenderValue
+
+Represents a person's gender.
+
+**Contract:**
+```json
+{
+  "code": "M",
+  "display": "Male"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Gender code: M, F, O, U, N |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `M` - Male
+- `F` - Female
+- `O` - Other
+- `U` - Unknown
+- `N` - Prefer not to say
+
+**Usage Example:**
+```json
+{
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  }
+}
+```
+
+---
+
+##### MaritalStatusValue
+
+Represents a person's marital status with optional effective date.
+
+**Contract:**
+```json
+{
+  "code": "MAR",
+  "display": "Married",
+  "effectiveFrom": "2015-06-20"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Marital status code |
+| `display` | string | Yes | Human-readable label |
+| `effectiveFrom` | date | No | Date this status became effective (ISO 8601) |
+
+**Standard Codes:**
+- `SIN` - Single
+- `MAR` - Married
+- `CIV` - Civil Partnership
+- `DIV` - Divorced
+- `WID` - Widowed
+- `SEP` - Separated
+- `COH` - Cohabiting
+
+**Usage Example:**
+```json
+{
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2015-06-20"
+  }
+}
+```
+
+---
+
+##### EmploymentStatusValue
+
+Represents a person's employment status.
+
+**Contract:**
+```json
+{
+  "code": "EMP",
+  "display": "Employed"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Employment status code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `EMP` - Employed
+- `SELF` - Self-Employed
+- `DIR` - Company Director
+- `RET` - Retired
+- `UNE` - Unemployed
+- `NW` - Not Working
+- `STU` - Student
+- `HOME` - Homemaker
+
+**Usage Example:**
+```json
+{
+  "employmentStatus": {
+    "code": "EMP",
+    "display": "Employed"
+  }
+}
+```
+
+---
+
+##### AddressTypeValue
+
+Represents the type of an address.
+
+**Contract:**
+```json
+{
+  "code": "RES",
+  "display": "Residential"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Address type code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `RES` - Residential
+- `CORR` - Correspondence
+- `PREV` - Previous
+- `WORK` - Work
+- `OTHER` - Other
+
+**Usage Example:**
+```json
+{
+  "addressType": {
+    "code": "RES",
+    "display": "Residential"
+  }
+}
+```
+
+---
+
+##### ContactTypeValue
+
+Represents the type of contact information.
+
+**Contract:**
+```json
+{
+  "code": "EMAIL",
+  "display": "Email"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Contact type code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `EMAIL` - Email
+- `MOBILE` - Mobile Phone
+- `HOME` - Home Phone
+- `WORK` - Work Phone
+- `FAX` - Fax
+
+**Usage Example:**
+```json
+{
+  "type": {
+    "code": "EMAIL",
+    "display": "Email"
+  }
+}
+```
+
+---
+
+##### TitleValue
+
+Represents a person's title or honorific.
+
+**Contract:**
+```json
+{
+  "code": "MR",
+  "display": "Mr"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Title code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `MR` - Mr
+- `MRS` - Mrs
+- `MS` - Ms
+- `MISS` - Miss
+- `DR` - Dr
+- `PROF` - Professor
+- `REV` - Reverend
+- `SIR` - Sir
+- `LADY` - Lady
+- `LORD` - Lord
+
+**Usage Example:**
+```json
+{
+  "title": {
+    "code": "MR",
+    "display": "Mr"
+  }
+}
+```
+
+---
+
+##### ProductTypeValue
+
+Represents a financial product type with optional category.
+
+**Contract:**
+```json
+{
+  "code": "SIPP",
+  "display": "Self-Invested Personal Pension",
+  "category": "Pension"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Product type code |
+| `display` | string | Yes | Human-readable label |
+| `category` | string | No | Product category grouping |
+
+**Standard Codes:**
+- Pensions: `PP` (Personal Pension), `SIPP` (SIPP), `GPP` (Group Personal Pension), `SSAS` (SSAS), `DB` (Defined Benefit), `SP` (State Pension)
+- Investments: `ISA` (ISA), `GIA` (General Investment Account), `JISA` (Junior ISA), `LISA` (Lifetime ISA), `OIC` (Offshore Investment)
+- Protection: `LIFE` (Life Insurance), `CIC` (Critical Illness), `IP` (Income Protection), `PMI` (Private Medical Insurance)
+- Mortgages: `RESMTG` (Residential Mortgage), `BTL` (Buy-to-Let), `EQUITY` (Equity Release)
+- Other: `BOND` (Investment Bond), `TRUST` (Trust), `SAVINGS` (Savings Account)
+
+**Usage Example:**
+```json
+{
+  "productType": {
+    "code": "SIPP",
+    "display": "Self-Invested Personal Pension",
+    "category": "Pension"
+  }
+}
+```
+
+---
+
+##### CountryValue
+
+Represents a country using ISO 3166-1 standard codes.
+
+**Contract:**
+```json
+{
+  "code": "GB",
+  "display": "United Kingdom",
+  "alpha3": "GBR"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | ISO 3166-1 alpha-2 country code (2 chars) |
+| `display` | string | Yes | Full country name |
+| `alpha3` | string | No | ISO 3166-1 alpha-3 country code (3 chars) |
+
+**Usage Example:**
+```json
+{
+  "country": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  }
+}
+```
+
+---
+
+##### CountyValue
+
+Represents a county or administrative region.
+
+**Contract:**
+```json
+{
+  "code": "GLA",
+  "display": "Greater London",
+  "country": {
+    "code": "GB",
+    "display": "United Kingdom"
+  }
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | County/region code |
+| `display` | string | Yes | Full county/region name |
+| `country` | CountryValue | No | Associated country |
+
+**Usage Example:**
+```json
+{
+  "county": {
+    "code": "GLA",
+    "display": "Greater London",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom"
+    }
+  }
+}
+```
+
+---
+
+##### CurrencyValue
+
+Represents a currency using ISO 4217 standard codes.
+
+**Contract:**
+```json
+{
+  "code": "GBP",
+  "display": "British Pound",
+  "symbol": "£"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | ISO 4217 currency code (3 chars) |
+| `display` | string | Yes | Full currency name |
+| `symbol` | string | No | Currency symbol (£, $, €, etc.) |
+
+**Standard Codes:**
+- `GBP` - British Pound (£)
+- `USD` - US Dollar ($)
+- `EUR` - Euro (€)
+- `CHF` - Swiss Franc (CHF)
+- `JPY` - Japanese Yen (¥)
+- `AUD` - Australian Dollar (A$)
+- `CAD` - Canadian Dollar (C$)
+
+**Usage Example:**
+```json
+{
+  "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+}
+```
+
+---
+
+##### FrequencyValue
+
+Represents payment or contribution frequency.
+
+**Contract:**
+```json
+{
+  "code": "M",
+  "display": "Monthly",
+  "periodsPerYear": 12
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Frequency code |
+| `display` | string | Yes | Human-readable label |
+| `periodsPerYear` | integer | No | Number of periods per year (for calculations) |
+
+**Standard Codes:**
+- `M` - Monthly (12 periods/year)
+- `Q` - Quarterly (4 periods/year)
+- `S` - Semi-Annual (2 periods/year)
+- `A` - Annual (1 period/year)
+- `W` - Weekly (52 periods/year)
+- `F` - Fortnightly (26 periods/year)
+- `SINGLE` - Single Payment (0 periods/year)
+
+**Usage Example:**
+```json
+{
+  "frequency": {
+    "code": "M",
+    "display": "Monthly",
+    "periodsPerYear": 12
+  }
+}
+```
+
+---
+
+##### StatusValue
+
+Represents a generic status with optional category.
+
+**Contract:**
+```json
+{
+  "code": "ACT",
+  "display": "Active",
+  "category": "Arrangement"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Status code |
+| `display` | string | Yes | Human-readable label |
+| `category` | string | No | Status category grouping |
+
+**Standard Codes:**
+- `ACT` - Active
+- `INA` - Inactive
+- `PEN` - Pending
+- `COM` - Completed
+- `CAN` - Cancelled
+- `SUB` - Submitted
+- `APP` - Approved
+- `REJ` - Rejected
+- `DRAFT` - Draft
+- `CLOSED` - Closed
+
+**Usage Example:**
+```json
+{
+  "status": {
+    "code": "ACT",
+    "display": "Active",
+    "category": "Arrangement"
+  }
+}
+```
+
+---
+
+##### MeetingTypeValue
+
+Represents the type of a client meeting.
+
+**Contract:**
+```json
+{
+  "code": "INIT",
+  "display": "Initial Meeting"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Meeting type code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `INIT` - Initial Meeting
+- `REVIEW` - Review Meeting
+- `ANNUAL` - Annual Review
+- `ADHOC` - Ad-hoc Meeting
+- `PHONE` - Phone Call
+- `VIDEO` - Video Conference
+
+**Usage Example:**
+```json
+{
+  "meetingType": {
+    "code": "INIT",
+    "display": "Initial Meeting"
+  }
+}
+```
+
+---
+
+##### ResidencyStatusValue
+
+Represents tax residency status.
+
+**Contract:**
+```json
+{
+  "code": "UK_RES",
+  "display": "UK Resident"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Residency status code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `UK_RES` - UK Resident
+- `UK_DOM` - UK Domiciled
+- `NON_RES` - Non-Resident
+- `NON_DOM` - Non-Domiciled
+- `EXPAT` - Expatriate
+
+**Usage Example:**
+```json
+{
+  "residencyStatus": {
+    "code": "UK_RES",
+    "display": "UK Resident"
+  }
+}
+```
+
+---
+
+##### HealthStatusValue
+
+Represents a person's health status for insurance purposes.
+
+**Contract:**
+```json
+{
+  "code": "GOOD",
+  "display": "Good Health"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | string | Yes | Health status code |
+| `display` | string | Yes | Human-readable label |
+
+**Standard Codes:**
+- `GOOD` - Good Health
+- `FAIR` - Fair Health
+- `POOR` - Poor Health
+- `PREEX` - Pre-existing Conditions
+- `UNKNOWN` - Unknown
+
+**Usage Example:**
+```json
+{
+  "healthStatus": {
+    "code": "GOOD",
+    "display": "Good Health"
+  }
+}
+```
+
+---
+
+### 13.17 Standard Reference Types
+
+Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `clientRef`, `adviserRef`).
+
+#### 13.11.1 ClientRef
+
+Reference to a Client entity.
+
+**Minimal Contract (Required for Create/Update):**
+```json
+{
+  "id": "client-123"
+}
+```
+
+**Full Contract (Server Response):**
+```json
+{
+  "id": "client-123",
+  "href": "/api/v1/clients/client-123",
+  "name": "John Michael Smith",
+  "clientNumber": "C00001234",
+  "type": "Person"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique client identifier |
+| `href` | string | Yes (response) | URL to client resource |
+| `name` | string | Yes (response) | Full client name |
+| `clientNumber` | string | No | Business client number |
+| `type` | enum | No | Client type: Person, Corporate, Trust |
+
+**Usage Example:**
+```json
+{
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/clients/client-123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  }
+}
+```
+
+#### 13.11.2 AdviserRef
+
+Reference to an Adviser entity.
+
+**Full Contract:**
+```json
+{
+  "id": "adviser-789",
+  "href": "/api/v1/advisers/adviser-789",
+  "name": "Sarah Johnson",
+  "code": "ADV001"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique adviser identifier |
+| `href` | string | Yes (response) | URL to adviser resource |
+| `name` | string | Yes (response) | Adviser full name |
+| `code` | string | No | Adviser business code |
+
+**Usage Example:**
+```json
+{
+  "adviserRef": {
+    "id": "adviser-789",
+    "href": "/api/v1/advisers/adviser-789",
+    "name": "Sarah Johnson",
+    "code": "ADV001"
+  }
+}
+```
+
+#### 13.11.3 ProviderRef
+
+Reference to a financial product Provider entity.
+
+**Full Contract:**
+```json
+{
+  "id": "provider-456",
+  "href": "/api/v1/providers/provider-456",
+  "name": "Aviva Life & Pensions UK Limited",
+  "frnNumber": "185896"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique provider identifier |
+| `href` | string | Yes (response) | URL to provider resource |
+| `name` | string | Yes (response) | Provider name |
+| `frnNumber` | string | No | FCA Firm Reference Number |
+
+**Usage Example:**
+```json
+{
+  "providerRef": {
+    "id": "provider-456",
+    "href": "/api/v1/providers/provider-456",
+    "name": "Aviva",
+    "frnNumber": "185896"
+  }
+}
+```
+
+#### 13.11.4 ArrangementRef
+
+Reference to an Arrangement entity (pension, investment, protection, mortgage).
+
+**Full Contract:**
+```json
+{
+  "id": "arrangement-111",
+  "href": "/api/v1/arrangements/arrangement-111",
+  "policyNumber": "POL123456",
+  "productType": "Pension",
+  "provider": "Aviva"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique arrangement identifier |
+| `href` | string | Yes (response) | URL to arrangement resource |
+| `policyNumber` | string | No | Policy/plan number |
+| `productType` | string | Yes (response) | Product type (Pension, Investment, etc.) |
+| `provider` | string | Yes (response) | Provider name |
+
+**Usage Example:**
+```json
+{
+  "arrangementRef": {
+    "id": "arrangement-111",
+    "href": "/api/v1/arrangements/arrangement-111",
+    "policyNumber": "SIPP123456",
+    "productType": "Pension",
+    "provider": "Aviva"
+  }
+}
+```
+
+#### 13.11.5 EmploymentRef
+
+Reference to an Employment entity.
+
+**Full Contract:**
+```json
+{
+  "id": "employment-222",
+  "href": "/api/v1/employments/employment-222",
+  "employerName": "Acme Corporation Ltd",
+  "status": "Current"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique employment identifier |
+| `href` | string | Yes (response) | URL to employment resource |
+| `employerName` | string | Yes (response) | Employer name |
+| `status` | enum | Yes (response) | Status: Current, Previous, Future |
+
+**Usage Example:**
+```json
+{
+  "employmentRef": {
+    "id": "employment-222",
+    "href": "/api/v1/employments/employment-222",
+    "employerName": "Acme Corp",
+    "status": "Current"
+  }
+}
+```
+
+#### 13.11.6 GoalRef
+
+Reference to a Goal entity.
+
+**Full Contract:**
+```json
+{
+  "id": "goal-333",
+  "href": "/api/v1/goals/goal-333",
+  "goalName": "Retirement at 65",
+  "priority": "High"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique goal identifier |
+| `href` | string | Yes (response) | URL to goal resource |
+| `goalName` | string | Yes (response) | Goal name/description |
+| `priority` | enum | No | Priority: High, Medium, Low |
+
+**Usage Example:**
+```json
+{
+  "goalRef": {
+    "id": "goal-333",
+    "href": "/api/v1/goals/goal-333",
+    "goalName": "Retirement Planning",
+    "priority": "High"
+  }
+}
+```
+
+#### 13.11.7 FactFindRef
+
+Reference to a FactFind (ADVICE_CASE) entity.
+
+**Full Contract:**
+```json
+{
+  "id": "factfind-444",
+  "href": "/api/v1/factfinds/factfind-444",
+  "factFindNumber": "FF001234",
+  "status": "InProgress"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | uuid | Yes | Unique fact find identifier |
+| `href` | string | Yes (response) | URL to fact find resource |
+| `factFindNumber` | string | No | Business fact find number |
+| `status` | enum | Yes (response) | Status: Draft, InProgress, Complete, Submitted |
+
+**Usage Example:**
+```json
+{
+  "factFindRef": {
+    "id": "factfind-444",
+    "href": "/api/v1/factfinds/factfind-444",
+    "factFindNumber": "FF001234",
+    "status": "InProgress"
+  }
+}
+```
+
+---
+
+## Appendices
+
+### Appendix A: Complete Entity-to-Endpoint Mapping
+
+**Client Onboarding & KYC Context:**
+- CLIENT → `/api/v1/clients`
+- ADDRESS → `/api/v1/clients/{id}/addresses`
+- CONTACT_DETAIL → `/api/v1/clients/{id}/contacts`
+- PROFESSIONAL_CONTACT → `/api/v1/clients/{id}/professional-contacts`
+- CLIENT_RELATIONSHIP → `/api/v1/clients/{id}/relationships`
+- DPA_CONSENT → `/api/v1/clients/{id}/dpa-consent`
+- MARKETING_CONSENT → `/api/v1/clients/{id}/marketing-consent`
+- VULNERABLE_CUSTOMER_FLAG → `/api/v1/clients/{id}/vulnerability`
+- DEPENDANT → `/api/v1/clients/{id}/dependants`
+
+**Circumstances Context:**
+- ADVICE_CASE → `/api/v1/factfinds`
+- EMPLOYMENT → `/api/v1/factfinds/{id}/employment`
+- INCOME → `/api/v1/factfinds/{id}/income`
+- INCOME_CHANGE → `/api/v1/factfinds/{id}/income-changes`
+- EXPENDITURE → `/api/v1/factfinds/{id}/expenditure`
+- EXPENDITURE_CHANGE → `/api/v1/factfinds/{id}/expenditure-changes`
+
+**Assets & Liabilities Context:**
+- ASSET → `/api/v1/assets`
+- BUSINESS_ASSET → `/api/v1/assets/{id}` (embedded in ASSET)
+- PROPERTY_DETAIL → `/api/v1/assets/{id}` (embedded in ASSET)
+- CREDIT_HISTORY → `/api/v1/clients/{id}/credit-history`
+- VALUATION → `/api/v1/arrangements/{id}/valuations`
+
+**Arrangements Context:**
+- ARRANGEMENT → `/api/v1/arrangements`
+- CONTRIBUTION → `/api/v1/arrangements/{id}/contributions`
+- WITHDRAWAL → `/api/v1/arrangements/{id}/withdrawals`
+- BENEFICIARY → `/api/v1/arrangements/{id}/beneficiaries`
+- CLIENT_PENSION → `/api/v1/clients/{id}/pension-summary`
+
+**Goals Context:**
+- GOAL → `/api/v1/goals`
+- OBJECTIVE → `/api/v1/goals/{id}/objectives`
+- NEED → `/api/v1/goals/{id}/needs`
+
+**Risk Profile Context:**
+- RISK_PROFILE → `/api/v1/risk-profiles`
+
+**Estate Planning Context:**
+- GIFT → `/api/v1/gifts`
+- GIFT_TRUST → `/api/v1/gift-trusts`
+
+### Appendix B: HTTP Status Code Reference
+
+**2xx Success:**
+- `200 OK` - GET, PUT, PATCH successful with body
+- `201 Created` - POST successful, resource created
+- `204 No Content` - PUT, PATCH, DELETE successful without body
+
+**4xx Client Errors:**
+- `400 Bad Request` - Invalid request syntax or validation error
+- `401 Unauthorized` - Authentication required or failed
+- `403 Forbidden` - Authenticated but not authorized
+- `404 Not Found` - Resource does not exist
+- `409 Conflict` - Concurrent modification or business rule violation
+- `412 Precondition Failed` - If-Match header missing/invalid
+- `422 Unprocessable Entity` - Semantic validation error
+- `429 Too Many Requests` - Rate limit exceeded
+
+**5xx Server Errors:**
+- `500 Internal Server Error` - Unexpected error
+- `503 Service Unavailable` - Service temporarily unavailable
+
+### Appendix C: Data Type Formats
+
+**Date/DateTime (ISO 8601):**
+- Date: `yyyy-MM-dd` (e.g., `2026-02-16`)
+- DateTime: `yyyy-MM-ddTHH:mm:ssZ` (e.g., `2026-02-16T14:30:00Z`)
+- Always UTC for DateTime
+
+**Money:**
+```json
+{
+  "amount": 75000.00,
+  "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+}
+```
+
+**Address:**
+```json
+{
+  "line1": "123 High Street",
+  "line2": "Apartment 4B",
+  "city": "London",
+  "postcode": "SW1A 1AA",
+  "county": {
+    "code": "GB-LND",
+    "name": "London"
+  },
+  "country": {
+    "code": "GB",
+    "name": "United Kingdom"
+  }
+}
+```
+
+**Country (ISO 3166-1 alpha-2):**
+```json
+{
+  "code": "GB",
+  "name": "United Kingdom"
+}
+```
+
+**County (ISO 3166-2):**
+```json
+{
+  "code": "GB-LND",
+  "name": "London"
+}
+```
+
+**Percentage:**
+- Range: 0.00 to 100.00
+- Decimal places: 2
+- Example: `4.75`, `50.0`, `100.00`
+
+### Appendix D: Common Enumerations
+
+**Marital Status:**
+- Single
+- Married
+- CivilPartnership
+- Divorced
+- Widowed
+- Separated
+
+**Gender:**
+- Male
+- Female
+- Other
+- PreferNotToSay
+
+**Employment Status:**
+- Employed
+- SelfEmployed
+- CompanyDirector
+- ContractWorker
+- SemiRetired
+- MaternityLeave
+- LongTermIllness
+- Unemployed
+- Retired
+- Student
+- Homemaker
+- Other
+
+**Client Type:**
+- Person
+- Corporate
+- Trust
+
+**Service Status:**
+- Prospect
+- Active
+- Inactive
+- Archived
+
+**Risk Rating:**
+- VeryCautious
+- Cautious
+- Balanced
+- Adventurous
+- VeryAdventurous
+
+### Appendix E: Security Considerations
+
+**Authentication:**
+- OAuth 2.0 with JWT tokens required for all endpoints
+- Token expiry: 1 hour (access), 30 days (refresh)
+- Support for token refresh flow
+
+**Authorization:**
+- Granular scope-based permissions
+- Resource-level access control
+- Tenant isolation enforced at data layer
+
+**Data Protection:**
+- PII fields obfuscated by default
+- Special scope required for sensitive data
+- Audit logging for all PII access
+- GDPR right to erasure support
+
+**Transport Security:**
+- TLS 1.2+ required
+- Strong cipher suites only
+- Certificate validation enforced
+
+**API Security:**
+- Rate limiting per user and tenant
+- Input validation and sanitization
+- Output encoding to prevent XSS
+- SQL injection prevention (parameterized queries)
+- CSRF protection for state-changing operations
+
+---
+
+## Document Metadata
+
+**Document Version:** 2.0
+**Status:** Design Specification v2.0 - Enhanced with Missing Entities
+**Date:** 2026-02-17
+**Author:** Principal API Designer
+**Reviewers:** Architecture Team, Product Owners, Compliance Team
+**Next Review:** 2026-03-16
+
+**Change Log:**
+- 2026-02-16: Initial comprehensive API design created (v1.0)
+- Complete coverage of 39 entities from Greenfield ERD
+- 8 bounded contexts with RESTful API specifications
+- Full request/response contracts with validation rules
+- Industry-standard terminology and compliance alignment
+
+**Related Documents:**
+- Greenfield ERD Design - FactFind System (steering/Target-Model/Greenfield-ERD-FactFind.md)
+- API Design Guidelines 2.0 (Company Standards)
+- FCA Handbook (COBS, PROD, ICOBS)
+- MiFID II Directive
+- GDPR Compliance Guidelines
+
+**File Path:** `C:\work\FactFind-Entities\steering\API-Docs\FactFind-API-Design.md`
+
+---
+
+**END OF SPECIFICATION**
+
+This comprehensive API design provides production-ready specifications for implementing the complete FactFind system. All endpoints follow RESTful principles, industry standards, and regulatory requirements for wealth management platforms.
