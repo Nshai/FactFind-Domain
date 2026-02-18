@@ -1,12 +1,12 @@
 
-<!-- FactFind API Design v3.0 - Generated: 2026-02-17T14:59:30.880008 -->
+<!-- FactFind API Design v2.0 - Generated: 2026-02-17T14:59:30.880008 -->
 # FactFind System API Design Specification
 ## Comprehensive RESTful API for Wealth Management Platform
 
-**Document Version:** 3.0
+**Document Version:** 2.0
 **Date:** 2026-02-18
-**Status:** Design Specification v3.0 - Enhanced with Missing Entities
-**API Version:** v2
+**Status:** Design Specification v2.0 - Enhanced with Missing Entities
+**API Version:** v1
 **Base URL:** `https://api.factfind.com`
 **Source:** Greenfield ERD Enhanced - Complete Domain Coverage (50+ entities, 2,000+ fields)
 
@@ -170,10 +170,18 @@ The FactFind API provides comprehensive digital capabilities for:
    - [5.1 Overview](#51-overview)
    - [5.2 Operations Summary](#52-operations-summary)
    - [5.3 Key Endpoints](#53-key-endpoints)
-6. [Income & Expenditure API](#6-income--expenditure-api)
+6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
    - [6.3 Key Endpoints](#63-key-endpoints)
+     - [6.3.1 List Employment Records](#631-list-employment-records)
+     - [6.3.2 Create Employment Record](#632-create-employment-record)
+     - [6.3.3 List Income Sources](#633-list-income-sources)
+     - [6.3.4 Create Income Source](#634-create-income-source)
+     - [6.3.5 Create Income Change](#635-create-income-change)
+     - [6.3.6 List Expenditure Items](#636-list-expenditure-items)
+     - [6.3.7 Create Expenditure Item](#637-create-expenditure-item)
+     - [6.3.8 Create Expenditure Change](#638-create-expenditure-change)
 7. [Employment API](#7-employment-api)
    - [7.1 Overview](#71-overview)
    - [7.2 Operations Summary](#72-operations-summary)
@@ -3548,450 +3556,695 @@ Income contract with required-on-create fields.
 
 
 
-## 6. Income & Expenditure API
+## 6. Income & Expenditure API (Circumstances Context)
 
 ### 6.1 Overview
 
-
 **Base Paths:**
-- Income: `/api/v1/factfinds/{factfindId}/income`
-- Expenditure: `/api/v1/factfinds/{factfindId}/expenditure`
+- Employment: `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment`
+- Income: `/api/v1/factfinds/{factfindId}/clients/{clientId}/income`
+- Income Changes: `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes`
+- Expenditure: `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure`
+- Expenditure Changes: `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
 
-**Purpose:** Manage client's existing financial arrangements including pensions, investments, protection policies, and mortgages.
+**Purpose:** Track client's actual income sources, employment history, expenditure, and expected changes to their financial circumstances.
 
 **Scope:**
-- Pension arrangements (Personal Pension, SIPP, SSAS, Defined Benefit, State Pension)
-- Investment arrangements (ISA, GIA, Offshore Bond, Onshore Bond, Investment Trust)
-- Protection arrangements (Life Assurance, Critical Illness, Income Protection, PHI)
-- Mortgage arrangements (Residential, Buy-to-Let, Commercial)
-- Savings accounts
-- General insurance (Home, Contents, Motor)
-- Annuities (Lifetime, Fixed Term)
-- Contributions tracking
-- Valuations and performance
-- Withdrawals and income
+- Employment history (current and past employment records)
+- Income sources (salaries, rental income, dividends, pensions in payment, benefits)
+- Expected income changes (promotions, bonuses, retirement, benefit changes)
+- Living expenses (mortgage/rent, utilities, food, transport, insurance)
+- Debt payments (loans, credit cards)
+- Expected expenditure changes (mortgage payoff, retirement lifestyle changes)
 
-**Aggregate Root:** FactFind (arrangements are nested within)
+**Aggregate Root:** Client (each client has their own circumstances, nested under FactFind)
+
+**Key Characteristics:**
+- **Nested under clients** - Each client in a fact-find has their own income and expenditure
+- **Actual cash flow** - Records real money coming in and going out
+- **Time-based** - Tracks start dates, end dates, and future changes
+- **Frequency-aware** - Handles weekly, monthly, quarterly, annual amounts
+- **Affordability calculations** - Supports budget and affordability assessments
 
 **Regulatory Compliance:**
-- FCA COBS (Suitability)
-- Pension Transfer regulations (TVAS/AVAS)
-- PROD (Product Governance)
-- Consumer Duty (Value Assessment)
+- FCA COBS (Suitability and Affordability)
+- Consumer Duty (Understanding Customer Needs)
+- Mortgage Credit Directive (Affordability Assessment)
 
 ### 6.2 Operations Summary
 
+**Employment Operations:**
+
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/arrangements` | List arrangements with filters | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements` | Create arrangement | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | Get arrangement details | `arrangements:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | Update arrangement | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | Delete arrangement | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | List contributions | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | Add contribution | `arrangements:write` |
-| PUT | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{id}` | Update contribution | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | List valuations | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | Add valuation | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | List withdrawals/income | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | Add withdrawal | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | List beneficiaries | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | Add beneficiary | `arrangements:write` |
-| GET | `/api/v1/reference/arrangement-types` | List arrangement types | `arrangements:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment` | List employment records | `circumstances:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment` | Create employment record | `circumstances:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Get employment details | `circumstances:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Update employment record | `circumstances:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Delete employment record | `circumstances:write` |
+
+**Income Operations:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income` | List income sources | `circumstances:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income` | Create income source | `circumstances:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Get income details | `circumstances:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Update income source | `circumstances:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Delete income source | `circumstances:write` |
+
+**Income Changes Operations:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes` | List expected income changes | `circumstances:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes` | Create income change | `circumstances:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Get income change details | `circumstances:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Update income change | `circumstances:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Delete income change | `circumstances:write` |
+
+**Expenditure Operations:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure` | List expenditure items | `circumstances:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure` | Create expenditure item | `circumstances:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Get expenditure details | `circumstances:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Update expenditure item | `circumstances:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Delete expenditure item | `circumstances:write` |
+
+**Expenditure Changes Operations:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes` | List expected expenditure changes | `circumstances:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes` | Create expenditure change | `circumstances:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Get expenditure change details | `circumstances:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Update expenditure change | `circumstances:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Delete expenditure change | `circumstances:write` |
 
 ### 6.3 Key Endpoints
 
-#### 6.3.1 Create Arrangement (Pension)
+### 6.3 Key Endpoints
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/arrangements`
+#### 6.3.1 List Employment Records
 
-**Description:** Create a new arrangement (polymorphic - type determined by productType).
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/employment`
 
-**Contract:** Uses the unified `Arrangement` contract (see Section 11.5). This is a polymorphic contract where `arrangementType` acts as a discriminator. Type-specific fields are included based on the arrangementType value.
+**Description:** Retrieve all employment records for a client, including current and historical employment.
 
-**Request Body (Personal Pension SIPP):**
-Arrangement contract with required-on-create fields and type-specific fields for pension arrangements.
+**Query Parameters:**
+- `status` - Filter by employment status (Current, Previous, NotEmployed)
+- `includeEnded` - Include employment records with end dates (default: true)
 
-
+**Response:**
 ```json
 {
-  "client": {
-    "id": 123
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "totalRecords": 2,
+  "employment": [
+    {
+      "id": "emp-456",
+      "employmentType": "Employed",
+      "employerName": "ABC Technology Ltd",
+      "jobTitle": "Software Engineer",
+      "occupation": {
+        "code": "2136",
+        "display": "Programmers and software development professionals"
+      },
+      "startDate": "2020-03-01",
+      "endDate": null,
+      "status": "Current",
+      "annualSalary": {
+        "amount": 65000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "payFrequency": "Monthly",
+      "bonusAmount": {
+        "amount": 5000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "benefitsInKind": {
+        "amount": 2000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-456"
+        }
+      }
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment"
+    },
+    "create": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment",
+      "method": "POST"
+    }
+  }
+}
+```
+
+#### 6.3.2 Create Employment Record
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/employment`
+
+**Description:** Create a new employment record for a client.
+
+**Request Body:**
+```json
+{
+  "employmentType": "Employed",
+  "employerName": "XYZ Corporation",
+  "jobTitle": "Financial Analyst",
+  "occupation": {
+    "code": "3537",
+    "display": "Financial and accounting technicians"
   },
-  "productType": {
-    "code": "PP",
-    "display": "Personal Pension",
-    "category": "Pension"
-  },
-  "productSubType": "SIPP",
-  "provider": {
-    "id": 500,
-    "name": "Vanguard"
-  },
-  "policyNumber": "PP-12345678",
-  "productName": "Vanguard SIPP",
-  "status": {
-    "code": "INF",
-    "display": "In Force"
-  },
-  "startDate": "2020-01-15",
-  "owners": "Client1",
-  "isPreExistingPlan": true,
-  "isCurrentScheme": true,
-  "pensionArrangement": "PersonalPension",
-  "pensionTaxBasis": "Relief at Source",
-  "normalRetirementAge": 65,
-  "selectedRetirementAge": 65,
-  "taxFreeCashOptions": "SchemeStandard",
-  "schemeSpecificPclsADayFundValue": {
-    "amount": 250000.00,
+  "startDate": "2021-06-01",
+  "endDate": null,
+  "status": "Current",
+  "annualSalary": {
+    "amount": 45000.00,
     "currency": {
       "code": "GBP",
       "display": "British Pound",
       "symbol": "£"
     }
   },
-  "schemeSpecificPclsADayPclsValue": {
-    "amount": 62500.00,
+  "payFrequency": "Monthly",
+  "bonusAmount": {
+    "amount": 3000.00,
     "currency": {
       "code": "GBP",
       "display": "British Pound",
       "symbol": "£"
     }
-  },
-  "hasProtectedPcls": false,
-  "isContributionsPaidBySalaryExchange": false,
-  "showInPfpPortfolio": true,
-  "isVisibleToClient": true
+  }
 }
 ```
 
 **Response:**
-Complete `Arrangement` contract with all fields populated, including server-generated and computed fields.
-
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/{factfindId}/arrangements/777
+Location: /api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789
 
 {
-  "id": 777,
-  "client": {
-    "id": 123,
-    "fullName": "John Smith",
-    "href": "/api/v1/factfinds/{factfindId}/clients/123"
+  "id": "emp-789",
+  "employmentType": "Employed",
+  "employerName": "XYZ Corporation",
+  "jobTitle": "Financial Analyst",
+  "occupation": {
+    "code": "3537",
+    "display": "Financial and accounting technicians"
   },
-  "productType": {
-    "code": "PP",
-    "display": "Personal Pension",
-    "category": "Pension"
-  },
-  "productSubType": "SIPP",
-  "provider": {
-    "id": 500,
-    "name": "Vanguard",
-    "href": "/api/v1/providers/500"
-  },
-  "policyNumber": "PP-12345678",
-  "productName": "Vanguard SIPP",
-  "status": {
-    "code": "INF",
-    "display": "In Force"
-  },
-  "startDate": "2020-01-15",
-  "owners": "Client1",
-  "isPreExistingPlan": true,
-  "isCurrentScheme": true,
-  "pensionArrangement": "PersonalPension",
-  "pensionTaxBasis": "Relief at Source",
-  "normalRetirementAge": 65,
-  "selectedRetirementAge": 65,
-  "taxFreeCashOptions": "SchemeStandard",
-  "schemeSpecificPclsADayFundValue": {
-    "amount": 250000.00,
+  "startDate": "2021-06-01",
+  "endDate": null,
+  "status": "Current",
+  "annualSalary": {
+    "amount": 45000.00,
     "currency": {
       "code": "GBP",
       "display": "British Pound",
       "symbol": "£"
     }
   },
-  "schemeSpecificPclsADayPclsValue": {
-    "amount": 62500.00,
+  "payFrequency": "Monthly",
+  "bonusAmount": {
+    "amount": 3000.00,
     "currency": {
       "code": "GBP",
       "display": "British Pound",
       "symbol": "£"
     }
   },
-  "hasProtectedPcls": false,
-  "isContributionsPaidBySalaryExchange": false,
-  "currentValue": {
-    "amount": 0.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "showInPfpPortfolio": true,
-  "isVisibleToClient": true,
-  "createdAt": "2026-02-16T15:00:00Z",
-  "updatedAt": "2026-02-16T15:00:00Z",
+  "createdAt": "2026-02-18T10:00:00Z",
+  "updatedAt": "2026-02-18T10:00:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777" },
-    "update": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777", "method": "PUT" },
-    "contributions": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777/contributions" },
-    "valuations": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777/valuations" },
-    "withdrawals": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777/withdrawals" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789"
+    },
+    "update": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789",
+      "method": "PATCH"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+    }
   }
 }
 ```
 
-**Product Types:**
+**Employment Types:**
+- `Employed` - Salaried employment
+- `SelfEmployed` - Self-employed/sole trader
+- `Director` - Company director
+- `Retired` - Retired from employment
+- `NotEmployed` - Unemployed or not in workforce
 
-**Pensions:**
-- `PersonalPension` (SIPP, SSAS, Group Personal Pension, Stakeholder)
-- `OccupationalPension` (Defined Benefit, Defined Contribution, SASS, FSAVC)
-- `StatePension` (Old State Pension, New State Pension)
-- `Annuity` (Lifetime Annuity, Fixed Term Annuity, Enhanced Annuity)
+#### 6.3.3 List Income Sources
 
-**Investments:**
-- `ISA` (Stocks & Shares ISA, Cash ISA, Lifetime ISA, Innovative Finance ISA)
-- `GeneralInvestmentAccount` (GIA, Platform Account, Discretionary Management)
-- `OffshoreBond` (Single Premium, Regular Premium)
-- `OnshoreBond` (Investment Bond, Guaranteed Bond)
-- `InvestmentTrust` (IT, OEIC, Unit Trust)
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/income`
 
-**Protection:**
-- `LifeAssurance` (Term Life, Whole of Life, Universal Life)
-- `CriticalIllnessCover` (Standalone, Accelerated)
-- `IncomeProtection` (Personal, Group, ASU)
-- `KeyPersonInsurance`
+**Description:** Retrieve all income sources for a client.
 
-**Mortgages:**
-- `ResidentialMortgage` (Repayment, Interest Only, Mixed)
-- `BuyToLetMortgage`
-- `CommercialMortgage`
-- `EquityRelease` (Lifetime Mortgage, Home Reversion)
-
-**Savings:**
-- `SavingsAccount` (Instant Access, Notice Account, Fixed Rate Bond)
-- `CashISA`
-
-**General Insurance:**
-- `BuildingsInsurance`
-- `ContentsInsurance`
-- `MotorInsurance`
-- `TravelInsurance`
-
-#### 6.3.2 Add Contribution
-
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/arrangements/{id}/contributions`
-
-**Description:** Add a contribution to a pension or investment arrangement.
-
-**Request Body:**
-```json
-{
-  "contributionType": "Regular",
-  "contributorType": "Member",
-  "contributionFrequency": "Monthly",
-  "contributionAmount": {
-    "amount": 500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "contributionTaxBasis": "ReliefAtSource",
-  "regularContributionAmountNetMember": {
-    "amount": 400.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "regularContributionAmountGrossMember": {
-    "amount": 500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "contributionStartsOn": "2020-01-15",
-  "contributionStopsOn": null
-}
-```
+**Query Parameters:**
+- `incomeCategory` - Filter by income category (Employment, Rental, Investment, Pension, Benefits, Other)
+- `isTaxable` - Filter by taxable status (true/false)
+- `includeEnded` - Include income with end dates (default: true)
 
 **Response:**
 ```json
 {
-  "id": "contribution-888",
-  "arrangementRef": {
-    "id": "arrangement-777",
-    "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-777",
-    "policyNumber": "POL123456",
-    "productType": "Pension",
-    "provider": "ABC Provider"
-  },
-  "contributionType": "Regular",
-  "contributorType": "Member",
-  "contributionFrequency": "Monthly",
-  "contributionAmount": {
-    "amount": 500.00,
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "totalIncome": {
+    "amount": 72000.00,
     "currency": {
       "code": "GBP",
       "display": "British Pound",
       "symbol": "£"
     }
   },
-  "contributionTaxBasis": "ReliefAtSource",
-  "regularContributionAmountNetMember": {
-    "amount": 400.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+  "income": [
+    {
+      "id": "inc-111",
+      "incomeCategory": "Employment",
+      "description": "Salary from ABC Technology",
+      "amount": {
+        "amount": 65000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": "Annual",
+      "startDate": "2020-03-01",
+      "endDate": null,
+      "isTaxable": true,
+      "_links": {
+        "self": {
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-111"
+        }
+      }
+    },
+    {
+      "id": "inc-222",
+      "incomeCategory": "Rental",
+      "description": "Rental income - Buy-to-Let property",
+      "amount": {
+        "amount": 7000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": "Annual",
+      "startDate": "2019-01-01",
+      "endDate": null,
+      "isTaxable": true,
+      "_links": {
+        "self": {
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-222"
+        }
+      }
     }
-  },
-  "regularContributionAmountGrossMember": {
-    "amount": 500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "taxReliefAmount": {
-    "amount": 100.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "annualContributionGross": {
-    "amount": 6000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "contributionPeriod": {
-    "startDate": "2020-01-15",
-    "endDate": null
-  },
-  "isActive": true,
-  "createdAt": "2026-02-16T15:05:00Z",
+  ],
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-777/contributions/contribution-888" },
-    "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-777" }
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income"
+    },
+    "create": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income",
+      "method": "POST"
+    }
   }
 }
 ```
 
-**Validation Rules:**
-- `contributionType` - Required, one of: Regular, Single, Transfer, EmployerContribution
-- `contributionFrequency` - Required for Regular, one of: Monthly, Quarterly, Annual
-- `contributionAmount` - Required, amount > 0
-- Net + Tax Relief = Gross for Relief at Source
-- Gross - Tax Relief = Net for Net Pay Arrangement
+#### 6.3.4 Create Income Source
 
-#### 6.3.3 Add Valuation
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/income`
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/arrangements/{id}/valuations`
-
-**Description:** Record a valuation for an arrangement.
+**Description:** Create a new income source for a client.
 
 **Request Body:**
 ```json
 {
-  "valuationDate": "2026-02-16",
-  "valuationType": "Current",
-  "currentValue": {
-    "amount": 275000.00,
+  "incomeCategory": "Pension",
+  "description": "State Pension",
+  "amount": {
+    "amount": 10600.00,
     "currency": {
       "code": "GBP",
       "display": "British Pound",
       "symbol": "£"
     }
   },
-  "surrenderTransferValue": {
-    "amount": 270000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
+  "frequency": "Annual",
+  "startDate": "2027-01-01",
+  "endDate": null,
+  "isTaxable": true
 }
 ```
 
 **Response:**
-```json
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333
+
 {
-  "id": "valuation-999",
-  "arrangementRef": {
-    "id": "arrangement-777",
-    "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-777",
-    "policyNumber": "POL123456",
-    "productType": "Pension",
-    "provider": "ABC Provider"
-  },
-  "valuationDate": "2026-02-16",
-  "valuationType": "Current",
-  "currentValue": {
-    "amount": 275000.00,
+  "id": "inc-333",
+  "incomeCategory": "Pension",
+  "description": "State Pension",
+  "amount": {
+    "amount": 10600.00,
     "currency": {
       "code": "GBP",
       "display": "British Pound",
       "symbol": "£"
     }
   },
-  "surrenderTransferValue": {
-    "amount": 270000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  },
-  "growthSinceLastValuation": {
-    "amount": 25000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  },
-    "percentageGrowth": 10.0
-  },
-  "createdAt": "2026-02-16T15:10:00Z",
+  "frequency": "Annual",
+  "startDate": "2027-01-01",
+  "endDate": null,
+  "isTaxable": true,
+  "createdAt": "2026-02-18T10:15:00Z",
+  "updatedAt": "2026-02-18T10:15:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777/valuations/999" },
-    "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777" }
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333"
+    },
+    "update": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333",
+      "method": "PATCH"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+    }
   }
 }
 ```
 
-**Valuation Types:**
-- `Current` - Current market value
-- `TransferValue` - Cash Equivalent Transfer Value (CETV) for DB pensions
-- `Projection` - Projected future value
-- `MaturityValue` - Expected maturity value
+**Income Categories:**
+- `Employment` - Salary, wages, bonuses
+- `Rental` - Rental income from properties
+- `Investment` - Dividends, interest
+- `Pension` - Pension income (state, private)
+- `Benefits` - State benefits, welfare
+- `Other` - Other income sources
+
+**Frequency Values:**
+- `Weekly`, `Fortnightly`, `Monthly`, `Quarterly`, `Annual`
+
+#### 6.3.5 Create Income Change
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes`
+
+**Description:** Record an expected change to income (e.g., retirement, promotion, bonus ending).
+
+**Request Body:**
+```json
+{
+  "incomeRef": {
+    "id": "inc-111",
+    "description": "Salary from ABC Technology"
+  },
+  "changeType": "Stop",
+  "effectiveDate": "2027-03-01",
+  "newAmount": null,
+  "reason": "Retirement"
+}
+```
+
+**Response:**
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-change-444
+
+{
+  "id": "inc-change-444",
+  "incomeRef": {
+    "id": "inc-111",
+    "description": "Salary from ABC Technology",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-111"
+  },
+  "changeType": "Stop",
+  "effectiveDate": "2027-03-01",
+  "newAmount": null,
+  "reason": "Retirement",
+  "createdAt": "2026-02-18T10:30:00Z",
+  "updatedAt": "2026-02-18T10:30:00Z",
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-change-444"
+    },
+    "income": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-111"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+    }
+  }
+}
+```
+
+**Change Types:**
+- `Increase` - Income will increase
+- `Decrease` - Income will decrease
+- `Stop` - Income will cease
+- `Start` - New income will commence
+
+#### 6.3.6 List Expenditure Items
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure`
+
+**Description:** Retrieve all expenditure items for a client.
+
+**Query Parameters:**
+- `expenditureType` - Filter by type (Mortgage, Rent, Utilities, Food, Transport, Insurance, Debt, Discretionary)
+- `isDiscretionary` - Filter by discretionary status (true/false)
+
+**Response:**
+```json
+{
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "totalExpenditure": {
+    "amount": 48000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "expenditure": [
+    {
+      "id": "exp-555",
+      "expenditureType": "Mortgage",
+      "description": "Mortgage payment - main residence",
+      "amount": {
+        "amount": 18000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": "Annual",
+      "isDiscretionary": false,
+      "startDate": "2015-06-01",
+      "endDate": "2040-05-31",
+      "_links": {
+        "self": {
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+        }
+      }
+    },
+    {
+      "id": "exp-666",
+      "expenditureType": "Utilities",
+      "description": "Gas, electricity, water",
+      "amount": {
+        "amount": 2400.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": "Annual",
+      "isDiscretionary": false,
+      "startDate": "2015-06-01",
+      "endDate": null,
+      "_links": {
+        "self": {
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-666"
+        }
+      }
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure"
+    },
+    "create": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure",
+      "method": "POST"
+    }
+  }
+}
+```
+
+#### 6.3.7 Create Expenditure Item
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure`
+
+**Description:** Create a new expenditure item for a client.
+
+**Request Body:**
+```json
+{
+  "expenditureType": "Transport",
+  "description": "Car lease payment",
+  "amount": {
+    "amount": 3600.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": "Annual",
+  "isDiscretionary": true,
+  "startDate": "2024-01-01",
+  "endDate": "2027-12-31"
+}
+```
+
+**Response:**
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
+
+{
+  "id": "exp-777",
+  "expenditureType": "Transport",
+  "description": "Car lease payment",
+  "amount": {
+    "amount": 3600.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": "Annual",
+  "isDiscretionary": true,
+  "startDate": "2024-01-01",
+  "endDate": "2027-12-31",
+  "createdAt": "2026-02-18T11:00:00Z",
+  "updatedAt": "2026-02-18T11:00:00Z",
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777"
+    },
+    "update": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777",
+      "method": "PATCH"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+    }
+  }
+}
+```
+
+**Expenditure Types:**
+- `Mortgage` - Mortgage or rent payments
+- `Rent` - Rental payments
+- `Utilities` - Gas, electricity, water, council tax
+- `Food` - Groceries and dining
+- `Transport` - Car, fuel, public transport
+- `Insurance` - Home, car, life insurance premiums
+- `Debt` - Loan payments, credit card payments
+- `Discretionary` - Entertainment, holidays, hobbies
+- `Other` - Other expenses
+
+#### 6.3.8 Create Expenditure Change
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
+
+**Description:** Record an expected change to expenditure (e.g., mortgage payoff, lifestyle changes).
+
+**Request Body:**
+```json
+{
+  "expenditureRef": {
+    "id": "exp-555",
+    "description": "Mortgage payment - main residence"
+  },
+  "changeType": "Stop",
+  "effectiveDate": "2040-05-31",
+  "newAmount": null,
+  "reason": "Mortgage term end"
+}
+```
+
+**Response:**
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/exp-change-888
+
+{
+  "id": "exp-change-888",
+  "expenditureRef": {
+    "id": "exp-555",
+    "description": "Mortgage payment - main residence",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+  },
+  "changeType": "Stop",
+  "effectiveDate": "2040-05-31",
+  "newAmount": null,
+  "reason": "Mortgage term end",
+  "createdAt": "2026-02-18T11:15:00Z",
+  "updatedAt": "2026-02-18T11:15:00Z",
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/exp-change-888"
+    },
+    "expenditure": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+    }
+  }
+}
+```
+
+**Change Types:**
+- `Increase` - Expenditure will increase
+- `Decrease` - Expenditure will decrease
+- `Stop` - Expenditure will cease
+- `Start` - New expenditure will commence
 
 ---
 
