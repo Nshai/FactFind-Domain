@@ -191,6 +191,15 @@ The FactFind API provides comprehensive digital capabilities for:
      - [5.6.3 Create Note](#563-create-note)
      - [5.6.4 Update Note](#564-update-note)
      - [5.6.5 Delete Note](#565-delete-note)
+   - [5.7 Custom Questions (Supplementary Questions)](#57-custom-questions-supplementary-questions) **NEW v3.0**
+     - [5.7.1 Operations Summary](#571-operations-summary)
+     - [5.7.2 List Custom Questions](#572-list-custom-questions)
+     - [5.7.3 Create Custom Question](#573-create-custom-question)
+     - [5.7.4 Get Custom Question Details](#574-get-custom-question-details)
+     - [5.7.5 Update Custom Question](#575-update-custom-question)
+     - [5.7.6 Delete Custom Question](#576-delete-custom-question)
+     - [5.7.7 Submit Question Answers](#577-submit-question-answers)
+     - [5.7.8 Get Question Answers](#578-get-question-answers)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -4903,6 +4912,980 @@ Response: Note created
 
 Use: Demonstrate suitability in file review
 ```
+
+---
+
+### 5.7 Custom Questions (Supplementary Questions)
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions`
+
+**Purpose:** Capture additional client information through configurable custom questions beyond standard fact-find fields. Supports dynamic questionnaires with conditional logic, validation rules, and flexible answer types.
+
+**Key Features:**
+- **10 Question Types** - Text, Textarea, NumberWhole, NumberDecimal, Date, YesNo, DropDownList, Select, Checkbox, Monetary
+- **Conditional Logic** - Questions can be required, enabled, or visible based on answers to other questions
+- **Flexible Options** - Multi-select support for dropdown, select, and checkbox questions
+- **Pattern Validation** - Regex patterns for text input validation
+- **Custom Attributes** - Extensible dictionary for additional metadata
+- **Tagging System** - Organize questions by tags and subcategories
+- **Separate Answer Storage** - Questions and answers stored separately for versioning
+- **Archival Support** - Questions can be archived without losing historical data
+
+**Use Cases:**
+- ESG preferences and ethical investing criteria
+- Additional due diligence questions for high-net-worth clients
+- Product-specific suitability questions
+- Regional compliance requirements
+- Firm-specific data capture requirements
+- Client preference tracking (communication, meeting preferences, etc.)
+
+**Aggregate Root:** Client (within FactFind context)
+
+**Regulatory Compliance:**
+- FCA COBS 9.2 (Assessing Suitability - Additional Information Gathering)
+- MiFID II Article 25 (Assessment of Suitability)
+- FCA Consumer Duty (Understanding Customer Needs)
+- GDPR Article 6 (Lawful Basis for Processing)
+- Data Protection Act 2018 (Special Category Data)
+
+---
+
+#### 5.7.1 Operations Summary
+
+**Question Management Endpoints:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions` | List all custom questions | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions` | Create custom question | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Get question details | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Update custom question | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Delete custom question | `client:write` |
+
+**Answer Management Endpoints:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers` | Get all question answers | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers` | Submit/update question answers | `client:write` |
+
+---
+
+#### 5.7.2 List Custom Questions
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions`
+
+**Description:** Retrieves all custom questions configured for a client, including archived questions. Use query parameters to filter by tags, subcategory, or archived status.
+
+**Path Parameters:**
+- `factfindId` (required) - The fact find identifier
+- `clientId` (required) - The client identifier
+
+**Query Parameters:**
+- `tags` (optional) - Filter by tags (comma-separated)
+- `subcategoryId` (optional) - Filter by subcategory ID
+- `includeArchived` (optional) - Include archived questions (default: false)
+- `page` (optional) - Page number (default: 1)
+- `pageSize` (optional) - Items per page (default: 50, max: 200)
+
+**Response:** `200 OK`
+
+```json
+{
+  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions",
+  "first_href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions?page=1",
+  "last_href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions?page=1",
+  "next_href": null,
+  "prev_href": null,
+  "items": [
+    {
+      "id": 1234,
+      "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1234",
+      "questionType": "YesNo",
+      "subcategory": {
+        "id": 10,
+        "order": 1
+      },
+      "isRequired": true,
+      "isMultiple": false,
+      "text": "Are you interested in ethical or ESG investing?",
+      "options": null,
+      "order": 1,
+      "tags": ["ESG", "Investment"],
+      "isArchived": false,
+      "includeNotes": true,
+      "placeHolderText": null,
+      "helpText": "ESG stands for Environmental, Social, and Governance investing",
+      "pattern": null,
+      "errorText": null,
+      "attributes": {
+        "displayGroup": "Investment Preferences",
+        "adviserOnly": "false"
+      },
+      "logic": []
+    },
+    {
+      "id": 1235,
+      "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1235",
+      "questionType": "Checkbox",
+      "subcategory": {
+        "id": 10,
+        "order": 2
+      },
+      "isRequired": false,
+      "isMultiple": true,
+      "text": "Which ESG factors are most important to you?",
+      "options": [
+        {
+          "order": 1,
+          "isArchived": false,
+          "value": 1,
+          "text": "Environmental sustainability"
+        },
+        {
+          "order": 2,
+          "isArchived": false,
+          "value": 2,
+          "text": "Social responsibility"
+        },
+        {
+          "order": 3,
+          "isArchived": false,
+          "value": 3,
+          "text": "Corporate governance"
+        },
+        {
+          "order": 4,
+          "isArchived": false,
+          "value": 4,
+          "text": "Climate change mitigation"
+        }
+      ],
+      "order": 2,
+      "tags": ["ESG", "Investment"],
+      "isArchived": false,
+      "includeNotes": false,
+      "placeHolderText": null,
+      "helpText": "Select all that apply",
+      "pattern": null,
+      "errorText": null,
+      "attributes": {
+        "displayGroup": "Investment Preferences"
+      },
+      "logic": [
+        {
+          "type": "VisibleIf",
+          "parentQuestion": {
+            "id": 1234,
+            "answer": "Yes"
+          }
+        }
+      ]
+    },
+    {
+      "id": 1236,
+      "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1236",
+      "questionType": "Monetary",
+      "subcategory": {
+        "id": 11,
+        "order": 1
+      },
+      "isRequired": true,
+      "isMultiple": false,
+      "text": "What is your target retirement income per year?",
+      "options": null,
+      "order": 3,
+      "tags": ["Retirement", "Goals"],
+      "isArchived": false,
+      "includeNotes": true,
+      "placeHolderText": "GBP 50000",
+      "helpText": "Enter amount in format: CURRENCY AMOUNT (e.g., GBP 50000)",
+      "pattern": "^[A-Z]{3}\\s\\d+(\\.\\d{2})?$",
+      "errorText": "Please enter amount in format: GBP 50000",
+      "attributes": {
+        "displayGroup": "Retirement Planning"
+      },
+      "logic": []
+    }
+  ],
+  "count": 3,
+  "_links": {
+    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" },
+    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
+    "answers": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers" }
+  }
+}
+```
+
+**Business Rules:**
+- Questions are returned in `order` sequence
+- Archived questions excluded by default unless `includeArchived=true`
+- Questions with conditional logic include parent question reference
+- Maximum 200 custom questions per client
+
+**Validation Rules:**
+- `factfindId` must exist
+- `clientId` must exist and belong to the factfind
+- User must have `client:read` permission
+
+---
+
+#### 5.7.3 Create Custom Question
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions`
+
+**Description:** Creates a new custom question for a client. The question can include validation rules, conditional logic, and custom attributes.
+
+**Path Parameters:**
+- `factfindId` (required) - The fact find identifier
+- `clientId` (required) - The client identifier
+
+**Request Body:**
+
+```json
+{
+  "questionType": "DropDownList",
+  "subcategory": {
+    "id": 12,
+    "order": 1
+  },
+  "isRequired": true,
+  "isMultiple": false,
+  "text": "How frequently would you like portfolio reviews?",
+  "options": [
+    {
+      "order": 1,
+      "isArchived": false,
+      "value": 1,
+      "text": "Quarterly"
+    },
+    {
+      "order": 2,
+      "isArchived": false,
+      "value": 2,
+      "text": "Semi-annually"
+    },
+    {
+      "order": 3,
+      "isArchived": false,
+      "value": 3,
+      "text": "Annually"
+    }
+  ],
+  "order": 5,
+  "tags": ["Service", "Preferences"],
+  "isArchived": false,
+  "includeNotes": true,
+  "placeHolderText": "Select review frequency",
+  "helpText": "We'll schedule regular reviews based on your preference",
+  "pattern": null,
+  "errorText": null,
+  "attributes": {
+    "displayGroup": "Service Preferences",
+    "affectsServiceLevel": "true"
+  },
+  "logic": []
+}
+```
+
+**Response:** `201 Created`
+
+```json
+{
+  "id": 1240,
+  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1240",
+  "questionType": "DropDownList",
+  "subcategory": {
+    "id": 12,
+    "order": 1
+  },
+  "isRequired": true,
+  "isMultiple": false,
+  "text": "How frequently would you like portfolio reviews?",
+  "options": [
+    {
+      "order": 1,
+      "isArchived": false,
+      "value": 1,
+      "text": "Quarterly"
+    },
+    {
+      "order": 2,
+      "isArchived": false,
+      "value": 2,
+      "text": "Semi-annually"
+    },
+    {
+      "order": 3,
+      "isArchived": false,
+      "value": 3,
+      "text": "Annually"
+    }
+  ],
+  "order": 5,
+  "tags": ["Service", "Preferences"],
+  "isArchived": false,
+  "includeNotes": true,
+  "placeHolderText": "Select review frequency",
+  "helpText": "We'll schedule regular reviews based on your preference",
+  "pattern": null,
+  "errorText": null,
+  "attributes": {
+    "displayGroup": "Service Preferences",
+    "affectsServiceLevel": "true"
+  },
+  "logic": [],
+  "_links": {
+    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1240" },
+    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
+    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" },
+    "answers": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers" }
+  }
+}
+```
+
+**Validation Rules:**
+- `questionType` must be one of: Text, Textarea, NumberWhole, NumberDecimal, Date, YesNo, DropDownList, Select, Checkbox, Monetary
+- `text` is required (max 500 characters)
+- `options` required for DropDownList, Select, Checkbox types
+- `options` must have at least 2 options
+- Each option must have unique `value`
+- `pattern` must be valid regex if provided
+- `logic.parentQuestion.id` must reference existing question
+- Maximum 200 custom questions per client
+
+**Error Responses:**
+- `400 Bad Request` - Invalid question type or validation failure
+- `404 Not Found` - Client or factfind not found
+- `409 Conflict` - Order conflict with existing question
+- `422 Unprocessable Entity` - Parent question reference invalid
+
+---
+
+#### 5.7.4 Get Custom Question Details
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
+
+**Description:** Retrieves full details of a specific custom question including all logic rules and options.
+
+**Path Parameters:**
+- `factfindId` (required) - The fact find identifier
+- `clientId` (required) - The client identifier
+- `questionId` (required) - The custom question identifier
+
+**Response:** `200 OK`
+
+```json
+{
+  "id": 1237,
+  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1237",
+  "questionType": "NumberDecimal",
+  "subcategory": {
+    "id": 13,
+    "order": 1
+  },
+  "isRequired": true,
+  "isMultiple": false,
+  "text": "What percentage of your portfolio would you allocate to alternative investments?",
+  "options": null,
+  "order": 10,
+  "tags": ["Investment", "RiskProfile"],
+  "isArchived": false,
+  "includeNotes": true,
+  "placeHolderText": "0.00",
+  "helpText": "Alternative investments include private equity, hedge funds, commodities, real estate",
+  "pattern": "^\\d{1,2}(\\.\\d{1,2})?$",
+  "errorText": "Please enter a percentage between 0 and 100",
+  "attributes": {
+    "displayGroup": "Asset Allocation",
+    "min": "0",
+    "max": "100",
+    "step": "0.01"
+  },
+  "logic": [
+    {
+      "type": "EnabledIf",
+      "parentQuestion": {
+        "id": 1234,
+        "answer": "Yes"
+      }
+    }
+  ],
+  "_links": {
+    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1237" },
+    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
+    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" },
+    "parentQuestion": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1234" }
+  }
+}
+```
+
+**Error Responses:**
+- `404 Not Found` - Question, client, or factfind not found
+
+---
+
+#### 5.7.5 Update Custom Question
+
+**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
+
+**Description:** Updates an existing custom question. Cannot change question type. All fields are replaced (not merged).
+
+**Path Parameters:**
+- `factfindId` (required) - The fact find identifier
+- `clientId` (required) - The client identifier
+- `questionId` (required) - The custom question identifier
+
+**Request Body:**
+
+```json
+{
+  "questionType": "Text",
+  "subcategory": {
+    "id": 14,
+    "order": 1
+  },
+  "isRequired": false,
+  "isMultiple": false,
+  "text": "Do you have any specific investment exclusions? (Updated wording)",
+  "options": null,
+  "order": 7,
+  "tags": ["Investment", "ESG", "Preferences"],
+  "isArchived": false,
+  "includeNotes": true,
+  "placeHolderText": "e.g., tobacco, weapons, fossil fuels",
+  "helpText": "List any sectors or companies you wish to exclude from your portfolio",
+  "pattern": null,
+  "errorText": null,
+  "attributes": {
+    "displayGroup": "Investment Preferences",
+    "maxLength": "1000"
+  },
+  "logic": []
+}
+```
+
+**Response:** `200 OK`
+
+```json
+{
+  "id": 1238,
+  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1238",
+  "questionType": "Text",
+  "subcategory": {
+    "id": 14,
+    "order": 1
+  },
+  "isRequired": false,
+  "isMultiple": false,
+  "text": "Do you have any specific investment exclusions? (Updated wording)",
+  "options": null,
+  "order": 7,
+  "tags": ["Investment", "ESG", "Preferences"],
+  "isArchived": false,
+  "includeNotes": true,
+  "placeHolderText": "e.g., tobacco, weapons, fossil fuels",
+  "helpText": "List any sectors or companies you wish to exclude from your portfolio",
+  "pattern": null,
+  "errorText": null,
+  "attributes": {
+    "displayGroup": "Investment Preferences",
+    "maxLength": "1000"
+  },
+  "logic": [],
+  "_links": {
+    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1238" },
+    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
+    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" }
+  }
+}
+```
+
+**Business Rules:**
+- Cannot change `questionType` after creation
+- Updating question text does not affect existing answers
+- Order changes may require reordering other questions
+
+**Validation Rules:**
+- Same validation rules as Create operation
+- `id` in URL must match existing question
+- Cannot change `questionType`
+
+**Error Responses:**
+- `400 Bad Request` - Attempt to change question type
+- `404 Not Found` - Question not found
+- `409 Conflict` - Order conflict
+
+---
+
+#### 5.7.6 Delete Custom Question
+
+**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
+
+**Description:** Soft deletes a custom question by marking it as archived. Historical answers are retained for audit purposes.
+
+**Path Parameters:**
+- `factfindId` (required) - The fact find identifier
+- `clientId` (required) - The client identifier
+- `questionId` (required) - The custom question identifier
+
+**Response:** `204 No Content`
+
+**Business Rules:**
+- Question is marked as `isArchived: true` (soft delete)
+- Historical answers are retained
+- Archived questions excluded from default listings
+- Can be retrieved with `includeArchived=true` query parameter
+
+**Error Responses:**
+- `404 Not Found` - Question not found
+- `409 Conflict` - Question has dependent child questions with logic
+
+---
+
+#### 5.7.7 Submit Question Answers
+
+**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers`
+
+**Description:** Submits or updates answers to custom questions. Replaces all answers (upsert operation). Missing questions in request remain unchanged.
+
+**Path Parameters:**
+- `factfindId` (required) - The fact find identifier
+- `clientId` (required) - The client identifier
+
+**Request Body:**
+
+```json
+[
+  {
+    "question": {
+      "id": 1234
+    },
+    "answerText": "Yes",
+    "selectedOptions": null,
+    "notes": "Client very interested in sustainable investing options"
+  },
+  {
+    "question": {
+      "id": 1235
+    },
+    "answerText": null,
+    "selectedOptions": [
+      {
+        "value": 1,
+        "text": "Environmental sustainability"
+      },
+      {
+        "value": 4,
+        "text": "Climate change mitigation"
+      }
+    ],
+    "notes": null
+  },
+  {
+    "question": {
+      "id": 1236
+    },
+    "answerText": "GBP 60000",
+    "selectedOptions": null,
+    "notes": "Includes state pension estimate of £11,500/year"
+  }
+]
+```
+
+**Response:** `200 OK`
+
+```json
+{
+  "message": "Answers saved successfully",
+  "answeredCount": 3,
+  "totalQuestions": 5,
+  "completionPercentage": 60.0,
+  "_links": {
+    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers" },
+    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" },
+    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" }
+  }
+}
+```
+
+**Business Rules:**
+- Upsert operation - creates new answers or updates existing
+- Missing questions in request are not modified
+- Empty `answerText` and `selectedOptions` clears the answer
+- For monetary questions, format is "CURRENCY AMOUNT" (e.g., "GBP 50000")
+- For select/dropdown/checkbox, use `selectedOptions` array
+- For all other types, use `answerText`
+
+**Validation Rules:**
+- `question.id` must reference existing custom question
+- `answerText` OR `selectedOptions` required (not both)
+- For DropDownList/Select/Checkbox: `selectedOptions` required
+- For other types: `answerText` required
+- `selectedOptions` values must match question's option values
+- `isMultiple=false`: maximum 1 option in `selectedOptions`
+- `isMultiple=true`: multiple options allowed in `selectedOptions`
+- Monetary format must match pattern: `^[A-Z]{3}\s\d+(\.\d{2})?$`
+- Number answers must match question's `pattern` if specified
+- Required questions must have answer if visible/enabled
+
+**Error Responses:**
+- `400 Bad Request` - Invalid answer format or validation failure
+- `404 Not Found` - Question reference not found
+- `422 Unprocessable Entity` - Answer doesn't match question type or options
+
+---
+
+#### 5.7.8 Get Question Answers
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers`
+
+**Description:** Retrieves all answers to custom questions for a client, including the question details for context.
+
+**Path Parameters:**
+- `factfindId` (required) - The fact find identifier
+- `clientId` (required) - The client identifier
+
+**Query Parameters:**
+- `tags` (optional) - Filter by question tags (comma-separated)
+- `subcategoryId` (optional) - Filter by subcategory
+- `includeUnanswered` (optional) - Include questions without answers (default: false)
+
+**Response:** `200 OK`
+
+```json
+{
+  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers",
+  "first_href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers?page=1",
+  "last_href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers?page=1",
+  "next_href": null,
+  "prev_href": null,
+  "items": [
+    {
+      "question": {
+        "id": 1234,
+        "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1234",
+        "questionType": "YesNo",
+        "subcategory": {
+          "id": 10,
+          "order": 1
+        },
+        "isRequired": true,
+        "isMultiple": false,
+        "text": "Are you interested in ethical or ESG investing?",
+        "options": null,
+        "order": 1,
+        "tags": ["ESG", "Investment"],
+        "isArchived": false,
+        "includeNotes": true,
+        "placeHolderText": null,
+        "helpText": "ESG stands for Environmental, Social, and Governance investing",
+        "pattern": null,
+        "errorText": null,
+        "attributes": {
+          "displayGroup": "Investment Preferences"
+        },
+        "logic": []
+      },
+      "answer": {
+        "answerText": "Yes",
+        "selectedOptions": null,
+        "notes": "Client very interested in sustainable investing options"
+      }
+    },
+    {
+      "question": {
+        "id": 1235,
+        "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1235",
+        "questionType": "Checkbox",
+        "subcategory": {
+          "id": 10,
+          "order": 2
+        },
+        "isRequired": false,
+        "isMultiple": true,
+        "text": "Which ESG factors are most important to you?",
+        "options": [
+          {
+            "order": 1,
+            "isArchived": false,
+            "value": 1,
+            "text": "Environmental sustainability"
+          },
+          {
+            "order": 2,
+            "isArchived": false,
+            "value": 2,
+            "text": "Social responsibility"
+          },
+          {
+            "order": 3,
+            "isArchived": false,
+            "value": 3,
+            "text": "Corporate governance"
+          },
+          {
+            "order": 4,
+            "isArchived": false,
+            "value": 4,
+            "text": "Climate change mitigation"
+          }
+        ],
+        "order": 2,
+        "tags": ["ESG", "Investment"],
+        "isArchived": false,
+        "includeNotes": false,
+        "placeHolderText": null,
+        "helpText": "Select all that apply",
+        "pattern": null,
+        "errorText": null,
+        "attributes": {
+          "displayGroup": "Investment Preferences"
+        },
+        "logic": [
+          {
+            "type": "VisibleIf",
+            "parentQuestion": {
+              "id": 1234,
+              "answer": "Yes"
+            }
+          }
+        ]
+      },
+      "answer": {
+        "answerText": null,
+        "selectedOptions": [
+          {
+            "value": 1,
+            "text": "Environmental sustainability"
+          },
+          {
+            "value": 4,
+            "text": "Climate change mitigation"
+          }
+        ],
+        "notes": null
+      }
+    },
+    {
+      "question": {
+        "id": 1236,
+        "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1236",
+        "questionType": "Monetary",
+        "subcategory": {
+          "id": 11,
+          "order": 1
+        },
+        "isRequired": true,
+        "isMultiple": false,
+        "text": "What is your target retirement income per year?",
+        "options": null,
+        "order": 3,
+        "tags": ["Retirement", "Goals"],
+        "isArchived": false,
+        "includeNotes": true,
+        "placeHolderText": "GBP 50000",
+        "helpText": "Enter amount in format: CURRENCY AMOUNT (e.g., GBP 50000)",
+        "pattern": "^[A-Z]{3}\\s\\d+(\\.\\d{2})?$",
+        "errorText": "Please enter amount in format: GBP 50000",
+        "attributes": {
+          "displayGroup": "Retirement Planning"
+        },
+        "logic": []
+      },
+      "answer": {
+        "answerText": "GBP 60000",
+        "selectedOptions": null,
+        "notes": "Includes state pension estimate of £11,500/year"
+      }
+    }
+  ],
+  "count": 3,
+  "_links": {
+    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers" },
+    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
+    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" }
+  }
+}
+```
+
+**Business Rules:**
+- Returns only answered questions by default
+- Use `includeUnanswered=true` to see all questions with empty answers
+- Answers are returned in question order
+- Includes full question details for context
+
+---
+
+### Question Types Reference
+
+| Question Type | Answer Format | Example | Notes |
+|--------------|---------------|---------|-------|
+| **Text** | Short text string | `"John Smith"` | Single-line text, max 255 chars |
+| **Textarea** | Long text string | `"Multi-line\ntext content"` | Multi-line text, max 5000 chars |
+| **NumberWhole** | Integer string | `"42"` | Whole numbers only |
+| **NumberDecimal** | Decimal string | `"42.50"` | Decimal numbers |
+| **Date** | ISO 8601 date | `"2026-02-18"` | Format: YYYY-MM-DD |
+| **YesNo** | "Yes" or "No" | `"Yes"` | Boolean question |
+| **DropDownList** | selectedOptions array | `[{"value": 1, "text": "Option 1"}]` | Single selection |
+| **Select** | selectedOptions array | `[{"value": 2, "text": "Option 2"}]` | Single or multiple selection |
+| **Checkbox** | selectedOptions array | `[{"value": 1}, {"value": 3}]` | Multiple selection |
+| **Monetary** | Currency + amount | `"GBP 50000.00"` | Format: CURRENCY AMOUNT |
+
+### Logic Types Reference
+
+| Logic Type | Description | Example Use Case |
+|-----------|-------------|------------------|
+| **RequiredIf** | Question becomes required if parent answer matches | "Pension transfer details required if 'Have existing pension' = Yes" |
+| **EnabledIf** | Question becomes enabled (editable) if parent answer matches | "Investment amount enabled if 'Investing?' = Yes" |
+| **VisibleIf** | Question becomes visible if parent answer matches | "ESG preferences visible if 'Interest in ESG' = Yes" |
+
+---
+
+### Use Cases
+
+#### Use Case 1: ESG Investment Preferences
+
+**Scenario:** Capture client's environmental, social, and governance investment preferences
+
+**API Flow:**
+```
+1. Create YesNo question: "Interested in ESG investing?"
+   POST /custom-questions
+
+2. Create Checkbox question with VisibleIf logic: "Which ESG factors?"
+   POST /custom-questions
+   (Visible only if Q1 = "Yes")
+
+3. Client completes questionnaire:
+   PUT /custom-questions/answers
+   [
+     {"question": {"id": 1}, "answerText": "Yes"},
+     {"question": {"id": 2}, "selectedOptions": [{"value": 1}, {"value": 4}]}
+   ]
+
+4. Retrieve answers for suitability report:
+   GET /custom-questions/answers
+```
+
+**Benefit:** Dynamic questionnaire adapts based on client responses, reducing clutter
+
+---
+
+#### Use Case 2: High-Net-Worth Due Diligence
+
+**Scenario:** Additional KYC questions for HNW clients (>£1M investable assets)
+
+**API Flow:**
+```
+1. Create custom questions for source of wealth:
+   POST /custom-questions
+   {
+     "text": "Please describe the source of your wealth",
+     "questionType": "Textarea",
+     "isRequired": true,
+     "tags": ["KYC", "HNW"]
+   }
+
+2. Create question for politically exposed person status:
+   POST /custom-questions
+   {
+     "text": "Are you or any family member a Politically Exposed Person?",
+     "questionType": "YesNo",
+     "isRequired": true,
+     "tags": ["KYC", "HNW", "PEP"]
+   }
+
+3. Submit answers during onboarding:
+   PUT /custom-questions/answers
+```
+
+**Benefit:** Firm-specific compliance requirements captured alongside standard fact-find
+
+---
+
+#### Use Case 3: Pension Transfer Suitability
+
+**Scenario:** Additional questions required for DB pension transfer advice
+
+**API Flow:**
+```
+1. Create question: "Do you have guaranteed benefits?"
+   POST /custom-questions
+
+2. Create conditional question: "What is your guaranteed annual income?"
+   POST /custom-questions
+   {
+     "logic": [{
+       "type": "RequiredIf",
+       "parentQuestion": {"id": 100, "answer": "Yes"}
+     }]
+   }
+
+3. Create monetary question: "Current transfer value?"
+   POST /custom-questions
+   {"questionType": "Monetary"}
+
+4. Adviser submits pension analysis:
+   PUT /custom-questions/answers
+```
+
+**Benefit:** Complex conditional logic ensures regulatory compliance for specialist advice
+
+---
+
+### Regulatory Compliance
+
+**FCA COBS 9.2 - Assessing Suitability:**
+- Custom questions allow firms to gather additional information beyond standard fact-find
+- Supports "know your customer" obligation
+- Documents client circumstances affecting suitability
+
+**MiFID II Article 25:**
+- Additional questions support enhanced suitability assessment
+- ESG preferences align with sustainability preferences requirements
+- Documented questionnaire responses provide audit trail
+
+**FCA Consumer Duty:**
+- Custom questions help firms understand individual client needs
+- Flexible questionnaire adapts to client circumstances
+- Notes field allows advisers to document client discussions
+
+**Data Protection Act 2018:**
+- Custom questions may capture special category data (health, politics)
+- Firms must ensure lawful basis for processing
+- Attributes field can flag data requiring additional protection
+- Soft delete preserves data for regulatory retention periods
+
+**FCA Handbook PS21/5 (Pension Transfer Advice):**
+- Additional due diligence questions for DB pension transfers
+- Conditional logic ensures required fields completed
+- Monetary question types capture transfer values and guaranteed benefits
+
+---
+
+### Technical Notes
+
+**Question Versioning:**
+- Questions are immutable once answers exist
+- Updates create new version internally
+- Historical answers reference original question version
+
+**Performance Optimization:**
+- Questions cached per client (invalidate on update)
+- Answers stored separately for efficient retrieval
+- Pagination recommended for clients with >50 questions
+
+**Conditional Logic Execution:**
+- Logic evaluated client-side for UX responsiveness
+- Server validates all logic rules on answer submission
+- Circular dependencies detected and rejected
+
+**Security Considerations:**
+- Custom attributes allow PII flagging
+- Questions marked as "adviserOnly" hidden from client portal
+- Audit log tracks all question and answer modifications
+- GDPR right-to-erasure: soft delete retains regulatory minimum
 
 ---
 
