@@ -14751,6 +14751,16 @@ The `FactFind` contract (also known as ADVICE_CASE) represents a fact-finding se
 
 Complete fact find aggregate root with summary calculations.
 
+**ENHANCED v2.2 - Industry-Aligned Value Types:**
+The FactFind contract has been refactored to group related fields into industry-standard value types:
+- **MeetingDetailsValue** (Section 13.2.1) - Meeting/consultation information (FCA/MiFID II terminology)
+- **FinancialSummaryValue** (Section 13.2.2) - Computed financial totals and metrics (read-only snapshot)
+- **AssetHoldingsValue** (Section 13.2.3) - Indicators of what financial products client holds (portfolio management terminology)
+- **InvestmentCapacityValue** (Section 13.2.4) - Client's capacity and budget for new investments (FCA suitability terminology)
+- **CompletionStatusValue** (Section 13.2.5) - Completion tracking and compliance checks
+
+This grouping improves clarity, aligns with industry standards, and makes the contract easier to understand and maintain.
+
 ```json
 {
   "id": "factfind-456",
@@ -14769,152 +14779,276 @@ Complete fact find aggregate root with summary calculations.
     "clientNumber": "C00001235",
     "type": "Person"
   },
-  "dateOfMeeting": "2026-02-16",
-  "typeOfMeeting": {
-    "code": "INIT",
-    "display": "Initial Consultation"
-  },
-  "clientsPresent": "BothClients",
-  "anybodyElsePresent": false,
-  "anybodyElsePresentDetails": null,
-  "scopeOfAdvice": {
-    "retirementPlanning": true,
-    "savingsAndInvestments": true,
-    "protection": true,
-    "mortgage": false,
-    "estatePlanning": false
-  },
   "adviserRef": {
     "id": "adviser-789",
     "href": "/api/v1/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
-  "isComplete": false,
-  "dateFactFindCompleted": null,
-  "dateDeclarationSigned": null,
-  "dateIdAmlChecked": "2026-02-16",
-  "status": {
-    "code": "INPROG",
-    "display": "In Progress"
-  },
-  "hasEmployments": true,
-  "hasExpenditures": true,
-  "hasAssets": true,
-  "hasLiabilities": true,
-  "hasDcPensionPersonal": true,
-  "hasDcPensionMoneyPurchase": true,
-  "hasDbPension": false,
-  "hasSavings": true,
-  "hasInvestments": true,
-  "hasProtection": true,
-  "hasExistingMortgage": true,
-  "hasAnnuity": false,
-  "hasEquityRelease": false,
-  "hasAdverseCredit": false,
-  "hasBeenRefusedCredit": false,
-  "incomeChangesExpected": false,
-  "expenditureChangesExpected": false,
-  "totalEarnedAnnualIncomeGross": {
-    "amount": 120000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalNetMonthlyIncome": {
-    "amount": 7500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalMonthlyExpenditure": {
-    "amount": 4500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalMonthlyDisposableIncome": {
-    "amount": 3000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "emergencyFund": {
-    "requiredAmount": {
-      "amount": 11400.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
+
+  "meetingDetails": {
+    "meetingDate": "2026-02-16",
+    "meetingType": {
+      "code": "INIT",
+      "display": "Initial Consultation"
     },
-    "committedAmount": {
-      "amount": 15000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
+    "clientsPresent": "BothClients",
+    "othersPresent": false,
+    "othersPresentDetails": null,
+    "scopeOfAdvice": {
+      "retirementPlanning": true,
+      "savingsAndInvestments": true,
+      "protection": true,
+      "mortgage": false,
+      "estatePlanning": false
+    }
+  },
+
+  "financialSummary": {
+    "income": {
+      "annualGross": {
+        "amount": 120000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "monthlyNet": {
+        "amount": 7500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netRelevantEarnings": {
+        "amount": 110000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
     },
-    "shortfall": {
-      "amount": 0.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
+    "expenditure": {
+      "monthlyTotal": {
+        "amount": 4500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "monthlyDisposable": {
+        "amount": 3000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "liquidity": {
+      "totalFundsAvailable": {
+        "amount": 85000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "availableForAdvice": {
+        "amount": 70000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    },
+    "taxation": {
+      "highestRate": {
+        "code": "HIGHER",
+        "display": "Higher Rate (40%)",
+        "rate": 0.40
+      }
+    },
+    "sourceOfFunds": "Savings from employment income over past 5 years",
+    "calculatedAt": "2026-02-16T15:45:00Z"
+  },
+
+  "assetHoldings": {
+    "employment": {
+      "hasEmployments": true
+    },
+    "pensions": {
+      "hasPersonalPension": true,
+      "hasMoneyPurchasePension": true,
+      "hasDefinedBenefitPension": false,
+      "hasAnnuity": false
+    },
+    "investments": {
+      "hasSavings": true,
+      "hasInvestments": true
+    },
+    "borrowing": {
+      "hasMortgage": true,
+      "hasEquityRelease": false,
+      "hasOtherLiabilities": true
+    },
+    "protection": {
+      "hasProtection": true
+    },
+    "credit": {
+      "hasAdverseCredit": false,
+      "hasBeenRefusedCredit": false
+    },
+    "other": {
+      "hasOtherAssets": true
     }
   },
-  "totalFundsAvailable": {
-    "amount": 85000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+
+  "investmentCapacity": {
+    "emergencyFund": {
+      "required": {
+        "amount": 11400.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "committed": {
+        "amount": 15000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "shortfall": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "status": "Adequate"
+    },
+    "regularContributions": {
+      "agreedMonthlyBudget": {
+        "amount": 1000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "sustainabilityRating": "High"
+    },
+    "lumpSumInvestment": {
+      "agreedAmount": {
+        "amount": 50000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "sourceOfFunds": "Savings from employment"
+    },
+    "futureChanges": {
+      "incomeChangesExpected": false,
+      "expenditureChangesExpected": false,
+      "details": null
+    },
+    "assessmentDate": "2026-02-16"
+  },
+
+  "completionStatus": {
+    "isComplete": false,
+    "status": {
+      "code": "INPROG",
+      "display": "In Progress"
+    },
+    "completionDate": null,
+    "declarationSignedDate": null,
+    "compliance": {
+      "idCheckedDate": "2026-02-16",
+      "amlCheckedDate": "2026-02-16",
+      "allChecksComplete": true
     }
   },
-  "totalLumpSumAvailableForAdvice": {
-    "amount": 70000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+
+  "atrAssessment": {
+    "templateRef": {
+      "id": "atr-template-v5",
+      "version": "5.0",
+      "name": "FCA Standard ATR 2025"
+    },
+    "assessmentDate": "2026-02-16T10:30:00Z",
+    "questions": [
+      {
+        "questionId": "Q1",
+        "text": "What is your investment experience?",
+        "answer": {
+          "code": "EXPERIENCED",
+          "display": "Experienced - I have invested for more than 5 years"
+        },
+        "score": 4
+      }
+    ],
+    "supplementaryQuestions": [],
+    "riskProfiles": {
+      "generated": [
+        {
+          "riskRating": "Cautious",
+          "riskScore": 35,
+          "description": "Lower risk, lower potential returns"
+        },
+        {
+          "riskRating": "Balanced",
+          "riskScore": 45,
+          "description": "Medium risk, medium potential returns"
+        },
+        {
+          "riskRating": "Adventurous",
+          "riskScore": 55,
+          "description": "Higher risk, higher potential returns"
+        }
+      ],
+      "chosen": {
+        "riskRating": "Balanced",
+        "riskScore": 45,
+        "chosenBy": "Client",
+        "chosenAt": "2026-02-16T10:45:00Z"
+      }
+    },
+    "capacityForLoss": {
+      "canAffordLosses": true,
+      "emergencyFundMonths": 6,
+      "assessmentNotes": "Client has adequate emergency fund and stable income"
+    },
+    "declarations": {
+      "clientDeclaration": {
+        "agreed": true,
+        "agreedAt": "2026-02-16T10:50:00Z"
+      },
+      "adviserDeclaration": {
+        "agreed": true,
+        "agreedAt": "2026-02-16T11:00:00Z",
+        "adviserRef": {
+          "id": "adviser-789",
+          "name": "Jane Doe"
+        }
+      }
+    },
+    "completedAt": "2026-02-16T11:10:00Z",
+    "nextReviewDate": "2027-02-16"
   },
-  "agreedMonthlyBudget": {
-    "amount": 1000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "agreedSingleInvestmentAmount": {
-    "amount": 50000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "highestTaxRate": "HigherRate",
-  "totalNetRelevantEarnings": {
-    "amount": 110000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "sourceOfInvestmentFunds": "Savings from employment income over past 5 years",
+
   "notes": "Clients seeking to consolidate pensions and review protection cover",
   "additionalNotes": null,
   "customQuestions": [
@@ -14923,6 +15057,7 @@ Complete fact find aggregate root with summary calculations.
       "answer": "Ensuring sufficient retirement income and protecting family"
     }
   ],
+
   "createdAt": "2026-02-16T14:30:00Z",
   "updatedAt": "2026-02-16T15:45:00Z",
   "_links": {
@@ -14945,53 +15080,63 @@ Complete fact find aggregate root with summary calculations.
 | `factFindNumber` | string | optional | ignored | included | write-once, business identifier |
 | `clientRef` | ClientRef | required | ignored | included | write-once, reference to Client |
 | `jointClientRef` | ClientRef | optional | ignored | included | write-once, reference to Client |
-| `dateOfMeeting` | date | required | updatable | included | - |
-| `typeOfMeeting` | enum | required | updatable | included | - |
-| `clientsPresent` | enum | optional | updatable | included | - |
-| `anybodyElsePresent` | boolean | optional | updatable | included | - |
-| `anybodyElsePresentDetails` | string | optional | updatable | included | - |
-| `scopeOfAdvice` | object | optional | updatable | included | Value type: embedded scope flags |
 | `adviserRef` | AdviserRef | required | updatable | included | Reference type: Primary adviser |
-| `isComplete` | boolean | ignored | ignored | included | read-only, computed from completion status |
-| `dateFactFindCompleted` | date | optional | updatable | included | - |
-| `dateDeclarationSigned` | date | optional | updatable | included | - |
-| `dateIdAmlChecked` | date | optional | updatable | included | - |
-| `status` | enum | optional | updatable | included | - |
-| `hasEmployments` | boolean | ignored | ignored | included | read-only, computed from child entities |
-| `hasExpenditures` | boolean | ignored | ignored | included | read-only, computed |
-| `hasAssets` | boolean | ignored | ignored | included | read-only, computed |
-| `hasLiabilities` | boolean | ignored | ignored | included | read-only, computed |
-| `hasDcPensionPersonal` | boolean | ignored | ignored | included | read-only, computed |
-| `hasDcPensionMoneyPurchase` | boolean | ignored | ignored | included | read-only, computed |
-| `hasDbPension` | boolean | ignored | ignored | included | read-only, computed |
-| `hasSavings` | boolean | ignored | ignored | included | read-only, computed |
-| `hasInvestments` | boolean | ignored | ignored | included | read-only, computed |
-| `hasProtection` | boolean | ignored | ignored | included | read-only, computed |
-| `hasExistingMortgage` | boolean | ignored | ignored | included | read-only, computed |
-| `hasAnnuity` | boolean | ignored | ignored | included | read-only, computed |
-| `hasEquityRelease` | boolean | ignored | ignored | included | read-only, computed |
-| `hasAdverseCredit` | boolean | optional | updatable | included | - |
-| `hasBeenRefusedCredit` | boolean | optional | updatable | included | - |
-| `incomeChangesExpected` | boolean | optional | updatable | included | - |
-| `expenditureChangesExpected` | boolean | optional | updatable | included | - |
-| `totalEarnedAnnualIncomeGross` | MoneyValue | ignored | ignored | included | read-only, computed from Income entities |
-| `totalNetMonthlyIncome` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `totalMonthlyExpenditure` | MoneyValue | ignored | ignored | included | read-only, computed from Expenditure entities |
-| `totalMonthlyDisposableIncome` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `emergencyFund` | object | optional | updatable | included | Value type: requiredAmount, committedAmount, shortfall (all MoneyValue) |
-| `totalFundsAvailable` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `totalLumpSumAvailableForAdvice` | MoneyValue | optional | updatable | included | Value type |
-| `agreedMonthlyBudget` | MoneyValue | optional | updatable | included | Value type |
-| `agreedSingleInvestmentAmount` | MoneyValue | optional | updatable | included | Value type |
-| `highestTaxRate` | enum | ignored | ignored | included | read-only, computed |
-| `totalNetRelevantEarnings` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `sourceOfInvestmentFunds` | string | optional | updatable | included | - |
+| **`meetingDetails`** | **MeetingDetailsValue** | **required** | **updatable** | **included** | **Value type group (Section 13.2.1)** |
+| **`financialSummary`** | **FinancialSummaryValue** | **ignored** | **ignored** | **included** | **read-only, computed value type (Section 13.2.2)** |
+| **`assetHoldings`** | **AssetHoldingsValue** | **ignored** | **partial** | **included** | **Mostly computed, credit fields updatable (Section 13.2.3)** |
+| **`investmentCapacity`** | **InvestmentCapacityValue** | **optional** | **updatable** | **included** | **Value type group (Section 13.2.4)** |
+| **`completionStatus`** | **CompletionStatusValue** | **optional** | **updatable** | **included** | **Value type group (Section 13.2.5)** |
+| `atrAssessment` | ATRAssessmentValue | optional | updatable | included | Embedded ATR from v2.1 (Section 10) |
 | `notes` | string | optional | updatable | included | - |
 | `additionalNotes` | string | optional | updatable | included | - |
 | `customQuestions` | array | optional | updatable | included | - |
 | `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
+
+**Field Mapping from v2.1 to v2.2:**
+
+| v2.1 Root Field | v2.2 Location | Behavior |
+|----------------|---------------|----------|
+| `dateOfMeeting` | `meetingDetails.meetingDate` | updatable |
+| `typeOfMeeting` | `meetingDetails.meetingType` | updatable |
+| `clientsPresent` | `meetingDetails.clientsPresent` | updatable |
+| `anybodyElsePresent` | `meetingDetails.othersPresent` | updatable |
+| `anybodyElsePresentDetails` | `meetingDetails.othersPresentDetails` | updatable |
+| `scopeOfAdvice` | `meetingDetails.scopeOfAdvice` | updatable |
+| `totalEarnedAnnualIncomeGross` | `financialSummary.income.annualGross` | read-only, computed |
+| `totalNetMonthlyIncome` | `financialSummary.income.monthlyNet` | read-only, computed |
+| `totalNetRelevantEarnings` | `financialSummary.income.netRelevantEarnings` | read-only, computed |
+| `totalMonthlyExpenditure` | `financialSummary.expenditure.monthlyTotal` | read-only, computed |
+| `totalMonthlyDisposableIncome` | `financialSummary.expenditure.monthlyDisposable` | read-only, computed |
+| `totalFundsAvailable` | `financialSummary.liquidity.totalFundsAvailable` | read-only, computed |
+| `totalLumpSumAvailableForAdvice` | `financialSummary.liquidity.availableForAdvice` | read-only, computed |
+| `highestTaxRate` | `financialSummary.taxation.highestRate` | read-only, computed |
+| `sourceOfInvestmentFunds` | `financialSummary.sourceOfFunds` | updatable |
+| `hasEmployments` | `assetHoldings.employment.hasEmployments` | read-only, computed |
+| `hasDcPensionPersonal` | `assetHoldings.pensions.hasPersonalPension` | read-only, computed |
+| `hasDcPensionMoneyPurchase` | `assetHoldings.pensions.hasMoneyPurchasePension` | read-only, computed |
+| `hasDbPension` | `assetHoldings.pensions.hasDefinedBenefitPension` | read-only, computed |
+| `hasAnnuity` | `assetHoldings.pensions.hasAnnuity` | read-only, computed |
+| `hasSavings` | `assetHoldings.investments.hasSavings` | read-only, computed |
+| `hasInvestments` | `assetHoldings.investments.hasInvestments` | read-only, computed |
+| `hasExistingMortgage` | `assetHoldings.borrowing.hasMortgage` | read-only, computed |
+| `hasEquityRelease` | `assetHoldings.borrowing.hasEquityRelease` | read-only, computed |
+| `hasLiabilities` | `assetHoldings.borrowing.hasOtherLiabilities` | read-only, computed |
+| `hasProtection` | `assetHoldings.protection.hasProtection` | read-only, computed |
+| `hasAdverseCredit` | `assetHoldings.credit.hasAdverseCredit` | updatable |
+| `hasBeenRefusedCredit` | `assetHoldings.credit.hasBeenRefusedCredit` | updatable |
+| `hasAssets` | `assetHoldings.other.hasOtherAssets` | read-only, computed |
+| `emergencyFund` | `investmentCapacity.emergencyFund` | updatable |
+| `agreedMonthlyBudget` | `investmentCapacity.regularContributions.agreedMonthlyBudget` | updatable |
+| `agreedSingleInvestmentAmount` | `investmentCapacity.lumpSumInvestment.agreedAmount` | updatable |
+| `incomeChangesExpected` | `investmentCapacity.futureChanges.incomeChangesExpected` | updatable |
+| `expenditureChangesExpected` | `investmentCapacity.futureChanges.expenditureChangesExpected` | updatable |
+| `isComplete` | `completionStatus.isComplete` | read-only, computed |
+| `status` | `completionStatus.status` | updatable |
+| `dateFactFindCompleted` | `completionStatus.completionDate` | updatable |
+| `dateDeclarationSigned` | `completionStatus.declarationSignedDate` | updatable |
+| `dateIdAmlChecked` | `completionStatus.compliance.idCheckedDate` | updatable |
 
 **Usage Examples:**
 
@@ -15000,20 +15145,29 @@ Complete fact find aggregate root with summary calculations.
 {
   "clientRef": { "id": "client-123" },
   "jointClientRef": { "id": "client-124" },
-  "dateOfMeeting": "2026-02-16",
-  "typeOfMeeting": "InitialConsultation",
   "adviserRef": { "id": "adviser-789" },
-  "scopeOfAdvice": {
-    "retirementPlanning": true,
-    "protection": true
+  "meetingDetails": {
+    "meetingDate": "2026-02-16",
+    "meetingType": {
+      "code": "INIT",
+      "display": "Initial Consultation"
+    },
+    "scopeOfAdvice": {
+      "retirementPlanning": true,
+      "protection": true
+    }
   },
-  "agreedMonthlyBudget": {
-    "amount": 1000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
+  "investmentCapacity": {
+    "regularContributions": {
+      "agreedMonthlyBudget": {
+        "amount": 1000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    }
   }
 }
 ```
@@ -15021,21 +15175,348 @@ Complete fact find aggregate root with summary calculations.
 **Updating a FactFind (PATCH /api/v1/factfinds/456):**
 ```json
 {
-  "status": {
-    "code": "COM",
-    "display": "Complete"
+  "completionStatus": {
+    "status": {
+      "code": "COM",
+      "display": "Complete"
+    },
+    "completionDate": "2026-02-16"
   },
-  "dateFactFindCompleted": "2026-02-16",
-  "agreedMonthlyBudget": {
-    "amount": 1500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+  "investmentCapacity": {
+    "regularContributions": {
+      "agreedMonthlyBudget": {
+        "amount": 1500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
     }
   }
 }
 ```
+
+---
+
+#### 13.2.1 MeetingDetailsValue Type
+
+The `MeetingDetailsValue` groups all information related to the consultation meeting itself. This aligns with FCA and MiFID II requirements for documenting client interactions.
+
+**Purpose:** Capture meeting/consultation information as required for regulatory compliance and audit trails.
+
+**Structure:**
+```json
+{
+  "meetingDate": "2026-02-16",
+  "meetingType": {
+    "code": "INIT",
+    "display": "Initial Consultation"
+  },
+  "clientsPresent": "BothClients",
+  "othersPresent": false,
+  "othersPresentDetails": null,
+  "scopeOfAdvice": {
+    "retirementPlanning": true,
+    "savingsAndInvestments": true,
+    "protection": true,
+    "mortgage": false,
+    "estatePlanning": false
+  }
+}
+```
+
+**Field Definitions:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `meetingDate` | date | Yes | Date when the fact-finding meeting took place |
+| `meetingType` | CodedValue | Yes | Type of meeting: Initial/Review/Annual |
+| `clientsPresent` | string | No | Who attended: BothClients/ClientOnly/JointOnly |
+| `othersPresent` | boolean | No | Whether anyone else was present besides clients and adviser |
+| `othersPresentDetails` | string | No | Details of who else was present (if othersPresent = true) |
+| `scopeOfAdvice` | object | No | Areas of advice covered in this fact find session |
+
+**Validation Rules:**
+- `meetingDate` cannot be in the future
+- If `othersPresent` is true, `othersPresentDetails` should be provided
+- At least one `scopeOfAdvice` area should be true
+
+---
+
+#### 13.2.2 FinancialSummaryValue Type
+
+The `FinancialSummaryValue` provides a read-only snapshot of the client's financial position, computed from child entities. This aligns with wealth management platform terminology.
+
+**Purpose:** Provide computed financial totals and metrics as a convenience for UI display and decision-making, without requiring clients to traverse child collections.
+
+**Behavior:** This is a **read-only** value type. All fields are computed by the system and cannot be updated directly. To change these values, update the underlying Income and Expenditure entities.
+
+**Structure:**
+```json
+{
+  "income": {
+    "annualGross": {
+      "amount": 120000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "monthlyNet": {
+      "amount": 7500.00,
+      "currency": { "code": "GBP" }
+    },
+    "netRelevantEarnings": {
+      "amount": 110000.00,
+      "currency": { "code": "GBP" }
+    }
+  },
+  "expenditure": {
+    "monthlyTotal": {
+      "amount": 4500.00,
+      "currency": { "code": "GBP" }
+    },
+    "monthlyDisposable": {
+      "amount": 3000.00,
+      "currency": { "code": "GBP" }
+    }
+  },
+  "liquidity": {
+    "totalFundsAvailable": {
+      "amount": 85000.00,
+      "currency": { "code": "GBP" }
+    },
+    "availableForAdvice": {
+      "amount": 70000.00,
+      "currency": { "code": "GBP" }
+    }
+  },
+  "taxation": {
+    "highestRate": {
+      "code": "HIGHER",
+      "display": "Higher Rate (40%)",
+      "rate": 0.40
+    }
+  },
+  "sourceOfFunds": "Savings from employment income over past 5 years",
+  "calculatedAt": "2026-02-16T15:45:00Z"
+}
+```
+
+**Field Definitions:**
+
+| Field | Computed From | Description |
+|-------|---------------|-------------|
+| `income.annualGross` | Sum of all Employment Income (gross, annualized) | Total earned annual income before tax |
+| `income.monthlyNet` | Sum of all Income (net, monthly) | Total net monthly income after tax |
+| `income.netRelevantEarnings` | Computed from earned income | Total net relevant earnings for pension purposes |
+| `expenditure.monthlyTotal` | Sum of all Expenditure (monthly) | Total monthly expenditure |
+| `expenditure.monthlyDisposable` | income.monthlyNet - expenditure.monthlyTotal | Monthly disposable income (surplus/deficit) |
+| `liquidity.totalFundsAvailable` | Sum of liquid Assets | Total funds available across all accounts |
+| `liquidity.availableForAdvice` | totalFundsAvailable - emergencyFund.committed | Funds available after emergency fund |
+| `taxation.highestRate` | Derived from income bands | Highest tax rate applicable to client |
+| `sourceOfFunds` | User-provided | Source of investment funds (AML requirement) |
+| `calculatedAt` | System timestamp | When these calculations were last performed |
+
+**Calculation Rules:**
+- All monetary values use the same currency across the fact find
+- Income values are normalized to annual/monthly as indicated
+- Disposable income can be negative (deficit scenario)
+- Emergency fund committed amount is subtracted from available funds
+- Calculations are performed asynchronously when Income/Expenditure entities change
+
+---
+
+#### 13.2.3 AssetHoldingsValue Type
+
+The `AssetHoldingsValue` provides boolean indicators of what financial products and arrangements the client currently holds. This uses standard portfolio management terminology.
+
+**Purpose:** Quick overview of client's existing product holdings to guide advice scope and product recommendations.
+
+**Behavior:** Most fields are **read-only** (computed from child Arrangement entities). The `credit` fields (`hasAdverseCredit`, `hasBeenRefusedCredit`) are **updatable** as they're typically captured during the fact-finding interview.
+
+**Structure:**
+```json
+{
+  "employment": {
+    "hasEmployments": true
+  },
+  "pensions": {
+    "hasPersonalPension": true,
+    "hasMoneyPurchasePension": true,
+    "hasDefinedBenefitPension": false,
+    "hasAnnuity": false
+  },
+  "investments": {
+    "hasSavings": true,
+    "hasInvestments": true
+  },
+  "borrowing": {
+    "hasMortgage": true,
+    "hasEquityRelease": false,
+    "hasOtherLiabilities": true
+  },
+  "protection": {
+    "hasProtection": true
+  },
+  "credit": {
+    "hasAdverseCredit": false,
+    "hasBeenRefusedCredit": false
+  },
+  "other": {
+    "hasOtherAssets": true
+  }
+}
+```
+
+**Field Definitions:**
+
+| Field | Computed From | Updatable | Description |
+|-------|---------------|-----------|-------------|
+| `employment.hasEmployments` | Employment entities exist | No | Client has employment records |
+| `pensions.hasPersonalPension` | Arrangement type = Personal Pension | No | Has personal pension plan |
+| `pensions.hasMoneyPurchasePension` | Arrangement type = Money Purchase | No | Has money purchase pension |
+| `pensions.hasDefinedBenefitPension` | Arrangement type = DB Pension | No | Has defined benefit pension |
+| `pensions.hasAnnuity` | Arrangement type = Annuity | No | Has annuity in payment |
+| `investments.hasSavings` | Arrangement type = Savings | No | Has savings accounts |
+| `investments.hasInvestments` | Arrangement type = Investment | No | Has investment accounts/ISAs |
+| `borrowing.hasMortgage` | Liability type = Mortgage | No | Has active mortgage |
+| `borrowing.hasEquityRelease` | Arrangement type = Equity Release | No | Has equity release product |
+| `borrowing.hasOtherLiabilities` | Liability entities exist | No | Has other liabilities |
+| `protection.hasProtection` | Arrangement type = Protection | No | Has protection policies |
+| `credit.hasAdverseCredit` | User input | **Yes** | Client has adverse credit history |
+| `credit.hasBeenRefusedCredit` | User input | **Yes** | Client has been refused credit |
+| `other.hasOtherAssets` | Asset entities exist | No | Has other assets |
+
+**Usage Notes:**
+- These flags are typically updated automatically when Arrangement entities are created/deleted
+- The credit flags must be explicitly set during fact-finding as they're self-declared
+- Use these flags in UI to conditionally display sections of the fact find
+
+---
+
+#### 13.2.4 InvestmentCapacityValue Type
+
+The `InvestmentCapacityValue` captures the client's capacity and budget for new investments or advice. This aligns with FCA suitability terminology around "capacity for loss" and "investment capacity."
+
+**Purpose:** Assess client's financial capacity to make new investments, considering emergency fund requirements and ongoing commitments.
+
+**Structure:**
+```json
+{
+  "emergencyFund": {
+    "required": {
+      "amount": 11400.00,
+      "currency": { "code": "GBP" }
+    },
+    "committed": {
+      "amount": 15000.00,
+      "currency": { "code": "GBP" }
+    },
+    "shortfall": {
+      "amount": 0.00,
+      "currency": { "code": "GBP" }
+    },
+    "status": "Adequate"
+  },
+  "regularContributions": {
+    "agreedMonthlyBudget": {
+      "amount": 1000.00,
+      "currency": { "code": "GBP" }
+    },
+    "sustainabilityRating": "High"
+  },
+  "lumpSumInvestment": {
+    "agreedAmount": {
+      "amount": 50000.00,
+      "currency": { "code": "GBP" }
+    },
+    "sourceOfFunds": "Savings from employment"
+  },
+  "futureChanges": {
+    "incomeChangesExpected": false,
+    "expenditureChangesExpected": false,
+    "details": null
+  },
+  "assessmentDate": "2026-02-16"
+}
+```
+
+**Field Definitions:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `emergencyFund.required` | MoneyValue | No | Calculated emergency fund requirement (typically 3-6 months expenses) |
+| `emergencyFund.committed` | MoneyValue | No | Amount client has committed to emergency fund |
+| `emergencyFund.shortfall` | MoneyValue | No | Shortfall if committed < required (computed) |
+| `emergencyFund.status` | string | No | Adequate/Shortfall/Not Set |
+| `regularContributions.agreedMonthlyBudget` | MoneyValue | No | Monthly amount client agrees to invest regularly |
+| `regularContributions.sustainabilityRating` | string | No | High/Medium/Low - sustainability assessment |
+| `lumpSumInvestment.agreedAmount` | MoneyValue | No | Lump sum amount client agrees to invest |
+| `lumpSumInvestment.sourceOfFunds` | string | No | Where the lump sum comes from (AML) |
+| `futureChanges.incomeChangesExpected` | boolean | No | Whether income changes are expected |
+| `futureChanges.expenditureChangesExpected` | boolean | No | Whether expenditure changes are expected |
+| `futureChanges.details` | string | No | Details of expected changes |
+| `assessmentDate` | date | No | When this assessment was completed |
+
+**Validation Rules:**
+- `emergencyFund.shortfall` is computed: max(0, required - committed)
+- `emergencyFund.status` is computed based on shortfall
+- `regularContributions.agreedMonthlyBudget` should not exceed monthly disposable income
+- If future changes expected, details should be provided
+
+**Emergency Fund Calculation:**
+- Default requirement: 3 months of monthly expenditure
+- Can be overridden based on client circumstances (e.g., stable employment = 3 months, self-employed = 6 months)
+- Shortfall must be addressed before recommending investments (FCA requirement)
+
+---
+
+#### 13.2.5 CompletionStatusValue Type
+
+The `CompletionStatusValue` tracks the completion status of the fact find and associated compliance checks.
+
+**Purpose:** Track workflow status and ensure all regulatory compliance checks are completed before advice can be provided.
+
+**Structure:**
+```json
+{
+  "isComplete": false,
+  "status": {
+    "code": "INPROG",
+    "display": "In Progress"
+  },
+  "completionDate": null,
+  "declarationSignedDate": null,
+  "compliance": {
+    "idCheckedDate": "2026-02-16",
+    "amlCheckedDate": "2026-02-16",
+    "allChecksComplete": true
+  }
+}
+```
+
+**Field Definitions:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `isComplete` | boolean | No | Whether fact find is complete (computed from status) |
+| `status` | CodedValue | No | Current status: Draft/InProgress/Complete/Archived |
+| `completionDate` | date | No | Date when fact find was marked complete |
+| `declarationSignedDate` | date | No | Date when client signed fact find declaration |
+| `compliance.idCheckedDate` | date | No | Date when ID verification was completed |
+| `compliance.amlCheckedDate` | date | No | Date when AML checks were completed |
+| `compliance.allChecksComplete` | boolean | No | Whether all compliance checks are done (computed) |
+
+**Validation Rules:**
+- `isComplete` is computed: true if status.code = "COM" (Complete)
+- `compliance.allChecksComplete` is computed: true if both idCheckedDate and amlCheckedDate are set
+- Cannot mark fact find complete unless allChecksComplete is true
+- `completionDate` is automatically set when status changes to Complete
+
+**Status Codes:**
+- `DRAFT` - Initial draft, not yet started
+- `INPROG` - In progress
+- `COM` - Complete and signed
+- `ARCHIVED` - Archived (historical record)
 
 ---
 
