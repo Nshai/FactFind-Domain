@@ -243,11 +243,6 @@ The FactFind API provides comprehensive digital capabilities for:
 
 ---
 
-**Appendices**
-
-- [Appendix A: Migration Guide - v2.0 to v2.1](#appendix-a-migration-guide---v20-to-v21) **NEW v2.1**
-
----
 
 ## 1. API Design Principles
 
