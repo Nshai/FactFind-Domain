@@ -81,11 +81,11 @@ The FactFind API provides comprehensive digital capabilities for:
 **PRIORITY 5: Financial Position Tracking**
 - **Section 4.4:** Current Position Summary API - Net worth, asset allocation, financial health
 
-**New Entity Contracts (Section 13)**
-- Investment Contract (13.8)
-- Property Contract (13.9)
-- Equity Contract (13.10)
-- CreditHistory Contract (13.11)
+**New Entity Contracts (Section 12)**
+- Investment Contract (12.8)
+- Property Contract (12.9)
+- Equity Contract (12.10)
+- CreditHistory Contract (12.11)
 
 **Coverage Improvements:**
 - Risk Assessment domain coverage increased from 38% to 95%
@@ -196,6 +196,12 @@ The FactFind API provides comprehensive digital capabilities for:
      - [6.3.6 List Expenditure Items](#636-list-expenditure-items)
      - [6.3.7 Create Expenditure Item](#637-create-expenditure-item)
      - [6.3.8 Create Expenditure Change](#638-create-expenditure-change)
+   - [6.4 Affordability](#64-affordability) **MOVED from 5.6 v3.0**
+     - [6.4.1 Operations Summary](#641-operations-summary)
+     - [6.4.2 Calculate Affordability](#642-calculate-affordability)
+     - [6.4.3 List Affordability Calculations](#643-list-affordability-calculations)
+     - [6.4.4 Update Affordability Calculation](#644-update-affordability-calculation)
+     - [6.4.5 Delete Affordability Calculation](#645-delete-affordability-calculation)
 7. [Employment API (Part of Circumstances Context)](#7-employment-api-part-of-circumstances-context)
    - [7.1 Overview](#71-overview)
    - [7.2 Operations Summary](#72-operations-summary)
@@ -225,7 +231,8 @@ The FactFind API provides comprehensive digital capabilities for:
     - [10.4 ATR Templates Reference Data](#104-atr-templates-reference-data) **NEW v2.0**
     - [10.5 Risk Assessment History API](#105-risk-assessment-history-api) **NEW v2.0**
     - [10.6 Integration with FactFind Workflow](#106-integration-with-factfind-workflow)
-11. [Estate Planning API](#11-estate-planning-api)
+11. [Reference Data API](#11-reference-data-api)
+    - Reference data APIs remain unchanged (not scoped to factfinds)
 12. [Entity Contracts](#12-entity-contracts)
     - [12.1 Client Contract](#121-client-contract)
     - [12.2 FactFind Contract](#122-factfind-contract)
@@ -237,8 +244,6 @@ The FactFind API provides comprehensive digital capabilities for:
     - [12.8 Collection Response Wrapper](#128-collection-response-wrapper)
     - [12.9 Contract Extension for Other Entities](#129-contract-extension-for-other-entities)
     - [12.10 Standard Value Types](#1210-standard-value-types)
-13. [Reference Data API](#13-reference-data-api)
-    - Reference data APIs remain unchanged (not scoped to factfinds)
 
 ---
 
@@ -1924,7 +1929,7 @@ All enumerations use structured Value Types with code/display pattern:
 - **Forward-Compatible**: New fields can be added without breaking changes
 - **Type-Safe**: Strongly typed in contract definitions
 
-See Section 11.10.9 for complete enumeration value type definitions.
+See Section 12.10.9 for complete enumeration value type definitions.
 
 ---
 
@@ -2008,7 +2013,7 @@ All subsequent API sections (5-11) document resources that are **nested under** 
 
 **Description:** Create a new client record (Person, Corporate, or Trust).
 
-**Contract:** Uses the unified `Client` contract (see Section 11.1). The same contract structure is used for request and response. Read-only fields (`id`, `createdAt`, `updatedAt`, computed fields) are ignored in the request and populated by the server in the response.
+**Contract:** Uses the unified `Client` contract (see Section 12.1). The same contract structure is used for request and response. Read-only fields (`id`, `createdAt`, `updatedAt`, computed fields) are ignored in the request and populated by the server in the response.
 
 **Request Headers:**
 ```http
@@ -2204,7 +2209,7 @@ Content-Type: application/json
 
 **Description:** Retrieve complete client details including demographic information.
 
-**Contract:** Returns the complete unified `Client` contract (see Section 11.1) with all fields populated.
+**Contract:** Returns the complete unified `Client` contract (see Section 12.1) with all fields populated.
 
 **Request Headers:**
 ```http
@@ -2342,7 +2347,7 @@ Complete `Client` contract.
 
 **Description:** List clients with filtering, sorting, and pagination.
 
-**Contract:** Returns collection wrapper (see Section 11.8) containing an array of `Client` contracts. Use `fields` query parameter for sparse fieldsets.
+**Contract:** Returns collection wrapper (see Section 12.8) containing an array of `Client` contracts. Use `fields` query parameter for sparse fieldsets.
 
 **Query Parameters:**
 - `search` (optional) - Full-text search across name fields
@@ -2925,7 +2930,7 @@ The financial health score is calculated on a 0-100 scale with five components:
 
 **Description:** Create a new fact find session for a client or joint clients.
 
-**Contract:** Uses the unified `FactFind` contract (see Section 11.2). Request includes required-on-create fields; response includes complete contract with server-generated fields.
+**Contract:** Uses the unified `FactFind` contract (see Section 12.2). Request includes required-on-create fields; response includes complete contract with server-generated fields.
 
 **Request Body:**
 FactFind contract with required-on-create fields. Read-only and computed fields are ignored.
@@ -3029,7 +3034,7 @@ ETag: "a1b2c3d4e5f6"
 
 **Description:** Add an income source to the fact find.
 
-**Contract:** Uses the unified `Income` contract (see Section 11.4). The same contract is used for request and response.
+**Contract:** Uses the unified `Income` contract (see Section 12.4). The same contract is used for request and response.
 
 **Request Body:**
 Income contract with required-on-create fields.
@@ -4457,15 +4462,17 @@ Income contract with required-on-create fields.
 
 | Code | Display | Description |
 |------|---------|-------------|
+| CHILD | Child | Child of client (gender neutral) |
 | SON | Son | Male child of client |
 | DAUGHTER | Daughter | Female child of client |
-| STEPSON | Stepson | Male stepchild |
-| STEPDAUGHTER | Stepdaughter | Female stepdaughter |
-| ADOPTED_SON | Adopted Son | Male adopted child |
-| ADOPTED_DAUGHTER | Adopted Daughter | Female adopted child |
+| STEP_CHILD | StepChild | Stepchild of client |
 | GRANDCHILD | Grandchild | Child of client's child |
-| ELDERLY_PARENT | Elderly Parent | Parent requiring financial support |
-| DISABLED_RELATIVE | Disabled Relative | Disabled family member requiring support |
+| PARENT | Parent | Parent of client requiring support |
+| GRANDPARENT | Grandparent | Grandparent of client requiring support |
+| STEP_PARENT | StepParent | Stepparent of client requiring support |
+| SPOUSE | Spouse | Married partner of client |
+| CIVIL_PARTNER | CivilPartner | Civil partnership partner of client |
+| PARTNER | Partner | Unmarried partner of client |
 | OTHER | Other | Other dependent relationship |
 
 ---
@@ -5287,6 +5294,610 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
 - `Decrease` - Expenditure will decrease
 - `Stop` - Expenditure will cease
 - `Start` - New expenditure will commence
+
+### 6.4 Affordability
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability`
+
+**Purpose:** Calculate comprehensive affordability assessments for clients based on their income and expenditure, supporting mortgage applications, protection planning, investment planning, and debt consolidation scenarios.
+
+**Scope:**
+- Monthly disposable income calculations
+- Revised income/expenditure with expected changes
+- Consolidated and repaid liability adjustments
+- Protection premium impact analysis
+- Emergency fund assessment
+- Lump sum availability analysis
+- Multiple scenario modeling (forgo non-essentials, exclude liabilities, rebroker protection)
+- Budget agreement and tracking
+
+**Key Features:**
+- **Dynamic Calculations** - Real-time affordability based on selected income and expenditure items
+- **Scenario Modeling** - Toggle various options to see impact on disposable income
+- **Expected Changes** - Include or exclude future income/expenditure changes
+- **Liability Consolidation** - Model impact of debt consolidation
+- **Protection Analysis** - Calculate protection premium impact
+- **Emergency Fund** - Track committed vs required emergency fund
+- **Lump Sum Planning** - Model available capital for investment or debt reduction
+
+**Aggregate Root:** Client (affordability nested under client)
+
+**Regulatory Compliance:**
+- MCOB (Mortgage Conduct of Business) - Affordability assessments
+- FCA Handbook - Responsible lending requirements
+- Consumer Duty - Understanding customer financial position
+- COBS 9.2 - Assessing suitability for investments and protection
+- CCA (Consumer Credit Act) - Creditworthiness assessments
+
+#### 6.4.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability` | Calculate affordability | `affordability:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability` | List all affordability calculations | `affordability:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Get specific calculation | `affordability:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Update calculation parameters | `affordability:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Delete calculation | `affordability:write` |
+
+**Total Endpoints:** 5
+
+#### 6.4.2 Calculate Affordability
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/affordability`
+
+**Description:** Perform a comprehensive affordability calculation based on selected income and expenditure items, with configurable scenario options.
+
+**Request Body:**
+
+```json
+{
+  "incomes": [
+    { "id": "income-001" },
+    { "id": "income-002" }
+  ],
+  "expenditures": [
+    { "id": "exp-001" },
+    { "id": "exp-002" },
+    { "id": "exp-003" }
+  ],
+  "options": {
+    "isIncludeExpectedIncomeChanges": true,
+    "isIncludeExpectedExpenditureChanges": false,
+    "isForgoNonEssentialExpenditure": false,
+    "isExcludeConsolidatedLiabilities": false,
+    "isExcludeRepaidLiabilities": false,
+    "isRebrokerProtection": false
+  },
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 5000.00,
+      "currencyCode": "GBP"
+    },
+    "requiredAmount": {
+      "amount": 8000.00,
+      "currencyCode": "GBP"
+    }
+  },
+  "lumpSum": {
+    "availableAmount": {
+      "amount": 50000.00,
+      "currencyCode": "GBP"
+    },
+    "agreedInvestmentAmount": {
+      "amount": 30000.00,
+      "currencyCode": "GBP"
+    },
+    "fundSource": "PropertySale",
+    "isAvailableWithoutPenalty": true,
+    "totalFundsAvailable": {
+      "amount": 55000.00,
+      "currencyCode": "GBP"
+    },
+    "notes": "From property sale completion expected March 2026"
+  },
+  "agreedBudget": {
+    "amount": 1500.00,
+    "currencyCode": "GBP"
+  },
+  "notes": "Client has variable income from bonus"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "afford-1001",
+  "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+  "clientRef": {
+    "id": "client-456",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-234/clients/client-456"
+  },
+  "incomes": [
+    {
+      "id": "income-001",
+      "description": "Primary employment salary",
+      "netMonthlyAmount": {
+        "amount": 3500.00,
+        "currencyCode": "GBP"
+      },
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/income/income-001"
+    },
+    {
+      "id": "income-002",
+      "description": "Rental income from BTL property",
+      "netMonthlyAmount": {
+        "amount": 1000.00,
+        "currencyCode": "GBP"
+      },
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/income/income-002"
+    }
+  ],
+  "expenditures": [
+    {
+      "id": "exp-001",
+      "description": "Mortgage payment",
+      "monthlyAmount": {
+        "amount": 1500.00,
+        "currencyCode": "GBP"
+      },
+      "isEssential": true,
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/expenditure/exp-001"
+    },
+    {
+      "id": "exp-002",
+      "description": "Living expenses",
+      "monthlyAmount": {
+        "amount": 1000.00,
+        "currencyCode": "GBP"
+      },
+      "isEssential": true,
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/expenditure/exp-002"
+    },
+    {
+      "id": "exp-003",
+      "description": "Gym membership and leisure",
+      "monthlyAmount": {
+        "amount": 300.00,
+        "currencyCode": "GBP"
+      },
+      "isEssential": false,
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/expenditure/exp-003"
+    }
+  ],
+  "monthly": {
+    "totalNetIncome": {
+      "amount": 4500.00,
+      "currencyCode": "GBP"
+    },
+    "totalExpenditure": {
+      "amount": 2800.00,
+      "currencyCode": "GBP"
+    },
+    "disposableIncome": {
+      "amount": 1700.00,
+      "currencyCode": "GBP"
+    },
+    "revisedIncome": {
+      "amount": 4700.00,
+      "currencyCode": "GBP"
+    },
+    "revisedExpenditure": {
+      "amount": 2900.00,
+      "currencyCode": "GBP"
+    },
+    "consolidatedExpenditure": {
+      "amount": 500.00,
+      "currencyCode": "GBP"
+    },
+    "repaidExpenditure": {
+      "amount": 300.00,
+      "currencyCode": "GBP"
+    },
+    "protectionPremiums": {
+      "amount": 150.00,
+      "currencyCode": "GBP"
+    },
+    "finalDisposableIncome": {
+      "amount": 1250.00,
+      "currencyCode": "GBP"
+    },
+    "isIncludeExpectedIncomeChanges": true,
+    "isIncludeExpectedExpenditureChanges": false,
+    "isForgoNonEssentialExpenditure": false,
+    "isExcludeConsolidatedLiabilities": false,
+    "isExcludeRepaidLiabilities": false,
+    "isRebrokerProtection": false,
+    "agreedBudget": {
+      "amount": 1500.00,
+      "currencyCode": "GBP"
+    },
+    "notes": "Client has variable income from bonus"
+  },
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 5000.00,
+      "currencyCode": "GBP"
+    },
+    "requiredAmount": {
+      "amount": 8000.00,
+      "currencyCode": "GBP"
+    },
+    "shortfall": {
+      "amount": 3000.00,
+      "currencyCode": "GBP"
+    }
+  },
+  "lumpSum": {
+    "availableAmount": {
+      "amount": 50000.00,
+      "currencyCode": "GBP"
+    },
+    "agreedInvestmentAmount": {
+      "amount": 30000.00,
+      "currencyCode": "GBP"
+    },
+    "fundSource": "PropertySale",
+    "isAvailableWithoutPenalty": true,
+    "totalFundsAvailable": {
+      "amount": 55000.00,
+      "currencyCode": "GBP"
+    },
+    "notes": "From property sale completion expected March 2026"
+  },
+  "createdAt": "2026-01-15T10:30:00Z",
+  "updatedAt": "2026-01-29T14:45:00Z",
+  "concurrencyId": 5,
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/ff-234/clients/client-456"
+    },
+    "update": {
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+      "method": "PATCH"
+    },
+    "delete": {
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+      "method": "DELETE"
+    }
+  }
+}
+```
+
+**Calculation Logic:**
+
+**1. Base Calculation:**
+```
+disposableIncome = totalNetIncome - totalExpenditure
+```
+
+**2. Revised Income (with expected changes):**
+```
+revisedIncome = totalNetIncome + expectedIncomeIncreases - expectedIncomeDecreases
+```
+
+**3. Revised Expenditure (with expected changes):**
+```
+revisedExpenditure = totalExpenditure + expectedExpenditureIncreases - expectedExpenditureDecreases
+```
+
+**4. Consolidated Expenditure Adjustment:**
+```
+If isExcludeConsolidatedLiabilities = true:
+  adjustedExpenditure = revisedExpenditure - consolidatedExpenditure
+```
+
+**5. Repaid Expenditure Adjustment:**
+```
+If isExcludeRepaidLiabilities = true:
+  adjustedExpenditure = adjustedExpenditure - repaidExpenditure
+```
+
+**6. Non-Essential Forgo:**
+```
+If isForgoNonEssentialExpenditure = true:
+  adjustedExpenditure = essentialExpenditureOnly
+```
+
+**7. Protection Premium Adjustment:**
+```
+If isRebrokerProtection = true:
+  adjustedExpenditure = adjustedExpenditure - currentProtectionPremiums + rebrokenProtectionPremiums
+```
+
+**8. Final Disposable Income:**
+```
+finalDisposableIncome = revisedIncome - adjustedExpenditure
+```
+
+**Validation Rules:**
+- `incomes` - At least one income required
+- `expenditures` - At least one expenditure required
+- All income/expenditure IDs must exist and belong to client
+- Emergency fund amounts must be non-negative
+- Lump sum amounts must be non-negative
+- agreedInvestmentAmount cannot exceed availableAmount
+
+**Business Rules:**
+- All amounts normalized to monthly frequency
+- Income changes only included if isIncludeExpectedIncomeChanges = true
+- Expenditure changes only included if isIncludeExpectedExpenditureChanges = true
+- Emergency fund shortfall calculated as requiredAmount - committedAmount
+- Emergency fund recommendation: 3-6 months essential expenditure
+- Final disposable income used for mortgage affordability, investment capacity
+
+#### 6.4.3 List Affordability Calculations
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/affordability`
+
+**Description:** Retrieve all affordability calculations for a client.
+
+**Query Parameters:**
+- `sort` - Sort by createdAt, updatedAt (default: createdAt desc)
+- `limit` - Maximum results (default: 20, max: 100)
+- `offset` - Pagination offset
+
+**Response:**
+
+```json
+{
+  "clientRef": {
+    "id": "client-456",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-234/clients/client-456"
+  },
+  "calculations": [
+    {
+      "id": "afford-1001",
+      "createdAt": "2026-01-29T14:45:00Z",
+      "monthly": {
+        "totalNetIncome": {
+          "amount": 4500.00,
+          "currencyCode": "GBP"
+        },
+        "finalDisposableIncome": {
+          "amount": 1250.00,
+          "currencyCode": "GBP"
+        }
+      },
+      "notes": "Client has variable income from bonus",
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001"
+    },
+    {
+      "id": "afford-1000",
+      "createdAt": "2026-01-15T10:30:00Z",
+      "monthly": {
+        "totalNetIncome": {
+          "amount": 4200.00,
+          "currencyCode": "GBP"
+        },
+        "finalDisposableIncome": {
+          "amount": 1100.00,
+          "currencyCode": "GBP"
+        }
+      },
+      "notes": "Initial assessment",
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1000"
+    }
+  ],
+  "totalCount": 2,
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/ff-234/clients/client-456"
+    }
+  }
+}
+```
+
+#### 6.4.4 Update Affordability Calculation
+
+**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}`
+
+**Description:** Update scenario options or add/remove income/expenditure items, triggering recalculation.
+
+**Request Body:**
+
+```json
+{
+  "options": {
+    "isForgoNonEssentialExpenditure": true,
+    "isExcludeConsolidatedLiabilities": true
+  },
+  "agreedBudget": {
+    "amount": 1800.00,
+    "currencyCode": "GBP"
+  },
+  "notes": "Updated scenario: client willing to forgo non-essentials"
+}
+```
+
+**Response:** 200 OK with recalculated affordability entity.
+
+**Automatic Recalculations:**
+- All monthly figures recalculated
+- Revised income/expenditure updated
+- Final disposable income recalculated
+- Updated timestamp incremented
+- concurrencyId incremented
+
+#### 6.4.5 Delete Affordability Calculation
+
+**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}`
+
+**Description:** Delete an affordability calculation.
+
+**Response:** 204 No Content
+
+**Business Rules:**
+- Soft delete (retained for audit)
+- Does not affect related income/expenditure records
+- Cannot delete if referenced in active mortgage application
+
+---
+
+**Scenario Options Explained:**
+
+| Option | Description | Impact |
+|--------|-------------|--------|
+| **isIncludeExpectedIncomeChanges** | Include future income increases/decreases | Increases revisedIncome if positive changes expected |
+| **isIncludeExpectedExpenditureChanges** | Include future expenditure increases/decreases | May increase/decrease revisedExpenditure |
+| **isForgoNonEssentialExpenditure** | Client willing to cut non-essential spending | Reduces expenditure to essentials only |
+| **isExcludeConsolidatedLiabilities** | Model debt consolidation scenario | Reduces expenditure by consolidated debt payments |
+| **isExcludeRepaidLiabilities** | Exclude debts being paid off | Reduces expenditure by repaid debt amounts |
+| **isRebrokerProtection** | Model rebrokering protection policies | Adjusts expenditure based on new protection premiums |
+
+---
+
+**Emergency Fund Calculation:**
+
+**Required Amount Recommendation:**
+- **Conservative:** 6 months essential expenditure
+- **Moderate:** 4 months essential expenditure
+- **Aggressive:** 3 months essential expenditure
+
+**Formula:**
+```
+requiredAmount = essentialMonthlyExpenditure × months (3-6)
+shortfall = requiredAmount - committedAmount
+```
+
+**Example:**
+- Essential monthly expenditure: £2,500
+- Months coverage: 4
+- Required amount: £10,000
+- Committed amount: £6,000
+- **Shortfall: £4,000**
+
+---
+
+**Lump Sum Sources:**
+
+| Code | Display | Description |
+|------|---------|-------------|
+| PROPERTY_SALE | PropertySale | Proceeds from property sale |
+| INHERITANCE | Inheritance | Inherited funds |
+| BONUS | Bonus | Employment bonus |
+| INVESTMENT_MATURITY | InvestmentMaturity | Maturing investment |
+| SAVINGS | Savings | Accumulated savings |
+| GIFT | Gift | Gift from family |
+| PENSION_LUMP_SUM | PensionLumpSum | Tax-free pension lump sum |
+| REDUNDANCY | Redundancy | Redundancy payment |
+| OTHER | Other | Other lump sum source |
+
+---
+
+**Use Cases:**
+
+### Use Case 1: Mortgage Affordability Assessment
+
+**Scenario:** Client applying for £250,000 mortgage
+
+**API Flow:**
+```
+1. POST /clients/client-456/affordability
+   Request: {
+     incomes: [salary, rental income],
+     expenditures: [all current expenditures],
+     options: {
+       isIncludeExpectedIncomeChanges: false,  // Conservative
+       isIncludeExpectedExpenditureChanges: true,
+       isForgoNonEssentialExpenditure: false
+     }
+   }
+
+2. Response shows:
+   - finalDisposableIncome: £1,250/month
+   - Maximum affordable mortgage payment: ~£1,000/month (80% of disposable)
+   - Affordable loan amount: ~£220,000 (at 4% over 25 years)
+
+3. Decision: £250,000 mortgage marginally affordable
+   - Requires: Reduce non-essentials OR increase income OR longer term
+```
+
+### Use Case 2: Debt Consolidation Planning
+
+**Scenario:** Client has 3 credit cards totaling £15,000, paying £500/month
+
+**API Flow:**
+```
+1. Create affordability scenario with consolidation:
+   POST /clients/client-456/affordability
+   Request: {
+     options: {
+       isExcludeConsolidatedLiabilities: true
+     },
+     consolidatedExpenditure: { amount: 500.00 }
+   }
+
+2. Response shows:
+   - Current disposable income: £800/month
+   - With consolidation (£250/month loan): £1,050/month
+   - Monthly saving: £250
+
+3. Decision: Consolidate at 8% APR over 5 years
+   - New payment: £250/month
+   - Frees up: £250/month
+   - Total interest saved: £3,000+
+```
+
+### Use Case 3: Investment Capacity Assessment
+
+**Scenario:** Client wants to start regular investment
+
+**API Flow:**
+```
+1. Calculate current affordability:
+   GET /clients/client-456/affordability (latest)
+   - finalDisposableIncome: £1,250/month
+   - agreedBudget: £1,500/month (client's target)
+
+2. Available for investment:
+   - Current disposable: £1,250
+   - Recommended emergency fund top-up: £100/month
+   - Available for regular investment: £1,150/month
+
+3. Recommendation:
+   - Regular investment: £800/month
+   - Emergency fund: £100/month
+   - Buffer: £350/month
+
+4. Create investment plan referencing affordability calculation
+```
+
+### Use Case 4: Forgo Non-Essentials Scenario
+
+**Scenario:** Client struggling with affordability, model cutting non-essentials
+
+**API Flow:**
+```
+1. Current position:
+   - Disposable income: £600/month
+   - Non-essential expenditure: £400/month
+   - Essential only: £200/month
+
+2. Model scenario:
+   PATCH /clients/client-456/affordability/afford-1001
+   Request: {
+     options: { isForgoNonEssentialExpenditure: true }
+   }
+
+3. Response shows:
+   - Original disposable income: £600/month
+   - With forgo non-essentials: £1,000/month
+   - Improvement: £400/month
+
+4. Discussion with client:
+   - Identify which non-essentials can be reduced
+   - Gym, entertainment, dining out
+   - Create sustainable budget
+```
 
 ---
 
@@ -6714,7 +7325,7 @@ See Section 10.3.4 for the main history endpoint.
 
 **Key Integration Points:**
 
-- ATR assessment embedded in FactFind Contract (Section 13.2)
+- ATR assessment embedded in FactFind Contract (Section 12.2)
 - No separate ATR entity - it's a complex value type on FactFind
 - History maintained automatically when ATR is updated
 - Risk profile influences product recommendations
@@ -6728,2415 +7339,9 @@ See Section 10.3.4 for the main history endpoint.
 5. **Regulatory Documentation** - All assessments preserved for audit trail
 
 ---
+## 11. Reference Data API
 
-
-## 11. Estate Planning API
-
-This section defines the unified entity contracts used throughout the FactFind API. Following the **Single Contract Principle** (Section 1.7), each entity has one canonical contract used for both requests (POST, PUT, PATCH) and responses (GET).
-
-Each field is annotated with its behavioral characteristics:
-- **required-on-create** - Must be provided when creating the entity
-- **optional** - Can be omitted in any operation
-- **read-only** - System-generated, cannot be set by clients
-- **write-once** - Can only be set on create, immutable thereafter
-- **updatable** - Can be modified via PUT/PATCH operations
-
-### 11.1 Client Contract
-
-The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic and regulatory information.
-
-**Reference Type:** Client is a reference type with identity (has `id` field).
-
-```json
-{
-  "id": "client-123",
-  "clientNumber": "C00001234",
-  "clientType": "Person",
-  "name": {
-    "title": {
-      "code": "MR",
-      "display": "Mr"
-    },
-    "firstName": "John",
-    "middleName": "Michael",
-    "lastName": "Smith",
-    "preferredName": "John"
-  },
-  "fullName": "Mr John Michael Smith",
-  "salutation": "Mr Smith",
-  "dateOfBirth": "1980-05-15",
-  "age": 45,
-  "placeOfBirth": "London",
-  "gender": {
-    "code": "M",
-    "display": "Male"
-  },
-  "maritalStatus": {
-    "code": "MAR",
-    "display": "Married",
-    "effectiveFrom": "2005-06-20"
-  },
-  "taxDetails": {
-    "niNumber": "AB123456C",
-    "taxReference": "1234567890"
-  },
-  "nationalClientIdentifier": "NCI-123456",
-  "passportRef": "502135321",
-  "passportExpiryDate": "2030-05-15",
-  "drivingLicenceRef": "SMITH801055JM9IJ",
-  "drivingLicenceExpiryDate": "2030-05-15",
-  "nationalityCountry": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfBirth": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfResidence": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfDomicile": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "isUkResident": true,
-  "isExpatriate": false,
-  "isDeceased": false,
-  "deceasedOn": null,
-  "hasWill": true,
-  "isWillUpToDate": true,
-  "isWillAdvised": true,
-  "willDetails": "Will created in 2020, held by Smith & Co Solicitors",
-  "isPowerOfAttorneyGranted": false,
-  "powerOfAttorneyName": null,
-  "hasEverSmoked": false,
-  "isSmoker": "Never",
-  "hasSmokedInLast12Months": "No",
-  "hasNicotineReplacementInLastYear": "No",
-  "hasVapedInLastYear": "No",
-  "inGoodHealth": true,
-  "medicalConditions": null,
-  "isMatchingServiceProposition": false,
-  "matchingServicePropositionReason": null,
-  "isHeadOfFamilyGroup": true,
-  "isJoint": true,
-  "spouseRef": {
-    "id": "client-124",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
-    "name": "Sarah Smith",
-    "clientNumber": "C00001235",
-    "type": "Person"
-  },
-  "serviceStatus": "Active",
-  "serviceStatusDate": "2020-01-15",
-  "clientSegment": "A",
-  "clientSegmentDate": "2020-01-15",
-  "clientCategory": "HighNetWorth",
-  "financialProfile": {
-    "grossAnnualIncome": {
-      "amount": 75000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "householdIncome": {
-      "amount": 120000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "netWorth": {
-      "amount": 450000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "householdNetWorth": {
-      "amount": 650000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "totalAssets": {
-      "amount": 500000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "totalJointAssets": {
-      "amount": 200000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "calculatedAt": "2026-02-18T10:30:00Z",
-    "lastReviewDate": "2026-02-18"
-  },
-  "primaryAddress": {
-    "line1": "123 Main Street",
-    "line2": "Apartment 4B",
-    "city": "London",
-    "county": {
-      "code": "GLA",
-      "display": "Greater London"
-    },
-    "postcode": "SW1A 1AA",
-    "country": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "addressType": {
-      "code": "RES",
-      "display": "Residential"
-    }
-  },
-  "contacts": [
-    {
-      "type": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
-      "value": "john.smith@example.com",
-      "isPrimary": true
-    },
-    {
-      "type": {
-        "code": "MOBILE",
-        "display": "Mobile"
-      },
-      "value": "+44 7700 900123",
-      "isPrimary": false
-    }
-  ],
-  "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
-    "name": "Jane Doe",
-    "code": "ADV001"
-  },
-  "paraplannerRef": {
-    "id": "adviser-790",
-    "href": "/api/v1/advisers/adviser-790",
-    "name": "Mark Taylor",
-    "code": "PP001"
-  },
-  "idCheckCompletedDate": "2020-01-10",
-  "idCheckExpiryDate": "2025-01-10",
-  "idCheckIssuer": "Experian",
-  "idCheckReference": "IDC-123456",
-  "idCheckResult": "Passed",
-  "taxCode": "1257L",
-  "notes": "Prefers email communication, interested in sustainable investing",
-  "profilePicture": "https://cdn.factfind.com/profiles/client-123.jpg",
-  "createdAt": "2020-01-15T10:30:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z",
-  "createdBy": {
-    "id": "user-999",
-    "name": "System Admin"
-  },
-  "updatedBy": {
-    "id": "user-789",
-    "name": "Jane Doe"
-  },
-  "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
-    "update": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123", "method": "PUT" },
-    "delete": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123", "method": "DELETE" },
-    "addresses": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/addresses" },
-    "contacts": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/contacts" },
-    "relationships": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/relationships" },
-    "dependants": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/dependants" },
-    "factfinds": { "href": "/api/v1/factfinds?clientId=client-123" },
-    "arrangements": { "href": "/api/v1/factfinds/{factfindId}/arrangements?clientId=client-123" },
-    "goals": { "href": "/api/v1/factfinds/{factfindId}/objectives?clientId=client-123" },
-    "riskProfile": { "href": "/api/v1/factfinds/{factfindId}/risk-profile?clientId=client-123" }
-  }
-}
-```
-
-**Field Behaviors:**
-
-| Field | Type | Create | Update | Response | Notes |
-|-------|------|--------|--------|----------|-------|
-| `id` | uuid | ignored | ignored | included | read-only, server-generated |
-| `clientNumber` | string | optional | ignored | included | write-once, business identifier |
-| `clientType` | enum | required | ignored | included | write-once, discriminator field |
-| `name` | NameValue | required | updatable | included | Value type: firstName, lastName required |
-| `fullName` | string | ignored | ignored | included | read-only, computed from name |
-| `salutation` | string | optional | updatable | included | - |
-| `dateOfBirth` | date | required | ignored | included | write-once, immutable after creation |
-| `age` | integer | ignored | ignored | included | read-only, computed from dateOfBirth |
-| `placeOfBirth` | string | optional | updatable | included | - |
-| `gender` | GenderValue | optional | updatable | included | Value type: code/display enumeration |
-| `maritalStatus` | MaritalStatusValue | optional | updatable | included | Value type: code/display/effectiveFrom |
-| `taxDetails` | TaxDetailsValue | optional | updatable | included | Value type: PII, requires `client:pii:read` scope |
-| `nationalClientIdentifier` | string | optional | updatable | included | - |
-| `passportRef` | string | optional | updatable | included | PII, requires `client:pii:read` scope |
-| `passportExpiryDate` | date | optional | updatable | included | - |
-| `drivingLicenceRef` | string | optional | updatable | included | PII, requires `client:pii:read` scope |
-| `drivingLicenceExpiryDate` | date | optional | updatable | included | - |
-| `nationalityCountry` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
-| `countryOfBirth` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
-| `countryOfResidence` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
-| `countryOfDomicile` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
-| `isUkResident` | boolean | optional | updatable | included | - |
-| `isExpatriate` | boolean | optional | updatable | included | - |
-| `isDeceased` | boolean | optional | updatable | included | - |
-| `deceasedOn` | date | optional | updatable | included | - |
-| `hasWill` | boolean | optional | updatable | included | - |
-| `isWillUpToDate` | boolean | optional | updatable | included | - |
-| `isWillAdvised` | boolean | optional | updatable | included | - |
-| `willDetails` | string | optional | updatable | included | - |
-| `isPowerOfAttorneyGranted` | boolean | optional | updatable | included | - |
-| `powerOfAttorneyName` | string | optional | updatable | included | - |
-| `hasEverSmoked` | boolean | optional | updatable | included | - |
-| `isSmoker` | enum | optional | updatable | included | - |
-| `hasSmokedInLast12Months` | enum | optional | updatable | included | - |
-| `hasNicotineReplacementInLastYear` | enum | optional | updatable | included | - |
-| `hasVapedInLastYear` | enum | optional | updatable | included | - |
-| `inGoodHealth` | boolean | optional | updatable | included | - |
-| `medicalConditions` | string | optional | updatable | included | - |
-| `isMatchingServiceProposition` | boolean | optional | updatable | included | - |
-| `matchingServicePropositionReason` | string | optional | updatable | included | - |
-| `isHeadOfFamilyGroup` | boolean | optional | updatable | included | - |
-| `isJoint` | boolean | optional | updatable | included | - |
-| `spouseRef` | ClientRef | optional | updatable | included | Reference type: Provide id on create/update |
-| `serviceStatus` | enum | optional | updatable | included | - |
-| `serviceStatusDate` | date | optional | updatable | included | - |
-| `clientSegment` | string | optional | updatable | included | - |
-| `clientSegmentDate` | date | optional | updatable | included | - |
-| `clientCategory` | enum | optional | updatable | included | - |
-| `financialProfile` | FinancialProfileValue | optional | updatable (partial for computed fields) | included | Value type: Financial snapshot and computed wealth metrics |
-| `primaryAddress` | AddressValue | optional | updatable | included | Value type: Embedded address, no id |
-| `contacts` | ContactValue[] | optional | updatable | included | Value type array: Email, phone contacts |
-| `adviserRef` | AdviserRef | optional | updatable | included | Reference type: Primary adviser |
-| `paraplannerRef` | AdviserRef | optional | updatable | included | Reference type: Paraplanner |
-| `idCheckCompletedDate` | date | optional | updatable | included | - |
-| `idCheckExpiryDate` | date | optional | updatable | included | - |
-| `idCheckIssuer` | string | optional | updatable | included | - |
-| `idCheckReference` | string | optional | updatable | included | - |
-| `idCheckResult` | enum | optional | updatable | included | - |
-| `taxCode` | string | optional | updatable | included | - |
-| `notes` | string | optional | updatable | included | - |
-| `profilePicture` | string | optional | updatable | included | URL to profile image |
-| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
-| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
-| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
-| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
-
-**Usage Examples:**
-
-**Creating a Client (POST /api/v1/factfinds/{factfindId}/clients):**
-```json
-{
-  "clientType": "Person",
-  "name": {
-    "title": "Mr",
-    "firstName": "John",
-    "lastName": "Smith"
-  },
-  "dateOfBirth": "1980-05-15",
-  "gender": "Male",
-  "nationalityCountry": { "code": "GB" },
-  "primaryAddress": {
-    "line1": "123 Main Street",
-    "city": "London",
-    "postcode": "SW1A 1AA",
-    "country": "GB"
-  },
-  "contacts": [
-    {
-      "type": "Email",
-      "value": "john.smith@example.com",
-      "isPrimary": true
-    }
-  ],
-  "adviserRef": {
-    "id": "adviser-789"
-  }
-}
-```
-Server generates `id`, `clientNumber`, `createdAt`, `updatedAt`, `fullName`, `age`, and populates reference display fields. Returns complete contract.
-
-**Updating a Client (PUT /api/v1/factfinds/{factfindId}/clients/client-123):**
-```json
-{
-  "name": {
-    "title": "Mr",
-    "firstName": "John",
-    "lastName": "Smith-Jones"
-  },
-  "gender": "Male",
-  "maritalStatus": "Married",
-  "nationalityCountry": { "code": "GB" },
-  "financialProfile": {
-    "grossAnnualIncome": {
-      "amount": 85000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    }
-  },
-  "spouseRef": {
-    "id": "client-124"
-  }
-}
-```
-Cannot change `dateOfBirth` (write-once). Server updates `updatedAt`, `fullName`, and returns complete contract.
-
-**Partial Update (PATCH /api/v1/factfinds/{factfindId}/clients/client-123):**
-```json
-{
-  "name": {
-    "lastName": "Smith-Jones"
-  },
-  "maritalStatus": {
-    "code": "MAR",
-    "display": "Married",
-    "effectiveFrom": "2015-06-20"
-  },
-  "financialProfile": {
-    "householdIncome": {
-      "amount": 145000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    }
-  }
-}
-```
-Only specified fields are updated. Returns complete contract with changes applied.
-
----
-
-### 11.2 FactFind Contract
-
-The `FactFind` contract (also known as ADVICE_CASE) represents a fact-finding session and aggregate root for circumstances discovery.
-
-**Reference Type:** FactFind is a reference type with identity (has `id` field).
-
-Complete fact find aggregate root with summary calculations.
-
-```json
-{
-  "id": "factfind-456",
-  "factFindNumber": "FF001234",
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
-  },
-  "jointClientRef": {
-    "id": "client-124",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
-    "name": "Sarah Smith",
-    "clientNumber": "C00001235",
-    "type": "Person"
-  },
-  "dateOfMeeting": "2026-02-16",
-  "typeOfMeeting": {
-    "code": "INIT",
-    "display": "Initial Consultation"
-  },
-  "clientsPresent": "BothClients",
-  "anybodyElsePresent": false,
-  "anybodyElsePresentDetails": null,
-  "scopeOfAdvice": {
-    "retirementPlanning": true,
-    "savingsAndInvestments": true,
-    "protection": true,
-    "mortgage": false,
-    "estatePlanning": false
-  },
-  "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
-    "name": "Jane Doe",
-    "code": "ADV001"
-  },
-  "isComplete": false,
-  "dateFactFindCompleted": null,
-  "dateDeclarationSigned": null,
-  "dateIdAmlChecked": "2026-02-16",
-  "status": {
-    "code": "INPROG",
-    "display": "In Progress"
-  },
-  "hasEmployments": true,
-  "hasExpenditures": true,
-  "hasAssets": true,
-  "hasLiabilities": true,
-  "hasDcPensionPersonal": true,
-  "hasDcPensionMoneyPurchase": true,
-  "hasDbPension": false,
-  "hasSavings": true,
-  "hasInvestments": true,
-  "hasProtection": true,
-  "hasExistingMortgage": true,
-  "hasAnnuity": false,
-  "hasEquityRelease": false,
-  "hasAdverseCredit": false,
-  "hasBeenRefusedCredit": false,
-  "incomeChangesExpected": false,
-  "expenditureChangesExpected": false,
-  "totalEarnedAnnualIncomeGross": {
-    "amount": 120000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalNetMonthlyIncome": {
-    "amount": 7500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalMonthlyExpenditure": {
-    "amount": 4500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalMonthlyDisposableIncome": {
-    "amount": 3000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "emergencyFund": {
-    "requiredAmount": {
-      "amount": 11400.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "committedAmount": {
-      "amount": 15000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "shortfall": {
-      "amount": 0.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    }
-  },
-  "totalFundsAvailable": {
-    "amount": 85000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalLumpSumAvailableForAdvice": {
-    "amount": 70000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "agreedMonthlyBudget": {
-    "amount": 1000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "agreedSingleInvestmentAmount": {
-    "amount": 50000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "highestTaxRate": "HigherRate",
-  "totalNetRelevantEarnings": {
-    "amount": 110000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "sourceOfInvestmentFunds": "Savings from employment income over past 5 years",
-  "notes": "Clients seeking to consolidate pensions and review protection cover",
-  "additionalNotes": null,
-  "customQuestions": [
-    {
-      "question": "What are your main financial concerns?",
-      "answer": "Ensuring sufficient retirement income and protecting family"
-    }
-  ],
-  "createdAt": "2026-02-16T14:30:00Z",
-  "updatedAt": "2026-02-16T15:45:00Z",
-  "_links": {
-    "self": { "href": "/api/v1/factfinds/factfind-456" },
-    "complete": { "href": "/api/v1/factfinds/factfind-456/complete", "method": "POST" },
-    "summary": { "href": "/api/v1/factfinds/factfind-456/summary" },
-    "employment": { "href": "/api/v1/factfinds/factfind-456/employment" },
-    "income": { "href": "/api/v1/factfinds/factfind-456/income" },
-    "expenditure": { "href": "/api/v1/factfinds/factfind-456/expenditure" },
-    "affordability": { "href": "/api/v1/factfinds/factfind-456/affordability" }
-  }
-}
-```
-
-**Field Behaviors:**
-
-| Field | Type | Create | Update | Response | Notes |
-|-------|------|--------|--------|----------|-------|
-| `id` | uuid | ignored | ignored | included | read-only, server-generated |
-| `factFindNumber` | string | optional | ignored | included | write-once, business identifier |
-| `clientRef` | ClientRef | required | ignored | included | write-once, reference to Client |
-| `jointClientRef` | ClientRef | optional | ignored | included | write-once, reference to Client |
-| `dateOfMeeting` | date | required | updatable | included | - |
-| `typeOfMeeting` | enum | required | updatable | included | - |
-| `clientsPresent` | enum | optional | updatable | included | - |
-| `anybodyElsePresent` | boolean | optional | updatable | included | - |
-| `anybodyElsePresentDetails` | string | optional | updatable | included | - |
-| `scopeOfAdvice` | object | optional | updatable | included | Value type: embedded scope flags |
-| `adviserRef` | AdviserRef | required | updatable | included | Reference type: Primary adviser |
-| `isComplete` | boolean | ignored | ignored | included | read-only, computed from completion status |
-| `dateFactFindCompleted` | date | optional | updatable | included | - |
-| `dateDeclarationSigned` | date | optional | updatable | included | - |
-| `dateIdAmlChecked` | date | optional | updatable | included | - |
-| `status` | enum | optional | updatable | included | - |
-| `hasEmployments` | boolean | ignored | ignored | included | read-only, computed from child entities |
-| `hasExpenditures` | boolean | ignored | ignored | included | read-only, computed |
-| `hasAssets` | boolean | ignored | ignored | included | read-only, computed |
-| `hasLiabilities` | boolean | ignored | ignored | included | read-only, computed |
-| `hasDcPensionPersonal` | boolean | ignored | ignored | included | read-only, computed |
-| `hasDcPensionMoneyPurchase` | boolean | ignored | ignored | included | read-only, computed |
-| `hasDbPension` | boolean | ignored | ignored | included | read-only, computed |
-| `hasSavings` | boolean | ignored | ignored | included | read-only, computed |
-| `hasInvestments` | boolean | ignored | ignored | included | read-only, computed |
-| `hasProtection` | boolean | ignored | ignored | included | read-only, computed |
-| `hasExistingMortgage` | boolean | ignored | ignored | included | read-only, computed |
-| `hasAnnuity` | boolean | ignored | ignored | included | read-only, computed |
-| `hasEquityRelease` | boolean | ignored | ignored | included | read-only, computed |
-| `hasAdverseCredit` | boolean | optional | updatable | included | - |
-| `hasBeenRefusedCredit` | boolean | optional | updatable | included | - |
-| `incomeChangesExpected` | boolean | optional | updatable | included | - |
-| `expenditureChangesExpected` | boolean | optional | updatable | included | - |
-| `totalEarnedAnnualIncomeGross` | MoneyValue | ignored | ignored | included | read-only, computed from Income entities |
-| `totalNetMonthlyIncome` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `totalMonthlyExpenditure` | MoneyValue | ignored | ignored | included | read-only, computed from Expenditure entities |
-| `totalMonthlyDisposableIncome` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `emergencyFund` | object | optional | updatable | included | Value type: requiredAmount, committedAmount, shortfall (all MoneyValue) |
-| `totalFundsAvailable` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `totalLumpSumAvailableForAdvice` | MoneyValue | optional | updatable | included | Value type |
-| `agreedMonthlyBudget` | MoneyValue | optional | updatable | included | Value type |
-| `agreedSingleInvestmentAmount` | MoneyValue | optional | updatable | included | Value type |
-| `highestTaxRate` | enum | ignored | ignored | included | read-only, computed |
-| `totalNetRelevantEarnings` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `sourceOfInvestmentFunds` | string | optional | updatable | included | - |
-| `notes` | string | optional | updatable | included | - |
-| `additionalNotes` | string | optional | updatable | included | - |
-| `customQuestions` | array | optional | updatable | included | - |
-| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
-| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
-
-**Usage Examples:**
-
-**Creating a FactFind (POST /api/v1/factfinds):**
-```json
-{
-  "clientRef": { "id": "client-123" },
-  "jointClientRef": { "id": "client-124" },
-  "dateOfMeeting": "2026-02-16",
-  "typeOfMeeting": "InitialConsultation",
-  "adviserRef": { "id": "adviser-789" },
-  "scopeOfAdvice": {
-    "retirementPlanning": true,
-    "protection": true
-  },
-  "agreedMonthlyBudget": {
-    "amount": 1000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-  }
-}
-```
-
-**Updating a FactFind (PATCH /api/v1/factfinds/456):**
-```json
-{
-  "status": {
-    "code": "COM",
-    "display": "Complete"
-  },
-  "dateFactFindCompleted": "2026-02-16",
-  "agreedMonthlyBudget": {
-    "amount": 1500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  }
-}
-```
-
----
-
-### 11.3 Address Contract
-
-The `Address` contract represents a client's address with additional metadata for residency tracking. When an address needs independent lifecycle management (e.g., address history), it becomes a reference type with identity.
-
-**Reference Type:** Address is a reference type with identity when managed as a separate resource (has `id` field).
-
-**Note:** For simple embedded addresses (like `primaryAddress` in Client), use `AddressValue` (see Section 11.10.2) which has no `id` and is embedded directly.
-
-```json
-{
-  "id": "address-789",
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
-  },
-  "addressType": "Residential",
-  "address": {
-    "line1": "123 High Street",
-    "line2": "Apartment 4B",
-    "city": "London",
-    "county": "Greater London",
-    "postcode": "SW1A 1AA",
-    "country": "GB"
-  },
-  "isCorrespondenceAddress": true,
-  "residencyPeriod": {
-    "startDate": "2020-01-15",
-    "endDate": null
-  },
-  "residencyStatus": "Owner",
-  "isOnElectoralRoll": true,
-  "createdAt": "2020-01-15T10:30:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z"
-}
-```
-
-**Key Field Behaviors:**
-- `id` - read-only, server-generated (uuid)
-- `clientRef` - write-once, reference to Client
-- `addressType` - required-on-create, updatable
-- `address` - required-on-create, updatable (AddressValue embedded)
-- `isCorrespondenceAddress` - optional, updatable (boolean)
-- `residencyPeriod` - optional, updatable (DateRangeValue)
-- `residencyStatus` - optional, updatable
-- `isOnElectoralRoll` - optional, updatable
-- `createdAt`, `updatedAt` - read-only
-
----
-
-### 11.4 Income Contract
-
-The `Income` contract represents an income source within a FactFind.
-
-**Reference Type:** Income is a reference type with identity (has `id` field).
-
-```json
-{
-  "id": "income-101",
-  "factFindRef": {
-    "id": "factfind-456",
-    "href": "/api/v1/factfinds/factfind-456",
-    "factFindNumber": "FF001234",
-    "status": "InProgress"
-  },
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
-  },
-  "employmentRef": {
-    "id": "employment-222",
-    "href": "/api/v1/employments/employment-222",
-    "employerName": "Tech Corp Ltd",
-    "status": "Current"
-  },
-  "incomeType": "Employment",
-  "description": "Salary from Tech Corp Ltd",
-  "grossAmount": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "netAmount": {
-    "amount": 55000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "frequency": {
-    "code": "A",
-    "display": "Annually",
-    "periodsPerYear": 1
-  },
-  "incomePeriod": {
-    "startDate": "2020-01-15",
-    "endDate": null
-  },
-  "isOngoing": true,
-  "isPrimary": true,
-  "isGuaranteed": true,
-  "taxDeducted": {
-    "amount": 15000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "nationalInsuranceDeducted": {
-    "amount": 5000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "notes": "Annual bonus typically £10k",
-  "createdAt": "2026-02-16T14:30:00Z",
-  "updatedAt": "2026-02-16T15:45:00Z"
-}
-```
-
-**Key Field Behaviors:**
-- `id` - read-only, server-generated (uuid)
-- `factFindRef` - write-once, reference to FactFind (set from URL path parameter)
-- `clientRef` - required-on-create, write-once, reference to Client
-- `employmentRef` - optional, updatable, reference to Employment
-- `incomeType` - required-on-create, updatable
-- `description` - optional, updatable
-- `grossAmount` - required-on-create, updatable (MoneyValue)
-- `netAmount` - optional, updatable (MoneyValue)
-- `frequency` - required-on-create, updatable
-- `incomePeriod` - optional, updatable (DateRangeValue)
-- `isOngoing`, `isPrimary`, `isGuaranteed` - optional, updatable
-- `taxDeducted`, `nationalInsuranceDeducted` - optional, updatable (MoneyValue)
-- `createdAt`, `updatedAt` - read-only
-
----
-
-### 11.5 Arrangement Contract
-
-The `Arrangement` contract represents financial products (pensions, investments, protection, mortgages). This is a polymorphic contract with type-specific fields.
-
-**Reference Type:** Arrangement is a reference type with identity (has `id` field).
-
-```json
-{
-  "id": "arrangement-555",
-  "arrangementNumber": "ARR123456",
-  "arrangementType": "Pension",
-  "pensionType": "PersonalPension",
-  "clientOwners": [
-    {
-      "id": "client-123",
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-      "name": "John Smith",
-      "clientNumber": "C00001234",
-      "type": "Person"
-    }
-  ],
-  "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
-    "name": "Jane Doe",
-    "code": "ADV001"
-  },
-  "productName": "ABC SIPP",
-  "providerRef": {
-    "id": "provider-456",
-    "href": "/api/v1/providers/provider-456",
-    "name": "ABC Pension Provider Ltd",
-    "frnNumber": "123456"
-  },
-  "policyNumber": "POL123456",
-  "status": {
-    "code": "ACT",
-    "display": "Active"
-  },
-  "arrangementPeriod": {
-    "startDate": "2015-01-01",
-    "endDate": null
-  },
-  "currentValue": {
-    "amount": 125000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "valuationDate": "2026-02-01",
-  "regularContribution": {
-    "amount": 500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "contributionFrequency": {
-    "code": "M",
-    "display": "Monthly",
-    "periodsPerYear": 12
-  },
-  "isInDrawdown": false,
-  "expectedRetirementAge": 67,
-  "projectedValueAtRetirement": {
-    "amount": 450000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "hasGuaranteedAnnuityRate": false,
-  "hasProtectedTaxFreeAmount": false,
-  "isSalarySacrifice": false,
-  "notes": "Consolidated from previous workplace pensions",
-  "createdAt": "2015-01-01T10:00:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555" },
-    "contributions": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555/contributions" },
-    "valuations": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555/valuations" }
-  }
-}
-```
-
-**Key Field Behaviors:**
-- `id` - read-only, server-generated
-- `arrangementType` - required-on-create, write-once (discriminator)
-- `pensionType`, `investmentType`, `protectionType`, `mortgageType` - required-on-create (type-specific), write-once
-- `clientId` - required-on-create, write-once
-- `productName`, `providerName`, `policyNumber` - required-on-create, updatable
-- `status` - optional, updatable
-- `startDate`, `endDate` - optional, updatable
-- `currentValue` - optional, updatable
-- `valuationDate` - optional, updatable (should match currentValue update)
-- Type-specific fields - vary by arrangementType
-- `createdAt`, `updatedAt` - read-only
-
----
-
-### 11.6 Goal Contract
-
-The `Goal` contract represents a client's financial goal.
-
-**Reference Type:** Goal is a reference type with identity (has `id` field).
-
-```json
-{
-  "id": "goal-888",
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
-  },
-  "goalType": "Retirement",
-  "goalName": "Comfortable retirement at age 65",
-  "description": "Build sufficient pension pot to support £40k annual income in retirement",
-  "priority": "High",
-  "targetAmount": {
-    "amount": 500000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "targetDate": "2045-05-15",
-  "yearsToGoal": 19,
-  "currentSavings": {
-    "amount": 125000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "monthlyContribution": {
-    "amount": 500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "projectedShortfall": {
-    "amount": 150000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "isAchievable": false,
-  "status": "InProgress",
-  "notes": "May need to increase contributions or adjust target",
-  "createdAt": "2026-02-16T14:30:00Z",
-  "updatedAt": "2026-02-16T15:45:00Z"
-}
-```
-
-**Key Field Behaviors:**
-- `id` - read-only, server-generated (uuid)
-- `clientRef` - write-once, reference to Client
-- `goalType` - required-on-create, updatable
-- `goalName` - required-on-create, updatable
-- `description` - optional, updatable
-- `priority` - optional, updatable
-- `targetAmount` - required-on-create, updatable (MoneyValue)
-- `targetDate` - required-on-create, updatable
-- `yearsToGoal` - read-only, computed from targetDate
-- `currentSavings`, `monthlyContribution` - optional, updatable (MoneyValue)
-- `projectedShortfall` - read-only, computed (MoneyValue)
-- `isAchievable` - read-only, computed
-- `status` - optional, updatable
-- `createdAt`, `updatedAt` - read-only
-
----
-
-### 11.7 RiskProfile Contract
-
-The `RiskProfile` contract represents a client's risk assessment and attitude to risk.
-
-**Reference Type:** RiskProfile is a reference type with identity (has `id` field).
-
-```json
-{
-  "id": "riskprofile-999",
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
-  },
-  "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
-    "name": "Jane Doe",
-    "code": "ADV001"
-  },
-  "assessmentDate": "2026-02-16",
-  "assessmentType": "ATR",
-  "attitudeToRiskScore": 6,
-  "attitudeToRiskRating": "Balanced",
-  "capacityForLossScore": 7,
-  "capacityForLossRating": "Medium",
-  "overallRiskRating": "Balanced",
-  "timeHorizon": "LongTerm",
-  "yearsToRetirement": 19,
-  "investmentExperience": "Moderate",
-  "hasInvestedBefore": true,
-  "understandsRisk": true,
-  "comfortableWithVolatility": true,
-  "wouldAcceptLosses": false,
-  "notes": "Client understands market volatility but nervous about large losses",
-  "questionsAndAnswers": [
-    {
-      "question": "How would you react to a 20% fall in your portfolio?",
-      "answer": "Hold steady and wait for recovery",
-      "score": 6
-    }
-  ],
-  "validUntil": "2027-02-16",
-  "reviewDate": "2027-02-16",
-  "isValid": true,
-  "createdAt": "2026-02-16T14:30:00Z",
-  "updatedAt": "2026-02-16T15:45:00Z"
-}
-```
-
-**Key Field Behaviors:**
-- `id` - read-only, server-generated
-- `clientId` - write-once, set from URL or required-on-create
-- `assessmentDate` - required-on-create, updatable
-- `assessmentType` - required-on-create, write-once
-- `attitudeToRiskScore`, `capacityForLossScore` - required-on-create, updatable
-- `attitudeToRiskRating`, `capacityForLossRating`, `overallRiskRating` - read-only, computed from scores
-- `timeHorizon`, `yearsToRetirement` - optional, updatable
-- `investmentExperience` - optional, updatable
-- Boolean fields (`hasInvestedBefore`, `understandsRisk`, etc.) - optional, updatable
-- `questionsAndAnswers` - optional, updatable (array)
-- `validUntil`, `reviewDate` - optional, updatable
-- `isValid` - read-only, computed from validUntil date
-- `createdAt`, `updatedAt` - read-only
-
----
-
-### 11.8 Collection Response Wrapper
-
-All list/collection endpoints use a standard wrapper contract:
-
-```json
-{
-  "data": [
-    { /* Complete entity contract */ },
-    { /* Complete entity contract */ }
-  ],
-  "pagination": {
-    "page": 1,
-    "pageSize": 20,
-    "totalPages": 5,
-    "totalCount": 95,
-    "hasMore": true
-  },
-  "_links": {
-    "first": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
-    "prev": null,
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
-    "next": { "href": "/api/v1/factfinds/{factfindId}/clients?page=2&pageSize=20" },
-    "last": { "href": "/api/v1/factfinds/{factfindId}/clients?page=5&pageSize=20" }
-  }
-}
-```
-
-The `data` array contains complete entity contracts. Clients can use field selection (`?fields=id,name`) to reduce response size.
-
----
-
-### 11.9 Contract Extension for Other Entities
-
-All other entities in the FactFind system follow the same Single Contract Principle:
-
-**Circumstances Entities:**
-- `Employment` - Employment history within FactFind
-- `Expenditure` - Expenditure items within FactFind
-- `Asset` - Assets (property, savings, investments)
-- `Liability` - Liabilities (mortgages, loans, credit cards)
-
-**Estate Planning Entities:**
-- `Gift` - Gifts made or intended
-- `GiftTrust` - Trust arrangements for gifts
-- `Beneficiary` - Beneficiaries of estates/trusts
-
-**Relationship Entities:**
-- `Relationship` - Client relationships (spouse, partner, ex-partner)
-- `Dependant` - Dependent family members
-- `ProfessionalContact` - Solicitors, accountants, other advisers
-
-**Reference Data Entities:**
-- `Provider` - Financial product providers
-- `ProductCategory` - Product categorization
-- `EnumValue` - Dynamic enumeration values
-
-Each entity contract follows the same field annotation pattern:
-- Fields marked as `required-on-create`, `optional`, `read-only`, `write-once`, or `updatable`
-- Same contract used for POST, PUT, PATCH, and GET
-- Collection responses wrapped in standard pagination envelope
-- Field selection supported via `?fields` query parameter
-
-### 11.10 Standard Value Types
-
-Value types are embedded data structures with no independent identity. They are named with a "Value" suffix and never have an `id` field. Value types are always embedded within their parent entity and have no separate API endpoints.
-
-#### 11.10.1 MoneyValue
-
-Represents a monetary amount with currency.
-
-**Contract:**
-```json
-{
-  "amount": 75000.00,
-  "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `amount` | decimal | Yes | - | Monetary amount (positive or negative) |
-| `currency` | CurrencyValue | Yes | - | Currency details (code, display, symbol) |
-
-**Validation Rules:**
-- `amount`: Precision 19, scale 4 (e.g., 9999999999999999.9999)
-- `currency.code`: Must be valid ISO 4217 code (GBP, USD, EUR, etc.)
-
-**Usage Example:**
-```json
-{
-  "financialProfile": {
-    "grossAnnualIncome": {
-      "amount": 75000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    }
-  },
-  "netMonthlyIncome": {
-    "amount": 4500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  }
-}
-```
-
-#### 11.10.2 AddressValue
-
-Represents a physical address.
-
-**Contract:**
-```json
-{
-  "line1": "123 Main Street",
-  "line2": "Flat 4B",
-  "line3": null,
-  "line4": null,
-  "city": "London",
-  "county": {
-    "code": "GLA",
-    "display": "Greater London"
-  },
-  "postcode": "SW1A 1AA",
-  "country": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "addressType": {
-    "code": "RES",
-    "display": "Residential"
-  }
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `line1` | string | Yes | Address line 1 (max 100 chars) |
-| `line2` | string | No | Address line 2 (max 100 chars) |
-| `line3` | string | No | Address line 3 (max 100 chars) |
-| `line4` | string | No | Address line 4 (max 100 chars) |
-| `city` | string | Yes | City/town (max 50 chars) |
-| `county` | CountyValue | No | County/state with code and display name |
-| `postcode` | string | Yes | Postal/ZIP code (max 20 chars) |
-| `country` | CountryValue | Yes | Country with ISO codes and display name |
-| `addressType` | AddressTypeValue | No | Type of address (Residential, Correspondence, etc.) |
-
-**Validation Rules:**
-- `country.code`: Must be valid ISO 3166-1 alpha-2 code (GB, US, FR, etc.)
-- `postcode`: Format validation based on country
-
-**Usage Example:**
-```json
-{
-  "primaryAddress": {
-    "line1": "10 Downing Street",
-    "city": "London",
-    "county": {
-      "code": "GLA",
-      "display": "Greater London"
-    },
-    "postcode": "SW1A 2AA",
-    "country": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "addressType": {
-      "code": "RES",
-      "display": "Residential"
-    }
-  }
-}
-```
-
-#### 11.10.3 DateRangeValue
-
-Represents a date range with start and optional end date.
-
-**Contract:**
-```json
-{
-  "startDate": "2020-01-01",
-  "endDate": "2025-12-31"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `startDate` | date | Yes | Start date (ISO 8601: YYYY-MM-DD) |
-| `endDate` | date | No | End date (ISO 8601: YYYY-MM-DD), null = ongoing |
-
-**Validation Rules:**
-- `endDate` must be after `startDate` if provided
-- Both dates must be valid calendar dates
-
-**Usage Example:**
-```json
-{
-  "employmentPeriod": {
-    "startDate": "2015-06-01",
-    "endDate": null
-  }
-}
-```
-
-#### 11.10.4 NameValue
-
-Represents a person's name.
-
-**Contract:**
-```json
-{
-  "title": {
-    "code": "MR",
-    "display": "Mr"
-  },
-  "firstName": "John",
-  "middleName": "Michael",
-  "lastName": "Smith",
-  "preferredName": "Johnny"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `title` | TitleValue | No | Title/honorific with code and display |
-| `firstName` | string | Yes | First name (max 50 chars) |
-| `middleName` | string | No | Middle name(s) (max 50 chars) |
-| `lastName` | string | Yes | Last name/surname (max 50 chars) |
-| `preferredName` | string | No | Preferred name/nickname (max 50 chars) |
-
-**Usage Example:**
-```json
-{
-  "name": {
-    "title": {
-      "code": "DR",
-      "display": "Dr"
-    },
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "preferredName": "Janey"
-  }
-}
-```
-
-#### 11.10.5 ContactValue
-
-Represents contact information (email, phone).
-
-**Contract:**
-```json
-{
-  "type": {
-    "code": "EMAIL",
-    "display": "Email"
-  },
-  "value": "john.smith@example.com",
-  "isPrimary": true
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | ContactTypeValue | Yes | Contact type with code and display (EMAIL, MOBILE, HOME, WORK, FAX) |
-| `value` | string | Yes | Contact value (email address or phone number) |
-| `isPrimary` | boolean | No | Whether this is the primary contact method |
-
-**Validation Rules:**
-- `value`: Format validation based on `type.code` (email format, phone number format)
-
-**Usage Example:**
-```json
-{
-  "contacts": [
-    {
-      "type": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
-      "value": "john@example.com",
-      "isPrimary": true
-    },
-    {
-      "type": {
-        "code": "MOBILE",
-        "display": "Mobile"
-      },
-      "value": "+44 7700 900123",
-      "isPrimary": false
-    }
-  ]
-}
-```
-
-#### 11.10.6 PercentageValue
-
-Represents a percentage as a decimal value.
-
-**Contract:**
-```json
-{
-  "value": 0.25
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `value` | decimal | Yes | Percentage value (0.00 = 0%, 1.00 = 100%) |
-
-**Validation Rules:**
-- `value`: Must be between 0.00 and 1.00 (or other specified range)
-
-**Usage Example:**
-```json
-{
-  "contributionRate": {
-    "value": 0.08
-  },
-  "taxRate": {
-    "value": 0.20
-  }
-}
-```
-
-#### 11.10.7 RateValue
-
-Represents an interest rate or other rate.
-
-**Contract:**
-```json
-{
-  "rate": 3.5,
-  "type": "Fixed"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `rate` | decimal | Yes | Rate value (e.g., 3.5 for 3.5%) |
-| `type` | enum | No | Rate type: Fixed, Variable, Tracker, Discount, Capped |
-
-**Usage Example:**
-```json
-{
-  "interestRate": {
-    "rate": 2.75,
-    "type": "Fixed"
-  },
-  "projectedGrowthRate": {
-    "rate": 5.0,
-    "type": "Variable"
-  }
-}
-```
-
-#### 11.10.8 TaxDetailsValue
-
-Represents tax identification details.
-
-**Contract:**
-```json
-{
-  "niNumber": "AB123456C",
-  "taxReference": "1234567890"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `niNumber` | string | No | UK National Insurance Number (9 chars) |
-| `taxReference` | string | No | Tax reference number (10 chars) |
-
-**Validation Rules:**
-- `niNumber`: Format AA123456A (2 letters, 6 digits, 1 letter)
-- `taxReference`: 10-digit UTR format
-
-**Usage Example:**
-```json
-{
-  "taxDetails": {
-    "niNumber": "AB123456C",
-    "taxReference": "1234567890"
-  }
-}
-```
-
-#### 11.10.9 Enumeration Value Types
-
-Enumeration value types represent categorical data using a structured code/display pattern. Unlike simple string enumerations, enumeration value types are self-documenting, internationalization-ready, and can carry rich metadata.
-
-**Standard Pattern:**
-All enumeration value types follow a consistent structure:
-```json
-{
-  "code": "MACHINE_READABLE_CODE",    // Required: Uppercase, short identifier
-  "display": "Human Readable Label",  // Required: User-facing label
-  // ... additional metadata as needed
-}
-```
-
-**Benefits:**
-- Self-documenting: No need to look up code meanings
-- Internationalization-ready: Display text can be localized
-- Rich metadata: Dates, categories, and other context
-- Forward-compatible: Can add fields without breaking changes
-- Type-safe: Strongly typed in contract definitions
-
----
-
-##### GenderValue
-
-Represents a person's gender.
-
-**Contract:**
-```json
-{
-  "code": "M",
-  "display": "Male"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Gender code: M, F, O, U, N |
-| `display` | string | Yes | Human-readable label |
-
-**Standard Codes:**
-- `M` - Male
-- `F` - Female
-- `O` - Other
-- `U` - Unknown
-- `N` - Prefer not to say
-
-**Usage Example:**
-```json
-{
-  "gender": {
-    "code": "M",
-    "display": "Male"
-  }
-}
-```
-
----
-
-##### MaritalStatusValue
-
-Represents a person's marital status with optional effective date.
-
-**Contract:**
-```json
-{
-  "code": "MAR",
-  "display": "Married",
-  "effectiveFrom": "2015-06-20"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Marital status code |
-| `display` | string | Yes | Human-readable label |
-| `effectiveFrom` | date | No | Date this status became effective (ISO 8601) |
-
-**Standard Codes:**
-- `SIN` - Single
-- `MAR` - Married
-- `CIV` - Civil Partnership
-- `DIV` - Divorced
-- `WID` - Widowed
-- `SEP` - Separated
-- `COH` - Cohabiting
-
-**Usage Example:**
-```json
-{
-  "maritalStatus": {
-    "code": "MAR",
-    "display": "Married",
-    "effectiveFrom": "2015-06-20"
-  }
-}
-```
-
----
-
-##### EmploymentStatusValue
-
-Represents a person's employment status.
-
-**Contract:**
-```json
-{
-  "code": "EMP",
-  "display": "Employed"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Employment status code |
-| `display` | string | Yes | Human-readable label |
-
-**Standard Codes:**
-- `EMP` - Employed
-- `SELF` - Self-Employed
-- `DIR` - Company Director
-- `RET` - Retired
-- `UNE` - Unemployed
-- `NW` - Not Working
-- `STU` - Student
-- `HOME` - Homemaker
-
-**Usage Example:**
-```json
-{
-  "employmentStatus": {
-    "code": "EMP",
-    "display": "Employed"
-  }
-}
-```
-
----
-
-##### AddressTypeValue
-
-Represents the type of an address.
-
-**Contract:**
-```json
-{
-  "code": "RES",
-  "display": "Residential"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Address type code |
-| `display` | string | Yes | Human-readable label |
-
-**Standard Codes:**
-- `RES` - Residential
-- `CORR` - Correspondence
-- `PREV` - Previous
-- `WORK` - Work
-- `OTHER` - Other
-
-**Usage Example:**
-```json
-{
-  "addressType": {
-    "code": "RES",
-    "display": "Residential"
-  }
-}
-```
-
----
-
-##### ContactTypeValue
-
-Represents the type of contact information.
-
-**Contract:**
-```json
-{
-  "code": "EMAIL",
-  "display": "Email"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Contact type code |
-| `display` | string | Yes | Human-readable label |
-
-**Standard Codes:**
-- `EMAIL` - Email
-- `MOBILE` - Mobile Phone
-- `HOME` - Home Phone
-- `WORK` - Work Phone
-- `FAX` - Fax
-
-**Usage Example:**
-```json
-{
-  "type": {
-    "code": "EMAIL",
-    "display": "Email"
-  }
-}
-```
-
----
-
-##### TitleValue
-
-Represents a person's title or honorific.
-
-**Contract:**
-```json
-{
-  "code": "MR",
-  "display": "Mr"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Title code |
-| `display` | string | Yes | Human-readable label |
-
-**Standard Codes:**
-- `MR` - Mr
-- `MRS` - Mrs
-- `MS` - Ms
-- `MISS` - Miss
-- `DR` - Dr
-- `PROF` - Professor
-- `REV` - Reverend
-- `SIR` - Sir
-- `LADY` - Lady
-- `LORD` - Lord
-
-**Usage Example:**
-```json
-{
-  "title": {
-    "code": "MR",
-    "display": "Mr"
-  }
-}
-```
-
----
-
-##### ProductTypeValue
-
-Represents a financial product type with optional category.
-
-**Contract:**
-```json
-{
-  "code": "SIPP",
-  "display": "Self-Invested Personal Pension",
-  "category": "Pension"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Product type code |
-| `display` | string | Yes | Human-readable label |
-| `category` | string | No | Product category grouping |
-
-**Standard Codes:**
-- Pensions: `PP` (Personal Pension), `SIPP` (SIPP), `GPP` (Group Personal Pension), `SSAS` (SSAS), `DB` (Defined Benefit), `SP` (State Pension)
-- Investments: `ISA` (ISA), `GIA` (General Investment Account), `JISA` (Junior ISA), `LISA` (Lifetime ISA), `OIC` (Offshore Investment)
-- Protection: `LIFE` (Life Insurance), `CIC` (Critical Illness), `IP` (Income Protection), `PMI` (Private Medical Insurance)
-- Mortgages: `RESMTG` (Residential Mortgage), `BTL` (Buy-to-Let), `EQUITY` (Equity Release)
-- Other: `BOND` (Investment Bond), `TRUST` (Trust), `SAVINGS` (Savings Account)
-
-**Usage Example:**
-```json
-{
-  "productType": {
-    "code": "SIPP",
-    "display": "Self-Invested Personal Pension",
-    "category": "Pension"
-  }
-}
-```
-
----
-
-##### CountryValue
-
-Represents a country using ISO 3166-1 standard codes.
-
-**Contract:**
-```json
-{
-  "code": "GB",
-  "display": "United Kingdom",
-  "alpha3": "GBR"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | ISO 3166-1 alpha-2 country code (2 chars) |
-| `display` | string | Yes | Full country name |
-| `alpha3` | string | No | ISO 3166-1 alpha-3 country code (3 chars) |
-
-**Usage Example:**
-```json
-{
-  "country": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  }
-}
-```
-
----
-
-##### CountyValue
-
-Represents a county or administrative region.
-
-**Contract:**
-```json
-{
-  "code": "GLA",
-  "display": "Greater London",
-  "country": {
-    "code": "GB",
-    "display": "United Kingdom"
-  }
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | County/region code |
-| `display` | string | Yes | Full county/region name |
-| `country` | CountryValue | No | Associated country |
-
-**Usage Example:**
-```json
-{
-  "county": {
-    "code": "GLA",
-    "display": "Greater London",
-    "country": {
-      "code": "GB",
-      "display": "United Kingdom"
-    }
-  }
-}
-```
-
----
-
-##### CurrencyValue
-
-Represents a currency using ISO 4217 standard codes.
-
-**Contract:**
-```json
-{
-  "code": "GBP",
-  "display": "British Pound",
-  "symbol": "£"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | ISO 4217 currency code (3 chars) |
-| `display` | string | Yes | Full currency name |
-| `symbol` | string | No | Currency symbol (£, $, €, etc.) |
-
-**Standard Codes:**
-- `GBP` - British Pound (£)
-- `USD` - US Dollar ($)
-- `EUR` - Euro (€)
-- `CHF` - Swiss Franc (CHF)
-- `JPY` - Japanese Yen (¥)
-- `AUD` - Australian Dollar (A$)
-- `CAD` - Canadian Dollar (C$)
-
-**Usage Example:**
-```json
-{
-  "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-}
-```
-
----
-
-##### FrequencyValue
-
-Represents payment or contribution frequency.
-
-**Contract:**
-```json
-{
-  "code": "M",
-  "display": "Monthly",
-  "periodsPerYear": 12
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Frequency code |
-| `display` | string | Yes | Human-readable label |
-| `periodsPerYear` | integer | No | Number of periods per year (for calculations) |
-
-**Standard Codes:**
-- `M` - Monthly (12 periods/year)
-- `Q` - Quarterly (4 periods/year)
-- `S` - Semi-Annual (2 periods/year)
-- `A` - Annual (1 period/year)
-- `W` - Weekly (52 periods/year)
-- `F` - Fortnightly (26 periods/year)
-- `SINGLE` - Single Payment (0 periods/year)
-
-**Usage Example:**
-```json
-{
-  "frequency": {
-    "code": "M",
-    "display": "Monthly",
-    "periodsPerYear": 12
-  }
-}
-```
-
----
-
-##### StatusValue
-
-Represents a generic status with optional category.
-
-**Contract:**
-```json
-{
-  "code": "ACT",
-  "display": "Active",
-  "category": "Arrangement"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Status code |
-| `display` | string | Yes | Human-readable label |
-| `category` | string | No | Status category grouping |
-
-**Standard Codes:**
-- `ACT` - Active
-- `INA` - Inactive
-- `PEN` - Pending
-- `COM` - Completed
-- `CAN` - Cancelled
-- `SUB` - Submitted
-- `APP` - Approved
-- `REJ` - Rejected
-- `DRAFT` - Draft
-- `CLOSED` - Closed
-
-**Usage Example:**
-```json
-{
-  "status": {
-    "code": "ACT",
-    "display": "Active",
-    "category": "Arrangement"
-  }
-}
-```
-
----
-
-##### MeetingTypeValue
-
-Represents the type of a client meeting.
-
-**Contract:**
-```json
-{
-  "code": "INIT",
-  "display": "Initial Meeting"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Meeting type code |
-| `display` | string | Yes | Human-readable label |
-
-**Standard Codes:**
-- `INIT` - Initial Meeting
-- `REVIEW` - Review Meeting
-- `ANNUAL` - Annual Review
-- `ADHOC` - Ad-hoc Meeting
-- `PHONE` - Phone Call
-- `VIDEO` - Video Conference
-
-**Usage Example:**
-```json
-{
-  "meetingType": {
-    "code": "INIT",
-    "display": "Initial Meeting"
-  }
-}
-```
-
----
-
-##### ResidencyStatusValue
-
-Represents tax residency status.
-
-**Contract:**
-```json
-{
-  "code": "UK_RES",
-  "display": "UK Resident"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Residency status code |
-| `display` | string | Yes | Human-readable label |
-
-**Standard Codes:**
-- `UK_RES` - UK Resident
-- `UK_DOM` - UK Domiciled
-- `NON_RES` - Non-Resident
-- `NON_DOM` - Non-Domiciled
-- `EXPAT` - Expatriate
-
-**Usage Example:**
-```json
-{
-  "residencyStatus": {
-    "code": "UK_RES",
-    "display": "UK Resident"
-  }
-}
-```
-
----
-
-##### HealthStatusValue
-
-Represents a person's health status for insurance purposes.
-
-**Contract:**
-```json
-{
-  "code": "GOOD",
-  "display": "Good Health"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Health status code |
-| `display` | string | Yes | Human-readable label |
-
-**Standard Codes:**
-- `GOOD` - Good Health
-- `FAIR` - Fair Health
-- `POOR` - Poor Health
-- `PREEX` - Pre-existing Conditions
-- `UNKNOWN` - Unknown
-
-**Usage Example:**
-```json
-{
-  "healthStatus": {
-    "code": "GOOD",
-    "display": "Good Health"
-  }
-}
-```
-
----
-
-### 11.11 Standard Reference Types
-
-Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `clientRef`, `adviserRef`).
-
-#### 11.11.1 ClientRef
-
-Reference to a Client entity.
-
-**Minimal Contract (Required for Create/Update):**
-```json
-{
-  "id": "client-123"
-}
-```
-
-**Full Contract (Server Response):**
-```json
-{
-  "id": "client-123",
-  "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-  "name": "John Michael Smith",
-  "clientNumber": "C00001234",
-  "type": "Person"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique client identifier |
-| `href` | string | Yes (response) | URL to client resource |
-| `name` | string | Yes (response) | Full client name |
-| `clientNumber` | string | No | Business client number |
-| `type` | enum | No | Client type: Person, Corporate, Trust |
-
-**Usage Example:**
-```json
-{
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
-  }
-}
-```
-
-#### 11.11.2 AdviserRef
-
-Reference to an Adviser entity.
-
-**Full Contract:**
-```json
-{
-  "id": "adviser-789",
-  "href": "/api/v1/advisers/adviser-789",
-  "name": "Sarah Johnson",
-  "code": "ADV001"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique adviser identifier |
-| `href` | string | Yes (response) | URL to adviser resource |
-| `name` | string | Yes (response) | Adviser full name |
-| `code` | string | No | Adviser business code |
-
-**Usage Example:**
-```json
-{
-  "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
-    "name": "Sarah Johnson",
-    "code": "ADV001"
-  }
-}
-```
-
-#### 11.11.3 ProviderRef
-
-Reference to a financial product Provider entity.
-
-**Full Contract:**
-```json
-{
-  "id": "provider-456",
-  "href": "/api/v1/providers/provider-456",
-  "name": "Aviva Life & Pensions UK Limited",
-  "frnNumber": "185896"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique provider identifier |
-| `href` | string | Yes (response) | URL to provider resource |
-| `name` | string | Yes (response) | Provider name |
-| `frnNumber` | string | No | FCA Firm Reference Number |
-
-**Usage Example:**
-```json
-{
-  "providerRef": {
-    "id": "provider-456",
-    "href": "/api/v1/providers/provider-456",
-    "name": "Aviva",
-    "frnNumber": "185896"
-  }
-}
-```
-
-#### 11.11.4 ArrangementRef
-
-Reference to an Arrangement entity (pension, investment, protection, mortgage).
-
-**Full Contract:**
-```json
-{
-  "id": "arrangement-111",
-  "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-111",
-  "policyNumber": "POL123456",
-  "productType": "Pension",
-  "provider": "Aviva"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique arrangement identifier |
-| `href` | string | Yes (response) | URL to arrangement resource |
-| `policyNumber` | string | No | Policy/plan number |
-| `productType` | string | Yes (response) | Product type (Pension, Investment, etc.) |
-| `provider` | string | Yes (response) | Provider name |
-
-**Usage Example:**
-```json
-{
-  "arrangementRef": {
-    "id": "arrangement-111",
-    "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-111",
-    "policyNumber": "SIPP123456",
-    "productType": "Pension",
-    "provider": "Aviva"
-  }
-}
-```
-
-#### 11.11.5 EmploymentRef
-
-Reference to an Employment entity.
-
-**Full Contract:**
-```json
-{
-  "id": "employment-222",
-  "href": "/api/v1/employments/employment-222",
-  "employerName": "Acme Corporation Ltd",
-  "status": "Current"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique employment identifier |
-| `href` | string | Yes (response) | URL to employment resource |
-| `employerName` | string | Yes (response) | Employer name |
-| `status` | enum | Yes (response) | Status: Current, Previous, Future |
-
-**Usage Example:**
-```json
-{
-  "employmentRef": {
-    "id": "employment-222",
-    "href": "/api/v1/employments/employment-222",
-    "employerName": "Acme Corp",
-    "status": "Current"
-  }
-}
-```
-
-#### 11.11.6 GoalRef
-
-Reference to a Goal entity.
-
-**Full Contract:**
-```json
-{
-  "id": "goal-333",
-  "href": "/api/v1/factfinds/{factfindId}/objectives/goal-333",
-  "goalName": "Retirement at 65",
-  "priority": "High"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique goal identifier |
-| `href` | string | Yes (response) | URL to goal resource |
-| `goalName` | string | Yes (response) | Goal name/description |
-| `priority` | enum | No | Priority: High, Medium, Low |
-
-**Usage Example:**
-```json
-{
-  "goalRef": {
-    "id": "goal-333",
-    "href": "/api/v1/factfinds/{factfindId}/objectives/goal-333",
-    "goalName": "Retirement Planning",
-    "priority": "High"
-  }
-}
-```
-
-#### 11.11.7 FactFindRef
-
-Reference to a FactFind (ADVICE_CASE) entity.
-
-**Full Contract:**
-```json
-{
-  "id": "factfind-444",
-  "href": "/api/v1/factfinds/factfind-444",
-  "factFindNumber": "FF001234",
-  "status": "InProgress"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique fact find identifier |
-| `href` | string | Yes (response) | URL to fact find resource |
-| `factFindNumber` | string | No | Business fact find number |
-| `status` | enum | Yes (response) | Status: Draft, InProgress, Complete, Submitted |
-
-**Usage Example:**
-```json
-{
-  "factFindRef": {
-    "id": "factfind-444",
-    "href": "/api/v1/factfinds/factfind-444",
-    "factFindNumber": "FF001234",
-    "status": "InProgress"
-  }
-}
-```
-
----
-
-## 12. Reference Data API
-
-### 12.1 Performance Considerations
+### 11.1 Performance Considerations
 
 **Query Optimization:**
 - Index all foreign keys for fast joins
@@ -9156,7 +7361,7 @@ Reference to a FactFind (ADVICE_CASE) entity.
 - Default page size: 20
 - Maximum page size: 100
 
-### 12.2 Caching Strategy
+### 11.2 Caching Strategy
 
 **HTTP Caching:**
 - ETags for all GET requests on single resources
@@ -9176,7 +7381,7 @@ Reference to a FactFind (ADVICE_CASE) entity.
 - Publish cache invalidation events
 - Subscribers update local caches
 
-### 12.3 Rate Limiting
+### 11.3 Rate Limiting
 
 **Per-User Limits:**
 - 1,000 requests per hour per user
@@ -9208,7 +7413,7 @@ Retry-After: 3600
 }
 ```
 
-### 12.4 API Versioning
+### 11.4 API Versioning
 
 **Version Lifecycle:**
 1. **Development** - Not publicly available
@@ -9231,7 +7436,7 @@ Sunset: Sun, 01 Jul 2028 00:00:00 GMT
 Link: <https://docs.factfind.com/migration/v1-to-v2>; rel="deprecation"
 ```
 
-### 12.5 Security Best Practices
+### 11.5 Security Best Practices
 
 **Input Validation:**
 - Validate all inputs against schema
@@ -9259,7 +7464,7 @@ Link: <https://docs.factfind.com/migration/v1-to-v2>; rel="deprecation"
 ---
 
 
-## 13. Entity Contracts
+## 12. Entity Contracts
 
 This section defines the unified entity contracts used throughout the FactFind API. Following the **Single Contract Principle** (Section 1.7), each entity has one canonical contract used for both requests (POST, PUT, PATCH) and responses (GET).
 
@@ -9270,7 +7475,7 @@ Each field is annotated with its behavioral characteristics:
 - **write-once** - Can only be set on create, immutable thereafter
 - **updatable** - Can be modified via PUT/PATCH operations
 
-### 13.1 Client Contract
+### 12.1 Client Contract
 
 The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic, regulatory, and preference information using a **composition pattern** with conditional types.
 
@@ -12067,7 +10272,7 @@ Content-Type: application/json
 
 ---
 
-### 13.2 FactFind Contract
+### 12.2 FactFind Contract
 
 
 **IMPORTANT NOTE - v2.1 Enhancement:**
@@ -12106,7 +10311,7 @@ See Section 10 for complete ATR API documentation and example payloads.
 }
 ```
 
-For the complete FactFind Contract with full ATR assessment example, see Section 10.3.1 or Section 13.2 in the latest version.
+For the complete FactFind Contract with full ATR assessment example, see Section 10.3.1 or Section 12.2 in the latest version.
 
 
 The `FactFind` contract (also known as ADVICE_CASE) represents a fact-finding session and aggregate root for circumstances discovery.
@@ -12117,11 +10322,11 @@ Complete fact find aggregate root with summary calculations.
 
 **ENHANCED v2.2 - Industry-Aligned Value Types:**
 The FactFind contract has been refactored to group related fields into industry-standard value types:
-- **MeetingDetailsValue** (Section 13.2.1) - Meeting/consultation information (FCA/MiFID II terminology)
-- **FinancialSummaryValue** (Section 13.2.2) - Computed financial totals and metrics (read-only snapshot)
-- **AssetHoldingsValue** (Section 13.2.3) - Indicators of what financial products client holds (portfolio management terminology)
-- **InvestmentCapacityValue** (Section 13.2.4) - Client's capacity and budget for new investments (FCA suitability terminology)
-- **CompletionStatusValue** (Section 13.2.5) - Completion tracking and compliance checks
+- **MeetingDetailsValue** (Section 12.2.1) - Meeting/consultation information (FCA/MiFID II terminology)
+- **FinancialSummaryValue** (Section 12.2.2) - Computed financial totals and metrics (read-only snapshot)
+- **AssetHoldingsValue** (Section 12.2.3) - Indicators of what financial products client holds (portfolio management terminology)
+- **InvestmentCapacityValue** (Section 12.2.4) - Client's capacity and budget for new investments (FCA suitability terminology)
+- **CompletionStatusValue** (Section 12.2.5) - Completion tracking and compliance checks
 
 This grouping improves clarity, aligns with industry standards, and makes the contract easier to understand and maintain.
 
@@ -12445,11 +10650,11 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 | `clientRef` | ClientRef | required | ignored | included | write-once, reference to Client |
 | `jointClientRef` | ClientRef | optional | ignored | included | write-once, reference to Client |
 | `adviserRef` | AdviserRef | required | updatable | included | Reference type: Primary adviser |
-| **`meetingDetails`** | **MeetingDetailsValue** | **required** | **updatable** | **included** | **Value type group (Section 13.2.1)** |
-| **`financialSummary`** | **FinancialSummaryValue** | **ignored** | **ignored** | **included** | **read-only, computed value type (Section 13.2.2)** |
-| **`assetHoldings`** | **AssetHoldingsValue** | **ignored** | **partial** | **included** | **Mostly computed, credit fields updatable (Section 13.2.3)** |
-| **`investmentCapacity`** | **InvestmentCapacityValue** | **optional** | **updatable** | **included** | **Value type group (Section 13.2.4)** |
-| **`completionStatus`** | **CompletionStatusValue** | **optional** | **updatable** | **included** | **Value type group (Section 13.2.5)** |
+| **`meetingDetails`** | **MeetingDetailsValue** | **required** | **updatable** | **included** | **Value type group (Section 12.2.1)** |
+| **`financialSummary`** | **FinancialSummaryValue** | **ignored** | **ignored** | **included** | **read-only, computed value type (Section 12.2.2)** |
+| **`assetHoldings`** | **AssetHoldingsValue** | **ignored** | **partial** | **included** | **Mostly computed, credit fields updatable (Section 12.2.3)** |
+| **`investmentCapacity`** | **InvestmentCapacityValue** | **optional** | **updatable** | **included** | **Value type group (Section 12.2.4)** |
+| **`completionStatus`** | **CompletionStatusValue** | **optional** | **updatable** | **included** | **Value type group (Section 12.2.5)** |
 | `atrAssessment` | ATRAssessmentValue | optional | updatable | included | Embedded ATR from v2.1 (Section 10) |
 | `notes` | string | optional | updatable | included | - |
 | `additionalNotes` | string | optional | updatable | included | - |
@@ -12884,13 +11089,13 @@ The `CompletionStatusValue` tracks the completion status of the fact find and as
 
 ---
 
-### 13.3 Address Contract
+### 12.3 Address Contract
 
 The `Address` contract represents a client's address with additional metadata for residency tracking. When an address needs independent lifecycle management (e.g., address history), it becomes a reference type with identity.
 
 **Reference Type:** Address is a reference type with identity when managed as a separate resource (has `id` field).
 
-**Note:** For simple embedded addresses (like `primaryAddress` in Client), use `AddressValue` (see Section 13.10.2) which has no `id` and is embedded directly.
+**Note:** For simple embedded addresses (like `primaryAddress` in Client), use `AddressValue` (see Section 12.10.2) which has no `id` and is embedded directly.
 
 ```json
 {
@@ -12946,7 +11151,7 @@ The `Address` contract represents a client's address with additional metadata fo
 
 ---
 
-### 13.4 Income Contract
+### 12.4 Income Contract
 
 The `Income` contract represents an income source within a FactFind.
 
@@ -13043,7 +11248,7 @@ The `Income` contract represents an income source within a FactFind.
 
 ---
 
-### 13.5 Arrangement Contract
+### 12.5 Arrangement Contract
 
 The `Arrangement` contract represents financial products (pensions, investments, protection, mortgages). This is a polymorphic contract with type-specific fields.
 
@@ -13157,7 +11362,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
 
 ---
 
-### 13.6 Goal Contract
+### 12.6 Goal Contract
 
 The `Goal` contract represents a client's financial goal.
 
@@ -13247,7 +11452,7 @@ The `Goal` contract represents a client's financial goal.
 
 ---
 
-### 13.7 RiskProfile Contract
+### 12.7 RiskProfile Contract
 
 The `RiskProfile` contract represents a client's risk assessment and attitude to risk.
 
@@ -13326,7 +11531,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 
 ---
 
-### 13.8 Investment Contract
+### 12.8 Investment Contract
 
 The `Investment` contract extends the Arrangement contract with investment-specific fields for ISAs, GIAs, Bonds, and Investment Trusts.
 
@@ -14150,7 +12355,7 @@ Only specified fields are updated. Returns complete contract with new holding ad
 
 ---
 
-### 13.9 Property Contract
+### 12.9 Property Contract
 
 The `Property` contract represents a property asset with valuation tracking, mortgage linking, and rental income management.
 
@@ -15020,7 +13225,7 @@ Only specified fields are updated. Server recalculates rental yield and net inco
 
 ---
 
-### 13.10 Equity Contract
+### 12.10 Equity Contract
 
 The `Equity` contract represents a direct stock holding with performance tracking and dividend history.
 
@@ -15893,7 +14098,7 @@ Only specified fields are updated. Server recalculates total dividends and yield
 
 ---
 
-### 13.11 CreditHistory Contract
+### 12.11 CreditHistory Contract
 
 The `CreditHistory` contract represents credit score and credit history tracking from multiple agencies.
 
@@ -16568,7 +14773,7 @@ Only specified fields are updated. Returns complete contract.
 
 ---
 
-### 13.12 IdentityVerification Contract
+### 12.12 IdentityVerification Contract
 
 The `IdentityVerification` contract represents identity verification status with KYC and AML checks.
 
@@ -17102,7 +15307,7 @@ Only specified fields are updated. Returns complete contract.
 
 ---
 
-### 13.13 Consent Contract
+### 12.13 Consent Contract
 
 The `Consent` contract represents GDPR consent tracking with purpose-specific consents and audit trail.
 
@@ -17691,7 +15896,7 @@ Server updates status and withdrawal date. Returns complete contract.
 
 ---
 
-### 13.14 Collection Response Wrapper
+### 12.14 Collection Response Wrapper
 
 All list/collection endpoints use a standard wrapper contract:
 
@@ -17722,7 +15927,7 @@ The `data` array contains complete entity contracts. Clients can use field selec
 
 ---
 
-### 13.15 Contract Extension for Other Entities
+### 12.15 Contract Extension for Other Entities
 
 All other entities in the FactFind system follow the same Single Contract Principle:
 
@@ -17753,7 +15958,7 @@ Each entity contract follows the same field annotation pattern:
 - Collection responses wrapped in standard pagination envelope
 - Field selection supported via `?fields` query parameter
 
-### 13.16 Standard Value Types
+### 12.16 Standard Value Types
 
 Value types are embedded data structures with no independent identity. They are named with a "Value" suffix and never have an `id` field. Value types are always embedded within their parent entity and have no separate API endpoints.
 
@@ -18730,7 +16935,7 @@ Represents a person's health status for insurance purposes.
 
 ---
 
-### 13.17 Standard Reference Types
+### 12.17 Standard Reference Types
 
 Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `clientRef`, `adviserRef`).
 
