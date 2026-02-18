@@ -182,11 +182,11 @@ The FactFind API provides comprehensive digital capabilities for:
      - [6.3.6 List Expenditure Items](#636-list-expenditure-items)
      - [6.3.7 Create Expenditure Item](#637-create-expenditure-item)
      - [6.3.8 Create Expenditure Change](#638-create-expenditure-change)
-7. [Employment API](#7-employment-api)
+7. [Employment API (Part of Circumstances Context)](#7-employment-api-part-of-circumstances-context)
    - [7.1 Overview](#71-overview)
    - [7.2 Operations Summary](#72-operations-summary)
    - [7.3 Key Endpoints](#73-key-endpoints)
-8. [Goals & Objectives API](#8-goals--objectives-api)
+8. [Goals & Objectives API (Goals Context)](#8-goals--objectives-api-goals-context)
    - [8.1 Overview](#81-overview)
    - [8.2 Operations Summary](#82-operations-summary)
    - [8.3 Key Endpoints](#83-key-endpoints)
@@ -4248,16 +4248,67 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
 
 ---
 
-## 7. Employment API
+## 7. Employment API (Part of Circumstances Context)
 
 ### 7.1 Overview
 
+**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment`
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/employment`
-
-**Purpose:** Capture and track client financial goals and objectives.
+**Purpose:** Track client's employment history and current employment status.
 
 **Scope:**
+- Current employment records
+- Historical employment (employment timeline)
+- Self-employment and directorship tracking
+- Employment income and benefits
+- Occupation and industry information
+- Employment status changes over time
+
+**Aggregate Root:** Client (employment is nested under each client)
+
+**Key Characteristics:**
+- **Nested under clients** - Each client has their own employment records
+- **Supports current and historical** - Track employment timeline including past roles
+- **Multiple employment types** - Employed, self-employed, director, retired, not employed
+- **Income connection** - Employment records link to income sources
+
+**Regulatory Compliance:**
+- FCA COBS (Know Your Customer - Employment Status)
+- Mortgage Credit Directive (Employment verification for affordability)
+- Consumer Duty (Understanding client circumstances)
+
+### 7.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment` | List employment history | `employment:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment` | Add employment record | `employment:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Get employment details | `employment:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Update employment | `employment:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Delete employment | `employment:write` |
+
+### 7.3 Key Endpoints
+
+Employment operations are documented in Section 6.3 (Income & Expenditure API) as part of the Circumstances Context.
+
+See Section 6.3.1 and 6.3.2 for detailed employment endpoint documentation including:
+- List Employment Records (Section 6.3.1)
+- Create Employment Record (Section 6.3.2)
+- Update Employment Record
+- Employment Types and Contract Types
+
+---
+
+## 8. Goals & Objectives API (Goals Context)
+
+### 8.1 Overview
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/objectives`
+
+**Purpose:** Capture and track client financial goals and objectives across different life areas using type-based routing.
+
+**Scope:**
+- Type-based objectives (investment, pension, protection, mortgage, budget, estate-planning)
 - Short, medium, and long-term goal definition
 - Protection goals (life cover, income protection, critical illness)
 - Retirement planning goals (retirement age, desired income)
@@ -4265,433 +4316,172 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
 - Mortgage goals (house purchase, remortgage)
 - Budget goals (spending limits, debt reduction)
 - Estate planning goals (inheritance, trusts, gifting)
-- Equity release goals
-- Goal prioritization
-- Funding allocation to goals
-- Goal completion tracking
+- Goal prioritization and tracking
+- Needs sub-resources for detailed requirements capture
 
-**Aggregate Root:** FactFind (goals are nested within)
+**Aggregate Root:** FactFind (objectives are nested within)
+
+**Key Characteristics:**
+- **Type discrimination via URL path** - Different objective types have type-specific fields
+- **Six objective types** - investment, pension, protection, mortgage, budget, estate-planning
+- **Type-specific contracts** - Each objective type has its own schema
+- **Needs sub-resources** - Capture detailed needs under each objective
 
 **Regulatory Compliance:**
 - FCA COBS (Understanding client objectives)
 - Consumer Duty (Delivering good outcomes)
 - PROD (Target Market assessment)
 
-### 7.2 Operations Summary
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/goals` | List goals | `goals:read` |
-| POST | `/api/v1/factfinds/{factfindId}/goals` | Create goal | `goals:write` |
-| GET | `/api/v1/factfinds/{factfindId}/goals/{goalId}` | Get goal details | `goals:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/goals/{goalId}` | Update goal | `goals:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/goals/{goalId}` | Delete goal | `goals:write` |
-| POST | `/api/v1/factfinds/{factfindId}/goals/{goalId}/complete` | Mark goal as complete | `goals:write` |
-| GET | `/api/v1/factfinds/{factfindId}/goals/{goalId}/objectives` | List objectives under goal | `goals:read` |
-| POST | `/api/v1/factfinds/{factfindId}/goals/{goalId}/objectives` | Add objective to goal | `goals:write` |
-| PUT | `/api/v1/factfinds/{factfindId}/goals/{id}/objectives/{objId}` | Update objective | `goals:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/goals/{id}/objectives/{objId}` | Remove objective | `goals:write` |
-| GET | `/api/v1/factfinds/{factfindId}/goals/{goalId}/funding` | Get goal funding allocation | `goals:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/goals/{id}/funding` | Update funding allocation | `goals:write` |
-
-### 7.3 Key Endpoints
-
-#### 7.3.1 Create Goal
-
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/goals`
-
-**Description:** Create a new financial goal for a client.
-
-**Contract:** Uses the unified `Goal` contract (see Section 11.6). The same contract is used for request and response.
-
-**Request Body (Retirement Goal):**
-Goal contract with required-on-create fields.
-
-
-```json
-{
-  "client": {
-    "id": 123
-  },
-  "goalType": "Retirement",
-  "category": "LongTerm",
-  "description": "Comfortable retirement at age 65",
-  "priority": 1,
-  "targetDate": "2045-05-15",
-  "targetAmount": {
-    "amount": 500000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "retirementAge": 65,
-  "desiredRetirementIncome": {
-    "amount": 30000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  },
-    "frequency": {
-      "code": "A",
-      "display": "Annual",
-      "periodsPerYear": 1
-    }
-  },
-  "currentProvisionAdequate": "No",
-  "shortfallAmount": {
-    "amount": 200000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-  }
-}
-```
-
-**Response:**
-Complete `Goal` contract with all fields populated, including server-generated and computed fields.
-
-```json
-{
-  "id": 555,
-  "client": {
-    "id": 123,
-    "fullName": "John Smith",
-    "href": "/api/v1/factfinds/{factfindId}/clients/123"
-  },
-  "goalType": "Retirement",
-  "category": "LongTerm",
-  "description": "Comfortable retirement at age 65",
-  "priority": 1,
-  "status": {
-    "code": "ACT",
-    "display": "Active"
-  },
-  "targetDate": "2045-05-15",
-  "yearsToGoal": 19,
-  "targetAmount": {
-    "amount": 500000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "retirementAge": 65,
-  "desiredRetirementIncome": {
-    "amount": 30000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  },
-    "frequency": {
-      "code": "A",
-      "display": "Annual",
-      "periodsPerYear": 1
-    }
-  },
-  "currentProvisionAdequate": "No",
-  "shortfallAmount": {
-    "amount": 200000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "fundingProgress": {
-    "allocatedAmount": {
-      "amount": 0.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "percentageComplete": 0.0,
-    "onTrack": false
-  },
-  "createdAt": "2026-02-16T15:20:00Z",
-  "updatedAt": "2026-02-16T15:20:00Z",
-  "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/objectives/555" },
-    "update": { "href": "/api/v1/factfinds/{factfindId}/objectives/555", "method": "PUT" },
-    "objectives": { "href": "/api/v1/factfinds/{factfindId}/objectives/555/objectives" },
-    "funding": { "href": "/api/v1/factfinds/{factfindId}/objectives/555/funding" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
-  }
-}
-```
-
-**Goal Types:**
-- `Investment` - Investment/savings goals
-- `Retirement` - Retirement planning
-- `Protection` - Protection needs (life, CI, IP)
-- `Mortgage` - Mortgage goals
-- `Budget` - Budget and spending goals
-- `EstatePlanning` - Estate planning goals
-- `EquityRelease` - Equity release goals
-
-**Categories:**
-- `ShortTerm` - 0-2 years
-- `MediumTerm` - 2-10 years
-- `LongTerm` - 10+ years
-
-#### 7.3.2 Add Objective
-
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/goals/{id}/objectives`
-
-**Description:** Add a specific objective under a goal.
-
-**Request Body:**
-```json
-{
-  "objectiveType": "IncreasePensionContributions",
-  "description": "Increase pension contributions to £750 per month",
-  "targetAmount": {
-    "amount": 9000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  },
-    "frequency": {
-      "code": "A",
-      "display": "Annual",
-      "periodsPerYear": 1
-    }
-  },
-  "targetDate": "2026-04-06",
-  "priority": 1,
-  "status": {
-    "code": "NS",
-    "display": "Not Started"
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "id": "objective-666",
-  "goalRef": {
-    "id": "goal-555",
-    "href": "/api/v1/factfinds/{factfindId}/objectives/goal-555",
-    "goalName": "Comfortable retirement at age 65",
-    "priority": "High"
-  },
-  "objectiveType": "IncreasePensionContributions",
-  "description": "Increase pension contributions to £750 per month",
-  "targetAmount": {
-    "amount": 9000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  },
-    "frequency": {
-      "code": "A",
-      "display": "Annual",
-      "periodsPerYear": 1
-    }
-  },
-  "targetDate": "2026-04-06",
-  "priority": 1,
-  "status": {
-    "code": "NS",
-    "display": "Not Started"
-  },
-  "createdAt": "2026-02-16T15:25:00Z",
-  "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/objectives/goal-555/objectives/objective-666" },
-    "goal": { "href": "/api/v1/factfinds/{factfindId}/objectives/goal-555" }
-  }
-}
-```
-
-**Objective Types:**
-- `IncreasePensionContributions`
-- `StartRegularSavings`
-- `ArrangeLifeCover`
-- `ArrangeCriticalIllnessCover`
-- `ArrangeIncomeProtection`
-- `RepayMortgage`
-- `RemortgageProperty`
-- `ConsolidateDebts`
-- `BuildEmergencyFund`
-- `ReduceExpenditure`
-- `CreateWill`
-- `SetupTrust`
-- `PlanGiftingStrategy`
-
----
-
-## 8. Goals & Objectives API
-
-### 8.1 Overview
-
-
-**Base Path:** `/api/v1/factfinds/{factfindId}/objectives`
-
-**Purpose:** Assess and record client's risk profile for investment suitability.
-
-**Scope:**
-- Attitude to Risk (ATR) questionnaire
-- Capacity for Loss assessment
-- Risk tolerance scoring
-- Investment knowledge and experience
-- Appropriateness assessment (MiFID II)
-- Risk rating assignment
-- Risk profile history and auditing
-
-**Aggregate Root:** RISK_PROFILE
-
-**Regulatory Compliance:**
-- FCA COBS 9 (Assessing Suitability)
-- MiFID II (Appropriateness Assessment)
-- PROD (Target Market matching)
-- Consumer Duty (Understanding needs)
-
 ### 8.2 Operations Summary
 
+**Objective Type Operations (6 types × 5 operations = 30 endpoints):**
+
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/risk-profile` | List risk profiles | `risk:read` |
-| POST | `/api/v1/factfinds/{factfindId}/risk-profile` | Create risk profile | `risk:write` |
-| GET | `/api/v1/factfinds/{factfindId}/risk-profile` | Get risk profile | `risk:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/risk-profile` | Update risk profile | `risk:write` |
-| GET | `/api/v1/factfinds/{factfindId}/risk-profile/questionnaire` | Get ATR questionnaire responses | `risk:read` |
-| PUT | `/api/v1/risk-profiles/{id}/questionnaire` | Update questionnaire | `risk:write` |
-| GET | `/api/v1/factfinds/{factfindId}/risk-profile/history` | Get risk profile history | `risk:read` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives` | List all objectives (all types) | `objectives:read` |
+| POST | `/api/v1/factfinds/{factfindId}/objectives/investment` | Create Investment Objective | `objectives:write` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/investment` | List Investment Objectives | `objectives:read` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Get Investment Objective | `objectives:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Update Investment Objective | `objectives:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Delete Investment Objective | `objectives:write` |
+| POST | `/api/v1/factfinds/{factfindId}/objectives/pension` | Create Pension Objective | `objectives:write` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/pension` | List Pension Objectives | `objectives:read` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Get Pension Objective | `objectives:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Update Pension Objective | `objectives:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Delete Pension Objective | `objectives:write` |
+| POST | `/api/v1/factfinds/{factfindId}/objectives/protection` | Create Protection Objective | `objectives:write` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/protection` | List Protection Objectives | `objectives:read` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Get Protection Objective | `objectives:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Update Protection Objective | `objectives:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Delete Protection Objective | `objectives:write` |
+| POST | `/api/v1/factfinds/{factfindId}/objectives/mortgage` | Create Mortgage Objective | `objectives:write` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/mortgage` | List Mortgage Objectives | `objectives:read` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Get Mortgage Objective | `objectives:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Update Mortgage Objective | `objectives:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Delete Mortgage Objective | `objectives:write` |
+| POST | `/api/v1/factfinds/{factfindId}/objectives/budget` | Create Budget Objective | `objectives:write` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/budget` | List Budget Objectives | `objectives:read` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Get Budget Objective | `objectives:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Update Budget Objective | `objectives:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Delete Budget Objective | `objectives:write` |
+| POST | `/api/v1/factfinds/{factfindId}/objectives/estate-planning` | Create Estate Planning Objective | `objectives:write` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/estate-planning` | List Estate Planning Objectives | `objectives:read` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Get Estate Planning Objective | `objectives:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Update Estate Planning Objective | `objectives:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Delete Estate Planning Objective | `objectives:write` |
 
-### 8.3 Key Endpoints
+**Needs Sub-Resources (5 operations):**
 
-#### 8.3.1 Create Risk Profile
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` | List needs | `objectives:read` |
+| POST | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` | Add need | `objectives:write` |
+| GET | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Get need details | `objectives:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Update need | `objectives:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Delete need | `objectives:write` |
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/risk-profile`
+**Total Endpoints:** 36 (31 objective operations + 5 needs operations)
 
-**Description:** Create a new risk profile assessment.
+### 8.3 Objective Types and Contracts
 
-**Contract:** Uses the unified `RiskProfile` contract (see Section 11.7). The same contract is used for request and response.
+Each objective type has specific fields relevant to that goal category. All objectives share common fields (id, factfindRef, clientRef, description, priority, targetDate, status) plus type-specific fields.
 
-**Request Body:**
-RiskProfile contract with required-on-create fields and assessment data.
+#### 8.3.1 Investment Objectives
 
+**Purpose:** Track investment goals and savings targets.
 
-```json
-{
-  "client": {
-    "id": 123
-  },
-  "assessmentDate": "2026-02-16",
-  "attitudeToRiskScore": 6,
-  "attitudeToRiskRating": "Balanced",
-  "capacityForLossScore": 7,
-  "capacityForLossRating": "High",
-  "overallRiskRating": "Balanced",
-  "investmentKnowledge": "Good",
-  "investmentExperience": "Experienced",
-  "appropriatenessAssessment": "Appropriate",
-  "assessmentMethod": "AdviserQuestionnaire",
-  "questionnaire": {
-    "questionnaireId": "ATR-2024-v1",
-    "responses": [
-      {
-        "questionId": "Q1",
-        "question": "How would you describe your investment experience?",
-        "response": "I have been investing for over 10 years",
-        "score": 4
-      },
-      {
-        "questionId": "Q2",
-        "question": "How would you react to a 20% fall in your portfolio value?",
-        "response": "I would hold and wait for recovery",
-        "score": 3
-      }
-    ],
-    "totalScore": 60,
-    "maxScore": 100
-  },
-  "capacityForLossDetails": "Client has substantial emergency fund, stable employment, no debts, and can withstand short-term volatility",
-  "reviewDate": "2027-02-16"
-}
-```
+**Type-Specific Fields:**
+- `investmentPurpose` - Purpose of the investment (Wealth accumulation, House deposit, Education, etc.)
+- `timeHorizon` - Investment time horizon in years
+- `riskProfile` - Target risk profile for investments
+- `lumpSumRequired` - Target lump sum amount
+- `currentInvestments` - Current investment value
+- `shortfallAmount` - Gap to target
 
-**Response:**
-Complete `RiskProfile` contract with all fields populated, including server-generated and computed fields.
+For detailed request/response examples, see API Endpoints Catalog Section 6.3.1.
 
-```json
-{
-  "id": 777,
-  "client": {
-    "id": 123,
-    "fullName": "John Smith",
-    "href": "/api/v1/factfinds/{factfindId}/clients/123"
-  },
-  "assessmentDate": "2026-02-16",
-  "attitudeToRiskScore": 6,
-  "attitudeToRiskRating": "Balanced",
-  "capacityForLossScore": 7,
-  "capacityForLossRating": "High",
-  "overallRiskRating": "Balanced",
-  "investmentKnowledge": "Good",
-  "investmentExperience": "Experienced",
-  "appropriatenessAssessment": "Appropriate",
-  "assessmentMethod": "AdviserQuestionnaire",
-  "questionnaire": {
-    "questionnaireId": "ATR-2024-v1",
-    "responses": [
-      {
-        "questionId": "Q1",
-        "question": "How would you describe your investment experience?",
-        "response": "I have been investing for over 10 years",
-        "score": 4
-      },
-      {
-        "questionId": "Q2",
-        "question": "How would you react to a 20% fall in your portfolio value?",
-        "response": "I would hold and wait for recovery",
-        "score": 3
-      }
-    ],
-    "totalScore": 60,
-    "maxScore": 100,
-    "percentageScore": 60.0
-  },
-  "capacityForLossDetails": "Client has substantial emergency fund, stable employment, no debts, and can withstand short-term volatility",
-  "reviewDate": "2027-02-16",
-  "isValid": true,
-  "expiryDate": "2028-02-16",
-  "createdAt": "2026-02-16T15:30:00Z",
-  "updatedAt": "2026-02-16T15:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/risk-profile/777" },
-    "update": { "href": "/api/v1/factfinds/{factfindId}/risk-profile/777", "method": "PUT" },
-    "questionnaire": { "href": "/api/v1/factfinds/{factfindId}/risk-profile/777/questionnaire" },
-    "history": { "href": "/api/v1/factfinds/{factfindId}/risk-profile/777/history" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
-  }
-}
-```
+#### 8.3.2 Pension Objectives
 
-**Risk Ratings:**
-- `VeryCautious` - Score 1-2
-- `Cautious` - Score 3-4
-- `Balanced` - Score 5-6
-- `Adventurous` - Score 7-8
-- `VeryAdventurous` - Score 9-10
+**Purpose:** Track retirement planning goals.
 
-**Investment Knowledge Levels:**
-- `None` - No investment knowledge
-- `Basic` - Basic understanding
-- `Good` - Good understanding
-- `Advanced` - Advanced knowledge
-- `Expert` - Professional/expert level
+**Type-Specific Fields:**
+- `retirementAge` - Target retirement age
+- `annualIncomeRequired` - Annual retirement income target
+- `lumpSumRequired` - Lump sum required at retirement
+- `incomeDrawdownStrategy` - Strategy for drawing income
+- `statePensionForecast` - Expected state pension amount
+
+For detailed request/response examples, see API Endpoints Catalog Section 6.3.2.
+
+#### 8.3.3 Protection Objectives
+
+**Purpose:** Track protection needs (life, critical illness, income protection).
+
+**Type-Specific Fields:**
+- `protectionType` - Type of protection (Life, Critical Illness, Income Protection)
+- `coverRequired` - Amount of cover required
+- `coverTerm` - Term of cover in years
+- `dependants` - Number of dependants
+- `currentCover` - Existing cover amount
+- `shortfallAmount` - Gap in protection
+
+For detailed request/response examples, see API Endpoints Catalog Section 6.3.3.
+
+#### 8.3.4 Mortgage Objectives
+
+**Purpose:** Track mortgage and property purchase goals.
+
+**Type-Specific Fields:**
+- `propertyValue` - Target property value
+- `depositAmount` - Available deposit
+- `loanRequired` - Mortgage amount required
+- `propertyAddress` - Target property address (if known)
+- `isFirstTimeBuyer` - First-time buyer status
+- `affordabilityAssessment` - Affordability assessment result
+
+For detailed request/response examples, see API Endpoints Catalog Section 6.3.4.
+
+#### 8.3.5 Budget Objectives
+
+**Purpose:** Track budget and spending goals.
+
+**Type-Specific Fields:**
+- `budgetType` - Type of budget goal (Debt Reduction, Emergency Fund, Spending Control, Savings)
+- `monthlyTarget` - Monthly budget target
+- `currentSpend` - Current monthly spending
+- `savingsTarget` - Target monthly savings
+
+For detailed request/response examples, see API Endpoints Catalog Section 6.3.5.
+
+#### 8.3.6 Estate Planning Objectives
+
+**Purpose:** Track estate planning and inheritance goals.
+
+**Type-Specific Fields:**
+- `estateValue` - Current estate value
+- `inheritanceTaxLiability` - Estimated IHT liability
+- `beneficiaryCount` - Number of beneficiaries
+- `trustsRequired` - Whether trusts are needed
+- `willInPlace` - Whether will is in place
+- `powerOfAttorneyInPlace` - Whether POA is in place
+
+For detailed request/response examples, see API Endpoints Catalog Section 6.3.6.
+
+### 8.4 Needs Sub-Resources
+
+**Purpose:** Capture detailed needs and questions under each objective.
+
+**Endpoint Pattern:** `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs`
+
+**Need Contract:**
+- `id` - Unique identifier
+- `questionId` - Question identifier
+- `question` - The question text
+- `answer` - Client's answer
+- `answeredAt` - Timestamp
+- `priority` - Priority level (High, Medium, Low)
+
+For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ---
 
