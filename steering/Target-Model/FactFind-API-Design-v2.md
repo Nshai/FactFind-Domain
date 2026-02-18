@@ -236,16 +236,6 @@ The FactFind API provides comprehensive digital capabilities for:
    - [9.1 Overview](#91-overview)
    - [9.2 Operations Summary](#92-operations-summary)
    - [9.3 Key Endpoints](#93-key-endpoints)
-9A. [Arrangements API (Type-Based Routing)](#9a-arrangements-api-type-based-routing) **NEW v2.1**
-   - [9A.1 Overview](#9a1-overview)
-   - [9A.2 Arrangement Types and Sub-Types](#9a2-arrangement-types-and-sub-types)
-   - [9A.3 Common Arrangement Operations](#9a3-common-arrangement-operations)
-   - [9A.4 Arrangement Sub-Resources](#9a4-arrangement-sub-resources)
-   - [9A.5 Client Pension Summary](#9a5-client-pension-summary)
-9B. [Savings & Investments API](#9b-savings--investments-api) **NEW v2.0**
-   - [9B.1 Overview](#9b1-overview)
-   - [9B.2 Operations Summary](#9b2-operations-summary)
-   - [9B.3 Key Endpoints](#9b3-key-endpoints)
 10. [Arrangements API (Type-Based Routing)](#10-arrangements-api-type-based-routing) **NEW v3.0**
     - [10.1 Overview](#101-overview)
     - [10.2 Arrangement Types and Routing](#102-arrangement-types-and-routing)
@@ -7856,7 +7846,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 **Purpose:** Manage factfind-level assets and liabilities with comprehensive tracking, valuations, and financial calculations.
 
 **Scope:**
-- Asset management (property, business, cash, other)
+- Asset management (property, business, investments, cash, other)
 - Liability tracking (mortgages, loans, credit cards, other debts)
 - Property details with valuations, LTV, rental yield, and CGT calculations
 - Business asset details with valuations
@@ -7924,7 +7914,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 **Description:** Retrieve all assets associated with a factfind. Assets can be owned by individual clients or jointly owned.
 
 **Query Parameters:**
-- `assetType` - Filter by asset type (property, business, cash, other)
+- `assetType` - Filter by asset type (property, business, investment, cash, other)
 - `clientId` - Filter by owning client
 - `includeDetails` - Include embedded property/business details (default: false)
 
