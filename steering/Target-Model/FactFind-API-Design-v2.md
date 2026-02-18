@@ -7856,7 +7856,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 **Purpose:** Manage factfind-level assets and liabilities with comprehensive tracking, valuations, and financial calculations.
 
 **Scope:**
-- Asset management (property, business, investments, cash, other)
+- Asset management (property, business, cash, other)
 - Liability tracking (mortgages, loans, credit cards, other debts)
 - Property details with valuations, LTV, rental yield, and CGT calculations
 - Business asset details with valuations
@@ -7924,7 +7924,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 **Description:** Retrieve all assets associated with a factfind. Assets can be owned by individual clients or jointly owned.
 
 **Query Parameters:**
-- `assetType` - Filter by asset type (property, business, investment, cash, other)
+- `assetType` - Filter by asset type (property, business, cash, other)
 - `clientId` - Filter by owning client
 - `includeDetails` - Include embedded property/business details (default: false)
 
