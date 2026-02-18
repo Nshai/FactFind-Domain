@@ -4334,7 +4334,7 @@ See Section 6.3.1 and 6.3.2 for detailed employment endpoint documentation inclu
 
 ### 8.2 Operations Summary
 
-**Objective Type Operations (6 types × 5 operations = 30 endpoints):**
+**Objective Type Operations (6 types × 4 operations + 1 list + 1 delete = 26 endpoints):**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
@@ -4343,32 +4343,29 @@ See Section 6.3.1 and 6.3.2 for detailed employment endpoint documentation inclu
 | GET | `/api/v1/factfinds/{factfindId}/objectives/investment` | List Investment Objectives | `objectives:read` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Get Investment Objective | `objectives:read` |
 | PATCH | `/api/v1/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Update Investment Objective | `objectives:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Delete Investment Objective | `objectives:write` |
 | POST | `/api/v1/factfinds/{factfindId}/objectives/pension` | Create Pension Objective | `objectives:write` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/pension` | List Pension Objectives | `objectives:read` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Get Pension Objective | `objectives:read` |
 | PATCH | `/api/v1/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Update Pension Objective | `objectives:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Delete Pension Objective | `objectives:write` |
 | POST | `/api/v1/factfinds/{factfindId}/objectives/protection` | Create Protection Objective | `objectives:write` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/protection` | List Protection Objectives | `objectives:read` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Get Protection Objective | `objectives:read` |
 | PATCH | `/api/v1/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Update Protection Objective | `objectives:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Delete Protection Objective | `objectives:write` |
 | POST | `/api/v1/factfinds/{factfindId}/objectives/mortgage` | Create Mortgage Objective | `objectives:write` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/mortgage` | List Mortgage Objectives | `objectives:read` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Get Mortgage Objective | `objectives:read` |
 | PATCH | `/api/v1/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Update Mortgage Objective | `objectives:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Delete Mortgage Objective | `objectives:write` |
 | POST | `/api/v1/factfinds/{factfindId}/objectives/budget` | Create Budget Objective | `objectives:write` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/budget` | List Budget Objectives | `objectives:read` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Get Budget Objective | `objectives:read` |
 | PATCH | `/api/v1/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Update Budget Objective | `objectives:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Delete Budget Objective | `objectives:write` |
 | POST | `/api/v1/factfinds/{factfindId}/objectives/estate-planning` | Create Estate Planning Objective | `objectives:write` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/estate-planning` | List Estate Planning Objectives | `objectives:read` |
 | GET | `/api/v1/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Get Estate Planning Objective | `objectives:read` |
 | PATCH | `/api/v1/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Update Estate Planning Objective | `objectives:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Delete Estate Planning Objective | `objectives:write` |
+| **DELETE** | **`/api/v1/factfinds/{factfindId}/objectives/{objectiveId}`** | **Delete any objective (all types)** | `objectives:write` |
+
+**Note:** DELETE operation does not require type in the path. The objective ID is sufficient to identify and delete the objective regardless of its type. The type is determined from the existing objective record.
 
 **Needs Sub-Resources (5 operations):**
 
@@ -4380,7 +4377,7 @@ See Section 6.3.1 and 6.3.2 for detailed employment endpoint documentation inclu
 | PATCH | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Update need | `objectives:write` |
 | DELETE | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Delete need | `objectives:write` |
 
-**Total Endpoints:** 36 (31 objective operations + 5 needs operations)
+**Total Endpoints:** 31 (26 objective operations + 5 needs operations)
 
 ### 8.3 Objective Types and Contracts
 
