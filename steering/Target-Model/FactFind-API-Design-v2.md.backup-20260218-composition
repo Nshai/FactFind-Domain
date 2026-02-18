@@ -11891,35 +11891,18 @@ Each field is annotated with its behavioral characteristics:
 
 ### 13.1 Client Contract
 
-The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic, regulatory, and preference information using a **composition pattern** with conditional types.
+The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic, regulatory, and preference information.
 
 **Reference Type:** Client is a reference type with identity (has `id` field).
 
-**Composition Pattern Architecture:**
-- **TClient** table contains common fields and `clientType` discriminator
-- **PersonValue**, **CorporateValue**, **TrustValue** are conditional embedded types based on `clientType`
-- Person-specific fields only present when `clientType="Person"`
-- Corporate-specific fields only present when `clientType="Corporate"`
-- Trust-specific fields only present when `clientType="Trust"`
-
 **Key Enhancements in v2.1:**
-- **Composition Pattern** - Conditional value types based on client type discriminator
-- **PersonValue** - Person-specific demographics (DOB, gender, marital status, health, occupation)
-- **CorporateValue** - Corporate-specific details (company name, registration, directors, shareholders)
-- **TrustValue** - Trust-specific information (trust name, type, settlor, trustees, beneficiaries)
 - **Addresses** - Full address history embedded as value types
 - **Contacts** - All contact methods (email, phone, mobile, work, website) embedded
 - **Identity Verification** - KYC, AML checks, MLR compliance embedded
 - **Vulnerabilities** - Client vulnerabilities and adjustments embedded
 - **Data Protection** - GDPR consent and privacy management embedded
 - **Marketing Preferences** - Channel preferences and interests embedded
-- **Estate Planning** - Will, LPA, gifts, trusts, IHT embedded (Person only)
-
----
-
-#### 13.1.1 Person Client Example
-
-**Person client** with full PersonValue embedded:
+- **Estate Planning** - Will, LPA, gifts, trusts, IHT embedded
 
 ```json
 {
@@ -11935,76 +11918,59 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "clientNumber": "C00001234",
   "clientType": "Person",
-  "personValue": {
+  "name": {
     "title": {
       "code": "MR",
       "display": "Mr"
     },
     "firstName": "John",
-    "middleNames": "Michael Robert",
+    "middleName": "Michael",
     "lastName": "Smith",
-    "preferredName": "John",
-    "fullName": "Mr John Michael Robert Smith",
-    "salutation": "Mr Smith",
-    "dateOfBirth": "1980-05-15",
-    "age": 45,
-    "placeOfBirth": "London",
-    "countryOfBirth": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "gender": {
-      "code": "M",
-      "display": "Male"
-    },
-    "maritalStatus": {
-      "code": "MAR",
-      "display": "Married",
-      "effectiveFrom": "2005-06-20"
-    },
-    "niNumber": "AB123456C",
-    "nationalityCountry": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "residencyCountry": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "domicileCountry": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "isUkResident": true,
-    "isExpatriate": false,
-    "smokingStatus": {
-      "code": "NEVER",
-      "display": "Never Smoked"
-    },
-    "healthMetrics": {
-      "heightCm": 178.0,
-      "weightKg": 82.5,
-      "bmi": 26.04,
-      "bmiCategory": "Overweight",
-      "lastMeasured": "2026-01-15"
-    },
-    "occupation": "Senior Software Engineer",
-    "occupationCode": {
-      "code": "2136",
-      "display": "Programmers and Software Development Professionals",
-      "socVersion": "SOC2020"
-    },
-    "employmentStatus": {
-      "code": "FT_EMP",
-      "display": "Full-Time Employed"
-    },
-    "isDeceased": false,
-    "deceasedDate": null
+    "preferredName": "John"
   },
+  "fullName": "Mr John Michael Smith",
+  "salutation": "Mr Smith",
+  "dateOfBirth": "1980-05-15",
+  "age": 45,
+  "placeOfBirth": "London",
+  "gender": {
+    "code": "M",
+    "display": "Male"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2005-06-20"
+  },
+  "taxDetails": {
+    "niNumber": "AB123456C",
+    "taxReference": "1234567890"
+  },
+  "nationalClientIdentifier": "NCI-123456",
+  "nationalityCountry": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfBirth": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfResidence": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "countryOfDomicile": {
+    "code": "GB",
+    "display": "United Kingdom",
+    "alpha3": "GBR"
+  },
+  "isUkResident": true,
+  "isExpatriate": false,
+  "isDeceased": false,
+  "deceasedOn": null,
   "addresses": [
     {
       "addressType": {
@@ -12093,6 +12059,15 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         "display": "Work Phone"
       },
       "value": "+44 20 7946 0123",
+      "isPrimary": false,
+      "isVerified": false
+    },
+    {
+      "contactType": {
+        "code": "WEBSITE",
+        "display": "Website"
+      },
+      "value": "https://www.example.com",
       "isPrimary": false,
       "isVerified": false
     }
@@ -12197,6 +12172,26 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         "Large print documents (16pt minimum)",
         "Extended appointment times (allow 90 minutes)",
         "Well-lit meeting rooms"
+      ],
+      "isActive": true,
+      "recordedBy": {
+        "id": "adviser-789",
+        "name": "Jane Doe"
+      }
+    },
+    {
+      "vulnerabilityType": {
+        "code": "FINANCIAL",
+        "display": "Financial vulnerability"
+      },
+      "severity": "Low",
+      "description": "Recent life event (bereavement) may affect decision-making",
+      "assessmentDate": "2024-06-01",
+      "reviewDate": "2025-06-01",
+      "adjustmentsRequired": [
+        "Additional cooling-off period",
+        "Involve trusted family member in discussions",
+        "Avoid complex products"
       ],
       "isActive": true,
       "recordedBy": {
@@ -12591,6 +12586,17 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "isDisabled": false
     }
   ],
+  "healthInformation": {
+    "hasEverSmoked": false,
+    "isSmoker": "Never",
+    "hasSmokedInLast12Months": "No",
+    "hasNicotineReplacementInLastYear": "No",
+    "hasVapedInLastYear": "No",
+    "inGoodHealth": true,
+    "medicalConditions": null,
+    "hasDisability": false,
+    "disabilityDetails": null
+  },
   "serviceStatus": "Active",
   "serviceStatusDate": "2020-01-15",
   "clientSegment": "A",
@@ -12681,1340 +12687,27 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 }
 ```
 
----
-
-#### 13.1.2 Corporate Client Example
-
-**Corporate client** with full CorporateValue embedded:
-
-```json
-{
-  "id": "client-567",
-  "factFindRef": {
-    "id": "factfind-890",
-    "href": "/api/v1/factfinds/factfind-890",
-    "factFindNumber": "FF-2025-00456",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
-  },
-  "clientNumber": "C00005678",
-  "clientType": "Corporate",
-  "corporateValue": {
-    "companyName": "TechVenture Solutions Ltd",
-    "tradingName": "TechVenture",
-    "registrationNumber": "09876543",
-    "incorporationDate": "2015-03-20",
-    "companyType": {
-      "code": "LTD",
-      "display": "Private Limited Company"
-    },
-    "vatNumber": "GB123456789",
-    "countryOfIncorporation": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "companyStatus": {
-      "code": "ACTIVE",
-      "display": "Active"
-    },
-    "sicCodes": [
-      {
-        "code": "62012",
-        "display": "Business and domestic software development"
-      },
-      {
-        "code": "62020",
-        "display": "Information technology consultancy activities"
-      }
-    ],
-    "numberOfEmployees": 45,
-    "annualTurnover": {
-      "amount": 3500000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "directors": [
-      {
-        "personRef": {
-          "id": "client-568",
-          "href": "/api/v1/clients/client-568",
-          "name": "Robert Johnson",
-          "clientNumber": "C00005679"
-        },
-        "appointedDate": "2015-03-20",
-        "role": "Managing Director",
-        "shareholding": 60.0,
-        "isActive": true
-      },
-      {
-        "personRef": {
-          "id": "client-569",
-          "href": "/api/v1/clients/client-569",
-          "name": "Amanda Chen",
-          "clientNumber": "C00005680"
-        },
-        "appointedDate": "2015-03-20",
-        "role": "Technical Director",
-        "shareholding": 40.0,
-        "isActive": true
-      }
-    ],
-    "shareholders": [
-      {
-        "shareholderRef": {
-          "id": "client-568",
-          "name": "Robert Johnson",
-          "type": "Person"
-        },
-        "sharesHeld": 600,
-        "shareClass": "Ordinary",
-        "percentage": 60.0,
-        "nominalValue": {
-          "amount": 600.00,
-          "currency": {
-            "code": "GBP",
-            "display": "British Pound",
-            "symbol": "£"
-          }
-        }
-      },
-      {
-        "shareholderRef": {
-          "id": "client-569",
-          "name": "Amanda Chen",
-          "type": "Person"
-        },
-        "sharesHeld": 400,
-        "shareClass": "Ordinary",
-        "percentage": 40.0,
-        "nominalValue": {
-          "amount": 400.00,
-          "currency": {
-            "code": "GBP",
-            "display": "British Pound",
-            "symbol": "£"
-          }
-        }
-      }
-    ],
-    "registeredOffice": {
-      "line1": "Tech Park Building 5",
-      "line2": "Silicon Street",
-      "line3": null,
-      "line4": null,
-      "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
-      "postcode": "EC2A 4DN",
-      "country": {
-        "code": "GB",
-        "display": "United Kingdom",
-        "alpha3": "GBR"
-      }
-    },
-    "accountsFilingDate": "2026-12-31",
-    "confirmationStatementDate": "2026-03-20",
-    "financialYearEnd": "2026-12-31"
-  },
-  "addresses": [
-    {
-      "addressType": {
-        "code": "REGISTERED",
-        "display": "Registered Office"
-      },
-      "line1": "Tech Park Building 5",
-      "line2": "Silicon Street",
-      "line3": null,
-      "line4": null,
-      "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
-      "postcode": "EC2A 4DN",
-      "country": {
-        "code": "GB",
-        "display": "United Kingdom",
-        "alpha3": "GBR"
-      },
-      "isPrimary": true,
-      "fromDate": "2015-03-20",
-      "toDate": null,
-      "yearsAtAddress": 11
-    },
-    {
-      "addressType": {
-        "code": "TRADING",
-        "display": "Trading Address"
-      },
-      "line1": "Innovation Hub",
-      "line2": "25 Tech Square",
-      "line3": null,
-      "line4": null,
-      "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
-      "postcode": "E1 6AN",
-      "country": {
-        "code": "GB",
-        "display": "United Kingdom",
-        "alpha3": "GBR"
-      },
-      "isPrimary": false,
-      "fromDate": "2020-06-01",
-      "toDate": null,
-      "yearsAtAddress": 6
-    }
-  ],
-  "contacts": [
-    {
-      "contactType": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
-      "value": "info@techventure.com",
-      "isPrimary": true,
-      "isVerified": true,
-      "verifiedDate": "2015-03-20"
-    },
-    {
-      "contactType": {
-        "code": "PHONE",
-        "display": "Main Office Phone"
-      },
-      "value": "+44 20 7946 1234",
-      "isPrimary": true,
-      "isVerified": true,
-      "verifiedDate": "2015-03-20"
-    },
-    {
-      "contactType": {
-        "code": "WEBSITE",
-        "display": "Website"
-      },
-      "value": "https://www.techventure.com",
-      "isPrimary": false,
-      "isVerified": true,
-      "verifiedDate": "2015-03-20"
-    }
-  ],
-  "identityVerification": {
-    "verificationStatus": "Verified",
-    "verificationDate": "2015-03-20",
-    "expiryDate": "2028-03-20",
-    "nextReviewDate": "2027-03-20",
-    "verifiedBy": {
-      "id": "adviser-800",
-      "name": "Michael Brown"
-    },
-    "verificationMethod": "Electronic",
-    "documents": [
-      {
-        "documentType": "Certificate of Incorporation",
-        "documentNumber": "09876543",
-        "issueDate": "2015-03-20",
-        "expiryDate": null,
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
-        "verified": true,
-        "verifiedDate": "2015-03-20",
-        "verificationSource": "Companies House"
-      },
-      {
-        "documentType": "VAT Registration Certificate",
-        "documentNumber": "GB123456789",
-        "issueDate": "2015-04-15",
-        "expiryDate": null,
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
-        "verified": true,
-        "verifiedDate": "2015-04-20",
-        "verificationSource": "HMRC"
-      }
-    ],
-    "amlChecks": {
-      "lastCheckDate": "2025-03-20",
-      "nextCheckDate": "2028-03-20",
-      "riskRating": "Low",
-      "sanctionsChecked": true,
-      "sanctionsMatches": 0,
-      "sanctionsCheckSource": "Dow Jones",
-      "pepChecked": true,
-      "isPep": false,
-      "pepCheckSource": "Dow Jones",
-      "adverseMediaChecked": true,
-      "adverseMediaMatches": 0,
-      "adverseMediaCheckSource": "LexisNexis",
-      "overallStatus": "Clear",
-      "checkPerformedBy": {
-        "id": "adviser-800",
-        "name": "Michael Brown"
-      }
-    },
-    "mlrCompliance": {
-      "kycCompliant": true,
-      "kycComplianceDate": "2015-03-20",
-      "cddCompleted": true,
-      "cddCompletedDate": "2015-03-20",
-      "eddRequired": false,
-      "eddCompletedDate": null,
-      "complianceStatus": "Compliant",
-      "complianceDate": "2015-03-20",
-      "reviewPeriod": "Triennial",
-      "lastReviewDate": "2025-03-20",
-      "nextReviewDate": "2028-03-20"
-    },
-    "sourceOfWealth": {
-      "primarySource": "Trading Activities",
-      "secondarySource": "Retained Earnings",
-      "description": "Software development and IT consulting services",
-      "evidenceProvided": true,
-      "evidenceType": "Annual Accounts, Management Accounts",
-      "verifiedDate": "2025-03-20"
-    },
-    "sourceOfFunds": {
-      "source": "Operating Profits",
-      "description": "Revenue from software development contracts",
-      "evidenceProvided": true,
-      "evidenceType": "Bank Statements, Invoices",
-      "verifiedDate": "2025-03-20"
-    }
-  },
-  "vulnerabilities": [],
-  "dataProtection": {
-    "gdprConsent": {
-      "dataProcessing": {
-        "consented": true,
-        "consentDate": "2015-03-20",
-        "consentMethod": "Written",
-        "lawfulBasis": "Legitimate Interest",
-        "consentText": "Company consents to data processing for corporate financial advice services",
-        "version": "1.0"
-      },
-      "marketing": {
-        "consented": true,
-        "consentDate": "2015-03-20",
-        "consentMethod": "Written",
-        "lawfulBasis": "Consent",
-        "consentText": "Company consents to receiving marketing communications",
-        "version": "1.0"
-      },
-      "profiling": {
-        "consented": false,
-        "consentDate": null,
-        "consentMethod": null,
-        "lawfulBasis": null,
-        "consentText": null,
-        "version": null
-      },
-      "thirdPartySharing": {
-        "consented": false,
-        "consentDate": null,
-        "consentMethod": null,
-        "lawfulBasis": null,
-        "consentText": null,
-        "version": null
-      }
-    },
-    "privacyPolicy": {
-      "version": "2.1",
-      "acceptedDate": "2015-03-20",
-      "url": "https://api.factfind.com/privacy-policy/v2.1",
-      "acceptanceMethod": "Written"
-    },
-    "dataRetention": {
-      "retentionPeriod": "7 years after relationship ends",
-      "retentionBasis": "FCA Regulatory Requirement",
-      "relationshipEndDate": null,
-      "retentionEndDate": null,
-      "archiveDate": null
-    },
-    "rightsExercised": {
-      "dsarRequests": 0,
-      "rectificationRequests": 0,
-      "erasureRequests": 0,
-      "portabilityRequests": 0,
-      "restrictionRequests": 0,
-      "objectionRequests": 0,
-      "lastRequestDate": null,
-      "lastRequestType": null
-    },
-    "breachNotifications": {
-      "breachCount": 0,
-      "lastBreachDate": null,
-      "breachesNotified": []
-    }
-  },
-  "marketingPreferences": {
-    "channels": {
-      "email": {
-        "consented": true,
-        "consentDate": "2015-03-20",
-        "doubleOptInDate": "2015-03-20",
-        "optOutDate": null,
-        "frequency": "Quarterly",
-        "lastContactDate": "2026-01-15",
-        "unsubscribed": false
-      },
-      "phone": {
-        "consented": true,
-        "consentDate": "2015-03-20",
-        "optOutDate": null,
-        "frequency": "Annual",
-        "lastContactDate": "2025-12-10",
-        "unsubscribed": false,
-        "tpsChecked": false,
-        "tpsRegistered": false,
-        "tpsCheckDate": null
-      },
-      "sms": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": false
-      },
-      "post": {
-        "consented": true,
-        "consentDate": "2015-03-20",
-        "optOutDate": null,
-        "frequency": "Biannual",
-        "lastContactDate": "2025-11-01",
-        "unsubscribed": false,
-        "mpsChecked": false,
-        "mpsRegistered": false,
-        "mpsCheckDate": null
-      },
-      "socialMedia": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": false
-      }
-    },
-    "interests": [
-      "Corporate Pensions",
-      "Group Life Assurance",
-      "Key Person Insurance",
-      "Business Protection"
-    ],
-    "productInterests": [
-      "Group Pensions",
-      "Group Life",
-      "Keyman Protection",
-      "Shareholder Protection"
-    ],
-    "suppressionList": false,
-    "unsubscribeAll": false,
-    "unsubscribeAllDate": null,
-    "lastUpdated": "2015-03-20",
-    "preferredContactTime": "Business Hours",
-    "doNotContact": false,
-    "doNotContactReason": null
-  },
-  "serviceStatus": "Active",
-  "serviceStatusDate": "2015-03-20",
-  "clientSegment": "B",
-  "clientSegmentDate": "2015-03-20",
-  "clientCategory": "SmallBusiness",
-  "grossAnnualIncome": {
-    "amount": 3500000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "netWorth": {
-    "amount": 1250000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalAssets": {
-    "amount": 2100000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "adviserRef": {
-    "id": "adviser-800",
-    "href": "/api/v1/advisers/adviser-800",
-    "name": "Michael Brown",
-    "code": "ADV002"
-  },
-  "paraplannerRef": {
-    "id": "adviser-801",
-    "href": "/api/v1/advisers/adviser-801",
-    "name": "Lisa Wong",
-    "code": "PP002"
-  },
-  "officeRef": {
-    "id": "office-2",
-    "name": "Manchester Office",
-    "code": "MAN"
-  },
-  "createdAt": "2015-03-20T09:00:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z",
-  "createdBy": {
-    "id": "adviser-800",
-    "name": "Michael Brown"
-  },
-  "updatedBy": {
-    "id": "adviser-800",
-    "name": "Michael Brown"
-  },
-  "_etag": "W/\"v2-20260216-143000\"",
-  "_links": {
-    "self": { "href": "/api/v1/clients/client-567" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-890" },
-    "adviser": { "href": "/api/v1/advisers/adviser-800" }
-  }
-}
-```
-
----
-
-#### 13.1.3 Trust Client Example
-
-**Trust client** with full TrustValue embedded:
-
-```json
-{
-  "id": "client-999",
-  "factFindRef": {
-    "id": "factfind-1111",
-    "href": "/api/v1/factfinds/factfind-1111",
-    "factFindNumber": "FF-2025-00789",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
-  },
-  "clientNumber": "C00009999",
-  "clientType": "Trust",
-  "trustValue": {
-    "trustName": "The Smith Family Discretionary Trust",
-    "trustType": {
-      "code": "DISCRETIONARY",
-      "display": "Discretionary Trust"
-    },
-    "settlementDate": "2018-04-15",
-    "trustRegistrationNumber": "TRN12345678",
-    "taxReference": "1234567890",
-    "trustDeed": {
-      "documentRef": "DEED-2018-04-15-SMITH",
-      "documentUrl": "https://docs.example.com/trusts/deed-smith-2018.pdf",
-      "executionDate": "2018-04-15",
-      "storedWith": "Harrison & Partners Solicitors",
-      "lastReviewedDate": "2024-04-15"
-    },
-    "settlor": {
-      "personRef": {
-        "id": "client-1000",
-        "href": "/api/v1/clients/client-1000",
-        "name": "William Smith",
-        "clientNumber": "C00010000"
-      },
-      "settlementAmount": {
-        "amount": 500000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "settlementDate": "2018-04-15",
-      "isDeceased": false
-    },
-    "trustees": [
-      {
-        "personRef": {
-          "id": "client-1001",
-          "href": "/api/v1/clients/client-1001",
-          "name": "Margaret Smith",
-          "clientNumber": "C00010001"
-        },
-        "appointedDate": "2018-04-15",
-        "role": "Principal Trustee",
-        "isProfessionalTrustee": false,
-        "isActive": true
-      },
-      {
-        "personRef": {
-          "id": "client-1002",
-          "href": "/api/v1/clients/client-1002",
-          "name": "James Harrison",
-          "clientNumber": "C00010002"
-        },
-        "appointedDate": "2018-04-15",
-        "role": "Professional Trustee",
-        "isProfessionalTrustee": true,
-        "professionalFirm": "Harrison & Partners Solicitors",
-        "isActive": true
-      }
-    ],
-    "beneficiaries": [
-      {
-        "personRef": {
-          "id": "client-1003",
-          "name": "Alexander Smith",
-          "type": "Person"
-        },
-        "relationship": "Grandchild",
-        "beneficiaryType": "Discretionary",
-        "class": "Income and Capital",
-        "percentage": null,
-        "fromDate": "2018-04-15",
-        "isActive": true
-      },
-      {
-        "personRef": {
-          "id": "client-1004",
-          "name": "Emily Smith",
-          "type": "Person"
-        },
-        "relationship": "Grandchild",
-        "beneficiaryType": "Discretionary",
-        "class": "Income and Capital",
-        "percentage": null,
-        "fromDate": "2018-04-15",
-        "isActive": true
-      },
-      {
-        "personRef": {
-          "id": "client-1005",
-          "name": "Sophie Smith",
-          "type": "Person"
-        },
-        "relationship": "Grandchild",
-        "beneficiaryType": "Discretionary",
-        "class": "Income and Capital",
-        "percentage": null,
-        "fromDate": "2020-06-20",
-        "isActive": true
-      }
-    ],
-    "trustAssets": {
-      "totalValue": {
-        "amount": 650000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "assetBreakdown": [
-        {
-          "assetType": "Cash",
-          "value": {
-            "amount": 50000.00,
-            "currency": {
-              "code": "GBP",
-              "display": "British Pound",
-              "symbol": "£"
-            }
-          },
-          "percentage": 7.69
-        },
-        {
-          "assetType": "Investments",
-          "value": {
-            "amount": 450000.00,
-            "currency": {
-              "code": "GBP",
-              "display": "British Pound",
-              "symbol": "£"
-            }
-          },
-          "percentage": 69.23
-        },
-        {
-          "assetType": "Property",
-          "value": {
-            "amount": 150000.00,
-            "currency": {
-              "code": "GBP",
-              "display": "British Pound",
-              "symbol": "£"
-            }
-          },
-          "percentage": 23.08
-        }
-      ],
-      "valuationDate": "2026-01-31"
-    },
-    "taxStatus": {
-      "taxYear": "2025/26",
-      "ihtRelevantProperty": true,
-      "lastIhtCharge": null,
-      "nextIhtChargeDate": "2028-04-15",
-      "cgtLiability": {
-        "amount": 0.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "incomeTaxLiability": {
-        "amount": 5600.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "trustRate": 45.0
-    },
-    "distributions": [
-      {
-        "beneficiaryRef": {
-          "id": "client-1003",
-          "name": "Alexander Smith"
-        },
-        "distributionDate": "2025-12-20",
-        "amount": {
-          "amount": 10000.00,
-          "currency": {
-            "code": "GBP",
-            "display": "British Pound",
-            "symbol": "£"
-          }
-        },
-        "distributionType": "Discretionary Payment",
-        "purpose": "Education Expenses"
-      },
-      {
-        "beneficiaryRef": {
-          "id": "client-1004",
-          "name": "Emily Smith"
-        },
-        "distributionDate": "2025-12-20",
-        "amount": {
-          "amount": 8000.00,
-          "currency": {
-            "code": "GBP",
-            "display": "British Pound",
-            "symbol": "£"
-          }
-        },
-        "distributionType": "Discretionary Payment",
-        "purpose": "Education Expenses"
-      }
-    ],
-    "accountingPeriodEnd": "2026-04-05",
-    "nextReviewDate": "2027-04-15"
-  },
-  "addresses": [
-    {
-      "addressType": {
-        "code": "TRUST_CORRESPONDENCE",
-        "display": "Trust Correspondence Address"
-      },
-      "line1": "Harrison & Partners Solicitors",
-      "line2": "Regency House",
-      "line3": "25 High Street",
-      "line4": null,
-      "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
-      "postcode": "WC2N 5DU",
-      "country": {
-        "code": "GB",
-        "display": "United Kingdom",
-        "alpha3": "GBR"
-      },
-      "isPrimary": true,
-      "fromDate": "2018-04-15",
-      "toDate": null,
-      "yearsAtAddress": 8
-    }
-  ],
-  "contacts": [
-    {
-      "contactType": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
-      "value": "trustees@smithfamilytrust.com",
-      "isPrimary": true,
-      "isVerified": true,
-      "verifiedDate": "2018-04-15"
-    },
-    {
-      "contactType": {
-        "code": "PHONE",
-        "display": "Trustee Contact Phone"
-      },
-      "value": "+44 20 7946 5678",
-      "isPrimary": true,
-      "isVerified": true,
-      "verifiedDate": "2018-04-15"
-    }
-  ],
-  "identityVerification": {
-    "verificationStatus": "Verified",
-    "verificationDate": "2018-04-15",
-    "expiryDate": "2028-04-15",
-    "nextReviewDate": "2027-04-15",
-    "verifiedBy": {
-      "id": "adviser-810",
-      "name": "Patricia Davies"
-    },
-    "verificationMethod": "Documentary",
-    "documents": [
-      {
-        "documentType": "Trust Deed",
-        "documentNumber": "DEED-2018-04-15-SMITH",
-        "issueDate": "2018-04-15",
-        "expiryDate": null,
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
-        "verified": true,
-        "verifiedDate": "2018-04-15",
-        "verificationSource": "Solicitor Certification"
-      },
-      {
-        "documentType": "HMRC Trust Registration",
-        "documentNumber": "TRN12345678",
-        "issueDate": "2018-04-20",
-        "expiryDate": null,
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
-        "verified": true,
-        "verifiedDate": "2018-04-25",
-        "verificationSource": "HMRC"
-      }
-    ],
-    "amlChecks": {
-      "lastCheckDate": "2025-04-15",
-      "nextCheckDate": "2028-04-15",
-      "riskRating": "Low",
-      "sanctionsChecked": true,
-      "sanctionsMatches": 0,
-      "sanctionsCheckSource": "Dow Jones",
-      "pepChecked": true,
-      "isPep": false,
-      "pepCheckSource": "Dow Jones",
-      "adverseMediaChecked": true,
-      "adverseMediaMatches": 0,
-      "adverseMediaCheckSource": "LexisNexis",
-      "overallStatus": "Clear",
-      "checkPerformedBy": {
-        "id": "adviser-810",
-        "name": "Patricia Davies"
-      }
-    },
-    "mlrCompliance": {
-      "kycCompliant": true,
-      "kycComplianceDate": "2018-04-15",
-      "cddCompleted": true,
-      "cddCompletedDate": "2018-04-15",
-      "eddRequired": false,
-      "eddCompletedDate": null,
-      "complianceStatus": "Compliant",
-      "complianceDate": "2018-04-15",
-      "reviewPeriod": "Triennial",
-      "lastReviewDate": "2025-04-15",
-      "nextReviewDate": "2028-04-15"
-    },
-    "sourceOfWealth": {
-      "primarySource": "Settlement by Settlor",
-      "secondarySource": "Investment Growth",
-      "description": "Initial settlement of £500,000 from William Smith, plus investment returns",
-      "evidenceProvided": true,
-      "evidenceType": "Trust Deed, Settlement Documentation, Investment Statements",
-      "verifiedDate": "2018-04-15"
-    },
-    "sourceOfFunds": {
-      "source": "Settlement Funds",
-      "description": "Cash and securities transferred from settlor",
-      "evidenceProvided": true,
-      "evidenceType": "Bank Transfer Records, Securities Transfer Documentation",
-      "verifiedDate": "2018-04-15"
-    }
-  },
-  "vulnerabilities": [],
-  "dataProtection": {
-    "gdprConsent": {
-      "dataProcessing": {
-        "consented": true,
-        "consentDate": "2018-04-15",
-        "consentMethod": "Written",
-        "lawfulBasis": "Legitimate Interest",
-        "consentText": "Trustees consent to data processing for trust administration and financial advice services",
-        "version": "1.0"
-      },
-      "marketing": {
-        "consented": false,
-        "consentDate": null,
-        "consentMethod": null,
-        "lawfulBasis": null,
-        "consentText": null,
-        "version": null
-      },
-      "profiling": {
-        "consented": false,
-        "consentDate": null,
-        "consentMethod": null,
-        "lawfulBasis": null,
-        "consentText": null,
-        "version": null
-      },
-      "thirdPartySharing": {
-        "consented": false,
-        "consentDate": null,
-        "consentMethod": null,
-        "lawfulBasis": null,
-        "consentText": null,
-        "version": null
-      }
-    },
-    "privacyPolicy": {
-      "version": "2.1",
-      "acceptedDate": "2018-04-15",
-      "url": "https://api.factfind.com/privacy-policy/v2.1",
-      "acceptanceMethod": "Written"
-    },
-    "dataRetention": {
-      "retentionPeriod": "10 years after trust dissolution",
-      "retentionBasis": "Trust Law Requirement",
-      "relationshipEndDate": null,
-      "retentionEndDate": null,
-      "archiveDate": null
-    },
-    "rightsExercised": {
-      "dsarRequests": 0,
-      "rectificationRequests": 0,
-      "erasureRequests": 0,
-      "portabilityRequests": 0,
-      "restrictionRequests": 0,
-      "objectionRequests": 0,
-      "lastRequestDate": null,
-      "lastRequestType": null
-    },
-    "breachNotifications": {
-      "breachCount": 0,
-      "lastBreachDate": null,
-      "breachesNotified": []
-    }
-  },
-  "marketingPreferences": {
-    "channels": {
-      "email": {
-        "consented": false,
-        "consentDate": null,
-        "doubleOptInDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": true
-      },
-      "phone": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": true,
-        "tpsChecked": false,
-        "tpsRegistered": false,
-        "tpsCheckDate": null
-      },
-      "sms": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": true
-      },
-      "post": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": true,
-        "mpsChecked": false,
-        "mpsRegistered": false,
-        "mpsCheckDate": null
-      },
-      "socialMedia": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": true
-      }
-    },
-    "interests": [],
-    "productInterests": [],
-    "suppressionList": false,
-    "unsubscribeAll": true,
-    "unsubscribeAllDate": "2018-04-15",
-    "lastUpdated": "2018-04-15",
-    "preferredContactTime": null,
-    "doNotContact": true,
-    "doNotContactReason": "Trust Entity - Professional Trustees Only"
-  },
-  "serviceStatus": "Active",
-  "serviceStatusDate": "2018-04-15",
-  "clientSegment": "C",
-  "clientSegmentDate": "2018-04-15",
-  "clientCategory": "Trust",
-  "netWorth": {
-    "amount": 650000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalAssets": {
-    "amount": 650000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "adviserRef": {
-    "id": "adviser-810",
-    "href": "/api/v1/advisers/adviser-810",
-    "name": "Patricia Davies",
-    "code": "ADV003"
-  },
-  "paraplannerRef": {
-    "id": "adviser-811",
-    "href": "/api/v1/advisers/adviser-811",
-    "name": "Andrew Wilson",
-    "code": "PP003"
-  },
-  "officeRef": {
-    "id": "office-1",
-    "name": "London Office",
-    "code": "LON"
-  },
-  "createdAt": "2018-04-15T10:00:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z",
-  "createdBy": {
-    "id": "adviser-810",
-    "name": "Patricia Davies"
-  },
-  "updatedBy": {
-    "id": "adviser-810",
-    "name": "Patricia Davies"
-  },
-  "_etag": "W/\"v2-20260216-143000\"",
-  "_links": {
-    "self": { "href": "/api/v1/clients/client-999" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-1111" },
-    "adviser": { "href": "/api/v1/advisers/adviser-810" }
-  }
-}
-```
-
----
-
-#### 13.1.4 Field Behaviors (Composition Pattern)
+#### 13.1.1 Field Behaviors
 
 | Field | Type | Required | Validation Rules | Notes |
 |-------|------|----------|------------------|-------|
 | `id` | string | Yes (read-only) | System-generated | Unique identifier |
 | `clientNumber` | string | Yes | Unique, max 20 chars | Business key |
-| `clientType` | string | Yes | Enum: Person, Corporate, Trust | Discriminator field |
-| `personValue` | PersonValue | Conditional | Required if clientType=Person | Person-specific fields |
-| `corporateValue` | CorporateValue | Conditional | Required if clientType=Corporate | Corporate-specific fields |
-| `trustValue` | TrustValue | Conditional | Required if clientType=Trust | Trust-specific fields |
+| `clientType` | string | Yes | Enum: Person, Corporate, Trust | Entity type |
+| `name` | NameValue | Yes | See NameValue definition | Full name components |
+| `dateOfBirth` | date | Conditional | ISO 8601, Person only | Required for Person |
+| `age` | integer | No (calculated) | Derived from dateOfBirth | System-calculated |
 | `addresses` | AddressValue[] | Yes | Min 1 address required | Full address history |
 | `contacts` | ContactValue[] | Yes | Min 1 email or phone required | All contact methods |
 | `identityVerification` | IdentityVerificationValue | Conditional | Required for KYC completion | KYC, AML, MLR compliance |
 | `vulnerabilities` | VulnerabilityValue[] | No | | Consumer Duty compliance |
 | `dataProtection` | DataProtectionValue | Yes | Required for GDPR compliance | GDPR consent management |
 | `marketingPreferences` | MarketingPreferencesValue | Yes | Required for marketing | Marketing opt-in/out |
-| `estatePlanning` | EstatePlanningValue | Conditional | Only for Person clients | Will, LPA, gifts, IHT |
-| `spouseRef` | ClientRef | Conditional | Only for Person clients | Spouse reference |
-| `dependants` | DependantValue[] | Conditional | Only for Person clients | Financial dependants |
+| `estatePlanning` | EstatePlanningValue | No | | Will, LPA, gifts, IHT |
+| `spouseRef` | ClientRef | Conditional | Required if isJoint=true | Spouse reference |
+| `dependants` | DependantValue[] | No | | Financial dependants |
 
----
-
-#### 13.1.5 PersonValue Type Definition
-
-Embedded value type for Person-specific fields. Only present when `clientType="Person"`.
-
-**Fields:**
-
-```typescript
-PersonValue {
-  title: CodedValue                    // Mr, Mrs, Dr, etc.
-  firstName: string                    // Required
-  middleNames: string                  // Optional, multiple middle names
-  lastName: string                     // Required
-  preferredName: string                // Optional
-  fullName: string                     // Calculated: "Title FirstName MiddleNames LastName"
-  salutation: string                   // Calculated: "Title LastName"
-  dateOfBirth: date                    // ISO 8601, Required
-  age: integer                         // Calculated from dateOfBirth
-  placeOfBirth: string                 // Optional
-  countryOfBirth: CountryValue         // ISO 3166-1
-  gender: CodedValue                   // M, F, O
-  maritalStatus: MaritalStatusValue    // MAR, SIN, DIV, etc. with effectiveFrom
-  niNumber: string                     // National Insurance Number (encrypted)
-  nationalityCountry: CountryValue     // ISO 3166-1
-  residencyCountry: CountryValue       // ISO 3166-1
-  domicileCountry: CountryValue        // ISO 3166-1
-  isUkResident: boolean                // Calculated
-  isExpatriate: boolean                // Calculated
-  smokingStatus: CodedValue            // NEVER, FORMER, CURRENT
-  healthMetrics: HealthMetricsValue    // Height, weight, BMI
-  occupation: string                   // Free text occupation
-  occupationCode: OccupationCodeValue  // SOC code
-  employmentStatus: CodedValue         // FT_EMP, PT_EMP, SELF_EMP, RETIRED, etc.
-  isDeceased: boolean                  // Default false
-  deceasedDate: date                   // Null if not deceased
-}
-```
-
-**Health Metrics:**
-```typescript
-HealthMetricsValue {
-  heightCm: decimal                    // Height in centimeters
-  weightKg: decimal                    // Weight in kilograms
-  bmi: decimal                         // Calculated: weight / (height^2)
-  bmiCategory: string                  // Calculated: Underweight, Normal, Overweight, Obese
-  lastMeasured: date                   // Date of last measurement
-}
-```
-
-**Validation Rules:**
-- `firstName` and `lastName` are required
-- `dateOfBirth` is required and must be in the past
-- `age` is system-calculated from `dateOfBirth`
-- `niNumber` must match UK NI format: `^[A-Z]{2}[0-9]{6}[A-D]$`
-- `bmi` is calculated as: `weightKg / (heightCm/100)^2`
-- If `isDeceased=true`, `deceasedDate` is required
-
----
-
-#### 13.1.6 CorporateValue Type Definition
-
-Embedded value type for Corporate-specific fields. Only present when `clientType="Corporate"`.
-
-**Fields:**
-
-```typescript
-CorporateValue {
-  companyName: string                  // Required, official registered name
-  tradingName: string                  // Optional, trading as name
-  registrationNumber: string           // Optional, Companies House number
-  incorporationDate: date              // Date of incorporation
-  companyType: CodedValue              // LTD, PLC, LLP, etc.
-  vatNumber: string                    // VAT registration number
-  countryOfIncorporation: CountryValue // ISO 3166-1
-  companyStatus: CodedValue            // ACTIVE, DISSOLVED, LIQUIDATION, etc.
-  sicCodes: SicCodeValue[]             // SIC industry classification codes
-  numberOfEmployees: integer           // Current employee count
-  annualTurnover: MoneyValue           // Last reported annual turnover
-  directors: DirectorValue[]           // Company directors
-  shareholders: ShareholderValue[]     // Company shareholders
-  registeredOffice: AddressValue       // Official registered office address
-  accountsFilingDate: date             // Next accounts filing date
-  confirmationStatementDate: date      // Next confirmation statement date
-  financialYearEnd: date               // Financial year end date
-}
-```
-
-**Director:**
-```typescript
-DirectorValue {
-  personRef: ClientRef                 // Reference to Person client
-  appointedDate: date                  // Date appointed as director
-  role: string                         // Managing Director, Technical Director, etc.
-  shareholding: decimal                // Percentage shareholding (0-100)
-  isActive: boolean                    // Currently active
-}
-```
-
-**Shareholder:**
-```typescript
-ShareholderValue {
-  shareholderRef: EntityRef            // Reference to Person/Corporate/Trust
-  sharesHeld: integer                  // Number of shares held
-  shareClass: string                   // Ordinary, Preference, etc.
-  percentage: decimal                  // Percentage of total shares (0-100)
-  nominalValue: MoneyValue             // Nominal value of shares
-}
-```
-
-**SIC Code:**
-```typescript
-SicCodeValue {
-  code: string                         // 5-digit SIC code
-  display: string                      // Description
-}
-```
-
-**Validation Rules:**
-- `companyName` is required
-- `registrationNumber` must match UK Companies House format if provided: `^[A-Z0-9]{8}$`
-- `vatNumber` must match UK VAT format if provided: `^GB[0-9]{9}$`
-- Director shareholdings sum must not exceed 100%
-- Shareholder percentages sum must equal 100%
-
----
-
-#### 13.1.7 TrustValue Type Definition
-
-Embedded value type for Trust-specific fields. Only present when `clientType="Trust"`.
-
-**Fields:**
-
-```typescript
-TrustValue {
-  trustName: string                    // Required, full trust name
-  trustType: CodedValue                // DISCRETIONARY, LIFE_INTEREST, BARE, etc.
-  settlementDate: date                 // Date trust was established
-  trustRegistrationNumber: string      // HMRC Trust Registration Number
-  taxReference: string                 // Trust tax reference (UTR)
-  trustDeed: TrustDeedValue            // Trust deed document details
-  settlor: SettlorValue                // Person who established the trust
-  trustees: TrusteeValue[]             // Trust trustees
-  beneficiaries: BeneficiaryValue[]    // Trust beneficiaries
-  trustAssets: TrustAssetsValue        // Asset breakdown and valuation
-  taxStatus: TrustTaxStatusValue       // IHT, CGT, income tax status
-  distributions: DistributionValue[]   // Historical distributions
-  accountingPeriodEnd: date            // Trust accounting period end date
-  nextReviewDate: date                 // Next trust review date
-}
-```
-
-**Trust Deed:**
-```typescript
-TrustDeedValue {
-  documentRef: string                  // Document reference number
-  documentUrl: string                  // URL to stored document
-  executionDate: date                  // Date deed was executed
-  storedWith: string                   // Where original is stored
-  lastReviewedDate: date               // Last review date
-}
-```
-
-**Settlor:**
-```typescript
-SettlorValue {
-  personRef: ClientRef                 // Reference to Person client
-  settlementAmount: MoneyValue         // Initial settlement amount
-  settlementDate: date                 // Date of settlement
-  isDeceased: boolean                  // Whether settlor is deceased
-}
-```
-
-**Trustee:**
-```typescript
-TrusteeValue {
-  personRef: ClientRef                 // Reference to Person client
-  appointedDate: date                  // Date appointed as trustee
-  role: string                         // Principal Trustee, Professional Trustee, etc.
-  isProfessionalTrustee: boolean       // Whether professional trustee
-  professionalFirm: string             // Firm name if professional
-  isActive: boolean                    // Currently active
-}
-```
-
-**Beneficiary:**
-```typescript
-BeneficiaryValue {
-  personRef: EntityRef                 // Reference to Person/Corporate
-  relationship: string                 // Child, Grandchild, etc.
-  beneficiaryType: string              // Discretionary, Fixed, Contingent
-  class: string                        // Income and Capital, Income Only, etc.
-  percentage: decimal                  // Fixed percentage if applicable
-  fromDate: date                       // Date became beneficiary
-  isActive: boolean                    // Currently active
-}
-```
-
-**Trust Assets:**
-```typescript
-TrustAssetsValue {
-  totalValue: MoneyValue               // Total asset value
-  assetBreakdown: AssetBreakdownValue[] // Breakdown by asset type
-  valuationDate: date                  // Date of valuation
-}
-
-AssetBreakdownValue {
-  assetType: string                    // Cash, Investments, Property, etc.
-  value: MoneyValue                    // Value of this asset type
-  percentage: decimal                  // Percentage of total (0-100)
-}
-```
-
-**Trust Tax Status:**
-```typescript
-TrustTaxStatusValue {
-  taxYear: string                      // e.g., "2025/26"
-  ihtRelevantProperty: boolean         // Subject to 10-year IHT charges
-  lastIhtCharge: date                  // Date of last IHT charge
-  nextIhtChargeDate: date              // Next 10-year charge date
-  cgtLiability: MoneyValue             // Estimated CGT liability
-  incomeTaxLiability: MoneyValue       // Estimated income tax liability
-  trustRate: decimal                   // Trust rate of tax (typically 45%)
-}
-```
-
-**Distribution:**
-```typescript
-DistributionValue {
-  beneficiaryRef: EntityRef            // Reference to beneficiary
-  distributionDate: date               // Date of distribution
-  amount: MoneyValue                   // Amount distributed
-  distributionType: string             // Discretionary Payment, Income Distribution, etc.
-  purpose: string                      // Purpose of distribution
-}
-```
-
-**Validation Rules:**
-- `trustName` is required
-- `settlementDate` must be in the past
-- `trustRegistrationNumber` must match HMRC format if provided: `^TRN[0-9]{8}$`
-- At least one trustee is required
-- At least one beneficiary is required
-- Asset breakdown percentages must sum to 100%
-- Distribution amounts must not exceed trust assets
-
----
-
-#### 13.1.8 AddressValue Type
+#### 13.1.2 AddressValue Type
 
 Embedded value type representing an address. Addresses have history (fromDate, toDate) but no separate identity.
 
@@ -14046,30 +12739,19 @@ Embedded value type representing an address. Addresses have history (fromDate, t
 }
 ```
 
-**Address Types:**
-- `RES` - Residential (Person)
-- `WORK` - Work Address (Person)
-- `PREV` - Previous Address (Person)
-- `MAIL` - Mailing Address (All)
-- `REGISTERED` - Registered Office (Corporate)
-- `TRADING` - Trading Address (Corporate)
-- `TRUST_CORRESPONDENCE` - Trust Correspondence Address (Trust)
-
 **Fields:**
-- `addressType` - Type of address
-- `line1-4` - Address lines (line1 required)
-- `city` - City/town (required)
+- `addressType` - Type of address (RES=Residential, WORK=Work, PREV=Previous, MAIL=Mailing)
+- `line1-4` - Address lines
+- `city` - City/town
 - `county` - County/region
 - `postcode` - Postal/ZIP code
-- `country` - Country (required, default GB)
+- `country` - Country
 - `isPrimary` - Is this the primary address?
 - `fromDate` - Date moved to this address
 - `toDate` - Date moved from this address (null if current)
 - `yearsAtAddress` - Calculated years at address (for affordability checks)
 
----
-
-#### 13.1.9 ContactValue Type
+#### 13.1.3 ContactValue Type
 
 Embedded value type representing a contact method.
 
@@ -14089,35 +12771,26 @@ Embedded value type representing a contact method.
 **Contact Types:**
 - `EMAIL` - Email address
 - `MOBILE` - Mobile phone
-- `PHONE` - Home phone / Main office phone
+- `PHONE` - Home phone
 - `WORK_PHONE` - Work phone
-- `WEBSITE` - Website
+- `WEBSITE` - Personal website
 - `LINKEDIN` - LinkedIn profile
 - `FAX` - Fax number (legacy)
 
-**Validation:**
-- `EMAIL` must match email format
-- Phone numbers should be in E.164 format: `+[country code][number]`
-- `WEBSITE` must be valid URL
-
----
-
-#### 13.1.10 IdentityVerificationValue Type
+#### 13.1.4 IdentityVerificationValue Type
 
 Embedded value type representing KYC, AML, and MLR compliance.
 
 **Key Components:**
 - **Verification Status** - Overall status (Verified, Pending, Failed, Expired)
-- **Documents** - Passport, driving license, utility bills, company docs, trust deeds
+- **Documents** - Passport, driving license, utility bills
 - **AML Checks** - Sanctions, PEP, adverse media screening
 - **MLR Compliance** - KYC, CDD, EDD status
 - **Source of Wealth/Funds** - Evidence and verification
 
-See full examples in the client JSON examples above.
+See full example in the Client Contract JSON above.
 
----
-
-#### 13.1.11 VulnerabilityValue Type
+#### 13.1.5 VulnerabilityValue Type
 
 Embedded value type representing client vulnerabilities (Consumer Duty requirement).
 
@@ -14146,11 +12819,7 @@ Embedded value type representing client vulnerabilities (Consumer Duty requireme
 - `CAPABILITY` - Capability limitation (language, literacy, digital skills)
 - `RESILIENCE` - Low resilience (multiple vulnerabilities)
 
-**Note:** Vulnerabilities are typically only applicable to Person clients. Corporate and Trust clients rarely have vulnerabilities.
-
----
-
-#### 13.1.12 DataProtectionValue Type
+#### 13.1.6 DataProtectionValue Type
 
 Embedded value type representing GDPR compliance and data protection.
 
@@ -14161,11 +12830,9 @@ Embedded value type representing GDPR compliance and data protection.
 - **Rights Exercised** - DSAR, rectification, erasure, portability requests
 - **Breach Notifications** - Any data breach notifications
 
-See full examples in the client JSON examples above.
+See full example in the Client Contract JSON above.
 
----
-
-#### 13.1.13 MarketingPreferencesValue Type
+#### 13.1.7 MarketingPreferencesValue Type
 
 Embedded value type representing marketing consent and preferences.
 
@@ -14176,13 +12843,11 @@ Embedded value type representing marketing consent and preferences.
 - **Frequency** - Preferred contact frequency per channel
 - **TPS/MPS Checks** - Telephone/Mail Preference Service registration
 
-See full examples in the client JSON examples above.
+See full example in the Client Contract JSON above.
 
----
+#### 13.1.8 EstatePlanningValue Type
 
-#### 13.1.14 EstatePlanningValue Type
-
-Embedded value type representing estate planning information. **Only applicable to Person clients.**
+Embedded value type representing estate planning information.
 
 **Key Components:**
 - **Will** - Will details, executors, beneficiaries, review dates
@@ -14192,164 +12857,7 @@ Embedded value type representing estate planning information. **Only applicable 
 - **IHT Estimate** - Inheritance tax calculation with nil-rate bands
 - **Life Insurance in Trust** - Trust-based life insurance policies
 
-See full example in the Person Client JSON above.
-
----
-
-#### 13.1.15 Validation Rules by Client Type
-
-**Person Client:**
-- `personValue` is required
-- `personValue.firstName` is required
-- `personValue.lastName` is required
-- `personValue.dateOfBirth` is required
-- `estatePlanning` is optional but only valid for Person
-- `spouseRef` is optional but only valid for Person
-- `dependants` is optional but only valid for Person
-
-**Corporate Client:**
-- `corporateValue` is required
-- `corporateValue.companyName` is required
-- `corporateValue.directors` must have at least 1 director
-- `corporateValue.shareholders` must have at least 1 shareholder
-- `estatePlanning` must not be present
-- `spouseRef` must not be present
-- `dependants` must not be present
-
-**Trust Client:**
-- `trustValue` is required
-- `trustValue.trustName` is required
-- `trustValue.trustees` must have at least 1 trustee
-- `trustValue.beneficiaries` must have at least 1 beneficiary
-- `estatePlanning` must not be present
-- `spouseRef` must not be present
-- `dependants` must not be present
-
----
-
-#### 13.1.16 Usage Examples
-
-**Creating a Person Client:**
-
-```http
-POST /api/v1/clients
-Content-Type: application/json
-
-{
-  "clientNumber": "C00001234",
-  "clientType": "Person",
-  "personValue": {
-    "title": { "code": "MR", "display": "Mr" },
-    "firstName": "John",
-    "lastName": "Smith",
-    "dateOfBirth": "1980-05-15",
-    "gender": { "code": "M", "display": "Male" }
-  },
-  "addresses": [
-    {
-      "addressType": { "code": "RES", "display": "Residential" },
-      "line1": "123 Main Street",
-      "city": "London",
-      "postcode": "SW1A 1AA",
-      "country": { "code": "GB", "display": "United Kingdom", "alpha3": "GBR" },
-      "isPrimary": true,
-      "fromDate": "2020-01-15"
-    }
-  ],
-  "contacts": [
-    {
-      "contactType": { "code": "EMAIL", "display": "Email" },
-      "value": "john.smith@example.com",
-      "isPrimary": true
-    }
-  ]
-}
-```
-
-**Creating a Corporate Client:**
-
-```http
-POST /api/v1/clients
-Content-Type: application/json
-
-{
-  "clientNumber": "C00005678",
-  "clientType": "Corporate",
-  "corporateValue": {
-    "companyName": "TechVenture Solutions Ltd",
-    "tradingName": "TechVenture",
-    "registrationNumber": "09876543",
-    "incorporationDate": "2015-03-20",
-    "companyType": { "code": "LTD", "display": "Private Limited Company" },
-    "countryOfIncorporation": { "code": "GB", "display": "United Kingdom", "alpha3": "GBR" }
-  },
-  "addresses": [
-    {
-      "addressType": { "code": "REGISTERED", "display": "Registered Office" },
-      "line1": "Tech Park Building 5",
-      "city": "London",
-      "postcode": "EC2A 4DN",
-      "country": { "code": "GB", "display": "United Kingdom", "alpha3": "GBR" },
-      "isPrimary": true,
-      "fromDate": "2015-03-20"
-    }
-  ],
-  "contacts": [
-    {
-      "contactType": { "code": "EMAIL", "display": "Email" },
-      "value": "info@techventure.com",
-      "isPrimary": true
-    }
-  ]
-}
-```
-
-**Creating a Trust Client:**
-
-```http
-POST /api/v1/clients
-Content-Type: application/json
-
-{
-  "clientNumber": "C00009999",
-  "clientType": "Trust",
-  "trustValue": {
-    "trustName": "The Smith Family Discretionary Trust",
-    "trustType": { "code": "DISCRETIONARY", "display": "Discretionary Trust" },
-    "settlementDate": "2018-04-15",
-    "trustRegistrationNumber": "TRN12345678",
-    "settlor": {
-      "personRef": {
-        "id": "client-1000",
-        "name": "William Smith"
-      },
-      "settlementAmount": {
-        "amount": 500000.00,
-        "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
-      },
-      "settlementDate": "2018-04-15"
-    }
-  },
-  "addresses": [
-    {
-      "addressType": { "code": "TRUST_CORRESPONDENCE", "display": "Trust Correspondence Address" },
-      "line1": "Harrison & Partners Solicitors",
-      "city": "London",
-      "postcode": "WC2N 5DU",
-      "country": { "code": "GB", "display": "United Kingdom", "alpha3": "GBR" },
-      "isPrimary": true,
-      "fromDate": "2018-04-15"
-    }
-  ],
-  "contacts": [
-    {
-      "contactType": { "code": "EMAIL", "display": "Email" },
-      "value": "trustees@smithfamilytrust.com",
-      "isPrimary": true
-    }
-  ]
-}
-```
+See full example in the Client Contract JSON above.
 
 ---
 
