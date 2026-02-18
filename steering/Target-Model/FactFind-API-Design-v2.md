@@ -71,7 +71,9 @@ The FactFind API provides comprehensive digital capabilities for:
 **PRIORITY 3: Assets & Liabilities Enhancements**
 - **Section 9.4:** Property Management API - Property portfolio, valuations, LTV calculations
 - **Section 9.5:** Equities Portfolio API - Direct stock holdings, performance tracking
-- **Section 9.6:** Credit History API - Credit scores, payment history, credit reports
+
+**PRIORITY 3A: Circumstances & Credit Assessment**
+- **Section 6.5:** Credit History API - Credit scores, payment history, adverse credit tracking, mortgage suitability
 
 **PRIORITY 4: Client Profile Enhancements**
 - **Section 5.5:** Identity Verification API - KYC workflow, AML checks, document verification (REMOVED in v2.1 - now embedded)
@@ -85,7 +87,6 @@ The FactFind API provides comprehensive digital capabilities for:
 - Investment Contract (12.8)
 - Property Contract (12.9)
 - Equity Contract (12.10)
-- CreditHistory Contract (12.11)
 
 **Coverage Improvements:**
 - Risk Assessment domain coverage increased from 38% to 95%
@@ -184,6 +185,12 @@ The FactFind API provides comprehensive digital capabilities for:
      - [5.5.4 Get Dependant Details](#554-get-dependant-details)
      - [5.5.5 Update Dependant](#555-update-dependant)
      - [5.5.6 Delete Dependant](#556-delete-dependant)
+   - [5.6 Notes](#56-notes) **NEW v3.0**
+     - [5.6.1 Operations Summary](#561-operations-summary)
+     - [5.6.2 List Notes](#562-list-notes)
+     - [5.6.3 Create Note](#563-create-note)
+     - [5.6.4 Update Note](#564-update-note)
+     - [5.6.5 Delete Note](#565-delete-note)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -202,6 +209,12 @@ The FactFind API provides comprehensive digital capabilities for:
      - [6.4.3 List Affordability Calculations](#643-list-affordability-calculations)
      - [6.4.4 Update Affordability Calculation](#644-update-affordability-calculation)
      - [6.4.5 Delete Affordability Calculation](#645-delete-affordability-calculation)
+   - [6.5 Credit History](#65-credit-history) **NEW v3.0**
+     - [6.5.1 Operations Summary](#651-operations-summary)
+     - [6.5.2 List Credit History](#652-list-credit-history)
+     - [6.5.3 Create Credit History Record](#653-create-credit-history-record)
+     - [6.5.4 Update Credit History Record](#654-update-credit-history-record)
+     - [6.5.5 Delete Credit History Record](#655-delete-credit-history-record)
 7. [Employment API (Part of Circumstances Context)](#7-employment-api-part-of-circumstances-context)
    - [7.1 Overview](#71-overview)
    - [7.2 Operations Summary](#72-operations-summary)
@@ -241,9 +254,15 @@ The FactFind API provides comprehensive digital capabilities for:
     - [12.5 Arrangement Contract](#125-arrangement-contract)
     - [12.6 Goal Contract](#126-goal-contract)
     - [12.7 RiskProfile Contract](#127-riskprofile-contract)
-    - [12.8 Collection Response Wrapper](#128-collection-response-wrapper)
-    - [12.9 Contract Extension for Other Entities](#129-contract-extension-for-other-entities)
-    - [12.10 Standard Value Types](#1210-standard-value-types)
+    - [12.8 Investment Contract](#128-investment-contract)
+    - [12.9 Property Contract](#129-property-contract)
+    - [12.10 Equity Contract](#1210-equity-contract)
+    - [12.11 IdentityVerification Contract](#1211-identityverification-contract)
+    - [12.12 Consent Contract](#1212-consent-contract)
+    - [12.13 Collection Response Wrapper](#1213-collection-response-wrapper)
+    - [12.14 Contract Extension for Other Entities](#1214-contract-extension-for-other-entities)
+    - [12.15 Standard Value Types](#1215-standard-value-types)
+    - [12.16 Standard Reference Types](#1216-standard-reference-types)
 
 ---
 
@@ -4603,6 +4622,263 @@ Where:
 
 ---
 
+### 5.6 Notes
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes`
+
+**Purpose:** Capture and manage advisor notes across different areas of the fact find, providing context, observations, and important information related to specific aspects of the client's financial planning.
+
+**Scope:**
+- Profile notes (personal circumstances, life events)
+- Employment notes (job security, career plans)
+- Asset & Liabilities notes (property, investments, debts)
+- Budget notes (spending patterns, financial discipline)
+- Mortgage notes (housing plans, affordability concerns)
+- Protection notes (health issues, cover requirements)
+- Retirement notes (retirement plans, pension expectations)
+- Investment notes (risk tolerance, investment experience)
+- Estate Planning notes (inheritance wishes, family dynamics)
+- Summary notes (overall observations, recommendations)
+
+**Key Features:**
+- **Categorized Notes** - Notes organized by discriminator for easy filtering
+- **Character Limit** - 500 characters per note for concise documentation
+- **Multiple Notes** - Multiple notes per category for comprehensive tracking
+- **Timestamped** - Track when notes were created and updated
+- **Audit Trail** - Complete history of all notes for compliance
+
+**Aggregate Root:** Client (notes nested under client)
+
+**Regulatory Compliance:**
+- FCA Handbook - Documenting client interactions and observations
+- COBS 9.2 - Recording basis for suitability assessment
+- Consumer Duty - Understanding customer circumstances
+- Data Protection Act 2018 - Secure storage of client notes
+- TCF (Treating Customers Fairly) - Documenting fair treatment
+
+#### 5.6.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes` | List all notes for client | `notes:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes` | Create new note | `notes:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Get specific note | `notes:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Update note | `notes:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Delete note | `notes:write` |
+
+**Total Endpoints:** 5
+
+#### 5.6.2 List Notes
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/notes`
+
+**Description:** Retrieve all notes for a client with optional filtering by discriminator.
+
+**Query Parameters:**
+- `discriminator` - Filter by note category (Profile, Employment, AssetLiabilities, etc.)
+- `sort` - Sort by createdAt or updatedAt (default: createdAt desc)
+- `limit` - Maximum results (default: 50, max: 200)
+- `offset` - Pagination offset
+
+**Response:**
+
+```json
+{
+  "clientRef": {
+    "id": "client-456",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-423/clients/client-456"
+  },
+  "notes": [
+    {
+      "id": "note-789",
+      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-789",
+      "discriminator": "Profile",
+      "notes": "Client recently married, spouse is self-employed. Planning to start a family within 2 years. Important for protection planning.",
+      "createdAt": "2026-02-18T10:30:00Z",
+      "updatedAt": "2026-02-18T10:30:00Z"
+    },
+    {
+      "id": "note-790",
+      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-790",
+      "discriminator": "Mortgage",
+      "notes": "Client's fixed rate ends in 6 months. Should review remortgage options. Considering moving to larger property in next 2-3 years.",
+      "createdAt": "2026-02-18T11:00:00Z",
+      "updatedAt": "2026-02-18T11:00:00Z"
+    },
+    {
+      "id": "note-791",
+      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-791",
+      "discriminator": "Protection",
+      "notes": "Client has no life insurance. High priority due to mortgage and planned family. Spouse has chronic condition - may affect premiums.",
+      "createdAt": "2026-02-18T11:15:00Z",
+      "updatedAt": "2026-02-18T11:15:00Z"
+    }
+  ],
+  "totalCount": 3,
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/ff-423/clients/client-456"
+    }
+  }
+}
+```
+
+#### 5.6.3 Create Note
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/notes`
+
+**Description:** Create a new note for the client in a specific category.
+
+**Request Body:**
+
+```json
+{
+  "discriminator": "Investment",
+  "notes": "Client has limited investment experience. Previously held only cash ISAs. Risk profile indicates balanced approach. Recommend gradual introduction to equity funds with clear education on volatility."
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "note-792",
+  "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-792",
+  "clientRef": {
+    "id": "client-456",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-423/clients/client-456"
+  },
+  "discriminator": "Investment",
+  "notes": "Client has limited investment experience. Previously held only cash ISAs. Risk profile indicates balanced approach. Recommend gradual introduction to equity funds with clear education on volatility.",
+  "createdAt": "2026-02-18T14:20:00Z",
+  "updatedAt": "2026-02-18T14:20:00Z",
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-792"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/ff-423/clients/client-456"
+    }
+  }
+}
+```
+
+**Validation Rules:**
+- `discriminator` - Required, must be valid enum value
+- `notes` - Required, max 500 characters
+- Client must exist and belong to factfind
+
+**Business Rules:**
+- Notes are immutable after creation (updates create new version)
+- Deleted notes soft-deleted (retained for audit)
+- Notes included in fact find completion checklist
+- Notes exported with fact find reports
+
+#### 5.6.4 Update Note
+
+**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}`
+
+**Description:** Update the text content of an existing note.
+
+**Request Body:**
+
+```json
+{
+  "notes": "Client has limited investment experience. Previously held only cash ISAs. Risk profile indicates balanced approach. Recommend gradual introduction to equity funds with clear education on volatility. UPDATE: Client comfortable with proposal after discussion."
+}
+```
+
+**Response:** 200 OK with updated note entity.
+
+**Note:** Some implementations may choose to make notes append-only for compliance, in which case PATCH would create a new version rather than overwrite.
+
+#### 5.6.5 Delete Note
+
+**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}`
+
+**Description:** Delete a note (soft delete for audit trail).
+
+**Response:** 204 No Content
+
+---
+
+**Note Discriminators (Enum):**
+
+| Code | Display | Use Case |
+|------|---------|----------|
+| PROFILE | Profile | Personal circumstances, life events, family status |
+| EMPLOYMENT | Employment | Job security, career plans, income stability |
+| ASSET_LIABILITIES | AssetLiabilities | Property notes, investment holdings, debt concerns |
+| BUDGET | Budget | Spending patterns, financial discipline, affordability |
+| MORTGAGE | Mortgage | Housing plans, remortgage, property moves |
+| PROTECTION | Protection | Health issues, cover requirements, existing policies |
+| RETIREMENT | Retirement | Retirement plans, pension expectations, lifestyle goals |
+| INVESTMENT | Investment | Risk tolerance, investment experience, objectives |
+| ESTATE_PLANNING | EstatePlanning | Inheritance wishes, family dynamics, trusts |
+| SUMMARY | Summary | Overall observations, key recommendations, next steps |
+
+---
+
+**Use Cases:**
+
+### Use Case 1: Record Protection Planning Notes
+
+**Scenario:** During fact find, discover client health issues affecting protection
+
+**API Flow:**
+```
+POST /clients/client-456/notes
+{
+  "discriminator": "Protection",
+  "notes": "Client disclosed pre-existing condition (Type 2 diabetes, controlled). May affect life insurance premiums. Consider specialist broker for underwriting."
+}
+
+Response: Note created successfully
+
+Use: Reference during protection planning
+```
+
+### Use Case 2: Track Mortgage Timeline
+
+**Scenario:** Client fixed rate ending, need to track timeline
+
+**API Flow:**
+```
+POST /clients/client-456/notes
+{
+  "discriminator": "Mortgage",
+  "notes": "Fixed rate ends Aug 2026. Current rate 2.5%, reverting to 6.5% SVR. Must review options by June 2026. Client considering moving to 4-bed in next 2 years."
+}
+
+Response: Note created
+
+Use: Set reminders, include in regular review
+```
+
+### Use Case 3: Document Investment Risk Discussion
+
+**Scenario:** Record client's risk tolerance discussion
+
+**API Flow:**
+```
+POST /clients/client-456/notes
+{
+  "discriminator": "Investment",
+  "notes": "ATR questionnaire: Balanced risk. Client comfortable with 5-10% volatility. Lost money in 2008 crash, learned to hold long-term. Prefers diversified funds over individual stocks."
+}
+
+Response: Note created
+
+Use: Demonstrate suitability in file review
+```
+
+---
+
 
 
 ## 6. Income & Expenditure API (Circumstances Context)
@@ -5897,6 +6173,432 @@ shortfall = requiredAmount - committedAmount
    - Identify which non-essentials can be reduced
    - Gym, entertainment, dining out
    - Create sustainable budget
+```
+
+### 6.5 Credit History
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history`
+
+**Purpose:** Track and manage client credit history including adverse credit events, missed payments, defaults, IVAs, bankruptcies, and repossessions to support mortgage applications, creditworthiness assessments, and financial planning.
+
+**Scope:**
+- Credit refusal tracking
+- Adverse credit events (defaults, CCJs, IVAs, bankruptcies)
+- Missed payment history
+- Payment arrears tracking
+- Debt outstanding status
+- Repossession history
+- Lender relationships
+- Liability linkage
+
+**Key Features:**
+- **Adverse Credit Flags** - Track refused credit and adverse events
+- **Event Dating** - Register, satisfy, discharge, and repossession dates
+- **Amount Tracking** - Original and outstanding debt amounts
+- **Payment History** - Missed and consecutive missed payments
+- **Arrears Management** - Track arrears and clearance status
+- **IVA Tracking** - Current IVA status and years maintained
+- **Liability Linking** - Connect credit history to specific liabilities
+- **Multiple Owners** - Support joint credit accounts
+
+**Aggregate Root:** Client (credit history nested under client)
+
+**Regulatory Compliance:**
+- MCOB (Mortgage Conduct of Business) - Credit history disclosure for mortgages
+- FCA Handbook - Understanding client creditworthiness
+- Consumer Credit Act - Credit history accuracy requirements
+- Data Protection Act 2018 - Sensitive credit data handling
+- GDPR - Right to rectification of credit data
+
+#### 6.5.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` | List all credit history records | `credit:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` | Add credit history record | `credit:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Get specific record | `credit:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Update credit record | `credit:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Delete credit record | `credit:write` |
+
+**Total Endpoints:** 5
+
+#### 6.5.2 List Credit History
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history`
+
+**Description:** Retrieve all credit history records for a client.
+
+**Query Parameters:**
+- `hasAdverseCredit` - Filter by adverse credit flag (true/false)
+- `type` - Filter by event type (Default, CCJ, IVA, Bankruptcy, Repossession)
+- `isDebtOutstanding` - Filter by outstanding debt status
+- `sort` - Sort by dateRegisteredOn, updatedAt (default: dateRegisteredOn desc)
+
+**Response:**
+
+```json
+{
+  "clientRef": {
+    "id": "client-456",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-423/clients/client-456"
+  },
+  "creditHistory": [
+    {
+      "id": "ch-789",
+      "href": "/api/v1/factfinds/ff-423/clients/client-456/credit-history/ch-789",
+      "owners": [
+        {
+          "id": "client-456",
+          "href": "/api/v1/factfinds/ff-423/clients/client-456",
+          "name": "John Smith",
+          "ownershipType": "Primary"
+        }
+      ],
+      "hasBeenRefusedCredit": false,
+      "hasAdverseCredit": true,
+      "type": "Default",
+      "dateRegisteredOn": "2020-06-15",
+      "dateSatisfiedOrClearedOn": "2023-12-20",
+      "amountRegistered": {
+        "amount": 5000.00,
+        "currency": "GBP"
+      },
+      "amountOutstanding": {
+        "amount": 0.00,
+        "currency": "GBP"
+      },
+      "isDebtOutstanding": false,
+      "lender": "High Street Bank",
+      "liability": {
+        "id": "liab-1001",
+        "href": "/api/v1/factfinds/ff-423/liabilities/liab-1001",
+        "description": "Credit Card Debt"
+      }
+    }
+  ],
+  "summary": {
+    "totalRecords": 1,
+    "hasRefusedCredit": false,
+    "hasAdverseCredit": true,
+    "adverseEventCount": 1,
+    "totalDebtOutstanding": {
+      "amount": 0.00,
+      "currency": "GBP"
+    }
+  },
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/ff-423/clients/client-456/credit-history"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/ff-423/clients/client-456"
+    }
+  }
+}
+```
+
+#### 6.5.3 Create Credit History Record
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history`
+
+**Description:** Add a new credit history event for the client.
+
+**Request Body:**
+
+```json
+{
+  "owners": [
+    {
+      "id": "client-456",
+      "ownershipType": "Primary"
+    }
+  ],
+  "hasBeenRefusedCredit": false,
+  "refusedCreditDetails": null,
+  "hasAdverseCredit": true,
+  "type": "Default",
+  "dateRegisteredOn": "2020-06-15",
+  "dateSatisfiedOrClearedOn": "2023-12-20",
+  "dateReposessedOn": null,
+  "dateDischargedOn": null,
+  "amountRegistered": {
+    "amount": 5000.00,
+    "currency": "GBP"
+  },
+  "amountOutstanding": {
+    "amount": 3500.00,
+    "currency": "GBP"
+  },
+  "isDebtOutstanding": true,
+  "numberOfPaymentsMissed": 2,
+  "consecutivePaymentsMissed": 2,
+  "numberOfPaymentsInArrears": 1,
+  "isArrearsClearedUponCompletion": true,
+  "isIvaCurrent": false,
+  "yearsMaintained": 5,
+  "lender": "High Street Bank",
+  "liability": {
+    "id": "liab-1001"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "ch-789",
+  "href": "/api/v1/factfinds/ff-423/clients/client-456/credit-history/ch-789",
+  "owners": [
+    {
+      "id": "client-456",
+      "href": "/api/v1/factfinds/ff-423/clients/client-456",
+      "name": "John Smith",
+      "ownershipType": "Primary"
+    }
+  ],
+  "hasBeenRefusedCredit": false,
+  "refusedCreditDetails": null,
+  "hasAdverseCredit": true,
+  "type": "Default",
+  "dateRegisteredOn": "2020-06-15",
+  "dateSatisfiedOrClearedOn": "2023-12-20",
+  "dateReposessedOn": null,
+  "dateDischargedOn": null,
+  "amountRegistered": {
+    "amount": 5000.00,
+    "currency": "GBP"
+  },
+  "amountOutstanding": {
+    "amount": 3500.00,
+    "currency": "GBP"
+  },
+  "isDebtOutstanding": true,
+  "numberOfPaymentsMissed": 2,
+  "consecutivePaymentsMissed": 2,
+  "numberOfPaymentsInArrears": 1,
+  "isArrearsClearedUponCompletion": true,
+  "isIvaCurrent": false,
+  "yearsMaintained": 5,
+  "lender": "High Street Bank",
+  "liability": {
+    "id": "liab-1001",
+    "href": "/api/v1/factfinds/ff-423/liabilities/liab-1001",
+    "description": "Credit Card Debt"
+  },
+  "concurrencyId": 1,
+  "createdAt": "2026-02-18T15:30:00Z",
+  "updatedAt": "2026-02-18T15:30:00Z",
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/ff-423/clients/client-456/credit-history/ch-789"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/ff-423/clients/client-456"
+    },
+    "liability": {
+      "href": "/api/v1/factfinds/ff-423/liabilities/liab-1001"
+    }
+  }
+}
+```
+
+**Validation Rules:**
+- `owners` - At least one owner required
+- `type` - Required if hasAdverseCredit = true
+- `dateRegisteredOn` - Required if hasAdverseCredit = true
+- `amountRegistered` - Required for defaults, CCJs
+- `amountOutstanding` - Must be <= amountRegistered
+- `yearsMaintained` - Required if isIvaCurrent = true
+- All dates cannot be in future
+
+**Business Rules:**
+- Adverse credit flag automatically set if type is specified
+- Satisfied date must be after registered date
+- Discharged date must be after registered date
+- Credit history affects mortgage affordability assessments
+- IVA affects creditworthiness for 6 years
+- Defaults remain on file for 6 years from registration date
+
+#### 6.5.4 Update Credit History Record
+
+**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}`
+
+**Description:** Update an existing credit history record, typically to mark as satisfied/cleared or update outstanding amount.
+
+**Request Body:**
+
+```json
+{
+  "dateSatisfiedOrClearedOn": "2024-01-15",
+  "amountOutstanding": {
+    "amount": 0.00,
+    "currency": "GBP"
+  },
+  "isDebtOutstanding": false,
+  "concurrencyId": 12
+}
+```
+
+**Response:** 200 OK with updated credit history entity.
+
+**Common Updates:**
+- Mark default as satisfied
+- Update outstanding debt amount
+- Clear arrears status
+- Complete IVA
+- Discharge bankruptcy
+
+#### 6.5.5 Delete Credit History Record
+
+**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}`
+
+**Description:** Delete a credit history record (soft delete for audit).
+
+**Response:** 204 No Content
+
+**Business Rules:**
+- Soft delete (retained for compliance)
+- Cannot delete if referenced in active mortgage application
+- Deletion logged for audit trail
+
+---
+
+**Credit History Types (Enum):**
+
+| Code | Display | Description | Typical Duration on File |
+|------|---------|-------------|-------------------------|
+| DEFAULT | Default | Payment default registered | 6 years from registration |
+| CCJ | County Court Judgment | Court judgment for unpaid debt | 6 years from judgment |
+| IVA | Individual Voluntary Arrangement | Formal agreement with creditors | 6 years from start |
+| BANKRUPTCY | Bankruptcy | Declared bankrupt | 6 years from discharge |
+| REPOSSESSION | Repossession | Property repossessed | 6 years from repossession |
+| MISSED_PAYMENT | Missed Payment | Late or missed payment | 6 years from missed payment |
+| DEBT_RELIEF_ORDER | Debt Relief Order | DRO for debts under £30k | 6 years from DRO |
+
+---
+
+**Ownership Types (Enum):**
+
+| Code | Display | Description |
+|------|---------|-------------|
+| PRIMARY | Primary | Primary account holder |
+| JOINT | Joint | Joint account holder (equal responsibility) |
+| GUARANTOR | Guarantor | Guarantor for account |
+| LINKED | Linked | Financial association (e.g., spouse) |
+
+---
+
+**Use Cases:**
+
+### Use Case 1: Record Satisfied Default for Mortgage Application
+
+**Scenario:** Client had credit card default, now satisfied, applying for mortgage
+
+**API Flow:**
+```
+POST /clients/client-456/credit-history
+{
+  "hasAdverseCredit": true,
+  "type": "Default",
+  "dateRegisteredOn": "2020-06-15",
+  "dateSatisfiedOrClearedOn": "2023-12-20",
+  "amountRegistered": { "amount": 5000.00, "currency": "GBP" },
+  "amountOutstanding": { "amount": 0.00, "currency": "GBP" },
+  "isDebtOutstanding": false,
+  "lender": "High Street Bank"
+}
+
+Response: Credit history created
+
+Impact on mortgage:
+- Default satisfied 1+ years ago: Good
+- Original amount only £5k: Minimal impact
+- Zero outstanding: Positive
+- Lender assessment: Consider specialist or mainstream with larger deposit
+```
+
+### Use Case 2: Track Active IVA
+
+**Scenario:** Client in IVA, need to track for creditworthiness
+
+**API Flow:**
+```
+POST /clients/client-456/credit-history
+{
+  "hasAdverseCredit": true,
+  "type": "IVA",
+  "dateRegisteredOn": "2022-03-01",
+  "isIvaCurrent": true,
+  "yearsMaintained": 2,
+  "amountRegistered": { "amount": 45000.00, "currency": "GBP" },
+  "amountOutstanding": { "amount": 15000.00, "currency": "GBP" }
+}
+
+Response: IVA credit history created
+
+Impact:
+- Active IVA: Cannot obtain mainstream credit
+- Years maintained: 2 of typical 5-6 year term
+- Must complete IVA before mortgage application
+- Review annually for IVA completion
+```
+
+### Use Case 3: Update Credit History - Default Satisfied
+
+**Scenario:** Client pays off default during fact find process
+
+**API Flow:**
+```
+GET /clients/client-456/credit-history/ch-789
+Current state: amountOutstanding = £3,500
+
+PATCH /clients/client-456/credit-history/ch-789
+{
+  "dateSatisfiedOrClearedOn": "2026-02-18",
+  "amountOutstanding": { "amount": 0.00, "currency": "GBP" },
+  "isDebtOutstanding": false
+}
+
+Response: Updated credit history
+
+Impact on mortgage application:
+- Recently satisfied: Better than outstanding
+- Shows commitment to clearing debt
+- May improve mortgage terms
+- Recommend waiting 3-6 months for credit score improvement
+```
+
+### Use Case 4: Joint Credit History
+
+**Scenario:** Joint clients have shared CCJ
+
+**API Flow:**
+```
+POST /clients/client-456/credit-history
+{
+  "owners": [
+    { "id": "client-456", "ownershipType": "Joint" },
+    { "id": "client-457", "ownershipType": "Joint" }
+  ],
+  "hasAdverseCredit": true,
+  "type": "CCJ",
+  "dateRegisteredOn": "2021-08-10",
+  "dateSatisfiedOrClearedOn": "2022-12-15",
+  "amountRegistered": { "amount": 8500.00, "currency": "GBP" },
+  "amountOutstanding": { "amount": 0.00, "currency": "GBP" },
+  "isDebtOutstanding": false,
+  "lender": "Utility Company"
+}
+
+Response: Joint credit history created
+
+Impact:
+- Affects both clients equally
+- CCJ satisfied 1+ year ago: Acceptable for many lenders
+- Joint mortgage application affected
+- Consider specialist broker
 ```
 
 ---
@@ -14098,682 +14800,7 @@ Only specified fields are updated. Server recalculates total dividends and yield
 
 ---
 
-### 12.11 CreditHistory Contract
-
-The `CreditHistory` contract represents credit score and credit history tracking from multiple agencies.
-
-**Reference Type:** CreditHistory is a reference type with identity (has `id` field).
-
-```json
-{
-  "id": "credit-654",
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
-  },
-  "factFindRef": {
-    "id": "factfind-123",
-    "href": "/api/v1/factfinds/factfind-123",
-    "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
-  },
-  "creditAgency": {
-    "code": "EXPERIAN",
-    "display": "Experian",
-    "website": "https://www.experian.co.uk"
-  },
-  "scoreDate": "2026-02-10",
-  "score": {
-    "scoreValue": 875,
-    "scoreRange": {
-      "minimum": 0,
-      "maximum": 999
-    },
-    "scoreBand": {
-      "code": "GOOD",
-      "display": "Good",
-      "rangeStart": 721,
-      "rangeEnd": 880
-    },
-    "scorePercentile": 68,
-    "changeFromPreviousMonth": 15,
-    "changeFromPreviousYear": 42,
-    "previousScore": 860,
-    "previousScoreDate": "2026-01-10"
-  },
-  "overallAssessment": {
-    "creditHealthScore": 72,
-    "creditHealthRating": {
-      "code": "GOOD",
-      "display": "Good"
-    },
-    "lendingSuitability": {
-      "code": "LIKELY",
-      "display": "Likely to be accepted for most lending"
-    },
-    "riskLevel": {
-      "code": "LOW_MEDIUM",
-      "display": "Low to Medium Risk"
-    }
-  },
-  "paymentHistory": {
-    "totalAccounts": 12,
-    "activeAccounts": 8,
-    "closedAccounts": 4,
-    "onTimePayments": 144,
-    "onTimePaymentPercentage": 96.0,
-    "latePayments": 6,
-    "missedPayments": 0,
-    "defaultedAccounts": 0,
-    "latePaymentsByPeriod": {
-      "last30Days": 0,
-      "last31To60Days": 1,
-      "last61To90Days": 0,
-      "over90Days": 0
-    },
-    "paymentHistoryScore": 85,
-    "paymentHistoryRating": {
-      "code": "GOOD",
-      "display": "Good"
-    },
-    "oldestAccountDate": "2010-03-15",
-    "accountAgeYears": 15.92
-  },
-  "creditUtilization": {
-    "totalCreditAvailable": {
-      "amount": 45000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "totalCreditUsed": {
-      "amount": 8500.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "utilizationPercentage": 18.89,
-    "utilizationScore": 82,
-    "utilizationRating": {
-      "code": "EXCELLENT",
-      "display": "Excellent"
-    },
-    "accountsAtLimit": 0,
-    "accountsNearLimit": 1,
-    "recommendedUtilization": 30.00
-  },
-  "creditAge": {
-    "oldestAccountDate": "2010-03-15",
-    "oldestAccountAgeYears": 15.92,
-    "averageAccountAge": {
-      "years": 8,
-      "months": 4
-    },
-    "averageAccountAgeYears": 8.33,
-    "newestAccountDate": "2025-06-12",
-    "newestAccountAgeMonths": 8,
-    "creditAgeScore": 78,
-    "creditAgeRating": {
-      "code": "GOOD",
-      "display": "Good"
-    }
-  },
-  "creditMix": {
-    "revolvingAccounts": 4,
-    "revolvingAccountsOpen": 3,
-    "installmentAccounts": 5,
-    "installmentAccountsOpen": 3,
-    "mortgageAccounts": 2,
-    "mortgageAccountsOpen": 1,
-    "otherAccounts": 1,
-    "otherAccountsOpen": 1,
-    "accountTypeBreakdown": {
-      "creditCards": 3,
-      "personalLoans": 2,
-      "carLoans": 1,
-      "mortgages": 2,
-      "storeCards": 1,
-      "utilities": 3
-    },
-    "creditMixScore": 88,
-    "creditMixRating": {
-      "code": "EXCELLENT",
-      "display": "Excellent"
-    }
-  },
-  "creditInquiries": {
-    "hardInquiries": {
-      "last12Months": 2,
-      "last24Months": 4,
-      "last6Months": 1
-    },
-    "softInquiries": {
-      "last12Months": 8
-    },
-    "recentInquiries": [
-      {
-        "date": "2025-12-05",
-        "inquiryType": {
-          "code": "HARD",
-          "display": "Hard Inquiry"
-        },
-        "creditor": "HSBC UK",
-        "productType": "Credit Card",
-        "impact": "Minor negative impact"
-      },
-      {
-        "date": "2025-06-12",
-        "inquiryType": {
-          "code": "HARD",
-          "display": "Hard Inquiry"
-        },
-        "creditor": "Santander UK",
-        "productType": "Personal Loan",
-        "impact": "Minor negative impact"
-      }
-    ],
-    "inquiriesScore": 91,
-    "inquiriesRating": {
-      "code": "EXCELLENT",
-      "display": "Excellent"
-    }
-  },
-  "derogatoryMarks": {
-    "hasAnyDerogatoryMarks": false,
-    "defaults": {
-      "count": 0,
-      "totalAmount": {
-        "amount": 0.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "details": []
-    },
-    "ccjs": {
-      "count": 0,
-      "totalAmount": {
-        "amount": 0.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "details": []
-    },
-    "bankruptcies": {
-      "count": 0,
-      "details": []
-    },
-    "ivas": {
-      "count": 0,
-      "details": []
-    },
-    "arrangementsToPayDebt": {
-      "count": 0,
-      "details": []
-    },
-    "repossessions": {
-      "count": 0,
-      "details": []
-    },
-    "foreclosures": {
-      "count": 0,
-      "details": []
-    }
-  },
-  "publicRecords": {
-    "hasPublicRecords": false,
-    "electoralRoll": {
-      "isRegistered": true,
-      "registrationDate": "2015-04-01",
-      "address": "123 Main Street, London, SW1A 1AA"
-    },
-    "bankruptcySearchDate": "2026-02-10",
-    "bankruptcyStatus": "Clear"
-  },
-  "accounts": [
-    {
-      "accountId": "acc-001",
-      "accountType": {
-        "code": "CREDIT_CARD",
-        "display": "Credit Card"
-      },
-      "creditor": "HSBC UK",
-      "accountNumber": "****1234",
-      "status": {
-        "code": "OPEN",
-        "display": "Open"
-      },
-      "openedDate": "2018-05-12",
-      "closedDate": null,
-      "creditLimit": {
-        "amount": 15000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "currentBalance": {
-        "amount": 2500.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "utilizationPercentage": 16.67,
-      "paymentStatus": {
-        "code": "CURRENT",
-        "display": "Current"
-      },
-      "lastPaymentDate": "2026-02-05",
-      "lastPaymentAmount": {
-        "amount": 500.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "missedPayments": 0,
-      "latePayments": 1,
-      "monthsReviewed": 72,
-      "paymentHistory": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC1CCC"
-    },
-    {
-      "accountId": "acc-002",
-      "accountType": {
-        "code": "MORTGAGE",
-        "display": "Mortgage"
-      },
-      "creditor": "Nationwide Building Society",
-      "accountNumber": "****5678",
-      "status": {
-        "code": "OPEN",
-        "display": "Open"
-      },
-      "openedDate": "2015-09-22",
-      "closedDate": null,
-      "originalAmount": {
-        "amount": 250000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "currentBalance": {
-        "amount": 185000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "monthlyPayment": {
-        "amount": 1250.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "paymentStatus": {
-        "code": "CURRENT",
-        "display": "Current"
-      },
-      "lastPaymentDate": "2026-02-01",
-      "missedPayments": 0,
-      "latePayments": 0,
-      "monthsReviewed": 125,
-      "paymentHistory": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
-    },
-    {
-      "accountId": "acc-003",
-      "accountType": {
-        "code": "PERSONAL_LOAN",
-        "display": "Personal Loan"
-      },
-      "creditor": "Santander UK",
-      "accountNumber": "****9012",
-      "status": {
-        "code": "OPEN",
-        "display": "Open"
-      },
-      "openedDate": "2025-06-12",
-      "closedDate": null,
-      "originalAmount": {
-        "amount": 10000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "currentBalance": {
-        "amount": 8500.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "monthlyPayment": {
-        "amount": 350.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "paymentStatus": {
-        "code": "CURRENT",
-        "display": "Current"
-      },
-      "lastPaymentDate": "2026-02-12",
-      "missedPayments": 0,
-      "latePayments": 0,
-      "monthsReviewed": 8,
-      "paymentHistory": "CCCCCCCC"
-    }
-  ],
-  "totalAccounts": 12,
-  "totalActiveAccounts": 8,
-  "creditReport": {
-    "reportProvider": "Experian",
-    "reportDate": "2026-02-10",
-    "reportReference": "EXP-2026-02-123456789",
-    "reportType": {
-      "code": "STATUTORY",
-      "display": "Statutory Credit Report"
-    },
-    "reportUrl": "/api/v1/documents/credit-report-654",
-    "validUntil": "2026-05-10",
-    "costOfReport": {
-      "amount": 2.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    }
-  },
-  "trends": {
-    "scoreHistory": [
-      {
-        "date": "2025-02-10",
-        "score": 833
-      },
-      {
-        "date": "2025-05-10",
-        "score": 845
-      },
-      {
-        "date": "2025-08-10",
-        "score": 852
-      },
-      {
-        "date": "2025-11-10",
-        "score": 860
-      },
-      {
-        "date": "2026-02-10",
-        "score": 875
-      }
-    ],
-    "utilizationHistory": [
-      {
-        "date": "2025-02-10",
-        "utilization": 25.5
-      },
-      {
-        "date": "2025-05-10",
-        "utilization": 22.3
-      },
-      {
-        "date": "2025-08-10",
-        "utilization": 20.1
-      },
-      {
-        "date": "2025-11-10",
-        "utilization": 19.5
-      },
-      {
-        "date": "2026-02-10",
-        "utilization": 18.89
-      }
-    ]
-  },
-  "recommendations": [
-    {
-      "category": {
-        "code": "PAYMENT_HISTORY",
-        "display": "Payment History"
-      },
-      "priority": {
-        "code": "LOW",
-        "display": "Low Priority"
-      },
-      "recommendation": "Continue making all payments on time to maintain excellent payment history",
-      "potentialScoreImpact": 5
-    },
-    {
-      "category": {
-        "code": "CREDIT_UTILIZATION",
-        "display": "Credit Utilization"
-      },
-      "priority": {
-        "code": "LOW",
-        "display": "Low Priority"
-      },
-      "recommendation": "Your credit utilization is excellent at 18.89%. Keep it below 30% for optimal score",
-      "potentialScoreImpact": 3
-    },
-    {
-      "category": {
-        "code": "CREDIT_AGE",
-        "display": "Credit Age"
-      },
-      "priority": {
-        "code": "MEDIUM",
-        "display": "Medium Priority"
-      },
-      "recommendation": "Avoid closing your oldest credit accounts to maintain credit age",
-      "potentialScoreImpact": 10
-    }
-  ],
-  "adverseCredit": {
-    "hasAdverseCredit": false,
-    "hasEverBeenBankrupt": false,
-    "hasBeenRefusedCredit": false,
-    "lastCreditRefusalDate": null,
-    "hasArrangementsToPayDebt": false,
-    "isInDebtManagementPlan": false
-  },
-  "fraudAlerts": {
-    "hasActiveFraudAlert": false,
-    "fraudAlerts": []
-  },
-  "identityVerification": {
-    "addressLinked": true,
-    "nameMatched": true,
-    "dateOfBirthMatched": true,
-    "verificationScore": 98,
-    "verificationStatus": {
-      "code": "VERIFIED",
-      "display": "Verified"
-    }
-  },
-  "nextReviewDate": "2026-05-10",
-  "reviewFrequency": {
-    "code": "QUARTERLY",
-    "display": "Quarterly"
-  },
-  "isConsented": true,
-  "consentDate": "2026-02-10",
-  "consentExpiryDate": "2027-02-10",
-  "notes": "Credit score improving steadily. Good payment history. Low utilization. No adverse marks.",
-  "documents": [
-    {
-      "documentId": "doc-cr-001",
-      "type": {
-        "code": "CREDIT_REPORT",
-        "display": "Credit Report"
-      },
-      "name": "Experian Statutory Credit Report - Feb 2026",
-      "date": "2026-02-10",
-      "url": "/api/v1/documents/doc-cr-001"
-    }
-  ],
-  "createdAt": "2026-02-10T10:00:00Z",
-  "updatedAt": "2026-02-10T11:30:00Z",
-  "createdBy": {
-    "id": "user-789",
-    "name": "Jane Doe"
-  },
-  "updatedBy": {
-    "id": "user-789",
-    "name": "Jane Doe"
-  },
-  "_links": {
-    "self": { "href": "/api/v1/credit-history/credit-654" },
-    "update": { "href": "/api/v1/credit-history/credit-654", "method": "PUT" },
-    "delete": { "href": "/api/v1/credit-history/credit-654", "method": "DELETE" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "creditReport": { "href": "/api/v1/documents/doc-cr-001" },
-    "accounts": { "href": "/api/v1/credit-history/credit-654/accounts" },
-    "trends": { "href": "/api/v1/credit-history/credit-654/trends" },
-    "recommendations": { "href": "/api/v1/credit-history/credit-654/recommendations" }
-  }
-}
-```
-
-**Field Behaviors:**
-
-| Field | Type | Create | Update | Response | Notes |
-|-------|------|--------|--------|----------|-------|
-| `id` | uuid | ignored | ignored | included | read-only, server-generated |
-| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
-| `factFindRef` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
-| `creditAgency` | CodeValue | required | ignored | included | write-once, Experian/Equifax/TransUnion |
-| `scoreDate` | date | required | updatable | included | Date of credit score assessment |
-| `score` | object | required | updatable | included | Credit score with range and band |
-| `overallAssessment` | object | optional | updatable | included | Overall credit health assessment |
-| `paymentHistory` | object | optional | updatable | included | Payment history metrics and scores |
-| `creditUtilization` | object | optional | updatable | included | Credit utilization details and score |
-| `creditAge` | object | optional | updatable | included | Credit age metrics and score |
-| `creditMix` | object | optional | updatable | included | Mix of credit account types |
-| `creditInquiries` | object | optional | updatable | included | Hard and soft inquiries |
-| `derogatoryMarks` | object | optional | updatable | included | Defaults, CCJs, bankruptcies, IVAs |
-| `publicRecords` | object | optional | updatable | included | Electoral roll, bankruptcy searches |
-| `accounts` | array | optional | updatable | included | Array of credit accounts |
-| `totalAccounts` | integer | ignored | ignored | included | read-only, count of accounts |
-| `totalActiveAccounts` | integer | ignored | ignored | included | read-only, count of active accounts |
-| `creditReport` | object | optional | updatable | included | Credit report details and reference |
-| `trends` | object | optional | updatable | included | Score and utilization history |
-| `recommendations` | array | optional | updatable | included | Recommendations for improving score |
-| `adverseCredit` | object | optional | updatable | included | Adverse credit indicators |
-| `fraudAlerts` | object | optional | updatable | included | Active fraud alerts |
-| `identityVerification` | object | optional | updatable | included | Identity verification status |
-| `nextReviewDate` | date | optional | updatable | included | Next scheduled review |
-| `reviewFrequency` | CodeValue | optional | updatable | included | Review frequency (Monthly/Quarterly/Annual) |
-| `isConsented` | boolean | required | updatable | included | Whether client has consented to credit check |
-| `consentDate` | date | required | updatable | included | Date of consent |
-| `consentExpiryDate` | date | optional | updatable | included | Consent expiry date |
-| `notes` | string | optional | updatable | included | Additional notes |
-| `documents` | array | optional | updatable | included | Array of document references |
-| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
-| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
-| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
-| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
-
-**Usage Examples:**
-
-**Creating a Credit History Record (POST /api/v1/credit-history):**
-```json
-{
-  "clientRef": { "id": "client-123" },
-  "factFindRef": { "id": "factfind-123" },
-  "creditAgency": { "code": "EXPERIAN" },
-  "scoreDate": "2026-02-10",
-  "score": {
-    "scoreValue": 875,
-    "scoreRange": { "minimum": 0, "maximum": 999 },
-    "scoreBand": { "code": "GOOD" }
-  },
-  "isConsented": true,
-  "consentDate": "2026-02-10"
-}
-```
-Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
-
-**Updating with New Credit Report (PUT /api/v1/credit-history/credit-654):**
-```json
-{
-  "scoreDate": "2026-05-10",
-  "score": {
-    "scoreValue": 890,
-    "scoreRange": { "minimum": 0, "maximum": 999 },
-    "scoreBand": { "code": "EXCELLENT" },
-    "changeFromPreviousMonth": 15
-  },
-  "creditUtilization": {
-    "totalCreditUsed": { "amount": 7500.00, "currency": { "code": "GBP" } },
-    "utilizationPercentage": 16.67
-  },
-  "creditReport": {
-    "reportDate": "2026-05-10",
-    "reportReference": "EXP-2026-05-234567890"
-  }
-}
-```
-Server updates `updatedAt`. Returns complete contract with updated scores.
-
-**Adding Payment Event (PATCH /api/v1/credit-history/credit-654):**
-```json
-{
-  "paymentHistory": {
-    "onTimePayments": 147,
-    "latePayments": 6,
-    "onTimePaymentPercentage": 96.1
-  }
-}
-```
-Only specified fields are updated. Returns complete contract.
-
-**Validation Rules:**
-
-1. **Required Fields on Create:** `clientRef`, `creditAgency`, `scoreDate`, `score`, `isConsented`, `consentDate`
-2. **Write-Once Fields:** Cannot be changed after creation: `clientRef`, `factFindRef`, `creditAgency`
-3. **Consent Validation:** `isConsented` must be true before creating credit check record
-4. **Score Range Validation:** `score.scoreValue` must be within `score.scoreRange` (0-999 for Experian, 300-850 for others)
-5. **Score Band Validation:** `score.scoreBand` must correspond to `score.scoreValue` for the credit agency
-6. **Date Logic:** `scoreDate` must not be in future, `consentExpiryDate` must be > `consentDate`
-7. **Utilization Calculation:** `creditUtilization.utilizationPercentage` = (totalCreditUsed / totalCreditAvailable) * 100
-8. **Payment History:** `onTimePaymentPercentage` = (onTimePayments / (onTimePayments + latePayments + missedPayments)) * 100
-9. **Account Validation:** Each account must have `accountType`, `creditor`, `status`, `openedDate`
-10. **Reference Integrity:** `clientRef.id`, `factFindRef.id` must reference existing entities
-
----
-
-### 12.12 IdentityVerification Contract
+### 12.11 IdentityVerification Contract
 
 The `IdentityVerification` contract represents identity verification status with KYC and AML checks.
 
@@ -15307,7 +15334,7 @@ Only specified fields are updated. Returns complete contract.
 
 ---
 
-### 12.13 Consent Contract
+### 12.12 Consent Contract
 
 The `Consent` contract represents GDPR consent tracking with purpose-specific consents and audit trail.
 
@@ -15896,7 +15923,7 @@ Server updates status and withdrawal date. Returns complete contract.
 
 ---
 
-### 12.14 Collection Response Wrapper
+### 12.13 Collection Response Wrapper
 
 All list/collection endpoints use a standard wrapper contract:
 
@@ -15927,7 +15954,7 @@ The `data` array contains complete entity contracts. Clients can use field selec
 
 ---
 
-### 12.15 Contract Extension for Other Entities
+### 12.14 Contract Extension for Other Entities
 
 All other entities in the FactFind system follow the same Single Contract Principle:
 
@@ -15958,7 +15985,7 @@ Each entity contract follows the same field annotation pattern:
 - Collection responses wrapped in standard pagination envelope
 - Field selection supported via `?fields` query parameter
 
-### 12.16 Standard Value Types
+### 12.15 Standard Value Types
 
 Value types are embedded data structures with no independent identity. They are named with a "Value" suffix and never have an `id` field. Value types are always embedded within their parent entity and have no separate API endpoints.
 
@@ -16935,7 +16962,7 @@ Represents a person's health status for insurance purposes.
 
 ---
 
-### 12.17 Standard Reference Types
+### 12.16 Standard Reference Types
 
 Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `clientRef`, `adviserRef`).
 
