@@ -4,7 +4,7 @@
 ## Comprehensive RESTful API for Wealth Management Platform
 
 **Document Version:** 2.0
-**Date:** 2026-02-17
+**Date:** 2026-02-18
 **Status:** Design Specification v2.0 - Enhanced with Missing Entities
 **API Version:** v1
 **Base URL:** `https://api.factfind.com`
@@ -98,105 +98,130 @@ The FactFind API provides comprehensive digital capabilities for:
 
 **MAJOR ARCHITECTURAL CHANGES:**
 
-**1. ATR Embedded in FactFind (Section 10)**
-- **BREAKING CHANGE:** ATR is now embedded within the FactFind entity, not a separate resource
-- **Template Management Removed:** No more POST/PUT/DELETE on risk questionnaires
-- **Templates as Reference Data:** ATR templates are system configuration, queryable via `/api/v1/reference/atr-templates`
-- **Simplified API:** Just 4 main endpoints - GET, PUT, choose-profile, history
-- **Risk Replay:** Enhanced historical tracking and comparison capabilities
-- **Regulatory Benefit:** Single source of truth for ATR assessment lifecycle
+1. **FactFind as Aggregate Root** - All API operations now scoped to a fact-find instance
+   - All endpoints now follow pattern: `/api/v1/factfinds/{factfindId}/{resource}`
+   - Clear hierarchical structure with explicit parent-child relationships
+   - Better transactional consistency and data isolation
 
-**2. Client Contract Enhanced with Value Types (Section 13.1)**
-- **Addresses:** Full address history as embedded value types (not separate resources)
-- **Contacts:** All contact types (email, phone, mobile, work, website) embedded
-- **Identity Verification:** KYC, AML checks, document verification embedded
-- **Vulnerabilities:** Client vulnerabilities and required adjustments embedded
-- **Data Protection:** GDPR consent, privacy policy, data retention embedded
-- **Marketing Preferences:** Channel preferences, interests, frequency embedded
-- **Estate Planning:** Will, LPA, gifts, trusts, IHT estimates embedded
-- **Section 5 Impact:** Removed separate APIs for identity verification, data protection, marketing preferences
+2. **Context-Based Organization** - Resources grouped by business context
+   - Client Onboarding & KYC: `/api/v1/factfinds/{factfindId}/clients`
+   - Circumstances: `/api/v1/factfinds/{factfindId}/income`, `/employment`, `/expenditure`
+   - Assets & Liabilities: `/api/v1/factfinds/{factfindId}/assets`
+   - Arrangements: `/api/v1/factfinds/{factfindId}/arrangements/{type}`
+   - Goals: `/api/v1/factfinds/{factfindId}/objectives`
 
-**3. FactFind Contract Enhanced with ATR Assessment (Section 13.2)**
-- **Embedded ATR:** Complete ATR assessment within FactFind contract
-- **Full Question History:** 15 standard questions + 45 supplementary questions
-- **Risk Profiles:** System-generated 3 adjacent profiles + client choice
-- **Capacity for Loss:** Adviser assessment included
-- **Declarations:** Client and adviser declarations embedded
-- **Workflow Integration:** ATR required for FactFind completion
+3. **Enhanced API Architecture (Section 1.5)** - New comprehensive section covering:
+   - Aggregate root pattern and benefits
+   - Hierarchical structure and URL design
+   - Context-based organization
+   - Transactional boundaries
+   - Entity lifecycle management
 
-**Benefits of These Changes:**
-- **Simpler API:** Fewer endpoints, less complexity
-- **Better Cohesion:** Related data stays together
-- **Transactional Consistency:** Updates are atomic
-- **Reduced Latency:** No N+1 query problems
-- **Regulatory Compliance:** Complete audit trail in one place
-- **Domain-Driven Design:** True aggregate boundaries
+4. **Breaking Changes** - All endpoints restructured (see Migration Guide in Appendix)
+   - Old: `/api/v1/clients/{clientId}` → New: `/api/v1/factfinds/{factfindId}/clients/{clientId}`
+   - Old: `/api/v1/arrangements/{arrangementId}` → New: `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}`
+   - All HATEOAS links updated to reflect new structure
 
-**Breaking Changes:**
-- Removed: `POST /api/v1/risk-questionnaires` (template creation)
-- Removed: `PUT /api/v1/risk-questionnaires/{id}` (template update)
-- Removed: `DELETE /api/v1/risk-questionnaires/{id}` (template deletion)
-- Removed: `POST /api/v1/factfinds/{id}/risk-questionnaires/{qid}/responses` (separate responses)
-- Removed: Section 5.5 (Identity Verification API)
-- Removed: Section 5.6 (Data Protection & Consent API)
-- Removed: Section 5.7 (Marketing Preferences API)
-- Removed: Section 10.6 (Supplementary Questions API)
-- Changed: Section 10.4 (now just reference data, not CRUD)
-- Enhanced: GET/PUT `/api/v1/factfinds/{id}` now includes embedded atrAssessment
-- Enhanced: GET/PUT `/api/v1/clients/{id}` now includes all value types
+**BENEFITS:**
+- Clearer data ownership and boundaries
+- Better multi-tenancy and security
+- Improved caching and performance
+- More discoverable API structure
+- Enforced transactional consistency
 
----
+**MIGRATION REQUIRED:**
+- All API consumers must update endpoint URLs
+- See Migration Guide for detailed mapping of old → new endpoints
+- Backward compatibility NOT maintained (major version bump required)
 
 ## Table of Contents
 
 1. [API Design Principles](#1-api-design-principles)
+   - [1.1 RESTful Architecture](#11-restful-architecture)
+   - [1.2 Naming Conventions](#12-naming-conventions)
+   - [1.3 HTTP Methods & Status Codes](#13-http-methods--status-codes)
+   - [1.4 Error Response Format](#14-error-response-format-rfc-7807)
+   - [1.5 API Architecture & Aggregate Root Pattern](#15-api-architecture--aggregate-root-pattern) **NEW v2.1**
+   - [1.6 Versioning Strategy](#16-versioning-strategy)
    - [1.7 Single Contract Principle](#17-single-contract-principle)
    - [1.8 Value and Reference Type Semantics](#18-value-and-reference-type-semantics)
    - [1.9 Aggregate Root Pattern](#19-aggregate-root-pattern)
 2. [Authentication & Authorization](#2-authentication--authorization)
+   - [2.1 OAuth 2.0 with JWT](#21-oauth-20-with-jwt)
+   - [2.2 Authorization Scopes](#22-authorization-scopes)
+   - [2.3 Multi-Tenancy](#23-multi-tenancy)
+   - [2.4 Sensitive Data Handling](#24-sensitive-data-handling)
+   - [2.5 Audit Logging](#25-audit-logging)
 3. [Common Patterns](#3-common-patterns)
+   - [3.1 Pagination](#31-pagination)
+   - [3.2 Filtering & Sorting](#32-filtering--sorting)
+   - [3.3 Field Selection](#33-field-selection-sparse-fieldsets)
+   - [3.4 Resource Expansion](#34-resource-expansion)
+   - [3.5 Optimistic Concurrency Control](#35-optimistic-concurrency-control)
+   - [3.6 Batch Operations](#36-batch-operations)
+   - [3.7 HATEOAS](#37-hateoas-hypermedia-controls)
+   - [3.8 Data Types](#38-data-types)
 4. [FactFind API (Root Aggregate)](#4-factfind-api-root-aggregate)
+   - [4.1 Overview](#41-overview)
+   - [4.2 Operations Summary](#42-operations-summary)
+   - [4.3 Key Endpoints](#43-key-endpoints)
    - [4.4 Current Position Summary API](#44-current-position-summary-api) **NEW v2.0**
-5. [FactFind Clients API](#5-factfind-clients-api)
-6. [FactFind Income & Expenditure API](#6-factfind-income--expenditure-api)
-7. [FactFind Arrangements API](#7-factfind-arrangements-api)
-8. [FactFind Goals API](#8-factfind-goals-api)
-9. [FactFind Assets & Liabilities API](#9-factfind-assets--liabilities-api)
+5. [Client Management API](#5-client-management-api)
+   - [5.1 Overview](#51-overview)
+   - [5.2 Operations Summary](#52-operations-summary)
+   - [5.3 Key Endpoints](#53-key-endpoints)
+6. [Income & Expenditure API](#6-income--expenditure-api)
+   - [6.1 Overview](#61-overview)
+   - [6.2 Operations Summary](#62-operations-summary)
+   - [6.3 Key Endpoints](#63-key-endpoints)
+7. [Employment API](#7-employment-api)
+   - [7.1 Overview](#71-overview)
+   - [7.2 Operations Summary](#72-operations-summary)
+   - [7.3 Key Endpoints](#73-key-endpoints)
+8. [Goals & Objectives API](#8-goals--objectives-api)
+   - [8.1 Overview](#81-overview)
+   - [8.2 Operations Summary](#82-operations-summary)
+   - [8.3 Key Endpoints](#83-key-endpoints)
+9. [Assets & Liabilities API](#9-assets--liabilities-api)
+   - [9.1 Overview](#91-overview)
+   - [9.2 Operations Summary](#92-operations-summary)
+   - [9.3 Key Endpoints](#93-key-endpoints)
    - [9.4 Property Management API](#94-property-management-api) **NEW v2.0**
    - [9.5 Equities Portfolio API](#95-equities-portfolio-api) **NEW v2.0**
    - [9.6 Credit History API](#96-credit-history-api) **NEW v2.0**
-9A. [FactFind Savings & Investments API](#9a-factfind-savings--investments-api) **NEW SECTION v2.0**
+9A. [Savings & Investments API](#9a-savings--investments-api) **NEW v2.0**
    - [9A.1 Overview](#9a1-overview)
    - [9A.2 Operations Summary](#9a2-operations-summary)
    - [9A.3 Key Endpoints](#9a3-key-endpoints)
-10. [FactFind Risk Profile API](#10-factfind-risk-profile-api)
-   - [10.1 Overview](#101-overview) **UPDATED v2.1**
-   - [10.2 Operations Summary](#102-operations-summary) **UPDATED v2.1**
-   - [10.3 Key Endpoints](#103-key-endpoints) **UPDATED v2.1**
-   - [10.4 ATR Templates Reference Data](#104-atr-templates-reference-data) **SIMPLIFIED v2.1**
-   - [10.5 Risk Assessment History API](#105-risk-assessment-history-api) **UPDATED v2.1**
-   - [10.6 Integration with FactFind Workflow](#106-integration-with-factfind-workflow) **NEW v2.1**
-11. [FactFind Estate Planning API](#11-factfind-estate-planning-api)
-12. [Reference Data API](#12-reference-data-api)
-13. [Entity Contracts](#13-entity-contracts)
-   - [13.1 Client Contract](#131-client-contract) **ENHANCED v2.1**
-   - [13.2 FactFind Contract](#132-factfind-contract) **ENHANCED v2.1**
-   - [13.3 Address Contract](#133-address-contract)
-   - [13.4 Income Contract](#134-income-contract)
-   - [13.5 Arrangement Contract](#135-arrangement-contract)
-   - [13.6 Goal Contract](#136-goal-contract)
-   - [13.7 RiskProfile Contract](#137-riskprofile-contract)
-   - [13.8 Investment Contract](#138-investment-contract) **NEW v2.0**
-   - [13.9 Property Contract](#139-property-contract) **NEW v2.0**
-   - [13.10 Equity Contract](#1310-equity-contract) **NEW v2.0**
-   - [13.11 CreditHistory Contract](#1311-credithistory-contract) **NEW v2.0**
-   - [13.12 Standard Value Types](#1312-standard-value-types) **ENHANCED v2.1**
-   - [13.13 Standard Reference Types](#1313-standard-reference-types)
-14. [Implementation Guidance](#14-implementation-guidance)
-15. [Appendices](#appendices)
+10. [Risk Profile API](#10-risk-profile-api)
+    - [10.1 Overview](#101-overview)
+    - [10.2 Operations Summary](#102-operations-summary)
+    - [10.3 Key Endpoints](#103-key-endpoints)
+    - [10.4 ATR Templates Reference Data](#104-atr-templates-reference-data) **NEW v2.0**
+    - [10.5 Risk Assessment History API](#105-risk-assessment-history-api) **NEW v2.0**
+    - [10.6 Integration with FactFind Workflow](#106-integration-with-factfind-workflow)
+11. [Estate Planning API](#11-estate-planning-api)
+12. [Entity Contracts](#12-entity-contracts)
+    - [12.1 Client Contract](#121-client-contract)
+    - [12.2 FactFind Contract](#122-factfind-contract)
+    - [12.3 Address Contract](#123-address-contract)
+    - [12.4 Income Contract](#124-income-contract)
+    - [12.5 Arrangement Contract](#125-arrangement-contract)
+    - [12.6 Goal Contract](#126-goal-contract)
+    - [12.7 RiskProfile Contract](#127-riskprofile-contract)
+    - [12.8 Collection Response Wrapper](#128-collection-response-wrapper)
+    - [12.9 Contract Extension for Other Entities](#129-contract-extension-for-other-entities)
+    - [12.10 Standard Value Types](#1210-standard-value-types)
+13. [Reference Data API](#13-reference-data-api)
+    - Reference data APIs remain unchanged (not scoped to factfinds)
 
 ---
 
+**Appendices**
+
+- [Appendix A: Migration Guide - v2.0 to v2.1](#appendix-a-migration-guide---v20-to-v21) **NEW v2.1**
+
+---
 
 ## 1. API Design Principles
 
@@ -231,7 +256,7 @@ The FactFind API strictly follows REST architectural principles:
 
 **Resource URIs:**
 ```
-/api/v1/clients                     (collection)
+/api/v1/factfinds/{factfindId}/clients                     (collection)
 /api/v1/clients/{id}                (single resource)
 /api/v1/clients/{id}/addresses      (sub-resource collection)
 /api/v1/factfinds/{id}/income       (nested resource)
@@ -318,52 +343,172 @@ All error responses follow RFC 7807 Problem Details format:
 - `conflict-error` - Business rule or concurrency violations
 - `server-error` - Internal server errors
 
-### 1.5 Aggregate-Oriented Design
 
-The FactFind API follows strict Domain-Driven Design (DDD) aggregate patterns with **FactFind as the single aggregate root**. This ensures transactional consistency, clear ownership boundaries, and proper business rule enforcement.
+### 1.5 API Architecture & Aggregate Root Pattern
 
-**Single Aggregate Root: FactFind**
+#### 1.5.1 Hierarchical Structure
 
-All business entities are owned by and accessed through the FactFind aggregate root:
+The FactFind API follows a **hierarchical, context-based structure** where **FactFind is the aggregate root**. This means all business operations are scoped to a specific fact-find instance, and all API endpoints reflect this parent-child relationship in their URL structure.
 
+**Design Principle:**
 ```
-/api/v1/factfinds                                    (Root aggregate - ONLY top-level resource)
-/api/v1/factfinds/{factfindId}
-/api/v1/factfinds/{factfindId}/clients               (Clients in this fact find)
-/api/v1/factfinds/{factfindId}/clients/{clientId}
-/api/v1/factfinds/{factfindId}/income                (Income discovered in this fact find)
-/api/v1/factfinds/{factfindId}/expenditure           (Expenditure captured in this fact find)
-/api/v1/factfinds/{factfindId}/employment            (Employment recorded in this fact find)
-/api/v1/factfinds/{factfindId}/arrangements          (Arrangements identified in this fact find)
-/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}
-/api/v1/factfinds/{factfindId}/goals                 (Goals established in this fact find)
-/api/v1/factfinds/{factfindId}/assets                (Assets discovered in this fact find)
-/api/v1/factfinds/{factfindId}/liabilities           (Liabilities identified in this fact find)
-/api/v1/factfinds/{factfindId}/risk-profile          (Risk profile assessed in this fact find)
-/api/v1/factfinds/{factfindId}/gifts                 (Gifts recorded in this fact find)
-/api/v1/factfinds/{factfindId}/complete              (Complete aggregate with all nested data)
+/api/v1/factfinds/{factfindId}/{context}/{resource}
 ```
 
-**Reference Data (System-Wide, Not Owned by FactFind):**
+**Examples:**
 ```
-/api/v1/reference/genders                            (System-wide lookups)
-/api/v1/reference/countries
-/api/v1/reference/providers
-/api/v1/reference/product-types
+/api/v1/factfinds/12345/clients                    # Client context
+/api/v1/factfinds/12345/income                     # Circumstances context
+/api/v1/factfinds/12345/arrangements/pensions      # Arrangements context
+/api/v1/factfinds/12345/objectives                 # Goals context
 ```
 
-**Design Principles:**
-- **Single Root Aggregate:** FactFind is the ONLY aggregate root for business data
-- **Transactional Boundary:** All operations within a fact find are transactionally consistent
-- **Clear Ownership:** Every entity belongs to exactly one fact find
-- **No Independent Access:** Clients, arrangements, goals, etc. cannot exist without a fact find context
-- **Reference Data Separation:** System-wide lookup data remains independent
+#### 1.5.2 FactFind as Aggregate Root
+
+**What is an Aggregate Root?**
+
+In Domain-Driven Design (DDD), an **aggregate** is a cluster of domain objects that can be treated as a single unit for data changes. The **aggregate root** is the entry point to the aggregate and the only entity that external objects should reference.
+
+**Why FactFind is the Aggregate Root:**
+
+1. **Transactional Boundary** - All client data, income, expenses, arrangements, and goals exist within the context of a single fact-find
+2. **Consistency Guarantee** - Changes to related entities (client, income, arrangements) must be consistent within the fact-find
+3. **Lifecycle Management** - Child entities (clients, arrangements, objectives) cannot exist without a parent fact-find
+4. **Business Rule Enforcement** - Business rules (e.g., "total income must equal sum of all income sources") are enforced at the fact-find level
+5. **Access Control** - Permissions are granted at the fact-find level and inherited by child entities
+
+#### 1.5.3 Context-Based Organization
+
+Resources are organized into **business contexts** that reflect the domain model:
+
+| Context | Resources | Base Path |
+|---------|-----------|-----------|
+| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Consents | `/api/v1/factfinds/{factfindId}/clients` |
+| **Circumstances** | Employment, Income, Expenditure, Income/Expenditure Changes | `/api/v1/factfinds/{factfindId}/{resource}` |
+| **Assets & Liabilities** | Assets, Properties, Equities, Credit History, Valuations | `/api/v1/factfinds/{factfindId}/assets` |
+| **Arrangements** | Pensions, Investments, Mortgages, Protection, Contributions, Withdrawals | `/api/v1/factfinds/{factfindId}/arrangements` |
+| **Goals & Objectives** | Objectives, Needs | `/api/v1/factfinds/{factfindId}/objectives` |
+| **Risk Profiling** | Risk Profile, ATR Assessments | `/api/v1/factfinds/{factfindId}/risk-profile` |
+| **Estate Planning** | Gifts, Trusts | `/api/v1/factfinds/{factfindId}/{resource}` |
+
+#### 1.5.4 Benefits of This Approach
+
+**1. Clear Data Ownership**
+- Every resource has a clear parent (ultimately, the fact-find)
+- No ambiguity about which fact-find a client or arrangement belongs to
+- Simplifies multi-tenancy and data isolation
+
+**2. Transactional Consistency**
+- All operations within a fact-find can be made atomic
+- Business rules can be enforced at aggregate boundaries
+- Easier to implement eventual consistency where needed
+
+**3. Better API Discoverability**
+- URL structure reflects domain model
+- Parent-child relationships are explicit
+- HATEOAS links are more meaningful
+
+**4. Simplified Security**
+- Access control at fact-find level applies to all child resources
+- No need to check permissions on every nested resource
+- Easier to implement row-level security
+
+**5. Improved Multi-Tenancy**
+- Clear tenant boundaries (each fact-find belongs to one tenant)
+- Data isolation guaranteed by URL structure
+- Prevents cross-fact-find data leakage
+
+**6. Better Caching**
+- Cache invalidation is simpler (invalidate by fact-find ID)
+- More predictable cache keys
+- Better cache hit rates
+
+#### 1.5.5 Transactional Boundaries
+
+**Aggregate Boundary = Transaction Boundary**
+
+All changes within a fact-find aggregate should be:
+- **Atomic** - Either all changes succeed or all fail
+- **Consistent** - Business rules are enforced across all entities
+- **Isolated** - Concurrent changes don't interfere
+- **Durable** - Changes are persisted reliably
+
+**Example - Adding Income to a FactFind:**
+
+```http
+POST /api/v1/factfinds/12345/income
+```
+
+This operation:
+1. Creates the income record
+2. Updates the fact-find's total income
+3. Recalculates disposable income
+4. Updates the fact-find's last modified timestamp
+5. Emits a domain event (`IncomeAdded`)
+
+All these changes happen atomically within the fact-find aggregate boundary.
+
+#### 1.5.6 Entity Lifecycle
+
+**All entities within a fact-find follow a consistent lifecycle:**
+
+1. **Creation** - Entities are created within a fact-find context
+2. **Retrieval** - Entities are retrieved via their parent fact-find
+3. **Update** - Entities are updated within their fact-find context
+4. **Deletion** - Entities are deleted, but the fact-find remains
+5. **Archival** - When a fact-find is archived, all child entities are archived
+
+**Example Lifecycle:**
+
+```http
+# 1. Create a fact-find
+POST /api/v1/factfinds
+Response: 201 Created, Location: /api/v1/factfinds/12345
+
+# 2. Add a client to the fact-find
+POST /api/v1/factfinds/12345/clients
+Response: 201 Created, Location: /api/v1/factfinds/12345/clients/67890
+
+# 3. Add an address to the client
+POST /api/v1/factfinds/12345/clients/67890/addresses
+Response: 201 Created, Location: /api/v1/factfinds/12345/clients/67890/addresses/11111
+
+# 4. Update the address
+PATCH /api/v1/factfinds/12345/clients/67890/addresses/11111
+Response: 200 OK
+
+# 5. Delete the address
+DELETE /api/v1/factfinds/12345/clients/67890/addresses/11111
+Response: 204 No Content
+
+# 6. Archive the fact-find (archives all children)
+POST /api/v1/factfinds/12345/archive
+Response: 200 OK
+```
+
+#### 1.5.7 Special Considerations
+
+**Cross-Aggregate References**
+
+Some entities may need to reference entities in other fact-finds (e.g., comparing historical risk profiles). These should be:
+- **Read-only** - No modifications across aggregates
+- **Eventually consistent** - Denormalized data may be slightly stale
+- **Explicitly marked** - Use `factfindRef` to indicate cross-aggregate references
+
+**Reference Data Exception**
+
+Reference data (lookup tables, templates, provider data) is **not** scoped to a fact-find:
+- `/api/v1/reference/income-types` - NOT `/api/v1/factfinds/{id}/reference/income-types`
+- `/api/v1/reference/providers` - NOT `/api/v1/factfinds/{id}/reference/providers`
+
+Reference data is **shared across all fact-finds** and managed separately.
+
 
 ### 1.6 Versioning Strategy
 
 **URL-Based Versioning:**
 ```
-https://api.factfind.com/api/v1/clients
+https://api.factfind.com/api/v1/factfinds/{factfindId}/clients
 https://api.factfind.com/api/v2/clients (future)
 ```
 
@@ -677,7 +822,7 @@ When one entity references another, use an expanded reference object containing:
 {
   "clientRef": {
     "id": "uuid-123",                    // Required: Unique identifier
-    "href": "/api/v1/clients/uuid-123",  // Required: URL to resource
+    "href": "/api/v1/factfinds/{factfindId}/clients/uuid-123",  // Required: URL to resource
     "name": "John Smith",                // Required: Human-readable display name
     "clientNumber": "C00001234",         // Optional: Business identifier
     "type": "Person"                     // Optional: Discriminator for polymorphic types
@@ -701,7 +846,7 @@ When one entity references another, use an expanded reference object containing:
 | `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": "uuid", "href": "/api/v1/clients/uuid", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
 | `AdviserRef` | `name`<br>`code` | `{ "id": "uuid", "href": "/api/v1/advisers/uuid", "name": "Sarah Johnson", "code": "ADV001" }` |
 | `ProviderRef` | `name`<br>`frnNumber` | `{ "id": "uuid", "href": "/api/v1/providers/uuid", "name": "Aviva", "frnNumber": "123456" }` |
-| `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": "uuid", "href": "/api/v1/arrangements/uuid", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
+| `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": "uuid", "href": "/api/v1/factfinds/{factfindId}/arrangements/uuid", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
 | `EmploymentRef` | `employerName`<br>`status` | `{ "id": "uuid", "href": "/api/v1/employments/uuid", "employerName": "Acme Corp", "status": "Current" }` |
 | `GoalRef` | `goalName`<br>`priority` | `{ "id": "uuid", "href": "/api/v1/goals/uuid", "goalName": "Retirement Planning", "priority": "High" }` |
 | `FactFindRef` | `factFindNumber`<br>`status` | `{ "id": "uuid", "href": "/api/v1/factfinds/uuid", "factFindNumber": "FF001234", "status": "InProgress" }` |
@@ -714,14 +859,14 @@ When one entity references another, use an expanded reference object containing:
   "factFindNumber": "FF001234",
   "clientRef": {                          // ClientRef - reference to Client entity
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "jointClientRef": {                     // Optional second client reference
     "id": "client-124",
-    "href": "/api/v1/clients/client-124",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
     "name": "Jane Smith",
     "clientNumber": "C00001235",
     "type": "Person"
@@ -803,7 +948,7 @@ GET /api/v1/factfinds/factfind-456
   "id": "factfind-456",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234"
   }
@@ -820,7 +965,7 @@ GET /api/v1/factfinds/factfind-456?expand=clientRef,adviserRef
   "id": "factfind-456",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person",
@@ -885,7 +1030,7 @@ Response:
   "id": "factfind-456",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",           // Server populates display fields
     "clientNumber": "C00001234"
   },
@@ -1348,10 +1493,10 @@ Response:
   },
   "_links": {
     "self": {
-      "href": "/api/v1/clients?limit=20&cursor=eyJpZCI6MTAwfQ=="
+      "href": "/api/v1/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTAwfQ=="
     },
     "next": {
-      "href": "/api/v1/clients?limit=20&cursor=eyJpZCI6MTIwfQ=="
+      "href": "/api/v1/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTIwfQ=="
     }
   }
 }
@@ -1375,11 +1520,11 @@ Response:
     "totalCount": 195
   },
   "_links": {
-    "first": { "href": "/api/v1/clients?page=1&pageSize=20" },
-    "prev": { "href": "/api/v1/clients?page=1&pageSize=20" },
-    "self": { "href": "/api/v1/clients?page=2&pageSize=20" },
-    "next": { "href": "/api/v1/clients?page=3&pageSize=20" },
-    "last": { "href": "/api/v1/clients?page=10&pageSize=20" }
+    "first": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "prev": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients?page=2&pageSize=20" },
+    "next": { "href": "/api/v1/factfinds/{factfindId}/clients?page=3&pageSize=20" },
+    "last": { "href": "/api/v1/factfinds/{factfindId}/clients?page=10&pageSize=20" }
   }
 }
 ```
@@ -1444,7 +1589,7 @@ GET /api/v1/factfinds/factfind-123
   "factFindNumber": "FF001234",
   "clientRef": {
     "id": "client-456",
-    "href": "/api/v1/clients/client-456",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-456",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -1476,7 +1621,7 @@ GET /api/v1/factfinds/factfind-123?expand=clientRef,adviserRef
   "factFindNumber": "FF001234",
   "clientRef": {
     "id": "client-456",
-    "href": "/api/v1/clients/client-456",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-456",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person",
@@ -1628,7 +1773,7 @@ Response (207 Multi-Status):
       "method": "DELETE"
     },
     "addresses": {
-      "href": "/api/v1/clients/123/addresses"
+      "href": "/api/v1/factfinds/{factfindId}/clients/123/addresses"
     },
     "factfinds": {
       "href": "/api/v1/factfinds?clientId=123"
@@ -1758,6 +1903,20 @@ See Section 11.10.9 for complete enumeration value type definitions.
 
 ## 4. FactFind API (Root Aggregate)
 
+
+**ARCHITECTURAL NOTE (v2.1):**
+
+FactFind is the **aggregate root** for all business operations. All other resources (clients, income, arrangements, etc.) are accessed through the FactFind context:
+
+- `/api/v1/factfinds` - Root collection
+- `/api/v1/factfinds/{factfindId}` - Specific fact-find
+- `/api/v1/factfinds/{factfindId}/clients` - Clients within a fact-find
+- `/api/v1/factfinds/{factfindId}/arrangements` - Arrangements within a fact-find
+- `/api/v1/factfinds/{factfindId}/objectives` - Objectives within a fact-find
+
+All subsequent API sections (5-11) document resources that are **nested under** the FactFind aggregate root.
+
+---
 ### 4.1 Overview
 
 **Purpose:** Manage client identities, relationships, and regulatory onboarding requirements.
@@ -1984,7 +2143,7 @@ Content-Type: application/json
       "href": "/api/v1/factfinds?clientId=123"
     },
     "arrangements": {
-      "href": "/api/v1/arrangements?clientId=123"
+      "href": "/api/v1/factfinds/{factfindId}/arrangements?clientId=123"
     }
   }
 }
@@ -2133,13 +2292,13 @@ Complete `Client` contract.
   "_links": {
     "self": { "href": "/api/v1/factfinds/{factfindId}/clients/123" },
     "update": { "href": "/api/v1/factfinds/{factfindId}/clients/123", "method": "PUT" },
-    "addresses": { "href": "/api/v1/clients/123/addresses" },
-    "contacts": { "href": "/api/v1/clients/123/contacts" },
-    "relationships": { "href": "/api/v1/clients/123/relationships" },
-    "dependants": { "href": "/api/v1/clients/123/dependants" },
+    "addresses": { "href": "/api/v1/factfinds/{factfindId}/clients/123/addresses" },
+    "contacts": { "href": "/api/v1/factfinds/{factfindId}/clients/123/contacts" },
+    "relationships": { "href": "/api/v1/factfinds/{factfindId}/clients/123/relationships" },
+    "dependants": { "href": "/api/v1/factfinds/{factfindId}/clients/123/dependants" },
     "factfinds": { "href": "/api/v1/factfinds?clientId=123" },
-    "arrangements": { "href": "/api/v1/arrangements?clientId=123" },
-    "goals": { "href": "/api/v1/goals?clientId=123" }
+    "arrangements": { "href": "/api/v1/factfinds/{factfindId}/arrangements?clientId=123" },
+    "goals": { "href": "/api/v1/factfinds/{factfindId}/objectives?clientId=123" }
   }
 }
 ```
@@ -2225,10 +2384,10 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
   },
   "_links": {
     "self": {
-      "href": "/api/v1/clients?limit=20"
+      "href": "/api/v1/factfinds/{factfindId}/clients?limit=20"
     },
     "next": {
-      "href": "/api/v1/clients?limit=20&cursor=eyJpZCI6MTI0fQ=="
+      "href": "/api/v1/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTI0fQ=="
     }
   }
 }
@@ -2337,7 +2496,7 @@ Location: /api/v1/clients/client-123/addresses/address-456
   "id": "vulnerability-789",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -2356,9 +2515,9 @@ Location: /api/v1/clients/client-123/addresses/address-456
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/clients/123/vulnerability" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/123/vulnerability" },
     "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" },
-    "history": { "href": "/api/v1/clients/123/vulnerability/history" }
+    "history": { "href": "/api/v1/factfinds/{factfindId}/clients/123/vulnerability/history" }
   }
 }
 ```
@@ -2676,9 +2835,12 @@ The financial health score is calculated on a 0-100 scale with five components:
 ---
 
 
-## 5. FactFind Clients API
+## 5. Client Management API
 
 ### 5.1 Overview
+
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/clients`
 
 **Purpose:** Capture comprehensive client circumstances and current financial position for financial planning.
 
@@ -3378,9 +3540,14 @@ Income contract with required-on-create fields.
 
 
 
-## 6. FactFind Income & Expenditure API
+## 6. Income & Expenditure API
 
 ### 6.1 Overview
+
+
+**Base Paths:**
+- Income: `/api/v1/factfinds/{factfindId}/income`
+- Expenditure: `/api/v1/factfinds/{factfindId}/expenditure`
 
 **Purpose:** Manage client's existing financial arrangements including pensions, investments, protection policies, and mortgages.
 
@@ -3564,9 +3731,9 @@ Location: /api/v1/factfinds/{factfindId}/arrangements/777
   "_links": {
     "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777" },
     "update": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777", "method": "PUT" },
-    "contributions": { "href": "/api/v1/arrangements/777/contributions" },
-    "valuations": { "href": "/api/v1/arrangements/777/valuations" },
-    "withdrawals": { "href": "/api/v1/arrangements/777/withdrawals" },
+    "contributions": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777/contributions" },
+    "valuations": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777/valuations" },
+    "withdrawals": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777/withdrawals" },
     "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
   }
 }
@@ -3657,7 +3824,7 @@ Location: /api/v1/factfinds/{factfindId}/arrangements/777
   "id": "contribution-888",
   "arrangementRef": {
     "id": "arrangement-777",
-    "href": "/api/v1/arrangements/arrangement-777",
+    "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-777",
     "policyNumber": "POL123456",
     "productType": "Pension",
     "provider": "ABC Provider"
@@ -3713,8 +3880,8 @@ Location: /api/v1/factfinds/{factfindId}/arrangements/777
   "isActive": true,
   "createdAt": "2026-02-16T15:05:00Z",
   "_links": {
-    "self": { "href": "/api/v1/arrangements/arrangement-777/contributions/contribution-888" },
-    "arrangement": { "href": "/api/v1/arrangements/arrangement-777" }
+    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-777/contributions/contribution-888" },
+    "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-777" }
   }
 }
 ```
@@ -3767,7 +3934,7 @@ Location: /api/v1/factfinds/{factfindId}/arrangements/777
   "id": "valuation-999",
   "arrangementRef": {
     "id": "arrangement-777",
-    "href": "/api/v1/arrangements/arrangement-777",
+    "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-777",
     "policyNumber": "POL123456",
     "productType": "Pension",
     "provider": "ABC Provider"
@@ -3806,7 +3973,7 @@ Location: /api/v1/factfinds/{factfindId}/arrangements/777
   },
   "createdAt": "2026-02-16T15:10:00Z",
   "_links": {
-    "self": { "href": "/api/v1/arrangements/777/valuations/999" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777/valuations/999" },
     "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/777" }
   }
 }
@@ -3820,9 +3987,12 @@ Location: /api/v1/factfinds/{factfindId}/arrangements/777
 
 ---
 
-## 7. FactFind Arrangements API
+## 7. Employment API
 
 ### 7.1 Overview
+
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/employment`
 
 **Purpose:** Capture and track client financial goals and objectives.
 
@@ -3988,10 +4158,10 @@ Complete `Goal` contract with all fields populated, including server-generated a
   "createdAt": "2026-02-16T15:20:00Z",
   "updatedAt": "2026-02-16T15:20:00Z",
   "_links": {
-    "self": { "href": "/api/v1/goals/555" },
-    "update": { "href": "/api/v1/goals/555", "method": "PUT" },
-    "objectives": { "href": "/api/v1/goals/555/objectives" },
-    "funding": { "href": "/api/v1/goals/555/funding" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/objectives/555" },
+    "update": { "href": "/api/v1/factfinds/{factfindId}/objectives/555", "method": "PUT" },
+    "objectives": { "href": "/api/v1/factfinds/{factfindId}/objectives/555/objectives" },
+    "funding": { "href": "/api/v1/factfinds/{factfindId}/objectives/555/funding" },
     "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
   }
 }
@@ -4050,7 +4220,7 @@ Complete `Goal` contract with all fields populated, including server-generated a
   "id": "objective-666",
   "goalRef": {
     "id": "goal-555",
-    "href": "/api/v1/goals/goal-555",
+    "href": "/api/v1/factfinds/{factfindId}/objectives/goal-555",
     "goalName": "Comfortable retirement at age 65",
     "priority": "High"
   },
@@ -4077,8 +4247,8 @@ Complete `Goal` contract with all fields populated, including server-generated a
   },
   "createdAt": "2026-02-16T15:25:00Z",
   "_links": {
-    "self": { "href": "/api/v1/goals/goal-555/objectives/objective-666" },
-    "goal": { "href": "/api/v1/goals/goal-555" }
+    "self": { "href": "/api/v1/factfinds/{factfindId}/objectives/goal-555/objectives/objective-666" },
+    "goal": { "href": "/api/v1/factfinds/{factfindId}/objectives/goal-555" }
   }
 }
 ```
@@ -4100,9 +4270,12 @@ Complete `Goal` contract with all fields populated, including server-generated a
 
 ---
 
-## 8. FactFind Goals API
+## 8. Goals & Objectives API
 
 ### 8.1 Overview
+
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/objectives`
 
 **Purpose:** Assess and record client's risk profile for investment suitability.
 
@@ -4236,10 +4409,10 @@ Complete `RiskProfile` contract with all fields populated, including server-gene
   "createdAt": "2026-02-16T15:30:00Z",
   "updatedAt": "2026-02-16T15:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/risk-profiles/777" },
-    "update": { "href": "/api/v1/risk-profiles/777", "method": "PUT" },
-    "questionnaire": { "href": "/api/v1/risk-profiles/777/questionnaire" },
-    "history": { "href": "/api/v1/risk-profiles/777/history" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/risk-profile/777" },
+    "update": { "href": "/api/v1/factfinds/{factfindId}/risk-profile/777", "method": "PUT" },
+    "questionnaire": { "href": "/api/v1/factfinds/{factfindId}/risk-profile/777/questionnaire" },
+    "history": { "href": "/api/v1/factfinds/{factfindId}/risk-profile/777/history" },
     "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
   }
 }
@@ -4261,9 +4434,12 @@ Complete `RiskProfile` contract with all fields populated, including server-gene
 
 ---
 
-## 9. FactFind Assets & Liabilities API
+## 9. Assets & Liabilities API
 
 ### 9.1 Overview
+
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/assets`
 
 **Purpose:** Manage estate planning activities including gifts and trusts.
 
@@ -4359,7 +4535,7 @@ Complete `Gift` contract with all fields populated, including server-generated a
   "petStatus": "Active",
   "createdAt": "2026-02-16T15:40:00Z",
   "_links": {
-    "self": { "href": "/api/v1/gifts/888" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/gifts/888" },
     "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" },
     "recipient": { "href": "/api/v1/factfinds/{factfindId}/clients/124" }
   }
@@ -8633,7 +8809,7 @@ Savings & Investments API provides specialized operations for investment product
 
 ---
 
-## 10. FactFind Risk Profile API
+## 10. Risk Profile API
 
 ### 10.1 Overview
 
@@ -9366,7 +9542,7 @@ See Section 10.3.4 for the main history endpoint.
 ---
 
 
-## 11. FactFind Estate Planning API
+## 11. Estate Planning API
 
 This section defines the unified entity contracts used throughout the FactFind API. Following the **Single Contract Principle** (Section 1.7), each entity has one canonical contract used for both requests (POST, PUT, PATCH) and responses (GET).
 
@@ -9464,7 +9640,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "isJoint": true,
   "spouseRef": {
     "id": "client-124",
-    "href": "/api/v1/clients/client-124",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
@@ -9594,17 +9770,17 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/clients/client-123" },
-    "update": { "href": "/api/v1/clients/client-123", "method": "PUT" },
-    "delete": { "href": "/api/v1/clients/client-123", "method": "DELETE" },
-    "addresses": { "href": "/api/v1/clients/client-123/addresses" },
-    "contacts": { "href": "/api/v1/clients/client-123/contacts" },
-    "relationships": { "href": "/api/v1/clients/client-123/relationships" },
-    "dependants": { "href": "/api/v1/clients/client-123/dependants" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
+    "update": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123", "method": "PUT" },
+    "delete": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123", "method": "DELETE" },
+    "addresses": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/addresses" },
+    "contacts": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/contacts" },
+    "relationships": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/relationships" },
+    "dependants": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/dependants" },
     "factfinds": { "href": "/api/v1/factfinds?clientId=client-123" },
-    "arrangements": { "href": "/api/v1/arrangements?clientId=client-123" },
-    "goals": { "href": "/api/v1/goals?clientId=client-123" },
-    "riskProfile": { "href": "/api/v1/risk-profiles?clientId=client-123" }
+    "arrangements": { "href": "/api/v1/factfinds/{factfindId}/arrangements?clientId=client-123" },
+    "goals": { "href": "/api/v1/factfinds/{factfindId}/objectives?clientId=client-123" },
+    "riskProfile": { "href": "/api/v1/factfinds/{factfindId}/risk-profile?clientId=client-123" }
   }
 }
 ```
@@ -9783,14 +9959,14 @@ Complete fact find aggregate root with summary calculations.
   "factFindNumber": "FF001234",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "jointClientRef": {
     "id": "client-124",
-    "href": "/api/v1/clients/client-124",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
@@ -10078,7 +10254,7 @@ The `Address` contract represents a client's address with additional metadata fo
   "id": "address-789",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -10134,7 +10310,7 @@ The `Income` contract represents an income source within a FactFind.
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -10229,7 +10405,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "clientOwners": [
     {
       "id": "client-123",
-      "href": "/api/v1/clients/client-123",
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
       "name": "John Smith",
       "clientNumber": "C00001234",
       "type": "Person"
@@ -10296,9 +10472,9 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "createdAt": "2015-01-01T10:00:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/arrangements/arrangement-555" },
-    "contributions": { "href": "/api/v1/arrangements/arrangement-555/contributions" },
-    "valuations": { "href": "/api/v1/arrangements/arrangement-555/valuations" }
+    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555" },
+    "contributions": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555/contributions" },
+    "valuations": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555/valuations" }
   }
 }
 ```
@@ -10329,7 +10505,7 @@ The `Goal` contract represents a client's financial goal.
   "id": "goal-888",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -10409,7 +10585,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
   "id": "riskprofile-999",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -10485,11 +10661,11 @@ All list/collection endpoints use a standard wrapper contract:
     "hasMore": true
   },
   "_links": {
-    "first": { "href": "/api/v1/clients?page=1&pageSize=20" },
+    "first": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
     "prev": null,
-    "self": { "href": "/api/v1/clients?page=1&pageSize=20" },
-    "next": { "href": "/api/v1/clients?page=2&pageSize=20" },
-    "last": { "href": "/api/v1/clients?page=5&pageSize=20" }
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "next": { "href": "/api/v1/factfinds/{factfindId}/clients?page=2&pageSize=20" },
+    "last": { "href": "/api/v1/factfinds/{factfindId}/clients?page=5&pageSize=20" }
   }
 }
 ```
@@ -11525,7 +11701,7 @@ Reference to a Client entity.
 ```json
 {
   "id": "client-123",
-  "href": "/api/v1/clients/client-123",
+  "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
   "name": "John Michael Smith",
   "clientNumber": "C00001234",
   "type": "Person"
@@ -11547,7 +11723,7 @@ Reference to a Client entity.
 {
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -11633,7 +11809,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 ```json
 {
   "id": "arrangement-111",
-  "href": "/api/v1/arrangements/arrangement-111",
+  "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-111",
   "policyNumber": "POL123456",
   "productType": "Pension",
   "provider": "Aviva"
@@ -11655,7 +11831,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 {
   "arrangementRef": {
     "id": "arrangement-111",
-    "href": "/api/v1/arrangements/arrangement-111",
+    "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-111",
     "policyNumber": "SIPP123456",
     "productType": "Pension",
     "provider": "Aviva"
@@ -11706,7 +11882,7 @@ Reference to a Goal entity.
 ```json
 {
   "id": "goal-333",
-  "href": "/api/v1/goals/goal-333",
+  "href": "/api/v1/factfinds/{factfindId}/objectives/goal-333",
   "goalName": "Retirement at 65",
   "priority": "High"
 }
@@ -11726,7 +11902,7 @@ Reference to a Goal entity.
 {
   "goalRef": {
     "id": "goal-333",
-    "href": "/api/v1/goals/goal-333",
+    "href": "/api/v1/factfinds/{factfindId}/objectives/goal-333",
     "goalName": "Retirement Planning",
     "priority": "High"
   }
@@ -12604,7 +12780,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "isJoint": true,
   "spouseRef": {
     "id": "client-124",
-    "href": "/api/v1/clients/client-124",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
@@ -12713,9 +12889,9 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "_etag": "W/\"v2-20260216-143000\"",
   "_links": {
-    "self": { "href": "/api/v1/clients/client-123" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
     "factfind": { "href": "/api/v1/factfinds/factfind-456" },
-    "spouse": { "href": "/api/v1/clients/client-124" },
+    "spouse": { "href": "/api/v1/factfinds/{factfindId}/clients/client-124" },
     "adviser": { "href": "/api/v1/advisers/adviser-789" }
   }
 }
@@ -12778,7 +12954,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       {
         "personRef": {
           "id": "client-568",
-          "href": "/api/v1/clients/client-568",
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-568",
           "name": "Robert Johnson",
           "clientNumber": "C00005679"
         },
@@ -12790,7 +12966,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       {
         "personRef": {
           "id": "client-569",
-          "href": "/api/v1/clients/client-569",
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-569",
           "name": "Amanda Chen",
           "clientNumber": "C00005680"
         },
@@ -13244,7 +13420,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "_etag": "W/\"v2-20260216-143000\"",
   "_links": {
-    "self": { "href": "/api/v1/clients/client-567" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-567" },
     "factfind": { "href": "/api/v1/factfinds/factfind-890" },
     "adviser": { "href": "/api/v1/advisers/adviser-800" }
   }
@@ -13290,7 +13466,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "settlor": {
       "personRef": {
         "id": "client-1000",
-        "href": "/api/v1/clients/client-1000",
+        "href": "/api/v1/factfinds/{factfindId}/clients/client-1000",
         "name": "William Smith",
         "clientNumber": "C00010000"
       },
@@ -13309,7 +13485,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       {
         "personRef": {
           "id": "client-1001",
-          "href": "/api/v1/clients/client-1001",
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-1001",
           "name": "Margaret Smith",
           "clientNumber": "C00010001"
         },
@@ -13321,7 +13497,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       {
         "personRef": {
           "id": "client-1002",
-          "href": "/api/v1/clients/client-1002",
+          "href": "/api/v1/factfinds/{factfindId}/clients/client-1002",
           "name": "James Harrison",
           "clientNumber": "C00010002"
         },
@@ -13816,7 +13992,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "_etag": "W/\"v2-20260216-143000\"",
   "_links": {
-    "self": { "href": "/api/v1/clients/client-999" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-999" },
     "factfind": { "href": "/api/v1/factfinds/factfind-1111" },
     "adviser": { "href": "/api/v1/advisers/adviser-810" }
   }
@@ -14546,7 +14722,7 @@ Embedded value type representing territorial status, residency, domicile, and ci
 **Creating a Person Client:**
 
 ```http
-POST /api/v1/clients
+POST /api/v1/factfinds/{factfindId}/clients
 Content-Type: application/json
 
 {
@@ -14601,7 +14777,7 @@ Content-Type: application/json
 **Creating a Corporate Client:**
 
 ```http
-POST /api/v1/clients
+POST /api/v1/factfinds/{factfindId}/clients
 Content-Type: application/json
 
 {
@@ -14650,7 +14826,7 @@ Content-Type: application/json
 **Creating a Trust Client:**
 
 ```http
-POST /api/v1/clients
+POST /api/v1/factfinds/{factfindId}/clients
 Content-Type: application/json
 
 {
@@ -14767,14 +14943,14 @@ This grouping improves clarity, aligns with industry standards, and makes the co
   "factFindNumber": "FF001234",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "jointClientRef": {
     "id": "client-124",
-    "href": "/api/v1/clients/client-124",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
@@ -15542,7 +15718,7 @@ The `Address` contract represents a client's address with additional metadata fo
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -15599,7 +15775,7 @@ The `Income` contract represents an income source within a FactFind.
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -15703,7 +15879,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "clientOwners": [
     {
       "id": "client-123",
-      "href": "/api/v1/clients/client-123",
+      "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
       "name": "John Smith",
       "clientNumber": "C00001234",
       "type": "Person"
@@ -15770,9 +15946,9 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "createdAt": "2015-01-01T10:00:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/arrangements/arrangement-555" },
-    "contributions": { "href": "/api/v1/arrangements/arrangement-555/contributions" },
-    "valuations": { "href": "/api/v1/arrangements/arrangement-555/valuations" }
+    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555" },
+    "contributions": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555/contributions" },
+    "valuations": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555/valuations" }
   }
 }
 ```
@@ -15813,7 +15989,7 @@ The `Goal` contract represents a client's financial goal.
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -15903,7 +16079,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -15983,7 +16159,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -16630,8 +16806,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
     "self": { "href": "/api/v1/investments/investment-789" },
     "update": { "href": "/api/v1/investments/investment-789", "method": "PUT" },
     "delete": { "href": "/api/v1/investments/investment-789", "method": "DELETE" },
-    "arrangement": { "href": "/api/v1/arrangements/arrangement-456" },
-    "client": { "href": "/api/v1/clients/client-123" },
+    "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-456" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
     "factfind": { "href": "/api/v1/factfinds/factfind-123" },
     "holdings": { "href": "/api/v1/investments/investment-789/holdings" },
     "contributions": { "href": "/api/v1/investments/investment-789/contributions" },
@@ -16948,7 +17124,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
     {
       "clientRef": {
         "id": "client-123",
-        "href": "/api/v1/clients/client-123",
+        "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
         "name": "John Smith",
         "clientNumber": "C00001234",
         "type": "Person"
@@ -17014,7 +17190,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
     {
       "mortgageRef": {
         "id": "mortgage-789",
-        "href": "/api/v1/arrangements/mortgage-789",
+        "href": "/api/v1/factfinds/{factfindId}/arrangements/mortgage-789",
         "arrangementType": "Mortgage",
         "provider": "Nationwide Building Society",
         "policyNumber": "MTG-987654321"
@@ -17496,16 +17672,16 @@ The `Property` contract represents a property asset with valuation tracking, mor
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/properties/property-456" },
-    "update": { "href": "/api/v1/properties/property-456", "method": "PUT" },
-    "delete": { "href": "/api/v1/properties/property-456", "method": "DELETE" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456" },
+    "update": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456", "method": "PUT" },
+    "delete": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456", "method": "DELETE" },
     "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "owners": { "href": "/api/v1/properties/property-456/owners" },
-    "mortgages": { "href": "/api/v1/properties/property-456/mortgages" },
-    "expenses": { "href": "/api/v1/properties/property-456/expenses" },
-    "rental": { "href": "/api/v1/properties/property-456/rental" },
-    "valuations": { "href": "/api/v1/properties/property-456/valuations" },
-    "documents": { "href": "/api/v1/properties/property-456/documents" }
+    "owners": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/owners" },
+    "mortgages": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/mortgages" },
+    "expenses": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/expenses" },
+    "rental": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/rental" },
+    "valuations": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/valuations" },
+    "documents": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/documents" }
   }
 }
 ```
@@ -17584,7 +17760,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
 
 **Usage Examples:**
 
-**Creating a Buy-To-Let Property (POST /api/v1/properties):**
+**Creating a Buy-To-Let Property (POST /api/v1/factfinds/{factfindId}/assets):**
 ```json
 {
   "factFindRef": { "id": "factfind-123" },
@@ -17676,7 +17852,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -18394,16 +18570,16 @@ The `Equity` contract represents a direct stock holding with performance trackin
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/equities/equity-321" },
-    "update": { "href": "/api/v1/equities/equity-321", "method": "PUT" },
-    "delete": { "href": "/api/v1/equities/equity-321", "method": "DELETE" },
-    "client": { "href": "/api/v1/clients/client-123" },
+    "self": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321" },
+    "update": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321", "method": "PUT" },
+    "delete": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321", "method": "DELETE" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
     "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "transactions": { "href": "/api/v1/equities/equity-321/transactions" },
-    "dividends": { "href": "/api/v1/equities/equity-321/dividends" },
-    "corporateActions": { "href": "/api/v1/equities/equity-321/corporate-actions" },
-    "performance": { "href": "/api/v1/equities/equity-321/performance" },
-    "documents": { "href": "/api/v1/equities/equity-321/documents" }
+    "transactions": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/transactions" },
+    "dividends": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/dividends" },
+    "corporateActions": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/corporate-actions" },
+    "performance": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/performance" },
+    "documents": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/documents" }
   }
 }
 ```
@@ -18449,7 +18625,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 
 **Usage Examples:**
 
-**Creating an Equity Holding (POST /api/v1/equities):**
+**Creating an Equity Holding (POST /api/v1/factfinds/{factfindId}/assets):**
 ```json
 {
   "factFindRef": { "id": "factfind-123" },
@@ -18540,7 +18716,7 @@ The `CreditHistory` contract represents credit score and credit history tracking
   "id": "credit-654",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -19085,7 +19261,7 @@ The `CreditHistory` contract represents credit score and credit history tracking
     "self": { "href": "/api/v1/credit-history/credit-654" },
     "update": { "href": "/api/v1/credit-history/credit-654", "method": "PUT" },
     "delete": { "href": "/api/v1/credit-history/credit-654", "method": "DELETE" },
-    "client": { "href": "/api/v1/clients/client-123" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
     "factfind": { "href": "/api/v1/factfinds/factfind-123" },
     "creditReport": { "href": "/api/v1/documents/doc-cr-001" },
     "accounts": { "href": "/api/v1/credit-history/credit-654/accounts" },
@@ -19215,7 +19391,7 @@ The `IdentityVerification` contract represents identity verification status with
   "id": "idverify-987",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -19588,7 +19764,7 @@ The `IdentityVerification` contract represents identity verification status with
     "self": { "href": "/api/v1/identity-verification/idverify-987" },
     "update": { "href": "/api/v1/identity-verification/idverify-987", "method": "PUT" },
     "delete": { "href": "/api/v1/identity-verification/idverify-987", "method": "DELETE" },
-    "client": { "href": "/api/v1/clients/client-123" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
     "factfind": { "href": "/api/v1/factfinds/factfind-123" },
     "verificationReport": { "href": "/api/v1/documents/doc-verify-001" },
     "amlReport": { "href": "/api/v1/documents/doc-verify-002" },
@@ -19749,7 +19925,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   "id": "consent-555",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -20182,7 +20358,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
     "withdraw": { "href": "/api/v1/consents/consent-555/withdraw", "method": "POST" },
     "renew": { "href": "/api/v1/consents/consent-555/renew", "method": "POST" },
     "delete": { "href": "/api/v1/consents/consent-555", "method": "DELETE" },
-    "client": { "href": "/api/v1/clients/client-123" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
     "factfind": { "href": "/api/v1/factfinds/factfind-123" },
     "consentForm": { "href": "/api/v1/documents/doc-consent-001" },
     "privacyNotice": { "href": "/api/v1/documents/doc-consent-002" },
@@ -20345,11 +20521,11 @@ All list/collection endpoints use a standard wrapper contract:
     "hasMore": true
   },
   "_links": {
-    "first": { "href": "/api/v1/clients?page=1&pageSize=20" },
+    "first": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
     "prev": null,
-    "self": { "href": "/api/v1/clients?page=1&pageSize=20" },
-    "next": { "href": "/api/v1/clients?page=2&pageSize=20" },
-    "last": { "href": "/api/v1/clients?page=5&pageSize=20" }
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "next": { "href": "/api/v1/factfinds/{factfindId}/clients?page=2&pageSize=20" },
+    "last": { "href": "/api/v1/factfinds/{factfindId}/clients?page=5&pageSize=20" }
   }
 }
 ```
@@ -21385,7 +21561,7 @@ Reference to a Client entity.
 ```json
 {
   "id": "client-123",
-  "href": "/api/v1/clients/client-123",
+  "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
   "name": "John Michael Smith",
   "clientNumber": "C00001234",
   "type": "Person"
@@ -21407,7 +21583,7 @@ Reference to a Client entity.
 {
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -21493,7 +21669,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 ```json
 {
   "id": "arrangement-111",
-  "href": "/api/v1/arrangements/arrangement-111",
+  "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-111",
   "policyNumber": "POL123456",
   "productType": "Pension",
   "provider": "Aviva"
@@ -21515,7 +21691,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 {
   "arrangementRef": {
     "id": "arrangement-111",
-    "href": "/api/v1/arrangements/arrangement-111",
+    "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-111",
     "policyNumber": "SIPP123456",
     "productType": "Pension",
     "provider": "Aviva"
@@ -21566,7 +21742,7 @@ Reference to a Goal entity.
 ```json
 {
   "id": "goal-333",
-  "href": "/api/v1/goals/goal-333",
+  "href": "/api/v1/factfinds/{factfindId}/objectives/goal-333",
   "goalName": "Retirement at 65",
   "priority": "High"
 }
@@ -21586,7 +21762,7 @@ Reference to a Goal entity.
 {
   "goalRef": {
     "id": "goal-333",
-    "href": "/api/v1/goals/goal-333",
+    "href": "/api/v1/factfinds/{factfindId}/objectives/goal-333",
     "goalName": "Retirement Planning",
     "priority": "High"
   }
@@ -21635,7 +21811,7 @@ Reference to a FactFind (ADVICE_CASE) entity.
 ### Appendix A: Complete Entity-to-Endpoint Mapping
 
 **Client Onboarding & KYC Context:**
-- CLIENT → `/api/v1/clients`
+- CLIENT → `/api/v1/factfinds/{factfindId}/clients`
 - ADDRESS → `/api/v1/clients/{id}/addresses`
 - CONTACT_DETAIL → `/api/v1/clients/{id}/contacts`
 - PROFESSIONAL_CONTACT → `/api/v1/clients/{id}/professional-contacts`
@@ -21654,29 +21830,29 @@ Reference to a FactFind (ADVICE_CASE) entity.
 - EXPENDITURE_CHANGE → `/api/v1/factfinds/{id}/expenditure-changes`
 
 **Assets & Liabilities Context:**
-- ASSET → `/api/v1/assets`
+- ASSET → `/api/v1/factfinds/{factfindId}/assets`
 - BUSINESS_ASSET → `/api/v1/assets/{id}` (embedded in ASSET)
 - PROPERTY_DETAIL → `/api/v1/assets/{id}` (embedded in ASSET)
 - CREDIT_HISTORY → `/api/v1/clients/{id}/credit-history`
 - VALUATION → `/api/v1/arrangements/{id}/valuations`
 
 **Arrangements Context:**
-- ARRANGEMENT → `/api/v1/arrangements`
+- ARRANGEMENT → `/api/v1/factfinds/{factfindId}/arrangements`
 - CONTRIBUTION → `/api/v1/arrangements/{id}/contributions`
 - WITHDRAWAL → `/api/v1/arrangements/{id}/withdrawals`
 - BENEFICIARY → `/api/v1/arrangements/{id}/beneficiaries`
 - CLIENT_PENSION → `/api/v1/clients/{id}/pension-summary`
 
 **Goals Context:**
-- GOAL → `/api/v1/goals`
+- GOAL → `/api/v1/factfinds/{factfindId}/objectives`
 - OBJECTIVE → `/api/v1/goals/{id}/objectives`
 - NEED → `/api/v1/goals/{id}/needs`
 
 **Risk Profile Context:**
-- RISK_PROFILE → `/api/v1/risk-profiles`
+- RISK_PROFILE → `/api/v1/factfinds/{factfindId}/risk-profile`
 
 **Estate Planning Context:**
-- GIFT → `/api/v1/gifts`
+- GIFT → `/api/v1/factfinds/{factfindId}/gifts`
 - GIFT_TRUST → `/api/v1/gift-trusts`
 
 ### Appendix B: HTTP Status Code Reference
@@ -21842,7 +22018,7 @@ Reference to a FactFind (ADVICE_CASE) entity.
 
 **Document Version:** 2.0
 **Status:** Design Specification v2.0 - Enhanced with Missing Entities
-**Date:** 2026-02-17
+**Date:** 2026-02-18
 **Author:** Principal API Designer
 **Reviewers:** Architecture Team, Product Owners, Compliance Team
 **Next Review:** 2026-03-16
@@ -21868,3 +22044,413 @@ Reference to a FactFind (ADVICE_CASE) entity.
 **END OF SPECIFICATION**
 
 This comprehensive API design provides production-ready specifications for implementing the complete FactFind system. All endpoints follow RESTful principles, industry standards, and regulatory requirements for wealth management platforms.
+
+
+---
+
+## Appendix A: Migration Guide - v2.0 to v2.1
+
+### Overview
+
+Version 2.1 introduces **breaking changes** to all API endpoints. The API has been restructured to follow a hierarchical, context-based design with **FactFind as the aggregate root**.
+
+**Impact:** ALL API consumers must update their endpoint URLs.
+
+**Timeline:** Immediate (no backward compatibility maintained - requires major version bump)
+
+### Endpoint Migration Map
+
+#### Client Management APIs
+
+| Old Endpoint (v2.0) | New Endpoint (v2.1) |
+|---------------------|---------------------|
+| `POST /api/v1/clients` | `POST /api/v1/factfinds/{factfindId}/clients` |
+| `GET /api/v1/clients/{clientId}` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}` |
+| `GET /api/v1/clients` | `GET /api/v1/factfinds/{factfindId}/clients` |
+| `PATCH /api/v1/clients/{clientId}` | `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}` |
+| `DELETE /api/v1/clients/{clientId}` | `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}` |
+| `POST /api/v1/clients/{clientId}/addresses` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` |
+| `GET /api/v1/clients/{clientId}/addresses` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` |
+| `POST /api/v1/clients/{clientId}/contacts` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` |
+| `POST /api/v1/clients/{clientId}/professional-contacts` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/professional-contacts` |
+| `POST /api/v1/clients/{clientId}/relationships` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` |
+| `GET /api/v1/clients/{clientId}/dpa-consent` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` |
+| `PUT /api/v1/clients/{clientId}/dpa-consent` | `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` |
+| `GET /api/v1/clients/{clientId}/marketing-consent` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` |
+| `GET /api/v1/clients/{clientId}/vulnerability` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` |
+| `POST /api/v1/clients/{clientId}/dependants` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` |
+| `GET /api/v1/clients/{clientId}/credit-history` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` |
+| `GET /api/v1/clients/{clientId}/pension-summary` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/pension-summary` |
+
+#### Employment APIs
+
+| Old Endpoint (v2.0) | New Endpoint (v2.1) |
+|---------------------|---------------------|
+| `POST /api/v1/employment` | `POST /api/v1/factfinds/{factfindId}/employment` |
+| `GET /api/v1/employment` | `GET /api/v1/factfinds/{factfindId}/employment` |
+| `GET /api/v1/employment/{employmentId}` | `GET /api/v1/factfinds/{factfindId}/employment/{employmentId}` |
+| `PATCH /api/v1/employment/{employmentId}` | `PATCH /api/v1/factfinds/{factfindId}/employment/{employmentId}` |
+| `DELETE /api/v1/employment/{employmentId}` | `DELETE /api/v1/factfinds/{factfindId}/employment/{employmentId}` |
+
+#### Income & Expenditure APIs
+
+| Old Endpoint (v2.0) | New Endpoint (v2.1) |
+|---------------------|---------------------|
+| `POST /api/v1/income` | `POST /api/v1/factfinds/{factfindId}/income` |
+| `GET /api/v1/income` | `GET /api/v1/factfinds/{factfindId}/income` |
+| `GET /api/v1/income/{incomeId}` | `GET /api/v1/factfinds/{factfindId}/income/{incomeId}` |
+| `PATCH /api/v1/income/{incomeId}` | `PATCH /api/v1/factfinds/{factfindId}/income/{incomeId}` |
+| `DELETE /api/v1/income/{incomeId}` | `DELETE /api/v1/factfinds/{factfindId}/income/{incomeId}` |
+| `POST /api/v1/income-changes` | `POST /api/v1/factfinds/{factfindId}/income-changes` |
+| `POST /api/v1/expenditure` | `POST /api/v1/factfinds/{factfindId}/expenditure` |
+| `GET /api/v1/expenditure` | `GET /api/v1/factfinds/{factfindId}/expenditure` |
+| `GET /api/v1/expenditure/{expenditureId}` | `GET /api/v1/factfinds/{factfindId}/expenditure/{expenditureId}` |
+| `PATCH /api/v1/expenditure/{expenditureId}` | `PATCH /api/v1/factfinds/{factfindId}/expenditure/{expenditureId}` |
+| `DELETE /api/v1/expenditure/{expenditureId}` | `DELETE /api/v1/factfinds/{factfindId}/expenditure/{expenditureId}` |
+| `POST /api/v1/expenditure-changes` | `POST /api/v1/factfinds/{factfindId}/expenditure-changes` |
+
+#### Assets & Liabilities APIs
+
+| Old Endpoint (v2.0) | New Endpoint (v2.1) |
+|---------------------|---------------------|
+| `POST /api/v1/assets` | `POST /api/v1/factfinds/{factfindId}/assets` |
+| `GET /api/v1/assets` | `GET /api/v1/factfinds/{factfindId}/assets` |
+| `GET /api/v1/assets/{assetId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
+| `PATCH /api/v1/assets/{assetId}` | `PATCH /api/v1/factfinds/{factfindId}/assets/{assetId}` |
+| `DELETE /api/v1/assets/{assetId}` | `DELETE /api/v1/factfinds/{factfindId}/assets/{assetId}` |
+| `POST /api/v1/properties` | `POST /api/v1/factfinds/{factfindId}/assets` (type=property) |
+| `GET /api/v1/properties/{propertyId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
+| `POST /api/v1/equities` | `POST /api/v1/factfinds/{factfindId}/assets` (type=equity) |
+| `GET /api/v1/equities/{equityId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
+
+#### Arrangements APIs
+
+| Old Endpoint (v2.0) | New Endpoint (v2.1) |
+|---------------------|---------------------|
+| `POST /api/v1/arrangements` | `POST /api/v1/factfinds/{factfindId}/arrangements` |
+| `GET /api/v1/arrangements` | `GET /api/v1/factfinds/{factfindId}/arrangements` |
+| `GET /api/v1/arrangements/{arrangementId}` | `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
+| `PATCH /api/v1/arrangements/{arrangementId}` | `PATCH /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
+| `DELETE /api/v1/arrangements/{arrangementId}` | `DELETE /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
+| `POST /api/v1/arrangements/{arrangementId}/contributions` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` |
+| `GET /api/v1/arrangements/{arrangementId}/contributions` | `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` |
+| `POST /api/v1/arrangements/{arrangementId}/withdrawals` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` |
+| `POST /api/v1/arrangements/{arrangementId}/beneficiaries` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` |
+| `POST /api/v1/arrangements/{arrangementId}/valuations` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` |
+
+**Type-Specific Arrangement Endpoints (NEW in v2.1):**
+
+| Type | Endpoint |
+|------|----------|
+| Investments | `GET /api/v1/factfinds/{factfindId}/arrangements/investments` |
+| Pensions | `GET /api/v1/factfinds/{factfindId}/arrangements/pensions` |
+| Mortgages | `GET /api/v1/factfinds/{factfindId}/arrangements/mortgages` |
+| Protection | `GET /api/v1/factfinds/{factfindId}/arrangements/protection` |
+
+#### Goals & Objectives APIs
+
+| Old Endpoint (v2.0) | New Endpoint (v2.1) |
+|---------------------|---------------------|
+| `POST /api/v1/goals` | `POST /api/v1/factfinds/{factfindId}/objectives` |
+| `GET /api/v1/goals` | `GET /api/v1/factfinds/{factfindId}/objectives` |
+| `GET /api/v1/goals/{goalId}` | `GET /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
+| `PATCH /api/v1/goals/{goalId}` | `PATCH /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
+| `DELETE /api/v1/goals/{goalId}` | `DELETE /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
+| `POST /api/v1/objectives` | `POST /api/v1/factfinds/{factfindId}/objectives` |
+| `POST /api/v1/objectives/{objectiveId}/needs` | `POST /api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` |
+
+#### Risk Profile APIs
+
+| Old Endpoint (v2.0) | New Endpoint (v2.1) |
+|---------------------|---------------------|
+| `GET /api/v1/risk-profiles` | `GET /api/v1/factfinds/{factfindId}/risk-profile` |
+| `POST /api/v1/risk-profiles` | `POST /api/v1/factfinds/{factfindId}/risk-profile` |
+| `GET /api/v1/risk-profiles/{riskProfileId}` | `GET /api/v1/factfinds/{factfindId}/risk-profile` |
+| `PATCH /api/v1/risk-profiles/{riskProfileId}` | `PATCH /api/v1/factfinds/{factfindId}/risk-profile` |
+
+**Note:** Risk profile is now a singleton within each fact-find (one risk profile per fact-find).
+
+#### Estate Planning APIs
+
+| Old Endpoint (v2.0) | New Endpoint (v2.1) |
+|---------------------|---------------------|
+| `POST /api/v1/gifts` | `POST /api/v1/factfinds/{factfindId}/gifts` |
+| `GET /api/v1/gifts` | `GET /api/v1/factfinds/{factfindId}/gifts` |
+| `GET /api/v1/gifts/{giftId}` | `GET /api/v1/factfinds/{factfindId}/gifts/{giftId}` |
+| `POST /api/v1/trusts` | `POST /api/v1/factfinds/{factfindId}/trusts` |
+| `GET /api/v1/trusts` | `GET /api/v1/factfinds/{factfindId}/trusts` |
+| `GET /api/v1/trusts/{trustId}` | `GET /api/v1/factfinds/{factfindId}/trusts/{trustId}` |
+
+### Migration Steps
+
+#### 1. Identify FactFind Context
+
+Before migrating, you need to determine the `factfindId` for each operation:
+
+**Option A: From UI Context**
+```javascript
+// In a typical SPA, the factfindId is in the URL
+const factfindId = window.location.pathname.split('/')[2]; // /factfinds/12345/...
+```
+
+**Option B: From Client/User Context**
+```javascript
+// Get active fact-find for current user
+const response = await fetch('/api/v1/factfinds?status=active&limit=1');
+const factfind = await response.json();
+const factfindId = factfind.data[0].factfindId;
+```
+
+**Option C: Create New FactFind First**
+```javascript
+// Create a new fact-find if none exists
+const response = await fetch('/api/v1/factfinds', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    title: 'New Fact-Find',
+    clientType: 'INDIVIDUAL'
+  })
+});
+const factfind = await response.json();
+const factfindId = factfind.factfindId;
+```
+
+#### 2. Update Base URLs
+
+**Before (v2.0):**
+```javascript
+const BASE_URL = '/api/v1';
+const clientsUrl = `${BASE_URL}/clients`;
+```
+
+**After (v2.1):**
+```javascript
+const BASE_URL = '/api/v1';
+const factfindId = getCurrentFactfindId(); // Your implementation
+const clientsUrl = `${BASE_URL}/factfinds/${factfindId}/clients`;
+```
+
+#### 3. Update API Client
+
+**Before (v2.0):**
+```javascript
+class ClientAPI {
+  async getClient(clientId) {
+    return fetch(`/api/v1/clients/${clientId}`);
+  }
+
+  async createAddress(clientId, address) {
+    return fetch(`/api/v1/clients/${clientId}/addresses`, {
+      method: 'POST',
+      body: JSON.stringify(address)
+    });
+  }
+}
+```
+
+**After (v2.1):**
+```javascript
+class ClientAPI {
+  constructor(factfindId) {
+    this.factfindId = factfindId;
+  }
+
+  async getClient(clientId) {
+    return fetch(`/api/v1/factfinds/${this.factfindId}/clients/${clientId}`);
+  }
+
+  async createAddress(clientId, address) {
+    return fetch(`/api/v1/factfinds/${this.factfindId}/clients/${clientId}/addresses`, {
+      method: 'POST',
+      body: JSON.stringify(address)
+    });
+  }
+}
+
+// Usage
+const factfindId = getCurrentFactfindId();
+const api = new ClientAPI(factfindId);
+```
+
+#### 4. Update HATEOAS Link Following
+
+**Before (v2.0):**
+```javascript
+// Old HATEOAS links
+{
+  "_links": {
+    "self": { "href": "/api/v1/clients/12345" },
+    "addresses": { "href": "/api/v1/clients/12345/addresses" }
+  }
+}
+```
+
+**After (v2.1):**
+```javascript
+// New HATEOAS links (factfindId embedded)
+{
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/999/clients/12345" },
+    "addresses": { "href": "/api/v1/factfinds/999/clients/12345/addresses" }
+  }
+}
+```
+
+**Migration Strategy:**
+- If your code follows HATEOAS links (recommended), minimal changes needed
+- Links are now absolute and include factfindId
+- Continue using `_links.self.href` for navigation
+
+#### 5. Update Query Parameters
+
+Query parameters remain the same, but base URLs change:
+
+**Before (v2.0):**
+```
+GET /api/v1/clients?page=1&limit=20&sort=lastName
+```
+
+**After (v2.1):**
+```
+GET /api/v1/factfinds/{factfindId}/clients?page=1&limit=20&sort=lastName
+```
+
+#### 6. Update Response Handling
+
+Response structure remains the same - only URLs change:
+
+**Before (v2.0):**
+```javascript
+const response = await fetch('/api/v1/clients/12345');
+const client = await response.json();
+console.log(client.clientId); // Still works
+```
+
+**After (v2.1):**
+```javascript
+const response = await fetch(`/api/v1/factfinds/${factfindId}/clients/12345`);
+const client = await response.json();
+console.log(client.clientId); // Same response structure
+```
+
+### Breaking Changes Summary
+
+| Category | Change | Impact |
+|----------|--------|--------|
+| **URLs** | All endpoints now require `factfindId` in path | HIGH - All API calls affected |
+| **Response Structure** | HATEOAS `_links` now include `factfindId` | LOW - Follow links as before |
+| **Request Bodies** | No changes | NONE |
+| **Query Parameters** | No changes | NONE |
+| **HTTP Methods** | No changes | NONE |
+| **Status Codes** | No changes | NONE |
+| **Headers** | No changes | NONE |
+
+### Non-Breaking Changes
+
+The following remain unchanged:
+
+1. **Request/Response payloads** - Same JSON structure
+2. **Authentication** - Same OAuth 2.0 flow
+3. **Error format** - Same RFC 7807 format
+4. **Pagination** - Same cursor-based pagination
+5. **Filtering** - Same query syntax
+6. **Field selection** - Same `fields` parameter
+7. **Resource expansion** - Same `expand` parameter
+8. **Optimistic concurrency** - Same `If-Match` / `ETag` headers
+
+### Reference Data (No Changes)
+
+Reference data APIs are **NOT affected** by this migration:
+
+```
+GET /api/v1/reference/income-types        ✓ No change
+GET /api/v1/reference/providers           ✓ No change
+GET /api/v1/reference/risk-templates      ✓ No change
+```
+
+These remain global and are not scoped to a fact-find.
+
+### Testing Your Migration
+
+#### 1. Unit Tests
+
+Update base URLs in your API mocks:
+
+```javascript
+// Before
+const mockClientUrl = '/api/v1/clients/12345';
+
+// After
+const mockFactfindId = '999';
+const mockClientUrl = `/api/v1/factfinds/${mockFactfindId}/clients/12345`;
+```
+
+#### 2. Integration Tests
+
+Update test fixtures:
+
+```javascript
+// Before
+describe('Client API', () => {
+  it('should fetch client', async () => {
+    const response = await fetch('/api/v1/clients/12345');
+    expect(response.status).toBe(200);
+  });
+});
+
+// After
+describe('Client API', () => {
+  const factfindId = 'test-factfind-123';
+
+  it('should fetch client', async () => {
+    const response = await fetch(`/api/v1/factfinds/${factfindId}/clients/12345`);
+    expect(response.status).toBe(200);
+  });
+});
+```
+
+#### 3. End-to-End Tests
+
+Update page objects:
+
+```javascript
+// Before
+class ClientPage {
+  async getClient(clientId) {
+    return this.page.goto(`/api/v1/clients/${clientId}`);
+  }
+}
+
+// After
+class ClientPage {
+  constructor(page, factfindId) {
+    this.page = page;
+    this.factfindId = factfindId;
+  }
+
+  async getClient(clientId) {
+    return this.page.goto(`/api/v1/factfinds/${this.factfindId}/clients/${clientId}`);
+  }
+}
+```
+
+### Rollback Strategy
+
+If you need to rollback to v2.0:
+
+1. **Version pinning**: Use `Accept: application/vnd.factfind.v2+json` header
+2. **Feature flag**: Enable v2.0 endpoints via feature flag
+3. **Dual writes**: Temporarily support both v2.0 and v2.1 endpoints
+
+**Note:** Rollback should be temporary. Plan to fully migrate to v2.1 as v2.0 will be deprecated.
+
+### Support & Questions
+
+- **Documentation**: See Section 1.5 for architectural details
+- **Examples**: All sections include updated examples
+- **Issues**: Report migration issues to API support team
+- **Timeline**: All API consumers must migrate within 90 days
+
+---
+
