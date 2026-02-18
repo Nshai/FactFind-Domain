@@ -600,12 +600,14 @@ Value types include three main categories:
     "display": "Married",
     "effectiveFrom": "2015-06-20"
   },
-  "grossAnnualIncome": {                  // MoneyValue - no id, embedded
-    "amount": 75000.00,
-    "currency": {                         // CurrencyValue (lookup)
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+  "financialProfile": {                   // FinancialProfileValue - no id, embedded
+    "grossAnnualIncome": {                // MoneyValue - no id, embedded
+      "amount": 75000.00,
+      "currency": {                       // CurrencyValue (lookup)
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "primaryAddress": {                     // AddressValue - no id, embedded
@@ -824,13 +826,15 @@ GET /api/v1/factfinds/factfind-456?expand=clientRef,adviserRef
     "type": "Person",
     // Full Client entity embedded when expanded
     "dateOfBirth": "1980-01-15",
-    "grossAnnualIncome": {
-      "amount": 75000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
+    "financialProfile": {
+      "grossAnnualIncome": {
+        "amount": 75000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
     },
     "primaryAddress": {
       "line1": "123 Main St",
@@ -1479,13 +1483,15 @@ GET /api/v1/factfinds/factfind-123?expand=clientRef,adviserRef
     // Full Client entity expanded
     "dateOfBirth": "1980-05-15",
     "age": 45,
-    "grossAnnualIncome": {
-      "amount": 75000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
+    "financialProfile": {
+      "grossAnnualIncome": {
+        "amount": 75000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
     },
     "primaryAddress": {
       "line1": "123 Main Street",
@@ -1663,12 +1669,14 @@ Response (207 Multi-Status):
 Uses `MoneyValue` with nested `CurrencyValue`:
 ```json
 {
-  "grossAnnualIncome": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   }
 }
@@ -2077,37 +2085,41 @@ Complete `Client` contract.
   "serviceStatusDate": "2020-01-15",
   "clientSegment": "A",
   "clientSegmentDate": "2020-01-15",
-  "grossAnnualIncome": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "netWorth": {
-    "amount": 450000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalAssets": {
-    "amount": 500000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "householdIncome": {
-    "amount": 120000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "householdIncome": {
+      "amount": 120000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "netWorth": {
+      "amount": 450000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalAssets": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "calculatedAt": "2026-02-18T10:30:00Z",
+    "lastReviewDate": "2026-02-18"
   },
   "primaryAdviser": {
     "id": 789,
@@ -9462,53 +9474,57 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "clientSegment": "A",
   "clientSegmentDate": "2020-01-15",
   "clientCategory": "HighNetWorth",
-  "grossAnnualIncome": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "householdIncome": {
-    "amount": 120000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "netWorth": {
-    "amount": 450000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "householdNetWorth": {
-    "amount": 650000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalAssets": {
-    "amount": 500000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalJointAssets": {
-    "amount": 200000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "householdIncome": {
+      "amount": 120000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "netWorth": {
+      "amount": 450000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "householdNetWorth": {
+      "amount": 650000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalAssets": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalJointAssets": {
+      "amount": 200000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "calculatedAt": "2026-02-18T10:30:00Z",
+    "lastReviewDate": "2026-02-18"
   },
   "primaryAddress": {
     "line1": "123 Main Street",
@@ -9645,12 +9661,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 | `clientSegment` | string | optional | updatable | included | - |
 | `clientSegmentDate` | date | optional | updatable | included | - |
 | `clientCategory` | enum | optional | updatable | included | - |
-| `grossAnnualIncome` | MoneyValue | optional | updatable | included | Value type: amount + currency |
-| `householdIncome` | MoneyValue | optional | updatable | included | Value type: amount + currency |
-| `netWorth` | MoneyValue | optional | updatable | included | Value type: amount + currency |
-| `householdNetWorth` | MoneyValue | optional | updatable | included | Value type: amount + currency |
-| `totalAssets` | MoneyValue | ignored | ignored | included | read-only, computed from arrangements |
-| `totalJointAssets` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `financialProfile` | FinancialProfileValue | optional | updatable (partial for computed fields) | included | Value type: Financial snapshot and computed wealth metrics |
 | `primaryAddress` | AddressValue | optional | updatable | included | Value type: Embedded address, no id |
 | `contacts` | ContactValue[] | optional | updatable | included | Value type array: Email, phone contacts |
 | `adviserRef` | AdviserRef | optional | updatable | included | Reference type: Primary adviser |
@@ -9714,12 +9725,14 @@ Server generates `id`, `clientNumber`, `createdAt`, `updatedAt`, `fullName`, `ag
   "gender": "Male",
   "maritalStatus": "Married",
   "nationalityCountry": { "code": "GB" },
-  "grossAnnualIncome": {
-    "amount": 85000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 85000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "spouseRef": {
@@ -9740,13 +9753,15 @@ Cannot change `dateOfBirth` (write-once). Server updates `updatedAt`, `fullName`
     "display": "Married",
     "effectiveFrom": "2015-06-20"
   },
-  "householdIncome": {
-    "amount": 145000.00,
-    "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
+  "financialProfile": {
+    "householdIncome": {
+      "amount": 145000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
   }
 }
 ```
@@ -10548,12 +10563,14 @@ Represents a monetary amount with currency.
 **Usage Example:**
 ```json
 {
-  "grossAnnualIncome": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "netMonthlyIncome": {
@@ -11904,13 +11921,14 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 **Key Enhancements in v2.1:**
 - **Composition Pattern** - Conditional value types based on client type discriminator
-- **PersonValue** - Person-specific demographics (DOB, gender, marital status, health, occupation)
+- **PersonValue** - Person-specific demographics (DOB, gender, marital status, health, occupation, vulnerabilities)
 - **CorporateValue** - Corporate-specific details (company name, registration, directors, shareholders)
 - **TrustValue** - Trust-specific information (trust name, type, settlor, trustees, beneficiaries)
+- **TerritorialProfile** - Territorial status, residency, domicile, citizenship (all client types)
 - **Addresses** - Full address history embedded as value types
 - **Contacts** - All contact methods (email, phone, mobile, work, website) embedded
 - **Identity Verification** - KYC, AML checks, MLR compliance embedded
-- **Vulnerabilities** - Client vulnerabilities and adjustments embedded
+- **Vulnerabilities** - Client vulnerabilities embedded in PersonValue (Person only, Consumer Duty)
 - **Data Protection** - GDPR consent and privacy management embedded
 - **Marketing Preferences** - Channel preferences and interests embedded
 - **Estate Planning** - Will, LPA, gifts, trusts, IHT embedded (Person only)
@@ -11948,12 +11966,6 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "salutation": "Mr Smith",
     "dateOfBirth": "1980-05-15",
     "age": 45,
-    "placeOfBirth": "London",
-    "countryOfBirth": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
     "gender": {
       "code": "M",
       "display": "Male"
@@ -11964,23 +11976,6 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "effectiveFrom": "2005-06-20"
     },
     "niNumber": "AB123456C",
-    "nationalityCountry": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "residencyCountry": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "domicileCountry": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
-    "isUkResident": true,
-    "isExpatriate": false,
     "smokingStatus": {
       "code": "NEVER",
       "display": "Never Smoked"
@@ -12003,7 +11998,70 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "display": "Full-Time Employed"
     },
     "isDeceased": false,
-    "deceasedDate": null
+    "deceasedDate": null,
+    "vulnerabilities": [
+      {
+        "vulnerabilityType": {
+          "code": "HEALTH",
+          "display": "Health-related"
+        },
+        "severity": "Medium",
+        "description": "Requires large print documents due to visual impairment",
+        "assessmentDate": "2020-01-15",
+        "reviewDate": "2025-01-15",
+        "adjustmentsRequired": [
+          "Large print documents (16pt minimum)",
+          "Extended appointment times (allow 90 minutes)",
+          "Well-lit meeting rooms"
+        ],
+        "isActive": true,
+        "recordedBy": {
+          "id": "adviser-789",
+          "name": "Jane Doe"
+        }
+      }
+    ]
+  },
+  "territorialProfile": {
+    "ukResident": true,
+    "ukDomicile": true,
+    "expatriate": false,
+    "countryOfBirth": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "placeOfBirth": "London",
+    "countryOfResidence": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countryOfDomicile": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countryOfOrigin": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countriesOfCitizenship": [
+      {
+        "country": {
+          "code": "GB",
+          "display": "United Kingdom",
+          "alpha3": "GBR"
+        },
+        "isPrimary": true,
+        "acquisitionDate": "1980-05-15",
+        "acquisitionMethod": {
+          "code": "BIRTH",
+          "display": "Birth"
+        }
+      }
+    ]
   },
   "addresses": [
     {
@@ -12183,28 +12241,6 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "verifiedDate": "2020-01-15"
     }
   },
-  "vulnerabilities": [
-    {
-      "vulnerabilityType": {
-        "code": "HEALTH",
-        "display": "Health-related"
-      },
-      "severity": "Medium",
-      "description": "Requires large print documents due to visual impairment",
-      "assessmentDate": "2020-01-15",
-      "reviewDate": "2025-01-15",
-      "adjustmentsRequired": [
-        "Large print documents (16pt minimum)",
-        "Extended appointment times (allow 90 minutes)",
-        "Well-lit meeting rooms"
-      ],
-      "isActive": true,
-      "recordedBy": {
-        "id": "adviser-789",
-        "name": "Jane Doe"
-      }
-    }
-  ],
   "dataProtection": {
     "gdprConsent": {
       "dataProcessing": {
@@ -12596,53 +12632,57 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "clientSegment": "A",
   "clientSegmentDate": "2020-01-15",
   "clientCategory": "HighNetWorth",
-  "grossAnnualIncome": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "householdIncome": {
-    "amount": 120000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "netWorth": {
-    "amount": 450000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "householdNetWorth": {
-    "amount": 650000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalAssets": {
-    "amount": 500000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalJointAssets": {
-    "amount": 200000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "householdIncome": {
+      "amount": 120000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "netWorth": {
+      "amount": 450000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "householdNetWorth": {
+      "amount": 650000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalAssets": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalJointAssets": {
+      "amount": 200000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "calculatedAt": "2026-02-18T10:30:00Z",
+    "lastReviewDate": "2026-02-18"
   },
   "adviserRef": {
     "id": "adviser-789",
@@ -12711,11 +12751,6 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "display": "Private Limited Company"
     },
     "vatNumber": "GB123456789",
-    "countryOfIncorporation": {
-      "code": "GB",
-      "display": "United Kingdom",
-      "alpha3": "GBR"
-    },
     "companyStatus": {
       "code": "ACTIVE",
       "display": "Active"
@@ -12994,7 +13029,25 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "verifiedDate": "2025-03-20"
     }
   },
-  "vulnerabilities": [],
+  "territorialProfile": {
+    "ukResident": true,
+    "ukDomicile": true,
+    "countryOfOrigin": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countryOfResidence": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countryOfDomicile": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    }
+  },
   "dataProtection": {
     "gdprConsent": {
       "dataProcessing": {
@@ -13134,29 +13187,33 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "clientSegment": "B",
   "clientSegmentDate": "2015-03-20",
   "clientCategory": "SmallBusiness",
-  "grossAnnualIncome": {
-    "amount": 3500000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "netWorth": {
-    "amount": 1250000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalAssets": {
-    "amount": 2100000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 3500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "netWorth": {
+      "amount": 1250000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalAssets": {
+      "amount": 2100000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "calculatedAt": "2026-02-18T10:30:00Z",
+    "lastReviewDate": "2026-02-18"
   },
   "adviserRef": {
     "id": "adviser-800",
@@ -13562,7 +13619,25 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "verifiedDate": "2018-04-15"
     }
   },
-  "vulnerabilities": [],
+  "territorialProfile": {
+    "ukResident": true,
+    "ukDomicile": true,
+    "countryOfOrigin": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countryOfResidence": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countryOfDomicile": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    }
+  },
   "dataProtection": {
     "gdprConsent": {
       "dataProcessing": {
@@ -13692,21 +13767,25 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "clientSegment": "C",
   "clientSegmentDate": "2018-04-15",
   "clientCategory": "Trust",
-  "netWorth": {
-    "amount": 650000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalAssets": {
-    "amount": 650000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+  "financialProfile": {
+    "netWorth": {
+      "amount": 650000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalAssets": {
+      "amount": 650000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "calculatedAt": "2026-02-18T10:30:00Z",
+    "lastReviewDate": "2026-02-18"
   },
   "adviserRef": {
     "id": "adviser-810",
@@ -13759,7 +13838,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 | `addresses` | AddressValue[] | Yes | Min 1 address required | Full address history |
 | `contacts` | ContactValue[] | Yes | Min 1 email or phone required | All contact methods |
 | `identityVerification` | IdentityVerificationValue | Conditional | Required for KYC completion | KYC, AML, MLR compliance |
-| `vulnerabilities` | VulnerabilityValue[] | No | | Consumer Duty compliance |
+| `territorialProfile` | TerritorialProfileValue | No | | Territorial status, residency, domicile, citizenship |
 | `dataProtection` | DataProtectionValue | Yes | Required for GDPR compliance | GDPR consent management |
 | `marketingPreferences` | MarketingPreferencesValue | Yes | Required for marketing | Marketing opt-in/out |
 | `estatePlanning` | EstatePlanningValue | Conditional | Only for Person clients | Will, LPA, gifts, IHT |
@@ -13785,16 +13864,9 @@ PersonValue {
   salutation: string                   // Calculated: "Title LastName"
   dateOfBirth: date                    // ISO 8601, Required
   age: integer                         // Calculated from dateOfBirth
-  placeOfBirth: string                 // Optional
-  countryOfBirth: CountryValue         // ISO 3166-1
   gender: CodedValue                   // M, F, O
   maritalStatus: MaritalStatusValue    // MAR, SIN, DIV, etc. with effectiveFrom
   niNumber: string                     // National Insurance Number (encrypted)
-  nationalityCountry: CountryValue     // ISO 3166-1
-  residencyCountry: CountryValue       // ISO 3166-1
-  domicileCountry: CountryValue        // ISO 3166-1
-  isUkResident: boolean                // Calculated
-  isExpatriate: boolean                // Calculated
   smokingStatus: CodedValue            // NEVER, FORMER, CURRENT
   healthMetrics: HealthMetricsValue    // Height, weight, BMI
   occupation: string                   // Free text occupation
@@ -13802,6 +13874,7 @@ PersonValue {
   employmentStatus: CodedValue         // FT_EMP, PT_EMP, SELF_EMP, RETIRED, etc.
   isDeceased: boolean                  // Default false
   deceasedDate: date                   // Null if not deceased
+  vulnerabilities: VulnerabilityValue[] // Client vulnerabilities (Consumer Duty)
 }
 ```
 
@@ -13840,7 +13913,6 @@ CorporateValue {
   incorporationDate: date              // Date of incorporation
   companyType: CodedValue              // LTD, PLC, LLP, etc.
   vatNumber: string                    // VAT registration number
-  countryOfIncorporation: CountryValue // ISO 3166-1
   companyStatus: CodedValue            // ACTIVE, DISSOLVED, LIQUIDATION, etc.
   sicCodes: SicCodeValue[]             // SIC industry classification codes
   numberOfEmployees: integer           // Current employee count
@@ -14119,7 +14191,7 @@ See full examples in the client JSON examples above.
 
 #### 13.1.11 VulnerabilityValue Type
 
-Embedded value type representing client vulnerabilities (Consumer Duty requirement).
+Embedded value type representing client vulnerabilities (Consumer Duty requirement). **Only applicable to Person clients** - embedded in `personValue.vulnerabilities` array.
 
 ```json
 {
@@ -14146,7 +14218,7 @@ Embedded value type representing client vulnerabilities (Consumer Duty requireme
 - `CAPABILITY` - Capability limitation (language, literacy, digital skills)
 - `RESILIENCE` - Low resilience (multiple vulnerabilities)
 
-**Note:** Vulnerabilities are typically only applicable to Person clients. Corporate and Trust clients rarely have vulnerabilities.
+**Note:** Vulnerabilities are only applicable to Person clients (Consumer Duty requirement). This array is embedded in `personValue.vulnerabilities` for Person clients only. Corporate and Trust clients do not have vulnerabilities.
 
 ---
 
@@ -14196,38 +14268,280 @@ See full example in the Person Client JSON above.
 
 ---
 
-#### 13.1.15 Validation Rules by Client Type
+#### 13.1.15 FinancialProfileValue Type
+
+Embedded value type representing client financial snapshot and computed wealth metrics. **Value type** with no identity, embedded in Client aggregate root.
+
+**Purpose:** Store client financial position including income, net worth, and computed asset totals from arrangements.
+
+**Type Classification:** Value Type (no identity, embedded in Client)
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `grossAnnualIncome` | MoneyValue | No | Individual's gross annual income (Person only) or company revenue (Corporate only) |
+| `householdIncome` | MoneyValue | No | Combined household income (Person only) |
+| `netWorth` | MoneyValue | No | Individual/entity net worth (assets - liabilities) |
+| `householdNetWorth` | MoneyValue | No | Combined household net worth (Person only) |
+| `totalAssets` | MoneyValue | No | **Computed** - Sum of all assets from arrangements (read-only) |
+| `totalJointAssets` | MoneyValue | No | **Computed** - Sum of jointly held assets (read-only) |
+| `calculatedAt` | timestamp | No | When financial metrics were last calculated |
+| `lastReviewDate` | date | No | When financial position was last reviewed with client |
+
+**Applicability by Client Type:**
+
+- **Person clients:** All fields applicable
+- **Corporate clients:** Only `grossAnnualIncome`, `netWorth`, `totalAssets` applicable (no household fields)
+- **Trust clients:** Only `netWorth`, `totalAssets` applicable
+
+**Example (Person Client):**
+
+```json
+{
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "householdIncome": {
+      "amount": 120000.00,
+      "currency": { "code": "GBP" }
+    },
+    "netWorth": {
+      "amount": 450000.00,
+      "currency": { "code": "GBP" }
+    },
+    "householdNetWorth": {
+      "amount": 650000.00,
+      "currency": { "code": "GBP" }
+    },
+    "totalAssets": {
+      "amount": 500000.00,
+      "currency": { "code": "GBP" }
+    },
+    "totalJointAssets": {
+      "amount": 200000.00,
+      "currency": { "code": "GBP" }
+    },
+    "calculatedAt": "2026-02-18T10:30:00Z",
+    "lastReviewDate": "2026-02-18"
+  }
+}
+```
+
+**Validation Rules:**
+
+- `totalAssets` and `totalJointAssets` are computed fields (read-only)
+- All monetary amounts must be >= 0
+- For Person clients: `householdIncome` >= `grossAnnualIncome` (if both provided)
+- For Person clients: `householdNetWorth` >= `netWorth` (if both provided)
+- `calculatedAt` is automatically set when computed fields are recalculated
+- `lastReviewDate` should be set when financial position is reviewed with client
+
+**Computed Field Calculation:**
+
+- `totalAssets` = Sum of all asset values from arrangements (bank accounts, investments, pensions, properties, etc.)
+- `totalJointAssets` = Sum of asset values where ownership = "Joint" or "JointTenants"
+
+---
+
+#### 13.1.16 TerritorialProfileValue Type
+
+Embedded value type representing territorial status, residency, domicile, and citizenship information. **Value type** with no identity, embedded in Client aggregate root.
+
+**Purpose:** Store territorial status, tax residency, domicile, and citizenship information for all client types (Person, Corporate, Trust).
+
+**Type Classification:** Value Type (no identity, embedded in Client)
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `ukResident` | boolean | No | UK resident for tax purposes (HMRC definition) |
+| `ukDomicile` | boolean | No | **Computed** - UK domiciled (countryOfDomicile.code === "GB") |
+| `expatriate` | boolean | No | Is expatriate (living outside country of origin) - Person only |
+| `countryOfBirth` | CodedValue | No | Country of birth (ISO 3166-1) - Person only |
+| `placeOfBirth` | string | No | City/town of birth - Person only |
+| `countryOfResidence` | CodedValue | No | Current country of residence (ISO 3166-1) - Person only |
+| `countryOfDomicile` | CodedValue | No | Country of domicile for tax purposes (ISO 3166-1) - Person only |
+| `countryOfOrigin` | CodedValue | No | Country of origin/nationality (Person), country of incorporation (Corporate), or jurisdiction of trust (Trust) (ISO 3166-1) |
+| `countriesOfCitizenship` | CitizenshipValue[] | No | Array of citizenship countries (supports dual/multiple citizenship) - Person only |
+
+**CitizenshipValue Structure:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `country` | CodedValue | Yes | Country of citizenship (ISO 3166-1) |
+| `isPrimary` | boolean | No | Primary citizenship |
+| `acquisitionDate` | date | No | Date citizenship acquired |
+| `acquisitionMethod` | CodedValue | No | How acquired (Birth/Naturalization/Descent/Marriage) |
+
+**Example (Person Client):**
+
+```json
+{
+  "territorialProfile": {
+    "ukResident": true,
+    "ukDomicile": true,
+    "expatriate": false,
+    "countryOfBirth": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "placeOfBirth": "London",
+    "countryOfResidence": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countryOfDomicile": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countryOfOrigin": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "countriesOfCitizenship": [
+      {
+        "country": {
+          "code": "GB",
+          "display": "United Kingdom",
+          "alpha3": "GBR"
+        },
+        "isPrimary": true,
+        "acquisitionDate": "1980-05-15",
+        "acquisitionMethod": {
+          "code": "BIRTH",
+          "display": "Birth"
+        }
+      }
+    ]
+  }
+}
+```
+
+**Example (Corporate Client):**
+
+```json
+{
+  "territorialProfile": {
+    "ukResident": true,
+    "countryOfOrigin": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    }
+  }
+}
+```
+
+**Example (Trust Client):**
+
+```json
+{
+  "territorialProfile": {
+    "ukResident": true,
+    "countryOfOrigin": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    }
+  }
+}
+```
+
+**Applicability by Client Type:**
+
+- **Person clients:** All fields applicable
+  - `countryOfOrigin` represents nationality/citizenship country
+  - Full territorial profile including birth, residence, domicile, and citizenship
+- **Corporate clients:** Limited fields applicable
+  - `ukResident` - for UK tax resident status
+  - `countryOfOrigin` - country of incorporation
+- **Trust clients:** Limited fields applicable
+  - `ukResident` - for UK tax resident status
+  - `countryOfOrigin` - jurisdiction where trust is registered/established
+
+**Validation Rules:**
+
+- `ukDomicile` is computed from `countryOfDomicile.code === "GB"` (read-only)
+- For Person clients: `ukResident` should align with `countryOfResidence.code === "GB"` (but may differ for tax purposes)
+- `expatriate` should be `true` if `countryOfResidence` differs from `countryOfOrigin`
+- At least one citizenship is recommended for Person clients
+- If multiple citizenships exist, exactly one should have `isPrimary: true`
+- All country codes must be valid ISO 3166-1 codes (alpha-2 format)
+- `acquisitionMethod` must be one of: Birth, Naturalization, Descent, Marriage
+
+**Notes:**
+
+- Territorial profile applies to all client types but with different field relevance
+- For Person clients, this supports Consumer Duty requirements for understanding client circumstances
+- For Corporate and Trust clients, primarily used for tax residency determination
+- `ukDomicile` is computed to ensure consistency with `countryOfDomicile`
+- Supports dual/multiple citizenship scenarios common in international clients
+
+---
+
+#### 13.1.17 Validation Rules by Client Type
 
 **Person Client:**
 - `personValue` is required
 - `personValue.firstName` is required
 - `personValue.lastName` is required
 - `personValue.dateOfBirth` is required
+- `personValue.vulnerabilities` is optional array (Consumer Duty)
 - `estatePlanning` is optional but only valid for Person
 - `spouseRef` is optional but only valid for Person
 - `dependants` is optional but only valid for Person
+- `territorialProfile` is optional but all Person-specific fields are available
+- `territorialProfile.ukDomicile` is computed from `territorialProfile.countryOfDomicile.code === "GB"`
+- `territorialProfile.countriesOfCitizenship` should have exactly one with `isPrimary: true` if multiple citizenships
+- `financialProfile.householdIncome` >= `financialProfile.grossAnnualIncome` (if both provided)
+- `financialProfile.householdNetWorth` >= `financialProfile.netWorth` (if both provided)
+- `financialProfile.householdIncome` and `financialProfile.householdNetWorth` only valid for Person
 
 **Corporate Client:**
 - `corporateValue` is required
 - `corporateValue.companyName` is required
 - `corporateValue.directors` must have at least 1 director
 - `corporateValue.shareholders` must have at least 1 shareholder
+- `territorialProfile` is optional but only `ukResident` and `countryOfOrigin` fields are applicable
+- `territorialProfile.countryOfOrigin` represents country of incorporation
+- `personValue.vulnerabilities` must not be present (vulnerabilities only for Person clients)
 - `estatePlanning` must not be present
 - `spouseRef` must not be present
 - `dependants` must not be present
+- `financialProfile.householdIncome` must not be present
+- `financialProfile.householdNetWorth` must not be present
 
 **Trust Client:**
 - `trustValue` is required
 - `trustValue.trustName` is required
 - `trustValue.trustees` must have at least 1 trustee
 - `trustValue.beneficiaries` must have at least 1 beneficiary
+- `territorialProfile` is optional but only `ukResident` and `countryOfOrigin` fields are applicable
+- `territorialProfile.countryOfOrigin` represents jurisdiction where trust is registered
+- `personValue.vulnerabilities` must not be present (vulnerabilities only for Person clients)
 - `estatePlanning` must not be present
 - `spouseRef` must not be present
 - `dependants` must not be present
+- `financialProfile.grossAnnualIncome` must not be present
+- `financialProfile.householdIncome` must not be present
+- `financialProfile.householdNetWorth` must not be present
+
+**FinancialProfileValue Validation (All Client Types):**
+- `totalAssets` and `totalJointAssets` are read-only computed fields
+- All monetary amounts must be >= 0
+- Computed fields are automatically calculated and cannot be set via API
 
 ---
 
-#### 13.1.16 Usage Examples
+#### 13.1.18 Usage Examples
 
 **Creating a Person Client:**
 
@@ -14243,7 +14557,14 @@ Content-Type: application/json
     "firstName": "John",
     "lastName": "Smith",
     "dateOfBirth": "1980-05-15",
-    "gender": { "code": "M", "display": "Male" }
+    "gender": { "code": "M", "display": "Male" },
+    "vulnerabilities": []
+  },
+  "territorialProfile": {
+    "ukResident": true,
+    "ukDomicile": true,
+    "countryOfOrigin": { "code": "GB", "display": "United Kingdom", "alpha3": "GBR" },
+    "countryOfResidence": { "code": "GB", "display": "United Kingdom", "alpha3": "GBR" }
   },
   "addresses": [
     {
@@ -14262,7 +14583,18 @@ Content-Type: application/json
       "value": "john.smith@example.com",
       "isPrimary": true
     }
-  ]
+  ],
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": { "code": "GBP" }
+    },
+    "netWorth": {
+      "amount": 450000.00,
+      "currency": { "code": "GBP" }
+    },
+    "lastReviewDate": "2026-02-18"
+  }
 }
 ```
 
@@ -14300,7 +14632,18 @@ Content-Type: application/json
       "value": "info@techventure.com",
       "isPrimary": true
     }
-  ]
+  ],
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 3500000.00,
+      "currency": { "code": "GBP" }
+    },
+    "netWorth": {
+      "amount": 1250000.00,
+      "currency": { "code": "GBP" }
+    },
+    "lastReviewDate": "2026-02-18"
+  }
 }
 ```
 
@@ -14347,7 +14690,14 @@ Content-Type: application/json
       "value": "trustees@smithfamilytrust.com",
       "isPrimary": true
     }
-  ]
+  ],
+  "financialProfile": {
+    "netWorth": {
+      "amount": 650000.00,
+      "currency": { "code": "GBP" }
+    },
+    "lastReviewDate": "2026-02-18"
+  }
 }
 ```
 
@@ -19592,12 +19942,14 @@ Represents a monetary amount with currency.
 **Usage Example:**
 ```json
 {
-  "grossAnnualIncome": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+  "financialProfile": {
+    "grossAnnualIncome": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "netMonthlyIncome": {
