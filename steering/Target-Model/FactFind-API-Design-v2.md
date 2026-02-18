@@ -170,6 +170,13 @@ The FactFind API provides comprehensive digital capabilities for:
    - [5.1 Overview](#51-overview)
    - [5.2 Operations Summary](#52-operations-summary)
    - [5.3 Key Endpoints](#53-key-endpoints)
+   - [5.4 Estate Planning](#54-estate-planning) **NEW v3.0**
+     - [5.4.1 Operations Summary](#541-operations-summary)
+     - [5.4.2 Get Estate Planning Overview](#542-get-estate-planning-overview)
+     - [5.4.3 Update Estate Planning Details](#543-update-estate-planning-details)
+     - [5.4.4 Record Gift](#544-record-gift)
+     - [5.4.5 List Gifts](#545-list-gifts)
+     - [5.4.6 Create Gift Trust](#546-create-gift-trust)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -3548,6 +3555,559 @@ Income contract with required-on-create fields.
 - Emergency fund recommended = 3-6 months essential expenditure
 - Affordability ratio = housing costs / gross income
 - Stress test applies +3% interest rate increase
+
+---
+
+### 5.4 Estate Planning
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+
+**Purpose:** Manage client-specific estate planning information including wills, powers of attorney, trusts, and gift planning for inheritance tax (IHT) mitigation.
+
+**Scope:**
+- Estate planning overview (wills, lasting power of attorney, inheritance wishes)
+- Gift recording and tracking (cash gifts, property gifts, business asset gifts)
+- Potentially Exempt Transfer (PET) tracking and 7-year rule monitoring
+- Gift trust management and beneficiary tracking
+- Inheritance Tax (IHT) calculations and liability assessment
+- Estate value monitoring and IHT planning strategies
+
+**Key Features:**
+- **Client-Level Resource** - Estate planning is specific to each individual client
+- **Gift History** - Complete audit trail of all gifts made by the client
+- **PET Tracking** - Automatic 7-year countdown for potentially exempt transfers
+- **IHT Calculations** - Real-time IHT exposure based on estate value and gifts
+- **Trust Management** - Link gifts to trusts with beneficiary tracking
+
+**Aggregate Root:** Client (estate planning nested under client)
+
+**Regulatory Compliance:**
+- FCA Handbook - Understanding client estate planning needs
+- HMRC Inheritance Tax regulations
+- Inheritance Tax Act 1984 - 7-year rule, exemptions, reliefs
+- Data Protection Act 2018 - Sensitive estate planning data
+- Money Laundering Regulations 2017 - Source of wealth for large gifts
+
+#### 5.4.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| **Estate Planning Overview** | | | |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
+| **Gifts Management** | | | |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Record a new gift | `estate:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts by client | `estate:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get gift details | `estate:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift record | `estate:write` |
+| **Trusts Management** | | | |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | Create gift trust | `estate:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | List client's trusts | `estate:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Get trust details | `estate:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Update trust | `estate:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |
+
+**Total Endpoints:** 12
+
+#### 5.4.2 Get Estate Planning Overview
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+
+**Description:** Retrieve comprehensive estate planning information for a client including wills, powers of attorney, total gifts made, and IHT exposure.
+
+**Response:**
+
+```json
+{
+  "clientRef": {
+    "id": "client-123",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-456/clients/client-123"
+  },
+  "estatePlanning": {
+    "hasWill": true,
+    "willLastUpdated": "2023-06-15",
+    "willLocation": "With solicitor - Smith & Partners LLP",
+    "hasLastingPowerOfAttorney": true,
+    "lpaTypes": ["Property and Financial Affairs", "Health and Welfare"],
+    "lpaRegistered": true,
+    "lpaRegistrationDate": "2023-07-01",
+    "executors": [
+      {
+        "name": "Sarah Smith",
+        "relationshipToClient": "Spouse",
+        "contactRef": { "id": "client-124" }
+      },
+      {
+        "name": "David Smith",
+        "relationshipToClient": "Brother",
+        "contactRef": { "id": "contact-789" }
+      }
+    ],
+    "inheritanceWishes": "Estate split equally between children. Family home to spouse.",
+    "concernsOrPriorities": "Minimize IHT burden, protect family home"
+  },
+  "giftsSummary": {
+    "totalGifts": 8,
+    "totalValueGifted": {
+      "amount": 125000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "activePETs": 3,
+    "giftsTaxFree": 5,
+    "totalIHTExposure": {
+      "amount": 42000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    }
+  },
+  "trustsSummary": {
+    "totalTrusts": 2,
+    "totalValueInTrust": {
+      "amount": 200000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "beneficiaryCount": 4
+  },
+  "ihtCalculation": {
+    "estimatedEstateValue": {
+      "amount": 850000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "ihtThreshold": {
+      "amount": 325000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "residenceNilRateBand": {
+      "amount": 175000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "totalAllowance": {
+      "amount": 500000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "taxableEstate": {
+      "amount": 350000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "estimatedIHT": {
+      "amount": 140000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "effectiveRate": 16.47
+  },
+  "lastReviewed": "2026-01-15",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "gifts": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts" },
+    "trusts": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/trusts" }
+  }
+}
+```
+
+#### 5.4.3 Update Estate Planning Details
+
+**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+
+**Description:** Update estate planning information such as will status, powers of attorney, and inheritance wishes.
+
+**Request Body:**
+
+```json
+{
+  "hasWill": true,
+  "willLastUpdated": "2026-02-15",
+  "willLocation": "With solicitor - Smith & Partners LLP",
+  "hasLastingPowerOfAttorney": true,
+  "lpaTypes": ["Property and Financial Affairs", "Health and Welfare"],
+  "lpaRegistered": true,
+  "lpaRegistrationDate": "2026-02-10",
+  "inheritanceWishes": "Estate to be split equally between three children after spouse passes. Family home to spouse with life interest.",
+  "concernsOrPriorities": "Minimize IHT, protect family home, provide for grandchildren's education"
+}
+```
+
+**Response:** 200 OK with updated estate planning overview.
+
+#### 5.4.4 Record Gift
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
+
+**Description:** Record a gift made by the client for IHT planning and PET tracking.
+
+**Request Body:**
+
+```json
+{
+  "giftDate": "2026-01-15",
+  "giftType": {
+    "code": "CASH",
+    "display": "Cash Gift"
+  },
+  "recipientName": "Emma Smith",
+  "recipientRelationship": {
+    "code": "CHILD",
+    "display": "Child"
+  },
+  "recipientRef": {
+    "id": "dependent-789"
+  },
+  "giftValue": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "giftPurpose": "University tuition assistance",
+  "isPotentiallyExemptTransfer": true,
+  "exemptionType": {
+    "code": "NONE",
+    "display": "No Exemption - Full PET"
+  },
+  "notes": "First of three annual payments for university costs"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "gift-123",
+  "clientRef": {
+    "id": "client-123",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-456/clients/client-123"
+  },
+  "giftDate": "2026-01-15",
+  "giftType": {
+    "code": "CASH",
+    "display": "Cash Gift"
+  },
+  "recipientName": "Emma Smith",
+  "recipientRelationship": {
+    "code": "CHILD",
+    "display": "Child"
+  },
+  "recipientRef": {
+    "id": "dependent-789",
+    "href": "/api/v1/factfinds/ff-456/clients/client-123/dependents/dependent-789"
+  },
+  "giftValue": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "giftPurpose": "University tuition assistance",
+  "isPotentiallyExemptTransfer": true,
+  "exemptionType": {
+    "code": "NONE",
+    "display": "No Exemption - Full PET"
+  },
+  "petExpiryDate": "2033-01-15",
+  "yearsRemaining": 6.92,
+  "petStatus": {
+    "code": "ACTIVE",
+    "display": "Active PET"
+  },
+  "ihtLiability": {
+    "amount": 6000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "notes": "First of three annual payments for university costs",
+  "createdAt": "2026-02-18T10:30:00Z",
+  "updatedAt": "2026-02-18T10:30:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-123" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "estate-planning": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning" }
+  }
+}
+```
+
+**Validation Rules:**
+- `giftDate` - Required, cannot be in future
+- `giftType` - Required, one of: Cash, Property, Business Asset, Investment, Other
+- `giftValue` - Required, must be positive
+- `recipientName` - Required
+
+**Business Rules:**
+- PET expiry date automatically calculated as gift date + 7 years
+- IHT liability calculated based on current IHT rate (40%) and exemptions
+- Years remaining updated automatically each day
+- PET status changes to "Exempt" once 7 years elapsed
+- Annual exemption (£3,000) applied automatically if available
+
+#### 5.4.5 List Gifts
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
+
+**Description:** Retrieve all gifts made by the client, with optional filtering by status and date range.
+
+**Query Parameters:**
+- `petStatus` - Filter by PET status (active, exempt, expired)
+- `fromDate` - Filter gifts from this date onwards
+- `toDate` - Filter gifts up to this date
+- `giftType` - Filter by gift type (cash, property, business_asset, etc.)
+- `minValue` - Minimum gift value
+- `includeExempt` - Include tax-exempt gifts (default: true)
+
+**Response:**
+
+```json
+{
+  "clientRef": {
+    "id": "client-123",
+    "fullName": "John Smith"
+  },
+  "gifts": [
+    {
+      "id": "gift-123",
+      "giftDate": "2026-01-15",
+      "giftType": { "code": "CASH", "display": "Cash Gift" },
+      "recipientName": "Emma Smith",
+      "recipientRelationship": { "code": "CHILD", "display": "Child" },
+      "giftValue": {
+        "amount": 15000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "isPotentiallyExemptTransfer": true,
+      "petExpiryDate": "2033-01-15",
+      "yearsRemaining": 6.92,
+      "petStatus": { "code": "ACTIVE", "display": "Active PET" },
+      "ihtLiability": {
+        "amount": 6000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-123" }
+      }
+    },
+    {
+      "id": "gift-124",
+      "giftDate": "2025-12-25",
+      "giftType": { "code": "CASH", "display": "Cash Gift" },
+      "recipientName": "Michael Smith",
+      "recipientRelationship": { "code": "CHILD", "display": "Child" },
+      "giftValue": {
+        "amount": 10000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "isPotentiallyExemptTransfer": true,
+      "petExpiryDate": "2032-12-25",
+      "yearsRemaining": 6.86,
+      "petStatus": { "code": "ACTIVE", "display": "Active PET" },
+      "ihtLiability": {
+        "amount": 4000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-124" }
+      }
+    },
+    {
+      "id": "gift-125",
+      "giftDate": "2019-03-10",
+      "giftType": { "code": "PROPERTY", "display": "Property Gift" },
+      "recipientName": "Sarah Smith",
+      "recipientRelationship": { "code": "SPOUSE", "display": "Spouse" },
+      "giftValue": {
+        "amount": 200000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "isPotentiallyExemptTransfer": false,
+      "exemptionType": { "code": "SPOUSE", "display": "Spouse Exemption" },
+      "petExpiryDate": null,
+      "yearsRemaining": 0,
+      "petStatus": { "code": "EXEMPT", "display": "Tax Exempt" },
+      "ihtLiability": {
+        "amount": 0.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-125" }
+      }
+    }
+  ],
+  "totalGifts": 3,
+  "totalValueGifted": {
+    "amount": 225000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "activePETs": 2,
+  "totalIHTExposure": {
+    "amount": 10000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts" },
+    "estate-planning": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning" }
+  }
+}
+```
+
+#### 5.4.6 Create Gift Trust
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts`
+
+**Description:** Create a gift trust for estate planning and IHT mitigation.
+
+**Request Body:**
+
+```json
+{
+  "trustName": "Smith Family Education Trust",
+  "trustType": {
+    "code": "BARE_TRUST",
+    "display": "Bare Trust"
+  },
+  "establishedDate": "2026-02-01",
+  "trustValue": {
+    "amount": 100000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "trustPurpose": "Provide for grandchildren's education expenses",
+  "trustees": [
+    {
+      "name": "John Smith",
+      "relationshipToClient": "Self",
+      "contactRef": { "id": "client-123" }
+    },
+    {
+      "name": "Sarah Smith",
+      "relationshipToClient": "Spouse",
+      "contactRef": { "id": "client-124" }
+    }
+  ],
+  "beneficiaries": [
+    {
+      "name": "Oliver Smith",
+      "relationshipToClient": "Grandchild",
+      "dateOfBirth": "2015-08-22",
+      "benefitShare": 50.0
+    },
+    {
+      "name": "Sophie Smith",
+      "relationshipToClient": "Grandchild",
+      "dateOfBirth": "2018-03-15",
+      "benefitShare": 50.0
+    }
+  ],
+  "linkedGifts": [
+    { "giftRef": { "id": "gift-126" } }
+  ]
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "trust-456",
+  "clientRef": {
+    "id": "client-123",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-456/clients/client-123"
+  },
+  "trustName": "Smith Family Education Trust",
+  "trustType": {
+    "code": "BARE_TRUST",
+    "display": "Bare Trust"
+  },
+  "establishedDate": "2026-02-01",
+  "trustValue": {
+    "amount": 100000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "trustPurpose": "Provide for grandchildren's education expenses",
+  "trustees": [
+    {
+      "name": "John Smith",
+      "relationshipToClient": "Self",
+      "contactRef": { "id": "client-123", "href": "/api/v1/factfinds/ff-456/clients/client-123" }
+    },
+    {
+      "name": "Sarah Smith",
+      "relationshipToClient": "Spouse",
+      "contactRef": { "id": "client-124", "href": "/api/v1/factfinds/ff-456/clients/client-124" }
+    }
+  ],
+  "beneficiaries": [
+    {
+      "name": "Oliver Smith",
+      "relationshipToClient": "Grandchild",
+      "dateOfBirth": "2015-08-22",
+      "age": 10,
+      "benefitShare": 50.0
+    },
+    {
+      "name": "Sophie Smith",
+      "relationshipToClient": "Grandchild",
+      "dateOfBirth": "2018-03-15",
+      "age": 7,
+      "benefitShare": 50.0
+    }
+  ],
+  "linkedGifts": [
+    {
+      "giftRef": { "id": "gift-126", "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-126" },
+      "giftDate": "2026-02-01",
+      "giftValue": { "amount": 100000.00, "currency": { "code": "GBP" } }
+    }
+  ],
+  "totalGiftsInTrust": {
+    "amount": 100000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "ihtTreatment": "Immediately chargeable transfer - periodic charges apply",
+  "nextPeriodicCharge": "2036-02-01",
+  "createdAt": "2026-02-18T11:00:00Z",
+  "updatedAt": "2026-02-18T11:00:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/trusts/trust-456" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "estate-planning": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning" }
+  }
+}
+```
+
+**Trust Types:**
+- **Bare Trust** - Beneficiary has immediate absolute entitlement
+- **Discretionary Trust** - Trustees have discretion over distributions
+- **Interest in Possession Trust** - Beneficiary has right to income
+- **Life Interest Trust** - Beneficiary has interest for life
+- **Disabled Person's Trust** - Special tax treatment for disabled beneficiaries
+
+**Validation Rules:**
+- `trustName` - Required, max 200 characters
+- `trustType` - Required
+- `establishedDate` - Required, cannot be in future
+- `trustValue` - Required, must be positive
+- `beneficiaries` - At least one beneficiary required
+- `benefitShare` - Must sum to 100% across all beneficiaries
+
+**Business Rules:**
+- Trust creation automatically creates linked gift if value > 0
+- IHT treatment determined by trust type
+- Periodic charges calculated for relevant property trusts (every 10 years)
+- Trust value tracked separately from personal estate
 
 ---
 
