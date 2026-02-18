@@ -1,12 +1,12 @@
 
-<!-- FactFind API Design v2.0 - Generated: 2026-02-17T14:59:30.880008 -->
+<!-- FactFind API Design v3.0 - Generated: 2026-02-17T14:59:30.880008 -->
 # FactFind System API Design Specification
 ## Comprehensive RESTful API for Wealth Management Platform
 
-**Document Version:** 2.0
+**Document Version:** 3.0
 **Date:** 2026-02-18
-**Status:** Design Specification v2.0 - Enhanced with Missing Entities
-**API Version:** v1
+**Status:** Design Specification v3.0 - Enhanced with Missing Entities
+**API Version:** v2
 **Base URL:** `https://api.factfind.com`
 **Source:** Greenfield ERD Enhanced - Complete Domain Coverage (50+ entities, 2,000+ fields)
 
@@ -118,8 +118,8 @@ The FactFind API provides comprehensive digital capabilities for:
    - Entity lifecycle management
 
 4. **Breaking Changes** - All endpoints restructured (see Migration Guide in Appendix)
-   - Old: `/api/v1/clients/{clientId}` → New: `/api/v1/factfinds/{factfindId}/clients/{clientId}`
-   - Old: `/api/v1/arrangements/{arrangementId}` → New: `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}`
+   - Old: `/api/v1/factfinds/{factfindId}/clients/{clientId}` → New: `/api/v1/factfinds/{factfindId}/clients/{clientId}`
+   - Old: `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` → New: `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}`
    - All HATEOAS links updated to reflect new structure
 
 **BENEFITS:**
@@ -189,10 +189,16 @@ The FactFind API provides comprehensive digital capabilities for:
    - [9.4 Property Management API](#94-property-management-api) **NEW v2.0**
    - [9.5 Equities Portfolio API](#95-equities-portfolio-api) **NEW v2.0**
    - [9.6 Credit History API](#96-credit-history-api) **NEW v2.0**
-9A. [Savings & Investments API](#9a-savings--investments-api) **NEW v2.0**
+9A. [Arrangements API (Type-Based Routing)](#9a-arrangements-api-type-based-routing) **NEW v2.1**
    - [9A.1 Overview](#9a1-overview)
-   - [9A.2 Operations Summary](#9a2-operations-summary)
-   - [9A.3 Key Endpoints](#9a3-key-endpoints)
+   - [9A.2 Arrangement Types and Sub-Types](#9a2-arrangement-types-and-sub-types)
+   - [9A.3 Common Arrangement Operations](#9a3-common-arrangement-operations)
+   - [9A.4 Arrangement Sub-Resources](#9a4-arrangement-sub-resources)
+   - [9A.5 Client Pension Summary](#9a5-client-pension-summary)
+9B. [Savings & Investments API](#9b-savings--investments-api) **NEW v2.0**
+   - [9B.1 Overview](#9b1-overview)
+   - [9B.2 Operations Summary](#9b2-operations-summary)
+   - [9B.3 Key Endpoints](#9b3-key-endpoints)
 10. [Risk Profile API](#10-risk-profile-api)
     - [10.1 Overview](#101-overview)
     - [10.2 Operations Summary](#102-operations-summary)
@@ -230,7 +236,7 @@ The FactFind API provides comprehensive digital capabilities for:
 The FactFind API strictly follows REST architectural principles:
 
 **Resource-Oriented Design:**
-- Resources are identified by URIs (e.g., `/api/v1/clients/123`)
+- Resources are identified by URIs (e.g., `/api/v1/factfinds/{factfindId}/clients/123`)
 - Resources are nouns, not verbs (clients, factfinds, arrangements)
 - HTTP methods define operations (GET, POST, PUT, PATCH, DELETE)
 - Proper HTTP status codes indicate outcomes
@@ -257,8 +263,8 @@ The FactFind API strictly follows REST architectural principles:
 **Resource URIs:**
 ```
 /api/v1/factfinds/{factfindId}/clients                     (collection)
-/api/v1/clients/{id}                (single resource)
-/api/v1/clients/{id}/addresses      (sub-resource collection)
+/api/v1/factfinds/{factfindId}/clients/{id}                (single resource)
+/api/v1/factfinds/{factfindId}/clients/{id}/addresses      (sub-resource collection)
 /api/v1/factfinds/{id}/income       (nested resource)
 ```
 
@@ -316,7 +322,7 @@ All error responses follow RFC 7807 Problem Details format:
   "title": "Validation Failed",
   "status": 400,
   "detail": "One or more validation errors occurred",
-  "instance": "/api/v1/clients/123/income",
+  "instance": "/api/v1/factfinds/{factfindId}/clients/123/income",
   "traceId": "00-4bf92f3577b34da6a3ce929d0e0e4736-00",
   "errors": [
     {
@@ -357,10 +363,12 @@ The FactFind API follows a **hierarchical, context-based structure** where **Fac
 
 **Examples:**
 ```
-/api/v1/factfinds/12345/clients                    # Client context
-/api/v1/factfinds/12345/income                     # Circumstances context
-/api/v1/factfinds/12345/arrangements/pensions      # Arrangements context
-/api/v1/factfinds/12345/objectives                 # Goals context
+/api/v1/factfinds/12345/clients                                    # Client context
+/api/v1/factfinds/12345/clients/67890/income                       # Circumstances context (per client)
+/api/v1/factfinds/12345/arrangements/investments/isa               # Arrangements context (type-based)
+/api/v1/factfinds/12345/arrangements/pensions/personal-pension     # Pension arrangements (type-based)
+/api/v1/factfinds/12345/objectives/investment                      # Goals context (type-based)
+/api/v1/factfinds/12345/attitude-to-risk                           # Risk profiling context
 ```
 
 #### 1.5.2 FactFind as Aggregate Root
@@ -383,13 +391,13 @@ Resources are organized into **business contexts** that reflect the domain model
 
 | Context | Resources | Base Path |
 |---------|-----------|-----------|
-| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Consents | `/api/v1/factfinds/{factfindId}/clients` |
-| **Circumstances** | Employment, Income, Expenditure, Income/Expenditure Changes | `/api/v1/factfinds/{factfindId}/{resource}` |
-| **Assets & Liabilities** | Assets, Properties, Equities, Credit History, Valuations | `/api/v1/factfinds/{factfindId}/assets` |
-| **Arrangements** | Pensions, Investments, Mortgages, Protection, Contributions, Withdrawals | `/api/v1/factfinds/{factfindId}/arrangements` |
-| **Goals & Objectives** | Objectives, Needs | `/api/v1/factfinds/{factfindId}/objectives` |
-| **Risk Profiling** | Risk Profile, ATR Assessments | `/api/v1/factfinds/{factfindId}/risk-profile` |
-| **Estate Planning** | Gifts, Trusts | `/api/v1/factfinds/{factfindId}/{resource}` |
+| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Consent, Vulnerabilities, ID Verification, Professional Contacts | `/api/v1/factfinds/{id}/clients/{id}/*` |
+| **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v1/factfinds/{id}/clients/{id}/*` |
+| **Assets & Liabilities** | Assets, Business Assets, Property Details, Credit History, Valuations | `/api/v1/factfinds/{id}/assets` |
+| **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v1/factfinds/{id}/arrangements/{type}` |
+| **Goals & Objectives** | Objectives (investment, pension, protection, mortgage, budget, estate-planning), Needs | `/api/v1/factfinds/{id}/objectives/{type}` |
+| **Risk Profiling** | ATR (client ATR), Supplementary Questions | `/api/v1/factfinds/{id}/attitude-to-risk` |
+| **Estate Planning** | Gifts, Trusts (nested under clients) | `/api/v1/factfinds/{id}/clients/{id}/estate-planning` |
 
 #### 1.5.4 Benefits of This Approach
 
@@ -433,16 +441,16 @@ All changes within a fact-find aggregate should be:
 - **Isolated** - Concurrent changes don't interfere
 - **Durable** - Changes are persisted reliably
 
-**Example - Adding Income to a FactFind:**
+**Example - Adding Income to a Client:**
 
 ```http
-POST /api/v1/factfinds/12345/income
+POST /api/v1/factfinds/12345/clients/67890/income
 ```
 
 This operation:
-1. Creates the income record
-2. Updates the fact-find's total income
-3. Recalculates disposable income
+1. Creates the income record for the specific client
+2. Updates the client's total income
+3. Recalculates the client's disposable income
 4. Updates the fact-find's last modified timestamp
 5. Emits a domain event (`IncomeAdded`)
 
@@ -591,7 +599,7 @@ Each field in the unified contract is annotated with behavioral characteristics:
 - Server ignores: `id`, `createdAt`, `updatedAt`, `write-once` fields
 - Response: Complete `Client` contract with updated values
 
-**PATCH /api/v1/clients/{id}** (Partial Update)
+**PATCH /api/v1/factfinds/{factfindId}/clients/{id}** (Partial Update)
 - Request: `Client` contract with subset of updatable fields
 - Server ignores: `id`, `createdAt`, `updatedAt`, `write-once` fields
 - Response: Complete `Client` contract with updated values
@@ -843,12 +851,12 @@ When one entity references another, use an expanded reference object containing:
 
 | Reference Type | Display Fields | Example |
 |----------------|----------------|---------|
-| `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": "uuid", "href": "/api/v1/clients/uuid", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
+| `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": "uuid", "href": "/api/v1/factfinds/{factfindId}/clients/uuid", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
 | `AdviserRef` | `name`<br>`code` | `{ "id": "uuid", "href": "/api/v1/advisers/uuid", "name": "Sarah Johnson", "code": "ADV001" }` |
 | `ProviderRef` | `name`<br>`frnNumber` | `{ "id": "uuid", "href": "/api/v1/providers/uuid", "name": "Aviva", "frnNumber": "123456" }` |
 | `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": "uuid", "href": "/api/v1/factfinds/{factfindId}/arrangements/uuid", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
 | `EmploymentRef` | `employerName`<br>`status` | `{ "id": "uuid", "href": "/api/v1/employments/uuid", "employerName": "Acme Corp", "status": "Current" }` |
-| `GoalRef` | `goalName`<br>`priority` | `{ "id": "uuid", "href": "/api/v1/goals/uuid", "goalName": "Retirement Planning", "priority": "High" }` |
+| `GoalRef` | `goalName`<br>`priority` | `{ "id": "uuid", "href": "/api/v1/factfinds/{factfindId}/goals/uuid", "goalName": "Retirement Planning", "priority": "High" }` |
 | `FactFindRef` | `factFindNumber`<br>`status` | `{ "id": "uuid", "href": "/api/v1/factfinds/uuid", "factFindNumber": "FF001234", "status": "InProgress" }` |
 
 **Reference Type Usage Example:**
@@ -1144,9 +1152,9 @@ GET  /api/v1/factfinds/{factfindId}/goals/{goalId}
 You CANNOT create or access these entities without a fact find context:
 ```
 ❌ POST /api/v1/factfinds/{factfindId}/clients               (Not supported)
-❌ GET  /api/v1/clients/{id}          (Not supported)
+❌ GET  /api/v1/factfinds/{factfindId}/clients/{id}          (Not supported)
 ❌ POST /api/v1/factfinds/{factfindId}/arrangements          (Not supported)
-❌ GET  /api/v1/arrangements/{id}     (Not supported)
+❌ GET  /api/v1/factfinds/{factfindId}/arrangements/{id}     (Not supported)
 ❌ POST /api/v1/factfinds/{factfindId}/goals                 (Not supported)
 ```
 
@@ -1687,7 +1695,7 @@ ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 
 2. Client updates resource with If-Match:
 ```http
-PUT /api/v1/clients/123
+PUT /api/v1/factfinds/{factfindId}/clients/123
 If-Match: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 
 {
@@ -2134,10 +2142,10 @@ Content-Type: application/json
       "method": "PUT"
     },
     "addresses": {
-      "href": "/api/v1/clients/123/addresses"
+      "href": "/api/v1/factfinds/{factfindId}/clients/123/addresses"
     },
     "contacts": {
-      "href": "/api/v1/clients/123/contacts"
+      "href": "/api/v1/factfinds/{factfindId}/clients/123/contacts"
     },
     "factfinds": {
       "href": "/api/v1/factfinds?clientId=123"
@@ -2425,13 +2433,13 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/clients/client-123/addresses/address-456
+Location: /api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-456
 
 {
   "id": "address-456",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/clients/client-123",
+    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -2456,8 +2464,8 @@ Location: /api/v1/clients/client-123/addresses/address-456
   "durationAtAddressMonths": 1,
   "createdAt": "2026-02-16T14:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/clients/client-123/addresses/address-456" },
-    "client": { "href": "/api/v1/clients/client-123" }
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-456" },
+    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" }
   }
 }
 ```
@@ -4028,10 +4036,10 @@ Location: /api/v1/factfinds/{factfindId}/arrangements/777
 | POST | `/api/v1/factfinds/{factfindId}/goals/{goalId}/complete` | Mark goal as complete | `goals:write` |
 | GET | `/api/v1/factfinds/{factfindId}/goals/{goalId}/objectives` | List objectives under goal | `goals:read` |
 | POST | `/api/v1/factfinds/{factfindId}/goals/{goalId}/objectives` | Add objective to goal | `goals:write` |
-| PUT | `/api/v1/goals/{id}/objectives/{objId}` | Update objective | `goals:write` |
-| DELETE | `/api/v1/goals/{id}/objectives/{objId}` | Remove objective | `goals:write` |
+| PUT | `/api/v1/factfinds/{factfindId}/goals/{id}/objectives/{objId}` | Update objective | `goals:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/goals/{id}/objectives/{objId}` | Remove objective | `goals:write` |
 | GET | `/api/v1/factfinds/{factfindId}/goals/{goalId}/funding` | Get goal funding allocation | `goals:read` |
-| PUT | `/api/v1/goals/{id}/funding` | Update funding allocation | `goals:write` |
+| PUT | `/api/v1/factfinds/{factfindId}/goals/{id}/funding` | Update funding allocation | `goals:write` |
 
 ### 7.3 Key Endpoints
 
@@ -8524,12 +8532,338 @@ Location: /api/v1/factfinds/ff-456/clients/client-123/credit-scores/cs-789
 
 ---
 
-
-
-
-## 9A. FactFind Savings & Investments API
+## 9A. Arrangements API (Type-Based Routing)
 
 ### 9A.1 Overview
+
+**Purpose:** Manage financial product arrangements (pensions, investments, mortgages, protection) with type-based routing for specialized operations.
+
+**Scope:**
+- Investment Arrangements (GIA, ISA, Bonds, Investment Trusts, Platform Accounts)
+- Pension Arrangements (Personal Pension, State Pension, Workplace Pension, SIPP, Final Salary)
+- Mortgage Arrangements (Residential, Buy-to-Let, Equity Release)
+- Protection Arrangements (Personal Protection, General Insurance, Life Cover, Critical Illness)
+- Arrangement contributions and withdrawals
+- Beneficiary management
+- Valuation tracking
+
+**Type-Based Routing Pattern:**
+
+Arrangements use a **type-based routing pattern** where the arrangement type is part of the URL path:
+
+```
+/api/v1/factfinds/{factfindId}/arrangements/{arrangementType}/{subType?}/{arrangementId?}
+```
+
+**Examples:**
+```
+/api/v1/factfinds/12345/arrangements/investments/isa                      # List ISA arrangements
+/api/v1/factfinds/12345/arrangements/investments/isa/arr-789              # Specific ISA arrangement
+/api/v1/factfinds/12345/arrangements/pensions/personal-pension            # List personal pensions
+/api/v1/factfinds/12345/arrangements/pensions/personal-pension/arr-456    # Specific personal pension
+/api/v1/factfinds/12345/arrangements/mortgages/arr-123                    # Specific mortgage
+/api/v1/factfinds/12345/arrangements/protections/personal-protection      # List personal protection
+```
+
+**Aggregate Root:** FactFind (arrangements are nested within)
+
+**Regulatory Compliance:**
+- FCA COBS (Product Governance and Suitability)
+- MiFID II (Investment Services and Best Execution)
+- Pension Schemes Act 2015
+- ISA Regulations 1998
+- Consumer Duty (Value Assessment and Fair Outcomes)
+
+### 9A.2 Arrangement Types and Sub-Types
+
+#### Investment Arrangements
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/investments/{subType}`
+
+**Sub-Types:**
+- `gia` - General Investment Account
+- `isa` - Individual Savings Account
+- `bonds` - Investment Bonds (Onshore/Offshore)
+- `investment-trust` - Investment Trusts, OEICs, Unit Trusts
+- `platform-account` - Investment Platform Account
+
+#### Pension Arrangements
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/pensions/{subType}`
+
+**Sub-Types:**
+- `personal-pension` - Personal Pension Plan
+- `state-pension` - State Pension entitlement
+- `workplace-pension` - Workplace/Occupational Pension
+- `sipp` - Self-Invested Personal Pension
+- `final-salary` - Final Salary/Defined Benefit Scheme
+- `drawdown` - Income Drawdown arrangements
+
+#### Mortgage Arrangements
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/mortgages`
+
+**Sub-Types (optional):**
+- `residential` - Residential Mortgage
+- `buy-to-let` - Buy-to-Let Mortgage
+- `equity-release` - Equity Release/Lifetime Mortgage
+
+#### Protection Arrangements
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/protections/{subType}`
+
+**Sub-Types:**
+- `personal-protection` - Life Cover, Critical Illness, Income Protection
+- `general-insurance` - Buildings, Contents, Travel insurance
+
+### 9A.3 Common Arrangement Operations
+
+#### 9A.3.1 List Arrangements by Type
+
+**Endpoint Pattern:** `GET /api/v1/factfinds/{factfindId}/arrangements/{type}/{subType?}`
+
+**Examples:**
+```
+GET /api/v1/factfinds/12345/arrangements/investments/isa
+GET /api/v1/factfinds/12345/arrangements/pensions/personal-pension
+GET /api/v1/factfinds/12345/arrangements/mortgages
+```
+
+**Query Parameters:**
+- `clientId` - Filter by client ID
+- `providerId` - Filter by provider ID
+- `status` - Filter by status (Active, Matured, Surrendered, Lapsed)
+- `includeValuations` - Include latest valuation (default: false)
+- `page`, `pageSize` - Pagination
+
+**Response:**
+```json
+{
+  "factfindId": "factfind-12345",
+  "arrangementType": "Investment",
+  "arrangementSubType": "ISA",
+  "totalArrangements": 2,
+  "totalValue": {
+    "amount": 85000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "arrangements": [
+    {
+      "id": "arr-789",
+      "arrangementNumber": "ARR-ISA-001",
+      "arrangementType": "Investment",
+      "investmentType": "ISA",
+      "isaType": "StocksAndSharesISA",
+      "client": {
+        "id": "client-123",
+        "name": "John Smith",
+        "href": "/api/v1/factfinds/12345/clients/client-123"
+      },
+      "productName": "Vanguard ISA",
+      "provider": {
+        "id": "provider-500",
+        "name": "Vanguard",
+        "href": "/api/v1/providers/provider-500"
+      },
+      "policyNumber": "ISA-98765432",
+      "status": {
+        "code": "ACT",
+        "display": "Active"
+      },
+      "currentValue": {
+        "amount": 45000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "valuationDate": "2026-02-16",
+      "_links": {
+        "self": {
+          "href": "/api/v1/factfinds/12345/arrangements/investments/isa/arr-789"
+        },
+        "contributions": {
+          "href": "/api/v1/factfinds/12345/arrangements/arr-789/contributions"
+        },
+        "valuations": {
+          "href": "/api/v1/factfinds/12345/arrangements/arr-789/valuations"
+        }
+      }
+    }
+  ],
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/12345/arrangements/investments/isa"
+    },
+    "create": {
+      "href": "/api/v1/factfinds/12345/arrangements/investments/isa",
+      "method": "POST"
+    },
+    "allArrangements": {
+      "href": "/api/v1/factfinds/12345/arrangements"
+    }
+  }
+}
+```
+
+#### 9A.3.2 Get Specific Arrangement
+
+**Endpoint Pattern:** `GET /api/v1/factfinds/{factfindId}/arrangements/{type}/{subType?}/{arrangementId}`
+
+**Examples:**
+```
+GET /api/v1/factfinds/12345/arrangements/investments/isa/arr-789
+GET /api/v1/factfinds/12345/arrangements/pensions/personal-pension/arr-456
+GET /api/v1/factfinds/12345/arrangements/mortgages/arr-123
+```
+
+**Response:** Complete arrangement contract with all type-specific fields (see Section 13.5).
+
+#### 9A.3.3 Create Arrangement
+
+**Endpoint Pattern:** `POST /api/v1/factfinds/{factfindId}/arrangements/{type}/{subType}`
+
+**Examples:**
+```
+POST /api/v1/factfinds/12345/arrangements/investments/isa
+POST /api/v1/factfinds/12345/arrangements/pensions/personal-pension
+POST /api/v1/factfinds/12345/arrangements/mortgages
+```
+
+**Request Body:** Complete arrangement contract with required fields for the specific type.
+
+#### 9A.3.4 Update Arrangement
+
+**Endpoint Pattern:** `PATCH /api/v1/factfinds/{factfindId}/arrangements/{type}/{subType}/{arrangementId}`
+
+**Examples:**
+```
+PATCH /api/v1/factfinds/12345/arrangements/investments/isa/arr-789
+PATCH /api/v1/factfinds/12345/arrangements/pensions/personal-pension/arr-456
+```
+
+#### 9A.3.5 Delete Arrangement
+
+**Endpoint Pattern:** `DELETE /api/v1/factfinds/{factfindId}/arrangements/{type}/{subType}/{arrangementId}`
+
+**Examples:**
+```
+DELETE /api/v1/factfinds/12345/arrangements/investments/isa/arr-789
+DELETE /api/v1/factfinds/12345/arrangements/pensions/personal-pension/arr-456
+```
+
+### 9A.4 Arrangement Sub-Resources
+
+#### 9A.4.1 Contributions
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions`
+
+Manage regular and ad-hoc contributions to arrangements.
+
+#### 9A.4.2 Withdrawals
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals`
+
+Manage withdrawals from arrangements (pensions, investments).
+
+#### 9A.4.3 Beneficiaries
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries`
+
+Manage beneficiaries for arrangements (pensions, protection, investments).
+
+#### 9A.4.4 Valuations
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations`
+
+Track historical valuations of arrangements.
+
+### 9A.5 Client Pension Summary
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/pension-summary`
+
+**Description:** Aggregate view of all pension arrangements for a specific client.
+
+**Response:**
+```json
+{
+  "clientId": "client-123",
+  "clientName": "John Smith",
+  "totalPensionValue": {
+    "amount": 325000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "statePensionForecast": {
+    "weeklyAmount": {
+      "amount": 203.85,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "qualifyingYears": 35,
+    "statePensionAge": 67
+  },
+  "pensionArrangements": [
+    {
+      "arrangementId": "arr-456",
+      "arrangementType": "PersonalPension",
+      "provider": {
+        "id": "provider-456",
+        "name": "ABC Pension Provider Ltd"
+      },
+      "currentValue": {
+        "amount": 125000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "_links": {
+        "self": {
+          "href": "/api/v1/factfinds/12345/arrangements/pensions/personal-pension/arr-456"
+        }
+      }
+    }
+  ],
+  "projectedRetirementIncome": {
+    "amount": 18500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "_links": {
+    "self": {
+      "href": "/api/v1/factfinds/12345/clients/client-123/pension-summary"
+    },
+    "client": {
+      "href": "/api/v1/factfinds/12345/clients/client-123"
+    },
+    "allPensions": {
+      "href": "/api/v1/factfinds/12345/arrangements/pensions?clientId=client-123"
+    }
+  }
+}
+```
+
+---
+
+## 9B. FactFind Savings & Investments API
+
+### 9B.1 Overview
 
 **Purpose:** Dedicated management of savings and investment products with specialized tracking, performance monitoring, and rebalancing capabilities.
 
@@ -8565,7 +8899,7 @@ Savings & Investments API provides specialized operations for investment product
 - Offshore Funds (Tax) Regulations 2009
 - Consumer Duty (Value Assessment and Fair Outcomes)
 
-### 9A.2 Operations Summary
+### 9B.2 Operations Summary
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
@@ -8580,9 +8914,9 @@ Savings & Investments API provides specialized operations for investment product
 | POST | `/api/v1/factfinds/{factfindId}/investments/rebalance` | Generate rebalancing recommendations | `investments:write` |
 | GET | `/api/v1/factfinds/{factfindId}/investments/tax-analysis` | Analyze tax wrapper efficiency | `investments:read` |
 
-### 9A.3 Key Endpoints
+### 9B.3 Key Endpoints
 
-#### 9A.3.1 List Investment Products
+#### 9B.3.1 List Investment Products
 
 **Endpoint:** `GET /api/v1/factfinds/{factfindId}/investments`
 
@@ -8716,7 +9050,7 @@ Savings & Investments API provides specialized operations for investment product
 - `asOfDate` must be valid ISO 8601 date format
 - `includePerformance=true` requires performance data to be available
 
-#### 9A.3.2 Get Portfolio Summary
+#### 9B.3.2 Get Portfolio Summary
 
 **Endpoint:** `GET /api/v1/factfinds/{factfindId}/investments/summary`
 
@@ -9890,7 +10224,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 ```
 Server generates `id`, `clientNumber`, `createdAt`, `updatedAt`, `fullName`, `age`, and populates reference display fields. Returns complete contract.
 
-**Updating a Client (PUT /api/v1/clients/client-123):**
+**Updating a Client (PUT /api/v1/factfinds/{factfindId}/clients/client-123):**
 ```json
 {
   "name": {
@@ -9918,7 +10252,7 @@ Server generates `id`, `clientNumber`, `createdAt`, `updatedAt`, `fullName`, `ag
 ```
 Cannot change `dateOfBirth` (write-once). Server updates `updatedAt`, `fullName`, and returns complete contract.
 
-**Partial Update (PATCH /api/v1/clients/client-123):**
+**Partial Update (PATCH /api/v1/factfinds/{factfindId}/clients/client-123):**
 ```json
 {
   "name": {
@@ -21812,14 +22146,14 @@ Reference to a FactFind (ADVICE_CASE) entity.
 
 **Client Onboarding & KYC Context:**
 - CLIENT → `/api/v1/factfinds/{factfindId}/clients`
-- ADDRESS → `/api/v1/clients/{id}/addresses`
-- CONTACT_DETAIL → `/api/v1/clients/{id}/contacts`
-- PROFESSIONAL_CONTACT → `/api/v1/clients/{id}/professional-contacts`
-- CLIENT_RELATIONSHIP → `/api/v1/clients/{id}/relationships`
-- DPA_CONSENT → `/api/v1/clients/{id}/dpa-consent`
-- MARKETING_CONSENT → `/api/v1/clients/{id}/marketing-consent`
-- VULNERABLE_CUSTOMER_FLAG → `/api/v1/clients/{id}/vulnerability`
-- DEPENDANT → `/api/v1/clients/{id}/dependants`
+- ADDRESS → `/api/v1/factfinds/{factfindId}/clients/{id}/addresses`
+- CONTACT_DETAIL → `/api/v1/factfinds/{factfindId}/clients/{id}/contacts`
+- PROFESSIONAL_CONTACT → `/api/v1/factfinds/{factfindId}/clients/{id}/professional-contacts`
+- CLIENT_RELATIONSHIP → `/api/v1/factfinds/{factfindId}/clients/{id}/relationships`
+- DPA_CONSENT → `/api/v1/factfinds/{factfindId}/clients/{id}/dpa-consent`
+- MARKETING_CONSENT → `/api/v1/factfinds/{factfindId}/clients/{id}/marketing-consent`
+- VULNERABLE_CUSTOMER_FLAG → `/api/v1/factfinds/{factfindId}/clients/{id}/vulnerability`
+- DEPENDANT → `/api/v1/factfinds/{factfindId}/clients/{id}/dependants`
 
 **Circumstances Context:**
 - ADVICE_CASE → `/api/v1/factfinds`
@@ -21831,22 +22165,22 @@ Reference to a FactFind (ADVICE_CASE) entity.
 
 **Assets & Liabilities Context:**
 - ASSET → `/api/v1/factfinds/{factfindId}/assets`
-- BUSINESS_ASSET → `/api/v1/assets/{id}` (embedded in ASSET)
-- PROPERTY_DETAIL → `/api/v1/assets/{id}` (embedded in ASSET)
-- CREDIT_HISTORY → `/api/v1/clients/{id}/credit-history`
-- VALUATION → `/api/v1/arrangements/{id}/valuations`
+- BUSINESS_ASSET → `/api/v1/factfinds/{factfindId}/assets/{id}` (embedded in ASSET)
+- PROPERTY_DETAIL → `/api/v1/factfinds/{factfindId}/assets/{id}` (embedded in ASSET)
+- CREDIT_HISTORY → `/api/v1/factfinds/{factfindId}/clients/{id}/credit-history`
+- VALUATION → `/api/v1/factfinds/{factfindId}/arrangements/{id}/valuations`
 
 **Arrangements Context:**
 - ARRANGEMENT → `/api/v1/factfinds/{factfindId}/arrangements`
-- CONTRIBUTION → `/api/v1/arrangements/{id}/contributions`
-- WITHDRAWAL → `/api/v1/arrangements/{id}/withdrawals`
-- BENEFICIARY → `/api/v1/arrangements/{id}/beneficiaries`
-- CLIENT_PENSION → `/api/v1/clients/{id}/pension-summary`
+- CONTRIBUTION → `/api/v1/factfinds/{factfindId}/arrangements/{id}/contributions`
+- WITHDRAWAL → `/api/v1/factfinds/{factfindId}/arrangements/{id}/withdrawals`
+- BENEFICIARY → `/api/v1/factfinds/{factfindId}/arrangements/{id}/beneficiaries`
+- CLIENT_PENSION → `/api/v1/factfinds/{factfindId}/clients/{id}/pension-summary`
 
 **Goals Context:**
 - GOAL → `/api/v1/factfinds/{factfindId}/objectives`
-- OBJECTIVE → `/api/v1/goals/{id}/objectives`
-- NEED → `/api/v1/goals/{id}/needs`
+- OBJECTIVE → `/api/v1/factfinds/{factfindId}/goals/{id}/objectives`
+- NEED → `/api/v1/factfinds/{factfindId}/goals/{id}/needs`
 
 **Risk Profile Context:**
 - RISK_PROFILE → `/api/v1/factfinds/{factfindId}/risk-profile`
@@ -22064,23 +22398,23 @@ Version 2.1 introduces **breaking changes** to all API endpoints. The API has be
 
 | Old Endpoint (v2.0) | New Endpoint (v2.1) |
 |---------------------|---------------------|
-| `POST /api/v1/clients` | `POST /api/v1/factfinds/{factfindId}/clients` |
-| `GET /api/v1/clients/{clientId}` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}` |
-| `GET /api/v1/clients` | `GET /api/v1/factfinds/{factfindId}/clients` |
-| `PATCH /api/v1/clients/{clientId}` | `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}` |
-| `DELETE /api/v1/clients/{clientId}` | `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}` |
-| `POST /api/v1/clients/{clientId}/addresses` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` |
-| `GET /api/v1/clients/{clientId}/addresses` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` |
-| `POST /api/v1/clients/{clientId}/contacts` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` |
-| `POST /api/v1/clients/{clientId}/professional-contacts` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/professional-contacts` |
-| `POST /api/v1/clients/{clientId}/relationships` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` |
-| `GET /api/v1/clients/{clientId}/dpa-consent` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` |
-| `PUT /api/v1/clients/{clientId}/dpa-consent` | `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` |
-| `GET /api/v1/clients/{clientId}/marketing-consent` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` |
-| `GET /api/v1/clients/{clientId}/vulnerability` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` |
-| `POST /api/v1/clients/{clientId}/dependants` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` |
-| `GET /api/v1/clients/{clientId}/credit-history` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` |
-| `GET /api/v1/clients/{clientId}/pension-summary` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/pension-summary` |
+| `POST /api/v1/factfinds/{factfindId}/clients` | `POST /api/v1/factfinds/{factfindId}/clients` |
+| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}` |
+| `GET /api/v1/factfinds/{factfindId}/clients` | `GET /api/v1/factfinds/{factfindId}/clients` |
+| `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}` | `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}` |
+| `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}` | `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}` |
+| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` |
+| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` |
+| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` |
+| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/professional-contacts` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/professional-contacts` |
+| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` |
+| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` |
+| `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` |
+| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` |
+| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` |
+| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` |
+| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` |
+| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/pension-summary` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/pension-summary` |
 
 #### Employment APIs
 
@@ -22113,11 +22447,11 @@ Version 2.1 introduces **breaking changes** to all API endpoints. The API has be
 
 | Old Endpoint (v2.0) | New Endpoint (v2.1) |
 |---------------------|---------------------|
-| `POST /api/v1/assets` | `POST /api/v1/factfinds/{factfindId}/assets` |
-| `GET /api/v1/assets` | `GET /api/v1/factfinds/{factfindId}/assets` |
-| `GET /api/v1/assets/{assetId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
-| `PATCH /api/v1/assets/{assetId}` | `PATCH /api/v1/factfinds/{factfindId}/assets/{assetId}` |
-| `DELETE /api/v1/assets/{assetId}` | `DELETE /api/v1/factfinds/{factfindId}/assets/{assetId}` |
+| `POST /api/v1/factfinds/{factfindId}/assets` | `POST /api/v1/factfinds/{factfindId}/assets` |
+| `GET /api/v1/factfinds/{factfindId}/assets` | `GET /api/v1/factfinds/{factfindId}/assets` |
+| `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
+| `PATCH /api/v1/factfinds/{factfindId}/assets/{assetId}` | `PATCH /api/v1/factfinds/{factfindId}/assets/{assetId}` |
+| `DELETE /api/v1/factfinds/{factfindId}/assets/{assetId}` | `DELETE /api/v1/factfinds/{factfindId}/assets/{assetId}` |
 | `POST /api/v1/properties` | `POST /api/v1/factfinds/{factfindId}/assets` (type=property) |
 | `GET /api/v1/properties/{propertyId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
 | `POST /api/v1/equities` | `POST /api/v1/factfinds/{factfindId}/assets` (type=equity) |
@@ -22127,16 +22461,16 @@ Version 2.1 introduces **breaking changes** to all API endpoints. The API has be
 
 | Old Endpoint (v2.0) | New Endpoint (v2.1) |
 |---------------------|---------------------|
-| `POST /api/v1/arrangements` | `POST /api/v1/factfinds/{factfindId}/arrangements` |
-| `GET /api/v1/arrangements` | `GET /api/v1/factfinds/{factfindId}/arrangements` |
-| `GET /api/v1/arrangements/{arrangementId}` | `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
-| `PATCH /api/v1/arrangements/{arrangementId}` | `PATCH /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
-| `DELETE /api/v1/arrangements/{arrangementId}` | `DELETE /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
-| `POST /api/v1/arrangements/{arrangementId}/contributions` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` |
-| `GET /api/v1/arrangements/{arrangementId}/contributions` | `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` |
-| `POST /api/v1/arrangements/{arrangementId}/withdrawals` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` |
-| `POST /api/v1/arrangements/{arrangementId}/beneficiaries` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` |
-| `POST /api/v1/arrangements/{arrangementId}/valuations` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` |
+| `POST /api/v1/factfinds/{factfindId}/arrangements` | `POST /api/v1/factfinds/{factfindId}/arrangements` |
+| `GET /api/v1/factfinds/{factfindId}/arrangements` | `GET /api/v1/factfinds/{factfindId}/arrangements` |
+| `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
+| `PATCH /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | `PATCH /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
+| `DELETE /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | `DELETE /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
+| `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` |
+| `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` |
+| `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` |
+| `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` |
+| `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` |
 
 **Type-Specific Arrangement Endpoints (NEW in v2.1):**
 
@@ -22151,13 +22485,13 @@ Version 2.1 introduces **breaking changes** to all API endpoints. The API has be
 
 | Old Endpoint (v2.0) | New Endpoint (v2.1) |
 |---------------------|---------------------|
-| `POST /api/v1/goals` | `POST /api/v1/factfinds/{factfindId}/objectives` |
-| `GET /api/v1/goals` | `GET /api/v1/factfinds/{factfindId}/objectives` |
-| `GET /api/v1/goals/{goalId}` | `GET /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
-| `PATCH /api/v1/goals/{goalId}` | `PATCH /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
-| `DELETE /api/v1/goals/{goalId}` | `DELETE /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
-| `POST /api/v1/objectives` | `POST /api/v1/factfinds/{factfindId}/objectives` |
-| `POST /api/v1/objectives/{objectiveId}/needs` | `POST /api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` |
+| `POST /api/v1/factfinds/{factfindId}/goals` | `POST /api/v1/factfinds/{factfindId}/objectives` |
+| `GET /api/v1/factfinds/{factfindId}/goals` | `GET /api/v1/factfinds/{factfindId}/objectives` |
+| `GET /api/v1/factfinds/{factfindId}/goals/{goalId}` | `GET /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
+| `PATCH /api/v1/factfinds/{factfindId}/goals/{goalId}` | `PATCH /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
+| `DELETE /api/v1/factfinds/{factfindId}/goals/{goalId}` | `DELETE /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
+| `POST /api/v1/factfinds/{factfindId}/objectives` | `POST /api/v1/factfinds/{factfindId}/objectives` |
+| `POST /api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` | `POST /api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` |
 
 #### Risk Profile APIs
 
@@ -22174,12 +22508,12 @@ Version 2.1 introduces **breaking changes** to all API endpoints. The API has be
 
 | Old Endpoint (v2.0) | New Endpoint (v2.1) |
 |---------------------|---------------------|
-| `POST /api/v1/gifts` | `POST /api/v1/factfinds/{factfindId}/gifts` |
-| `GET /api/v1/gifts` | `GET /api/v1/factfinds/{factfindId}/gifts` |
-| `GET /api/v1/gifts/{giftId}` | `GET /api/v1/factfinds/{factfindId}/gifts/{giftId}` |
-| `POST /api/v1/trusts` | `POST /api/v1/factfinds/{factfindId}/trusts` |
-| `GET /api/v1/trusts` | `GET /api/v1/factfinds/{factfindId}/trusts` |
-| `GET /api/v1/trusts/{trustId}` | `GET /api/v1/factfinds/{factfindId}/trusts/{trustId}` |
+| `POST /api/v1/factfinds/{factfindId}/gifts` | `POST /api/v1/factfinds/{factfindId}/gifts` |
+| `GET /api/v1/factfinds/{factfindId}/gifts` | `GET /api/v1/factfinds/{factfindId}/gifts` |
+| `GET /api/v1/factfinds/{factfindId}/gifts/{giftId}` | `GET /api/v1/factfinds/{factfindId}/gifts/{giftId}` |
+| `POST /api/v1/factfinds/{factfindId}/trusts` | `POST /api/v1/factfinds/{factfindId}/trusts` |
+| `GET /api/v1/factfinds/{factfindId}/trusts` | `GET /api/v1/factfinds/{factfindId}/trusts` |
+| `GET /api/v1/factfinds/{factfindId}/trusts/{trustId}` | `GET /api/v1/factfinds/{factfindId}/trusts/{trustId}` |
 
 ### Migration Steps
 
@@ -22280,8 +22614,8 @@ const api = new ClientAPI(factfindId);
 // Old HATEOAS links
 {
   "_links": {
-    "self": { "href": "/api/v1/clients/12345" },
-    "addresses": { "href": "/api/v1/clients/12345/addresses" }
+    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/12345" },
+    "addresses": { "href": "/api/v1/factfinds/{factfindId}/clients/12345/addresses" }
   }
 }
 ```
@@ -22308,7 +22642,7 @@ Query parameters remain the same, but base URLs change:
 
 **Before (v2.0):**
 ```
-GET /api/v1/clients?page=1&limit=20&sort=lastName
+GET /api/v1/factfinds/{factfindId}/clients?page=1&limit=20&sort=lastName
 ```
 
 **After (v2.1):**
@@ -22322,7 +22656,7 @@ Response structure remains the same - only URLs change:
 
 **Before (v2.0):**
 ```javascript
-const response = await fetch('/api/v1/clients/12345');
+const response = await fetch('/api/v1/factfinds/{factfindId}/clients/12345');
 const client = await response.json();
 console.log(client.clientId); // Still works
 ```
@@ -22379,7 +22713,7 @@ Update base URLs in your API mocks:
 
 ```javascript
 // Before
-const mockClientUrl = '/api/v1/clients/12345';
+const mockClientUrl = '/api/v1/factfinds/{factfindId}/clients/12345';
 
 // After
 const mockFactfindId = '999';
@@ -22394,7 +22728,7 @@ Update test fixtures:
 // Before
 describe('Client API', () => {
   it('should fetch client', async () => {
-    const response = await fetch('/api/v1/clients/12345');
+    const response = await fetch('/api/v1/factfinds/{factfindId}/clients/12345');
     expect(response.status).toBe(200);
   });
 });
