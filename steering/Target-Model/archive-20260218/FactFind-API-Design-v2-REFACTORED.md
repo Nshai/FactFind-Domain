@@ -3366,6 +3366,3863 @@ Income contract with required-on-create fields.
 
 
 
+### 5.5 Identity Verification API
+
+**Purpose:** Manage identity verification, KYC compliance, and AML checks for regulatory compliance.
+
+**Scope:**
+- Document verification (passport, driving license, utility bills)
+- KYC (Know Your Customer) workflow management
+- AML (Anti-Money Laundering) checks and screening
+- PEP (Politically Exposed Person) screening
+- Identity verification status tracking
+- Document upload and storage with retention policies
+- Verification provider integration (e.g., Onfido, Jumio, Trulioo)
+- Regulatory compliance tracking (MLR 2017, FCA requirements)
+- Re-verification workflow (every 2 years or on risk trigger)
+- Enhanced Due Diligence (EDD) for high-risk clients
+
+**Aggregate Root:** FactFind (identity verification is nested within client)
+
+**Regulatory Compliance:**
+- MLR 2017 (Money Laundering Regulations 2017) - Customer Due Diligence
+- FCA Handbook - SYSC 6.3 (Financial Crime)
+- FCA Handbook - SYSC 3.2 (AML Systems and Controls)
+- JMLSG Guidance (Joint Money Laundering Steering Group)
+- Data Protection Act 2018 - Lawful basis for processing
+- GDPR Article 6(1)(c) - Legal obligation
+
+#### 5.5.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification` | Submit identity document | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification` | Get verification status | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}` | Update verification | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/history` | Get verification history | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/aml-check` | Trigger AML check | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/documents` | Get uploaded documents | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/documents` | Upload document | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/documents/{documentId}` | Delete document | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/verify` | Submit for verification | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/approve` | Manually approve verification | `client:admin` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/reject` | Reject verification | `client:admin` |
+
+#### 5.5.2 Key Endpoints
+
+##### 5.5.2.1 Submit Identity Document
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification`
+
+**Description:** Submit identity verification documents for a client. This initiates the KYC process and creates an identity verification record.
+
+**Request Body:**
+
+```json
+{
+  "verificationType": "StandardKYC",
+  "verificationReason": "NewClientOnboarding",
+  "riskCategory": "Standard",
+  "documents": [
+    {
+      "documentType": "Passport",
+      "documentNumber": "123456789",
+      "issuingCountry": "GB",
+      "issuingAuthority": "HM Passport Office",
+      "issueDate": "2019-03-15",
+      "expiryDate": "2029-03-15",
+      "documentReference": "doc-upload-abc123",
+      "documentUrl": "https://secure-docs.factfind.com/uploads/abc123.pdf",
+      "firstName": "John",
+      "middleName": "Michael",
+      "lastName": "Smith",
+      "dateOfBirth": "1985-06-20",
+      "placeOfBirth": "London, United Kingdom",
+      "nationality": "British",
+      "uploadedBy": "adv-789",
+      "uploadedDate": "2026-02-17T10:00:00Z"
+    },
+    {
+      "documentType": "UtilityBill",
+      "utilityType": "Electricity",
+      "providerName": "British Gas",
+      "accountNumber": "****5678",
+      "billDate": "2026-01-15",
+      "documentReference": "doc-upload-def456",
+      "documentUrl": "https://secure-docs.factfind.com/uploads/def456.pdf",
+      "address": {
+        "line1": "123 High Street",
+        "line2": "Flat 4B",
+        "city": "London",
+        "county": "Greater London",
+        "postcode": "SW1A 1AA",
+        "country": "United Kingdom"
+      },
+      "uploadedBy": "adv-789",
+      "uploadedDate": "2026-02-17T10:05:00Z"
+    }
+  ],
+  "verificationProvider": "Onfido",
+  "performAMLCheck": true,
+  "performPEPCheck": true,
+  "adviserNotes": "Standard KYC verification for new client. Client provided original passport for inspection during meeting.",
+  "adviserId": "adv-789",
+  "verificationDate": "2026-02-17T10:00:00Z"
+}
+```
+
+**Verification Type Values:**
+- `StandardKYC` - Standard customer due diligence
+- `SimplifiedDueDiligence` - Simplified checks for low-risk clients
+- `EnhancedDueDiligence` - Enhanced checks for high-risk clients
+- `Reverification` - Periodic re-verification (every 2 years)
+- `RiskTriggered` - Verification triggered by risk event
+
+**Verification Reason Values:**
+- `NewClientOnboarding` - Initial client onboarding
+- `PeriodicReview` - Regular 2-year re-verification
+- `RiskEvent` - Triggered by suspicious activity or risk indicator
+- `RegulatoryRequirement` - Compliance-mandated verification
+- `ClientUpdate` - Client requested update to personal details
+- `AddressChange` - Verification of new address
+
+**Risk Category Values:**
+- `Low` - Low-risk client (simplified due diligence permitted)
+- `Standard` - Standard risk client (standard due diligence)
+- `High` - High-risk client (enhanced due diligence required)
+- `Prohibited` - Client in prohibited category (cannot onboard)
+
+**Document Type Values:**
+- `Passport` - Valid passport
+- `DrivingLicense` - UK or EU driving license
+- `NationalIdentityCard` - EU/EEA national ID card
+- `BiometricResidencePermit` - UK biometric residence permit
+- `UtilityBill` - Recent utility bill (gas, electricity, water)
+- `BankStatement` - Recent bank statement
+- `CouncilTaxBill` - Council tax bill
+- `MortgageStatement` - Mortgage statement
+- `TenancyAgreement` - Signed tenancy agreement
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789
+```
+
+```json
+{
+  "id": "idv-789",
+  "factfindId": "ff-456",
+  "clientId": "client-123",
+  "verificationType": "StandardKYC",
+  "verificationReason": "NewClientOnboarding",
+  "status": "Pending",
+  "riskCategory": "Standard",
+  "submittedDate": "2026-02-17T10:05:30Z",
+  "submittedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "role": "FinancialAdviser"
+  },
+  "verificationProvider": "Onfido",
+  "providerReferenceId": "onfido-check-abc123xyz",
+  "documents": [
+    {
+      "id": "doc-001",
+      "documentType": "Passport",
+      "documentNumber": "123456789",
+      "issuingCountry": "GB",
+      "issueDate": "2019-03-15",
+      "expiryDate": "2029-03-15",
+      "status": "PendingVerification",
+      "documentReference": "doc-upload-abc123",
+      "uploadedDate": "2026-02-17T10:00:00Z",
+      "retentionExpiryDate": "2032-02-17"
+    },
+    {
+      "id": "doc-002",
+      "documentType": "UtilityBill",
+      "utilityType": "Electricity",
+      "providerName": "British Gas",
+      "billDate": "2026-01-15",
+      "status": "PendingVerification",
+      "documentReference": "doc-upload-def456",
+      "uploadedDate": "2026-02-17T10:05:00Z",
+      "retentionExpiryDate": "2032-02-17"
+    }
+  ],
+  "amlCheck": {
+    "status": "Initiated",
+    "provider": "WorldCheck",
+    "initiatedDate": "2026-02-17T10:05:30Z",
+    "checkReference": "wc-check-789"
+  },
+  "pepCheck": {
+    "status": "Initiated",
+    "provider": "DowJones",
+    "initiatedDate": "2026-02-17T10:05:30Z",
+    "checkReference": "dj-pep-456"
+  },
+  "estimatedCompletionDate": "2026-02-19T10:05:30Z",
+  "nextReviewDate": "2028-02-17",
+  "regulatoryCompliance": {
+    "mlr2017Compliant": false,
+    "customerDueDiligenceComplete": false,
+    "identityVerified": false,
+    "addressVerified": false,
+    "sourceOfWealthVerified": false
+  },
+  "adviserNotes": "Standard KYC verification for new client. Client provided original passport for inspection during meeting.",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "documents": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/documents" },
+    "aml-check": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check" },
+    "verify": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/verify", "method": "POST" }
+  }
+}
+```
+
+**Verification Status Values:**
+- `Pending` - Submitted, awaiting processing
+- `InProgress` - Verification checks in progress
+- `AwaitingDocuments` - Additional documents required
+- `AwaitingManualReview` - Requires manual compliance review
+- `Verified` - Successfully verified
+- `PartiallyVerified` - Some checks passed, some failed
+- `Failed` - Verification failed
+- `Rejected` - Manually rejected by compliance
+- `Expired` - Verification has expired (>2 years)
+
+**Validation Rules:**
+- At least one identity document (Passport, DrivingLicense, NationalIdentityCard) required
+- At least one proof of address document required (< 3 months old)
+- Passport/DrivingLicense must not be expired
+- Document names must match client name in FactFind
+- Address on proof of address must match client address
+- All required fields for document type must be provided
+- AML/PEP checks required for all Standard and High risk clients
+- Enhanced Due Diligence required for High risk category
+
+**HTTP Status Codes:**
+- `201 Created` - Identity verification created successfully
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/validation-error",
+  "title": "Identity Verification Validation Failed",
+  "status": 422,
+  "detail": "Utility bill is older than 3 months and cannot be used for address verification",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification",
+  "errors": [
+    {
+      "field": "documents[1].billDate",
+      "message": "Utility bill must be dated within the last 3 months",
+      "rejectedValue": "2025-10-15",
+      "constraint": "maxAge",
+      "maxAgeMonths": 3
+    }
+  ]
+}
+```
+
+---
+
+##### 5.5.2.2 Get Verification Status
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification`
+
+**Description:** Get the current identity verification status for a client, including document verification results, AML check results, and compliance status.
+
+**Query Parameters:**
+- `includeDocuments` - Include document details (default: true)
+- `includeHistory` - Include verification history (default: false)
+
+**Response:**
+
+```json
+{
+  "id": "idv-789",
+  "factfindId": "ff-456",
+  "clientId": "client-123",
+  "clientName": "John Michael Smith",
+  "verificationType": "StandardKYC",
+  "verificationReason": "NewClientOnboarding",
+  "status": "Verified",
+  "riskCategory": "Standard",
+  "overallVerificationScore": 95,
+  "submittedDate": "2026-02-17T10:05:30Z",
+  "submittedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "role": "FinancialAdviser"
+  },
+  "verifiedDate": "2026-02-17T14:30:00Z",
+  "verifiedBy": {
+    "id": "user-compliance-001",
+    "name": "Compliance Officer",
+    "role": "ComplianceOfficer"
+  },
+  "verificationProvider": "Onfido",
+  "providerReferenceId": "onfido-check-abc123xyz",
+  "providerResult": {
+    "overallResult": "Clear",
+    "documentAuthenticity": "Genuine",
+    "faceMatch": "Match",
+    "faceMatchScore": 98,
+    "livenessCheck": "Pass",
+    "addressCheck": "Verified",
+    "completedDate": "2026-02-17T12:15:00Z"
+  },
+  "documents": [
+    {
+      "id": "doc-001",
+      "documentType": "Passport",
+      "documentNumber": "123456789",
+      "issuingCountry": "GB",
+      "issuingAuthority": "HM Passport Office",
+      "issueDate": "2019-03-15",
+      "expiryDate": "2029-03-15",
+      "status": "Verified",
+      "verificationStatus": "Genuine",
+      "verificationDate": "2026-02-17T12:15:00Z",
+      "verificationProvider": "Onfido",
+      "verificationNotes": "Document verified as genuine. All security features present and correct.",
+      "documentReference": "doc-upload-abc123",
+      "uploadedDate": "2026-02-17T10:00:00Z",
+      "retentionExpiryDate": "2032-02-17",
+      "extractedData": {
+        "firstName": "JOHN",
+        "middleName": "MICHAEL",
+        "lastName": "SMITH",
+        "dateOfBirth": "1985-06-20",
+        "placeOfBirth": "LONDON",
+        "nationality": "BRITISH",
+        "sex": "M"
+      },
+      "securityFeatures": {
+        "mrzPresent": true,
+        "mrzValid": true,
+        "hologramPresent": true,
+        "chipPresent": true,
+        "chipValid": true
+      }
+    },
+    {
+      "id": "doc-002",
+      "documentType": "UtilityBill",
+      "utilityType": "Electricity",
+      "providerName": "British Gas",
+      "accountNumber": "****5678",
+      "billDate": "2026-01-15",
+      "status": "Verified",
+      "verificationStatus": "AddressConfirmed",
+      "verificationDate": "2026-02-17T12:20:00Z",
+      "verificationProvider": "Manual",
+      "verificationNotes": "Address verified against client declaration. Document appears genuine.",
+      "documentReference": "doc-upload-def456",
+      "uploadedDate": "2026-02-17T10:05:00Z",
+      "retentionExpiryDate": "2032-02-17",
+      "address": {
+        "line1": "123 High Street",
+        "line2": "Flat 4B",
+        "city": "London",
+        "county": "Greater London",
+        "postcode": "SW1A 1AA",
+        "country": "United Kingdom"
+      }
+    }
+  ],
+  "amlCheck": {
+    "id": "aml-check-123",
+    "status": "Clear",
+    "riskRating": "Low",
+    "provider": "WorldCheck",
+    "checkReference": "wc-check-789",
+    "initiatedDate": "2026-02-17T10:05:30Z",
+    "completedDate": "2026-02-17T10:45:00Z",
+    "screeningResults": {
+      "sanctionsMatch": false,
+      "watchlistMatch": false,
+      "adverseMediaMatch": false,
+      "lawEnforcementMatch": false,
+      "matchCount": 0
+    },
+    "searchCriteria": {
+      "firstName": "John",
+      "middleName": "Michael",
+      "lastName": "Smith",
+      "dateOfBirth": "1985-06-20",
+      "nationality": "British",
+      "residenceCountry": "United Kingdom"
+    },
+    "listsScreened": [
+      "OFAC SDN List (US)",
+      "EU Consolidated Sanctions List",
+      "UK HMT Sanctions List",
+      "UN Consolidated Sanctions List",
+      "Interpol Wanted Persons",
+      "National Crime Agency Watch List"
+    ],
+    "nextScreeningDate": "2027-02-17",
+    "complianceNotes": "No matches found across all sanctions and watchlists. Client clear for onboarding."
+  },
+  "pepCheck": {
+    "id": "pep-check-456",
+    "status": "NotPEP",
+    "riskRating": "Low",
+    "provider": "DowJones",
+    "checkReference": "dj-pep-456",
+    "initiatedDate": "2026-02-17T10:05:30Z",
+    "completedDate": "2026-02-17T10:50:00Z",
+    "pepStatus": "NotIdentified",
+    "pepCategories": [],
+    "relativeOrCloseAssociate": false,
+    "adverseMedia": {
+      "matchFound": false,
+      "newsArticles": 0
+    },
+    "searchResults": {
+      "directMatch": false,
+      "familyMemberMatch": false,
+      "closeAssociateMatch": false
+    },
+    "complianceNotes": "No PEP matches identified. Client is not a politically exposed person."
+  },
+  "sourceOfWealth": {
+    "declared": true,
+    "primarySource": "Employment",
+    "employmentDetails": {
+      "employer": "ABC Corporation Ltd",
+      "position": "Senior Software Engineer",
+      "yearsEmployed": 8,
+      "annualIncome": 75000
+    },
+    "secondarySources": [
+      "Savings",
+      "Investment Returns"
+    ],
+    "verified": true,
+    "verificationMethod": "Payslips",
+    "verificationDate": "2026-02-17T14:00:00Z",
+    "verificationNotes": "Recent payslips provided showing consistent income. Matches declared amount."
+  },
+  "sourceOfFunds": {
+    "declared": true,
+    "source": "PersonalSavings",
+    "amount": 50000,
+    "verified": true,
+    "verificationMethod": "BankStatements",
+    "verificationDate": "2026-02-17T14:00:00Z",
+    "verificationNotes": "Bank statements show accumulated savings over 5 years. Consistent with declared source."
+  },
+  "nextReviewDate": "2028-02-17",
+  "reviewFrequency": "TwoYearly",
+  "expiryDate": "2028-02-17",
+  "daysUntilExpiry": 730,
+  "regulatoryCompliance": {
+    "mlr2017Compliant": true,
+    "customerDueDiligenceComplete": true,
+    "identityVerified": true,
+    "addressVerified": true,
+    "sourceOfWealthVerified": true,
+    "sourceOfFundsVerified": true,
+    "ongoingMonitoring": true,
+    "complianceCheckDate": "2026-02-17T14:30:00Z"
+  },
+  "complianceApproval": {
+    "approved": true,
+    "approvedBy": {
+      "id": "user-compliance-001",
+      "name": "Compliance Officer",
+      "role": "ComplianceOfficer"
+    },
+    "approvalDate": "2026-02-17T14:30:00Z",
+    "approvalNotes": "All KYC checks completed successfully. Client approved for onboarding. Standard risk category confirmed."
+  },
+  "outstandingRequirements": [],
+  "verificationHistory": {
+    "attemptCount": 1,
+    "lastAttempt": "2026-02-17T10:05:30Z",
+    "successfulAttempts": 1,
+    "failedAttempts": 0
+  },
+  "adviserNotes": "Standard KYC verification for new client. Client provided original passport for inspection during meeting.",
+  "internalNotes": "No issues identified during verification. All checks passed first time.",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "documents": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/documents" },
+    "history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/history" },
+    "aml-check": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check" }
+  }
+}
+```
+
+**AML Status Values:**
+- `NotStarted` - AML check not initiated
+- `Initiated` - Check in progress
+- `InProgress` - Screening in progress
+- `Clear` - No matches found
+- `PotentialMatch` - Requires manual review
+- `Match` - Confirmed match found
+- `Failed` - Check failed (technical error)
+- `Expired` - Check results expired
+
+**PEP Status Values:**
+- `NotStarted` - PEP check not initiated
+- `Initiated` - Check in progress
+- `NotPEP` - Not a politically exposed person
+- `DomesticPEP` - UK politically exposed person
+- `ForeignPEP` - Foreign politically exposed person
+- `InternationalPEP` - International organization PEP
+- `FormerPEP` - Former PEP (within 12 months)
+- `RelativeOfPEP` - Family member of PEP
+- `CloseAssociateOfPEP` - Known close associate of PEP
+
+**Risk Rating Values:**
+- `Low` - Low risk client
+- `Medium` - Medium risk client
+- `High` - High risk client requiring EDD
+- `Prohibited` - Cannot onboard (sanctions match)
+
+**HTTP Status Codes:**
+- `200 OK` - Verification status retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client or verification not found
+
+---
+
+##### 5.5.2.3 Trigger AML Check
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/{id}/aml-check`
+
+**Description:** Trigger or re-run AML (Anti-Money Laundering) screening for a client. This performs sanctions screening, PEP checks, and adverse media screening.
+
+**Request Body:**
+
+```json
+{
+  "checkType": "Comprehensive",
+  "includeAdverseMedia": true,
+  "includePEPCheck": true,
+  "includeSanctionsCheck": true,
+  "includeWatchlistCheck": true,
+  "provider": "WorldCheck",
+  "searchCriteria": {
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "dateOfBirth": "1985-06-20",
+    "nationality": "British",
+    "residenceCountry": "United Kingdom",
+    "additionalCountries": ["United States"],
+    "occupation": "Software Engineer"
+  },
+  "reason": "InitialOnboarding",
+  "adviserId": "adv-789",
+  "checkDate": "2026-02-17T11:00:00Z",
+  "notes": "Initial AML screening for new client onboarding"
+}
+```
+
+**Check Type Values:**
+- `Basic` - Sanctions lists only
+- `Standard` - Sanctions + PEP checks
+- `Comprehensive` - Sanctions + PEP + Adverse Media + Watchlists
+- `Enhanced` - Comprehensive + deep web search
+
+**AML Reason Values:**
+- `InitialOnboarding` - First-time client screening
+- `PeriodicReview` - Regular annual/bi-annual screening
+- `TransactionTrigger` - Triggered by large/suspicious transaction
+- `RiskEscalation` - Client risk category increased
+- `RegulatoryRequirement` - Mandated by regulator
+- `ManualRequest` - Adviser-initiated review
+
+**Provider Values:**
+- `WorldCheck` - Refinitiv World-Check
+- `DowJones` - Dow Jones Risk & Compliance
+- `ComplyAdvantage` - ComplyAdvantage AML
+- `LexisNexis` - LexisNexis Bridger
+- `Trulioo` - Trulioo GlobalGateway
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123
+```
+
+```json
+{
+  "id": "aml-check-123",
+  "identityVerificationId": "idv-789",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "checkType": "Comprehensive",
+  "status": "InProgress",
+  "initiatedDate": "2026-02-17T11:00:15Z",
+  "initiatedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "role": "FinancialAdviser"
+  },
+  "provider": "WorldCheck",
+  "providerReference": "wc-check-2026-02-17-789",
+  "estimatedCompletionTime": "2026-02-17T11:30:15Z",
+  "searchCriteria": {
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "dateOfBirth": "1985-06-20",
+    "nationality": "British",
+    "residenceCountry": "United Kingdom",
+    "additionalCountries": ["United States"],
+    "occupation": "Software Engineer"
+  },
+  "checksIncluded": {
+    "sanctionsCheck": true,
+    "pepCheck": true,
+    "adverseMediaCheck": true,
+    "watchlistCheck": true,
+    "lawEnforcementCheck": true
+  },
+  "listsToScreen": [
+    "OFAC SDN List (US)",
+    "OFAC Consolidated Non-SDN List (US)",
+    "EU Consolidated Sanctions List",
+    "UK HMT Sanctions List",
+    "UN Consolidated Sanctions List",
+    "FATF High-Risk Jurisdictions",
+    "Interpol Wanted Persons",
+    "National Crime Agency Watch List",
+    "World Bank Debarred Entities",
+    "Global PEP Database"
+  ],
+  "reason": "InitialOnboarding",
+  "notes": "Initial AML screening for new client onboarding",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123" },
+    "identity-verification": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "poll": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123", "method": "GET" }
+  }
+}
+```
+
+**Complete AML Check Result (after processing):**
+
+When the check is complete (status: "Clear" or "Match"), the response includes:
+
+```json
+{
+  "id": "aml-check-123",
+  "identityVerificationId": "idv-789",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "checkType": "Comprehensive",
+  "status": "Clear",
+  "riskRating": "Low",
+  "overallResult": "NoMatchesFound",
+  "initiatedDate": "2026-02-17T11:00:15Z",
+  "completedDate": "2026-02-17T11:25:30Z",
+  "processingTime": "00:25:15",
+  "initiatedBy": {
+    "id": "adv-789",
+    "name": "Jane Adviser",
+    "role": "FinancialAdviser"
+  },
+  "reviewedBy": {
+    "id": "user-compliance-001",
+    "name": "Compliance Officer",
+    "role": "ComplianceOfficer"
+  },
+  "reviewedDate": "2026-02-17T11:30:00Z",
+  "provider": "WorldCheck",
+  "providerReference": "wc-check-2026-02-17-789",
+  "searchCriteria": {
+    "firstName": "John",
+    "middleName": "Michael",
+    "lastName": "Smith",
+    "dateOfBirth": "1985-06-20",
+    "nationality": "British",
+    "residenceCountry": "United Kingdom",
+    "additionalCountries": ["United States"],
+    "occupation": "Software Engineer"
+  },
+  "screeningResults": {
+    "sanctionsCheck": {
+      "status": "Clear",
+      "matchCount": 0,
+      "potentialMatches": [],
+      "listsScreened": [
+        {
+          "listName": "OFAC SDN List (US)",
+          "listVersion": "2026-02-17",
+          "matches": 0
+        },
+        {
+          "listName": "EU Consolidated Sanctions List",
+          "listVersion": "2026-02-15",
+          "matches": 0
+        },
+        {
+          "listName": "UK HMT Sanctions List",
+          "listVersion": "2026-02-16",
+          "matches": 0
+        },
+        {
+          "listName": "UN Consolidated Sanctions List",
+          "listVersion": "2026-02-14",
+          "matches": 0
+        }
+      ]
+    },
+    "pepCheck": {
+      "status": "Clear",
+      "pepStatus": "NotPEP",
+      "matchCount": 0,
+      "potentialMatches": [],
+      "categoriesChecked": [
+        "HeadOfState",
+        "GovernmentMinister",
+        "SeniorGovernmentOfficial",
+        "JudicialOfficial",
+        "MilitaryOfficer",
+        "PoliticalPartyOfficial",
+        "StateOwnedEnterprise"
+      ]
+    },
+    "adverseMediaCheck": {
+      "status": "Clear",
+      "matchCount": 0,
+      "newsArticlesReviewed": 127,
+      "categories": [
+        {
+          "category": "Financial Crime",
+          "matches": 0
+        },
+        {
+          "category": "Fraud",
+          "matches": 0
+        },
+        {
+          "category": "Money Laundering",
+          "matches": 0
+        },
+        {
+          "category": "Corruption",
+          "matches": 0
+        },
+        {
+          "category": "Terrorism Financing",
+          "matches": 0
+        },
+        {
+          "category": "Tax Evasion",
+          "matches": 0
+        }
+      ],
+      "positiveNewsCount": 12,
+      "neutralNewsCount": 115,
+      "negativeNewsCount": 0
+    },
+    "watchlistCheck": {
+      "status": "Clear",
+      "matchCount": 0,
+      "listsScreened": [
+        {
+          "listName": "Interpol Wanted Persons",
+          "matches": 0
+        },
+        {
+          "listName": "National Crime Agency Watch List",
+          "matches": 0
+        },
+        {
+          "listName": "World Bank Debarred Entities",
+          "matches": 0
+        }
+      ]
+    },
+    "lawEnforcementCheck": {
+      "status": "Clear",
+      "matchCount": 0
+    }
+  },
+  "riskAssessment": {
+    "overallRiskScore": 15,
+    "riskRating": "Low",
+    "riskFactors": [
+      {
+        "factor": "Nationality",
+        "score": 5,
+        "weight": "Medium",
+        "description": "UK national - standard risk"
+      },
+      {
+        "factor": "Residence",
+        "score": 5,
+        "weight": "Medium",
+        "description": "UK resident - standard risk"
+      },
+      {
+        "factor": "Occupation",
+        "score": 5,
+        "weight": "Low",
+        "description": "Software Engineer - low-risk occupation"
+      }
+    ],
+    "recommendedDueDiligence": "Standard",
+    "ongoingMonitoringFrequency": "Annual",
+    "enhancedDueDiligenceRequired": false
+  },
+  "complianceDecision": {
+    "decision": "Approve",
+    "decisionDate": "2026-02-17T11:30:00Z",
+    "decidedBy": {
+      "id": "user-compliance-001",
+      "name": "Compliance Officer",
+      "role": "ComplianceOfficer"
+    },
+    "rationale": "No adverse findings across all screening categories. Client presents low risk profile. Standard due diligence procedures applied. Approved for onboarding.",
+    "conditions": [],
+    "nextReviewDate": "2027-02-17"
+  },
+  "regulatoryCompliance": {
+    "mlr2017Compliant": true,
+    "riskBasedApproach": true,
+    "customerDueDiligence": "Standard",
+    "ongoingMonitoringRequired": true,
+    "recordKeepingPeriod": 5,
+    "recordRetentionExpiryDate": "2031-02-17"
+  },
+  "reason": "InitialOnboarding",
+  "notes": "Initial AML screening for new client onboarding",
+  "complianceNotes": "All checks completed successfully. No issues identified. Client approved for onboarding with standard monitoring.",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123" },
+    "identity-verification": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "report": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check/aml-check-123/report.pdf" }
+  }
+}
+```
+
+**AML Check with Potential Match Example:**
+
+```json
+{
+  "id": "aml-check-456",
+  "identityVerificationId": "idv-890",
+  "clientId": "client-456",
+  "factfindId": "ff-789",
+  "checkType": "Comprehensive",
+  "status": "PotentialMatch",
+  "riskRating": "Medium",
+  "overallResult": "RequiresManualReview",
+  "initiatedDate": "2026-02-17T11:00:15Z",
+  "completedDate": "2026-02-17T11:28:45Z",
+  "processingTime": "00:28:30",
+  "provider": "WorldCheck",
+  "screeningResults": {
+    "sanctionsCheck": {
+      "status": "Clear",
+      "matchCount": 0
+    },
+    "pepCheck": {
+      "status": "PotentialMatch",
+      "pepStatus": "RequiresReview",
+      "matchCount": 2,
+      "potentialMatches": [
+        {
+          "matchId": "pep-match-001",
+          "matchScore": 85,
+          "matchType": "NameAndDOBMatch",
+          "personName": "John M Smith",
+          "dateOfBirth": "1985-06-20",
+          "nationality": "British",
+          "pepCategory": "FormerGovernmentOfficial",
+          "position": "Deputy Director, Department for Transport",
+          "activeFrom": "2018-03-01",
+          "activeTo": "2022-08-15",
+          "pepType": "FormerPEP",
+          "daysSinceLeftOffice": 1281,
+          "source": "UK Government Public Records",
+          "confidence": "Medium",
+          "requiresManualReview": true,
+          "reviewNotes": "Name and DOB match. Requires verification that this is the same individual."
+        },
+        {
+          "matchId": "pep-match-002",
+          "matchScore": 65,
+          "matchType": "NameMatch",
+          "personName": "John Michael Smith",
+          "dateOfBirth": "1984-08-12",
+          "nationality": "American",
+          "pepCategory": "LocalGovernmentOfficial",
+          "position": "City Council Member, Springfield",
+          "activeFrom": "2020-01-01",
+          "activeTo": null,
+          "pepType": "CurrentPEP",
+          "source": "US Public Records",
+          "confidence": "Low",
+          "requiresManualReview": true,
+          "reviewNotes": "Name match only. Different DOB and nationality. Likely false positive."
+        }
+      ]
+    },
+    "adverseMediaCheck": {
+      "status": "Clear",
+      "matchCount": 0
+    }
+  },
+  "riskAssessment": {
+    "overallRiskScore": 45,
+    "riskRating": "Medium",
+    "riskFactors": [
+      {
+        "factor": "PotentialPEPMatch",
+        "score": 30,
+        "weight": "High",
+        "description": "Potential match with former UK government official"
+      }
+    ],
+    "recommendedDueDiligence": "Enhanced",
+    "enhancedDueDiligenceRequired": true
+  },
+  "complianceDecision": {
+    "decision": "PendingReview",
+    "decisionDate": null,
+    "decidedBy": null,
+    "rationale": "Potential PEP match requires manual verification. Enhanced due diligence may be required depending on verification outcome.",
+    "requiredActions": [
+      "Verify identity against PEP match",
+      "Obtain additional documentation",
+      "Source of wealth verification",
+      "Enhanced due diligence if PEP confirmed"
+    ],
+    "assignedTo": {
+      "id": "user-compliance-001",
+      "name": "Compliance Officer",
+      "role": "ComplianceOfficer"
+    },
+    "assignedDate": "2026-02-17T11:30:00Z",
+    "dueDate": "2026-02-19T17:00:00Z"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-789/clients/client-456/identity-verification/idv-890/aml-check/aml-check-456" },
+    "approve": { "href": "/api/v1/factfinds/ff-789/clients/client-456/identity-verification/idv-890/aml-check/aml-check-456/approve", "method": "POST" },
+    "reject": { "href": "/api/v1/factfinds/ff-789/clients/client-456/identity-verification/idv-890/aml-check/aml-check-456/reject", "method": "POST" },
+    "escalate": { "href": "/api/v1/factfinds/ff-789/clients/client-456/identity-verification/idv-890/aml-check/aml-check-456/escalate", "method": "POST" }
+  }
+}
+```
+
+**Validation Rules:**
+- Identity verification must exist
+- Cannot run AML check if identity not verified
+- Minimum search criteria: firstName, lastName, dateOfBirth
+- Provider must be configured and active
+- High-risk clients require Enhanced check type
+- Check frequency: Initial + annual minimum
+
+**HTTP Status Codes:**
+- `201 Created` - AML check initiated successfully
+- `200 OK` - AML check already exists and is current
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Identity verification not found
+- `422 Unprocessable Entity` - Validation failed
+- `503 Service Unavailable` - AML provider unavailable
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/aml-check-error",
+  "title": "AML Check Cannot Be Initiated",
+  "status": 422,
+  "detail": "Identity must be verified before AML screening can be performed",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789/aml-check",
+  "currentVerificationStatus": "Pending",
+  "requiredStatus": "Verified",
+  "recommendation": "Complete identity verification before initiating AML checks"
+}
+```
+
+---
+
+##### 5.5.2.4 Get Verification History
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/identity-verification/history`
+
+**Description:** Get complete audit trail of all identity verification attempts, updates, and re-verifications for a client.
+
+**Query Parameters:**
+- `fromDate` - Filter from date (ISO 8601)
+- `toDate` - Filter to date (ISO 8601)
+- `verificationType` - Filter by type: StandardKYC, EnhancedDueDiligence, Reverification
+- `includeDocuments` - Include document details (default: false)
+- `includeAMLChecks` - Include AML check history (default: false)
+- `page` - Page number (default: 1)
+- `pageSize` - Items per page (default: 20, max: 100)
+
+**Response:**
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "clientName": "John Michael Smith",
+  "currentVerificationStatus": "Verified",
+  "currentVerificationId": "idv-789",
+  "currentVerificationDate": "2026-02-17T14:30:00Z",
+  "nextReviewDate": "2028-02-17",
+  "totalVerifications": 3,
+  "verificationHistory": [
+    {
+      "id": "idv-789",
+      "verificationType": "StandardKYC",
+      "verificationReason": "NewClientOnboarding",
+      "status": "Verified",
+      "riskCategory": "Standard",
+      "submittedDate": "2026-02-17T10:05:30Z",
+      "submittedBy": {
+        "id": "adv-789",
+        "name": "Jane Adviser",
+        "role": "FinancialAdviser"
+      },
+      "verifiedDate": "2026-02-17T14:30:00Z",
+      "verifiedBy": {
+        "id": "user-compliance-001",
+        "name": "Compliance Officer",
+        "role": "ComplianceOfficer"
+      },
+      "documentCount": 2,
+      "verificationProvider": "Onfido",
+      "amlCheckStatus": "Clear",
+      "pepCheckStatus": "NotPEP",
+      "overallVerificationScore": 95,
+      "outcome": "Approved",
+      "expiryDate": "2028-02-17",
+      "events": [
+        {
+          "eventType": "VerificationCreated",
+          "eventDate": "2026-02-17T10:05:30Z",
+          "eventBy": {
+            "id": "adv-789",
+            "name": "Jane Adviser"
+          },
+          "description": "Identity verification initiated for new client onboarding"
+        },
+        {
+          "eventType": "DocumentUploaded",
+          "eventDate": "2026-02-17T10:06:00Z",
+          "eventBy": {
+            "id": "adv-789",
+            "name": "Jane Adviser"
+          },
+          "description": "Passport uploaded (doc-001)",
+          "metadata": {
+            "documentType": "Passport",
+            "documentId": "doc-001"
+          }
+        },
+        {
+          "eventType": "DocumentUploaded",
+          "eventDate": "2026-02-17T10:07:00Z",
+          "eventBy": {
+            "id": "adv-789",
+            "name": "Jane Adviser"
+          },
+          "description": "Utility bill uploaded (doc-002)",
+          "metadata": {
+            "documentType": "UtilityBill",
+            "documentId": "doc-002"
+          }
+        },
+        {
+          "eventType": "AMLCheckInitiated",
+          "eventDate": "2026-02-17T10:05:30Z",
+          "eventBy": {
+            "id": "system",
+            "name": "System"
+          },
+          "description": "AML screening initiated via WorldCheck"
+        },
+        {
+          "eventType": "AMLCheckCompleted",
+          "eventDate": "2026-02-17T11:25:30Z",
+          "eventBy": {
+            "id": "system",
+            "name": "System"
+          },
+          "description": "AML screening completed - Clear",
+          "metadata": {
+            "status": "Clear",
+            "riskRating": "Low"
+          }
+        },
+        {
+          "eventType": "DocumentVerified",
+          "eventDate": "2026-02-17T12:15:00Z",
+          "eventBy": {
+            "id": "onfido-system",
+            "name": "Onfido"
+          },
+          "description": "Passport verified as genuine",
+          "metadata": {
+            "documentId": "doc-001",
+            "verificationResult": "Genuine"
+          }
+        },
+        {
+          "eventType": "DocumentVerified",
+          "eventDate": "2026-02-17T12:20:00Z",
+          "eventBy": {
+            "id": "user-compliance-001",
+            "name": "Compliance Officer"
+          },
+          "description": "Utility bill verified - address confirmed",
+          "metadata": {
+            "documentId": "doc-002",
+            "verificationResult": "AddressConfirmed"
+          }
+        },
+        {
+          "eventType": "VerificationApproved",
+          "eventDate": "2026-02-17T14:30:00Z",
+          "eventBy": {
+            "id": "user-compliance-001",
+            "name": "Compliance Officer"
+          },
+          "description": "Identity verification approved. All checks passed. Client cleared for onboarding.",
+          "metadata": {
+            "approvalNotes": "All KYC checks completed successfully. Client approved for onboarding. Standard risk category confirmed."
+          }
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-789" }
+      }
+    },
+    {
+      "id": "idv-456",
+      "verificationType": "Reverification",
+      "verificationReason": "PeriodicReview",
+      "status": "Verified",
+      "riskCategory": "Standard",
+      "submittedDate": "2024-02-10T09:00:00Z",
+      "submittedBy": {
+        "id": "adv-456",
+        "name": "Previous Adviser",
+        "role": "FinancialAdviser"
+      },
+      "verifiedDate": "2024-02-12T15:00:00Z",
+      "verifiedBy": {
+        "id": "user-compliance-002",
+        "name": "Senior Compliance Officer",
+        "role": "ComplianceOfficer"
+      },
+      "documentCount": 1,
+      "verificationProvider": "Manual",
+      "amlCheckStatus": "Clear",
+      "pepCheckStatus": "NotPEP",
+      "overallVerificationScore": 92,
+      "outcome": "Approved",
+      "expiryDate": "2026-02-12",
+      "expired": true,
+      "supersededBy": "idv-789",
+      "events": [
+        {
+          "eventType": "VerificationCreated",
+          "eventDate": "2024-02-10T09:00:00Z",
+          "eventBy": {
+            "id": "adv-456",
+            "name": "Previous Adviser"
+          },
+          "description": "2-year re-verification initiated"
+        },
+        {
+          "eventType": "DocumentUploaded",
+          "eventDate": "2024-02-10T09:15:00Z",
+          "eventBy": {
+            "id": "adv-456",
+            "name": "Previous Adviser"
+          },
+          "description": "Bank statement uploaded for address verification"
+        },
+        {
+          "eventType": "AMLCheckCompleted",
+          "eventDate": "2024-02-10T10:30:00Z",
+          "eventBy": {
+            "id": "system",
+            "name": "System"
+          },
+          "description": "Annual AML re-screening completed - Clear"
+        },
+        {
+          "eventType": "VerificationApproved",
+          "eventDate": "2024-02-12T15:00:00Z",
+          "eventBy": {
+            "id": "user-compliance-002",
+            "name": "Senior Compliance Officer"
+          },
+          "description": "Re-verification approved. No changes to client profile."
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-456" }
+      }
+    },
+    {
+      "id": "idv-123",
+      "verificationType": "StandardKYC",
+      "verificationReason": "NewClientOnboarding",
+      "status": "Verified",
+      "riskCategory": "Standard",
+      "submittedDate": "2022-01-15T10:00:00Z",
+      "submittedBy": {
+        "id": "adv-456",
+        "name": "Previous Adviser",
+        "role": "FinancialAdviser"
+      },
+      "verifiedDate": "2022-01-17T14:00:00Z",
+      "verifiedBy": {
+        "id": "user-compliance-002",
+        "name": "Senior Compliance Officer",
+        "role": "ComplianceOfficer"
+      },
+      "documentCount": 3,
+      "verificationProvider": "Jumio",
+      "amlCheckStatus": "Clear",
+      "pepCheckStatus": "NotPEP",
+      "overallVerificationScore": 90,
+      "outcome": "Approved",
+      "expiryDate": "2024-01-17",
+      "expired": true,
+      "supersededBy": "idv-456",
+      "events": [
+        {
+          "eventType": "VerificationCreated",
+          "eventDate": "2022-01-15T10:00:00Z",
+          "eventBy": {
+            "id": "adv-456",
+            "name": "Previous Adviser"
+          },
+          "description": "Initial client onboarding verification"
+        },
+        {
+          "eventType": "VerificationApproved",
+          "eventDate": "2022-01-17T14:00:00Z",
+          "eventBy": {
+            "id": "user-compliance-002",
+            "name": "Senior Compliance Officer"
+          },
+          "description": "Initial verification approved"
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/idv-123" }
+      }
+    }
+  ],
+  "statistics": {
+    "totalVerifications": 3,
+    "successfulVerifications": 3,
+    "failedVerifications": 0,
+    "pendingVerifications": 0,
+    "averageVerificationTime": "2 days 4 hours",
+    "lastVerificationDate": "2026-02-17T14:30:00Z",
+    "nextScheduledReview": "2028-02-17",
+    "amlScreeningCount": 5,
+    "documentCount": 6
+  },
+  "complianceHistory": [
+    {
+      "date": "2026-02-17",
+      "event": "KYC Refresh Completed",
+      "status": "Compliant",
+      "notes": "All verification checks passed. MLR 2017 compliant."
+    },
+    {
+      "date": "2024-02-12",
+      "event": "Periodic Re-verification",
+      "status": "Compliant",
+      "notes": "2-year re-verification completed successfully."
+    },
+    {
+      "date": "2022-01-17",
+      "event": "Initial Onboarding",
+      "status": "Compliant",
+      "notes": "Client successfully onboarded. All KYC requirements met."
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 3,
+    "totalPages": 1
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification/history" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "current": { "href": "/api/v1/factfinds/ff-456/clients/client-123/identity-verification" }
+  }
+}
+```
+
+**Event Type Values:**
+- `VerificationCreated` - Verification record created
+- `DocumentUploaded` - Document added
+- `DocumentVerified` - Document verification completed
+- `DocumentRejected` - Document rejected
+- `AMLCheckInitiated` - AML screening started
+- `AMLCheckCompleted` - AML screening finished
+- `PEPCheckCompleted` - PEP screening finished
+- `VerificationSubmitted` - Submitted for review
+- `VerificationApproved` - Approved by compliance
+- `VerificationRejected` - Rejected by compliance
+- `VerificationExpired` - Verification expired
+- `ReverificationRequired` - Re-verification needed
+- `RiskCategoryChanged` - Risk category updated
+- `StatusChanged` - Status updated
+
+**HTTP Status Codes:**
+- `200 OK` - History retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+### 5.6 Data Protection & Consent API
+
+**Purpose:** Manage GDPR consent, data subject rights, and data protection compliance.
+
+**Scope:**
+- GDPR consent management with purpose specification and lawful basis
+- Data processing consent tracking with version control
+- Data retention policies and automated expiry
+- Consent withdrawal workflows with immediate effect
+- Right to be forgotten (RTBF) requests and erasure workflows
+- Data portability requests with secure export
+- Consent audit trail with complete version history
+- Privacy policy acknowledgment and version tracking
+- Data subject access requests (DSAR)
+- Legitimate interest assessments
+
+**Aggregate Root:** FactFind (consent is nested within client)
+
+**Regulatory Compliance:**
+- GDPR (General Data Protection Regulation) - Articles 6, 7, 13, 15, 16, 17, 18, 20, 21
+- Data Protection Act 2018 (UK)
+- FCA Handbook - SYSC 3A (Data Protection)
+- ICO (Information Commissioner's Office) Guidelines
+- Privacy and Electronic Communications Regulations (PECR)
+
+#### 5.6.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent` | Get consent status | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent` | Update consent | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent/record` | Record consent event | `client:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent/history` | Get consent history | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/consent/withdraw` | Withdraw consent | `client:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/data` | Right to be forgotten (RTBF) | `client:admin` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/data/export` | Data portability request | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/data/access-request` | Submit DSAR | `client:read` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/privacy-policy` | Get privacy policy status | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/privacy-policy/acknowledge` | Acknowledge privacy policy | `client:write` |
+
+#### 5.6.2 Key Endpoints
+
+##### 5.6.2.1 Get Consent Status
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/consent`
+
+**Description:** Get current consent status for all processing purposes with lawful basis, consent dates, and privacy policy version.
+
+**Query Parameters:**
+- `includeHistory` - Include consent history summary (default: false)
+- `includePrivacyPolicy` - Include privacy policy details (default: true)
+
+**Response:**
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "clientName": "John Michael Smith",
+  "overallConsentStatus": "Valid",
+  "lastUpdated": "2026-02-17T10:00:00Z",
+  "consentVersion": "2.0",
+  "privacyPolicy": {
+    "version": "3.0",
+    "effectiveDate": "2025-05-01",
+    "acknowledgedDate": "2026-02-17T10:00:00Z",
+    "acknowledgedBy": "Client",
+    "acknowledgementMethod": "OnlinePortal",
+    "policyUrl": "https://www.factfind.com/privacy-policy/v3.0",
+    "requiresReacknowledgement": false,
+    "nextReviewDate": "2026-05-01"
+  },
+  "processingConsents": [
+    {
+      "purpose": "DataProcessing",
+      "purposeDescription": "Processing personal data to provide financial advice and services",
+      "lawfulBasis": "Contract",
+      "lawfulBasisDescription": "Processing necessary for performance of contract (GDPR Article 6(1)(b))",
+      "consentStatus": "ConsentNotRequired",
+      "consentRequired": false,
+      "consentGiven": null,
+      "consentDate": null,
+      "consentMethod": null,
+      "mandatory": true,
+      "canWithdraw": false,
+      "withdrawalImpact": "Service cannot be provided without this processing",
+      "retentionPeriod": "6 years after relationship ends",
+      "retentionExpiryDate": null,
+      "dataCategories": [
+        "IdentityData",
+        "ContactData",
+        "FinancialData",
+        "TransactionalData"
+      ],
+      "processingActivities": [
+        "Financial assessment and analysis",
+        "Advice and recommendation provision",
+        "Application processing",
+        "Ongoing service delivery"
+      ],
+      "dataSharing": {
+        "shared": true,
+        "recipients": [
+          "Product providers",
+          "Compliance systems",
+          "Payment processors"
+        ],
+        "internationalTransfers": false
+      }
+    },
+    {
+      "purpose": "RegulatoryCompliance",
+      "purposeDescription": "Compliance with legal and regulatory obligations including AML, KYC, and FCA requirements",
+      "lawfulBasis": "LegalObligation",
+      "lawfulBasisDescription": "Processing necessary for compliance with legal obligation (GDPR Article 6(1)(c))",
+      "consentStatus": "ConsentNotRequired",
+      "consentRequired": false,
+      "consentGiven": null,
+      "consentDate": null,
+      "consentMethod": null,
+      "mandatory": true,
+      "canWithdraw": false,
+      "withdrawalImpact": "Cannot comply with legal obligations without this processing",
+      "retentionPeriod": "6 years from transaction date",
+      "retentionExpiryDate": null,
+      "dataCategories": [
+        "IdentityData",
+        "ContactData",
+        "FinancialData",
+        "VerificationDocuments"
+      ],
+      "processingActivities": [
+        "Identity verification (KYC)",
+        "AML screening",
+        "Regulatory reporting",
+        "Record keeping"
+      ],
+      "dataSharing": {
+        "shared": true,
+        "recipients": [
+          "Financial Conduct Authority",
+          "National Crime Agency",
+          "HMRC",
+          "AML screening providers"
+        ],
+        "internationalTransfers": true,
+        "transferSafeguards": "Standard Contractual Clauses (SCC)"
+      }
+    },
+    {
+      "purpose": "Marketing",
+      "purposeDescription": "Marketing communications about products and services that may be of interest",
+      "lawfulBasis": "Consent",
+      "lawfulBasisDescription": "Consent of the data subject (GDPR Article 6(1)(a))",
+      "consentStatus": "Granted",
+      "consentRequired": true,
+      "consentGiven": true,
+      "consentDate": "2026-02-17T10:00:00Z",
+      "consentExpiryDate": "2028-02-17T10:00:00Z",
+      "consentMethod": "OnlineForm",
+      "consentEvidence": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "consentText": "I agree to receive marketing communications about products and services",
+        "recordId": "consent-record-789"
+      },
+      "mandatory": false,
+      "canWithdraw": true,
+      "withdrawalImpact": "No impact on service provision",
+      "channels": {
+        "email": {
+          "consented": true,
+          "consentDate": "2026-02-17T10:00:00Z",
+          "frequency": "Monthly"
+        },
+        "phone": {
+          "consented": false,
+          "consentDate": null
+        },
+        "sms": {
+          "consented": false,
+          "consentDate": null
+        },
+        "post": {
+          "consented": true,
+          "consentDate": "2026-02-17T10:00:00Z",
+          "frequency": "Quarterly"
+        }
+      },
+      "retentionPeriod": "Until consent withdrawn or 2 years of inactivity",
+      "dataCategories": [
+        "ContactData",
+        "PreferenceData"
+      ],
+      "processingActivities": [
+        "Email marketing campaigns",
+        "Postal marketing",
+        "Product recommendations"
+      ],
+      "dataSharing": {
+        "shared": true,
+        "recipients": [
+          "Email service providers",
+          "Marketing automation platforms"
+        ],
+        "internationalTransfers": false
+      }
+    },
+    {
+      "purpose": "Profiling",
+      "purposeDescription": "Automated analysis of personal data to evaluate preferences, interests, and suitability",
+      "lawfulBasis": "Consent",
+      "lawfulBasisDescription": "Consent of the data subject (GDPR Article 6(1)(a))",
+      "consentStatus": "Granted",
+      "consentRequired": true,
+      "consentGiven": true,
+      "consentDate": "2026-02-17T10:00:00Z",
+      "consentMethod": "OnlineForm",
+      "mandatory": false,
+      "canWithdraw": true,
+      "withdrawalImpact": "May receive less tailored advice and recommendations",
+      "retentionPeriod": "Duration of client relationship plus 2 years",
+      "dataCategories": [
+        "FinancialData",
+        "BehaviouralData",
+        "PreferenceData"
+      ],
+      "processingActivities": [
+        "Risk profiling",
+        "Suitability assessment",
+        "Product matching",
+        "Recommendation engine"
+      ],
+      "automatedDecisionMaking": {
+        "used": true,
+        "description": "Automated risk scoring and product recommendations",
+        "humanReview": true,
+        "rightToObjectNotified": true
+      },
+      "dataSharing": {
+        "shared": false,
+        "recipients": [],
+        "internationalTransfers": false
+      }
+    },
+    {
+      "purpose": "ThirdPartySharing",
+      "purposeDescription": "Sharing data with selected third parties for marketing purposes",
+      "lawfulBasis": "Consent",
+      "lawfulBasisDescription": "Consent of the data subject (GDPR Article 6(1)(a))",
+      "consentStatus": "Refused",
+      "consentRequired": true,
+      "consentGiven": false,
+      "consentDate": null,
+      "consentMethod": null,
+      "mandatory": false,
+      "canWithdraw": true,
+      "withdrawalImpact": "No impact on service provision",
+      "retentionPeriod": "N/A",
+      "dataCategories": [],
+      "processingActivities": [],
+      "dataSharing": {
+        "shared": false,
+        "recipients": [],
+        "internationalTransfers": false
+      }
+    },
+    {
+      "purpose": "AnalyticsAndImprovement",
+      "purposeDescription": "Analysis of aggregated data to improve services and understand usage patterns",
+      "lawfulBasis": "LegitimateInterest",
+      "lawfulBasisDescription": "Legitimate interests of the controller (GDPR Article 6(1)(f))",
+      "consentStatus": "ConsentNotRequired",
+      "consentRequired": false,
+      "consentGiven": null,
+      "consentDate": null,
+      "consentMethod": null,
+      "mandatory": false,
+      "canWithdraw": false,
+      "canObject": true,
+      "withdrawalImpact": "No impact on service provision",
+      "legitimateInterestAssessment": {
+        "purpose": "Service improvement and quality assurance",
+        "necessity": "Helps us improve our services and provide better customer experience",
+        "balancingTest": "Data is anonymized where possible. Client interests protected through anonymization and aggregation.",
+        "assessmentDate": "2025-04-15",
+        "assessmentBy": "Data Protection Officer",
+        "mitigations": [
+          "Data anonymization",
+          "Aggregation of data",
+          "Limited retention period",
+          "Right to object respected"
+        ]
+      },
+      "retentionPeriod": "3 years in aggregated anonymized form",
+      "dataCategories": [
+        "UsageData",
+        "BehaviouralData"
+      ],
+      "processingActivities": [
+        "Service usage analysis",
+        "Performance monitoring",
+        "Quality improvement"
+      ],
+      "dataSharing": {
+        "shared": false,
+        "recipients": [],
+        "internationalTransfers": false
+      }
+    }
+  ],
+  "dataSubjectRights": {
+    "rightToAccess": {
+      "available": true,
+      "lastExercised": null,
+      "requestUrl": "/api/v1/factfinds/ff-456/clients/client-123/data/access-request"
+    },
+    "rightToRectification": {
+      "available": true,
+      "lastExercised": null,
+      "requestUrl": "/api/v1/factfinds/ff-456/clients/client-123"
+    },
+    "rightToErasure": {
+      "available": true,
+      "lastExercised": null,
+      "restrictions": "Some data must be retained for regulatory compliance (6 years)",
+      "requestUrl": "/api/v1/factfinds/ff-456/clients/client-123/data"
+    },
+    "rightToRestriction": {
+      "available": true,
+      "lastExercised": null
+    },
+    "rightToDataPortability": {
+      "available": true,
+      "lastExercised": null,
+      "formats": ["JSON", "CSV", "PDF"],
+      "requestUrl": "/api/v1/factfinds/ff-456/clients/client-123/data/export"
+    },
+    "rightToObject": {
+      "available": true,
+      "lastExercised": null,
+      "applicableTo": ["Marketing", "Profiling", "AnalyticsAndImprovement"]
+    }
+  },
+  "consentRefreshRequired": false,
+  "nextConsentReviewDate": "2027-02-17",
+  "dataProtectionOfficer": {
+    "name": "Sarah Johnson",
+    "email": "dpo@factfind.com",
+    "phone": "+44 20 1234 5678"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "update": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent", "method": "PUT" },
+    "withdraw": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent/withdraw", "method": "POST" },
+    "history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent/history" },
+    "data-export": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/export", "method": "POST" },
+    "data-erasure": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data", "method": "DELETE" }
+  }
+}
+```
+
+**Consent Status Values:**
+- `Granted` - Consent given
+- `Refused` - Consent explicitly refused
+- `Withdrawn` - Previously granted, now withdrawn
+- `Expired` - Consent has expired
+- `ConsentNotRequired` - Processing does not require consent
+- `Pending` - Awaiting consent decision
+
+**Lawful Basis Values (GDPR Article 6):**
+- `Consent` - Article 6(1)(a) - Consent of the data subject
+- `Contract` - Article 6(1)(b) - Performance of contract
+- `LegalObligation` - Article 6(1)(c) - Compliance with legal obligation
+- `VitalInterests` - Article 6(1)(d) - Protection of vital interests
+- `PublicTask` - Article 6(1)(e) - Performance of task in public interest
+- `LegitimateInterest` - Article 6(1)(f) - Legitimate interests of controller
+
+**Consent Method Values:**
+- `OnlineForm` - Online consent form
+- `OnlinePortal` - Client portal
+- `WrittenForm` - Paper consent form
+- `VerbalConsent` - Verbal consent (recorded)
+- `EmailConfirmation` - Email confirmation link
+- `DigitalSignature` - Electronically signed
+- `DoubleOptIn` - Double opt-in confirmation
+
+**HTTP Status Codes:**
+- `200 OK` - Consent status retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+##### 5.6.2.2 Update Consent Preferences
+
+**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/consent`
+
+**Description:** Update consent preferences for one or more processing purposes. Records consent with full audit trail including IP address, timestamp, and consent evidence.
+
+**Request Body:**
+
+```json
+{
+  "consentUpdates": [
+    {
+      "purpose": "Marketing",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentText": "I agree to receive marketing communications about products and services that may be of interest to me",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Weekly"
+        },
+        "phone": {
+          "consented": false
+        },
+        "sms": {
+          "consented": false
+        },
+        "post": {
+          "consented": true,
+          "frequency": "Monthly"
+        }
+      },
+      "interests": [
+        "Pensions",
+        "Investments",
+        "Protection"
+      ]
+    },
+    {
+      "purpose": "Profiling",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentText": "I agree to automated profiling to receive personalized product recommendations"
+    },
+    {
+      "purpose": "ThirdPartySharing",
+      "consentGiven": false,
+      "consentMethod": "OnlinePortal",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentText": "I do not agree to share my data with third parties for marketing purposes"
+    }
+  ],
+  "privacyPolicyVersion": "3.0",
+  "privacyPolicyAcknowledged": true,
+  "consentEvidence": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "deviceType": "Desktop",
+    "browserLanguage": "en-GB",
+    "timestamp": "2026-02-17T11:30:00Z"
+  },
+  "consentRecordedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "userName": "John Smith"
+  },
+  "notes": "Client updated marketing preferences via online portal during annual review"
+}
+```
+
+**Response:**
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "consentVersion": "2.1",
+  "updatedDate": "2026-02-17T11:30:15Z",
+  "updatedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "userName": "John Smith"
+  },
+  "updatedConsents": [
+    {
+      "purpose": "Marketing",
+      "previousStatus": "Refused",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentExpiryDate": "2028-02-17T11:30:00Z",
+      "consentMethod": "OnlinePortal",
+      "consentRecordId": "consent-rec-987",
+      "channels": {
+        "email": {
+          "consented": true,
+          "previouslyConsented": false,
+          "consentChanged": true,
+          "frequency": "Weekly"
+        },
+        "phone": {
+          "consented": false,
+          "previouslyConsented": false,
+          "consentChanged": false
+        },
+        "sms": {
+          "consented": false,
+          "previouslyConsented": false,
+          "consentChanged": false
+        },
+        "post": {
+          "consented": true,
+          "previouslyConsented": false,
+          "consentChanged": true,
+          "frequency": "Monthly"
+        }
+      },
+      "interests": [
+        "Pensions",
+        "Investments",
+        "Protection"
+      ]
+    },
+    {
+      "purpose": "Profiling",
+      "previousStatus": "Refused",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentMethod": "OnlinePortal",
+      "consentRecordId": "consent-rec-988"
+    },
+    {
+      "purpose": "ThirdPartySharing",
+      "previousStatus": "Refused",
+      "newStatus": "Refused",
+      "consentGiven": false,
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentMethod": "OnlinePortal",
+      "consentRecordId": "consent-rec-989",
+      "consentChanged": false
+    }
+  ],
+  "privacyPolicy": {
+    "version": "3.0",
+    "acknowledgedDate": "2026-02-17T11:30:00Z",
+    "acknowledgedBy": "Client"
+  },
+  "consentEvidence": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "deviceType": "Desktop",
+    "timestamp": "2026-02-17T11:30:00Z",
+    "stored": true,
+    "retentionPeriod": "7 years"
+  },
+  "auditTrail": {
+    "recordCreated": true,
+    "recordId": "audit-456",
+    "timestamp": "2026-02-17T11:30:15Z"
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent/history" }
+  }
+}
+```
+
+**Validation Rules:**
+- At least one consent update required
+- `purpose` must be valid consent-requiring purpose
+- Cannot update consent for non-consent purposes (Contract, LegalObligation)
+- `consentMethod` required for all updates
+- `consentDate` must not be future date
+- Privacy policy version must be current or recent version
+- IP address required for online consent capture
+- Consent text must match approved wording
+
+**HTTP Status Codes:**
+- `200 OK` - Consent updated successfully
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/consent-error",
+  "title": "Consent Update Failed",
+  "status": 422,
+  "detail": "Cannot update consent for purpose that does not require consent",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/consent",
+  "errors": [
+    {
+      "field": "consentUpdates[0].purpose",
+      "message": "Purpose 'DataProcessing' uses lawful basis 'Contract' and does not require consent",
+      "rejectedValue": "DataProcessing",
+      "lawfulBasis": "Contract"
+    }
+  ]
+}
+```
+
+---
+
+##### 5.6.2.3 Right to Be Forgotten (RTBF)
+
+**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/data`
+
+**Description:** Process GDPR Article 17 Right to Erasure request. Identifies data to be erased, data that must be retained, and coordinates erasure across systems.
+
+**Request Body:**
+
+```json
+{
+  "erasureReason": "ConsentWithdrawn",
+  "erasureReasonDetail": "Client has withdrawn all consent and wishes personal data to be erased",
+  "requestedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "verificationMethod": "EmailVerification",
+    "verificationDate": "2026-02-17T12:00:00Z"
+  },
+  "requestDate": "2026-02-17T12:00:00Z",
+  "erasureScope": "CompleteErasure",
+  "confirmErasure": true,
+  "clientAcknowledgement": "I understand that erasing my data will end my relationship with FactFind and I will no longer receive services. I understand that some data must be retained for regulatory compliance.",
+  "adviserId": "adv-789",
+  "adviserNotes": "Client has confirmed erasure request. All services terminated. Exit interview completed."
+}
+```
+
+**Erasure Reason Values:**
+- `ConsentWithdrawn` - Consent withdrawn (GDPR Article 17(1)(b))
+- `NoLongerNecessary` - Data no longer necessary (GDPR Article 17(1)(a))
+- `ObjectToProcessing` - Objection to processing (GDPR Article 17(1)(c))
+- `UnlawfulProcessing` - Processing was unlawful (GDPR Article 17(1)(d))
+- `LegalObligation` - Erasure required by law (GDPR Article 17(1)(e))
+
+**Erasure Scope Values:**
+- `CompleteErasure` - Erase all non-essential data
+- `MarketingOnly` - Erase marketing data only
+- `ConsentBasedOnly` - Erase only data processed under consent
+- `Partial` - Custom erasure scope
+
+**Response:**
+
+```http
+HTTP/1.1 202 Accepted
+Location: /api/v1/factfinds/ff-456/clients/client-123/data/erasure/erasure-req-123
+```
+
+```json
+{
+  "erasureRequestId": "erasure-req-123",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "InProgress",
+  "erasureReason": "ConsentWithdrawn",
+  "requestDate": "2026-02-17T12:00:00Z",
+  "requestedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "name": "John Smith",
+    "verified": true
+  },
+  "erasureScope": "CompleteErasure",
+  "estimatedCompletionDate": "2026-03-17T12:00:00Z",
+  "legalTimeLimit": "2026-03-17T12:00:00Z",
+  "dataInventory": {
+    "totalDataCategories": 12,
+    "dataToBeErased": 8,
+    "dataToBeRetained": 4,
+    "categories": [
+      {
+        "category": "IdentityData",
+        "dataCount": 15,
+        "erasureStatus": "PartialErasure",
+        "erasureDetail": "Name, DOB retained for regulatory compliance. Photo ID will be erased.",
+        "retentionReason": "Legal obligation (MLR 2017 - 5 year retention)",
+        "retentionExpiryDate": "2031-02-17"
+      },
+      {
+        "category": "ContactData",
+        "dataCount": 8,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "All contact details (email, phone, address) will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "FinancialData",
+        "dataCount": 142,
+        "erasureStatus": "Retained",
+        "erasureDetail": "Financial transaction records retained for regulatory compliance",
+        "retentionReason": "Legal obligation (FCA requirements - 6 year retention)",
+        "retentionExpiryDate": "2032-02-17"
+      },
+      {
+        "category": "TransactionalData",
+        "dataCount": 89,
+        "erasureStatus": "Retained",
+        "erasureDetail": "Transaction audit trail retained for regulatory compliance",
+        "retentionReason": "Legal obligation (FCA requirements - 6 year retention)",
+        "retentionExpiryDate": "2032-02-17"
+      },
+      {
+        "category": "MarketingData",
+        "dataCount": 47,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "All marketing preferences, communications history, and marketing data will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "ConsentRecords",
+        "dataCount": 12,
+        "erasureStatus": "PartialErasure",
+        "erasureDetail": "Consent records anonymized (personal identifiers removed but consent audit trail maintained)",
+        "retentionReason": "Legitimate interest (demonstrating GDPR compliance)",
+        "retentionExpiryDate": "2029-02-17"
+      },
+      {
+        "category": "BehaviouralData",
+        "dataCount": 234,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "Website usage, portal access logs, and behavioral data will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "PreferenceData",
+        "dataCount": 28,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "User preferences and settings will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "CommunicationData",
+        "dataCount": 156,
+        "erasureStatus": "Retained",
+        "erasureDetail": "Regulatory communications and advice records retained",
+        "retentionReason": "Legal obligation (FCA requirements)",
+        "retentionExpiryDate": "2032-02-17"
+      },
+      {
+        "category": "DocumentsData",
+        "dataCount": 23,
+        "erasureStatus": "PartialErasure",
+        "erasureDetail": "KYC documents retained for compliance. Other documents erased.",
+        "retentionReason": "Legal obligation (MLR 2017)",
+        "retentionExpiryDate": "2031-02-17"
+      },
+      {
+        "category": "ProfileData",
+        "dataCount": 45,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "Risk profile, suitability assessments (non-regulatory) will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      },
+      {
+        "category": "AuthenticationData",
+        "dataCount": 5,
+        "erasureStatus": "CompleteErasure",
+        "erasureDetail": "Login credentials, security questions, and authentication tokens will be erased",
+        "retentionReason": null,
+        "retentionExpiryDate": null
+      }
+    ]
+  },
+  "erasureWorkflow": {
+    "steps": [
+      {
+        "stepNumber": 1,
+        "stepName": "VerifyIdentity",
+        "status": "Completed",
+        "completedDate": "2026-02-17T12:00:00Z"
+      },
+      {
+        "stepNumber": 2,
+        "stepName": "AssessErasureRequest",
+        "status": "Completed",
+        "completedDate": "2026-02-17T12:05:00Z"
+      },
+      {
+        "stepNumber": 3,
+        "stepName": "IdentifyDataToErase",
+        "status": "Completed",
+        "completedDate": "2026-02-17T12:10:00Z"
+      },
+      {
+        "stepNumber": 4,
+        "stepName": "NotifyThirdParties",
+        "status": "InProgress",
+        "estimatedCompletion": "2026-02-24T12:00:00Z",
+        "thirdPartiesToNotify": [
+          "Product Provider A",
+          "Product Provider B",
+          "Email Service Provider",
+          "AML Screening Provider"
+        ]
+      },
+      {
+        "stepNumber": 5,
+        "stepName": "PerformErasure",
+        "status": "Pending",
+        "estimatedCompletion": "2026-03-10T12:00:00Z"
+      },
+      {
+        "stepNumber": 6,
+        "stepName": "VerifyErasure",
+        "status": "Pending",
+        "estimatedCompletion": "2026-03-15T12:00:00Z"
+      },
+      {
+        "stepNumber": 7,
+        "stepName": "NotifyClient",
+        "status": "Pending",
+        "estimatedCompletion": "2026-03-17T12:00:00Z"
+      }
+    ]
+  },
+  "thirdPartyNotifications": {
+    "required": true,
+    "recipientCount": 4,
+    "recipients": [
+      {
+        "recipientType": "ProductProvider",
+        "recipientName": "Product Provider A",
+        "notificationStatus": "Pending",
+        "dataSharedWith": "Client investment and transaction data"
+      },
+      {
+        "recipientType": "ProductProvider",
+        "recipientName": "Product Provider B",
+        "notificationStatus": "Pending",
+        "dataSharedWith": "Client pension and protection data"
+      },
+      {
+        "recipientType": "ServiceProvider",
+        "recipientName": "Email Service Provider",
+        "notificationStatus": "Pending",
+        "dataSharedWith": "Client contact details for marketing"
+      },
+      {
+        "recipientType": "ComplianceService",
+        "recipientName": "AML Screening Provider",
+        "notificationStatus": "Pending",
+        "dataSharedWith": "Client identity data for AML screening"
+      }
+    ]
+  },
+  "legalAssessment": {
+    "erasureAllowed": true,
+    "erasureRestrictions": [
+      "Financial transaction records must be retained for 6 years (FCA)",
+      "KYC documents must be retained for 5 years (MLR 2017)",
+      "Regulatory communications must be retained for 6 years (FCA)"
+    ],
+    "assessedBy": {
+      "id": "user-dpo-001",
+      "name": "Data Protection Officer",
+      "role": "DataProtectionOfficer"
+    },
+    "assessmentDate": "2026-02-17T12:05:00Z",
+    "assessmentNotes": "Client has valid grounds for erasure (consent withdrawn). Erasure will proceed for all non-essential data. Retained data clearly documented with legal basis."
+  },
+  "complianceOfficerApproval": {
+    "required": true,
+    "approved": true,
+    "approvedBy": {
+      "id": "user-compliance-001",
+      "name": "Compliance Officer"
+    },
+    "approvalDate": "2026-02-17T12:10:00Z",
+    "approvalNotes": "Erasure request verified and approved. Client identity confirmed. All regulatory retention requirements documented."
+  },
+  "clientNotification": {
+    "notificationRequired": true,
+    "notificationMethod": "Email",
+    "notificationAddress": "john.smith@example.com",
+    "notificationScheduled": "2026-03-17T12:00:00Z",
+    "notificationContent": "You will receive confirmation once your data erasure is complete, along with details of any data retained for legal/regulatory compliance."
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/erasure/erasure-req-123" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "status": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/erasure/erasure-req-123/status" }
+  }
+}
+```
+
+**Erasure Status Values:**
+- `Pending` - Request received, awaiting processing
+- `InProgress` - Erasure in progress
+- `AwaitingApproval` - Requires manual approval
+- `Completed` - Erasure completed
+- `PartiallyCompleted` - Some data erased, some retained
+- `Rejected` - Request rejected (no valid grounds)
+- `Failed` - Technical failure during erasure
+
+**Validation Rules:**
+- Client identity must be verified before processing
+- Must provide valid erasure reason
+- Cannot erase data where legal obligation to retain
+- Regulatory retention periods must be respected (FCA 6 years, MLR 2017 5 years)
+- Third parties must be notified of erasure
+- Erasure must be completed within 1 month (extendable to 3 months)
+- Must maintain proof of erasure for 3 years
+
+**HTTP Status Codes:**
+- `202 Accepted` - Erasure request accepted and being processed
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions or erasure not permitted
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/erasure-error",
+  "title": "Data Erasure Not Permitted",
+  "status": 403,
+  "detail": "Data erasure cannot be performed due to overriding legal obligation to retain data",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/data",
+  "legalBasis": "Legal obligation to retain client data under FCA regulations",
+  "retentionPeriod": "6 years from last transaction",
+  "retentionExpiryDate": "2032-02-17",
+  "explanation": "Financial services regulations require retention of client transaction and advice records for 6 years. While we can erase marketing and non-essential data, core regulatory records must be retained.",
+  "partialErasureAvailable": true,
+  "contactDPO": "dpo@factfind.com"
+}
+```
+
+---
+
+##### 5.6.2.4 Get Consent History (Audit Trail)
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/consent/history`
+
+**Description:** Get complete GDPR Article 7(1) compliant audit trail of all consent events, changes, and withdrawals.
+
+**Query Parameters:**
+- `purpose` - Filter by purpose: Marketing, Profiling, ThirdPartySharing, etc.
+- `fromDate` - Filter from date (ISO 8601)
+- `toDate` - Filter to date (ISO 8601)
+- `eventType` - Filter by event type: ConsentGranted, ConsentWithdrawn, ConsentUpdated, etc.
+- `includeEvidence` - Include consent evidence (IP, user agent) (default: true)
+- `page` - Page number (default: 1)
+- `pageSize` - Items per page (default: 50, max: 100)
+
+**Response:**
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "clientName": "John Michael Smith",
+  "currentConsentVersion": "2.1",
+  "totalConsentEvents": 15,
+  "consentHistory": [
+    {
+      "eventId": "consent-event-015",
+      "eventType": "ConsentGranted",
+      "eventDate": "2026-02-17T11:30:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "Refused",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentVersion": "2.1",
+      "privacyPolicyVersion": "3.0",
+      "consentText": "I agree to receive marketing communications about products and services that may be of interest to me",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Weekly"
+        },
+        "post": {
+          "consented": true,
+          "frequency": "Monthly"
+        }
+      },
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "deviceType": "Desktop",
+        "browserLanguage": "en-GB",
+        "timestamp": "2026-02-17T11:30:00Z",
+        "stored": true
+      },
+      "notes": "Client updated marketing preferences via online portal during annual review"
+    },
+    {
+      "eventId": "consent-event-014",
+      "eventType": "ConsentGranted",
+      "eventDate": "2026-02-17T11:30:00Z",
+      "purpose": "Profiling",
+      "previousStatus": "Refused",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentVersion": "2.1",
+      "privacyPolicyVersion": "3.0",
+      "consentText": "I agree to automated profiling to receive personalized product recommendations",
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "timestamp": "2026-02-17T11:30:00Z",
+        "stored": true
+      }
+    },
+    {
+      "eventId": "consent-event-013",
+      "eventType": "PrivacyPolicyAcknowledged",
+      "eventDate": "2026-02-17T10:00:00Z",
+      "purpose": "All",
+      "privacyPolicyVersion": "3.0",
+      "privacyPolicyEffectiveDate": "2025-05-01",
+      "acknowledgementMethod": "OnlinePortal",
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.100",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        "timestamp": "2026-02-17T10:00:00Z",
+        "stored": true
+      },
+      "notes": "Client acknowledged updated privacy policy version 3.0 during login"
+    },
+    {
+      "eventId": "consent-event-012",
+      "eventType": "ConsentRefreshed",
+      "eventDate": "2025-02-15T09:00:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "Granted",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "EmailConfirmation",
+      "consentVersion": "2.0",
+      "privacyPolicyVersion": "2.5",
+      "consentText": "Please confirm you still wish to receive marketing communications",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Monthly"
+        }
+      },
+      "recordedBy": {
+        "type": "System",
+        "systemName": "ConsentRefreshSystem"
+      },
+      "evidence": {
+        "emailAddress": "john.smith@example.com",
+        "confirmationLink": "https://portal.factfind.com/consent/confirm/abc123",
+        "confirmationDate": "2025-02-15T09:15:30Z",
+        "stored": true
+      },
+      "notes": "Annual consent refresh completed via email confirmation"
+    },
+    {
+      "eventId": "consent-event-011",
+      "eventType": "ConsentWithdrawn",
+      "eventDate": "2024-08-20T14:30:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "Granted",
+      "newStatus": "Withdrawn",
+      "consentGiven": false,
+      "withdrawalMethod": "OnlinePortal",
+      "withdrawalReason": "TooManyEmails",
+      "consentVersion": "1.9",
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.105",
+        "timestamp": "2024-08-20T14:30:00Z",
+        "stored": true
+      },
+      "effectiveDate": "2024-08-20T14:30:00Z",
+      "processingStoppedDate": "2024-08-20T14:30:05Z",
+      "notes": "Client withdrew marketing consent citing too many emails"
+    },
+    {
+      "eventId": "consent-event-010",
+      "eventType": "ConsentUpdated",
+      "eventDate": "2024-03-10T10:15:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "Granted",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlinePortal",
+      "consentVersion": "1.8",
+      "changeDescription": "Updated communication frequency from Weekly to Monthly",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Monthly",
+          "previousFrequency": "Weekly"
+        }
+      },
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.102",
+        "timestamp": "2024-03-10T10:15:00Z",
+        "stored": true
+      },
+      "notes": "Client reduced email frequency preference"
+    },
+    {
+      "eventId": "consent-event-009",
+      "eventType": "PrivacyPolicyAcknowledged",
+      "eventDate": "2023-11-01T08:00:00Z",
+      "purpose": "All",
+      "privacyPolicyVersion": "2.5",
+      "privacyPolicyEffectiveDate": "2023-11-01",
+      "acknowledgementMethod": "OnlinePortal",
+      "recordedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith"
+      },
+      "evidence": {
+        "ipAddress": "192.168.1.98",
+        "timestamp": "2023-11-01T08:00:00Z",
+        "stored": true
+      },
+      "notes": "Client acknowledged privacy policy update version 2.5"
+    },
+    {
+      "eventId": "consent-event-008",
+      "eventType": "ConsentGranted",
+      "eventDate": "2023-06-15T11:00:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "NotSet",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "WrittenForm",
+      "consentVersion": "1.7",
+      "privacyPolicyVersion": "2.0",
+      "consentText": "I agree to receive marketing communications",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Weekly"
+        },
+        "post": {
+          "consented": false
+        }
+      },
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-789",
+        "userName": "Jane Adviser"
+      },
+      "evidence": {
+        "formReference": "MKT-CONSENT-2023-456",
+        "formDate": "2023-06-15",
+        "clientSignature": true,
+        "witnessSignature": true,
+        "stored": true,
+        "storageLocation": "Document management system"
+      },
+      "notes": "Marketing consent captured on written consent form during annual review meeting"
+    },
+    {
+      "eventId": "consent-event-007",
+      "eventType": "DataSubjectAccessRequest",
+      "eventDate": "2023-03-20T10:00:00Z",
+      "purpose": "All",
+      "requestType": "SubjectAccessRequest",
+      "requestStatus": "Completed",
+      "requestedBy": {
+        "type": "Client",
+        "userId": "client-123",
+        "userName": "John Smith",
+        "email": "john.smith@example.com"
+      },
+      "processedBy": {
+        "id": "user-dpo-001",
+        "name": "Data Protection Officer"
+      },
+      "requestDate": "2023-03-20T10:00:00Z",
+      "completionDate": "2023-04-15T17:00:00Z",
+      "responseMethod": "SecurePortal",
+      "notes": "Client requested copy of all personal data held (GDPR Article 15). Response provided within 1 month."
+    },
+    {
+      "eventId": "consent-event-006",
+      "eventType": "ConsentGranted",
+      "eventDate": "2022-01-17T14:00:00Z",
+      "purpose": "Profiling",
+      "previousStatus": "NotSet",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlineForm",
+      "consentVersion": "1.5",
+      "privacyPolicyVersion": "1.8",
+      "consentText": "I agree to automated profiling for personalized recommendations",
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-456",
+        "userName": "Previous Adviser"
+      },
+      "evidence": {
+        "formUrl": "https://portal.factfind.com/onboarding/consent",
+        "ipAddress": "192.168.1.85",
+        "timestamp": "2022-01-17T14:00:00Z",
+        "stored": true
+      },
+      "notes": "Profiling consent captured during initial onboarding"
+    },
+    {
+      "eventId": "consent-event-005",
+      "eventType": "ConsentGranted",
+      "eventDate": "2022-01-17T14:00:00Z",
+      "purpose": "Marketing",
+      "previousStatus": "NotSet",
+      "newStatus": "Granted",
+      "consentGiven": true,
+      "consentMethod": "OnlineForm",
+      "consentVersion": "1.5",
+      "privacyPolicyVersion": "1.8",
+      "consentText": "I agree to receive marketing communications",
+      "channels": {
+        "email": {
+          "consented": true,
+          "frequency": "Weekly"
+        }
+      },
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-456",
+        "userName": "Previous Adviser"
+      },
+      "evidence": {
+        "formUrl": "https://portal.factfind.com/onboarding/consent",
+        "ipAddress": "192.168.1.85",
+        "timestamp": "2022-01-17T14:00:00Z",
+        "stored": true
+      },
+      "notes": "Initial marketing consent captured during client onboarding"
+    },
+    {
+      "eventId": "consent-event-004",
+      "eventType": "PrivacyPolicyAcknowledged",
+      "eventDate": "2022-01-17T13:45:00Z",
+      "purpose": "All",
+      "privacyPolicyVersion": "1.8",
+      "privacyPolicyEffectiveDate": "2022-01-01",
+      "acknowledgementMethod": "OnlineForm",
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-456",
+        "userName": "Previous Adviser"
+      },
+      "evidence": {
+        "formUrl": "https://portal.factfind.com/onboarding/privacy",
+        "ipAddress": "192.168.1.85",
+        "timestamp": "2022-01-17T13:45:00Z",
+        "checkboxChecked": true,
+        "stored": true
+      },
+      "notes": "Initial privacy policy acknowledged during client onboarding"
+    },
+    {
+      "eventId": "consent-event-003",
+      "eventType": "LawfulBasisEstablished",
+      "eventDate": "2022-01-17T13:40:00Z",
+      "purpose": "RegulatoryCompliance",
+      "lawfulBasis": "LegalObligation",
+      "lawfulBasisDescription": "Processing necessary for compliance with MLR 2017 and FCA requirements",
+      "consentRequired": false,
+      "recordedBy": {
+        "type": "System",
+        "systemName": "OnboardingSystem"
+      },
+      "notes": "Lawful basis established for regulatory compliance processing"
+    },
+    {
+      "eventId": "consent-event-002",
+      "eventType": "LawfulBasisEstablished",
+      "eventDate": "2022-01-17T13:40:00Z",
+      "purpose": "DataProcessing",
+      "lawfulBasis": "Contract",
+      "lawfulBasisDescription": "Processing necessary for performance of service contract",
+      "consentRequired": false,
+      "recordedBy": {
+        "type": "System",
+        "systemName": "OnboardingSystem"
+      },
+      "notes": "Lawful basis established for core data processing"
+    },
+    {
+      "eventId": "consent-event-001",
+      "eventType": "ClientCreated",
+      "eventDate": "2022-01-17T13:30:00Z",
+      "purpose": "All",
+      "recordedBy": {
+        "type": "Adviser",
+        "userId": "adv-456",
+        "userName": "Previous Adviser"
+      },
+      "notes": "Client record created. GDPR consent tracking initiated."
+    }
+  ],
+  "consentStatistics": {
+    "totalEvents": 15,
+    "consentsGranted": 6,
+    "consentsWithdrawn": 1,
+    "consentsUpdated": 2,
+    "consentsRefreshed": 1,
+    "privacyPolicyAcknowledgements": 3,
+    "dataSubjectAccessRequests": 1,
+    "lawfulBasisEstablishments": 2,
+    "firstConsentDate": "2022-01-17T14:00:00Z",
+    "lastConsentUpdate": "2026-02-17T11:30:00Z",
+    "activePurposes": 4,
+    "withdrawnPurposes": 0
+  },
+  "regulatoryCompliance": {
+    "gdprArticle7Compliant": true,
+    "consentEvidenceStored": true,
+    "consentWithdrawalMechanismAvailable": true,
+    "privacyNoticeProvided": true,
+    "lastComplianceReview": "2026-02-17T11:30:00Z"
+  },
+  "pagination": {
+    "page": 1,
+    "pageSize": 50,
+    "totalItems": 15,
+    "totalPages": 1
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent/history" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "current-consent": { "href": "/api/v1/factfinds/ff-456/clients/client-123/consent" }
+  }
+}
+```
+
+**Event Type Values:**
+- `ConsentGranted` - Consent given for purpose
+- `ConsentWithdrawn` - Consent withdrawn
+- `ConsentUpdated` - Consent preferences updated
+- `ConsentRefreshed` - Periodic consent re-confirmation
+- `ConsentExpired` - Consent expired
+- `PrivacyPolicyAcknowledged` - Privacy policy acknowledged
+- `LawfulBasisEstablished` - Lawful basis documented
+- `DataSubjectAccessRequest` - DSAR submitted
+- `DataPortabilityRequest` - Data export requested
+- `ErasureRequest` - Right to be forgotten requested
+- `RectificationRequest` - Data correction requested
+- `ClientCreated` - Client record created
+
+**HTTP Status Codes:**
+- `200 OK` - Consent history retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+##### 5.6.2.5 Data Portability Request
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/data/export`
+
+**Description:** GDPR Article 20 data portability request. Export client's personal data in structured, commonly used, machine-readable format.
+
+**Request Body:**
+
+```json
+{
+  "exportFormat": "JSON",
+  "dataScope": "AllPersonalData",
+  "includeCategories": [
+    "IdentityData",
+    "ContactData",
+    "FinancialData",
+    "TransactionalData",
+    "ConsentData",
+    "DocumentsData"
+  ],
+  "excludeCategories": [],
+  "includeDocuments": true,
+  "requestedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "verificationMethod": "PortalLogin",
+    "verificationDate": "2026-02-17T13:00:00Z"
+  },
+  "requestDate": "2026-02-17T13:00:00Z",
+  "deliveryMethod": "SecureDownloadLink",
+  "reason": "SwitchingProvider",
+  "notes": "Client is switching to new financial adviser and requires data export"
+}
+```
+
+**Export Format Values:**
+- `JSON` - JSON format
+- `CSV` - CSV format (multiple files)
+- `PDF` - PDF report format
+- `XML` - XML format
+
+**Data Scope Values:**
+- `AllPersonalData` - All personal data
+- `ConsentBasedOnly` - Only data processed under consent
+- `SpecificCategories` - Selected categories only
+
+**Delivery Method Values:**
+- `SecureDownloadLink` - Time-limited secure download link
+- `Email` - Encrypted email attachment
+- `API` - Direct API download
+- `Portal` - Available in client portal
+
+**Response:**
+
+```http
+HTTP/1.1 202 Accepted
+Location: /api/v1/factfinds/ff-456/clients/client-123/data/export/export-req-456
+```
+
+```json
+{
+  "exportRequestId": "export-req-456",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "Processing",
+  "exportFormat": "JSON",
+  "requestDate": "2026-02-17T13:00:00Z",
+  "requestedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "name": "John Smith",
+    "verified": true
+  },
+  "estimatedCompletionDate": "2026-02-17T14:00:00Z",
+  "dataScope": "AllPersonalData",
+  "dataCategories": [
+    {
+      "category": "IdentityData",
+      "recordCount": 15,
+      "includeInExport": true
+    },
+    {
+      "category": "ContactData",
+      "recordCount": 8,
+      "includeInExport": true
+    },
+    {
+      "category": "FinancialData",
+      "recordCount": 142,
+      "includeInExport": true
+    },
+    {
+      "category": "TransactionalData",
+      "recordCount": 89,
+      "includeInExport": true
+    },
+    {
+      "category": "ConsentData",
+      "recordCount": 15,
+      "includeInExport": true
+    },
+    {
+      "category": "DocumentsData",
+      "recordCount": 23,
+      "includeInExport": true
+    }
+  ],
+  "deliveryMethod": "SecureDownloadLink",
+  "securityMeasures": {
+    "encrypted": true,
+    "passwordProtected": true,
+    "linkExpiry": "7 days",
+    "downloadLimit": 3,
+    "accessLog": true
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/export/export-req-456" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "status": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/export/export-req-456/status" }
+  }
+}
+```
+
+**When Export is Complete:**
+
+```json
+{
+  "exportRequestId": "export-req-456",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "Completed",
+  "exportFormat": "JSON",
+  "requestDate": "2026-02-17T13:00:00Z",
+  "completedDate": "2026-02-17T13:45:00Z",
+  "processingTime": "00:45:00",
+  "exportedDataSummary": {
+    "totalRecords": 292,
+    "fileSize": "15.7 MB",
+    "fileCount": 24,
+    "categories": [
+      {
+        "category": "IdentityData",
+        "recordCount": 15
+      },
+      {
+        "category": "ContactData",
+        "recordCount": 8
+      },
+      {
+        "category": "FinancialData",
+        "recordCount": 142
+      },
+      {
+        "category": "TransactionalData",
+        "recordCount": 89
+      },
+      {
+        "category": "ConsentData",
+        "recordCount": 15
+      },
+      {
+        "category": "DocumentsData",
+        "recordCount": 23
+      }
+    ]
+  },
+  "downloadLink": {
+    "url": "https://secure-exports.factfind.com/download/export-req-456",
+    "availableFrom": "2026-02-17T13:45:00Z",
+    "expiresAt": "2026-02-24T13:45:00Z",
+    "expiresIn": "7 days",
+    "downloadLimit": 3,
+    "downloadsRemaining": 3,
+    "password": "Sent separately via SMS",
+    "encrypted": true,
+    "encryptionMethod": "AES-256"
+  },
+  "clientNotification": {
+    "notified": true,
+    "notificationMethod": "Email",
+    "notificationAddress": "john.smith@example.com",
+    "notificationDate": "2026-02-17T13:45:30Z"
+  },
+  "exportContents": {
+    "files": [
+      {
+        "filename": "client_profile.json",
+        "category": "IdentityData",
+        "size": "2.3 KB"
+      },
+      {
+        "filename": "financial_data.json",
+        "category": "FinancialData",
+        "size": "8.5 MB"
+      },
+      {
+        "filename": "transactions.json",
+        "category": "TransactionalData",
+        "size": "4.2 MB"
+      },
+      {
+        "filename": "consent_history.json",
+        "category": "ConsentData",
+        "size": "45 KB"
+      },
+      {
+        "filename": "documents/",
+        "category": "DocumentsData",
+        "size": "2.9 MB",
+        "fileCount": 20
+      }
+    ]
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/data/export/export-req-456" },
+    "download": { "href": "https://secure-exports.factfind.com/download/export-req-456", "method": "GET" }
+  }
+}
+```
+
+**Export Status Values:**
+- `Pending` - Request queued
+- `Processing` - Export being generated
+- `Completed` - Export ready for download
+- `Downloaded` - Export has been downloaded
+- `Expired` - Download link expired
+- `Failed` - Export generation failed
+
+**Validation Rules:**
+- Client identity must be verified
+- Export must be completed within 1 month
+- Download link expires after 7 days
+- Password sent via separate channel
+- Access logged for security
+- Maximum 3 downloads permitted
+
+**HTTP Status Codes:**
+- `202 Accepted` - Export request accepted
+- `200 OK` - Export completed (when polling status)
+- `400 Bad Request` - Invalid request
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+### 5.7 Marketing Preferences API
+
+**Purpose:** Manage marketing consent and communication channel preferences with PECR compliance.
+
+**Scope:**
+- Marketing consent by channel (email, phone, SMS, post)
+- Communication preferences and frequency management
+- Preference center functionality
+- Opt-in and opt-out workflows with audit trail
+- One-click unsubscribe functionality
+- Marketing consent audit trail
+- Suppression list management (Do Not Contact)
+- PECR (Privacy and Electronic Communications Regulations) compliance
+- Double opt-in workflow for email marketing
+- Interest-based marketing preferences
+
+**Aggregate Root:** FactFind (marketing preferences nested within client)
+
+**Regulatory Compliance:**
+- PECR Regulation 22 (Electronic Mail Marketing)
+- PECR Regulation 21 (Telephone Marketing)
+- GDPR Article 6(1)(a) (Consent)
+- ICO Direct Marketing Guidance
+- Data Protection Act 2018
+- TPS (Telephone Preference Service) compliance
+- CTPS (Corporate Telephone Preference Service) compliance
+
+#### 5.7.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get preferences | `client:read` |
+| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update preferences | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/opt-in` | Opt-in to marketing | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/opt-out` | Opt-out of marketing | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/unsubscribe` | Unsubscribe (one-click) | Public |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/history` | Get preference history | `client:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/double-opt-in/initiate` | Initiate double opt-in | `client:write` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/double-opt-in/confirm` | Confirm double opt-in | Public |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/suppression` | Add to suppression list | `client:admin` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/suppression` | Remove from suppression | `client:admin` |
+
+#### 5.7.2 Key Endpoints
+
+##### 5.7.2.1 Get Marketing Preferences
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-preferences`
+
+**Description:** Get current marketing preferences including channel consent, communication frequency, interest categories, and suppression status.
+
+**Query Parameters:**
+- `includeHistory` - Include preference history summary (default: false)
+- `includeSuppressionDetails` - Include suppression list details (default: true)
+
+**Response:**
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "clientName": "John Michael Smith",
+  "overallMarketingStatus": "OptedIn",
+  "lastUpdated": "2026-02-17T11:30:00Z",
+  "preferencesVersion": "3.2",
+  "channelPreferences": {
+    "email": {
+      "consented": true,
+      "consentStatus": "Active",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentMethod": "DoubleOptIn",
+      "consentSource": "PreferenceCenter",
+      "emailAddress": "john.smith@example.com",
+      "emailVerified": true,
+      "emailVerifiedDate": "2026-02-17T11:32:15Z",
+      "frequency": "Weekly",
+      "preferredDayOfWeek": "Wednesday",
+      "preferredTimeOfDay": "Morning",
+      "lastEmailSent": "2026-02-14T09:00:00Z",
+      "emailsSentThisMonth": 3,
+      "openRate": 45.5,
+      "clickRate": 12.3,
+      "bounceStatus": "None",
+      "unsubscribeLink": "https://portal.factfind.com/unsubscribe/client-123/token-abc",
+      "suppressionStatus": "None",
+      "pecrCompliant": true
+    },
+    "phone": {
+      "consented": false,
+      "consentStatus": "NotConsented",
+      "consentDate": null,
+      "phoneNumber": "+44 7700 900123",
+      "tpsRegistered": false,
+      "tpsCheckDate": "2026-02-17T10:00:00Z",
+      "suppressionStatus": "None",
+      "pecrCompliant": true,
+      "notes": "Client prefers not to receive phone marketing calls"
+    },
+    "sms": {
+      "consented": false,
+      "consentStatus": "NotConsented",
+      "consentDate": null,
+      "mobileNumber": "+44 7700 900123",
+      "suppressionStatus": "None",
+      "pecrCompliant": true
+    },
+    "post": {
+      "consented": true,
+      "consentStatus": "Active",
+      "consentDate": "2026-02-17T11:30:00Z",
+      "consentMethod": "OnlineForm",
+      "consentSource": "PreferenceCenter",
+      "postalAddress": {
+        "line1": "123 High Street",
+        "line2": "Flat 4B",
+        "city": "London",
+        "county": "Greater London",
+        "postcode": "SW1A 1AA",
+        "country": "United Kingdom"
+      },
+      "frequency": "Monthly",
+      "lastMailingSent": "2026-01-15",
+      "mailingsSentThisYear": 2,
+      "suppressionStatus": "None",
+      "mpsRegistered": false,
+      "mpsCheckDate": "2026-02-17T10:00:00Z",
+      "environmentalPreference": "RecycledPaperOnly"
+    }
+  },
+  "interestCategories": {
+    "consented": true,
+    "interests": [
+      {
+        "category": "Pensions",
+        "subcategories": [
+          "PersonalPensions",
+          "SIPP",
+          "PensionTransfers"
+        ],
+        "consented": true,
+        "consentDate": "2026-02-17T11:30:00Z"
+      },
+      {
+        "category": "Investments",
+        "subcategories": [
+          "ISA",
+          "GeneralInvestmentAccounts",
+          "Bonds"
+        ],
+        "consented": true,
+        "consentDate": "2026-02-17T11:30:00Z"
+      },
+      {
+        "category": "Protection",
+        "subcategories": [
+          "LifeAssurance",
+          "CriticalIllness",
+          "IncomeProtection"
+        ],
+        "consented": true,
+        "consentDate": "2026-02-17T11:30:00Z"
+      },
+      {
+        "category": "Mortgages",
+        "subcategories": [],
+        "consented": false,
+        "consentDate": null
+      },
+      {
+        "category": "GeneralInsurance",
+        "subcategories": [],
+        "consented": false,
+        "consentDate": null
+      }
+    ]
+  },
+  "contentPreferences": {
+    "newsletterSubscription": true,
+    "marketUpdates": true,
+    "productAnnouncements": true,
+    "eventInvitations": true,
+    "educationalContent": true,
+    "surveyInvitations": false,
+    "thirdPartyOffers": false
+  },
+  "communicationFrequency": {
+    "email": {
+      "frequency": "Weekly",
+      "maxPerWeek": 2,
+      "maxPerMonth": 8
+    },
+    "post": {
+      "frequency": "Monthly",
+      "maxPerMonth": 1,
+      "maxPerQuarter": 3
+    }
+  },
+  "suppressionStatus": {
+    "suppressed": false,
+    "globalSuppression": false,
+    "channelSuppressions": {
+      "email": false,
+      "phone": false,
+      "sms": false,
+      "post": false
+    },
+    "suppressionReasons": [],
+    "doNotContact": false
+  },
+  "externalRegistrations": {
+    "tps": {
+      "registered": false,
+      "lastChecked": "2026-02-17T10:00:00Z",
+      "nextCheck": "2026-03-17T10:00:00Z"
+    },
+    "ctps": {
+      "registered": false,
+      "lastChecked": "2026-02-17T10:00:00Z",
+      "nextCheck": "2026-03-17T10:00:00Z"
+    },
+    "mps": {
+      "registered": false,
+      "lastChecked": "2026-02-17T10:00:00Z",
+      "nextCheck": "2026-03-17T10:00:00Z"
+    }
+  },
+  "engagementMetrics": {
+    "email": {
+      "totalSent": 48,
+      "totalOpens": 22,
+      "totalClicks": 6,
+      "openRate": 45.8,
+      "clickRate": 12.5,
+      "unsubscribeRate": 0,
+      "bounceRate": 0,
+      "lastEngagement": "2026-02-14T10:30:00Z"
+    },
+    "post": {
+      "totalSent": 8,
+      "responseRate": 2.5,
+      "lastEngagement": "2025-12-20"
+    }
+  },
+  "consentEvidence": {
+    "emailConsent": {
+      "consentRecordId": "consent-rec-987",
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "timestamp": "2026-02-17T11:30:00Z",
+      "consentText": "I agree to receive marketing communications by email",
+      "doubleOptInConfirmed": true,
+      "confirmationDate": "2026-02-17T11:32:15Z",
+      "stored": true
+    },
+    "postConsent": {
+      "consentRecordId": "consent-rec-988",
+      "ipAddress": "192.168.1.100",
+      "timestamp": "2026-02-17T11:30:00Z",
+      "consentText": "I agree to receive marketing communications by post",
+      "stored": true
+    }
+  },
+  "regulatoryCompliance": {
+    "pecrCompliant": true,
+    "gdprCompliant": true,
+    "consentRefreshRequired": false,
+    "nextConsentReview": "2028-02-17",
+    "lastComplianceCheck": "2026-02-17T11:30:00Z"
+  },
+  "preferenceCenter": {
+    "available": true,
+    "url": "https://portal.factfind.com/preferences/client-123",
+    "lastAccessed": "2026-02-17T11:30:00Z",
+    "accessCount": 3
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "update": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences", "method": "PUT" },
+    "opt-out": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/opt-out", "method": "POST" },
+    "unsubscribe": { "href": "https://portal.factfind.com/unsubscribe/client-123/token-abc" },
+    "history": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/history" },
+    "preference-center": { "href": "https://portal.factfind.com/preferences/client-123" }
+  }
+}
+```
+
+**Overall Marketing Status Values:**
+- `OptedIn` - Actively consented to at least one channel
+- `OptedOut` - Explicitly opted out of all channels
+- `NotSet` - No preference set yet
+- `Suppressed` - On suppression list (Do Not Contact)
+- `Expired` - Consent has expired
+
+**Consent Status Values:**
+- `Active` - Currently consented and active
+- `PendingVerification` - Awaiting email verification (double opt-in)
+- `NotConsented` - No consent given
+- `Withdrawn` - Previously consented, now withdrawn
+- `Expired` - Consent has expired
+- `Suppressed` - Suppressed from marketing
+
+**Consent Method Values:**
+- `DoubleOptIn` - Email confirmed via confirmation link
+- `SingleOptIn` - Opted in via form (not email)
+- `OnlineForm` - Online preference form
+- `WrittenForm` - Paper consent form
+- `VerbalConsent` - Telephone consent
+- `PreTicked` - Pre-ticked box (non-PECR compliant)
+
+**Frequency Values:**
+- `Daily` - Daily communications
+- `Weekly` - Weekly communications
+- `Fortnightly` - Every two weeks
+- `Monthly` - Monthly communications
+- `Quarterly` - Quarterly communications
+- `Annually` - Annual communications
+- `AsNeeded` - No fixed frequency
+
+**Suppression Status Values:**
+- `None` - Not suppressed
+- `TemporarySuppression` - Temporary suppression (e.g., bereavement)
+- `PermanentSuppression` - Permanent Do Not Contact
+- `Bounced` - Email bounced repeatedly
+- `Complained` - Spam complaint received
+- `LegalRequirement` - Legal requirement to suppress
+
+**HTTP Status Codes:**
+- `200 OK` - Preferences retrieved successfully
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+
+---
+
+##### 5.7.2.2 Update Marketing Preferences
+
+**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-preferences`
+
+**Description:** Update marketing preferences for one or more channels with full consent tracking.
+
+**Request Body:**
+
+```json
+{
+  "channelUpdates": {
+    "email": {
+      "consented": true,
+      "emailAddress": "john.smith@example.com",
+      "frequency": "Weekly",
+      "preferredDayOfWeek": "Wednesday",
+      "preferredTimeOfDay": "Morning",
+      "requireDoubleOptIn": true
+    },
+    "phone": {
+      "consented": false,
+      "phoneNumber": "+44 7700 900123"
+    },
+    "sms": {
+      "consented": false,
+      "mobileNumber": "+44 7700 900123"
+    },
+    "post": {
+      "consented": true,
+      "frequency": "Monthly",
+      "environmentalPreference": "RecycledPaperOnly"
+    }
+  },
+  "interestUpdates": {
+    "Pensions": {
+      "consented": true,
+      "subcategories": ["PersonalPensions", "SIPP", "PensionTransfers"]
+    },
+    "Investments": {
+      "consented": true,
+      "subcategories": ["ISA", "GeneralInvestmentAccounts", "Bonds"]
+    },
+    "Protection": {
+      "consented": true,
+      "subcategories": ["LifeAssurance", "CriticalIllness"]
+    },
+    "Mortgages": {
+      "consented": false
+    }
+  },
+  "contentPreferences": {
+    "newsletterSubscription": true,
+    "marketUpdates": true,
+    "productAnnouncements": true,
+    "eventInvitations": true,
+    "educationalContent": true,
+    "surveyInvitations": false,
+    "thirdPartyOffers": false
+  },
+  "consentEvidence": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "timestamp": "2026-02-17T11:30:00Z",
+    "source": "PreferenceCenter"
+  },
+  "updatedBy": {
+    "type": "Client",
+    "userId": "client-123",
+    "userName": "John Smith"
+  },
+  "notes": "Client updated marketing preferences via preference center"
+}
+```
+
+**Response:**
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "updateStatus": "Success",
+  "updatedDate": "2026-02-17T11:30:15Z",
+  "preferencesVersion": "3.2",
+  "channelUpdates": {
+    "email": {
+      "status": "PendingVerification",
+      "previousConsent": false,
+      "newConsent": true,
+      "consentChanged": true,
+      "requiresDoubleOptIn": true,
+      "verificationEmailSent": true,
+      "verificationEmailAddress": "john.smith@example.com",
+      "verificationTokenExpiry": "2026-02-19T11:30:15Z",
+      "message": "Verification email sent. Please check your inbox and click the confirmation link.",
+      "pecrCompliant": true
+    },
+    "phone": {
+      "status": "Updated",
+      "previousConsent": false,
+      "newConsent": false,
+      "consentChanged": false,
+      "pecrCompliant": true
+    },
+    "sms": {
+      "status": "Updated",
+      "previousConsent": false,
+      "newConsent": false,
+      "consentChanged": false,
+      "pecrCompliant": true
+    },
+    "post": {
+      "status": "Active",
+      "previousConsent": false,
+      "newConsent": true,
+      "consentChanged": true,
+      "consentRecordId": "consent-rec-988",
+      "pecrCompliant": true
+    }
+  },
+  "interestUpdates": {
+    "Pensions": {
+      "status": "Updated",
+      "consented": true,
+      "previouslyConsented": false
+    },
+    "Investments": {
+      "status": "Updated",
+      "consented": true,
+      "previouslyConsented": false
+    },
+    "Protection": {
+      "status": "Updated",
+      "consented": true,
+      "previouslyConsented": false
+    },
+    "Mortgages": {
+      "status": "NoChange",
+      "consented": false,
+      "previouslyConsented": false
+    }
+  },
+  "auditTrail": {
+    "eventRecorded": true,
+    "eventId": "mkt-event-456",
+    "timestamp": "2026-02-17T11:30:15Z"
+  },
+  "warnings": [
+    {
+      "channel": "email",
+      "warning": "Email verification required. Marketing emails will not be sent until email address is confirmed.",
+      "action": "CheckEmailAndConfirm"
+    }
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences" },
+    "verify-email": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/double-opt-in/confirm", "method": "POST" },
+    "preference-center": { "href": "https://portal.factfind.com/preferences/client-123" }
+  }
+}
+```
+
+**Update Status Values:**
+- `Success` - All updates applied successfully
+- `PartialSuccess` - Some updates applied, some failed
+- `Failed` - Update failed
+- `PendingVerification` - Awaiting verification
+
+**Validation Rules:**
+- Email address required if email consent = true
+- Phone number required if phone/SMS consent = true
+- Email verification required for email marketing (PECR Regulation 22)
+- Cannot opt-in to phone if registered on TPS
+- Postal address required if post consent = true
+- Frequency must be valid value
+- Interest categories must exist in system
+
+**HTTP Status Codes:**
+- `200 OK` - Preferences updated successfully
+- `202 Accepted` - Update accepted, pending verification
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/marketing-preference-error",
+  "title": "Marketing Preference Update Failed",
+  "status": 422,
+  "detail": "Cannot opt-in to phone marketing - client is registered on TPS",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences",
+  "errors": [
+    {
+      "field": "channelUpdates.phone.consented",
+      "message": "Client phone number is registered on Telephone Preference Service (TPS). Cannot opt-in to phone marketing.",
+      "rejectedValue": true,
+      "tpsRegistered": true,
+      "tpsCheckDate": "2026-02-17T10:00:00Z",
+      "pecrCompliance": "Regulation 21 - Cannot make unsolicited calls to TPS-registered numbers"
+    }
+  ]
+}
+```
+
+---
+
+##### 5.7.2.3 Opt-in to Marketing
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/opt-in`
+
+**Description:** Explicit opt-in workflow for marketing with full PECR compliance including double opt-in for email.
+
+**Request Body:**
+
+```json
+{
+  "channels": ["Email", "Post"],
+  "emailAddress": "john.smith@example.com",
+  "postalAddress": {
+    "line1": "123 High Street",
+    "line2": "Flat 4B",
+    "city": "London",
+    "county": "Greater London",
+    "postcode": "SW1A 1AA",
+    "country": "United Kingdom"
+  },
+  "interests": ["Pensions", "Investments", "Protection"],
+  "frequency": {
+    "email": "Weekly",
+    "post": "Monthly"
+  },
+  "consentSource": "WebsiteForm",
+  "consentText": "I agree to receive marketing communications from FactFind about products and services that may be of interest to me",
+  "consentEvidence": {
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "formUrl": "https://www.factfind.com/contact/opt-in",
+    "timestamp": "2026-02-17T12:00:00Z",
+    "checkboxChecked": true,
+    "preTicked": false
+  },
+  "doubleOptInRequired": true,
+  "gdprCompliant": true,
+  "pecrCompliant": true,
+  "notes": "Client opted in via website contact form"
+}
+```
+
+**Consent Source Values:**
+- `WebsiteForm` - Website opt-in form
+- `PreferenceCenter` - Client preference center
+- `PhoneCall` - Telephone conversation
+- `EmailResponse` - Email response
+- `InPersonMeeting` - Face-to-face meeting
+- `WrittenForm` - Paper form
+
+**Response:**
+
+```http
+HTTP/1.1 201 Created
+Location: /api/v1/factfinds/ff-456/clients/client-123/marketing/opt-in/optin-789
+```
+
+```json
+{
+  "optInId": "optin-789",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "PendingEmailVerification",
+  "optInDate": "2026-02-17T12:00:00Z",
+  "channels": {
+    "email": {
+      "status": "PendingVerification",
+      "emailAddress": "john.smith@example.com",
+      "verificationRequired": true,
+      "verificationEmailSent": true,
+      "verificationEmailSentDate": "2026-02-17T12:00:15Z",
+      "verificationTokenExpiry": "2026-02-19T12:00:15Z",
+      "verificationUrl": "https://portal.factfind.com/verify-email/token-abc123",
+      "pecrCompliant": false,
+      "pecrComplianceNotes": "Awaiting email verification (PECR Regulation 22)"
+    },
+    "post": {
+      "status": "Active",
+      "postalAddress": {
+        "line1": "123 High Street",
+        "line2": "Flat 4B",
+        "city": "London",
+        "county": "Greater London",
+        "postcode": "SW1A 1AA",
+        "country": "United Kingdom"
+      },
+      "consentRecordId": "consent-rec-991",
+      "pecrCompliant": true
+    }
+  },
+  "interests": {
+    "Pensions": {
+      "consented": true,
+      "consentDate": "2026-02-17T12:00:00Z"
+    },
+    "Investments": {
+      "consented": true,
+      "consentDate": "2026-02-17T12:00:00Z"
+    },
+    "Protection": {
+      "consented": true,
+      "consentDate": "2026-02-17T12:00:00Z"
+    }
+  },
+  "frequency": {
+    "email": "Weekly",
+    "post": "Monthly"
+  },
+  "consentEvidence": {
+    "recorded": true,
+    "consentRecordId": "consent-rec-990",
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+    "timestamp": "2026-02-17T12:00:00Z",
+    "consentText": "I agree to receive marketing communications from FactFind about products and services that may be of interest to me",
+    "checkboxChecked": true,
+    "preTicked": false,
+    "stored": true,
+    "retentionPeriod": "7 years"
+  },
+  "regulatoryCompliance": {
+    "gdprCompliant": true,
+    "pecrCompliant": false,
+    "pecrComplianceReason": "Email verification pending",
+    "doubleOptInRequired": true,
+    "doubleOptInCompleted": false
+  },
+  "nextSteps": [
+    {
+      "step": "VerifyEmail",
+      "description": "Client must verify email address by clicking confirmation link",
+      "dueDate": "2026-02-19T12:00:15Z"
+    }
+  ],
+  "warnings": [
+    {
+      "warning": "Email marketing will not commence until email address is verified",
+      "regulation": "PECR Regulation 22",
+      "action": "AwaitingEmailVerification"
+    }
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/opt-in/optin-789" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "verify-email": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/double-opt-in/confirm", "method": "POST" },
+    "preferences": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing-preferences" }
+  }
+}
+```
+
+**Opt-in Status Values:**
+- `PendingEmailVerification` - Email verification required
+- `Active` - Opt-in active
+- `Expired` - Verification link expired
+- `Failed` - Opt-in failed
+
+**Validation Rules:**
+- Email address required for email channel
+- Email verification required (double opt-in) for PECR compliance
+- Consent text must be clear and specific
+- Cannot be pre-ticked checkbox (PECR non-compliant)
+- Must record IP address and timestamp
+- TPS check required for phone opt-in
+- Consent must be freely given, specific, informed, unambiguous
+
+**HTTP Status Codes:**
+- `201 Created` - Opt-in created, pending verification
+- `200 OK` - Opt-in active (non-email channels)
+- `400 Bad Request` - Invalid request data
+- `401 Unauthorized` - Authentication required
+- `403 Forbidden` - Cannot opt-in (e.g., TPS registered)
+- `404 Not Found` - Client not found
+- `422 Unprocessable Entity` - Validation failed
+
+---
+
+##### 5.7.2.4 Unsubscribe (One-Click)
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing/unsubscribe`
+
+**Description:** PECR-compliant one-click unsubscribe from marketing communications. Can be accessed without authentication via unsubscribe token.
+
+**Request Body:**
+
+```json
+{
+  "unsubscribeToken": "token-abc123xyz",
+  "unsubscribeScope": "AllChannels",
+  "unsubscribeReason": "TooManyEmails",
+  "feedback": "I was receiving too many emails every week",
+  "timestamp": "2026-02-17T13:00:00Z"
+}
+```
+
+**Unsubscribe Scope Values:**
+- `EmailOnly` - Unsubscribe from email only
+- `AllChannels` - Unsubscribe from all marketing
+- `SpecificCategory` - Unsubscribe from specific interest category
+
+**Unsubscribe Reason Values:**
+- `TooManyEmails` - Receiving too many communications
+- `NotInterested` - No longer interested
+- `IrrelevantContent` - Content not relevant
+- `PrivacyConcerns` - Privacy concerns
+- `ChangedProvider` - Switched to different provider
+- `Other` - Other reason
+
+**Response:**
+
+```http
+HTTP/1.1 200 OK
+```
+
+```json
+{
+  "unsubscribeId": "unsub-456",
+  "clientId": "client-123",
+  "factfindId": "ff-456",
+  "status": "Completed",
+  "unsubscribeDate": "2026-02-17T13:00:00Z",
+  "unsubscribeScope": "AllChannels",
+  "unsubscribeReason": "TooManyEmails",
+  "channelsUnsubscribed": [
+    {
+      "channel": "Email",
+      "previousStatus": "Active",
+      "newStatus": "Unsubscribed",
+      "effectiveDate": "2026-02-17T13:00:00Z",
+      "processingStoppedDate": "2026-02-17T13:00:05Z",
+      "suppressionAdded": true
+    },
+    {
+      "channel": "Post",
+      "previousStatus": "Active",
+      "newStatus": "Unsubscribed",
+      "effectiveDate": "2026-02-17T13:00:00Z",
+      "processingStoppedDate": "2026-02-17T13:00:05Z",
+      "suppressionAdded": true
+    }
+  ],
+  "suppressionList": {
+    "addedToSuppression": true,
+    "suppressionType": "Marketing",
+    "suppressionDate": "2026-02-17T13:00:00Z",
+    "permanent": false,
+    "canReOptIn": true
+  },
+  "processingActions": {
+    "marketingStoppedImmediately": true,
+    "emailCampaignsRemoved": true,
+    "mailingListsRemoved": true,
+    "scheduledCommunicationsCancelled": 2
+  },
+  "reOptInAvailable": {
+    "available": true,
+    "method": "PreferenceCenter",
+    "url": "https://portal.factfind.com/preferences/client-123",
+    "cooldownPeriod": "None"
+  },
+  "confirmation": {
+    "confirmationSent": true,
+    "confirmationMethod": "Email",
+    "confirmationDate": "2026-02-17T13:00:10Z",
+    "confirmationMessage": "You have been unsubscribed from all marketing communications. You will no longer receive marketing emails or mailings from us."
+  },
+  "feedback": {
+    "recorded": true,
+    "reason": "TooManyEmails",
+    "feedbackText": "I was receiving too many emails every week",
+    "feedbackWillBeReviewed": true
+  },
+  "pecrCompliance": {
+    "compliant": true,
+    "oneClickUnsubscribe": true,
+    "immediateEffect": true,
+    "noReAuthentication": true
+  },
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/marketing/unsubscribe" },
+    "resubscribe": { "href": "https://portal.factfind.com/preferences/client-123" },
+    "preference-center": { "href": "https://portal.factfind.com/preferences/client-123" }
+  }
+}
+```
+
+**Unsubscribe Status Values:**
+- `Completed` - Unsubscribe completed
+- `Failed` - Unsubscribe failed
+- `AlreadyUnsubscribed` - Already unsubscribed
+
+**Validation Rules:**
+- Unsubscribe token must be valid and not expired
+- Must process unsubscribe immediately (PECR requirement)
+- Must not require re-authentication
+- Must be one-click process
+- Must send confirmation
+- Must add to suppression list
+- Must stop processing within 24 hours
+
+**HTTP Status Codes:**
+- `200 OK` - Unsubscribe completed
+- `400 Bad Request` - Invalid token or request
+- `404 Not Found` - Client or token not found
+- `410 Gone` - Token expired
+
+**Error Response Example:**
+
+```json
+{
+  "type": "https://api.factfind.com/errors/unsubscribe-error",
+  "title": "Unsubscribe Token Invalid",
+  "status": 404,
+  "detail": "The unsubscribe token is invalid or has expired",
+  "instance": "/api/v1/factfinds/ff-456/clients/client-123/marketing/unsubscribe",
+  "tokenStatus": "Expired",
+  "tokenExpiry": "2026-02-10T13:00:00Z",
+  "alternativeAction": "Please visit the preference center to update your marketing preferences",
+  "preferenceCenterUrl": "https://portal.factfind.com/preferences"
+}
+```
+
+---
+
+---
+
+
 ## 6. FactFind Income & Expenditure API
 
 ### 6.1 Overview
@@ -11891,18 +15748,9 @@ Each field is annotated with its behavioral characteristics:
 
 ### 13.1 Client Contract
 
-The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic, regulatory, and preference information.
+The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic and regulatory information.
 
 **Reference Type:** Client is a reference type with identity (has `id` field).
-
-**Key Enhancements in v2.1:**
-- **Addresses** - Full address history embedded as value types
-- **Contacts** - All contact methods (email, phone, mobile, work, website) embedded
-- **Identity Verification** - KYC, AML checks, MLR compliance embedded
-- **Vulnerabilities** - Client vulnerabilities and adjustments embedded
-- **Data Protection** - GDPR consent and privacy management embedded
-- **Marketing Preferences** - Channel preferences and interests embedded
-- **Estate Planning** - Will, LPA, gifts, trusts, IHT embedded
 
 ```json
 {
@@ -11947,6 +15795,10 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "taxReference": "1234567890"
   },
   "nationalClientIdentifier": "NCI-123456",
+  "passportRef": "502135321",
+  "passportExpiryDate": "2030-05-15",
+  "drivingLicenceRef": "SMITH801055JM9IJ",
+  "drivingLicenceExpiryDate": "2030-05-15",
   "nationalityCountry": {
     "code": "GB",
     "display": "United Kingdom",
@@ -11971,592 +15823,19 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "isExpatriate": false,
   "isDeceased": false,
   "deceasedOn": null,
-  "addresses": [
-    {
-      "addressType": {
-        "code": "RES",
-        "display": "Residential"
-      },
-      "line1": "123 Main Street",
-      "line2": "Apartment 4B",
-      "line3": null,
-      "line4": null,
-      "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
-      "postcode": "SW1A 1AA",
-      "country": {
-        "code": "GB",
-        "display": "United Kingdom",
-        "alpha3": "GBR"
-      },
-      "isPrimary": true,
-      "fromDate": "2020-01-15",
-      "toDate": null,
-      "yearsAtAddress": 6
-    },
-    {
-      "addressType": {
-        "code": "PREV",
-        "display": "Previous Address"
-      },
-      "line1": "45 Old Road",
-      "line2": null,
-      "line3": null,
-      "line4": null,
-      "city": "Manchester",
-      "county": {
-        "code": "GTM",
-        "display": "Greater Manchester"
-      },
-      "postcode": "M1 1AA",
-      "country": {
-        "code": "GB",
-        "display": "United Kingdom",
-        "alpha3": "GBR"
-      },
-      "isPrimary": false,
-      "fromDate": "2015-03-10",
-      "toDate": "2020-01-14",
-      "yearsAtAddress": 5
-    }
-  ],
-  "contacts": [
-    {
-      "contactType": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
-      "value": "john.smith@example.com",
-      "isPrimary": true,
-      "isVerified": true,
-      "verifiedDate": "2020-01-15"
-    },
-    {
-      "contactType": {
-        "code": "MOBILE",
-        "display": "Mobile Phone"
-      },
-      "value": "+44 7700 900123",
-      "isPrimary": true,
-      "isVerified": true,
-      "verifiedDate": "2020-01-15"
-    },
-    {
-      "contactType": {
-        "code": "PHONE",
-        "display": "Home Phone"
-      },
-      "value": "+44 20 7946 0958",
-      "isPrimary": false,
-      "isVerified": false
-    },
-    {
-      "contactType": {
-        "code": "WORK_PHONE",
-        "display": "Work Phone"
-      },
-      "value": "+44 20 7946 0123",
-      "isPrimary": false,
-      "isVerified": false
-    },
-    {
-      "contactType": {
-        "code": "WEBSITE",
-        "display": "Website"
-      },
-      "value": "https://www.example.com",
-      "isPrimary": false,
-      "isVerified": false
-    }
-  ],
-  "identityVerification": {
-    "verificationStatus": "Verified",
-    "verificationDate": "2020-01-15",
-    "expiryDate": "2025-01-15",
-    "nextReviewDate": "2025-01-15",
-    "verifiedBy": {
-      "id": "adviser-789",
-      "name": "Jane Doe"
-    },
-    "verificationMethod": "Electronic",
-    "documents": [
-      {
-        "documentType": "Passport",
-        "documentNumber": "502135321",
-        "issueDate": "2020-05-15",
-        "expiryDate": "2030-05-15",
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
-        "verified": true,
-        "verifiedDate": "2020-01-15",
-        "verificationSource": "GOV.UK Verify"
-      },
-      {
-        "documentType": "DrivingLicense",
-        "documentNumber": "SMITH801055JM9IJ",
-        "issueDate": "2020-05-15",
-        "expiryDate": "2030-05-15",
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
-        "verified": true,
-        "verifiedDate": "2020-01-15",
-        "verificationSource": "DVLA"
-      }
-    ],
-    "amlChecks": {
-      "lastCheckDate": "2020-01-15",
-      "nextCheckDate": "2025-01-15",
-      "riskRating": "Low",
-      "sanctionsChecked": true,
-      "sanctionsMatches": 0,
-      "sanctionsCheckSource": "World-Check",
-      "pepChecked": true,
-      "isPep": false,
-      "pepCheckSource": "World-Check",
-      "adverseMediaChecked": true,
-      "adverseMediaMatches": 0,
-      "adverseMediaCheckSource": "LexisNexis",
-      "overallStatus": "Clear",
-      "checkPerformedBy": {
-        "id": "adviser-789",
-        "name": "Jane Doe"
-      }
-    },
-    "mlrCompliance": {
-      "kycCompliant": true,
-      "kycComplianceDate": "2020-01-15",
-      "cddCompleted": true,
-      "cddCompletedDate": "2020-01-15",
-      "eddRequired": false,
-      "eddCompletedDate": null,
-      "complianceStatus": "Compliant",
-      "complianceDate": "2020-01-15",
-      "reviewPeriod": "Annual",
-      "lastReviewDate": "2025-01-15",
-      "nextReviewDate": "2026-01-15"
-    },
-    "sourceOfWealth": {
-      "primarySource": "Employment",
-      "secondarySource": "Investments",
-      "description": "Senior executive salary and investment portfolio",
-      "evidenceProvided": true,
-      "evidenceType": "Payslips, Investment Statements",
-      "verifiedDate": "2020-01-15"
-    },
-    "sourceOfFunds": {
-      "source": "Savings",
-      "description": "Personal savings accumulated over 20 years",
-      "evidenceProvided": true,
-      "evidenceType": "Bank Statements",
-      "verifiedDate": "2020-01-15"
-    }
-  },
-  "vulnerabilities": [
-    {
-      "vulnerabilityType": {
-        "code": "HEALTH",
-        "display": "Health-related"
-      },
-      "severity": "Medium",
-      "description": "Requires large print documents due to visual impairment",
-      "assessmentDate": "2020-01-15",
-      "reviewDate": "2025-01-15",
-      "adjustmentsRequired": [
-        "Large print documents (16pt minimum)",
-        "Extended appointment times (allow 90 minutes)",
-        "Well-lit meeting rooms"
-      ],
-      "isActive": true,
-      "recordedBy": {
-        "id": "adviser-789",
-        "name": "Jane Doe"
-      }
-    },
-    {
-      "vulnerabilityType": {
-        "code": "FINANCIAL",
-        "display": "Financial vulnerability"
-      },
-      "severity": "Low",
-      "description": "Recent life event (bereavement) may affect decision-making",
-      "assessmentDate": "2024-06-01",
-      "reviewDate": "2025-06-01",
-      "adjustmentsRequired": [
-        "Additional cooling-off period",
-        "Involve trusted family member in discussions",
-        "Avoid complex products"
-      ],
-      "isActive": true,
-      "recordedBy": {
-        "id": "adviser-789",
-        "name": "Jane Doe"
-      }
-    }
-  ],
-  "dataProtection": {
-    "gdprConsent": {
-      "dataProcessing": {
-        "consented": true,
-        "consentDate": "2020-01-15",
-        "consentMethod": "Explicit",
-        "lawfulBasis": "Consent",
-        "consentText": "I consent to my personal data being processed for financial advice services",
-        "version": "1.0"
-      },
-      "marketing": {
-        "consented": true,
-        "consentDate": "2020-01-15",
-        "consentMethod": "Explicit",
-        "lawfulBasis": "Consent",
-        "consentText": "I consent to receiving marketing communications",
-        "version": "1.0"
-      },
-      "profiling": {
-        "consented": false,
-        "consentDate": null,
-        "consentMethod": null,
-        "lawfulBasis": null,
-        "consentText": null,
-        "version": null
-      },
-      "thirdPartySharing": {
-        "consented": false,
-        "consentDate": null,
-        "consentMethod": null,
-        "lawfulBasis": null,
-        "consentText": null,
-        "version": null
-      }
-    },
-    "privacyPolicy": {
-      "version": "2.1",
-      "acceptedDate": "2020-01-15",
-      "url": "https://api.factfind.com/privacy-policy/v2.1",
-      "acceptanceMethod": "Electronic"
-    },
-    "dataRetention": {
-      "retentionPeriod": "7 years after relationship ends",
-      "retentionBasis": "FCA Regulatory Requirement",
-      "relationshipEndDate": null,
-      "retentionEndDate": null,
-      "archiveDate": null
-    },
-    "rightsExercised": {
-      "dsarRequests": 0,
-      "rectificationRequests": 0,
-      "erasureRequests": 0,
-      "portabilityRequests": 0,
-      "restrictionRequests": 0,
-      "objectionRequests": 0,
-      "lastRequestDate": null,
-      "lastRequestType": null
-    },
-    "breachNotifications": {
-      "breachCount": 0,
-      "lastBreachDate": null,
-      "breachesNotified": []
-    }
-  },
-  "marketingPreferences": {
-    "channels": {
-      "email": {
-        "consented": true,
-        "consentDate": "2020-01-15",
-        "doubleOptInDate": "2020-01-15",
-        "optOutDate": null,
-        "frequency": "Monthly",
-        "lastContactDate": "2026-02-01",
-        "unsubscribed": false
-      },
-      "phone": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": false,
-        "tpsChecked": true,
-        "tpsRegistered": false,
-        "tpsCheckDate": "2020-01-15"
-      },
-      "sms": {
-        "consented": true,
-        "consentDate": "2020-01-15",
-        "optOutDate": null,
-        "frequency": "Quarterly",
-        "lastContactDate": "2026-01-15",
-        "unsubscribed": false
-      },
-      "post": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": false,
-        "mpsChecked": true,
-        "mpsRegistered": false,
-        "mpsCheckDate": "2020-01-15"
-      },
-      "socialMedia": {
-        "consented": false,
-        "consentDate": null,
-        "optOutDate": null,
-        "frequency": null,
-        "lastContactDate": null,
-        "unsubscribed": false
-      }
-    },
-    "interests": [
-      "Retirement Planning",
-      "Investment Advice",
-      "Tax Planning",
-      "Estate Planning"
-    ],
-    "productInterests": [
-      "Pensions",
-      "ISAs",
-      "Investments",
-      "Protection"
-    ],
-    "suppressionList": false,
-    "unsubscribeAll": false,
-    "unsubscribeAllDate": null,
-    "lastUpdated": "2020-01-15",
-    "preferredContactTime": "Weekday Evenings",
-    "doNotContact": false,
-    "doNotContactReason": null
-  },
-  "estatePlanning": {
-    "will": {
-      "hasWill": true,
-      "willDate": "2020-06-15",
-      "lastReviewed": "2024-06-15",
-      "nextReviewDate": "2027-06-15",
-      "isUpToDate": true,
-      "willType": "Simple Will",
-      "willStoredWith": "Smith & Co Solicitors",
-      "willStoredLocation": "London Office",
-      "executors": [
-        {
-          "name": "Sarah Smith",
-          "relationship": "Spouse",
-          "type": "Primary",
-          "contactDetails": "sarah.smith@example.com"
-        },
-        {
-          "name": "David Smith",
-          "relationship": "Brother",
-          "type": "Substitute",
-          "contactDetails": "david.smith@example.com"
-        }
-      ],
-      "beneficiaries": [
-        {
-          "name": "Sarah Smith",
-          "relationship": "Spouse",
-          "percentage": 100,
-          "notes": "Primary beneficiary"
-        }
-      ],
-      "advisedByUs": true,
-      "advisedDate": "2020-06-01"
-    },
-    "powerOfAttorney": {
-      "hasLPA": true,
-      "lpaType": "Property and Financial Affairs",
-      "lpaDate": "2021-05-10",
-      "lpaRegistered": true,
-      "lpaRegistrationDate": "2021-05-15",
-      "lpaExpiryDate": null,
-      "attorneys": [
-        {
-          "name": "Sarah Smith",
-          "relationship": "Spouse",
-          "type": "Primary",
-          "contactDetails": "sarah.smith@example.com"
-        }
-      ],
-      "instructions": "Can act jointly and severally",
-      "advisedByUs": true,
-      "advisedDate": "2021-04-15"
-    },
-    "healthWelfareLPA": {
-      "hasHealthWelfareLPA": true,
-      "lpaDate": "2021-05-10",
-      "lpaRegistered": true,
-      "lpaRegistrationDate": "2021-05-15",
-      "attorneys": [
-        {
-          "name": "Sarah Smith",
-          "relationship": "Spouse",
-          "type": "Primary",
-          "contactDetails": "sarah.smith@example.com"
-        }
-      ]
-    },
-    "gifts": {
-      "totalGiftsLastYear": {
-        "amount": 6000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "annualExemptionUsed": {
-        "amount": 6000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "annualExemptionAvailable": {
-        "amount": 0.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "petsOutstanding": 2,
-      "petDetails": [
-        {
-          "recipient": "Adult Child 1",
-          "amount": {
-            "amount": 10000.00,
-            "currency": {
-              "code": "GBP",
-              "display": "British Pound",
-              "symbol": "£"
-            }
-          },
-          "dateOfGift": "2023-05-15",
-          "survivePeriod": 7,
-          "yearsRemaining": 4
-        },
-        {
-          "recipient": "Adult Child 2",
-          "amount": {
-            "amount": 10000.00,
-            "currency": {
-              "code": "GBP",
-              "display": "British Pound",
-              "symbol": "£"
-            }
-          },
-          "dateOfGift": "2024-05-15",
-          "survivePeriod": 7,
-          "yearsRemaining": 5
-        }
-      ],
-      "regularGiftsFromIncome": {
-        "hasRegularGifts": true,
-        "amount": {
-          "amount": 500.00,
-          "currency": {
-            "code": "GBP",
-            "display": "British Pound",
-            "symbol": "£"
-          }
-        },
-        "frequency": "Monthly",
-        "recipient": "Grandchildren"
-      }
-    },
-    "trusts": {
-      "hasTrusts": false,
-      "numberOfTrusts": 0,
-      "trustDetails": []
-    },
-    "ihtEstimate": {
-      "estimatedEstate": {
-        "amount": 650000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "nilRateBand": {
-        "amount": 325000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "residenceNilRateBand": {
-        "amount": 175000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "transferableNilRateBand": {
-        "amount": 0.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "totalNilRateBand": {
-        "amount": 500000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "taxableEstate": {
-        "amount": 150000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "estimatedIHT": {
-        "amount": 60000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "ihtRate": 0.40,
-      "calculationDate": "2026-02-18",
-      "nextReviewDate": "2027-02-18"
-    },
-    "lifeInsuranceInTrust": {
-      "hasLifeInsuranceInTrust": true,
-      "policies": [
-        {
-          "policyRef": "LI-123456",
-          "sumAssured": {
-            "amount": 250000.00,
-            "currency": {
-              "code": "GBP",
-              "display": "British Pound",
-              "symbol": "£"
-            }
-          },
-          "trustType": "Discretionary Trust",
-          "beneficiaries": ["Spouse", "Children"]
-        }
-      ]
-    }
-  },
+  "hasWill": true,
+  "isWillUpToDate": true,
+  "isWillAdvised": true,
+  "willDetails": "Will created in 2020, held by Smith & Co Solicitors",
+  "isPowerOfAttorneyGranted": false,
+  "powerOfAttorneyName": null,
+  "hasEverSmoked": false,
+  "isSmoker": "Never",
+  "hasSmokedInLast12Months": "No",
+  "hasNicotineReplacementInLastYear": "No",
+  "hasVapedInLastYear": "No",
+  "inGoodHealth": true,
+  "medicalConditions": null,
   "isMatchingServiceProposition": false,
   "matchingServicePropositionReason": null,
   "isHeadOfFamilyGroup": true,
@@ -12567,35 +15846,6 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
-  },
-  "dependants": [
-    {
-      "name": "Emma Smith",
-      "relationship": "Daughter",
-      "dateOfBirth": "2010-03-15",
-      "age": 16,
-      "isFinanciallyDependent": true,
-      "isDisabled": false
-    },
-    {
-      "name": "Oliver Smith",
-      "relationship": "Son",
-      "dateOfBirth": "2012-08-22",
-      "age": 14,
-      "isFinanciallyDependent": true,
-      "isDisabled": false
-    }
-  ],
-  "healthInformation": {
-    "hasEverSmoked": false,
-    "isSmoker": "Never",
-    "hasSmokedInLast12Months": "No",
-    "hasNicotineReplacementInLastYear": "No",
-    "hasVapedInLastYear": "No",
-    "inGoodHealth": true,
-    "medicalConditions": null,
-    "hasDisability": false,
-    "disabilityDetails": null
   },
   "serviceStatus": "Active",
   "serviceStatusDate": "2020-01-15",
@@ -12650,6 +15900,43 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "symbol": "£"
     }
   },
+  "primaryAddress": {
+    "line1": "123 Main Street",
+    "line2": "Apartment 4B",
+    "city": "London",
+    "county": {
+      "code": "GLA",
+      "display": "Greater London"
+    },
+    "postcode": "SW1A 1AA",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom",
+      "alpha3": "GBR"
+    },
+    "addressType": {
+      "code": "RES",
+      "display": "Residential"
+    }
+  },
+  "contacts": [
+    {
+      "type": {
+        "code": "EMAIL",
+        "display": "Email"
+      },
+      "value": "john.smith@example.com",
+      "isPrimary": true
+    },
+    {
+      "type": {
+        "code": "MOBILE",
+        "display": "Mobile"
+      },
+      "value": "+44 7700 900123",
+      "isPrimary": false
+    }
+  ],
   "adviserRef": {
     "id": "adviser-789",
     "href": "/api/v1/advisers/adviser-789",
@@ -12659,249 +15946,206 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "paraplannerRef": {
     "id": "adviser-790",
     "href": "/api/v1/advisers/adviser-790",
-    "name": "Tom Johnson",
+    "name": "Mark Taylor",
     "code": "PP001"
   },
-  "officeRef": {
-    "id": "office-1",
-    "name": "London Office",
-    "code": "LON"
-  },
+  "idCheckCompletedDate": "2020-01-10",
+  "idCheckExpiryDate": "2025-01-10",
+  "idCheckIssuer": "Experian",
+  "idCheckReference": "IDC-123456",
+  "idCheckResult": "Passed",
+  "taxCode": "1257L",
+  "notes": "Prefers email communication, interested in sustainable investing",
+  "profilePicture": "https://cdn.factfind.com/profiles/client-123.jpg",
   "createdAt": "2020-01-15T10:30:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "createdBy": {
-    "id": "adviser-789",
-    "name": "Jane Doe"
+    "id": "user-999",
+    "name": "System Admin"
   },
   "updatedBy": {
-    "id": "adviser-789",
+    "id": "user-789",
     "name": "Jane Doe"
   },
-  "_etag": "W/\"v2-20260216-143000\"",
   "_links": {
     "self": { "href": "/api/v1/clients/client-123" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
-    "spouse": { "href": "/api/v1/clients/client-124" },
-    "adviser": { "href": "/api/v1/advisers/adviser-789" }
+    "update": { "href": "/api/v1/clients/client-123", "method": "PUT" },
+    "delete": { "href": "/api/v1/clients/client-123", "method": "DELETE" },
+    "addresses": { "href": "/api/v1/clients/client-123/addresses" },
+    "contacts": { "href": "/api/v1/clients/client-123/contacts" },
+    "relationships": { "href": "/api/v1/clients/client-123/relationships" },
+    "dependants": { "href": "/api/v1/clients/client-123/dependants" },
+    "factfinds": { "href": "/api/v1/factfinds?clientId=client-123" },
+    "arrangements": { "href": "/api/v1/arrangements?clientId=client-123" },
+    "goals": { "href": "/api/v1/goals?clientId=client-123" },
+    "riskProfile": { "href": "/api/v1/risk-profiles?clientId=client-123" }
   }
 }
 ```
 
-#### 13.1.1 Field Behaviors
+**Field Behaviors:**
 
-| Field | Type | Required | Validation Rules | Notes |
-|-------|------|----------|------------------|-------|
-| `id` | string | Yes (read-only) | System-generated | Unique identifier |
-| `clientNumber` | string | Yes | Unique, max 20 chars | Business key |
-| `clientType` | string | Yes | Enum: Person, Corporate, Trust | Entity type |
-| `name` | NameValue | Yes | See NameValue definition | Full name components |
-| `dateOfBirth` | date | Conditional | ISO 8601, Person only | Required for Person |
-| `age` | integer | No (calculated) | Derived from dateOfBirth | System-calculated |
-| `addresses` | AddressValue[] | Yes | Min 1 address required | Full address history |
-| `contacts` | ContactValue[] | Yes | Min 1 email or phone required | All contact methods |
-| `identityVerification` | IdentityVerificationValue | Conditional | Required for KYC completion | KYC, AML, MLR compliance |
-| `vulnerabilities` | VulnerabilityValue[] | No | | Consumer Duty compliance |
-| `dataProtection` | DataProtectionValue | Yes | Required for GDPR compliance | GDPR consent management |
-| `marketingPreferences` | MarketingPreferencesValue | Yes | Required for marketing | Marketing opt-in/out |
-| `estatePlanning` | EstatePlanningValue | No | | Will, LPA, gifts, IHT |
-| `spouseRef` | ClientRef | Conditional | Required if isJoint=true | Spouse reference |
-| `dependants` | DependantValue[] | No | | Financial dependants |
+| Field | Type | Create | Update | Response | Notes |
+|-------|------|--------|--------|----------|-------|
+| `id` | uuid | ignored | ignored | included | read-only, server-generated |
+| `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
+| `clientNumber` | string | optional | ignored | included | write-once, business identifier |
+| `clientType` | enum | required | ignored | included | write-once, discriminator field |
+| `name` | NameValue | required | updatable | included | Value type: firstName, lastName required |
+| `fullName` | string | ignored | ignored | included | read-only, computed from name |
+| `salutation` | string | optional | updatable | included | - |
+| `dateOfBirth` | date | required | ignored | included | write-once, immutable after creation |
+| `age` | integer | ignored | ignored | included | read-only, computed from dateOfBirth |
+| `placeOfBirth` | string | optional | updatable | included | - |
+| `gender` | GenderValue | optional | updatable | included | Value type: code/display enumeration |
+| `maritalStatus` | MaritalStatusValue | optional | updatable | included | Value type: code/display/effectiveFrom |
+| `taxDetails` | TaxDetailsValue | optional | updatable | included | Value type: PII, requires `client:pii:read` scope |
+| `nationalClientIdentifier` | string | optional | updatable | included | - |
+| `passportRef` | string | optional | updatable | included | PII, requires `client:pii:read` scope |
+| `passportExpiryDate` | date | optional | updatable | included | - |
+| `drivingLicenceRef` | string | optional | updatable | included | PII, requires `client:pii:read` scope |
+| `drivingLicenceExpiryDate` | date | optional | updatable | included | - |
+| `nationalityCountry` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfBirth` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfResidence` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `countryOfDomicile` | CountryValue | optional | updatable | included | Value type: ISO country code/display/alpha3 |
+| `isUkResident` | boolean | optional | updatable | included | - |
+| `isExpatriate` | boolean | optional | updatable | included | - |
+| `isDeceased` | boolean | optional | updatable | included | - |
+| `deceasedOn` | date | optional | updatable | included | - |
+| `hasWill` | boolean | optional | updatable | included | - |
+| `isWillUpToDate` | boolean | optional | updatable | included | - |
+| `isWillAdvised` | boolean | optional | updatable | included | - |
+| `willDetails` | string | optional | updatable | included | - |
+| `isPowerOfAttorneyGranted` | boolean | optional | updatable | included | - |
+| `powerOfAttorneyName` | string | optional | updatable | included | - |
+| `hasEverSmoked` | boolean | optional | updatable | included | - |
+| `isSmoker` | enum | optional | updatable | included | - |
+| `hasSmokedInLast12Months` | enum | optional | updatable | included | - |
+| `hasNicotineReplacementInLastYear` | enum | optional | updatable | included | - |
+| `hasVapedInLastYear` | enum | optional | updatable | included | - |
+| `inGoodHealth` | boolean | optional | updatable | included | - |
+| `medicalConditions` | string | optional | updatable | included | - |
+| `isMatchingServiceProposition` | boolean | optional | updatable | included | - |
+| `matchingServicePropositionReason` | string | optional | updatable | included | - |
+| `isHeadOfFamilyGroup` | boolean | optional | updatable | included | - |
+| `isJoint` | boolean | optional | updatable | included | - |
+| `spouseRef` | ClientRef | optional | updatable | included | Reference type: Provide id on create/update |
+| `serviceStatus` | enum | optional | updatable | included | - |
+| `serviceStatusDate` | date | optional | updatable | included | - |
+| `clientSegment` | string | optional | updatable | included | - |
+| `clientSegmentDate` | date | optional | updatable | included | - |
+| `clientCategory` | enum | optional | updatable | included | - |
+| `grossAnnualIncome` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `householdIncome` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `netWorth` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `householdNetWorth` | MoneyValue | optional | updatable | included | Value type: amount + currency |
+| `totalAssets` | MoneyValue | ignored | ignored | included | read-only, computed from arrangements |
+| `totalJointAssets` | MoneyValue | ignored | ignored | included | read-only, computed |
+| `primaryAddress` | AddressValue | optional | updatable | included | Value type: Embedded address, no id |
+| `contacts` | ContactValue[] | optional | updatable | included | Value type array: Email, phone contacts |
+| `adviserRef` | AdviserRef | optional | updatable | included | Reference type: Primary adviser |
+| `paraplannerRef` | AdviserRef | optional | updatable | included | Reference type: Paraplanner |
+| `idCheckCompletedDate` | date | optional | updatable | included | - |
+| `idCheckExpiryDate` | date | optional | updatable | included | - |
+| `idCheckIssuer` | string | optional | updatable | included | - |
+| `idCheckReference` | string | optional | updatable | included | - |
+| `idCheckResult` | enum | optional | updatable | included | - |
+| `taxCode` | string | optional | updatable | included | - |
+| `notes` | string | optional | updatable | included | - |
+| `profilePicture` | string | optional | updatable | included | URL to profile image |
+| `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
+| `createdBy` | object | ignored | ignored | included | read-only, audit trail |
+| `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
+| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
 
-#### 13.1.2 AddressValue Type
+**Usage Examples:**
 
-Embedded value type representing an address. Addresses have history (fromDate, toDate) but no separate identity.
-
+**Creating a Client (POST /api/v1/clients):**
 ```json
 {
-  "addressType": {
-    "code": "RES",
-    "display": "Residential"
+  "clientType": "Person",
+  "name": {
+    "title": "Mr",
+    "firstName": "John",
+    "lastName": "Smith"
   },
-  "line1": "123 Main Street",
-  "line2": "Apartment 4B",
-  "line3": null,
-  "line4": null,
-  "city": "London",
-  "county": {
-    "code": "GLA",
-    "display": "Greater London"
+  "dateOfBirth": "1980-05-15",
+  "gender": "Male",
+  "nationalityCountry": { "code": "GB" },
+  "primaryAddress": {
+    "line1": "123 Main Street",
+    "city": "London",
+    "postcode": "SW1A 1AA",
+    "country": "GB"
   },
-  "postcode": "SW1A 1AA",
-  "country": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "isPrimary": true,
-  "fromDate": "2020-01-15",
-  "toDate": null,
-  "yearsAtAddress": 6
-}
-```
-
-**Fields:**
-- `addressType` - Type of address (RES=Residential, WORK=Work, PREV=Previous, MAIL=Mailing)
-- `line1-4` - Address lines
-- `city` - City/town
-- `county` - County/region
-- `postcode` - Postal/ZIP code
-- `country` - Country
-- `isPrimary` - Is this the primary address?
-- `fromDate` - Date moved to this address
-- `toDate` - Date moved from this address (null if current)
-- `yearsAtAddress` - Calculated years at address (for affordability checks)
-
-#### 13.1.3 ContactValue Type
-
-Embedded value type representing a contact method.
-
-```json
-{
-  "contactType": {
-    "code": "EMAIL",
-    "display": "Email"
-  },
-  "value": "john.smith@example.com",
-  "isPrimary": true,
-  "isVerified": true,
-  "verifiedDate": "2020-01-15"
-}
-```
-
-**Contact Types:**
-- `EMAIL` - Email address
-- `MOBILE` - Mobile phone
-- `PHONE` - Home phone
-- `WORK_PHONE` - Work phone
-- `WEBSITE` - Personal website
-- `LINKEDIN` - LinkedIn profile
-- `FAX` - Fax number (legacy)
-
-#### 13.1.4 IdentityVerificationValue Type
-
-Embedded value type representing KYC, AML, and MLR compliance.
-
-**Key Components:**
-- **Verification Status** - Overall status (Verified, Pending, Failed, Expired)
-- **Documents** - Passport, driving license, utility bills
-- **AML Checks** - Sanctions, PEP, adverse media screening
-- **MLR Compliance** - KYC, CDD, EDD status
-- **Source of Wealth/Funds** - Evidence and verification
-
-See full example in the Client Contract JSON above.
-
-#### 13.1.5 VulnerabilityValue Type
-
-Embedded value type representing client vulnerabilities (Consumer Duty requirement).
-
-```json
-{
-  "vulnerabilityType": {
-    "code": "HEALTH",
-    "display": "Health-related"
-  },
-  "severity": "Medium",
-  "description": "Requires large print documents due to visual impairment",
-  "assessmentDate": "2020-01-15",
-  "reviewDate": "2025-01-15",
-  "adjustmentsRequired": [
-    "Large print documents (16pt minimum)",
-    "Extended appointment times (allow 90 minutes)"
+  "contacts": [
+    {
+      "type": "Email",
+      "value": "john.smith@example.com",
+      "isPrimary": true
+    }
   ],
-  "isActive": true
+  "adviserRef": {
+    "id": "adviser-789"
+  }
 }
 ```
+Server generates `id`, `clientNumber`, `createdAt`, `updatedAt`, `fullName`, `age`, and populates reference display fields. Returns complete contract.
 
-**Vulnerability Types:**
-- `HEALTH` - Health-related (physical/mental health)
-- `FINANCIAL` - Financial vulnerability (low income, high debt)
-- `LIFE_EVENT` - Life event (bereavement, divorce, redundancy)
-- `CAPABILITY` - Capability limitation (language, literacy, digital skills)
-- `RESILIENCE` - Low resilience (multiple vulnerabilities)
+**Updating a Client (PUT /api/v1/clients/client-123):**
+```json
+{
+  "name": {
+    "title": "Mr",
+    "firstName": "John",
+    "lastName": "Smith-Jones"
+  },
+  "gender": "Male",
+  "maritalStatus": "Married",
+  "nationalityCountry": { "code": "GB" },
+  "grossAnnualIncome": {
+    "amount": 85000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "spouseRef": {
+    "id": "client-124"
+  }
+}
+```
+Cannot change `dateOfBirth` (write-once). Server updates `updatedAt`, `fullName`, and returns complete contract.
 
-#### 13.1.6 DataProtectionValue Type
-
-Embedded value type representing GDPR compliance and data protection.
-
-**Key Components:**
-- **GDPR Consent** - Data processing, marketing, profiling, third-party sharing consents
-- **Privacy Policy** - Version acceptance tracking
-- **Data Retention** - Retention period and deletion dates
-- **Rights Exercised** - DSAR, rectification, erasure, portability requests
-- **Breach Notifications** - Any data breach notifications
-
-See full example in the Client Contract JSON above.
-
-#### 13.1.7 MarketingPreferencesValue Type
-
-Embedded value type representing marketing consent and preferences.
-
-**Key Components:**
-- **Channels** - Email, phone, SMS, post, social media preferences
-- **Interests** - Topics of interest (retirement, investments, tax, estate planning)
-- **Product Interests** - Product categories of interest
-- **Frequency** - Preferred contact frequency per channel
-- **TPS/MPS Checks** - Telephone/Mail Preference Service registration
-
-See full example in the Client Contract JSON above.
-
-#### 13.1.8 EstatePlanningValue Type
-
-Embedded value type representing estate planning information.
-
-**Key Components:**
-- **Will** - Will details, executors, beneficiaries, review dates
-- **Power of Attorney** - LPA for property/finance and health/welfare
-- **Gifts** - Annual exemption usage, PETs, regular gifts from income
-- **Trusts** - Trust structures and beneficiaries
-- **IHT Estimate** - Inheritance tax calculation with nil-rate bands
-- **Life Insurance in Trust** - Trust-based life insurance policies
-
-See full example in the Client Contract JSON above.
+**Partial Update (PATCH /api/v1/clients/client-123):**
+```json
+{
+  "name": {
+    "lastName": "Smith-Jones"
+  },
+  "maritalStatus": {
+    "code": "MAR",
+    "display": "Married",
+    "effectiveFrom": "2015-06-20"
+  },
+  "householdIncome": {
+    "amount": 145000.00,
+    "currency": {
+    "code": "GBP",
+    "display": "British Pound",
+    "symbol": "£"
+  }
+  }
+}
+```
+Only specified fields are updated. Returns complete contract with changes applied.
 
 ---
 
 ### 13.2 FactFind Contract
-
-
-**IMPORTANT NOTE - v2.1 Enhancement:**
-The FactFind Contract now includes an embedded `atrAssessment` object containing:
-- 15 standard ATR questions with answers
-- 45 supplementary questions
-- System-generated risk profiles (3 adjacent options)
-- Client's chosen risk profile
-- Capacity for loss assessment
-- Client and adviser declarations
-- Review dates and history tracking
-
-See Section 10 for complete ATR API documentation and example payloads.
-
-**Example of embedded ATR in FactFind:**
-```json
-{
-  "id": "factfind-123",
-  "client": {...},
-  "status": "InProgress",
-  "atrAssessment": {
-    "templateRef": { "id": "atr-template-v5", "version": "5.0", "name": "FCA Standard ATR 2025" },
-    "assessmentDate": "2026-02-18T10:30:00Z",
-    "questions": [ /* 15 questions */ ],
-    "supplementaryQuestions": [ /* 45 questions */ ],
-    "riskProfiles": {
-      "generated": [ /* 3 adjacent profiles */ ],
-      "chosen": { "riskRating": "Balanced", "riskScore": 45, "chosenBy": "Client" }
-    },
-    "capacityForLoss": { "canAffordLosses": true, "emergencyFundMonths": 6 },
-    "declarations": { /* client and adviser declarations */ },
-    "completedAt": "2026-02-18T11:10:00Z"
-  },
-  "createdAt": "2026-02-15T09:00:00Z",
-  "updatedAt": "2026-02-18T11:10:00Z"
-}
-```
-
-For the complete FactFind Contract with full ATR assessment example, see Section 10.3.1 or Section 13.2 in the latest version.
-
 
 The `FactFind` contract (also known as ADVICE_CASE) represents a fact-finding session and aggregate root for circumstances discovery.
 
