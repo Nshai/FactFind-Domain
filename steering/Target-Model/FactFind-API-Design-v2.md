@@ -177,6 +177,13 @@ The FactFind API provides comprehensive digital capabilities for:
      - [5.4.4 Record Gift](#544-record-gift)
      - [5.4.5 List Gifts](#545-list-gifts)
      - [5.4.6 Create Gift Trust](#546-create-gift-trust)
+   - [5.5 Dependants](#55-dependants) **NEW v3.0**
+     - [5.5.1 Operations Summary](#551-operations-summary)
+     - [5.5.2 List Dependants](#552-list-dependants)
+     - [5.5.3 Create Dependant](#553-create-dependant)
+     - [5.5.4 Get Dependant Details](#554-get-dependant-details)
+     - [5.5.5 Update Dependant](#555-update-dependant)
+     - [5.5.6 Delete Dependant](#556-delete-dependant)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -4108,6 +4115,484 @@ Income contract with required-on-create fields.
 - IHT treatment determined by trust type
 - Periodic charges calculated for relevant property trusts (every 10 years)
 - Trust value tracked separately from personal estate
+
+---
+
+### 5.5 Dependants
+
+**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants`
+
+**Purpose:** Manage client's dependants including children, elderly parents, and other financially dependent individuals for protection planning and financial forecasting.
+
+**Scope:**
+- Dependant demographic information (name, date of birth, relationship)
+- Living arrangements tracking (living with client or separate)
+- Financial dependency status and duration
+- Age-based dependency calculations
+- Dependency end date projections
+- Multiple client associations (e.g., child dependant of both joint clients)
+
+**Key Features:**
+- **Automatic Age Calculation** - Age calculated from date of birth and updated daily
+- **Dependency Period Tracking** - Track when financial dependency ends (age-based or date-based)
+- **Custom Age Thresholds** - Override standard dependency age (e.g., dependency until age 25 for university)
+- **Multiple Parent Support** - Dependant can be associated with multiple clients (joint families)
+- **Protection Planning** - Critical for calculating protection needs and life insurance requirements
+
+**Aggregate Root:** Client (dependants nested under client)
+
+**Regulatory Compliance:**
+- FCA Handbook - Understanding dependant needs for protection advice
+- COBS 9.2 - Assessing suitability for protection planning
+- Consumer Duty - Ensuring adequate protection for dependants
+- Data Protection Act 2018 - Sensitive data about minors
+
+#### 5.5.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | List all client's dependants | `clients:read` |
+| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | Add new dependant | `clients:write` |
+| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | `clients:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Update dependant | `clients:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Delete dependant | `clients:write` |
+
+**Total Endpoints:** 5
+
+#### 5.5.2 List Dependants
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants`
+
+**Description:** Retrieve all dependants associated with a client.
+
+**Query Parameters:**
+- `isFinanciallyDependant` - Filter by financial dependency status (true/false)
+- `isLivingWith` - Filter by living arrangement (true/false)
+- `relationshipType` - Filter by relationship (Son, Daughter, Elderly Parent, etc.)
+- `maxAge` - Filter dependants under specified age
+- `includeInactive` - Include dependants past financial dependency end date (default: false)
+
+**Response:**
+
+```json
+{
+  "clientRef": {
+    "id": "client-123",
+    "fullName": "John Smith",
+    "href": "/api/v1/factfinds/ff-456/clients/client-123"
+  },
+  "dependants": [
+    {
+      "id": "dep-001",
+      "name": "James Smith",
+      "dateOfBirth": "2015-06-20",
+      "calculatedAge": 10,
+      "relationshipType": {
+        "code": "SON",
+        "display": "Son"
+      },
+      "isLivingWith": true,
+      "isFinanciallyDependant": true,
+      "ageCustomUntil": 21,
+      "financialDependencyEndsOn": "2036-06-20",
+      "financialDependencyPeriod": "Until Age 21",
+      "yearsOfDependencyRemaining": 11,
+      "clients": [
+        {
+          "id": "client-123",
+          "fullName": "John Smith",
+          "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        },
+        {
+          "id": "client-124",
+          "fullName": "Sarah Smith",
+          "href": "/api/v1/factfinds/ff-456/clients/client-124"
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001" }
+      }
+    },
+    {
+      "id": "dep-002",
+      "name": "Emma Smith",
+      "dateOfBirth": "2018-03-15",
+      "calculatedAge": 7,
+      "relationshipType": {
+        "code": "DAUGHTER",
+        "display": "Daughter"
+      },
+      "isLivingWith": true,
+      "isFinanciallyDependant": true,
+      "ageCustomUntil": 18,
+      "financialDependencyEndsOn": "2036-03-15",
+      "financialDependencyPeriod": "Until Age 18",
+      "yearsOfDependencyRemaining": 10,
+      "clients": [
+        {
+          "id": "client-123",
+          "fullName": "John Smith",
+          "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        },
+        {
+          "id": "client-124",
+          "fullName": "Sarah Smith",
+          "href": "/api/v1/factfinds/ff-456/clients/client-124"
+        }
+      ],
+      "_links": {
+        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-002" }
+      }
+    }
+  ],
+  "totalCount": 2,
+  "financiallyDependantCount": 2,
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" }
+  }
+}
+```
+
+#### 5.5.3 Create Dependant
+
+**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants`
+
+**Description:** Add a new dependant to a client's record.
+
+**Request Body:**
+
+```json
+{
+  "name": "James Smith",
+  "dateOfBirth": "2015-06-20",
+  "relationshipType": {
+    "code": "SON",
+    "display": "Son"
+  },
+  "isLivingWith": true,
+  "isFinanciallyDependant": true,
+  "ageCustom": null,
+  "ageCustomUntil": 21,
+  "notes": "Attending secondary school. Plans to attend university.",
+  "clients": [
+    {
+      "id": "client-123"
+    },
+    {
+      "id": "client-124"
+    }
+  ]
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "dep-001",
+  "name": "James Smith",
+  "dateOfBirth": "2015-06-20",
+  "calculatedAge": 10,
+  "relationshipType": {
+    "code": "SON",
+    "display": "Son"
+  },
+  "isLivingWith": true,
+  "isFinanciallyDependant": true,
+  "ageCustom": null,
+  "ageCustomUntil": 21,
+  "financialDependencyEndsOn": "2036-06-20",
+  "financialDependencyPeriod": "Until Age 21",
+  "yearsOfDependencyRemaining": 11,
+  "notes": "Attending secondary school. Plans to attend university.",
+  "clients": [
+    {
+      "id": "client-123",
+      "fullName": "John Smith",
+      "href": "/api/v1/factfinds/ff-456/clients/client-123"
+    },
+    {
+      "id": "client-124",
+      "fullName": "Sarah Smith",
+      "href": "/api/v1/factfinds/ff-456/clients/client-124"
+    }
+  ],
+  "createdAt": "2026-02-18T12:00:00Z",
+  "updatedAt": "2026-02-18T12:00:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" }
+  }
+}
+```
+
+**Validation Rules:**
+- `name` - Required, max 200 characters
+- `dateOfBirth` - Required, cannot be in future, must result in age < 100
+- `relationshipType` - Required, must be valid code
+- `ageCustomUntil` - Optional, must be >= current age and <= 30
+- `clients` - At least one client required, all clients must exist and belong to same factfind
+
+**Business Rules:**
+- If `ageCustomUntil` not provided, defaults to 18
+- If `ageCustom` provided, overrides calculated age (for adoption scenarios)
+- `financialDependencyEndsOn` automatically calculated as dateOfBirth + ageCustomUntil years
+- `calculatedAge` updated daily based on current date and dateOfBirth
+- `yearsOfDependencyRemaining` = financialDependencyEndsOn - current date (in years)
+- `financialDependencyPeriod` formatted as human-readable string
+
+#### 5.5.4 Get Dependant Details
+
+**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
+
+**Description:** Retrieve detailed information about a specific dependant.
+
+**Response:**
+
+```json
+{
+  "id": "dep-001",
+  "name": "James Smith",
+  "dateOfBirth": "2015-06-20",
+  "calculatedAge": 10,
+  "ageCustom": null,
+  "ageCustomUntil": 21,
+  "relationshipType": {
+    "code": "SON",
+    "display": "Son"
+  },
+  "isLivingWith": true,
+  "isFinanciallyDependant": true,
+  "financialDependencyEndsOn": "2036-06-20",
+  "financialDependencyPeriod": "Until Age 21",
+  "yearsOfDependencyRemaining": 11,
+  "monthsOfDependencyRemaining": 131,
+  "notes": "Attending secondary school. Plans to attend university.",
+  "clients": [
+    {
+      "id": "client-123",
+      "fullName": "John Smith",
+      "relationshipToClient": "Father",
+      "href": "/api/v1/factfinds/ff-456/clients/client-123"
+    },
+    {
+      "id": "client-124",
+      "fullName": "Sarah Smith",
+      "relationshipToClient": "Mother",
+      "href": "/api/v1/factfinds/ff-456/clients/client-124"
+    }
+  ],
+  "protectionNeeds": {
+    "estimatedAnnualCost": {
+      "amount": 12000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "totalCapitalRequired": {
+      "amount": 132000.00,
+      "currency": { "code": "GBP", "symbol": "£" },
+      "calculation": "11 years × £12,000"
+    }
+  },
+  "createdAt": "2026-02-18T12:00:00Z",
+  "updatedAt": "2026-02-18T12:00:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001" },
+    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "update": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001", "method": "PATCH" },
+    "delete": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001", "method": "DELETE" }
+  }
+}
+```
+
+**Additional Calculated Fields:**
+- `monthsOfDependencyRemaining` - Months until dependency ends
+- `protectionNeeds.estimatedAnnualCost` - Estimated yearly cost for dependant
+- `protectionNeeds.totalCapitalRequired` - Total capital needed until independence
+
+#### 5.5.5 Update Dependant
+
+**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
+
+**Description:** Update dependant information. Commonly used to update living arrangements, financial dependency status, or custom age threshold.
+
+**Request Body:**
+
+```json
+{
+  "isLivingWith": false,
+  "ageCustomUntil": 25,
+  "notes": "Now attending university. Living in student accommodation. Extended dependency to age 25 to cover university and initial career years."
+}
+```
+
+**Response:** 200 OK with updated dependant entity including recalculated fields:
+- `financialDependencyEndsOn` recalculated to "2040-06-20" (age 25)
+- `financialDependencyPeriod` updated to "Until Age 25"
+- `yearsOfDependencyRemaining` recalculated to 15 years
+- `protectionNeeds.totalCapitalRequired` recalculated based on new duration
+
+**Partial Update Support:**
+- Only provided fields are updated
+- Calculated fields automatically updated when dependencies change
+- Timestamps updated on any change
+
+#### 5.5.6 Delete Dependant
+
+**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
+
+**Description:** Remove a dependant record from the client.
+
+**Response:** 204 No Content
+
+**Business Rules:**
+- Soft delete - record marked as deleted but retained for audit
+- Cannot be restored via API (contact support for restoration)
+- Removes dependant from protection needs calculations
+- Does not affect historical protection recommendations
+
+---
+
+**Relationship Types:**
+
+| Code | Display | Description |
+|------|---------|-------------|
+| SON | Son | Male child of client |
+| DAUGHTER | Daughter | Female child of client |
+| STEPSON | Stepson | Male stepchild |
+| STEPDAUGHTER | Stepdaughter | Female stepdaughter |
+| ADOPTED_SON | Adopted Son | Male adopted child |
+| ADOPTED_DAUGHTER | Adopted Daughter | Female adopted child |
+| GRANDCHILD | Grandchild | Child of client's child |
+| ELDERLY_PARENT | Elderly Parent | Parent requiring financial support |
+| DISABLED_RELATIVE | Disabled Relative | Disabled family member requiring support |
+| OTHER | Other | Other dependent relationship |
+
+---
+
+**Age Calculation Rules:**
+
+1. **Standard Calculation:**
+   - `calculatedAge = floor((current date - dateOfBirth) / 365.25)`
+   - Updated daily at midnight UTC
+
+2. **Custom Age Override:**
+   - `ageCustom` field allows manual age entry (for adoption scenarios)
+   - If `ageCustom` is set, it overrides `calculatedAge`
+   - Use case: Child adopted at age 5, birth date unknown
+
+3. **Financial Dependency End Date:**
+   - `financialDependencyEndsOn = dateOfBirth + ageCustomUntil years`
+   - Default `ageCustomUntil = 18`
+   - Common overrides: 21 (higher education), 25 (university + career start)
+
+4. **Years Remaining:**
+   - `yearsOfDependencyRemaining = floor((financialDependencyEndsOn - current date) / 365.25)`
+   - Can be negative if dependency end date has passed
+   - Used for protection needs calculations
+
+---
+
+**Protection Needs Calculation:**
+
+Used to calculate life insurance and income protection requirements.
+
+**Formula:**
+```
+Total Capital Required = Years of Dependency Remaining × Estimated Annual Cost
+
+Where:
+- Years of Dependency Remaining = financialDependencyEndsOn - current date
+- Estimated Annual Cost = configurable per dependant (default £12,000 per child)
+```
+
+**Example:**
+- Dependant: James Smith, age 10
+- Dependency until: Age 21
+- Years remaining: 11 years
+- Estimated annual cost: £12,000
+- **Total capital required: £132,000**
+
+**Multiple Dependants:**
+- Sum total capital required across all dependants
+- Add 10-20% buffer for inflation and unexpected costs
+- Consider education costs separately (university fees, living expenses)
+
+---
+
+**Use Cases:**
+
+### Use Case 1: Add Child Dependant for Joint Clients
+
+**Scenario:** Joint clients have a 10-year-old son attending secondary school
+
+**API Flow:**
+```
+1. POST /clients/client-123/dependants
+   Request: {
+     name: "James Smith",
+     dateOfBirth: "2015-06-20",
+     relationshipType: "SON",
+     isLivingWith: true,
+     isFinanciallyDependant: true,
+     ageCustomUntil: 21,
+     clients: [client-123, client-124]  // Both parents
+   }
+
+2. Response includes:
+   - calculatedAge: 10
+   - financialDependencyEndsOn: "2036-06-20"
+   - yearsOfDependencyRemaining: 11
+   - protectionNeeds.totalCapitalRequired: £132,000
+
+3. Use for protection planning:
+   - Calculate life insurance requirement
+   - Calculate income protection requirement
+   - Factor into retirement planning (freed-up cash flow at age 21)
+```
+
+### Use Case 2: Update Dependency Age for University
+
+**Scenario:** Child going to university, extend dependency from 18 to 25
+
+**API Flow:**
+```
+1. PATCH /clients/client-123/dependants/dep-001
+   Request: {
+     ageCustomUntil: 25,
+     notes: "Attending university. Extended to age 25 for university and career start."
+   }
+
+2. Automatic recalculation:
+   - financialDependencyEndsOn: "2040-06-20" (was "2033-06-20")
+   - yearsOfDependencyRemaining: 15 (was 8)
+   - protectionNeeds.totalCapitalRequired: £180,000 (was £96,000)
+
+3. Update protection recommendations:
+   - Increase life insurance coverage by £84,000
+   - Update income protection calculations
+```
+
+### Use Case 3: Calculate Total Protection Needs
+
+**Scenario:** Calculate total life insurance required for all dependants
+
+**API Flow:**
+```
+1. GET /clients/client-123/dependants
+
+2. Response includes 3 dependants:
+   - James (age 10, until 21): £132,000
+   - Emma (age 7, until 18): £132,000
+   - Oliver (age 4, until 18): £168,000
+
+3. Calculate total:
+   - Sum: £432,000
+   - Add 15% buffer: £496,800
+   - Add mortgage: £250,000
+   - Add funeral costs: £10,000
+   - **Total life insurance required: £756,800**
+```
 
 ---
 
