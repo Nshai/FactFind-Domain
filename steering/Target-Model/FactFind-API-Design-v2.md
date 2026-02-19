@@ -7916,13 +7916,13 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 | PATCH | `/api/v1/factfinds/{id}/liabilities/{liabilityId}` | Update liability | `liabilities:write` |
 | DELETE | `/api/v1/factfinds/{id}/liabilities/{liabilityId}` | Delete liability | `liabilities:write` |
 | **Property Details** | | | |
-| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}` | Get property detail | `assets:read` |
-| PUT | `/api/v1/factfinds/{id}/property-detail/{propertyId}` | Update property detail | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}/valuations` | Get valuation history | `assets:read` |
-| POST | `/api/v1/factfinds/{id}/property-detail/{propertyId}/valuations` | Add property valuation | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}/ltv` | Calculate LTV | `assets:read` |
-| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}/rental-yield` | Calculate rental yield | `assets:read` |
-| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}/capital-gains` | Calculate CGT | `assets:read` |
+| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}` | Get property detail | `assets:read` |
+| PUT | `/api/v1/factfinds/{id}/property-details/{propertyId}` | Update property detail | `assets:write` |
+| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}/valuations` | Get valuation history | `assets:read` |
+| POST | `/api/v1/factfinds/{id}/property-details/{propertyId}/valuations` | Add property valuation | `assets:write` |
+| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}/ltv` | Calculate LTV | `assets:read` |
+| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}/rental-yield` | Calculate rental yield | `assets:read` |
+| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}/capital-gains` | Calculate CGT | `assets:read` |
 | **Business Asset Details** | | | |
 | GET | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}` | Get business asset detail | `assets:read` |
 | PUT | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}` | Update business asset | `assets:write` |
@@ -7997,7 +7997,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "rnrbEligibility": "Not Eligible",
       "isBusinessReliefQualifying": false,
       "isHolding": false,
-      "propertyRef": { "id": 1234, "href": "/api/v1/factfinds/679/property-detail/1234" },
+      "propertyRef": { "id": 1234, "href": "/api/v1/factfinds/679/property-details/1234" },
       "arrangementRef": { "id": 1234, "href": "/api/v1/factfinds/679/clients/4436/arrangements/1234" },
       "incomeRef": { "id": 1234, "href": "/api/v1/factfinds/679/clients/4436/income/1234" },
       "notes": "Rental property - managed by external agent",
@@ -8159,7 +8159,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "rnrbEligibility": "Eligible",
   "isBusinessReliefQualifying": false,
   "isHolding": false,
-  "propertyRef": { "id": 5001, "href": "/api/v1/factfinds/679/property-detail/5001" },
+  "propertyRef": { "id": 5001, "href": "/api/v1/factfinds/679/property-details/5001" },
   "incomeRef": { "id": 3456, "href": "/api/v1/factfinds/679/clients/346/income/3456" },
   "notes": "Rental property generating monthly income",
   "createdAt": "2026-02-19T10:15:00Z",
@@ -8169,84 +8169,72 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.3 Get Property Details
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/property-detail/{propertyId}`
+**Endpoint:** `GET /api/v1/factfinds/{id}/property-details/{propertyId}`
 
-**Description:** Get detailed property information for a property asset. Property details are stored separately and referenced from the asset via `propertyRef`.
+**Description:** Get detailed property information including construction details, tenure, and physical characteristics.
 
 **Response:**
 
 ```json
 {
   "id": 1234,
-  "href": "/api/v1/factfinds/679/property-detail/1234",
-  "assetRef": { "id": 1234, "href": "/api/v1/factfinds/679/clients/346/assets/1234" },
+  "href": "/api/v1/factfinds/679/property-details/1234",
   "propertyType": {
-    "code": "RESIDENTIAL_OWNER_OCCUPIED",
-    "display": "Residential - Owner Occupied"
+    "code": "DETACHED",
+    "display": "Detached House"
   },
+  "tenureType": "Freehold",
+  "leaseholdEndsOn": null,
+  "propertyStatus": {
+    "code": "RESIDENTIAL",
+    "display": "Residential"
+  },
+  "constructionType": {
+    "code": "BRICK_AND_TILE",
+    "display": "Brick and Tile"
+  },
+  "constructionNotes": "Traditional brick construction with tile roof",
+  "roofConstructionType": {
+    "code": "PITCHED_CLAY_TILES",
+    "display": "Pitched Clay Tiles"
+  },
+  "numberOfBedrooms": 3,
+  "yearBuilt": 1995,
+  "isNewBuild": false,
+  "isNHBCCertificateCovered": false,
+  "isOtherCertificateCovered": false,
+  "otherCertificateNotes": null,
+  "builderName": null,
+  "isExLocalAuthority": false,
+  "numberOfOutbuildings": 1,
   "address": {
     "line1": "123 Main Street",
     "line2": "Apartment 4B",
-    "city": "London",
-    "county": "Greater London",
-    "postcode": "SW1A 1AA",
-    "country": { "code": "GB", "display": "United Kingdom" }
-  },
-  "propertyDetails": {
-    "bedrooms": 3,
-    "bathrooms": 2,
-    "propertySize": {
-      "value": 1200,
-      "unit": "sqft"
+    "line3": null,
+    "line4": null,
+    "locality": "London",
+    "postalCode": "SW1A 1AA",
+    "county": {
+      "code": "GB-LND",
+      "name": "London"
     },
-    "yearBuilt": 1995,
-    "tenure": {
-      "code": "FREEHOLD",
-      "display": "Freehold"
+    "country": {
+      "isoCode": "GB",
+      "name": "United Kingdom"
     }
   },
-  "linkedMortgages": [
-    {
-      "liabilityRef": { "id": "liability-789", "href": "/api/v1/factfinds/ff-456/liabilities/liability-789" },
-      "outstandingBalance": {
-        "amount": 180000.00,
-        "currency": { "code": "GBP" }
-      }
-    }
-  ],
-  "rentalDetails": {
-    "isRented": true,
-    "monthlyRent": {
-      "amount": 1800.00,
-      "currency": { "code": "GBP" }
-    },
-    "annualRentalIncome": {
-      "amount": 21600.00,
-      "currency": { "code": "GBP" }
-    }
-  },
-  "taxDetails": {
-    "isPrimaryResidence": false,
-    "cgtExemptions": [],
-    "stampDutyPaid": {
-      "amount": 8500.00,
-      "currency": { "code": "GBP" }
-    }
-  },
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-10T14:20:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/679/property-detail/1234" },
-    "asset": { "href": "/api/v1/factfinds/679/clients/346/assets/1234" },
-    "valuations": { "href": "/api/v1/factfinds/679/property-detail/1234/valuations" },
-    "ltv": { "href": "/api/v1/factfinds/679/property-detail/1234/ltv" },
-    "rental-yield": { "href": "/api/v1/factfinds/679/property-detail/1234/rental-yield" },
-    "capital-gains": { "href": "/api/v1/factfinds/679/property-detail/1234/capital-gains" }
+    "self": { "href": "/api/v1/factfinds/679/property-details/1234" },
+    "factfind": { "href": "/api/v1/factfinds/679" }
   }
 }
 ```
 
 #### 9.3.4 Calculate LTV (Loan-to-Value)
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/property-detail/{propertyId}/ltv`
+**Endpoint:** `GET /api/v1/factfinds/{id}/property-details/{propertyId}/ltv`
 
 **Description:** Calculate the Loan-to-Value ratio for a property by comparing linked mortgages to current property value.
 
@@ -8283,7 +8271,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.5 Calculate Rental Yield
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/property-detail/{propertyId}/rental-yield`
+**Endpoint:** `GET /api/v1/factfinds/{id}/property-details/{propertyId}/rental-yield`
 
 **Description:** Calculate gross and net rental yield for a buy-to-let property.
 
@@ -21397,7 +21385,7 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
   "isHolding": false,
   "propertyRef": {
     "id": 1234,
-    "href": "/api/v1/factfinds/679/property-detail/1234"
+    "href": "/api/v1/factfinds/679/property-details/1234"
   },
   "arrangementRef": {
     "id": 1234,
@@ -22590,137 +22578,68 @@ The `CreditHistory` contract represents a client's credit history items includin
 
 ### 13.24 Property Detail Contract
 
-The `PropertyDetail` contract represents detailed property information for property assets including physical characteristics, tenure, and rental details.
+The `PropertyDetail` contract represents detailed property information including physical characteristics, construction details, and tenure information.
 
 **Reference Type:** PropertyDetail is a reference type with identity (has `id` field).
 
 **Key Features:**
-- Detailed property characteristics
-- Tenure tracking (Freehold, Leasehold, Shared)
-- Rental income details
-- Mortgage/LTV tracking
-- Tax planning information
+- Property type and status classification
+- Construction and roof type details
+- Tenure tracking (Freehold, Leasehold, Commonhold)
+- Building characteristics (age, bedrooms, outbuildings)
+- Certificate and warranty tracking (NHBC, Listed Building)
+- Ex-local authority property identification
 
 #### Complete Property Detail Contract
 
 ```json
 {
-  "id": 1234,
-  "href": "/api/v1/factfinds/679/property-detail/1234",
-  "assetRef": {
-    "id": 1234,
-    "href": "/api/v1/factfinds/679/clients/346/assets/1234"
-  },
+  "id": 1,
+  "href": "/api/v1/factfinds/679/property-details/1",
   "propertyType": {
-    "code": "RESIDENTIAL_OWNER_OCCUPIED",
-    "display": "Residential - Owner Occupied"
+    "code": "DETACHED",
+    "display": "Detached House"
   },
+  "tenureType": "Freehold",
+  "leaseholdEndsOn": null,
+  "propertyStatus": {
+    "code": "RESIDENTIAL",
+    "display": "Residential"
+  },
+  "constructionType": {
+    "code": "BRICK_AND_TILE",
+    "display": "Brick and Tile"
+  },
+  "constructionNotes": "Victorian cottage with modern renovation",
+  "roofConstructionType": {
+    "code": "PITCHED_SLATE_TILES",
+    "display": "Pitched Slate Tiles"
+  },
+  "numberOfBedrooms": 4,
+  "yearBuilt": 1890,
+  "isNewBuild": false,
+  "isNHBCCertificateCovered": false,
+  "isOtherCertificateCovered": true,
+  "otherCertificateNotes": "Grade II Listed Building - Conservation Area",
+  "builderName": null,
+  "isExLocalAuthority": false,
+  "numberOfOutbuildings": 1,
   "address": {
-    "line1": "123 Main Street",
-    "line2": "Apartment 4B",
-    "city": "London",
-    "county": "Greater London",
-    "postcode": "SW1A 1AA",
+    "line1": "Rose Cottage",
+    "line2": "Church Lane",
+    "line3": null,
+    "line4": null,
+    "locality": "Cotswolds Village",
+    "postalCode": "GL54 2AB",
+    "county": {
+      "code": "GB-GLS",
+      "name": "Gloucestershire"
+    },
     "country": {
-      "code": "GB",
-      "display": "United Kingdom"
+      "isoCode": "GB",
+      "name": "United Kingdom"
     }
   },
-  "propertyDetails": {
-    "bedrooms": 3,
-    "bathrooms": 2,
-    "receptionRooms": 2,
-    "propertySize": {
-      "value": 1200,
-      "unit": "sqft"
-    },
-    "plotSize": {
-      "value": 0.15,
-      "unit": "acres"
-    },
-    "yearBuilt": 1995,
-    "construction": {
-      "code": "BRICK",
-      "display": "Brick"
-    },
-    "roofConstruction": {
-      "code": "PITCHED_TILE",
-      "display": "Pitched Tile"
-    },
-    "tenure": {
-      "code": "FREEHOLD",
-      "display": "Freehold"
-    },
-    "leaseholdDetails": null
-  },
-  "linkedMortgages": [
-    {
-      "liabilityRef": {
-        "id": 789,
-        "href": "/api/v1/factfinds/679/liabilities/789"
-      },
-      "outstandingBalance": {
-        "amount": 180000.00,
-        "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
-      }
-    }
-  ],
-  "ltv": {
-    "ratio": 40.0,
-    "equity": {
-      "amount": 270000.00,
-      "currency": {
-        "code": "GBP",
-        "symbol": "£"
-      }
-    }
-  },
-  "rentalDetails": {
-    "isRented": false,
-    "monthlyRent": null,
-    "annualRentalIncome": null,
-    "tenancyType": null
-  },
-  "taxDetails": {
-    "isPrimaryResidence": true,
-    "rnrbEligible": true,
-    "cgtExemptions": ["Primary Residence Relief"],
-    "stampDutyPaid": {
-      "amount": 8500.00,
-      "currency": {
-        "code": "GBP",
-        "symbol": "£"
-      }
-    }
-  },
-  "valuationHistory": [
-    {
-      "date": "2026-01-15",
-      "value": {
-        "amount": 450000.00,
-        "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
-      },
-      "valuationBasis": "Comparable Sales"
-    },
-    {
-      "date": "2020-05-10",
-      "value": {
-        "amount": 350000.00,
-        "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
-      },
-      "valuationBasis": "Purchase Price"
-    }
-  ],
-  "notes": "Property recently renovated - new kitchen and bathroom in 2025",
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-02-10T14:20:00Z"
 }
@@ -22732,38 +22651,214 @@ The `PropertyDetail` contract represents detailed property information for prope
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned property detail identifier |
 | `href` | string | read-only | Canonical URI for this property detail |
-| `assetRef` | AssetRef | read-only | Reference to parent asset |
-| `propertyType.code` | enum | required-on-create | Property type code |
+| `propertyType.code` | enum | required-on-create | Property type code (see codes below) |
 | `propertyType.display` | string | read-only | Human-readable property type |
+| `tenureType` | enum string | required-on-create | Tenure type (Freehold, Leasehold, Commonhold) |
+| `leaseholdEndsOn` | date | optional | Lease end date (required if tenureType=Leasehold) |
+| `propertyStatus.code` | enum | required-on-create | Property status code |
+| `propertyStatus.display` | string | read-only | Human-readable property status |
+| `constructionType.code` | enum | optional | Construction type code |
+| `constructionType.display` | string | read-only | Construction type display |
+| `constructionNotes` | string | optional | Additional construction details (max 500 chars) |
+| `roofConstructionType.code` | enum | optional | Roof construction code |
+| `roofConstructionType.display` | string | read-only | Roof construction display |
+| `numberOfBedrooms` | integer | optional | Number of bedrooms (0 for studios/commercial) |
+| `yearBuilt` | integer | optional | Year property was built (1800 to current year) |
+| `isNewBuild` | boolean | optional | Property is new build (default: false) |
+| `isNHBCCertificateCovered` | boolean | optional | Covered by NHBC certificate (default: false) |
+| `isOtherCertificateCovered` | boolean | optional | Covered by other certificate/warranty (default: false) |
+| `otherCertificateNotes` | string | optional | Other certificate details (max 500 chars) |
+| `builderName` | string | optional | Builder name (for new builds, max 200 chars) |
+| `isExLocalAuthority` | boolean | optional | Ex-local authority property (default: false) |
+| `numberOfOutbuildings` | integer | optional | Number of outbuildings (default: 0) |
 | `address` | AddressValue | required-on-create | Property address |
-| `propertyDetails.bedrooms` | integer | optional | Number of bedrooms |
-| `propertyDetails.bathrooms` | integer | optional | Number of bathrooms |
-| `propertyDetails.receptionRooms` | integer | optional | Number of reception rooms |
-| `propertyDetails.propertySize` | MeasurementValue | optional | Property size |
-| `propertyDetails.plotSize` | MeasurementValue | optional | Plot/land size |
-| `propertyDetails.yearBuilt` | integer | optional | Year property was built |
-| `propertyDetails.construction.code` | enum | optional | Construction type code |
-| `propertyDetails.construction.display` | string | read-only | Construction type display |
-| `propertyDetails.roofConstruction.code` | enum | optional | Roof construction code |
-| `propertyDetails.roofConstruction.display` | string | read-only | Roof construction display |
-| `propertyDetails.tenure.code` | enum | required-on-create | Tenure type code |
-| `propertyDetails.tenure.display` | string | read-only | Tenure type display |
-| `propertyDetails.leaseholdDetails` | LeaseholdValue | optional | Leasehold details (if applicable) |
-| `linkedMortgages[]` | array | read-only | Mortgages secured on this property |
-| `ltv.ratio` | decimal | read-only | Calculated loan-to-value ratio |
-| `ltv.equity` | MoneyValue | read-only | Calculated equity |
-| `rentalDetails.isRented` | boolean | optional | Property is currently rented |
-| `rentalDetails.monthlyRent` | MoneyValue | optional | Monthly rental income |
-| `rentalDetails.annualRentalIncome` | MoneyValue | read-only | Calculated annual rental income |
-| `rentalDetails.tenancyType.code` | enum | optional | Tenancy type code |
-| `taxDetails.isPrimaryResidence` | boolean | optional | Is primary residence |
-| `taxDetails.rnrbEligible` | boolean | optional | RNRB eligible |
-| `taxDetails.cgtExemptions[]` | array | optional | CGT exemptions |
-| `taxDetails.stampDutyPaid` | MoneyValue | optional | Stamp duty paid on purchase |
-| `valuationHistory[]` | array | read-only | Historical valuations |
-| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `address.line1` | string | required | Address line 1 |
+| `address.line2` | string | optional | Address line 2 |
+| `address.line3` | string | optional | Address line 3 |
+| `address.line4` | string | optional | Address line 4 |
+| `address.locality` | string | required | City/town |
+| `address.postalCode` | string | required | Postal/ZIP code |
+| `address.county.code` | string | optional | County code (ISO-3166-2, max 6 chars) |
+| `address.county.name` | string | read-only | County name |
+| `address.country.isoCode` | string | required | Country ISO code (ISO-3166-1 alpha-2) |
+| `address.country.name` | string | read-only | Country name |
 | `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
 | `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Property Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `DETACHED` | Detached House |
+| `SEMI_DETACHED` | Semi-Detached House |
+| `TERRACE` | Terraced House |
+| `END_TERRACE` | End of Terrace House |
+| `FLAT` | Flat/Apartment |
+| `MAISONETTE` | Maisonette |
+| `BUNGALOW` | Bungalow |
+| `COTTAGE` | Cottage |
+| `STUDIO` | Studio |
+| `PENTHOUSE` | Penthouse |
+| `LAND` | Land/Plot |
+| `COMMERCIAL` | Commercial Property |
+| `MIXED_USE` | Mixed Use |
+| `OTHER` | Other |
+
+#### Tenure Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `Freehold` | Freehold |
+| `Leasehold` | Leasehold |
+| `Commonhold` | Commonhold |
+| `SharedOwnership` | Shared Ownership |
+| `ShareOfFreehold` | Share of Freehold |
+
+#### Property Status Codes
+
+| Code | Display Name |
+|------|-------------|
+| `RESIDENTIAL` | Residential |
+| `BUY_TO_LET` | Buy to Let |
+| `HOLIDAY_HOME` | Holiday Home |
+| `INVESTMENT` | Investment Property |
+| `COMMERCIAL` | Commercial |
+| `MIXED_USE` | Mixed Use |
+| `DEVELOPMENT` | Development/Project |
+| `VACANT` | Vacant |
+
+#### Construction Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `BRICK_AND_TILE` | Brick and Tile |
+| `BRICK_AND_BLOCK` | Brick and Block |
+| `STONE` | Stone |
+| `TIMBER_FRAME` | Timber Frame |
+| `CONCRETE` | Concrete |
+| `STEEL_FRAME` | Steel Frame |
+| `PREFABRICATED` | Prefabricated/Modular |
+| `LISTED_BUILDING` | Listed Building |
+| `TRADITIONAL` | Traditional Construction |
+| `NON_STANDARD` | Non-Standard Construction |
+| `OTHER` | Other |
+
+#### Roof Construction Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `PITCHED_SLATE_TILES` | Pitched Slate Tiles |
+| `PITCHED_CLAY_TILES` | Pitched Clay Tiles |
+| `PITCHED_CONCRETE_TILES` | Pitched Concrete Tiles |
+| `FLAT_FELT` | Flat Felt |
+| `FLAT_RUBBER` | Flat Rubber Membrane |
+| `THATCHED` | Thatched |
+| `METAL` | Metal Roof |
+| `GREEN_ROOF` | Green/Living Roof |
+| `MIXED` | Mixed Roof Types |
+| `OTHER` | Other |
+
+#### Validation Rules
+
+**Property Type:**
+- Must be valid enum from Property Type Codes
+
+**Tenure Type:**
+- Must be valid enum from Tenure Type Codes
+- If `tenureType = Leasehold`:
+  - `leaseholdEndsOn` is required
+  - `leaseholdEndsOn` must be > today
+  - `leaseholdEndsOn` should be >= today + 50 years (business rule for mortgage suitability)
+
+**Number of Bedrooms:**
+- Must be >= 0
+- 0 is valid for studios or commercial properties
+
+**Number of Outbuildings:**
+- Must be >= 0
+
+**Year Built:**
+- Must be valid year between 1800 and current year
+- Must be logically consistent with `isNewBuild`
+- If `isNewBuild = true`, `yearBuilt` should be within last 2 years
+
+**Construction Type:**
+- Must be valid enum from Construction Type Codes
+- Should be consistent with `propertyType`
+- Non-standard construction may require additional notes in `constructionNotes`
+
+**Roof Construction Type:**
+- Must be valid enum from Roof Construction Type Codes if provided
+- Should be consistent with `constructionType`
+
+**NHBC Certificate:**
+- If `isNHBCCertificateCovered = true`, `otherCertificateNotes` should mention NHBC
+- NHBC certificates are typically for properties less than 10 years old
+
+**Leasehold:**
+- If `tenureType = Leasehold`, `leaseholdEndsOn` is required
+- Lease term remaining (years) = `leaseholdEndsOn` - today
+- Properties with less than 80 years remaining may have financing challenges
+
+**Address:**
+- `line1`, `locality`, `postalCode`, and `country.isoCode` are required
+- Postal code format must match country standards
+
+#### Business Rules
+
+**New Build Consistency:**
+- If `isNewBuild = true`:
+  - `yearBuilt` should be current year or current year - 1
+  - Consider setting `isNHBCCertificateCovered = true` if applicable
+  - `builderName` should be provided if known
+
+**Ex-Local Authority:**
+- If `isExLocalAuthority = true`:
+  - May impact mortgage availability
+  - Should be disclosed in property details
+
+**Listed Buildings:**
+- If property is Listed Building (Grade I, II*, II):
+  - Set `constructionType = LISTED_BUILDING`
+  - Document listing grade in `otherCertificateNotes`
+  - Set `isOtherCertificateCovered = true`
+
+**Conservation Areas:**
+- If property is in Conservation Area:
+  - Document in `otherCertificateNotes`
+
+**Leasehold Suitability:**
+- Lease term >= 125 years: Generally suitable for all mortgages
+- Lease term 80-125 years: May require lease extension discussion
+- Lease term < 80 years: Lease extension typically required
+
+#### API Operations
+
+**Create Property Detail:**
+```
+POST /api/v1/factfinds/{factfindId}/property-details
+```
+Returns: `201 Created` with Location header
+
+**Update Property Detail:**
+```
+PATCH /api/v1/factfinds/{factfindId}/property-details/{id}
+```
+Returns: `200 OK`
+- All fields optional (partial updates allowed)
+- `id` is immutable (cannot be changed)
+
+**Get Property Detail:**
+```
+GET /api/v1/factfinds/{factfindId}/property-details/{id}
+```
+Returns: `200 OK`
+
+**Delete Property Detail:**
+```
+DELETE /api/v1/factfinds/{factfindId}/property-details/{id}
+```
+Returns: `204 No Content`
 
 ---
 
