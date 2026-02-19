@@ -800,10 +800,16 @@ Value types include three main categories:
 1. **Composite Value Objects:** Complex data structures with multiple fields
    - `MoneyValue`, `AddressValue`, `NameValue`, `ContactValue`, `DateRangeValue`, `TaxDetailsValue`, `RateValue`, `PercentageValue`
 
-2. **Enumerations:** Code/display pairs for categorical data
-   - `GenderValue`, `MaritalStatusValue`, `EmploymentStatusValue`, `AddressTypeValue`, `ContactTypeValue`, `TitleValue`, `StatusValue`, `MeetingTypeValue`
+2. **Simple Enumerations:** String codes for categorical data
+   - `GenderValue`, `EmploymentStatusValue`, `ResidencyStatusValue`, `HealthStatusValue`, `SmokingStatusValue`
 
-3. **Lookup Values:** Reference data with rich metadata
+3. **Temporal Enumerations:** Code/display pairs with temporal tracking
+   - `MaritalStatusValue` (has effectiveFrom field)
+
+4. **Structured Enumerations:** Code/display pairs for reference data
+   - `AddressTypeValue`, `ContactTypeValue`, `TitleValue`, `StatusValue`, `MeetingTypeValue`
+
+5. **Lookup Values:** Reference data with rich metadata
    - `CountryValue`, `CountyValue`, `CurrencyValue`, `FrequencyValue`, `ProductTypeValue`
 
 **All value types share these characteristics:**
@@ -817,7 +823,7 @@ Value types include three main categories:
 |------------|--------|---------|
 | `MoneyValue` | `amount: decimal`<br>`currency: CurrencyValue` | `{ "amount": 75000.00, "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" } }` |
 | `AddressValue` | `line1-4, city, county, postcode`<br>`country: CountryValue`<br>`addressType: AddressTypeValue` | `{ "line1": "123 Main St", "city": "London", "postcode": "SW1A 1AA", "country": { "code": "GB", "display": "United Kingdom" } }` |
-| `GenderValue` | `code: string`<br>`display: string` | `{ "code": "M", "display": "Male" }` |
+| `GenderValue` | `string` | `"M"` (simple string enum) |
 | `MaritalStatusValue` | `code: string`<br>`display: string`<br>`effectiveFrom: date` | `{ "code": "MAR", "display": "Married", "effectiveFrom": "2015-06-20" }` |
 | `CountryValue` | `code: string`<br>`display: string`<br>`alpha3: string` | `{ "code": "GB", "display": "United Kingdom", "alpha3": "GBR" }` |
 | `DateRangeValue` | `startDate: date`<br>`endDate: date` | `{ "startDate": "2020-01-01", "endDate": "2025-12-31" }` |
@@ -841,11 +847,8 @@ Value types include three main categories:
     "lastName": "Smith"
   },
   "dateOfBirth": "1980-01-15",            // Primitive value type
-  "gender": {                             // GenderValue (enumeration)
-    "code": "M",
-    "display": "Male"
-  },
-  "maritalStatus": {                      // MaritalStatusValue (enumeration)
+  "gender": "M",                          // GenderValue (simple string enum)
+  "maritalStatus": {                      // MaritalStatusValue (temporal enumeration with effectiveFrom)
     "code": "MAR",
     "display": "Married",
     "effectiveFrom": "2015-06-20"
@@ -1979,10 +1982,7 @@ Uses `AddressValue` with nested `CountryValue` and `CountyValue`:
 All enumerations use structured Value Types with code/display pattern:
 ```json
 {
-  "gender": {
-    "code": "M",
-    "display": "Male"
-  },
+  "gender": "M",
   "maritalStatus": {
     "code": "MAR",
     "display": "Married",
@@ -2108,14 +2108,8 @@ Client contract with required-on-create fields. Read-only and computed fields ar
   },
   "salutation": "Mr Smith",
   "dateOfBirth": "1980-05-15",
-  "gender": {
-    "code": "M",
-    "display": "Male"
-  },
-  "maritalStatus": {
-    "code": "MAR",
-    "display": "Married"
-  },
+  "gender": "M",
+  "maritalStatus": "MAR",
   "taxDetails": {
     "niNumber": "AB123456C"
   },
@@ -2175,14 +2169,8 @@ Content-Type: application/json
   "salutation": "Mr Smith",
   "dateOfBirth": "1980-05-15",
   "age": 45,
-  "gender": {
-    "code": "M",
-    "display": "Male"
-  },
-  "maritalStatus": {
-    "code": "MAR",
-    "display": "Married"
-  },
+  "gender": "M",
+  "maritalStatus": "MAR",
   "taxDetails": {
     "niNumber": "AB123456C"
   },
@@ -2308,10 +2296,7 @@ Complete `Client` contract.
   "fullName": "Mr John Michael Smith",
   "dateOfBirth": "1980-05-15",
   "age": 45,
-  "gender": {
-    "code": "M",
-    "display": "Male"
-  },
+  "gender": "M",
   "maritalStatus": {
     "code": "MAR",
     "display": "Married",
@@ -4262,10 +4247,7 @@ Income contract with required-on-create fields.
       "name": "James Smith",
       "dateOfBirth": "2015-06-20",
       "calculatedAge": 10,
-      "relationshipType": {
-        "code": "SON",
-        "display": "Son"
-      },
+      "relationshipType": "SON",
       "isLivingWith": true,
       "isFinanciallyDependant": true,
       "ageCustomUntil": 21,
@@ -4293,10 +4275,7 @@ Income contract with required-on-create fields.
       "name": "Emma Smith",
       "dateOfBirth": "2018-03-15",
       "calculatedAge": 7,
-      "relationshipType": {
-        "code": "DAUGHTER",
-        "display": "Daughter"
-      },
+      "relationshipType": "DAUGHTER",
       "isLivingWith": true,
       "isFinanciallyDependant": true,
       "ageCustomUntil": 18,
@@ -4341,10 +4320,7 @@ Income contract with required-on-create fields.
 {
   "name": "James Smith",
   "dateOfBirth": "2015-06-20",
-  "relationshipType": {
-    "code": "SON",
-    "display": "Son"
-  },
+  "relationshipType": "SON",
   "isLivingWith": true,
   "isFinanciallyDependant": true,
   "ageCustom": null,
@@ -4369,10 +4345,7 @@ Income contract with required-on-create fields.
   "name": "James Smith",
   "dateOfBirth": "2015-06-20",
   "calculatedAge": 10,
-  "relationshipType": {
-    "code": "SON",
-    "display": "Son"
-  },
+  "relationshipType": "SON",
   "isLivingWith": true,
   "isFinanciallyDependant": true,
   "ageCustom": null,
@@ -4433,10 +4406,7 @@ Income contract with required-on-create fields.
   "calculatedAge": 10,
   "ageCustom": null,
   "ageCustomUntil": 21,
-  "relationshipType": {
-    "code": "SON",
-    "display": "Son"
-  },
+  "relationshipType": "SON",
   "isLivingWith": true,
   "isFinanciallyDependant": true,
   "financialDependencyEndsOn": "2036-06-20",
@@ -7958,16 +7928,10 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "id": 1234,
       "href": "/api/v1/factfinds/679/clients/346/assets/1234",
       "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
-      "assetType": {
-        "code": "PROPERTY",
-        "display": "Property"
-      },
+      "assetType": "PROPERTY",
       "description": "Primary Residence - 123 Main Street",
       "ownership": {
-        "ownershipType": {
-          "code": "JOINT",
-          "display": "Joint Ownership"
-        },
+        "ownershipType": "JOINT",
         "owners": [
           {
             "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
@@ -8008,16 +7972,10 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "id": 1235,
       "href": "/api/v1/factfinds/679/clients/346/assets/1235",
       "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
-      "assetType": {
-        "code": "OWN_BUSINESS",
-        "display": "Own Business"
-      },
+      "assetType": "OWN_BUSINESS",
       "description": "Smith & Co Limited - Software Consulting",
       "ownership": {
-        "ownershipType": {
-          "code": "SOLE_CLIENT1",
-          "display": "Sole Client 1"
-        },
+        "ownershipType": "SOLE_CLIENT1",
         "owners": [
           {
             "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
@@ -8074,16 +8032,10 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ```json
 {
-  "assetType": {
-    "code": "PROPERTY",
-    "display": "Property"
-  },
+  "assetType": "PROPERTY",
   "description": "Buy-to-Let Property - 45 Oak Avenue",
   "ownership": {
-    "ownershipType": {
-      "code": "SOLE_CLIENT1",
-      "display": "Sole Client 1"
-    },
+    "ownershipType": "SOLE_CLIENT1",
     "owners": [
       {
         "clientRef": { "id": "client-123" },
@@ -8124,16 +8076,10 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "id": 1236,
   "href": "/api/v1/factfinds/679/clients/346/assets/1236",
   "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
-  "assetType": {
-    "code": "PROPERTY",
-    "display": "Property"
-  },
+  "assetType": "PROPERTY",
   "description": "Buy-to-Let Property - 45 Oak Avenue",
   "ownership": {
-    "ownershipType": {
-      "code": "SOLE_CLIENT1",
-      "display": "Sole Client 1"
-    },
+    "ownershipType": "SOLE_CLIENT1",
     "owners": [
       {
         "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
@@ -8179,25 +8125,13 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 {
   "id": 1234,
   "href": "/api/v1/factfinds/679/property-details/1234",
-  "propertyType": {
-    "code": "DETACHED",
-    "display": "Detached House"
-  },
+  "propertyType": "DETACHED",
   "tenureType": "Freehold",
   "leaseholdEndsOn": null,
-  "propertyStatus": {
-    "code": "RESIDENTIAL",
-    "display": "Residential"
-  },
-  "constructionType": {
-    "code": "BRICK_AND_TILE",
-    "display": "Brick and Tile"
-  },
+  "propertyStatus": "RESIDENTIAL",
+  "constructionType": "BRICK_AND_TILE",
   "constructionNotes": "Traditional brick construction with tile roof",
-  "roofConstructionType": {
-    "code": "PITCHED_CLAY_TILES",
-    "display": "Pitched Clay Tiles"
-  },
+  "roofConstructionType": "PITCHED_CLAY_TILES",
   "numberOfBedrooms": 3,
   "yearBuilt": 1995,
   "isNewBuild": false,
@@ -8321,10 +8255,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     {
       "id": "liability-789",
       "factfindRef": { "id": "ff-456" },
-      "liabilityType": {
-        "code": "MORTGAGE",
-        "display": "Mortgage"
-      },
+      "liabilityType": "MORTGAGE",
       "lender": "First National Bank",
       "accountNumber": "****1234",
       "outstandingBalance": {
@@ -8385,7 +8316,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   },
   "assetsByType": [
     {
-      "assetType": { "code": "PROPERTY", "display": "Property" },
+      "assetType": "PROPERTY",
       "count": 1,
       "totalValue": {
         "amount": 450000.00,
@@ -8394,7 +8325,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "percentage": 64.29
     },
     {
-      "assetType": { "code": "OWN_BUSINESS", "display": "Own Business" },
+      "assetType": "OWN_BUSINESS",
       "count": 1,
       "totalValue": {
         "amount": 250000.00,
@@ -8451,11 +8382,11 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   },
   "assetBreakdown": [
     {
-      "assetType": { "code": "PROPERTY", "display": "Property" },
+      "assetType": "PROPERTY",
       "value": { "amount": 450000.00, "currency": { "code": "GBP" } }
     },
     {
-      "assetType": { "code": "OWN_BUSINESS", "display": "Own Business" },
+      "assetType": "OWN_BUSINESS",
       "value": { "amount": 250000.00, "currency": { "code": "GBP" } }
     }
   ],
@@ -8632,10 +8563,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": {
-    "code": "GIA",
-    "display": "General Investment Account"
-  },
+  "arrangementType": "GIA",
   "provider": {
     "name": "Vanguard UK",
     "reference": "VANG-UK-001",
@@ -8711,14 +8639,8 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": "arr-gia-001",
   "href": "/api/v1/factfinds/ff-456/arrangements/investments/GIA/arr-gia-001",
-  "arrangementType": {
-    "code": "GIA",
-    "display": "General Investment Account"
-  },
-  "arrangementCategory": {
-    "code": "INVESTMENT",
-    "display": "Investment"
-  },
+  "arrangementType": "GIA",
+  "arrangementCategory": "INVESTMENT",
   "provider": {
     "name": "Vanguard UK",
     "reference": "VANG-UK-001",
@@ -8841,10 +8763,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": {
-    "code": "ISA",
-    "display": "Individual Savings Account"
-  },
+  "arrangementType": "ISA",
   "isaType": {
     "code": "STOCKS_SHARES",
     "display": "Stocks & Shares ISA"
@@ -8938,14 +8857,8 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": "arr-isa-002",
   "href": "/api/v1/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
-  "arrangementType": {
-    "code": "ISA",
-    "display": "Individual Savings Account"
-  },
-  "arrangementCategory": {
-    "code": "INVESTMENT",
-    "display": "Investment"
-  },
+  "arrangementType": "ISA",
+  "arrangementCategory": "INVESTMENT",
   "isaType": {
     "code": "STOCKS_SHARES",
     "display": "Stocks & Shares ISA"
@@ -9304,10 +9217,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": {
-    "code": "PERSONAL_PENSION",
-    "display": "Personal Pension"
-  },
+  "arrangementType": "PERSONAL_PENSION",
   "provider": {
     "name": "Standard Life",
     "reference": "SL-UK-001",
@@ -9400,14 +9310,8 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": "arr-pp-003",
   "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003",
-  "arrangementType": {
-    "code": "PERSONAL_PENSION",
-    "display": "Personal Pension"
-  },
-  "arrangementCategory": {
-    "code": "PENSION",
-    "display": "Pension"
-  },
+  "arrangementType": "PERSONAL_PENSION",
+  "arrangementCategory": "PENSION",
   "provider": {
     "name": "Standard Life",
     "reference": "SL-UK-001",
@@ -9558,10 +9462,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": {
-    "code": "STATE_PENSION",
-    "display": "State Pension"
-  },
+  "arrangementType": "STATE_PENSION",
   "nationalInsuranceNumber": "AB123456C",
   "qualifyingYears": 35,
   "yearsToStatePensionAge": 12,
@@ -9685,10 +9586,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": {
-    "code": "FINAL_SALARY",
-    "display": "Final Salary / Defined Benefit"
-  },
+  "arrangementType": "FINAL_SALARY",
   "provider": {
     "name": "NHS Pension Scheme",
     "reference": "NHS-PS-001"
@@ -9780,14 +9678,8 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": "arr-db-004",
   "href": "/api/v1/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004",
-  "arrangementType": {
-    "code": "FINAL_SALARY",
-    "display": "Final Salary / Defined Benefit"
-  },
-  "arrangementCategory": {
-    "code": "PENSION",
-    "display": "Pension"
-  },
+  "arrangementType": "FINAL_SALARY",
+  "arrangementCategory": "PENSION",
   "provider": {
     "name": "NHS Pension Scheme",
     "reference": "NHS-PS-001"
@@ -10065,10 +9957,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": {
-    "code": "MORTGAGE",
-    "display": "Mortgage"
-  },
+  "arrangementType": "MORTGAGE",
   "mortgageType": {
     "code": "RESIDENTIAL",
     "display": "Residential Mortgage"
@@ -10167,14 +10056,8 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": "arr-mort-005",
   "href": "/api/v1/factfinds/ff-456/arrangements/mortgages/arr-mort-005",
-  "arrangementType": {
-    "code": "MORTGAGE",
-    "display": "Mortgage"
-  },
-  "arrangementCategory": {
-    "code": "MORTGAGE",
-    "display": "Mortgage"
-  },
+  "arrangementType": "MORTGAGE",
+  "arrangementCategory": "MORTGAGE",
   "mortgageType": {
     "code": "RESIDENTIAL",
     "display": "Residential Mortgage"
@@ -10351,10 +10234,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": {
-    "code": "PROTECTION",
-    "display": "Protection"
-  },
+  "arrangementType": "PROTECTION",
   "protectionType": {
     "code": "LIFE_COVER",
     "display": "Life Cover"
@@ -10385,10 +10265,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 500000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "coverType": {
-      "code": "LEVEL_TERM",
-      "display": "Level Term Assurance"
-    },
+    "coverType": "LEVEL_TERM",
     "coverPeriod": {
       "years": 30,
       "endsOn": "2050-04-01"
@@ -10449,14 +10326,8 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": "arr-prot-006",
   "href": "/api/v1/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006",
-  "arrangementType": {
-    "code": "PROTECTION",
-    "display": "Protection"
-  },
-  "arrangementCategory": {
-    "code": "PROTECTION",
-    "display": "Protection"
-  },
+  "arrangementType": "PROTECTION",
+  "arrangementCategory": "PROTECTION",
   "protectionType": {
     "code": "LIFE_COVER",
     "display": "Life Cover"
@@ -10496,10 +10367,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 500000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "coverType": {
-      "code": "LEVEL_TERM",
-      "display": "Level Term Assurance"
-    },
+    "coverType": "LEVEL_TERM",
     "coverPeriod": {
       "years": 30,
       "endsOn": "2050-04-01"
@@ -10651,10 +10519,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": {
-    "code": "GENERAL_INSURANCE",
-    "display": "General Insurance"
-  },
+  "arrangementType": "GENERAL_INSURANCE",
   "insuranceType": {
     "code": "BUILDINGS",
     "display": "Buildings Insurance"
@@ -12306,20 +12171,14 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "salutation": "Mr Smith",
     "dateOfBirth": "1980-05-15",
     "age": 45,
-    "gender": {
-      "code": "M",
-      "display": "Male"
-    },
+    "gender": "M",
     "maritalStatus": {
       "code": "MAR",
       "display": "Married",
       "effectiveFrom": "2005-06-20"
     },
     "niNumber": "AB123456C",
-    "smokingStatus": {
-      "code": "NEVER",
-      "display": "Never Smoked"
-    },
+    "smokingStatus": "NEVER",
     "healthMetrics": {
       "heightCm": 178.0,
       "weightKg": 82.5,
@@ -14894,7 +14753,7 @@ Content-Type: application/json
     "firstName": "John",
     "lastName": "Smith",
     "dateOfBirth": "1980-05-15",
-    "gender": { "code": "M", "display": "Male" },
+    "gender": "M",
     "vulnerabilities": []
   },
   "territorialProfile": {
@@ -16325,14 +16184,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
     "clientNumber": "C00001234",
     "type": "Person"
   },
-  "arrangementType": {
-    "code": "INV",
-    "display": "Investment"
-  },
-  "productType": {
-    "code": "ISA",
-    "display": "Individual Savings Account"
-  },
+  "arrangementType": "INV",
+  "productType": "ISA",
   "provider": {
     "code": "VANGUARD",
     "display": "Vanguard Asset Management",
@@ -16988,22 +16841,22 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | `arrangementId` | uuid | required | ignored | included | write-once, link to parent Arrangement |
 | `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
 | `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
-| `arrangementType` | CodeValue | required | ignored | included | write-once, discriminator field |
-| `productType` | CodeValue | required | ignored | included | write-once, ISA/GIA/Bond/Investment Trust |
+| `arrangementType` | string | required | ignored | included | write-once, discriminator field |
+| `productType` | string | required | ignored | included | write-once, ISA/GIA/Bond/Investment Trust |
 | `provider` | ProviderValue | required | updatable | included | Provider details with FRN |
 | `policyNumber` | string | required | ignored | included | write-once, unique identifier |
 | `accountNumber` | string | optional | updatable | included | Account reference number |
 | `planName` | string | optional | updatable | included | Name of investment plan |
 | `startDate` | date | required | ignored | included | write-once, inception date |
 | `maturityDate` | date | optional | updatable | included | For fixed-term investments |
-| `status` | CodeValue | optional | updatable | included | Active/Closed/Suspended |
-| `investmentType` | CodeValue | required | updatable | included | Detailed investment classification |
-| `isaType` | CodeValue | optional | updatable | included | If ISA: Stocks/Cash/Innovative/Lifetime |
+| `status` | string | optional | updatable | included | Active/Closed/Suspended |
+| `investmentType` | string | required | updatable | included | Detailed investment classification |
+| `isaType` | string | optional | updatable | included | If ISA: Stocks/Cash/Innovative/Lifetime |
 | `taxYear` | string | optional | updatable | included | Current tax year for ISA allowance |
 | `annualIsaAllowance` | MoneyValue | optional | updatable | included | Annual ISA contribution limit |
 | `isaAllowanceUsed` | MoneyValue | optional | updatable | included | Amount of allowance used this year |
 | `isaAllowanceRemaining` | MoneyValue | ignored | ignored | included | read-only, computed |
-| `taxWrapperType` | CodeValue | optional | updatable | included | ISA/SIPP/other tax wrapper |
+| `taxWrapperType` | string | optional | updatable | included | ISA/SIPP/other tax wrapper |
 | `isTaxable` | boolean | optional | updatable | included | Whether gains are taxable |
 | `currentValue` | MoneyValue | required | updatable | included | Current market value |
 | `valuationDate` | date | required | updatable | included | Date of valuation |
@@ -17028,19 +16881,19 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | `totalWithdrawals` | MoneyValue | ignored | ignored | included | read-only, sum of withdrawals |
 | `netContributions` | MoneyValue | ignored | ignored | included | read-only, contributions - withdrawals |
 | `regularContribution` | MoneyValue | optional | updatable | included | Regular monthly/annual contribution |
-| `regularContributionFrequency` | CodeValue | optional | updatable | included | Monthly/Quarterly/Annual |
+| `regularContributionFrequency` | string | optional | updatable | included | Monthly/Quarterly/Annual |
 | `nextContributionDate` | date | optional | updatable | included | Next scheduled contribution |
 | `isRegularContributionActive` | boolean | optional | updatable | included | Whether regular contributions are active |
 | `taxFields` | object | optional | updatable | included | Capital gains, dividends, tax paid |
 | `charges` | object | optional | updatable | included | AMC, platform fees, TER |
-| `riskRating` | CodeValue | optional | updatable | included | Investment risk rating |
+| `riskRating` | string | optional | updatable | included | Investment risk rating |
 | `investmentObjective` | string | optional | updatable | included | Stated investment goal |
 | `benchmarkIndex` | string | optional | updatable | included | Performance benchmark |
-| `rebalancingFrequency` | CodeValue | optional | updatable | included | Quarterly/Semi-annual/Annual |
+| `rebalancingFrequency` | string | optional | updatable | included | Quarterly/Semi-annual/Annual |
 | `lastRebalancingDate` | date | optional | updatable | included | Last portfolio rebalance |
 | `nextRebalancingDate` | date | optional | updatable | included | Next scheduled rebalance |
 | `isAdvised` | boolean | optional | updatable | included | Whether investment is advised |
-| `adviceType` | CodeValue | optional | updatable | included | Ongoing/One-off advice |
+| `adviceType` | string | optional | updatable | included | Ongoing/One-off advice |
 | `adviserRef` | AdviserRef | optional | updatable | included | Reference to adviser |
 | `lastReviewDate` | date | optional | updatable | included | Last review date |
 | `nextReviewDate` | date | optional | updatable | included | Next scheduled review |
@@ -17060,9 +16913,9 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "arrangementId": "arrangement-456",
   "factFindRef": { "id": "factfind-123" },
   "clientRef": { "id": "client-123" },
-  "arrangementType": { "code": "INV" },
-  "productType": { "code": "ISA" },
-  "provider": { "code": "VANGUARD" },
+  "arrangementType": "INV",
+  "productType": "ISA",
+  "provider": "VANGUARD",
   "policyNumber": "ISA-987654321",
   "startDate": "2020-04-06",
   "inceptionDate": "2020-04-06",
@@ -17141,18 +16994,12 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "display": "In Progress"
     }
   },
-  "propertyType": {
-    "code": "BTL",
-    "display": "Buy To Let"
-  },
+  "propertyType": "BTL",
   "propertySubType": {
     "code": "APARTMENT",
     "display": "Apartment/Flat"
   },
-  "ownershipType": {
-    "code": "FREEHOLD",
-    "display": "Freehold"
-  },
+  "ownershipType": "FREEHOLD",
   "address": {
     "line1": "Flat 12, Riverside Apartments",
     "line2": "45 Thames Street",
@@ -17292,10 +17139,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       },
       "ownershipPercentage": 100.00,
       "isPrimaryOwner": true,
-      "ownershipType": {
-        "code": "SOLE",
-        "display": "Sole Ownership"
-      }
+      "ownershipType": "SOLE"
     }
   ],
   "ownershipStructure": {
@@ -17853,16 +17697,16 @@ The `Property` contract represents a property asset with valuation tracking, mor
 |-------|------|--------|--------|----------|-------|
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
 | `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
-| `propertyType` | CodeValue | required | ignored | included | write-once, PrimaryResidence/BuyToLet/SecondHome/Commercial |
-| `propertySubType` | CodeValue | optional | updatable | included | Detached/SemiDetached/Terraced/Apartment/Bungalow |
-| `ownershipType` | CodeValue | optional | updatable | included | Freehold/Leasehold/Shared Ownership |
+| `propertyType` | string | required | ignored | included | write-once, PrimaryResidence/BuyToLet/SecondHome/Commercial |
+| `propertySubType` | string | optional | updatable | included | Detached/SemiDetached/Terraced/Apartment/Bungalow |
+| `ownershipType` | string | optional | updatable | included | Freehold/Leasehold/Shared Ownership |
 | `address` | AddressValue | required | updatable | included | Full property address with UPRN and coordinates |
 | `propertyDescription` | string | optional | updatable | included | Free text description |
 | `numberOfBedrooms` | integer | optional | updatable | included | Number of bedrooms |
 | `numberOfBathrooms` | integer | optional | updatable | included | Number of bathrooms |
 | `numberOfReceptionRooms` | integer | optional | updatable | included | Number of reception rooms |
 | `floorArea` | object | optional | updatable | included | Floor area with unit (sqft/sqm) |
-| `tenure` | CodeValue | optional | updatable | included | Freehold/Leasehold |
+| `tenure` | string | optional | updatable | included | Freehold/Leasehold |
 | `leaseRemaining` | integer | optional | updatable | included | Years remaining on lease |
 | `groundRent` | object | optional | updatable | included | Annual ground rent with frequency |
 | `serviceCharge` | object | optional | updatable | included | Monthly/annual service charge |
@@ -17871,12 +17715,12 @@ The `Property` contract represents a property asset with valuation tracking, mor
 | `purchaseCosts` | object | optional | updatable | included | Breakdown of purchase costs (stamp duty, legal, etc.) |
 | `totalInvestment` | MoneyValue | ignored | ignored | included | read-only, purchasePrice + purchaseCosts.totalCosts |
 | `owners` | array | required | updatable | included | Array of owners with percentage ownership |
-| `ownershipStructure` | CodeValue | required | updatable | included | Sole/Joint/Tenants in Common |
+| `ownershipStructure` | string | required | updatable | included | Sole/Joint/Tenants in Common |
 | `isJointOwnership` | boolean | ignored | ignored | included | read-only, computed from owners array |
-| `jointOwnershipType` | CodeValue | optional | updatable | included | If joint: Joint Tenants/Tenants in Common |
+| `jointOwnershipType` | string | optional | updatable | included | If joint: Joint Tenants/Tenants in Common |
 | `currentValue` | MoneyValue | required | updatable | included | Current market value |
 | `valuationDate` | date | required | updatable | included | Date of valuation |
-| `valuationType` | CodeValue | required | updatable | included | Desktop/Surveyor/EstateAgent/RICS |
+| `valuationType` | string | required | updatable | included | Desktop/Surveyor/EstateAgent/RICS |
 | `valuationProvider` | string | optional | updatable | included | Name of valuation provider |
 | `valuationReference` | string | optional | updatable | included | Reference number for valuation |
 | `previousValuation` | MoneyValue | optional | updatable | included | Previous valuation amount |
@@ -17925,7 +17769,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
 ```json
 {
   "factFindRef": { "id": "factfind-123" },
-  "propertyType": { "code": "BTL" },
+  "propertyType": "BTL",
   "address": {
     "line1": "Flat 12, Riverside Apartments",
     "line2": "45 Thames Street",
@@ -18691,10 +18535,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     },
     "beta": 1.15
   },
-  "accountType": {
-    "code": "GIA",
-    "display": "General Investment Account"
-  },
+  "accountType": "GIA",
   "broker": {
     "name": "Hargreaves Lansdown",
     "accountNumber": "HL-12345678"
@@ -18758,8 +18599,8 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | `cusip` | string | optional | ignored | included | write-once, CUSIP identifier (US stocks) |
 | `companyName` | string | required | updatable | included | Name of company |
 | `companyDescription` | string | optional | updatable | included | Brief description of company |
-| `exchange` | CodeValue | required | updatable | included | Stock exchange where traded |
-| `sector` | CodeValue | optional | updatable | included | Sector and sub-sector classification |
+| `exchange` | string | required | updatable | included | Stock exchange where traded |
+| `sector` | string | optional | updatable | included | Sector and sub-sector classification |
 | `industry` | string | optional | updatable | included | Industry classification |
 | `currency` | CurrencyValue | required | updatable | included | Trading currency |
 | `country` | CountryValue | optional | updatable | included | Country of domicile |
@@ -18771,7 +18612,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | `corporateActions` | array | optional | updatable | included | Array of corporate actions (splits, rights issues) |
 | `taxCalculation` | object | optional | updatable | included | Tax calculation details including Section 104 pool |
 | `marketData` | object | optional | updatable | included | Current market data and statistics |
-| `accountType` | CodeValue | optional | updatable | included | ISA/GIA/SIPP account type |
+| `accountType` | string | optional | updatable | included | ISA/GIA/SIPP account type |
 | `broker` | object | optional | updatable | included | Broker details and account number |
 | `isAdvised` | boolean | optional | updatable | included | Whether holding is advised |
 | `adviserRef` | AdviserRef | optional | updatable | included | Reference to adviser |
@@ -18804,7 +18645,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     "currentPrice": { "amount": 5.15, "currency": { "code": "GBP" } },
     "currentValue": { "amount": 15450.00, "currency": { "code": "GBP" } }
   },
-  "accountType": { "code": "GIA" }
+  "accountType": "GIA"
 }
 ```
 Server generates `id`, `createdAt`, `updatedAt`, and computes performance metrics. Returns complete contract.
@@ -19267,9 +19108,9 @@ The `IdentityVerification` contract represents identity verification status with
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
 | `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
 | `factFindRef` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
-| `verificationType` | CodeValue | required | ignored | included | write-once, KYC/AML/EnhancedDueDiligence |
-| `verificationLevel` | CodeValue | optional | updatable | included | Standard/Enhanced/Simplified |
-| `verificationStatus` | CodeValue | required | updatable | included | Pending/InProgress/Verified/Failed/Expired |
+| `verificationType` | string | required | ignored | included | write-once, KYC/AML/EnhancedDueDiligence |
+| `verificationLevel` | string | optional | updatable | included | Standard/Enhanced/Simplified |
+| `verificationStatus` | string | required | updatable | included | Pending/InProgress/Verified/Failed/Expired |
 | `verificationDate` | timestamp | required | updatable | included | Date/time of verification |
 | `verificationExpiryDate` | date | optional | updatable | included | Verification expiry date |
 | `isExpired` | boolean | ignored | ignored | included | read-only, computed from expiryDate |
@@ -19283,7 +19124,7 @@ The `IdentityVerification` contract represents identity verification status with
 | `regulatoryCompliance` | object | optional | updatable | included | Compliance with MLR, FCA, KYC, GDPR |
 | `verificationHistory` | array | optional | updatable | included | Historical verification records |
 | `nextReviewDate` | date | optional | updatable | included | Next scheduled review date |
-| `reviewFrequency` | CodeValue | optional | updatable | included | Monthly/Quarterly/Annual |
+| `reviewFrequency` | string | optional | updatable | included | Monthly/Quarterly/Annual |
 | `verifiedBy` | object | required | updatable | included | User who performed verification |
 | `verifiedAt` | timestamp | required | updatable | included | Verification timestamp |
 | `verificationIpAddress` | string | optional | updatable | included | IP address of verification |
@@ -19341,7 +19182,7 @@ Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
   "verificationDate": "2026-02-10T14:30:00Z",
   "verificationExpiryDate": "2027-02-10",
   "identityProvider": {
-    "provider": { "code": "ONFIDO" },
+    "provider": "ONFIDO",
     "providerReference": "ONFIDO-CHK-123456789",
     "providerScore": 98,
     "providerDecision": { "code": "CLEAR" }
@@ -19862,20 +19703,20 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
 | `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
 | `factFindRef` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
-| `consentPurpose` | CodeValue | required | ignored | included | write-once, DataProcessing/Marketing/Profiling/ThirdPartySharing |
+| `consentPurpose` | string | required | ignored | included | write-once, DataProcessing/Marketing/Profiling/ThirdPartySharing |
 | `consentPurposeDescription` | string | optional | updatable | included | Detailed description of purpose |
-| `consentStatus` | CodeValue | required | updatable | included | Given/Withdrawn/Expired |
+| `consentStatus` | string | required | updatable | included | Given/Withdrawn/Expired |
 | `consentGivenDate` | timestamp | required | updatable | included | Date/time consent was given |
 | `consentWithdrawnDate` | timestamp | optional | updatable | included | Date/time consent was withdrawn |
 | `consentExpiryDate` | date | optional | updatable | included | Consent expiry date |
 | `isExpired` | boolean | ignored | ignored | included | read-only, computed from expiryDate |
 | `daysUntilExpiry` | integer | ignored | ignored | included | read-only, computed |
 | `isActive` | boolean | ignored | ignored | included | read-only, status is Given and not expired |
-| `consentMethod` | CodeValue | required | updatable | included | Explicit/Implicit/LegitimateInterest |
-| `consentChannel` | CodeValue | required | updatable | included | Web/Mobile/InPerson/Email/Phone |
+| `consentMethod` | string | required | updatable | included | Explicit/Implicit/LegitimateInterest |
+| `consentChannel` | string | required | updatable | included | Web/Mobile/InPerson/Email/Phone |
 | `consentVersion` | string | optional | updatable | included | Version of consent form |
 | `consentText` | string | optional | updatable | included | Actual consent text shown to client |
-| `lawfulBasis` | CodeValue | required | updatable | included | GDPR lawful basis (Consent/Contract/LegalObligation/etc) |
+| `lawfulBasis` | string | required | updatable | included | GDPR lawful basis (Consent/Contract/LegalObligation/etc) |
 | `lawfulBasisDetails` | string | optional | updatable | included | Details of lawful basis |
 | `specialCategoryData` | object | optional | updatable | included | Special category data processing details |
 | `dataProcessing` | object | required | updatable | included | Data categories, processing activities, retention |
@@ -20427,22 +20268,9 @@ All enumeration value types follow a consistent structure:
 
 ##### GenderValue
 
-Represents a person's gender.
+Represents a person's gender as a simple string enum.
 
-**Contract:**
-```json
-{
-  "code": "M",
-  "display": "Male"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Gender code: M, F, O, U, N |
-| `display` | string | Yes | Human-readable label |
+**Type:** `string`
 
 **Standard Codes:**
 - `M` - Male
@@ -20454,10 +20282,7 @@ Represents a person's gender.
 **Usage Example:**
 ```json
 {
-  "gender": {
-    "code": "M",
-    "display": "Male"
-  }
+  "gender": "M"
 }
 ```
 
@@ -20508,22 +20333,9 @@ Represents a person's marital status with optional effective date.
 
 ##### EmploymentStatusValue
 
-Represents a person's employment status.
+Represents a person's employment status as a simple string enum.
 
-**Contract:**
-```json
-{
-  "code": "EMP",
-  "display": "Employed"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Employment status code |
-| `display` | string | Yes | Human-readable label |
+**Type:** `string`
 
 **Standard Codes:**
 - `EMP` - Employed
@@ -20951,22 +20763,9 @@ Represents the type of a client meeting.
 
 ##### ResidencyStatusValue
 
-Represents tax residency status.
+Represents tax residency status as a simple string enum.
 
-**Contract:**
-```json
-{
-  "code": "UK_RES",
-  "display": "UK Resident"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Residency status code |
-| `display` | string | Yes | Human-readable label |
+**Type:** `string`
 
 **Standard Codes:**
 - `UK_RES` - UK Resident
@@ -20978,10 +20777,7 @@ Represents tax residency status.
 **Usage Example:**
 ```json
 {
-  "residencyStatus": {
-    "code": "UK_RES",
-    "display": "UK Resident"
-  }
+  "residencyStatus": "UK_RES"
 }
 ```
 
@@ -20989,22 +20785,9 @@ Represents tax residency status.
 
 ##### HealthStatusValue
 
-Represents a person's health status for insurance purposes.
+Represents a person's health status for insurance purposes as a simple string enum.
 
-**Contract:**
-```json
-{
-  "code": "GOOD",
-  "display": "Good Health"
-}
-```
-
-**Fields:**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `code` | string | Yes | Health status code |
-| `display` | string | Yes | Human-readable label |
+**Type:** `string`
 
 **Standard Codes:**
 - `GOOD` - Good Health
@@ -21016,10 +20799,7 @@ Represents a person's health status for insurance purposes.
 **Usage Example:**
 ```json
 {
-  "healthStatus": {
-    "code": "GOOD",
-    "display": "Good Health"
-  }
+  "healthStatus": "GOOD"
 }
 ```
 
@@ -21313,16 +21093,10 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "assetType": {
-    "code": "PROPERTY",
-    "display": "Property"
-  },
+  "assetType": "PROPERTY",
   "description": "Primary Residence - 123 Main Street",
   "ownership": {
-    "ownershipType": {
-      "code": "JOINT",
-      "display": "Joint Ownership"
-    },
+    "ownershipType": "JOINT",
     "owners": [
       {
         "clientRef": {
@@ -22596,25 +22370,13 @@ The `PropertyDetail` contract represents detailed property information including
 {
   "id": 1,
   "href": "/api/v1/factfinds/679/property-details/1",
-  "propertyType": {
-    "code": "DETACHED",
-    "display": "Detached House"
-  },
+  "propertyType": "DETACHED",
   "tenureType": "Freehold",
   "leaseholdEndsOn": null,
-  "propertyStatus": {
-    "code": "RESIDENTIAL",
-    "display": "Residential"
-  },
-  "constructionType": {
-    "code": "BRICK_AND_TILE",
-    "display": "Brick and Tile"
-  },
+  "propertyStatus": "RESIDENTIAL",
+  "constructionType": "BRICK_AND_TILE",
   "constructionNotes": "Victorian cottage with modern renovation",
-  "roofConstructionType": {
-    "code": "PITCHED_SLATE_TILES",
-    "display": "Pitched Slate Tiles"
-  },
+  "roofConstructionType": "PITCHED_SLATE_TILES",
   "numberOfBedrooms": 4,
   "yearBuilt": 1890,
   "isNewBuild": false,
@@ -23147,10 +22909,7 @@ The `Dependant` contract represents a dependent family member of one or more cli
   "fullName": "Emily Rose Smith",
   "dateOfBirth": "2015-08-20",
   "age": 10,
-  "gender": {
-    "code": "F",
-    "display": "Female"
-  },
+  "gender": "F",
   "relationship": {
     "code": "CHILD",
     "display": "Child"
@@ -23834,10 +23593,7 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
       "code": "GOOD",
       "display": "Good"
     },
-    "investmentExperience": {
-      "code": "MODERATE",
-      "display": "Moderate"
-    },
+    "investmentExperience": "MODERATE",
     "productsHeld": [
       "Stocks and Shares ISA",
       "Workplace Pension",
@@ -24808,10 +24564,7 @@ The `MortgageArrangement` contract represents a mortgage or secured lending prod
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "arrangementCategory": {
-    "code": "MORTGAGE",
-    "display": "Mortgage"
-  },
+  "arrangementCategory": "MORTGAGE",
   "productName": "First Direct 5 Year Fixed Rate Mortgage",
   "providerName": "First Direct",
   "providerRef": {
@@ -24948,10 +24701,7 @@ The `InvestmentArrangement` contract represents investment products including GI
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "arrangementCategory": {
-    "code": "INVESTMENT",
-    "display": "Investment"
-  },
+  "arrangementCategory": "INVESTMENT",
   "investmentType": {
     "code": "GENERAL_INVESTMENT_ACCOUNT",
     "display": "General Investment Account (GIA)"
@@ -25129,10 +24879,7 @@ The `ProtectionArrangement` contract represents protection products including Li
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "arrangementCategory": {
-    "code": "PROTECTION",
-    "display": "Protection"
-  },
+  "arrangementCategory": "PROTECTION",
   "protectionType": {
     "code": "LIFE_ASSURANCE",
     "display": "Life Assurance"
@@ -25284,10 +25031,7 @@ The `PensionArrangement` contract represents pension products including Personal
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "arrangementCategory": {
-    "code": "PENSION",
-    "display": "Pension"
-  },
+  "arrangementCategory": "PENSION",
   "pensionType": {
     "code": "PERSONAL_PENSION",
     "display": "Personal Pension"
