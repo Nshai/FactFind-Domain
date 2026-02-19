@@ -254,7 +254,7 @@ The FactFind API provides comprehensive digital capabilities for:
       - [10.4.5 Final Salary (Defined Benefit)](#1045-final-salary-defined-benefit)
       - [10.4.6 Pension Drawdown](#1046-pension-drawdown)
       - [10.4.7 Annuity](#1047-annuity)
-    - [10.5 Mortgage Arrangements](#105-mortgage-arrangements)
+    - [10.5 Secured Lending Arrangements](#105-secured-lending-arrangements)
     - [10.6 Protection Arrangements](#106-protection-arrangements)
       - [10.6.1 Personal Protection (Life, CI, IP)](#1061-personal-protection-life-ci-ip)
       - [10.6.2 General Insurance](#1062-general-insurance)
@@ -313,7 +313,7 @@ The FactFind API provides comprehensive digital capabilities for:
     - [13.38 Estate Planning - Gift Contract](#1338-estate-planning---gift-contract)
     - [13.39 Estate Planning - Trust Contract](#1339-estate-planning---trust-contract)
     - [13.40 Identity Verification & Data Protection Consent Contract](#1340-identity-verification--data-protection-consent-contract)
-    - [13.41 Arrangement - Mortgage Contract](#1341-arrangement---mortgage-contract)
+    - [13.41 Arrangement - Secured Lending Contract](#1341-arrangement---secured-lending-contract)
     - [13.42 Arrangement - Investment Contract (General Investment Account)](#1342-arrangement---investment-contract-general-investment-account)
     - [13.43 Arrangement - Protection Contract (Life Assurance)](#1343-arrangement---protection-contract-life-assurance)
     - [13.44 Arrangement - Pension Contract (Personal Pension)](#1344-arrangement---pension-contract-personal-pension)
@@ -491,8 +491,8 @@ Resources are organized into **business contexts** that reflect the domain model
 | **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Consent, Vulnerabilities, ID Verification, Professional Contacts | `/api/v1/factfinds/{id}/clients/{id}/*` |
 | **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v1/factfinds/{id}/clients/{id}/*` |
 | **Assets & Liabilities** | Assets, Business Assets, Property Details, Credit History, Valuations | `/api/v1/factfinds/{id}/assets` |
-| **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v1/factfinds/{id}/arrangements/{type}` |
-| **Goals & Objectives** | Objectives (investment, pension, protection, mortgage, budget, estate-planning), Needs | `/api/v1/factfinds/{id}/objectives/{type}` |
+| **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Secured Lending Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v1/factfinds/{id}/arrangements/{type}` |
+| **Goals & Objectives** | Objectives (investment, pension, protection, secured-lending, budget, estate-planning), Needs | `/api/v1/factfinds/{id}/objectives/{type}` |
 | **Risk Profiling** | ATR (client ATR), Supplementary Questions | `/api/v1/factfinds/{id}/attitude-to-risk` |
 | **Estate Planning** | Gifts, Trusts (nested under clients) | `/api/v1/factfinds/{id}/clients/{id}/estate-planning` |
 
@@ -9937,62 +9937,46 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-### 10.5 Mortgage Arrangements
+### 10.5 Secured Lending Arrangements
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/mortgages`
+**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/secured-lending`
 
-**Purpose:** Manage mortgage and secured lending arrangements linked to property assets.
+**Purpose:** Manage secured lending arrangements including traditional mortgages and equity release products linked to property assets.
 
 **Operations:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/mortgages` | Create Mortgage | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/mortgages` | List Mortgages | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Get Mortgage details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Update Mortgage | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Delete Mortgage | `arrangements:write` |
+| POST | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending` | Create Secured Lending | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending` | List Secured Lending | `arrangements:read` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending/{arrangementId}` | Get Secured Lending details | `arrangements:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending/{arrangementId}` | Update Secured Lending | `arrangements:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending/{arrangementId}` | Delete Secured Lending | `arrangements:write` |
 
-**Create Mortgage Request:**
+**Create Secured Lending Request:**
 
 ```json
 {
-  "arrangementType": "MORTGAGE",
-  "mortgageType": {
-    "code": "RESIDENTIAL",
-    "display": "Residential Mortgage"
-  },
-  "provider": {
-    "name": "Nationwide Building Society",
-    "reference": "NBS-UK-001",
-    "contactDetails": {
-      "phone": "0800 302 010",
-      "email": "mortgages@nationwide.co.uk"
-    }
-  },
+  "arrangementCategory": "SECURED_LENDING",
   "accountNumber": "NBS-MORT-123456",
-  "startDate": "2018-06-15",
-  "maturityDate": "2043-06-15",
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "id": "client-123",
+      "href": "/api/v1/factfinds/ff-456/clients/client-123",
       "ownershipPercentage": 50.0
     },
     {
-      "clientRef": { "id": "client-124" },
+      "id": "client-124",
+      "href": "/api/v1/factfinds/ff-456/clients/client-124",
       "ownershipPercentage": 50.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
-  "propertyRef": {
-    "id": "asset-prop-001",
-    "href": "/api/v1/factfinds/ff-456/assets/property/asset-prop-001"
-  },
-  "loanDetails": {
-    "originalAmount": {
+  "productType": "FixedRateMortgage",
+  "lenderName": "Nationwide Building Society",
+  "productName": "5 Year Fixed Rate Mortgage",
+  "description": "Main residence mortgage",
+  "loanAmounts": {
+    "originalLoanAmount": {
       "amount": 300000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
@@ -10000,53 +9984,107 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 245000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "balanceDate": "2026-02-18"
-  },
-  "repaymentDetails": {
-    "repaymentType": {
-      "code": "REPAYMENT",
-      "display": "Capital & Interest Repayment"
-    },
-    "monthlyPayment": {
-      "amount": 1450.00,
+    "depositAmount": {
+      "amount": 100000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "termRemaining": {
-      "years": 17,
-      "months": 4
-    }
-  },
-  "interestDetails": {
-    "currentRate": 4.25,
-    "rateType": {
-      "code": "FIXED",
-      "display": "Fixed Rate"
+    "originalPropertyValuation": {
+      "amount": 400000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
     },
-    "fixedUntil": "2028-06-30",
-    "revertRate": 7.99,
-    "initialRate": 2.89,
-    "productType": "5 Year Fixed Rate"
-  },
-  "ltvAnalysis": {
-    "propertyValue": {
+    "currentPropertyValuation": {
       "amount": 425000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "currentLTV": 57.65,
-    "ltvAtPurchase": 70.59,
-    "equity": {
-      "amount": 180000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    }
+    "loanToValueRatio": 57.65
   },
-  "remortgageOptions": {
+  "interestTerms": {
+    "interestRate": 4.25,
+    "annualPercentageRate": 4.35,
+    "rateType": "Fixed",
+    "baseRateIndex": null,
+    "reversionRate": 7.99,
+    "hasCollarRate": false,
+    "collarRate": null,
+    "initialRatePeriodEndsOn": "2028-06-30",
+    "initialTermYears": 5,
+    "initialTermMonths": 0,
+    "remainingTermYears": 17,
+    "remainingTermMonths": 4
+  },
+  "repaymentStructure": {
+    "repaymentMethod": "CapitalAndInterest",
+    "capitalRepaymentAmount": {
+      "amount": 300000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "capitalTermYears": 25,
+    "capitalTermMonths": 0,
+    "interestOnlyAmount": null,
+    "interestOnlyTermYears": null,
+    "interestOnlyTermMonths": null,
+    "interestOnlyRepaymentVehicle": null,
+    "lumpSumAdvance": null,
+    "monthlyIncomeDrawdown": null,
+    "regularAnnualOverpayment": null,
+    "currentRepaymentVehicles": []
+  },
+  "feesAndCharges": {
+    "lenderFees": {
+      "amount": 999.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "ongoingContributions": null
+  },
+  "keyDates": {
+    "startDate": "2018-06-15",
+    "endDate": "2043-06-15",
+    "completionDate": "2018-06-15",
+    "exchangeDate": "2018-06-08",
+    "nextPaymentDueDate": "2026-03-15",
+    "nextReviewDate": "2028-01-01",
+    "balanceAsOfDate": "2026-02-18",
+    "applicationSubmittedDate": "2018-05-10",
+    "valuationInstructedDate": "2018-05-12",
+    "valuationDate": "2018-05-18",
+    "valuationReceivedDate": "2018-05-22",
+    "offerIssuedDate": "2018-05-28",
+    "targetCompletionDate": "2018-06-15",
+    "schemeEndDate": null
+  },
+  "redemptionTerms": {
+    "hasEarlyRepaymentCharge": true,
+    "earlyRepaymentTerms": "4% of outstanding balance until 2028-06-30",
+    "earlyRepaymentChargeEndsOn": "2028-06-30",
     "earlyRepaymentCharge": {
       "amount": 9800.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "ercExpiryDate": "2028-06-30",
-    "portability": true
-  }
+    "earlyRepaymentChargeSecondCharge": null,
+    "netProceedsOnRedemption": {
+      "amount": 235200.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    }
+  },
+  "specialFeatures": {
+    "isFirstTimeBuyer": false,
+    "isCurrentResidence": true,
+    "hasGuarantor": false,
+    "isPortable": true,
+    "isPropertySold": false,
+    "isRedeemed": false,
+    "hasDischargeOnCompletion": false,
+    "hasConsentToLet": false,
+    "consentToLetExpiresOn": null,
+    "hasDebtConsolidation": false,
+    "incomeVerificationStatus": "Employed",
+    "isIncomeEvidenced": true
+  },
+  "propertyDetail": {
+    "id": "asset-prop-001",
+    "href": "/api/v1/factfinds/ff-456/property-details/asset-prop-001"
+  },
+  "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before."
 }
 ```
 
@@ -10054,59 +10092,39 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-mort-005",
-  "href": "/api/v1/factfinds/ff-456/arrangements/mortgages/arr-mort-005",
-  "arrangementType": "MORTGAGE",
-  "arrangementCategory": "MORTGAGE",
-  "mortgageType": {
-    "code": "RESIDENTIAL",
-    "display": "Residential Mortgage"
+  "id": "arr-secl-005",
+  "href": "/api/v1/factfinds/ff-456/arrangements/secured-lending/arr-secl-005",
+  "factfindRef": {
+    "id": "ff-456",
+    "href": "/api/v1/factfinds/ff-456"
   },
-  "provider": {
-    "name": "Nationwide Building Society",
-    "reference": "NBS-UK-001",
-    "contactDetails": {
-      "phone": "0800 302 010",
-      "email": "mortgages@nationwide.co.uk"
-    }
-  },
+  "arrangementCategory": "SECURED_LENDING",
   "accountNumber": "NBS-MORT-123456",
-  "startDate": "2018-06-15",
-  "maturityDate": "2043-06-15",
-  "currentValue": {
-    "amount": -245000.00,
-    "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
-  },
-  "valuationDate": "2026-02-18",
+  "policyNumber": null,
+  "illustrationReference": null,
   "owners": [
     {
-      "clientRef": {
-        "id": "client-123",
-        "fullName": "John Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-123"
-      },
+      "id": "client-123",
+      "href": "/api/v1/factfinds/ff-456/clients/client-123",
+      "fullName": "John Smith",
       "ownershipPercentage": 50.0
     },
     {
-      "clientRef": {
-        "id": "client-124",
-        "fullName": "Jane Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-124"
-      },
+      "id": "client-124",
+      "href": "/api/v1/factfinds/ff-456/clients/client-124",
+      "fullName": "Jane Smith",
       "ownershipPercentage": 50.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
-  "propertyRef": {
-    "id": "asset-prop-001",
-    "address": "123 High Street, London",
-    "href": "/api/v1/factfinds/ff-456/assets/property/asset-prop-001"
-  },
-  "loanDetails": {
-    "originalAmount": {
+  "sellingAdviser": null,
+  "agencyStatus": null,
+  "agencyStatusDate": null,
+  "productType": "FixedRateMortgage",
+  "lenderName": "Nationwide Building Society",
+  "productName": "5 Year Fixed Rate Mortgage",
+  "description": "Main residence mortgage",
+  "loanAmounts": {
+    "originalLoanAmount": {
       "amount": 300000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
@@ -10114,79 +10132,124 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 245000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "balanceDate": "2026-02-18",
-    "principalRepaid": {
-      "amount": 55000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    }
-  },
-  "repaymentDetails": {
-    "repaymentType": {
-      "code": "REPAYMENT",
-      "display": "Capital & Interest Repayment"
-    },
-    "monthlyPayment": {
-      "amount": 1450.00,
+    "depositAmount": {
+      "amount": 100000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "annualPayment": {
-      "amount": 17400.00,
+    "equityReleased": null,
+    "originalPropertyValuation": {
+      "amount": 400000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "termRemaining": {
-      "years": 17,
-      "months": 4
-    },
-    "projectedPayoffDate": "2043-06-15"
-  },
-  "interestDetails": {
-    "currentRate": 4.25,
-    "rateType": {
-      "code": "FIXED",
-      "display": "Fixed Rate"
-    },
-    "fixedUntil": "2028-06-30",
-    "monthsRemainingOnDeal": 28,
-    "revertRate": 7.99,
-    "initialRate": 2.89,
-    "productType": "5 Year Fixed Rate"
-  },
-  "ltvAnalysis": {
-    "propertyValue": {
+    "currentPropertyValuation": {
       "amount": 425000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "currentLTV": 57.65,
-    "ltvAtPurchase": 70.59,
-    "equity": {
-      "amount": 180000.00,
+    "loanToValueRatio": 57.65
+  },
+  "interestTerms": {
+    "interestRate": 4.25,
+    "annualPercentageRate": 4.35,
+    "rateType": "Fixed",
+    "baseRateIndex": null,
+    "reversionRate": 7.99,
+    "hasCollarRate": false,
+    "collarRate": null,
+    "initialRatePeriodEndsOn": "2028-06-30",
+    "initialTermYears": 5,
+    "initialTermMonths": 0,
+    "remainingTermYears": 17,
+    "remainingTermMonths": 4
+  },
+  "repaymentStructure": {
+    "repaymentMethod": "CapitalAndInterest",
+    "capitalRepaymentAmount": {
+      "amount": 300000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "equityPercentage": 42.35
+    "capitalTermYears": 25,
+    "capitalTermMonths": 0,
+    "interestOnlyAmount": null,
+    "interestOnlyTermYears": null,
+    "interestOnlyTermMonths": null,
+    "interestOnlyRepaymentVehicle": null,
+    "lumpSumAdvance": null,
+    "monthlyIncomeDrawdown": null,
+    "regularAnnualOverpayment": null,
+    "currentRepaymentVehicles": []
   },
-  "affordabilityCheck": {
-    "debtToIncomeRatio": 2.45,
-    "stressTested": true,
-    "stressTestRate": 7.25,
-    "passedStressTest": true
+  "feesAndCharges": {
+    "lenderFees": {
+      "amount": 999.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "ongoingContributions": null
   },
-  "remortgageOptions": {
+  "keyDates": {
+    "startDate": "2018-06-15",
+    "endDate": "2043-06-15",
+    "completionDate": "2018-06-15",
+    "exchangeDate": "2018-06-08",
+    "nextPaymentDueDate": "2026-03-15",
+    "nextReviewDate": "2028-01-01",
+    "balanceAsOfDate": "2026-02-18",
+    "applicationSubmittedDate": "2018-05-10",
+    "valuationInstructedDate": "2018-05-12",
+    "valuationDate": "2018-05-18",
+    "valuationReceivedDate": "2018-05-22",
+    "offerIssuedDate": "2018-05-28",
+    "targetCompletionDate": "2018-06-15",
+    "schemeEndDate": null
+  },
+  "redemptionTerms": {
+    "hasEarlyRepaymentCharge": true,
+    "earlyRepaymentTerms": "4% of outstanding balance until 2028-06-30",
+    "earlyRepaymentChargeEndsOn": "2028-06-30",
     "earlyRepaymentCharge": {
       "amount": 9800.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "ercPercentage": 4.0,
-    "ercExpiryDate": "2028-06-30",
-    "portability": true,
-    "remortgageRecommended": false
+    "earlyRepaymentChargeSecondCharge": null,
+    "netProceedsOnRedemption": {
+      "amount": 235200.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    }
   },
-  "concurrencyId": "i1f7g5e4-6j89-8i2f-3h7g-5e6f7g8h9i0j",
+  "specialFeatures": {
+    "isFirstTimeBuyer": false,
+    "isCurrentResidence": true,
+    "hasGuarantor": false,
+    "isPortable": true,
+    "isPropertySold": false,
+    "isRedeemed": false,
+    "hasDischargeOnCompletion": false,
+    "hasConsentToLet": false,
+    "consentToLetExpiresOn": null,
+    "hasDebtConsolidation": false,
+    "incomeVerificationStatus": "Employed",
+    "isIncomeEvidenced": true
+  },
+  "sharedOwnershipDetails": null,
+  "offsetFeatures": null,
+  "asset": null,
+  "property": {
+    "id": "asset-prop-001",
+    "href": "/api/v1/factfinds/ff-456/properties/asset-prop-001",
+    "address": "123 High Street, London"
+  },
+  "propertyDetail": {
+    "id": "asset-prop-001",
+    "href": "/api/v1/factfinds/ff-456/property-details/asset-prop-001"
+  },
+  "linkedArrangements": [],
+  "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before.",
   "createdAt": "2026-02-18T10:50:00Z",
   "updatedAt": "2026-02-18T10:50:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/mortgages/arr-mort-005" },
+    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/secured-lending/arr-secl-005" },
     "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "property": { "href": "/api/v1/factfinds/ff-456/assets/property/asset-prop-001" },
+    "property": { "href": "/api/v1/factfinds/ff-456/properties/asset-prop-001" },
+    "propertyDetail": { "href": "/api/v1/factfinds/ff-456/property-details/asset-prop-001" },
     "owners": [
       { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
       { "href": "/api/v1/factfinds/ff-456/clients/client-124" }
@@ -10196,9 +10259,11 @@ The Arrangements API provides comprehensive management of client financial produ
 ```
 
 **Validation Rules:**
-- `arrangementType.code` - Required, must be "MORTGAGE"
-- `mortgageType` - Required, one of: RESIDENTIAL, BUY_TO_LET, SECOND_CHARGE
-- `propertyRef` - Required, must link to existing property asset
+- `arrangementCategory` - Required, must be "SECURED_LENDING"
+- `productType` - Required, see Product Type Codes (FixedRateMortgage, LifetimeMortgage, etc.)
+- `propertyDetail` - Required, must link to existing property detail record
+- `owners` - Required, at least one owner with sum of ownershipPercentage = 100
+- Product-specific validation applies (see Section 13.41 Validation Rules)
 - `currentBalance` - Required, must be positive
 - `monthlyPayment` - Required, must be positive
 - `currentRate` - Required, must be > 0
@@ -24541,139 +24606,614 @@ The `IdentityVerification` contract represents identity verification checks and 
 
 ---
 
-### 13.41 Arrangement - Mortgage Contract
+### 13.41 Arrangement - Secured Lending Contract
 
-The `MortgageArrangement` contract represents a mortgage or secured lending product.
+The `SecuredLendingArrangement` contract represents secured lending products including traditional mortgages and equity release products (lifetime mortgages, home reversion plans). This unified contract uses a product type discriminator to handle both mortgage and equity release scenarios with industry-standard field grouping.
 
-**Reference Type:** MortgageArrangement is a reference type with identity (has `id` field).
+**Reference Type:** SecuredLendingArrangement is a reference type with identity (has `id` field).
 
 **Key Features:**
-- Mortgage product details
-- Lender and intermediary information
-- Rate type and payment structure
-- Overpayment and redemption terms
-- Links to liability and property
+- Unified contract for mortgages and equity release products
+- Product type discriminator (FixedRateMortgage, LifetimeMortgage, etc.)
+- Industry-standard 14 field group structure
+- Owner array supporting multiple ownership percentages
+- Comprehensive interest rate and repayment structures
+- Support for shared ownership and offset features
 
-#### Complete Mortgage Arrangement Contract
+#### Complete Secured Lending Arrangement Contract
 
 ```json
 {
-  "id": 12001,
-  "href": "/api/v1/factfinds/679/arrangements/mortgages/12001",
+  "id": 5001,
+  "href": "/api/v1/factfinds/679/arrangements/secured-lending/5001",
   "factfindRef": {
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "arrangementCategory": "MORTGAGE",
-  "productName": "First Direct 5 Year Fixed Rate Mortgage",
-  "providerName": "First Direct",
-  "providerRef": {
-    "id": "provider-123",
-    "href": "/api/v1/providers/provider-123"
-  },
-  "liabilityRef": {
-    "id": 5678,
-    "href": "/api/v1/factfinds/679/clients/346/liabilities/5678"
-  },
-  "propertyRef": {
-    "id": 1111,
-    "href": "/api/v1/factfinds/679/clients/346/property-details/1111"
-  },
-  "accountNumber": "12345678",
-  "sortCode": "40-47-84",
-  "mortgageAmount": {
-    "amount": 350000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
+  "arrangementCategory": "SECURED_LENDING",
+
+  "accountNumber": "MTG-001234",
+  "policyNumber": "POL-98765",
+  "illustrationReference": "IOB-REF-123456",
+
+  "owners": [
+    {
+      "id": 456,
+      "href": "/api/v1/factfinds/679/clients/456",
+      "ownershipPercentage": 100.00
     }
+  ],
+  "sellingAdviser": {
+    "id": 123,
+    "href": "/api/v1/advisers/123",
+    "name": "John Adviser",
+    "firmName": "ABC Mortgage Services"
   },
-  "outstandingBalance": {
-    "amount": 325000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "startDate": "2023-01-15",
-  "maturityDate": "2048-01-15",
-  "termRemaining": {
-    "years": 21,
-    "months": 11
-  },
-  "interestRate": 4.49,
-  "rateType": {
-    "code": "FIXED",
-    "display": "Fixed Rate"
-  },
-  "fixedRateEndDate": "2028-01-15",
-  "repaymentType": {
-    "code": "CAPITAL_AND_INTEREST",
-    "display": "Capital and Interest"
-  },
-  "monthlyPayment": {
-    "amount": 1945.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "overpaymentAllowance": {
-    "allowedPercentage": 10,
-    "allowedAmount": {
-      "amount": 35000.00,
+  "agencyStatus": "NotUnderAgency",
+  "agencyStatusDate": "2023-02-06",
+
+  "productType": "FixedRateMortgage",
+  "lenderName": "National Bank plc",
+  "productName": "Fixed Rate Mortgage Premium",
+  "description": "Main residence mortgage - 25 year fixed",
+
+  "loanAmounts": {
+    "originalLoanAmount": {
+      "amount": 250000.00,
       "currency": {
         "code": "GBP",
         "symbol": "£"
       }
     },
+    "currentBalance": {
+      "amount": 235000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "depositAmount": {
+      "amount": 132000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "equityReleased": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "originalPropertyValuation": {
+      "amount": 382000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentPropertyValuation": {
+      "amount": 385000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "loanToValueRatio": 65.50
+  },
+
+  "interestTerms": {
+    "interestRate": 3.50,
+    "annualPercentageRate": 3.75,
+    "rateType": "Fixed",
+    "baseRateIndex": "SONIA",
+    "reversionRate": 4.25,
+    "hasCollarRate": false,
+    "collarRate": null,
+    "initialRatePeriodEndsOn": "2028-02-06",
+    "initialTermYears": 5,
+    "initialTermMonths": 0,
+    "remainingTermYears": 23,
+    "remainingTermMonths": 6
+  },
+
+  "repaymentStructure": {
+    "repaymentMethod": "CapitalAndInterest",
+    "capitalRepaymentAmount": {
+      "amount": 200000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "capitalTermYears": 25,
+    "capitalTermMonths": 0,
+    "interestOnlyAmount": {
+      "amount": 50000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "interestOnlyTermYears": 10,
+    "interestOnlyTermMonths": 0,
+    "interestOnlyRepaymentVehicle": "ISA",
+    "lumpSumAdvance": null,
+    "monthlyIncomeDrawdown": null,
+    "regularAnnualOverpayment": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentRepaymentVehicles": ["ISA", "Pension"]
+  },
+
+  "feesAndCharges": {
+    "lenderFees": {
+      "amount": 995.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "ongoingContributions": null
+  },
+
+  "keyDates": {
+    "startDate": "2023-02-06",
+    "endDate": "2048-02-06",
+    "completionDate": "2023-02-06",
+    "exchangeDate": "2023-01-27",
+    "nextPaymentDueDate": "2026-03-06",
+    "nextReviewDate": "2028-02-01",
+    "balanceAsOfDate": "2026-02-10",
+    "applicationSubmittedDate": "2023-01-20",
+    "valuationInstructedDate": "2023-01-15",
+    "valuationDate": "2023-01-22",
+    "valuationReceivedDate": "2023-01-28",
+    "offerIssuedDate": "2023-01-30",
+    "targetCompletionDate": "2023-02-06",
+    "schemeEndDate": null
+  },
+
+  "redemptionTerms": {
+    "hasEarlyRepaymentCharge": true,
+    "earlyRepaymentTerms": "No repayment for first 2 years, 3% penalty for years 2-5",
+    "earlyRepaymentChargeEndsOn": "2028-02-06",
     "earlyRepaymentCharge": {
-      "applicable": true,
-      "percentage": 3,
-      "expiryDate": "2028-01-15"
+      "amount": 7500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "earlyRepaymentChargeSecondCharge": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "netProceedsOnRedemption": {
+      "amount": 227500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
     }
   },
-  "loanToValue": 70.0,
-  "propertyValue": {
-    "amount": 464285.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
+
+  "specialFeatures": {
+    "isFirstTimeBuyer": false,
+    "isCurrentResidence": true,
+    "hasGuarantor": false,
+    "isPortable": true,
+    "isPropertySold": false,
+    "isRedeemed": false,
+    "hasDischargeOnCompletion": true,
+    "hasConsentToLet": false,
+    "consentToLetExpiresOn": null,
+    "hasDebtConsolidation": false,
+    "incomeVerificationStatus": "Employed",
+    "isIncomeEvidenced": true
+  },
+
+  "sharedOwnershipDetails": {
+    "sharedEquitySchemeType": null,
+    "sharedEquitySchemeProvider": null,
+    "sharedEquityRepaymentStartsOn": null,
+    "sharedEquityLoanPercentage": null,
+    "sharedEquityLoanAmount": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "sharedOwnershipPercentageOwned": null,
+    "sharedOwnershipHousingAssociation": null,
+    "sharedOwnershipMonthlyRent": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
     }
   },
-  "purpose": {
-    "code": "RESIDENTIAL_PURCHASE",
-    "display": "Residential Purchase"
+
+  "offsetFeatures": {
+    "offsetLinkedAccountNumber": "OFFSET-123456",
+    "offsetOptions": [
+      "AccountOffset",
+      "SavingsOffset",
+      "CurrentAccountOffset"
+    ]
   },
-  "isInterestOnly": false,
-  "hasAssociatedProtection": true,
-  "protectionRefs": [
+
+  "asset": {
+    "id": 67890,
+    "href": "/api/v1/factfinds/679/assets/67890"
+  },
+  "property": {
+    "id": 12345,
+    "href": "/api/v1/factfinds/679/properties/12345"
+  },
+  "propertyDetail": {
+    "id": 5,
+    "href": "/api/v1/factfinds/679/property-details/5"
+  },
+  "linkedArrangements": [
     {
-      "id": 20001,
-      "href": "/api/v1/factfinds/679/arrangements/protection/20001"
+      "id": 99999,
+      "href": "/api/v1/factfinds/679/arrangements/99999",
+      "arrangementType": "Endowment"
     }
   ],
-  "adviserDetails": {
-    "adviserName": "John Adviser",
-    "firmName": "ABC Mortgage Services",
-    "adviceDate": "2022-12-10"
-  },
-  "notes": "5-year fixed rate mortgage. Fixed rate ends January 2028. Review options 6 months before.",
-  "createdAt": "2023-01-20T10:00:00Z",
-  "updatedAt": "2026-02-15T09:00:00Z"
+
+  "notes": "Main residence mortgage. Fixed rate ends February 2028. Review options 6 months before end of fixed period.",
+  "createdAt": "2023-01-15T10:00:00Z",
+  "updatedAt": "2026-02-10T14:30:00Z"
 }
 ```
 
-#### Mortgage Purpose Codes
+#### Field Definitions
 
-| Code | Display Name |
+The SecuredLending contract is organized into 14 logical field groups for clarity and industry-standard alignment.
+
+##### 1. Core Identification
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | Required | Unique identifier for the secured lending arrangement |
+| `href` | string (URI) | Required | Self-referencing URI for this resource |
+| `accountNumber` | string | Optional | Lender's account reference number |
+| `policyNumber` | string | Optional | Policy or plan number |
+| `illustrationReference` | string | Optional | Illustration of Benefits (IOB) reference number |
+
+##### 2. Ownership & Advice
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `owners[]` | array of objects | Required | Array of client owners with ownership percentages |
+| `owners[].id` | integer | Required | Client identifier |
+| `owners[].href` | string (URI) | Required | URI to client resource |
+| `owners[].ownershipPercentage` | decimal | Required | Percentage ownership (0-100, defaults to 100 for single owner) |
+| `sellingAdviser` | object | Optional | Adviser who arranged this product |
+| `sellingAdviser.id` | integer | Required | Adviser identifier |
+| `sellingAdviser.href` | string (URI) | Required | URI to adviser resource |
+| `sellingAdviser.name` | string | Optional | Adviser name |
+| `sellingAdviser.firmName` | string | Optional | Adviser firm name |
+| `agencyStatus` | string | Optional | Agency status (NotUnderAgency, UnderAgency, etc.) |
+| `agencyStatusDate` | string (date) | Optional | Date agency status was set |
+
+##### 3. Product Classification
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `productType` | string (enum) | Required | **Product type discriminator** - determines required fields (see Product Type Codes) |
+| `lenderName` | string | Required | Name of the lending institution |
+| `productName` | string | Required | Specific product name from lender |
+| `description` | string | Optional | Additional product description or notes |
+
+##### 4. Loan Amounts
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `loanAmounts` | object | Required | Container for all loan amount fields |
+| `loanAmounts.originalLoanAmount` | MoneyValue | Required | Initial loan amount at origination |
+| `loanAmounts.currentBalance` | MoneyValue | Required | Current outstanding balance |
+| `loanAmounts.depositAmount` | MoneyValue | Conditional | Deposit amount (required for traditional mortgages, N/A for equity release) |
+| `loanAmounts.equityReleased` | MoneyValue | Conditional | Amount of equity released (N/A for traditional mortgages, required for equity release) |
+| `loanAmounts.originalPropertyValuation` | MoneyValue | Required | Property valuation at origination |
+| `loanAmounts.currentPropertyValuation` | MoneyValue | Optional | Current property valuation |
+| `loanAmounts.loanToValueRatio` | decimal | Required | LTV percentage (calculated: currentBalance / currentPropertyValuation * 100) |
+
+##### 5. Interest Terms
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `interestTerms` | object | Required | Container for all interest-related fields |
+| `interestTerms.interestRate` | decimal | Required | Current interest rate percentage |
+| `interestTerms.annualPercentageRate` | decimal | Optional | APR including all costs (regulatory disclosure) |
+| `interestTerms.rateType` | string (enum) | Required | Fixed, Variable, Tracker, Discount, Capped, Offset |
+| `interestTerms.baseRateIndex` | string | Conditional | Base rate index (e.g., "SONIA") - required for Tracker products |
+| `interestTerms.reversionRate` | decimal | Conditional | Rate after initial period ends (required for traditional mortgages with initial deal) |
+| `interestTerms.hasCollarRate` | boolean | Optional | Whether a collar (minimum) rate applies |
+| `interestTerms.collarRate` | decimal | Optional | Minimum interest rate (if hasCollarRate = true) |
+| `interestTerms.initialRatePeriodEndsOn` | string (date) | Conditional | Date initial rate period ends (required for Fixed, Discount products) |
+| `interestTerms.initialTermYears` | integer | Optional | Years in initial rate period |
+| `interestTerms.initialTermMonths` | integer | Optional | Additional months in initial rate period |
+| `interestTerms.remainingTermYears` | integer | Conditional | Years remaining on mortgage (required for traditional mortgages) |
+| `interestTerms.remainingTermMonths` | integer | Conditional | Additional months remaining (required for traditional mortgages) |
+
+##### 6. Repayment Structure
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `repaymentStructure` | object | Required | Container for repayment-related fields |
+| `repaymentStructure.repaymentMethod` | string (enum) | Required | Method of repayment (see Repayment Method Codes) |
+| `repaymentStructure.capitalRepaymentAmount` | MoneyValue | Conditional | Amount on capital repayment (required if CapitalAndInterest or PartAndPart) |
+| `repaymentStructure.capitalTermYears` | integer | Conditional | Years for capital repayment portion |
+| `repaymentStructure.capitalTermMonths` | integer | Conditional | Additional months for capital repayment |
+| `repaymentStructure.interestOnlyAmount` | MoneyValue | Conditional | Amount on interest-only (required if InterestOnly or PartAndPart) |
+| `repaymentStructure.interestOnlyTermYears` | integer | Conditional | Years for interest-only portion |
+| `repaymentStructure.interestOnlyTermMonths` | integer | Conditional | Additional months for interest-only |
+| `repaymentStructure.interestOnlyRepaymentVehicle` | string | Conditional | Planned repayment vehicle (e.g., "ISA", "Pension") - required if InterestOnly |
+| `repaymentStructure.lumpSumAdvance` | MoneyValue | Conditional | Initial lump sum drawdown (equity release products) |
+| `repaymentStructure.monthlyIncomeDrawdown` | MoneyValue | Conditional | Regular monthly drawdown amount (equity release products) |
+| `repaymentStructure.regularAnnualOverpayment` | MoneyValue | Optional | Regular annual overpayment amount |
+| `repaymentStructure.currentRepaymentVehicles` | array of strings | Optional | Current repayment vehicles in place (e.g., ["ISA", "Pension"]) |
+
+##### 7. Fees & Contributions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `feesAndCharges` | object | Optional | Container for fee-related fields |
+| `feesAndCharges.lenderFees` | MoneyValue | Optional | Arrangement/booking fees charged by lender |
+| `feesAndCharges.ongoingContributions` | object | Optional | Ongoing contributions structure (primarily for equity release) |
+| `feesAndCharges.ongoingContributions.type` | string | Conditional | Type of contribution (Regular, Adhoc) |
+| `feesAndCharges.ongoingContributions.amount` | MoneyValue | Conditional | Contribution amount |
+| `feesAndCharges.ongoingContributions.frequency` | string | Conditional | Frequency (Monthly, Quarterly, Annually) |
+| `feesAndCharges.ongoingContributions.contributorType` | string | Conditional | Who makes contribution (Client, ThirdParty) |
+| `feesAndCharges.ongoingContributions.startsOn` | string (date) | Conditional | Contribution start date |
+| `feesAndCharges.ongoingContributions.stopsOn` | string (date) | Optional | Contribution end date |
+| `feesAndCharges.ongoingContributions.isInitialFee` | boolean | Optional | Whether this is an initial fee |
+| `feesAndCharges.ongoingContributions.isOngoingFee` | boolean | Optional | Whether this is an ongoing fee |
+| `feesAndCharges.ongoingContributions.notes` | string | Optional | Additional notes |
+
+##### 8. Key Dates
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `keyDates` | object | Required | Container for all date fields |
+| `keyDates.startDate` | string (date) | Required | Start date of the arrangement |
+| `keyDates.endDate` | string (date) | Conditional | End/maturity date (required for traditional mortgages, null for equity release) |
+| `keyDates.completionDate` | string (date) | Optional | Date the property purchase/remortgage completed |
+| `keyDates.exchangeDate` | string (date) | Optional | Date contracts were exchanged |
+| `keyDates.nextPaymentDueDate` | string (date) | Optional | Next scheduled payment date |
+| `keyDates.nextReviewDate` | string (date) | Optional | Scheduled review date |
+| `keyDates.balanceAsOfDate` | string (date) | Optional | Date of the current balance statement |
+| `keyDates.applicationSubmittedDate` | string (date) | Optional | Date application was submitted to lender |
+| `keyDates.valuationInstructedDate` | string (date) | Optional | Date valuation was instructed |
+| `keyDates.valuationDate` | string (date) | Optional | Date property was valued |
+| `keyDates.valuationReceivedDate` | string (date) | Optional | Date valuation report was received |
+| `keyDates.offerIssuedDate` | string (date) | Optional | Date lender issued formal offer |
+| `keyDates.targetCompletionDate` | string (date) | Optional | Target/planned completion date |
+| `keyDates.schemeEndDate` | string (date) | Optional | Scheme end date (primarily for equity release products) |
+
+##### 9. Redemption Terms
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `redemptionTerms` | object | Optional | Container for early repayment/redemption fields |
+| `redemptionTerms.hasEarlyRepaymentCharge` | boolean | Required | Whether early repayment charges apply |
+| `redemptionTerms.earlyRepaymentTerms` | string | Optional | Description of early repayment charge terms |
+| `redemptionTerms.earlyRepaymentChargeEndsOn` | string (date) | Conditional | Date when early repayment charges end |
+| `redemptionTerms.earlyRepaymentCharge` | MoneyValue | Optional | Calculated early repayment charge amount |
+| `redemptionTerms.earlyRepaymentChargeSecondCharge` | MoneyValue | Optional | ERC amount for second charge (if applicable) |
+| `redemptionTerms.netProceedsOnRedemption` | MoneyValue | Optional | Net proceeds after redemption costs |
+
+##### 10. Special Features
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `specialFeatures` | object | Optional | Container for special feature flags |
+| `specialFeatures.isFirstTimeBuyer` | boolean | Optional | Whether borrower is first-time buyer |
+| `specialFeatures.isCurrentResidence` | boolean | Optional | Whether property is current main residence |
+| `specialFeatures.hasGuarantor` | boolean | Optional | Whether arrangement has a guarantor |
+| `specialFeatures.isPortable` | boolean | Optional | Whether mortgage is portable to new property |
+| `specialFeatures.isPropertySold` | boolean | Optional | Whether the secured property has been sold |
+| `specialFeatures.isRedeemed` | boolean | Optional | Whether the loan has been fully redeemed |
+| `specialFeatures.hasDischargeOnCompletion` | boolean | Optional | Whether arrangement will discharge on completion (remortgage scenario) |
+| `specialFeatures.hasConsentToLet` | boolean | Optional | Whether consent to let has been granted |
+| `specialFeatures.consentToLetExpiresOn` | string (date) | Optional | Expiry date of consent to let |
+| `specialFeatures.hasDebtConsolidation` | boolean | Optional | Whether loan includes debt consolidation |
+| `specialFeatures.incomeVerificationStatus` | string (enum) | Optional | Income verification status (see Income Verification Status Codes) |
+| `specialFeatures.isIncomeEvidenced` | boolean | Optional | Whether income has been documented/evidenced |
+
+##### 11. Shared Ownership Details
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `sharedOwnershipDetails` | object | Optional | Container for shared ownership/equity fields (null if not applicable) |
+| `sharedOwnershipDetails.sharedEquitySchemeType` | string (enum) | Conditional | Type of shared equity scheme (see Shared Equity Scheme Type Codes) |
+| `sharedOwnershipDetails.sharedEquitySchemeProvider` | string | Conditional | Provider of shared equity scheme (e.g., government, housing association) |
+| `sharedOwnershipDetails.sharedEquityRepaymentStartsOn` | string (date) | Optional | Date when shared equity loan repayment begins |
+| `sharedOwnershipDetails.sharedEquityLoanPercentage` | decimal | Optional | Percentage of property value held as shared equity |
+| `sharedOwnershipDetails.sharedEquityLoanAmount` | MoneyValue | Optional | Monetary amount of shared equity loan |
+| `sharedOwnershipDetails.sharedOwnershipPercentageOwned` | decimal | Optional | Percentage of property owned (for shared ownership, typically 25-75%) |
+| `sharedOwnershipDetails.sharedOwnershipHousingAssociation` | string | Conditional | Name of housing association (required if sharedOwnershipPercentageOwned is set) |
+| `sharedOwnershipDetails.sharedOwnershipMonthlyRent` | MoneyValue | Conditional | Monthly rent on unowned portion (required if sharedOwnershipPercentageOwned is set) |
+
+##### 12. Offset Features
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `offsetFeatures` | object | Optional | Container for offset mortgage features (null if not applicable) |
+| `offsetFeatures.offsetLinkedAccountNumber` | string | Optional | Account number of linked offset account |
+| `offsetFeatures.offsetOptions` | array of strings | Optional | Available offset options (e.g., ["AccountOffset", "SavingsOffset"]) |
+
+##### 13. Related Entities
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `asset` | object | Optional | HATEOAS link to related asset record |
+| `asset.id` | integer | Required | Asset identifier |
+| `asset.href` | string (URI) | Required | URI to asset resource |
+| `property` | object | Optional | HATEOAS link to related property record |
+| `property.id` | integer | Required | Property identifier |
+| `property.href` | string (URI) | Required | URI to property resource |
+| `propertyDetail` | object | Optional | HATEOAS link to property details record |
+| `propertyDetail.id` | integer | Required | Property detail identifier |
+| `propertyDetail.href` | string (URI) | Required | URI to property detail resource |
+| `linkedArrangements[]` | array of objects | Optional | Linked arrangements (e.g., endowments, protection products) |
+| `linkedArrangements[].id` | integer | Required | Arrangement identifier |
+| `linkedArrangements[].href` | string (URI) | Required | URI to arrangement resource |
+| `linkedArrangements[].arrangementType` | string | Optional | Type of linked arrangement |
+
+##### 14. Audit Trail
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `notes` | string | Optional | Free-text notes about the arrangement |
+| `createdAt` | string (ISO 8601) | Required | Timestamp when record was created |
+| `updatedAt` | string (ISO 8601) | Required | Timestamp when record was last updated |
+
+#### Product Type Codes
+
+Traditional Mortgages:
+- `FixedRateMortgage` - Fixed interest rate for set period
+- `VariableRateMortgage` - Rate varies with lender's standard variable rate
+- `TrackerMortgage` - Tracks base rate (e.g., SONIA + margin)
+- `DiscountedMortgage` - Discount off lender's SVR
+- `CappedRateMortgage` - Rate capped at maximum level
+- `OffsetMortgage` - Linked to savings/current account
+
+Equity Release Products:
+- `LifetimeMortgage` - Loan secured on property, repaid on death/care
+- `HomeReversionPlan` - Sell percentage of property for lump sum/income
+- `RetirementInterestOnlyMortgage` - Interest-only for over 55s
+
+Specialized Products:
+- `BuyToLetMortgage` - For rental properties
+- `CommercialMortgage` - For business premises
+- `BridgingLoan` - Short-term finance between purchases
+- `SharedOwnershipMortgage` - Part buy, part rent
+- `SharedEquityMortgage` - Government/housing association co-owns
+
+#### Repayment Method Codes
+
+Traditional Mortgage Methods:
+- `CapitalAndInterest` - Repayment mortgage (capital + interest paid monthly)
+- `InterestOnly` - Only interest paid, capital owed at end of term
+- `PartAndPart` - Split between capital repayment and interest-only portions
+
+Equity Release Methods:
+- `NoRequiredPayment` - Interest rolls up (standard lifetime mortgage)
+- `VoluntaryInterestPayment` - Client can choose to pay interest
+- `LumpSumAdvance` - Single drawdown at outset
+- `MonthlyIncomeDrawdown` - Regular monthly payments to client
+- `ReservedDrawdownFacility` - Facility to draw additional funds over time
+
+#### Rate Type Codes
+
+| Code | Description |
 |------|-------------|
-| `RESIDENTIAL_PURCHASE` | Residential Purchase |
-| `RESIDENTIAL_REMORTGAGE` | Residential Remortgage |
-| `BUY_TO_LET_PURCHASE` | Buy-to-Let Purchase |
-| `BUY_TO_LET_REMORTGAGE` | Buy-to-Let Remortgage |
-| `CAPITAL_RAISING` | Capital Raising |
-| `DEBT_CONSOLIDATION` | Debt Consolidation |
+| `Fixed` | Fixed interest rate for specified period |
+| `Variable` | Variable rate at lender's discretion |
+| `Tracker` | Tracks a base rate (e.g., SONIA) plus fixed margin |
+| `Discount` | Discount off lender's standard variable rate |
+| `Capped` | Variable rate with maximum cap |
+| `Offset` | Interest offset by linked savings/current account balances |
+
+#### Income Verification Status Codes
+
+| Code | Description |
+|------|-------------|
+| `Employed` | Income verified via employment |
+| `SelfEmployed` | Income verified via self-employment records |
+| `Retired` | Income verified via pension/retirement income |
+| `NotVerified` | Income not verified (e.g., self-certification) |
+| `Exempt` | Income verification not required |
+
+#### Shared Equity Scheme Type Codes
+
+| Code | Description |
+|------|-------------|
+| `HelpToBuy` | Government Help to Buy equity loan scheme |
+| `SharedOwnership` | Shared ownership with housing association |
+| `RightToBuy` | Right to Buy scheme |
+| `RightToAcquire` | Right to Acquire scheme |
+| `Other` | Other shared equity scheme |
+
+#### Validation Rules
+
+##### Product-Specific Required Fields
+
+**Traditional Mortgages** (FixedRateMortgage, VariableRateMortgage, TrackerMortgage, etc.):
+- `loanAmounts.depositAmount` - REQUIRED
+- `keyDates.endDate` - REQUIRED (maturity date)
+- `interestTerms.remainingTermYears` - REQUIRED
+- `interestTerms.reversionRate` - REQUIRED if initial rate period applies
+- `loanAmounts.equityReleased` - N/A (should be null or zero)
+
+**Equity Release Products** (LifetimeMortgage, HomeReversionPlan, RetirementInterestOnlyMortgage):
+- `loanAmounts.equityReleased` - REQUIRED
+- `keyDates.endDate` - N/A (should be null, repaid on death/care)
+- `loanAmounts.depositAmount` - N/A (should be null or zero)
+- `interestTerms.remainingTermYears` - N/A (should be null)
+
+##### Repayment Structure Validation
+
+**If repaymentMethod = "PartAndPart":**
+- `repaymentStructure.capitalRepaymentAmount` - REQUIRED (must be > 0)
+- `repaymentStructure.interestOnlyAmount` - REQUIRED (must be > 0)
+- SUM(capitalRepaymentAmount + interestOnlyAmount) SHOULD EQUAL originalLoanAmount
+
+**If repaymentMethod = "InterestOnly":**
+- `repaymentStructure.interestOnlyAmount` - REQUIRED
+- `repaymentStructure.interestOnlyRepaymentVehicle` - REQUIRED
+- `repaymentStructure.currentRepaymentVehicles` - REQUIRED (min 1 vehicle)
+
+**If repaymentMethod = "CapitalAndInterest":**
+- `repaymentStructure.capitalRepaymentAmount` - REQUIRED
+- `repaymentStructure.capitalRepaymentAmount` SHOULD EQUAL originalLoanAmount
+
+##### LTV Calculation Rules
+
+```
+loanToValueRatio = (currentBalance / currentPropertyValuation) × 100
+```
+
+**Regulatory Guidelines:**
+- Lifetime Mortgages: loanToValueRatio typically ≤ 60% (Equity Release Council guidelines)
+- First-Time Buyer Mortgages: depositAmount ≥ (originalPropertyValuation × 0.05) [minimum 5% deposit]
+- Standard Mortgages: loanToValueRatio typically ≤ 95%
+
+##### Shared Ownership Validation
+
+**If sharedOwnershipDetails.sharedOwnershipPercentageOwned is not null:**
+- `sharedOwnershipDetails.sharedOwnershipHousingAssociation` - REQUIRED
+- `sharedOwnershipDetails.sharedOwnershipMonthlyRent` - REQUIRED
+- `sharedOwnershipPercentageOwned` MUST BE BETWEEN 25 AND 75 (typical shared ownership range)
+
+##### Date Sequence Validation
+
+**Application Process Dates:**
+```
+valuationInstructedDate ≤ valuationDate ≤ valuationReceivedDate
+applicationSubmittedDate ≤ offerIssuedDate ≤ exchangeDate ≤ completionDate
+```
+
+**Operational Dates:**
+```
+startDate ≤ balanceAsOfDate ≤ currentDate
+startDate < endDate (if endDate is not null)
+initialRatePeriodEndsOn ≤ earlyRepaymentChargeEndsOn
+```
 
 ---
 
@@ -24956,7 +25496,7 @@ The `ProtectionArrangement` contract represents protection products including Li
   "linkedTo": {
     "mortgageRef": {
       "id": 12001,
-      "href": "/api/v1/factfinds/679/arrangements/mortgages/12001"
+      "href": "/api/v1/factfinds/679/arrangements/secured-lending/12001"
     },
     "liabilityRef": {
       "id": 5678,
@@ -25599,7 +26139,7 @@ Version 2.1 introduces **breaking changes** to all API endpoints. The API has be
 |------|----------|
 | Investments | `GET /api/v1/factfinds/{factfindId}/arrangements/investments` |
 | Pensions | `GET /api/v1/factfinds/{factfindId}/arrangements/pensions` |
-| Mortgages | `GET /api/v1/factfinds/{factfindId}/arrangements/mortgages` |
+| Secured Lending | `GET /api/v1/factfinds/{factfindId}/arrangements/secured-lending` |
 | Protection | `GET /api/v1/factfinds/{factfindId}/arrangements/protection` |
 
 #### Goals & Objectives APIs
