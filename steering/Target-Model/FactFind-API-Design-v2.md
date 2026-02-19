@@ -7849,16 +7849,21 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 - Asset management (property, business, investments, cash, other)
 - Liability tracking (mortgages, loans, credit cards, other debts)
 - Property details with valuations, LTV, rental yield, and CGT calculations
-- Business asset details with valuations
+- Business asset details with valuations and dividend tracking
 - Aggregated views for financial summary and net worth calculations
-- Joint ownership tracking across multiple clients
+- Joint ownership tracking across multiple clients with ownership shares
+- Tax relief and inheritance tax planning fields
 
 **Key Features:**
-- **Embedded Property Details** - Property-specific data nested within property assets
-- **Embedded Business Details** - Business-specific data nested within business assets
-- **Valuation History** - Track multiple valuations over time for properties and businesses
+- **Property Reference** - Property-specific data via propertyRef linking
+- **Business Dividends** - Dividend tracking per owner with withdrawal types and frequency
+- **Valuation Basis** - Record valuation methods (Market Valuation, Comparable Sales, Net Asset Value, etc.)
+- **Tax Planning Fields** - Business Asset Disposal Relief, Inheritance Tax exemptions, RNRB eligibility, Business Relief
 - **Financial Calculations** - Automated LTV, rental yield, CGT, net worth calculations
-- **Joint Ownership** - Assets can be jointly owned by multiple clients within factfind
+- **Joint Ownership** - Assets can be jointly owned by multiple clients with percentage shares
+- **Client Visibility** - Control which assets are visible to clients
+- **Rental Expenses** - Track expenses for rental properties
+- **Holding Status** - Mark assets as holdings for portfolio management
 
 **Aggregate Root:** FactFind (assets and liabilities are factfind-level resources)
 
@@ -7914,9 +7919,10 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 **Description:** Retrieve all assets associated with a client in a factfind. Assets can be owned solely or jointly.
 
 **Query Parameters:**
-- `assetType` - Filter by asset type codes (MAIN_RESIDENCE, CASH, INVESTMENTS, etc.)
+- `assetType` - Filter by asset type codes (PROPERTY, CASH, INVESTMENTS, OWN_BUSINESS, etc.)
 - `ownershipType` - Filter by ownership type (SOLE_CLIENT1, SOLE_CLIENT2, JOINT)
 - `hasIncome` - Filter assets with linked income (true/false)
+- `hasDividends` - Filter assets with dividend income (true/false)
 
 **Response:**
 
@@ -7928,8 +7934,8 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "href": "/api/v1/factfinds/679/clients/346/assets/1234",
       "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
       "assetType": {
-        "code": "MAIN_RESIDENCE",
-        "display": "Main Residence"
+        "code": "PROPERTY",
+        "display": "Property"
       },
       "description": "Primary Residence - 123 Main Street",
       "ownership": {
@@ -7953,20 +7959,81 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
         "currency": { "code": "GBP", "symbol": "£" }
       },
       "valuedOn": "2026-01-15",
+      "valuationBasis": "Comparable Sales",
       "originalValue": {
-        "amount": 350000.00,
+        "amount": 450000.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
-      "purchasedOn": "2020-05-10",
+      "purchasedOn": "2024-05-10",
+      "rentalExpenses": { "amount": 1200.00, "currency": "GBP" },
+      "isVisibleToClient": true,
+      "isBusinessAssetDisposalRelief": false,
+      "isFreeFromInheritanceTax": false,
+      "rnrbEligibility": "Not Eligible",
+      "isBusinessReliefQualifying": false,
+      "isHolding": false,
       "propertyRef": { "id": 1234, "href": "/api/v1/factfinds/679/property-detail/1234" },
-      "arrangementRef": { "id": 5678, "href": "/api/v1/factfinds/679/clients/346/arrangements/5678" },
+      "arrangementRef": { "id": 1234, "href": "/api/v1/factfinds/679/clients/4436/arrangements/1234" },
+      "incomeRef": { "id": 1234, "href": "/api/v1/factfinds/679/clients/4436/income/1234" },
+      "notes": "Rental property - managed by external agent",
       "createdAt": "2026-02-01T10:00:00Z",
       "updatedAt": "2026-02-15T14:30:00Z"
+    },
+    {
+      "id": 1235,
+      "href": "/api/v1/factfinds/679/clients/346/assets/1235",
+      "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
+      "assetType": {
+        "code": "OWN_BUSINESS",
+        "display": "Own Business"
+      },
+      "description": "Smith & Co Limited - Software Consulting",
+      "ownership": {
+        "ownershipType": {
+          "code": "SOLE_CLIENT1",
+          "display": "Sole Client 1"
+        },
+        "owners": [
+          {
+            "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
+            "ownershipShare": 100.0
+          }
+        ]
+      },
+      "dividends": {
+        "owners": [
+          {
+            "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
+            "dividend": { "amount": 5000.00, "currency": "GBP" },
+            "withdrawalType": "Regular",
+            "frequency": "Monthly"
+          }
+        ]
+      },
+      "currentValue": {
+        "amount": 250000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "valuedOn": "2026-01-15",
+      "valuationBasis": "Net Asset Value",
+      "originalValue": {
+        "amount": 100000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "purchasedOn": "2018-03-20",
+      "isVisibleToClient": true,
+      "isBusinessAssetDisposalRelief": true,
+      "isFreeFromInheritanceTax": false,
+      "isBusinessReliefQualifying": true,
+      "isHolding": false,
+      "notes": "Limited company - 100% shareholding",
+      "createdAt": "2026-01-10T09:30:00Z",
+      "updatedAt": "2026-02-01T11:00:00Z"
     }
   ],
-  "totalCount": 1,
+  "totalCount": 2,
   "totalValue": {
-    "amount": 450000.00,
+    "amount": 700000.00,
     "currency": { "code": "GBP", "symbol": "£" }
   }
 }
@@ -7983,8 +8050,8 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 ```json
 {
   "assetType": {
-    "code": "RENTAL_PROPERTY_OTHER_PROPERTY",
-    "display": "Rental Property / Other Property"
+    "code": "PROPERTY",
+    "display": "Property"
   },
   "description": "Buy-to-Let Property - 45 Oak Avenue",
   "ownership": {
@@ -8004,17 +8071,76 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     "currency": { "code": "GBP", "symbol": "£" }
   },
   "valuedOn": "2026-02-01",
+  "valuationBasis": "Market Valuation",
   "originalValue": {
     "amount": 220000.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
   "purchasedOn": "2020-03-15",
+  "rentalExpenses": { "amount": 800.00, "currency": "GBP" },
+  "isVisibleToClient": true,
+  "isBusinessAssetDisposalRelief": false,
+  "isFreeFromInheritanceTax": false,
+  "rnrbEligibility": "Eligible",
+  "isBusinessReliefQualifying": false,
+  "isHolding": false,
   "propertyRef": { "id": 5001 },
-  "incomeRef": { "id": 3456 }
+  "incomeRef": { "id": 3456 },
+  "notes": "Rental property generating monthly income"
 }
 ```
 
 **Response:** 201 Created with complete asset entity including server-generated fields (`id`, `href`, `factfindRef`, `createdAt`, `updatedAt`).
+
+**Example Response:**
+
+```json
+{
+  "id": 1236,
+  "href": "/api/v1/factfinds/679/clients/346/assets/1236",
+  "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
+  "assetType": {
+    "code": "PROPERTY",
+    "display": "Property"
+  },
+  "description": "Buy-to-Let Property - 45 Oak Avenue",
+  "ownership": {
+    "ownershipType": {
+      "code": "SOLE_CLIENT1",
+      "display": "Sole Client 1"
+    },
+    "owners": [
+      {
+        "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
+        "ownershipShare": 100.0
+      }
+    ]
+  },
+  "currentValue": {
+    "amount": 275000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "valuedOn": "2026-02-01",
+  "valuationBasis": "Market Valuation",
+  "originalValue": {
+    "amount": 220000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "purchasedOn": "2020-03-15",
+  "rentalExpenses": { "amount": 800.00, "currency": "GBP" },
+  "isVisibleToClient": true,
+  "isBusinessAssetDisposalRelief": false,
+  "isFreeFromInheritanceTax": false,
+  "rnrbEligibility": "Eligible",
+  "isBusinessReliefQualifying": false,
+  "isHolding": false,
+  "propertyRef": { "id": 5001, "href": "/api/v1/factfinds/679/property-detail/5001" },
+  "incomeRef": { "id": 3456, "href": "/api/v1/factfinds/679/clients/346/income/3456" },
+  "notes": "Rental property generating monthly income",
+  "createdAt": "2026-02-19T10:15:00Z",
+  "updatedAt": "2026-02-19T10:15:00Z"
+}
+```
 
 #### 9.3.3 Get Property Details
 
@@ -8239,29 +8365,29 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ```json
 {
-  "factfindRef": { "id": "ff-456" },
+  "factfindRef": { "id": 679 },
   "totalAssets": {
-    "amount": 725000.00,
+    "amount": 700000.00,
     "currency": { "code": "GBP" }
   },
   "assetsByType": [
     {
-      "assetType": { "code": "MAIN_RESIDENCE", "display": "Main Residence" },
+      "assetType": { "code": "PROPERTY", "display": "Property" },
       "count": 1,
       "totalValue": {
         "amount": 450000.00,
         "currency": { "code": "GBP" }
       },
-      "percentage": 62.07
+      "percentage": 64.29
     },
     {
-      "assetType": { "code": "RENTAL_PROPERTY_OTHER_PROPERTY", "display": "Rental Property / Other Property" },
+      "assetType": { "code": "OWN_BUSINESS", "display": "Own Business" },
       "count": 1,
       "totalValue": {
-        "amount": 275000.00,
+        "amount": 250000.00,
         "currency": { "code": "GBP" }
       },
-      "percentage": 37.93
+      "percentage": 35.71
     }
   ],
   "assetsByClient": [
@@ -8299,7 +8425,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "factfindRef": { "id": 679 },
   "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
   "totalAssets": {
-    "amount": 475000.00,
+    "amount": 700000.00,
     "currency": { "code": "GBP" }
   },
   "totalLiabilities": {
@@ -8307,17 +8433,17 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     "currency": { "code": "GBP" }
   },
   "netWorth": {
-    "amount": 295000.00,
+    "amount": 520000.00,
     "currency": { "code": "GBP" }
   },
   "assetBreakdown": [
     {
-      "assetType": { "code": "MAIN_RESIDENCE", "display": "Main Residence" },
+      "assetType": { "code": "PROPERTY", "display": "Property" },
       "value": { "amount": 450000.00, "currency": { "code": "GBP" } }
     },
     {
-      "assetType": { "code": "CASH", "display": "Cash" },
-      "value": { "amount": 25000.00, "currency": { "code": "GBP" } }
+      "assetType": { "code": "OWN_BUSINESS", "display": "Own Business" },
+      "value": { "amount": 250000.00, "currency": { "code": "GBP" } }
     }
   ],
   "calculatedAt": "2026-02-18T10:30:00Z"
