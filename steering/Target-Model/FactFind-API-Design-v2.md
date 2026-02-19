@@ -21481,44 +21481,60 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 
 ### 13.18 Liability Contract
 
-The `Liability` contract represents a client's debt obligation (mortgage, loan, credit card, etc.) with repayment details and protection coverage tracking.
+The `Liability` contract represents a client's debt obligation (mortgage, loan, credit card, maintenance/alimony, etc.) with repayment details and protection coverage tracking.
 
 **Reference Type:** Liability is a reference type with identity (has `id` field).
 
 **Key Features:**
-- Supports multiple liability types (Mortgage, Loan, Credit Card, etc.)
-- Interest rate tracking with rate type (Fixed, Variable, Tracker)
-- Repayment method tracking
-- Protection coverage linking
+- Supports 11 liability categories (Main Residence, Credit/Store Cards, Personal Loans, etc.)
+- Interest rate tracking with 9 rate types (Fixed, Variable, Tracker, LIBOR, etc.)
+- Repayment vs. Interest Only tracking
+- 8 protection type options (Life Only, CIC Only, ASU Only, combinations)
 - Property/asset linking for secured loans
-- Responsibility sharing for joint liabilities
+- Early redemption charge tracking
+- Consolidation planning support
+- Guarantor mortgage flag
 
 #### Complete Liability Contract
 
 ```json
 {
   "id": 789,
-  "href": "/api/v1/factfinds/679/liabilities/789",
+  "href": "/api/v1/factfinds/679/clients/346/liabilities/789",
   "factfindRef": {
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "liabilityType": {
-    "code": "MORTGAGE",
-    "display": "Mortgage"
+  "owner": {
+    "clientRef": {
+      "id": "client-123",
+      "href": "/api/v1/factfinds/679/clients/client-123",
+      "name": "Bob Byblik"
+    }
   },
-  "description": "Primary Residence Mortgage",
-  "lenderName": "Nationwide Building Society",
-  "accountNumber": "****1234",
-  "outstandingBalance": {
-    "amount": 180000.00,
+  "liabilityAccountNumber": "MTG-123456",
+  "liabilityCategory": {
+    "code": "MAIN_RESIDENCE",
+    "display": "Main Residence"
+  },
+  "description": "Primary Residence Mortgage - 123 Main Street",
+  "originalLoanAmount": {
+    "amount": 250000.00,
     "currency": {
       "code": "GBP",
       "symbol": "£"
     }
   },
-  "originalLoanAmount": {
-    "amount": 250000.00,
+  "repaymentOrInterestOnly": {
+    "code": "REPAYMENT",
+    "display": "Repayment"
+  },
+  "rateType": {
+    "code": "FIXED",
+    "display": "Fixed"
+  },
+  "amountOutstanding": {
+    "amount": 180000.00,
     "currency": {
       "code": "GBP",
       "symbol": "£"
@@ -21531,63 +21547,40 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
       "symbol": "£"
     }
   },
-  "monthlyPayment": {
+  "interestRate": 3.5,
+  "paymentAmount": {
     "amount": 1200.00,
     "currency": {
       "code": "GBP",
       "symbol": "£"
     }
   },
-  "repaymentType": {
-    "code": "CAPITAL_AND_INTEREST",
-    "display": "Capital and Interest"
-  },
-  "interestRate": 3.5,
-  "interestRateType": {
-    "code": "FIXED",
-    "display": "Fixed Rate"
-  },
-  "fixedRateEndDate": "2027-06-01",
-  "loanTerm": 300,
-  "remainingTerm": 246,
-  "startDate": "2015-06-01",
+  "lender": "Nationwide Building Society",
+  "loanTermYears": 25,
   "endDate": "2040-06-01",
-  "protectionType": {
-    "code": "LIFE_ASSURANCE",
-    "display": "Life Assurance"
+  "protected": {
+    "code": "LIFE_AND_CIC",
+    "display": "Life and CIC"
+  },
+  "earlyRedemptionCharge": {
+    "amount": 5000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "consolidate": false,
+  "isToBeRepaid": false,
+  "howWillLiabilityBeRepaid": null,
+  "isGuarantorMortgage": false,
+  "linkedAssetRef": {
+    "id": 1234,
+    "href": "/api/v1/factfinds/679/clients/346/assets/1234"
   },
   "protectionArrangementRef": {
     "id": 555,
     "href": "/api/v1/factfinds/679/arrangements/555"
   },
-  "linkedAsset": {
-    "assetRef": {
-      "id": 1234,
-      "href": "/api/v1/factfinds/679/clients/346/assets/1234"
-    },
-    "description": "Primary Residence"
-  },
-  "responsibleClients": [
-    {
-      "clientRef": {
-        "id": "client-123",
-        "href": "/api/v1/factfinds/679/clients/client-123"
-      },
-      "responsibilityShare": 50.0
-    },
-    {
-      "clientRef": {
-        "id": "client-124",
-        "href": "/api/v1/factfinds/679/clients/client-124"
-      },
-      "responsibilityShare": 50.0
-    }
-  ],
-  "isToBeRepaid": false,
-  "isConsolidated": false,
-  "repaymentNotes": null,
-  "isGuarantorMortgage": false,
-  "notes": "Mortgage to be reviewed in 2027 when fixed rate ends",
   "createdAt": "2026-01-15T09:00:00Z",
   "updatedAt": "2026-02-10T11:30:00Z"
 }
@@ -21600,81 +21593,325 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 | `id` | integer | read-only | System-assigned liability identifier |
 | `href` | string | read-only | Canonical URI for this liability |
 | `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `liabilityType.code` | enum | required-on-create | Liability type code (MORTGAGE, LOAN, CREDIT_CARD, etc.) |
-| `liabilityType.display` | string | read-only | Human-readable liability type |
-| `description` | string | required-on-create | Liability description (max 500 chars) |
-| `lenderName` | string | required-on-create | Name of lender/creditor (max 200 chars) |
-| `accountNumber` | string | optional | Account/loan number (masked for security) |
-| `outstandingBalance` | MoneyValue | required-on-create | Current outstanding balance |
-| `originalLoanAmount` | MoneyValue | optional | Original loan amount (for loans/mortgages) |
-| `creditLimit` | MoneyValue | optional | Credit limit (for credit cards/overdrafts) |
-| `monthlyPayment` | MoneyValue | required-on-create | Regular monthly payment amount |
-| `repaymentType.code` | enum | required-on-create | Repayment method code |
-| `repaymentType.display` | string | read-only | Human-readable repayment method |
+| `owner.clientRef` | ClientRef | required-on-create | Owner of the liability |
+| `liabilityAccountNumber` | string | optional | Account/reference number (max 100 chars) |
+| `liabilityCategory.code` | enum | required-on-create | Liability category code |
+| `liabilityCategory.display` | string | read-only | Human-readable liability category |
+| `description` | string | optional | Liability description (max 500 chars) |
+| `originalLoanAmount` | MoneyValue | optional | Original loan/mortgage amount |
+| `repaymentOrInterestOnly.code` | enum | optional | Repayment method (REPAYMENT or INTEREST_ONLY) |
+| `repaymentOrInterestOnly.display` | string | read-only | Human-readable repayment method |
+| `rateType.code` | enum | optional | Interest rate type code |
+| `rateType.display` | string | read-only | Human-readable rate type |
+| `amountOutstanding` | MoneyValue | optional | Current outstanding balance |
+| `creditLimit` | MoneyValue | optional | Credit limit (for credit cards) |
 | `interestRate` | decimal | optional | Annual interest rate percentage |
-| `interestRateType.code` | enum | optional | Rate type (FIXED, VARIABLE, TRACKER) |
-| `interestRateType.display` | string | read-only | Human-readable rate type |
-| `fixedRateEndDate` | date | optional | End date for fixed rate period |
-| `loanTerm` | integer | optional | Original loan term in months |
-| `remainingTerm` | integer | read-only | Calculated remaining term in months |
-| `startDate` | date | optional | Loan start date |
-| `endDate` | date | optional | Loan end date |
-| `protectionType.code` | enum | optional | Type of protection cover |
-| `protectionType.display` | string | read-only | Human-readable protection type |
-| `protectionArrangementRef` | ArrangementRef | optional | Link to protection arrangement |
-| `linkedAsset.assetRef` | AssetRef | optional | Link to secured asset (for mortgages) |
-| `linkedAsset.description` | string | read-only | Asset description |
-| `responsibleClients[]` | array | required-on-create | Clients responsible for debt |
-| `responsibleClients[].clientRef` | ClientRef | required | Responsible client |
-| `responsibleClients[].responsibilityShare` | decimal | required | Percentage responsibility (0-100) |
-| `isToBeRepaid` | boolean | optional | Planned for repayment/refinancing (default: false) |
-| `isConsolidated` | boolean | optional | Part of consolidation plan (default: false) |
-| `repaymentNotes` | string | optional | Repayment planning notes (max 1000 chars) |
+| `paymentAmount` | MoneyValue | optional | Monthly payment amount |
+| `lender` | string | optional | Lender/creditor name (max 200 chars) |
+| `loanTermYears` | decimal | optional | Loan term in years |
+| `endDate` | date | optional | Loan end/maturity date |
+| `protected.code` | enum | optional | Protection type code |
+| `protected.display` | string | read-only | Human-readable protection type |
+| `earlyRedemptionCharge` | MoneyValue | optional | Early redemption penalty amount |
+| `consolidate` | boolean | optional | Mark for consolidation (default: false) |
+| `isToBeRepaid` | boolean | optional | Planned for repayment (default: false) |
+| `howWillLiabilityBeRepaid` | string | optional | Repayment plan details (max 2000 chars) |
 | `isGuarantorMortgage` | boolean | optional | Has guarantor (default: false) |
-| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `linkedAssetRef` | AssetRef | optional | Link to secured asset (for mortgages) |
+| `protectionArrangementRef` | ArrangementRef | optional | Link to protection policy arrangement |
 | `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
 | `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
 
-#### Liability Type Codes
+#### Liability Category Codes
 
 | Code | Display Name |
 |------|-------------|
-| `MORTGAGE` | Mortgage |
-| `SECURED_LOAN` | Secured Loan |
-| `PERSONAL_LOAN` | Personal Loan |
-| `CREDIT_CARD` | Credit Card |
-| `OVERDRAFT` | Overdraft |
-| `STORE_CARD` | Store Card |
-| `CAR_LOAN` | Car Loan/HP |
-| `STUDENT_LOAN` | Student Loan |
-| `PAYDAY_LOAN` | Payday Loan |
-| `OTHER_DEBT` | Other Debt |
+| `MAIN_RESIDENCE` | Main Residence |
+| `CREDIT_STORE_CARDS` | Credit/Store Cards |
+| `PERSONAL_LOANS` | Personal Loans |
+| `MORTGAGE_REPAYMENT_VEHICLE` | Mortgage Repayment Vehicle |
+| `STUDENT_LOANS` | Student Loans |
+| `CAR_LOAN` | Car Loan |
+| `HIRE_PURCHASE` | Hire Purchase |
+| `MAINTENANCE_ALIMONY` | Maintenance/Alimony |
+| `OTHER_SECURED_LOANS` | Other Secured Loans |
+| `OTHER_MORTGAGES` | Other Mortgages |
+| `OTHER` | Other |
 
-#### Repayment Type Codes
+#### Repayment or Interest Only Codes
 
 | Code | Display Name |
 |------|-------------|
-| `CAPITAL_AND_INTEREST` | Capital and Interest |
+| `REPAYMENT` | Repayment |
 | `INTEREST_ONLY` | Interest Only |
-| `MINIMUM_PAYMENT` | Minimum Payment |
-| `FIXED_AMOUNT` | Fixed Amount |
+
+#### Rate Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `CAPPED` | Capped |
+| `DISCOUNT` | Discount |
+| `FIXED` | Fixed |
+| `FLEXIBLE` | Flexible |
+| `LIBOR` | LIBOR |
+| `OFFSET_RATE` | Offset Rate |
+| `STANDARD` | Standard |
+| `TRACKER` | Tracker |
+| `VARIABLE` | Variable |
+
+#### Protection Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `NO` | No |
+| `LIFE_ONLY` | Life Only |
+| `CIC_ONLY` | CIC Only |
+| `ASU_ONLY` | ASU Only |
+| `LIFE_AND_CIC` | Life and CIC |
+| `LIFE_AND_ASU` | Life and ASU |
+| `CIC_AND_ASU` | CIC and ASU |
+| `LIFE_CIC_AND_ASU` | Life, CIC and ASU |
 
 #### Validation Rules
 
-1. **Responsibility Validation:**
-   - Sum of all `responsibilityShare` values must equal 100.0
-   - At least one responsible client must be specified
+1. **Owner Validation:**
+   - `owner.clientRef` is required - at least one owner must be specified
+   - Owner must be a valid client within the fact find
 
-2. **Mortgage-Specific:**
-   - Mortgages should have `linkedAsset` reference
-   - Should have `protectionType` and optionally `protectionArrangementRef`
+2. **Category-Specific Fields:**
+   - **Main Residence, Other Mortgages, Personal Loans, Car Loan, Hire Purchase, Other Secured Loans, Other:**
+     - All fields available including `originalLoanAmount`, `amountOutstanding`, `creditLimit`, `interestRate`, `lender`, `loanTermYears`, `earlyRedemptionCharge`
+   - **Maintenance/Alimony:**
+     - Simplified field set - only `rateType`, `paymentAmount`, `endDate` available
+     - No loan/credit fields
+   - **Mortgage Repayment Vehicle:**
+     - Simplified field set - only `rateType`, `interestRate`, `paymentAmount`, `endDate` available
+     - No loan amount or lender fields
+   - **Credit/Store Cards:**
+     - Must have `creditLimit` specified
+     - `amountOutstanding` should not exceed `creditLimit`
 
-3. **Credit Facilities:**
-   - Credit cards and overdrafts should have `creditLimit`
-   - `outstandingBalance` should not exceed `creditLimit`
+3. **Mortgage-Specific (Main Residence, Other Mortgages):**
+   - Should have `linkedAssetRef` reference to property asset
+   - Should have `protected` field set if protection is in place
+   - If protected, optionally link to `protectionArrangementRef`
 
-4. **Interest Rate:**
-   - `fixedRateEndDate` only applicable when `interestRateType` is FIXED
+4. **Repayment Planning:**
+   - If `isToBeRepaid` is true, `howWillLiabilityBeRepaid` should be provided
+   - `consolidate` flag indicates liability is part of consolidation plan
+
+5. **Guarantor Mortgage:**
+   - `isGuarantorMortgage` field available for "Other" category only
+   - Indicates if mortgage has a guarantor arrangement
+
+#### Additional Liability Examples
+
+**Example 2: Credit/Store Card Liability**
+
+```json
+{
+  "id": 790,
+  "href": "/api/v1/factfinds/679/clients/346/liabilities/790",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "owner": {
+    "clientRef": {
+      "id": "client-123",
+      "href": "/api/v1/factfinds/679/clients/client-123",
+      "name": "Bob Byblik"
+    }
+  },
+  "liabilityAccountNumber": "****4567",
+  "liabilityCategory": {
+    "code": "CREDIT_STORE_CARDS",
+    "display": "Credit/Store Cards"
+  },
+  "description": "Visa Credit Card",
+  "originalLoanAmount": null,
+  "repaymentOrInterestOnly": null,
+  "rateType": {
+    "code": "VARIABLE",
+    "display": "Variable"
+  },
+  "amountOutstanding": {
+    "amount": 3500.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "creditLimit": {
+    "amount": 10000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "interestRate": 19.9,
+  "paymentAmount": {
+    "amount": 250.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "lender": "HSBC",
+  "loanTermYears": null,
+  "endDate": null,
+  "protected": {
+    "code": "NO",
+    "display": "No"
+  },
+  "earlyRedemptionCharge": null,
+  "consolidate": true,
+  "isToBeRepaid": true,
+  "howWillLiabilityBeRepaid": "To be consolidated with other debts and paid off via balance transfer to 0% card",
+  "isGuarantorMortgage": false,
+  "linkedAssetRef": null,
+  "protectionArrangementRef": null,
+  "createdAt": "2026-01-20T11:00:00Z",
+  "updatedAt": "2026-02-10T14:00:00Z"
+}
+```
+
+**Example 3: Maintenance/Alimony Liability**
+
+```json
+{
+  "id": 791,
+  "href": "/api/v1/factfinds/679/clients/346/liabilities/791",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "owner": {
+    "clientRef": {
+      "id": "client-123",
+      "href": "/api/v1/factfinds/679/clients/client-123",
+      "name": "Bob Byblik"
+    }
+  },
+  "liabilityAccountNumber": null,
+  "liabilityCategory": {
+    "code": "MAINTENANCE_ALIMONY",
+    "display": "Maintenance/Alimony"
+  },
+  "description": "Child maintenance for two children",
+  "originalLoanAmount": null,
+  "repaymentOrInterestOnly": null,
+  "rateType": null,
+  "amountOutstanding": null,
+  "creditLimit": null,
+  "interestRate": null,
+  "paymentAmount": {
+    "amount": 800.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "lender": null,
+  "loanTermYears": null,
+  "endDate": "2034-08-20",
+  "protected": {
+    "code": "NO",
+    "display": "No"
+  },
+  "earlyRedemptionCharge": null,
+  "consolidate": false,
+  "isToBeRepaid": false,
+  "howWillLiabilityBeRepaid": null,
+  "isGuarantorMortgage": false,
+  "linkedAssetRef": null,
+  "protectionArrangementRef": null,
+  "createdAt": "2026-01-22T10:30:00Z",
+  "updatedAt": "2026-01-22T10:30:00Z"
+}
+```
+
+**Example 4: Personal Loan Liability**
+
+```json
+{
+  "id": 792,
+  "href": "/api/v1/factfinds/679/clients/346/liabilities/792",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "owner": {
+    "clientRef": {
+      "id": "client-124",
+      "href": "/api/v1/factfinds/679/clients/client-124",
+      "name": "Jane Byblik"
+    }
+  },
+  "liabilityAccountNumber": "PL-789012",
+  "liabilityCategory": {
+    "code": "PERSONAL_LOANS",
+    "display": "Personal Loans"
+  },
+  "description": "Home improvement loan",
+  "originalLoanAmount": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "repaymentOrInterestOnly": {
+    "code": "REPAYMENT",
+    "display": "Repayment"
+  },
+  "rateType": {
+    "code": "FIXED",
+    "display": "Fixed"
+  },
+  "amountOutstanding": {
+    "amount": 12500.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "creditLimit": null,
+  "interestRate": 5.9,
+  "paymentAmount": {
+    "amount": 300.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "lender": "Santander",
+  "loanTermYears": 5,
+  "endDate": "2028-06-15",
+  "protected": {
+    "code": "LIFE_ONLY",
+    "display": "Life Only"
+  },
+  "earlyRedemptionCharge": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "consolidate": false,
+  "isToBeRepaid": false,
+  "howWillLiabilityBeRepaid": null,
+  "isGuarantorMortgage": false,
+  "linkedAssetRef": null,
+  "protectionArrangementRef": {
+    "id": 556,
+    "href": "/api/v1/factfinds/679/arrangements/556"
+  },
+  "createdAt": "2023-06-15T09:00:00Z",
+  "updatedAt": "2026-02-05T10:15:00Z"
+}
+```
 
 ---
 
