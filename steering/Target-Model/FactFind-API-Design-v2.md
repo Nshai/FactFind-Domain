@@ -21280,6 +21280,1429 @@ Reference to a FactFind (ADVICE_CASE) entity.
 }
 ```
 
+### 13.17 Asset Contract
+
+The `Asset` contract represents a client's asset (property, business, cash, investments, etc.) with ownership, valuation, and tax planning information.
+
+**Reference Type:** Asset is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Supports 16 asset type categories (Property, Own Business, Cash, Investments, etc.)
+- Complex ownership model with multiple owners and percentage shares
+- Dividend tracking for business assets
+- Valuation basis recording
+- Tax relief fields (BADR, IHT, RNRB, Business Relief)
+- Links to property details, arrangements, and income
+- Rental expense tracking
+- Client visibility control
+
+#### Complete Asset Contract
+
+```json
+{
+  "id": 1234,
+  "href": "/api/v1/factfinds/679/clients/346/assets/1234",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "assetType": {
+    "code": "PROPERTY",
+    "display": "Property"
+  },
+  "description": "Primary Residence - 123 Main Street",
+  "ownership": {
+    "ownershipType": {
+      "code": "JOINT",
+      "display": "Joint Ownership"
+    },
+    "owners": [
+      {
+        "clientRef": {
+          "id": "client-123",
+          "href": "/api/v1/factfinds/679/clients/client-123"
+        },
+        "ownershipShare": 50.0
+      },
+      {
+        "clientRef": {
+          "id": "client-124",
+          "href": "/api/v1/factfinds/679/clients/client-124"
+        },
+        "ownershipShare": 50.0
+      }
+    ]
+  },
+  "dividends": {
+    "owners": [
+      {
+        "clientRef": {
+          "id": "client-123",
+          "href": "/api/v1/factfinds/679/clients/client-123"
+        },
+        "dividend": {
+          "amount": 5000.00,
+          "currency": "GBP"
+        },
+        "withdrawalType": "Regular",
+        "frequency": "Monthly"
+      }
+    ]
+  },
+  "currentValue": {
+    "amount": 450000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuedOn": "2026-01-15",
+  "valuationBasis": "Comparable Sales",
+  "originalValue": {
+    "amount": 350000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "purchasedOn": "2024-05-10",
+  "rentalExpenses": {
+    "amount": 1200.00,
+    "currency": "GBP"
+  },
+  "isVisibleToClient": true,
+  "isBusinessAssetDisposalRelief": false,
+  "isFreeFromInheritanceTax": false,
+  "rnrbEligibility": "Not Eligible",
+  "isBusinessReliefQualifying": false,
+  "isHolding": false,
+  "propertyRef": {
+    "id": 1234,
+    "href": "/api/v1/factfinds/679/property-detail/1234"
+  },
+  "arrangementRef": {
+    "id": 1234,
+    "href": "/api/v1/factfinds/679/clients/346/arrangements/1234"
+  },
+  "incomeRef": {
+    "id": 1234,
+    "href": "/api/v1/factfinds/679/clients/346/income/1234"
+  },
+  "notes": "Rental property - managed by external agent",
+  "createdAt": "2026-02-01T10:00:00Z",
+  "updatedAt": "2026-02-15T14:30:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned asset identifier |
+| `href` | string | read-only | Canonical URI for this asset |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `assetType.code` | enum | required-on-create | Asset type code (PROPERTY, OWN_BUSINESS, CASH, etc.) |
+| `assetType.display` | string | read-only | Human-readable asset type label |
+| `description` | string | required-on-create | Asset description (max 500 chars) |
+| `ownership.ownershipType.code` | enum | required-on-create | SOLE_CLIENT1, SOLE_CLIENT2, JOINT |
+| `ownership.ownershipType.display` | string | read-only | Human-readable ownership type |
+| `ownership.owners[]` | array | required-on-create | Array of owners with shares |
+| `ownership.owners[].clientRef` | ClientRef | required-on-create | Reference to owning client |
+| `ownership.owners[].ownershipShare` | decimal | required-on-create | Percentage ownership (0-100) |
+| `dividends` | DividendsValue | optional | Dividend information for business assets |
+| `dividends.owners[]` | array | optional | Array of dividend recipients |
+| `dividends.owners[].clientRef` | ClientRef | required | Dividend recipient client |
+| `dividends.owners[].dividend` | MoneyValue | required | Dividend amount |
+| `dividends.owners[].withdrawalType` | enum | required | Regular or Lumpsum |
+| `dividends.owners[].frequency` | enum | required | Payment frequency (Monthly, Quarterly, etc.) |
+| `currentValue` | MoneyValue | required-on-create | Current asset valuation |
+| `valuedOn` | date | optional | Date of valuation |
+| `valuationBasis` | string | optional | Valuation method used |
+| `originalValue` | MoneyValue | optional | Original purchase value |
+| `purchasedOn` | date | optional | Date asset was acquired |
+| `rentalExpenses` | MoneyValue | optional | Monthly rental expenses |
+| `isVisibleToClient` | boolean | optional | Visibility in client portal (default: true) |
+| `isBusinessAssetDisposalRelief` | boolean | optional | BADR eligibility (default: false) |
+| `isFreeFromInheritanceTax` | boolean | optional | IHT exemption (default: false) |
+| `rnrbEligibility` | string | optional | Residence Nil Rate Band eligibility |
+| `isBusinessReliefQualifying` | boolean | optional | Business Relief for IHT (default: false) |
+| `isHolding` | boolean | optional | Asset is a holding (default: false) |
+| `propertyRef` | PropertyRef | optional | Link to property details |
+| `arrangementRef` | ArrangementRef | optional | Link to related arrangement (mortgage) |
+| `incomeRef` | IncomeRef | optional | Link to income generated by asset |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Asset Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `BOAT` | Boat |
+| `BUY_TO_LET_PROPERTY` | Buy to Let Property |
+| `CASH` | Cash |
+| `COLLECTIBLES_ART_OTHER_VALUABLES` | Collectibles/ Art/ Other Valuables |
+| `COMMERCIAL_PROPERTY` | Commercial Property |
+| `HOLIDAY_HOME` | Holiday Home |
+| `HOME_CONTENTS` | Home Contents |
+| `INVESTMENT_PROPERTY` | Investment Property |
+| `INVESTMENTS` | Investments |
+| `MAIN_RESIDENCE` | Main Residence |
+| `MOTOR_VEHICLES` | Motor Vehicles |
+| `NON_INCOME_PRODUCING_REAL_ESTATE` | Non-Income Producing Real Estate |
+| `OTHER` | Other |
+| `OVERSEAS_PROPERTY` | Overseas Property |
+| `OWN_BUSINESS` | Own Business |
+| `PROPERTY` | Property |
+| `RENTAL_PROPERTY_OTHER_PROPERTY` | Rental Property / Other Property |
+
+#### Validation Rules
+
+1. **Ownership Validation:**
+   - Sum of all `ownershipShare` values must equal 100.0
+   - For `JOINT` ownership, must have 2+ owners
+   - For `SOLE_CLIENT1` or `SOLE_CLIENT2`, should have 1 owner with 100% share
+
+2. **Dividends Validation:**
+   - `dividends` field only applicable for `OWN_BUSINESS` asset type
+   - Each dividend owner must have `dividend`, `withdrawalType`, and `frequency`
+
+3. **Property Assets:**
+   - Property asset types should have `propertyRef` linking to property detail
+   - If generating rental income, should have `incomeRef`
+   - If mortgaged, should have `arrangementRef`
+
+4. **Tax Relief Validation:**
+   - `isBusinessAssetDisposalRelief` only applicable for business assets
+   - `rnrbEligibility` only applicable for residential properties
+   - `isBusinessReliefQualifying` only applicable for business assets
+
+---
+
+### 13.18 Liability Contract
+
+The `Liability` contract represents a client's debt obligation (mortgage, loan, credit card, etc.) with repayment details and protection coverage tracking.
+
+**Reference Type:** Liability is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Supports multiple liability types (Mortgage, Loan, Credit Card, etc.)
+- Interest rate tracking with rate type (Fixed, Variable, Tracker)
+- Repayment method tracking
+- Protection coverage linking
+- Property/asset linking for secured loans
+- Responsibility sharing for joint liabilities
+
+#### Complete Liability Contract
+
+```json
+{
+  "id": 789,
+  "href": "/api/v1/factfinds/679/liabilities/789",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "liabilityType": {
+    "code": "MORTGAGE",
+    "display": "Mortgage"
+  },
+  "description": "Primary Residence Mortgage",
+  "lenderName": "Nationwide Building Society",
+  "accountNumber": "****1234",
+  "outstandingBalance": {
+    "amount": 180000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "originalLoanAmount": {
+    "amount": 250000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "creditLimit": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "monthlyPayment": {
+    "amount": 1200.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "repaymentType": {
+    "code": "CAPITAL_AND_INTEREST",
+    "display": "Capital and Interest"
+  },
+  "interestRate": 3.5,
+  "interestRateType": {
+    "code": "FIXED",
+    "display": "Fixed Rate"
+  },
+  "fixedRateEndDate": "2027-06-01",
+  "loanTerm": 300,
+  "remainingTerm": 246,
+  "startDate": "2015-06-01",
+  "endDate": "2040-06-01",
+  "protectionType": {
+    "code": "LIFE_ASSURANCE",
+    "display": "Life Assurance"
+  },
+  "protectionArrangementRef": {
+    "id": 555,
+    "href": "/api/v1/factfinds/679/arrangements/555"
+  },
+  "linkedAsset": {
+    "assetRef": {
+      "id": 1234,
+      "href": "/api/v1/factfinds/679/clients/346/assets/1234"
+    },
+    "description": "Primary Residence"
+  },
+  "responsibleClients": [
+    {
+      "clientRef": {
+        "id": "client-123",
+        "href": "/api/v1/factfinds/679/clients/client-123"
+      },
+      "responsibilityShare": 50.0
+    },
+    {
+      "clientRef": {
+        "id": "client-124",
+        "href": "/api/v1/factfinds/679/clients/client-124"
+      },
+      "responsibilityShare": 50.0
+    }
+  ],
+  "isToBeRepaid": false,
+  "isConsolidated": false,
+  "repaymentNotes": null,
+  "isGuarantorMortgage": false,
+  "notes": "Mortgage to be reviewed in 2027 when fixed rate ends",
+  "createdAt": "2026-01-15T09:00:00Z",
+  "updatedAt": "2026-02-10T11:30:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned liability identifier |
+| `href` | string | read-only | Canonical URI for this liability |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `liabilityType.code` | enum | required-on-create | Liability type code (MORTGAGE, LOAN, CREDIT_CARD, etc.) |
+| `liabilityType.display` | string | read-only | Human-readable liability type |
+| `description` | string | required-on-create | Liability description (max 500 chars) |
+| `lenderName` | string | required-on-create | Name of lender/creditor (max 200 chars) |
+| `accountNumber` | string | optional | Account/loan number (masked for security) |
+| `outstandingBalance` | MoneyValue | required-on-create | Current outstanding balance |
+| `originalLoanAmount` | MoneyValue | optional | Original loan amount (for loans/mortgages) |
+| `creditLimit` | MoneyValue | optional | Credit limit (for credit cards/overdrafts) |
+| `monthlyPayment` | MoneyValue | required-on-create | Regular monthly payment amount |
+| `repaymentType.code` | enum | required-on-create | Repayment method code |
+| `repaymentType.display` | string | read-only | Human-readable repayment method |
+| `interestRate` | decimal | optional | Annual interest rate percentage |
+| `interestRateType.code` | enum | optional | Rate type (FIXED, VARIABLE, TRACKER) |
+| `interestRateType.display` | string | read-only | Human-readable rate type |
+| `fixedRateEndDate` | date | optional | End date for fixed rate period |
+| `loanTerm` | integer | optional | Original loan term in months |
+| `remainingTerm` | integer | read-only | Calculated remaining term in months |
+| `startDate` | date | optional | Loan start date |
+| `endDate` | date | optional | Loan end date |
+| `protectionType.code` | enum | optional | Type of protection cover |
+| `protectionType.display` | string | read-only | Human-readable protection type |
+| `protectionArrangementRef` | ArrangementRef | optional | Link to protection arrangement |
+| `linkedAsset.assetRef` | AssetRef | optional | Link to secured asset (for mortgages) |
+| `linkedAsset.description` | string | read-only | Asset description |
+| `responsibleClients[]` | array | required-on-create | Clients responsible for debt |
+| `responsibleClients[].clientRef` | ClientRef | required | Responsible client |
+| `responsibleClients[].responsibilityShare` | decimal | required | Percentage responsibility (0-100) |
+| `isToBeRepaid` | boolean | optional | Planned for repayment/refinancing (default: false) |
+| `isConsolidated` | boolean | optional | Part of consolidation plan (default: false) |
+| `repaymentNotes` | string | optional | Repayment planning notes (max 1000 chars) |
+| `isGuarantorMortgage` | boolean | optional | Has guarantor (default: false) |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Liability Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `MORTGAGE` | Mortgage |
+| `SECURED_LOAN` | Secured Loan |
+| `PERSONAL_LOAN` | Personal Loan |
+| `CREDIT_CARD` | Credit Card |
+| `OVERDRAFT` | Overdraft |
+| `STORE_CARD` | Store Card |
+| `CAR_LOAN` | Car Loan/HP |
+| `STUDENT_LOAN` | Student Loan |
+| `PAYDAY_LOAN` | Payday Loan |
+| `OTHER_DEBT` | Other Debt |
+
+#### Repayment Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `CAPITAL_AND_INTEREST` | Capital and Interest |
+| `INTEREST_ONLY` | Interest Only |
+| `MINIMUM_PAYMENT` | Minimum Payment |
+| `FIXED_AMOUNT` | Fixed Amount |
+
+#### Validation Rules
+
+1. **Responsibility Validation:**
+   - Sum of all `responsibilityShare` values must equal 100.0
+   - At least one responsible client must be specified
+
+2. **Mortgage-Specific:**
+   - Mortgages should have `linkedAsset` reference
+   - Should have `protectionType` and optionally `protectionArrangementRef`
+
+3. **Credit Facilities:**
+   - Credit cards and overdrafts should have `creditLimit`
+   - `outstandingBalance` should not exceed `creditLimit`
+
+4. **Interest Rate:**
+   - `fixedRateEndDate` only applicable when `interestRateType` is FIXED
+
+---
+
+### 13.19 Employment Contract
+
+The `Employment` contract represents a client's employment history with employer details, employment status, and income associations.
+
+**Reference Type:** Employment is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Supports multiple employment statuses (Current, Previous, Future, Self-Employed)
+- Employer details tracking
+- Employment dates and duration
+- Income linking
+- Notice period tracking
+- Retirement age planning
+
+#### Complete Employment Contract
+
+```json
+{
+  "id": 567,
+  "href": "/api/v1/factfinds/679/clients/346/employment/567",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "employmentStatus": {
+    "code": "EMPLOYED_FULL_TIME",
+    "display": "Employed - Full Time"
+  },
+  "employerName": "Acme Corporation Ltd",
+  "jobTitle": "Senior Software Engineer",
+  "industry": {
+    "code": "IT",
+    "display": "Information Technology"
+  },
+  "employerAddress": {
+    "line1": "Tech Park Building 5",
+    "line2": "Silicon Way",
+    "city": "London",
+    "postcode": "EC1A 1BB",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom"
+    }
+  },
+  "startDate": "2015-03-01",
+  "endDate": null,
+  "isCurrent": true,
+  "durationYears": 11,
+  "durationMonths": 0,
+  "retirementAge": 67,
+  "plannedRetirementDate": "2047-05-15",
+  "noticePeriod": {
+    "value": 3,
+    "unit": "MONTHS"
+  },
+  "annualSalary": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "pensionContribution": {
+    "employeePercentage": 5.0,
+    "employerPercentage": 8.0,
+    "monthlyAmount": {
+      "amount": 812.50,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "benefits": [
+    {
+      "type": "Health Insurance",
+      "description": "Private medical insurance - family cover",
+      "annualValue": {
+        "amount": 2400.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    {
+      "type": "Life Cover",
+      "description": "Death in service - 4x salary",
+      "coverAmount": {
+        "amount": 300000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    }
+  ],
+  "linkedIncomes": [
+    {
+      "id": 890,
+      "href": "/api/v1/factfinds/679/clients/346/income/890",
+      "category": "Basic Annual Income"
+    }
+  ],
+  "notes": "Expecting promotion to Principal Engineer in Q3 2026",
+  "createdAt": "2026-01-05T10:00:00Z",
+  "updatedAt": "2026-02-10T14:20:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned employment identifier |
+| `href` | string | read-only | Canonical URI for this employment |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to employed client |
+| `employmentStatus.code` | enum | required-on-create | Employment status code |
+| `employmentStatus.display` | string | read-only | Human-readable employment status |
+| `employerName` | string | required-on-create | Employer name (max 200 chars) |
+| `jobTitle` | string | optional | Job title/role (max 200 chars) |
+| `industry.code` | enum | optional | Industry sector code |
+| `industry.display` | string | read-only | Human-readable industry |
+| `employerAddress` | AddressValue | optional | Employer address |
+| `startDate` | date | required-on-create | Employment start date |
+| `endDate` | date | optional | Employment end date (null if current) |
+| `isCurrent` | boolean | read-only | Calculated: endDate is null |
+| `durationYears` | integer | read-only | Calculated employment duration (years) |
+| `durationMonths` | integer | read-only | Calculated employment duration (months) |
+| `retirementAge` | integer | optional | Planned retirement age |
+| `plannedRetirementDate` | date | read-only | Calculated retirement date |
+| `noticePeriod.value` | integer | optional | Notice period length |
+| `noticePeriod.unit` | enum | optional | DAYS, WEEKS, MONTHS |
+| `annualSalary` | MoneyValue | optional | Annual salary amount |
+| `pensionContribution` | PensionContributionValue | optional | Pension contribution details |
+| `pensionContribution.employeePercentage` | decimal | optional | Employee contribution % |
+| `pensionContribution.employerPercentage` | decimal | optional | Employer contribution % |
+| `pensionContribution.monthlyAmount` | MoneyValue | read-only | Calculated monthly contribution |
+| `benefits[]` | array | optional | Employment benefits |
+| `benefits[].type` | string | required | Benefit type |
+| `benefits[].description` | string | optional | Benefit description |
+| `benefits[].annualValue` | MoneyValue | optional | Annual value of benefit |
+| `benefits[].coverAmount` | MoneyValue | optional | Cover amount (for insurance benefits) |
+| `linkedIncomes[]` | array | read-only | Incomes linked to this employment |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Employment Status Codes
+
+| Code | Display Name |
+|------|-------------|
+| `EMPLOYED_FULL_TIME` | Employed - Full Time |
+| `EMPLOYED_PART_TIME` | Employed - Part Time |
+| `SELF_EMPLOYED` | Self-Employed |
+| `COMPANY_DIRECTOR` | Company Director |
+| `RETIRED` | Retired |
+| `NOT_WORKING` | Not Working |
+| `STUDENT` | Student |
+| `HOMEMAKER` | Homemaker |
+| `UNABLE_TO_WORK` | Unable to Work |
+| `BETWEEN_JOBS` | Between Jobs |
+| `CONTRACTOR` | Contractor |
+| `UNEMPLOYED` | Unemployed |
+
+---
+
+### 13.20 Budget Contract
+
+The `Budget` contract represents a client's budgeted/planned monthly expenditure by category.
+
+**Reference Type:** Budget is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Monthly budget amounts by category
+- Category-level planning
+- Comparison with actual expenditure
+- Affordability assessment support
+
+#### Complete Budget Contract
+
+```json
+{
+  "id": 445,
+  "href": "/api/v1/factfinds/679/clients/346/budget/445",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "category": "Housing",
+  "amount": {
+    "amount": 1500.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "notes": "Monthly mortgage payment and council tax",
+  "createdAt": "2026-01-10T09:00:00Z",
+  "updatedAt": "2026-02-05T10:15:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned budget identifier |
+| `href` | string | read-only | Canonical URI for this budget item |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to client |
+| `category` | string | required-on-create | Budget category name (max 100 chars) |
+| `amount` | MoneyValue | required-on-create | Budgeted monthly amount |
+| `notes` | string | optional | Budget notes and assumptions (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+---
+
+### 13.21 Expenditure Contract
+
+The `Expenditure` contract represents a client's actual expenditure aggregate, containing either summarized monthly expenditure or detailed expense breakdown.
+
+**Reference Type:** Expenditure is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Can represent summarized or detailed expenditure
+- Links to detailed expenses
+- Supports affordability calculations
+- Total monthly expenditure tracking
+
+#### Complete Expenditure Contract
+
+```json
+{
+  "id": 667,
+  "href": "/api/v1/factfinds/679/clients/346/expenditure/667",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "isDetailed": true,
+  "totalMonthlyExpenditure": {
+    "amount": 3250.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "includeInAffordability": true,
+  "expenses": [
+    {
+      "id": 1001,
+      "href": "/api/v1/factfinds/679/clients/346/expenditure/667/expenses/1001",
+      "category": "Mortgage",
+      "amount": {
+        "amount": 1200.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    {
+      "id": 1002,
+      "href": "/api/v1/factfinds/679/clients/346/expenditure/667/expenses/1002",
+      "category": "Groceries",
+      "amount": {
+        "amount": 600.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    }
+  ],
+  "notes": "Monthly expenditure based on bank statements review",
+  "createdAt": "2026-01-15T11:00:00Z",
+  "updatedAt": "2026-02-08T14:30:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned expenditure identifier |
+| `href` | string | read-only | Canonical URI for this expenditure |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to client |
+| `isDetailed` | boolean | required-on-create | True if detailed expenses tracked |
+| `totalMonthlyExpenditure` | MoneyValue | read-only | Calculated total monthly expenditure |
+| `includeInAffordability` | boolean | optional | Include in affordability calculations (default: false) |
+| `expenses[]` | array | read-only | Array of detailed expense items |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+---
+
+### 13.22 Expense Contract
+
+The `Expense` contract represents a single expense line item within an expenditure aggregate.
+
+**Reference Type:** Expense is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Granular expense tracking
+- Category-based classification
+- Frequency support
+- Links to parent expenditure
+
+#### Complete Expense Contract
+
+```json
+{
+  "id": 1001,
+  "href": "/api/v1/factfinds/679/clients/346/expenditure/667/expenses/1001",
+  "expenditureRef": {
+    "id": 667,
+    "href": "/api/v1/factfinds/679/clients/346/expenditure/667"
+  },
+  "category": {
+    "code": "MORTGAGE",
+    "display": "Mortgage"
+  },
+  "description": "Primary residence mortgage payment",
+  "amount": {
+    "amount": 1200.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "frequency": {
+    "code": "MONTHLY",
+    "display": "Monthly"
+  },
+  "monthlyAmount": {
+    "amount": 1200.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "includeInAffordability": true,
+  "notes": "Fixed rate until June 2027",
+  "createdAt": "2026-01-15T11:00:00Z",
+  "updatedAt": "2026-02-08T14:30:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned expense identifier |
+| `href` | string | read-only | Canonical URI for this expense |
+| `expenditureRef` | ExpenditureRef | read-only | Reference to parent expenditure |
+| `category.code` | enum | required-on-create | Expense category code |
+| `category.display` | string | read-only | Human-readable category |
+| `description` | string | optional | Expense description (max 500 chars) |
+| `amount` | MoneyValue | required-on-create | Expense amount at specified frequency |
+| `frequency.code` | enum | required-on-create | Payment frequency code |
+| `frequency.display` | string | read-only | Human-readable frequency |
+| `monthlyAmount` | MoneyValue | read-only | Calculated monthly amount |
+| `includeInAffordability` | boolean | optional | Include in affordability (default: false) |
+| `notes` | string | optional | Additional notes (max 1000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+---
+
+### 13.23 Credit History Contract
+
+The `CreditHistory` contract represents a client's credit history items including credit scores, payment history, and adverse credit events.
+
+**Reference Type:** CreditHistory is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Credit score tracking
+- Adverse credit event recording
+- Payment history
+- Mortgage suitability assessment
+
+#### Complete Credit History Contract
+
+```json
+{
+  "id": 334,
+  "href": "/api/v1/factfinds/679/clients/346/credit-history/334",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "creditScore": {
+    "score": 780,
+    "maxScore": 999,
+    "rating": "Excellent",
+    "provider": "Experian",
+    "checkedDate": "2026-01-15"
+  },
+  "hasAdverseCredit": false,
+  "adverseCreditEvents": [],
+  "ccjCount": 0,
+  "defaultCount": 0,
+  "bankruptcyHistory": false,
+  "ivaHistory": false,
+  "missedPayments": {
+    "last12Months": 0,
+    "last6Years": 0
+  },
+  "mortgageSuitability": {
+    "isEligible": true,
+    "factors": [
+      "Good credit score (780)",
+      "No adverse credit",
+      "No missed payments"
+    ]
+  },
+  "notes": "Excellent credit history - eligible for best mortgage rates",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned credit history identifier |
+| `href` | string | read-only | Canonical URI for this credit history |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to client |
+| `creditScore.score` | integer | optional | Credit score value |
+| `creditScore.maxScore` | integer | optional | Maximum possible score |
+| `creditScore.rating` | string | optional | Rating category (Excellent, Good, Fair, Poor) |
+| `creditScore.provider` | string | optional | Credit reference agency |
+| `creditScore.checkedDate` | date | optional | Date score was checked |
+| `hasAdverseCredit` | boolean | optional | Has adverse credit events (default: false) |
+| `adverseCreditEvents[]` | array | optional | List of adverse credit events |
+| `ccjCount` | integer | optional | County Court Judgment count |
+| `defaultCount` | integer | optional | Default count |
+| `bankruptcyHistory` | boolean | optional | Has bankruptcy history (default: false) |
+| `ivaHistory` | boolean | optional | Has IVA history (default: false) |
+| `missedPayments.last12Months` | integer | optional | Missed payments in last 12 months |
+| `missedPayments.last6Years` | integer | optional | Missed payments in last 6 years |
+| `mortgageSuitability.isEligible` | boolean | read-only | Eligible for standard mortgages |
+| `mortgageSuitability.factors[]` | array | read-only | Factors affecting suitability |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+---
+
+### 13.24 Property Detail Contract
+
+The `PropertyDetail` contract represents detailed property information for property assets including physical characteristics, tenure, and rental details.
+
+**Reference Type:** PropertyDetail is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Detailed property characteristics
+- Tenure tracking (Freehold, Leasehold, Shared)
+- Rental income details
+- Mortgage/LTV tracking
+- Tax planning information
+
+#### Complete Property Detail Contract
+
+```json
+{
+  "id": 1234,
+  "href": "/api/v1/factfinds/679/property-detail/1234",
+  "assetRef": {
+    "id": 1234,
+    "href": "/api/v1/factfinds/679/clients/346/assets/1234"
+  },
+  "propertyType": {
+    "code": "RESIDENTIAL_OWNER_OCCUPIED",
+    "display": "Residential - Owner Occupied"
+  },
+  "address": {
+    "line1": "123 Main Street",
+    "line2": "Apartment 4B",
+    "city": "London",
+    "county": "Greater London",
+    "postcode": "SW1A 1AA",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom"
+    }
+  },
+  "propertyDetails": {
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "receptionRooms": 2,
+    "propertySize": {
+      "value": 1200,
+      "unit": "sqft"
+    },
+    "plotSize": {
+      "value": 0.15,
+      "unit": "acres"
+    },
+    "yearBuilt": 1995,
+    "construction": {
+      "code": "BRICK",
+      "display": "Brick"
+    },
+    "roofConstruction": {
+      "code": "PITCHED_TILE",
+      "display": "Pitched Tile"
+    },
+    "tenure": {
+      "code": "FREEHOLD",
+      "display": "Freehold"
+    },
+    "leaseholdDetails": null
+  },
+  "linkedMortgages": [
+    {
+      "liabilityRef": {
+        "id": 789,
+        "href": "/api/v1/factfinds/679/liabilities/789"
+      },
+      "outstandingBalance": {
+        "amount": 180000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    }
+  ],
+  "ltv": {
+    "ratio": 40.0,
+    "equity": {
+      "amount": 270000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "rentalDetails": {
+    "isRented": false,
+    "monthlyRent": null,
+    "annualRentalIncome": null,
+    "tenancyType": null
+  },
+  "taxDetails": {
+    "isPrimaryResidence": true,
+    "rnrbEligible": true,
+    "cgtExemptions": ["Primary Residence Relief"],
+    "stampDutyPaid": {
+      "amount": 8500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "valuationHistory": [
+    {
+      "date": "2026-01-15",
+      "value": {
+        "amount": 450000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "valuationBasis": "Comparable Sales"
+    },
+    {
+      "date": "2020-05-10",
+      "value": {
+        "amount": 350000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "valuationBasis": "Purchase Price"
+    }
+  ],
+  "notes": "Property recently renovated - new kitchen and bathroom in 2025",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-10T14:20:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned property detail identifier |
+| `href` | string | read-only | Canonical URI for this property detail |
+| `assetRef` | AssetRef | read-only | Reference to parent asset |
+| `propertyType.code` | enum | required-on-create | Property type code |
+| `propertyType.display` | string | read-only | Human-readable property type |
+| `address` | AddressValue | required-on-create | Property address |
+| `propertyDetails.bedrooms` | integer | optional | Number of bedrooms |
+| `propertyDetails.bathrooms` | integer | optional | Number of bathrooms |
+| `propertyDetails.receptionRooms` | integer | optional | Number of reception rooms |
+| `propertyDetails.propertySize` | MeasurementValue | optional | Property size |
+| `propertyDetails.plotSize` | MeasurementValue | optional | Plot/land size |
+| `propertyDetails.yearBuilt` | integer | optional | Year property was built |
+| `propertyDetails.construction.code` | enum | optional | Construction type code |
+| `propertyDetails.construction.display` | string | read-only | Construction type display |
+| `propertyDetails.roofConstruction.code` | enum | optional | Roof construction code |
+| `propertyDetails.roofConstruction.display` | string | read-only | Roof construction display |
+| `propertyDetails.tenure.code` | enum | required-on-create | Tenure type code |
+| `propertyDetails.tenure.display` | string | read-only | Tenure type display |
+| `propertyDetails.leaseholdDetails` | LeaseholdValue | optional | Leasehold details (if applicable) |
+| `linkedMortgages[]` | array | read-only | Mortgages secured on this property |
+| `ltv.ratio` | decimal | read-only | Calculated loan-to-value ratio |
+| `ltv.equity` | MoneyValue | read-only | Calculated equity |
+| `rentalDetails.isRented` | boolean | optional | Property is currently rented |
+| `rentalDetails.monthlyRent` | MoneyValue | optional | Monthly rental income |
+| `rentalDetails.annualRentalIncome` | MoneyValue | read-only | Calculated annual rental income |
+| `rentalDetails.tenancyType.code` | enum | optional | Tenancy type code |
+| `taxDetails.isPrimaryResidence` | boolean | optional | Is primary residence |
+| `taxDetails.rnrbEligible` | boolean | optional | RNRB eligible |
+| `taxDetails.cgtExemptions[]` | array | optional | CGT exemptions |
+| `taxDetails.stampDutyPaid` | MoneyValue | optional | Stamp duty paid on purchase |
+| `valuationHistory[]` | array | read-only | Historical valuations |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+---
+
+### 13.25 Business Asset Contract
+
+The `BusinessAsset` contract represents detailed business asset information including valuation basis, dividend tracking, and tax relief eligibility.
+
+**Reference Type:** BusinessAsset is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Business valuation tracking
+- Dividend distribution management
+- Business Asset Disposal Relief tracking
+- Business Relief for IHT
+- Multiple valuation methods
+
+#### Complete Business Asset Contract
+
+```json
+{
+  "id": 555,
+  "href": "/api/v1/factfinds/679/business-assets/555",
+  "assetRef": {
+    "id": 1235,
+    "href": "/api/v1/factfinds/679/clients/346/assets/1235"
+  },
+  "businessName": "Smith & Co Limited",
+  "companyNumber": "12345678",
+  "incorporationDate": "2018-03-20",
+  "businessType": {
+    "code": "LIMITED_COMPANY",
+    "display": "Limited Company"
+  },
+  "industry": {
+    "code": "SOFTWARE",
+    "display": "Software Development"
+  },
+  "ownershipStructure": {
+    "totalShares": 100,
+    "ownedShares": 100,
+    "ownershipPercentage": 100.0,
+    "shareClass": "Ordinary"
+  },
+  "valuationBasis": {
+    "code": "NET_ASSET_VALUE",
+    "display": "Net Asset Value"
+  },
+  "valuations": [
+    {
+      "date": "2026-01-15",
+      "value": {
+        "amount": 250000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "method": "Net Asset Value",
+      "valuedBy": "Company Accountant"
+    }
+  ],
+  "dividendPolicy": {
+    "paymentSchedule": {
+      "code": "MONTHLY",
+      "display": "Monthly"
+    },
+    "annualDividend": {
+      "amount": 60000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "monthlyDividend": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "taxReliefs": {
+    "businessAssetDisposalRelief": true,
+    "businessReliefQualifying": true,
+    "ihtReliefPercentage": 100,
+    "notes": "Qualifying trading company - 100% IHT relief after 2 years"
+  },
+  "financials": {
+    "annualTurnover": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "annualProfit": {
+      "amount": 150000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "netAssets": {
+      "amount": 250000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "financialYearEnd": "2025-12-31"
+  },
+  "exitStrategy": {
+    "plannedExitDate": "2035-03-20",
+    "exitMethod": "Sale to Management Team",
+    "expectedSaleValue": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "notes": "Profitable software consultancy - considering expansion in 2027",
+  "createdAt": "2026-01-10T09:00:00Z",
+  "updatedAt": "2026-02-01T11:00:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned business asset identifier |
+| `href` | string | read-only | Canonical URI for this business asset |
+| `assetRef` | AssetRef | read-only | Reference to parent asset |
+| `businessName` | string | required-on-create | Business name (max 200 chars) |
+| `companyNumber` | string | optional | Companies House registration number |
+| `incorporationDate` | date | optional | Date business was incorporated |
+| `businessType.code` | enum | required-on-create | Business structure code |
+| `businessType.display` | string | read-only | Business structure display |
+| `industry.code` | enum | optional | Industry sector code |
+| `industry.display` | string | read-only | Industry sector display |
+| `ownershipStructure` | OwnershipValue | optional | Shareholding details |
+| `valuationBasis.code` | enum | required-on-create | Valuation method code |
+| `valuationBasis.display` | string | read-only | Valuation method display |
+| `valuations[]` | array | read-only | Historical valuations |
+| `dividendPolicy` | DividendPolicyValue | optional | Dividend distribution details |
+| `taxReliefs` | TaxReliefsValue | optional | Tax relief eligibility |
+| `financials` | FinancialsValue | optional | Financial performance |
+| `exitStrategy` | ExitStrategyValue | optional | Exit planning details |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+---
+
+### 13.26 Notes Contract
+
+The `Notes` contract represents a note attached to a fact find entity using a unified discriminator pattern.
+
+**Reference Type:** Notes is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Unified discriminator pattern for all note types
+- Supports 10+ note discriminators
+- Rich text content support
+- Attachment linking
+- Visibility control
+
+#### Complete Notes Contract
+
+```json
+{
+  "id": 888,
+  "href": "/api/v1/factfinds/679/notes/888",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "noteDiscriminator": {
+    "code": "ASSET_NOTES",
+    "display": "Asset Notes"
+  },
+  "entityRef": {
+    "type": "Asset",
+    "id": 1234,
+    "href": "/api/v1/factfinds/679/clients/346/assets/1234"
+  },
+  "subject": "Property Valuation Discussion",
+  "content": "Discussed recent property valuation with client. Market conditions favorable for sale in 2027.",
+  "contentType": "text/plain",
+  "isVisibleToClient": false,
+  "isSystemGenerated": false,
+  "createdBy": {
+    "id": "adviser-789",
+    "name": "Sarah Johnson"
+  },
+  "attachments": [
+    {
+      "id": "att-111",
+      "filename": "valuation_report.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 524288,
+      "href": "/api/v1/factfinds/679/notes/888/attachments/att-111"
+    }
+  ],
+  "createdAt": "2026-02-10T14:00:00Z",
+  "updatedAt": "2026-02-10T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned note identifier |
+| `href` | string | read-only | Canonical URI for this note |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `noteDiscriminator.code` | enum | required-on-create | Note type discriminator code |
+| `noteDiscriminator.display` | string | read-only | Note type display |
+| `entityRef` | EntityRef | optional | Reference to related entity |
+| `subject` | string | required-on-create | Note subject/title (max 200 chars) |
+| `content` | string | required-on-create | Note content (max 10000 chars) |
+| `contentType` | string | optional | Content MIME type (default: text/plain) |
+| `isVisibleToClient` | boolean | optional | Visible in client portal (default: false) |
+| `isSystemGenerated` | boolean | read-only | Generated by system (default: false) |
+| `createdBy` | UserRef | read-only | User who created the note |
+| `attachments[]` | array | read-only | Attached files |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Note Discriminator Codes
+
+| Code | Display Name | Description |
+|------|-------------|-------------|
+| `ASSET_NOTES` | Asset Notes | Notes about assets |
+| `LIABILITY_NOTES` | Liability Notes | Notes about liabilities |
+| `INCOME_NOTES` | Income Notes | Notes about income |
+| `EXPENDITURE_NOTES` | Expenditure Notes | Notes about expenditure |
+| `EMPLOYMENT_NOTES` | Employment Notes | Notes about employment |
+| `ARRANGEMENT_NOTES` | Arrangement Notes | Notes about arrangements |
+| `GOAL_NOTES` | Goal Notes | Notes about goals |
+| `RISK_NOTES` | Risk Assessment Notes | Notes about risk assessment |
+| `GENERAL_NOTES` | General Notes | General fact find notes |
+| `MEETING_NOTES` | Meeting Notes | Meeting minutes/notes |
+
+---
+
+### 13.27 Dependant Contract
+
+The `Dependant` contract represents a dependent family member of a client.
+
+**Reference Type:** Dependant is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Dependent demographics
+- Financial dependency tracking
+- Education and care needs
+- Relationship to client
+- Age and duration calculations
+
+#### Complete Dependant Contract
+
+```json
+{
+  "id": 999,
+  "href": "/api/v1/factfinds/679/clients/client-123/dependants/999",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "firstName": "Emily",
+  "middleNames": "Rose",
+  "lastName": "Smith",
+  "fullName": "Emily Rose Smith",
+  "dateOfBirth": "2015-08-20",
+  "age": 10,
+  "gender": {
+    "code": "F",
+    "display": "Female"
+  },
+  "relationship": {
+    "code": "CHILD",
+    "display": "Child"
+  },
+  "isFinanciallyDependent": true,
+  "dependencyDetails": {
+    "estimatedDependencyEndAge": 21,
+    "estimatedDependencyEndDate": "2036-08-20",
+    "monthlyCost": {
+      "amount": 800.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "annualCost": {
+      "amount": 9600.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "educationDetails": {
+    "currentEducationLevel": "Primary School",
+    "isInPrivateEducation": false,
+    "plannedHigherEducation": true,
+    "estimatedEducationCosts": {
+      "amount": 50000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "healthDetails": {
+    "hasSpecialNeeds": false,
+    "requiresOngoingCare": false,
+    "healthNotes": null
+  },
+  "livingArrangements": {
+    "livesWithClient": true,
+    "custodyArrangement": "Full Custody"
+  },
+  "notes": "Plans to attend university - considering STEM subjects",
+  "createdAt": "2026-01-05T10:00:00Z",
+  "updatedAt": "2026-02-01T09:30:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned dependant identifier |
+| `href` | string | read-only | Canonical URI for this dependant |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to client parent |
+| `firstName` | string | required-on-create | First name (max 100 chars) |
+| `middleNames` | string | optional | Middle names (max 200 chars) |
+| `lastName` | string | required-on-create | Last name (max 100 chars) |
+| `fullName` | string | read-only | Calculated full name |
+| `dateOfBirth` | date | required-on-create | Date of birth |
+| `age` | integer | read-only | Calculated age |
+| `gender.code` | enum | optional | Gender code (M, F, O, X) |
+| `gender.display` | string | read-only | Gender display |
+| `relationship.code` | enum | required-on-create | Relationship type code |
+| `relationship.display` | string | read-only | Relationship type display |
+| `isFinanciallyDependent` | boolean | optional | Financially dependent (default: true) |
+| `dependencyDetails` | DependencyValue | optional | Financial dependency details |
+| `educationDetails` | EducationValue | optional | Education information |
+| `healthDetails` | HealthValue | optional | Health and care needs |
+| `livingArrangements` | LivingArrangementsValue | optional | Living situation |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Relationship Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `CHILD` | Child |
+| `STEP_CHILD` | Step Child |
+| `ADOPTED_CHILD` | Adopted Child |
+| `FOSTER_CHILD` | Foster Child |
+| `GRANDCHILD` | Grandchild |
+| `PARENT` | Parent |
+| `SIBLING` | Sibling |
+| `OTHER_RELATIVE` | Other Relative |
+| `NON_RELATIVE` | Non-Relative |
+
+---
 ---
 
 ## Appendices
