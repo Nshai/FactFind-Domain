@@ -1988,10 +1988,7 @@ All enumerations use structured Value Types with code/display pattern:
     "display": "Married",
     "effectiveFrom": "2015-06-20"
   },
-  "employmentStatus": {
-    "code": "EMP",
-    "display": "Employed"
-  }
+  "employmentStatus": "Employed"
 }
 ```
 
@@ -12348,10 +12345,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "display": "Programmers and Software Development Professionals",
       "socVersion": "SOC2020"
     },
-    "employmentStatus": {
-      "code": "FT_EMP",
-      "display": "Full-Time Employed"
-    },
+    "employmentStatus": "Employed",
     "isDeceased": false,
     "deceasedDate": null,
     "vulnerabilities": [
@@ -20556,10 +20550,7 @@ Represents a person's employment status.
 **Usage Example:**
 ```json
 {
-  "employmentStatus": {
-    "code": "EMP",
-    "display": "Employed"
-  }
+  "employmentStatus": "Employed"
 }
 ```
 
@@ -21945,115 +21936,272 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 
 ### 13.19 Employment Contract
 
-The `Employment` contract represents a client's employment history with employer details, employment status, and income associations.
+The `Employment` contract represents a client's employment history with employer details, employment status, self-employed income tracking, and affordability calculations.
 
 **Reference Type:** Employment is a reference type with identity (has `id` field).
 
 **Key Features:**
-- Supports multiple employment statuses (Current, Previous, Future, Self-Employed)
-- Employer details tracking
-- Employment dates and duration
-- Income linking
-- Notice period tracking
-- Retirement age planning
+- Supports multiple employment statuses (Employed, Self-Employed, Company Director, Retired, etc.)
+- Business type classification for self-employed clients
+- Three years of accounts for self-employed income tracking
+- Employer details and address tracking
+- Probation period tracking
+- Tax rate capture for affordability
+- Continuous employment duration
+- Income linking via HATEOAS
 
-#### Complete Employment Contract
+#### Complete Employment Contract (Employed Example)
 
 ```json
 {
   "id": 567,
-  "href": "/api/v1/factfinds/679/clients/346/employment/567",
-  "factfindRef": {
-    "id": 679,
-    "href": "/api/v1/factfinds/679"
-  },
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
-  },
-  "employmentStatus": {
-    "code": "EMPLOYED_FULL_TIME",
-    "display": "Employed - Full Time"
-  },
-  "employerName": "Acme Corporation Ltd",
-  "jobTitle": "Senior Software Engineer",
-  "industry": {
-    "code": "IT",
-    "display": "Information Technology"
-  },
-  "employerAddress": {
+  "href": "/api/v1/factfinds/679/clients/346/employments/567",
+  "employmentStatus": "Employed",
+  "employmentBusinessType": null,
+  "employmentStatusDescription": "Full-time permanent employee",
+  "occupation": "Senior Software Engineer",
+  "employer": "Acme Corporation Ltd",
+  "intendedRetirementAge": 67,
+  "startsOn": "2015-03-01",
+  "endsOn": null,
+  "inProbation": false,
+  "probationPeriodInMonths": null,
+  "industryType": "Information Technology",
+  "continuousEmploymentMonths": 132,
+  "isCurrentEmployment": true,
+  "highestTaxRate": "40%",
+  "address": {
     "line1": "Tech Park Building 5",
     "line2": "Silicon Way",
-    "city": "London",
-    "postcode": "EC1A 1BB",
+    "line3": null,
+    "line4": null,
+    "locality": "London",
+    "postalCode": "EC1A 1BB",
+    "county": {
+      "code": "GB-LND",
+      "name": "London"
+    },
     "country": {
-      "code": "GB",
-      "display": "United Kingdom"
+      "isoCode": "GB",
+      "name": "United Kingdom"
     }
   },
-  "startDate": "2015-03-01",
-  "endDate": null,
-  "isCurrent": true,
-  "durationYears": 11,
-  "durationMonths": 0,
-  "retirementAge": 67,
-  "plannedRetirementDate": "2047-05-15",
-  "noticePeriod": {
-    "value": 3,
-    "unit": "MONTHS"
+  "client": {
+    "id": 346
   },
-  "annualSalary": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
+  "selfEmployedIncome": null,
+  "incomesHref": "/api/v1/factfinds/679/clients/346/incomes?filter=employment.id eq 567"
+}
+```
+
+#### Complete Employment Contract (Self-Employed Example)
+
+```json
+{
+  "id": 568,
+  "href": "/api/v1/factfinds/679/clients/347/employments/568",
+  "employmentStatus": "SelfEmployed",
+  "employmentBusinessType": "PrivateLimitedCompany",
+  "employmentStatusDescription": "Director and majority shareholder of limited company",
+  "occupation": "IT Consultant",
+  "employer": "TechSolutions Ltd",
+  "intendedRetirementAge": 65,
+  "startsOn": "2018-04-01",
+  "endsOn": null,
+  "inProbation": null,
+  "probationPeriodInMonths": null,
+  "industryType": "Professional Services - IT Consulting",
+  "continuousEmploymentMonths": 94,
+  "isCurrentEmployment": true,
+  "highestTaxRate": "45%",
+  "address": {
+    "line1": "Business Centre",
+    "line2": "123 High Street",
+    "line3": null,
+    "line4": null,
+    "locality": "Manchester",
+    "postalCode": "M1 1AA",
+    "county": {
+      "code": "GB-MAN",
+      "name": "Greater Manchester"
+    },
+    "country": {
+      "isoCode": "GB",
+      "name": "United Kingdom"
     }
   },
-  "pensionContribution": {
-    "employeePercentage": 5.0,
-    "employerPercentage": 8.0,
-    "monthlyAmount": {
-      "amount": 812.50,
+  "client": {
+    "id": 347
+  },
+  "selfEmployedIncome": {
+    "mostRecentAnnualAccounts": {
+      "grossProfit": {
+        "amount": 180000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netProfit": {
+        "amount": 150000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "shareOfCompanyProfit": {
+        "amount": 180000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "grossDividend": {
+        "amount": 60000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 54000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "grossSalary": {
+        "amount": 25000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netSalary": {
+        "amount": 20000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "yearEnd": "2024-03-31",
+      "includeInAffordability": true
+    },
+    "yearTwoAnnualAccounts": {
+      "grossProfit": {
+        "amount": 165000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netProfit": {
+        "amount": 135000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "shareOfCompanyProfit": {
+        "amount": 165000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "grossDividend": {
+        "amount": 55000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 49500.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "grossSalary": {
+        "amount": 24000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netSalary": {
+        "amount": 19200.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "yearEnd": "2023-03-31",
+      "includeInAffordability": false
+    },
+    "yearThreeAnnualAccounts": {
+      "grossProfit": {
+        "amount": 150000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netProfit": {
+        "amount": 120000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "shareOfCompanyProfit": {
+        "amount": 150000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "grossDividend": {
+        "amount": 50000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 45000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "grossSalary": {
+        "amount": 22000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netSalary": {
+        "amount": 17600.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "yearEnd": "2022-03-31",
+      "includeInAffordability": false
+    },
+    "recentGrossPreTaxProfit": {
+      "amount": 180000.00,
       "currency": {
         "code": "GBP",
         "symbol": "£"
       }
     }
   },
-  "benefits": [
-    {
-      "type": "Health Insurance",
-      "description": "Private medical insurance - family cover",
-      "annualValue": {
-        "amount": 2400.00,
-        "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
-      }
-    },
-    {
-      "type": "Life Cover",
-      "description": "Death in service - 4x salary",
-      "coverAmount": {
-        "amount": 300000.00,
-        "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
-      }
-    }
-  ],
-  "linkedIncomes": [
-    {
-      "id": 890,
-      "href": "/api/v1/factfinds/679/clients/346/income/890",
-      "category": "Basic Annual Income"
-    }
-  ],
-  "notes": "Expecting promotion to Principal Engineer in Q3 2026",
-  "createdAt": "2026-01-05T10:00:00Z",
-  "updatedAt": "2026-02-10T14:20:00Z"
+  "incomesHref": "/api/v1/factfinds/679/clients/347/incomes?filter=employment.id eq 568"
 }
 ```
 
@@ -22063,55 +22211,80 @@ The `Employment` contract represents a client's employment history with employer
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned employment identifier |
 | `href` | string | read-only | Canonical URI for this employment |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to employed client |
-| `employmentStatus.code` | enum | required-on-create | Employment status code |
-| `employmentStatus.display` | string | read-only | Human-readable employment status |
-| `employerName` | string | required-on-create | Employer name (max 200 chars) |
-| `jobTitle` | string | optional | Job title/role (max 200 chars) |
-| `industry.code` | enum | optional | Industry sector code |
-| `industry.display` | string | read-only | Human-readable industry |
-| `employerAddress` | AddressValue | optional | Employer address |
-| `startDate` | date | required-on-create | Employment start date |
-| `endDate` | date | optional | Employment end date (null if current) |
-| `isCurrent` | boolean | read-only | Calculated: endDate is null |
-| `durationYears` | integer | read-only | Calculated employment duration (years) |
-| `durationMonths` | integer | read-only | Calculated employment duration (months) |
-| `retirementAge` | integer | optional | Planned retirement age |
-| `plannedRetirementDate` | date | read-only | Calculated retirement date |
-| `noticePeriod.value` | integer | optional | Notice period length |
-| `noticePeriod.unit` | enum | optional | DAYS, WEEKS, MONTHS |
-| `annualSalary` | MoneyValue | optional | Annual salary amount |
-| `pensionContribution` | PensionContributionValue | optional | Pension contribution details |
-| `pensionContribution.employeePercentage` | decimal | optional | Employee contribution % |
-| `pensionContribution.employerPercentage` | decimal | optional | Employer contribution % |
-| `pensionContribution.monthlyAmount` | MoneyValue | read-only | Calculated monthly contribution |
-| `benefits[]` | array | optional | Employment benefits |
-| `benefits[].type` | string | required | Benefit type |
-| `benefits[].description` | string | optional | Benefit description |
-| `benefits[].annualValue` | MoneyValue | optional | Annual value of benefit |
-| `benefits[].coverAmount` | MoneyValue | optional | Cover amount (for insurance benefits) |
-| `linkedIncomes[]` | array | read-only | Incomes linked to this employment |
-| `notes` | string | optional | Additional notes (max 2000 chars) |
-| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
-| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+| `employmentStatus` | enum string | required-on-create | Employment status (see codes below) |
+| `employmentBusinessType` | enum string | optional | Business type for self-employed (null for employed) |
+| `employmentStatusDescription` | string | optional | Additional employment status details (max 1000 chars) |
+| `occupation` | string | optional | Job title or occupation (max 512 chars) |
+| `employer` | string | optional | Employer or business name (max 512 chars) |
+| `intendedRetirementAge` | integer | optional | Planned retirement age (0-99) |
+| `startsOn` | date | optional | Employment start date (YYYY-MM-DD) |
+| `endsOn` | date | optional | Employment end date (YYYY-MM-DD), null if current |
+| `inProbation` | boolean | optional | Currently in probation period |
+| `probationPeriodInMonths` | integer | optional | Length of probation period (1-99 months) |
+| `industryType` | string | optional | Industry or sector (max 100 chars) |
+| `continuousEmploymentMonths` | integer | optional | Months of continuous employment |
+| `isCurrentEmployment` | boolean | read-only | Computed from start and end dates |
+| `highestTaxRate` | string | optional | Highest marginal tax rate (e.g., "40%", "45%") |
+| `address` | AddressValue | optional | Employer/business address |
+| `address.line1` | string | optional | Address line 1 |
+| `address.line2` | string | optional | Address line 2 |
+| `address.line3` | string | optional | Address line 3 |
+| `address.line4` | string | optional | Address line 4 |
+| `address.locality` | string | optional | City/town |
+| `address.postalCode` | string | optional | Postal/ZIP code |
+| `address.county.code` | string | optional | County code (ISO-3166-2, max 6 chars) |
+| `address.county.name` | string | read-only | County name |
+| `address.country.isoCode` | string | required | Country ISO code (ISO-3166-1 alpha-2) |
+| `address.country.name` | string | read-only | Country name |
+| `client.id` | integer | read-only | Reference to client |
+| `selfEmployedIncome` | SelfEmployedIncomeValue | optional | Self-employed accounts (null if not self-employed) |
+| `selfEmployedIncome.mostRecentAnnualAccounts` | AnnualAccountsValue | optional | Most recent year accounts |
+| `selfEmployedIncome.yearTwoAnnualAccounts` | AnnualAccountsValue | optional | Previous year accounts |
+| `selfEmployedIncome.yearThreeAnnualAccounts` | AnnualAccountsValue | optional | Third year accounts |
+| `selfEmployedIncome.recentGrossPreTaxProfit` | MoneyValue | read-only | Most recent gross profit |
+| `incomesHref` | string | read-only | HATEOAS link to related incomes |
+
+#### Annual Accounts Fields (for Self-Employed Income)
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `grossProfit` | MoneyValue | optional | Gross profit for the year |
+| `netProfit` | MoneyValue | optional | Net profit for the year |
+| `shareOfCompanyProfit` | MoneyValue | optional | Share of company profit |
+| `grossDividend` | MoneyValue | optional | Gross dividend received |
+| `netDividend` | MoneyValue | optional | Net dividend after tax |
+| `grossSalary` | MoneyValue | optional | Gross salary drawn |
+| `netSalary` | MoneyValue | optional | Net salary after tax |
+| `yearEnd` | date | required | Year end date (YYYY-MM-DD) |
+| `includeInAffordability` | boolean | required | Include in affordability calculations |
 
 #### Employment Status Codes
 
-| Code | Display Name |
+| Code | Description |
 |------|-------------|
-| `EMPLOYED_FULL_TIME` | Employed - Full Time |
-| `EMPLOYED_PART_TIME` | Employed - Part Time |
-| `SELF_EMPLOYED` | Self-Employed |
-| `COMPANY_DIRECTOR` | Company Director |
-| `RETIRED` | Retired |
-| `NOT_WORKING` | Not Working |
-| `STUDENT` | Student |
-| `HOMEMAKER` | Homemaker |
-| `UNABLE_TO_WORK` | Unable to Work |
-| `BETWEEN_JOBS` | Between Jobs |
-| `CONTRACTOR` | Contractor |
-| `UNEMPLOYED` | Unemployed |
+| `Employed` | Employed |
+| `SelfEmployed` | Self-Employed |
+| `CompanyDirector` | Company Director |
+| `Retired` | Retired |
+| `Unemployed` | Unemployed |
+| `Houseperson` | Houseperson |
+| `Student` | Student |
+| `MaternityLeave` | Maternity Leave |
+| `LongTermIllness` | Long Term Illness |
+| `ContractWorker` | Contract Worker |
+| `CarerOfaChildUnder16` | Carer of a Child Under 16 |
+| `CarerOfaPersonOver16` | Carer of a Person Over 16 |
+| `Other` | Other |
+| `Unknown` | Unknown |
+
+#### Employment Business Type Codes (for Self-Employed)
+
+| Code | Description |
+|------|-------------|
+| `SoleTrader` | Sole Trader |
+| `PrivateLimitedCompany` | Private Limited Company |
+| `Partnership` | Partnership |
+| `LimitedLiabilityPartnership` | Limited Liability Partnership |
 
 ---
 
@@ -22841,15 +23014,16 @@ The `Notes` contract represents a note attached to a fact find entity using a un
 
 ### 13.27 Dependant Contract
 
-The `Dependant` contract represents a dependent family member of a client.
+The `Dependant` contract represents a dependent family member of one or more clients.
 
 **Reference Type:** Dependant is a reference type with identity (has `id` field).
 
 **Key Features:**
 - Dependent demographics
+- Multiple client relationships (e.g., child of both parents)
 - Financial dependency tracking
 - Education and care needs
-- Relationship to client
+- Relationship to clients
 - Age and duration calculations
 
 #### Complete Dependant Contract
@@ -22857,15 +23031,21 @@ The `Dependant` contract represents a dependent family member of a client.
 ```json
 {
   "id": 999,
-  "href": "/api/v1/factfinds/679/clients/client-123/dependants/999",
+  "href": "/api/v1/factfinds/679/dependants/999",
   "factfindRef": {
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
-  },
+  "clients": [
+    {
+      "id": 123,
+      "href": "/api/v1/factfinds/679/clients/123"
+    },
+    {
+      "id": 124,
+      "href": "/api/v1/factfinds/679/clients/124"
+    }
+  ],
   "firstName": "Emily",
   "middleNames": "Rose",
   "lastName": "Smith",
@@ -22920,7 +23100,7 @@ The `Dependant` contract represents a dependent family member of a client.
     "livesWithClient": true,
     "custodyArrangement": "Full Custody"
   },
-  "notes": "Plans to attend university - considering STEM subjects",
+  "notes": "Plans to attend university - considering STEM subjects. Child of both John and Sarah Smith.",
   "createdAt": "2026-01-05T10:00:00Z",
   "updatedAt": "2026-02-01T09:30:00Z"
 }
@@ -22933,7 +23113,9 @@ The `Dependant` contract represents a dependent family member of a client.
 | `id` | integer | read-only | System-assigned dependant identifier |
 | `href` | string | read-only | Canonical URI for this dependant |
 | `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to client parent |
+| `clients[]` | array | required-on-create | Array of client references (min 1, supports multiple parents) |
+| `clients[].id` | integer | required | Client identifier |
+| `clients[].href` | string | read-only | Client URI |
 | `firstName` | string | required-on-create | First name (max 100 chars) |
 | `middleNames` | string | optional | Middle names (max 200 chars) |
 | `lastName` | string | required-on-create | Last name (max 100 chars) |
