@@ -289,6 +289,34 @@ The FactFind API provides comprehensive digital capabilities for:
     - [13.14 Contract Extension for Other Entities](#1314-contract-extension-for-other-entities)
     - [13.15 Standard Value Types](#1315-standard-value-types)
     - [13.16 Standard Reference Types](#1316-standard-reference-types)
+    - [13.17 Asset Contract](#1317-asset-contract)
+    - [13.18 Liability Contract](#1318-liability-contract)
+    - [13.19 Employment Contract](#1319-employment-contract)
+    - [13.20 Budget Contract](#1320-budget-contract)
+    - [13.21 Expenditure Contract](#1321-expenditure-contract)
+    - [13.22 Expense Contract](#1322-expense-contract)
+    - [13.23 Credit History Contract](#1323-credit-history-contract)
+    - [13.24 Property Detail Contract](#1324-property-detail-contract)
+    - [13.25 Business Asset Contract](#1325-business-asset-contract)
+    - [13.26 Notes Contract](#1326-notes-contract)
+    - [13.27 Dependant Contract](#1327-dependant-contract)
+    - [13.28 Income Changes Contract](#1328-income-changes-contract)
+    - [13.29 Expenditure Changes Contract](#1329-expenditure-changes-contract)
+    - [13.30 Affordability Assessment Contract](#1330-affordability-assessment-contract)
+    - [13.31 Contact Contract](#1331-contact-contract)
+    - [13.32 Attitude to Risk (ATR) Contract](#1332-attitude-to-risk-atr-contract)
+    - [13.33 Professional Contact Contract](#1333-professional-contact-contract)
+    - [13.34 Vulnerability Contract](#1334-vulnerability-contract)
+    - [13.35 Marketing Preferences Contract](#1335-marketing-preferences-contract)
+    - [13.36 Estate Planning - Will Contract](#1336-estate-planning---will-contract)
+    - [13.37 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1337-estate-planning---lasting-power-of-attorney-lpa-contract)
+    - [13.38 Estate Planning - Gift Contract](#1338-estate-planning---gift-contract)
+    - [13.39 Estate Planning - Trust Contract](#1339-estate-planning---trust-contract)
+    - [13.40 Identity Verification & Data Protection Consent Contract](#1340-identity-verification--data-protection-consent-contract)
+    - [13.41 Arrangement - Mortgage Contract](#1341-arrangement---mortgage-contract)
+    - [13.42 Arrangement - Investment Contract (General Investment Account)](#1342-arrangement---investment-contract-general-investment-account)
+    - [13.43 Arrangement - Protection Contract (Life Assurance)](#1343-arrangement---protection-contract-life-assurance)
+    - [13.44 Arrangement - Pension Contract (Personal Pension)](#1344-arrangement---pension-contract-personal-pension)
 
 ---
 
@@ -22940,6 +22968,2276 @@ The `Dependant` contract represents a dependent family member of a client.
 | `NON_RELATIVE` | Non-Relative |
 
 ---
+
+### 13.28 Income Changes Contract
+
+The `IncomeChanges` contract represents anticipated changes to a client's income, used for affordability and cash flow planning.
+
+**Reference Type:** IncomeChanges is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Future income change tracking
+- Effective date planning
+- Income increase/decrease modeling
+- Links to income sources
+- Affordability impact assessment
+
+#### Complete Income Changes Contract
+
+```json
+{
+  "id": 345,
+  "href": "/api/v1/factfinds/679/clients/346/income-changes/345",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "incomeRef": {
+    "id": 890,
+    "href": "/api/v1/factfinds/679/clients/346/income/890"
+  },
+  "changeType": {
+    "code": "INCREASE",
+    "display": "Income Increase"
+  },
+  "description": "Salary increase following promotion to Senior Engineer",
+  "currentAmount": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "newAmount": {
+    "amount": 85000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "changeAmount": {
+    "amount": 10000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "changePercentage": 13.33,
+  "effectiveDate": "2026-04-01",
+  "isConfirmed": true,
+  "confidenceLevel": {
+    "code": "HIGH",
+    "display": "High Confidence"
+  },
+  "impactOnAffordability": {
+    "monthlyImpact": {
+      "amount": 625.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "improvedAffordability": true
+  },
+  "notes": "Promotion confirmed by employer - effective from April",
+  "createdAt": "2026-02-15T10:00:00Z",
+  "updatedAt": "2026-02-15T10:00:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned income change identifier |
+| `href` | string | read-only | Canonical URI for this income change |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to client |
+| `incomeRef` | IncomeRef | optional | Reference to existing income source |
+| `changeType.code` | enum | required-on-create | Change type code (INCREASE, DECREASE, NEW, CEASE) |
+| `changeType.display` | string | read-only | Human-readable change type |
+| `description` | string | required-on-create | Description of income change (max 500 chars) |
+| `currentAmount` | MoneyValue | optional | Current income amount |
+| `newAmount` | MoneyValue | required-on-create | New/expected income amount |
+| `changeAmount` | MoneyValue | read-only | Calculated change amount |
+| `changePercentage` | decimal | read-only | Calculated percentage change |
+| `effectiveDate` | date | required-on-create | Date change takes effect |
+| `isConfirmed` | boolean | optional | Change is confirmed (default: false) |
+| `confidenceLevel.code` | enum | optional | Confidence in change occurring |
+| `confidenceLevel.display` | string | read-only | Human-readable confidence level |
+| `impactOnAffordability` | AffordabilityImpactValue | read-only | Calculated affordability impact |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Change Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `INCREASE` | Income Increase |
+| `DECREASE` | Income Decrease |
+| `NEW` | New Income Source |
+| `CEASE` | Income Will Cease |
+
+#### Confidence Level Codes
+
+| Code | Display Name |
+|------|-------------|
+| `HIGH` | High Confidence |
+| `MEDIUM` | Medium Confidence |
+| `LOW` | Low Confidence |
+| `SPECULATIVE` | Speculative |
+
+---
+
+### 13.29 Expenditure Changes Contract
+
+The `ExpenditureChanges` contract represents anticipated changes to a client's expenditure, used for affordability and cash flow planning.
+
+**Reference Type:** ExpenditureChanges is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Future expenditure change tracking
+- Effective date planning
+- Increase/decrease modeling
+- Links to expense sources
+- Affordability impact assessment
+
+#### Complete Expenditure Changes Contract
+
+```json
+{
+  "id": 456,
+  "href": "/api/v1/factfinds/679/clients/346/expenditure-changes/456",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "expenseRef": {
+    "id": 1001,
+    "href": "/api/v1/factfinds/679/clients/346/expenditure/667/expenses/1001"
+  },
+  "changeType": {
+    "code": "CEASE",
+    "display": "Expenditure Will Cease"
+  },
+  "description": "Mortgage will be paid off",
+  "currentAmount": {
+    "amount": 1200.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "newAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "changeAmount": {
+    "amount": -1200.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "changePercentage": -100.0,
+  "effectiveDate": "2027-06-01",
+  "isConfirmed": true,
+  "confidenceLevel": {
+    "code": "HIGH",
+    "display": "High Confidence"
+  },
+  "impactOnAffordability": {
+    "monthlyImpact": {
+      "amount": 1200.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "improvedAffordability": true
+  },
+  "notes": "Mortgage term ends June 2027 - confirmed with lender",
+  "createdAt": "2026-02-18T11:00:00Z",
+  "updatedAt": "2026-02-18T11:00:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned expenditure change identifier |
+| `href` | string | read-only | Canonical URI for this expenditure change |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to client |
+| `expenseRef` | ExpenseRef | optional | Reference to existing expense |
+| `changeType.code` | enum | required-on-create | Change type code (INCREASE, DECREASE, NEW, CEASE) |
+| `changeType.display` | string | read-only | Human-readable change type |
+| `description` | string | required-on-create | Description of expenditure change (max 500 chars) |
+| `currentAmount` | MoneyValue | optional | Current expenditure amount |
+| `newAmount` | MoneyValue | required-on-create | New/expected expenditure amount |
+| `changeAmount` | MoneyValue | read-only | Calculated change amount |
+| `changePercentage` | decimal | read-only | Calculated percentage change |
+| `effectiveDate` | date | required-on-create | Date change takes effect |
+| `isConfirmed` | boolean | optional | Change is confirmed (default: false) |
+| `confidenceLevel.code` | enum | optional | Confidence in change occurring |
+| `confidenceLevel.display` | string | read-only | Human-readable confidence level |
+| `impactOnAffordability` | AffordabilityImpactValue | read-only | Calculated affordability impact |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+---
+
+### 13.30 Affordability Assessment Contract
+
+The `AffordabilityAssessment` contract represents a mortgage affordability calculation with stress testing and regulatory compliance checks.
+
+**Reference Type:** AffordabilityAssessment is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Income and expenditure analysis
+- Debt-to-income ratio calculations
+- Stress testing at higher interest rates
+- Regulatory compliance (FCA guidelines)
+- Multiple scenario modeling
+- Surplus income calculations
+
+#### Complete Affordability Assessment Contract
+
+```json
+{
+  "id": 1111,
+  "href": "/api/v1/factfinds/679/affordability-assessments/1111",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "assessmentDate": "2026-02-19",
+  "assessmentType": {
+    "code": "MORTGAGE_AFFORDABILITY",
+    "display": "Mortgage Affordability"
+  },
+  "clients": [
+    {
+      "clientRef": {
+        "id": "client-123",
+        "href": "/api/v1/factfinds/679/clients/client-123"
+      }
+    },
+    {
+      "clientRef": {
+        "id": "client-124",
+        "href": "/api/v1/factfinds/679/clients/client-124"
+      }
+    }
+  ],
+  "incomeAnalysis": {
+    "totalGrossIncome": {
+      "amount": 95000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "totalNetIncome": {
+      "amount": 68000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "monthlyGrossIncome": {
+      "amount": 7916.67,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "monthlyNetIncome": {
+      "amount": 5666.67,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "includedIncomeSources": [
+      {
+        "id": 890,
+        "category": "Employment Income",
+        "amount": {
+          "amount": 75000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      },
+      {
+        "id": 891,
+        "category": "Employment Income",
+        "amount": {
+          "amount": 20000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      }
+    ]
+  },
+  "expenditureAnalysis": {
+    "totalMonthlyExpenditure": {
+      "amount": 3250.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "essentialExpenditure": {
+      "amount": 2800.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "discretionaryExpenditure": {
+      "amount": 450.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "existingCreditCommitments": {
+      "amount": 500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "proposedMortgage": {
+    "loanAmount": {
+      "amount": 350000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "interestRate": 4.5,
+    "termYears": 25,
+    "monthlyPayment": {
+      "amount": 1945.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "repaymentType": "Capital and Interest"
+  },
+  "affordabilityCalculations": {
+    "surplusIncome": {
+      "amount": 1471.67,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "debtToIncomeRatio": 37.5,
+    "loanToIncomeMultiple": 3.68,
+    "affordabilityRatio": 24.56,
+    "isAffordable": true
+  },
+  "stressTesting": {
+    "stressTestRate": 7.0,
+    "stressedMonthlyPayment": {
+      "amount": 2475.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "stressedSurplusIncome": {
+      "amount": 941.67,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "passesStressTest": true
+  },
+  "regulatoryCompliance": {
+    "fcaAffordabilityChecks": true,
+    "responsibleLendingCriteria": true,
+    "vulnerableCustomerConsiderations": false
+  },
+  "recommendation": {
+    "isAffordable": true,
+    "maxAffordableLoan": {
+      "amount": 375000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "notes": "Clients demonstrate strong affordability with comfortable surplus income even under stress testing"
+  },
+  "createdAt": "2026-02-19T14:30:00Z",
+  "updatedAt": "2026-02-19T14:30:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned assessment identifier |
+| `href` | string | read-only | Canonical URI for this assessment |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `assessmentDate` | date | required-on-create | Date of assessment |
+| `assessmentType.code` | enum | required-on-create | Assessment type code |
+| `assessmentType.display` | string | read-only | Human-readable assessment type |
+| `clients[]` | array | required-on-create | Clients included in assessment |
+| `incomeAnalysis` | IncomeAnalysisValue | required-on-create | Income breakdown and totals |
+| `expenditureAnalysis` | ExpenditureAnalysisValue | required-on-create | Expenditure breakdown |
+| `proposedMortgage` | ProposedMortgageValue | required-on-create | Proposed mortgage details |
+| `affordabilityCalculations` | AffordabilityCalcsValue | read-only | Calculated affordability metrics |
+| `stressTesting` | StressTestValue | read-only | Stress test results |
+| `regulatoryCompliance` | RegulatoryComplianceValue | read-only | Compliance checks |
+| `recommendation` | RecommendationValue | optional | Assessment recommendation |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+---
+
+### 13.31 Contact Contract
+
+The `Contact` contract represents a contact method (email, phone, mobile, work phone, website) for a client.
+
+**Reference Type:** Contact is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Multiple contact types (Email, Phone, Mobile, Work, Website)
+- Preferred contact designation
+- Contact validation status
+- Opt-in/opt-out preferences
+- Marketing consent tracking
+
+#### Complete Contact Contract
+
+```json
+{
+  "id": 2222,
+  "href": "/api/v1/factfinds/679/clients/client-123/contacts/2222",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "contactType": {
+    "code": "EMAIL",
+    "display": "Email"
+  },
+  "value": "john.smith@example.com",
+  "isPrimary": true,
+  "isPreferred": true,
+  "isVerified": true,
+  "verifiedDate": "2026-01-15",
+  "isValidForMarketing": true,
+  "marketingOptIn": true,
+  "notes": "Primary email for all communications",
+  "createdAt": "2026-01-05T10:00:00Z",
+  "updatedAt": "2026-01-15T09:30:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned contact identifier |
+| `href` | string | read-only | Canonical URI for this contact |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to client |
+| `contactType.code` | enum | required-on-create | Contact type code |
+| `contactType.display` | string | read-only | Human-readable contact type |
+| `value` | string | required-on-create | Contact value (email, phone number, URL) |
+| `isPrimary` | boolean | optional | Primary contact of this type (default: false) |
+| `isPreferred` | boolean | optional | Preferred contact method (default: false) |
+| `isVerified` | boolean | optional | Contact has been verified (default: false) |
+| `verifiedDate` | date | optional | Date contact was verified |
+| `isValidForMarketing` | boolean | optional | Valid for marketing use (default: false) |
+| `marketingOptIn` | boolean | optional | Opted in to marketing (default: false) |
+| `notes` | string | optional | Additional notes (max 1000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Contact Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `EMAIL` | Email |
+| `PHONE` | Phone |
+| `MOBILE` | Mobile |
+| `WORK_PHONE` | Work Phone |
+| `WEBSITE` | Website |
+| `FAX` | Fax |
+
+---
+
+### 13.32 Attitude to Risk (ATR) Contract
+
+The `AttitudeToRisk` contract represents a client's risk tolerance assessment, typically completed via questionnaire for investment and pension advice.
+
+**Reference Type:** AttitudeToRisk is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Standardized risk questionnaire responses
+- Risk profile categorization (1-10 scale or Conservative/Balanced/Adventurous)
+- Investment capacity for loss
+- Time horizon consideration
+- Knowledge and experience assessment
+- Regulatory compliance (FCA suitability requirements)
+
+#### Complete ATR Contract
+
+```json
+{
+  "id": 3333,
+  "href": "/api/v1/factfinds/679/clients/client-123/attitude-to-risk/3333",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "assessmentDate": "2026-02-10",
+  "assessmentMethod": {
+    "code": "QUESTIONNAIRE",
+    "display": "Risk Questionnaire"
+  },
+  "questionnaireUsed": "FinaMetrica Risk Profile",
+  "riskScore": 65,
+  "riskProfile": {
+    "code": "BALANCED",
+    "display": "Balanced"
+  },
+  "riskLevel": 6,
+  "investmentObjective": {
+    "code": "GROWTH",
+    "display": "Growth"
+  },
+  "timeHorizon": {
+    "years": 15,
+    "category": "Long Term"
+  },
+  "capacityForLoss": {
+    "code": "MEDIUM",
+    "display": "Medium Capacity"
+  },
+  "knowledgeAndExperience": {
+    "investmentKnowledge": {
+      "code": "GOOD",
+      "display": "Good"
+    },
+    "investmentExperience": {
+      "code": "MODERATE",
+      "display": "Moderate"
+    },
+    "productsHeld": [
+      "Stocks and Shares ISA",
+      "Workplace Pension",
+      "Investment Bonds"
+    ]
+  },
+  "volatilityTolerance": {
+    "maxAcceptableLoss": 20,
+    "reactionToLosses": "Would review strategy but remain invested",
+    "comfortWithFluctuation": "Moderate"
+  },
+  "recommendedAssetAllocation": {
+    "equities": 60,
+    "bonds": 30,
+    "cash": 5,
+    "alternatives": 5
+  },
+  "isValid": true,
+  "validUntil": "2027-02-10",
+  "reviewRequired": false,
+  "notes": "Client comfortable with balanced risk/return profile. Has good understanding of investment principles.",
+  "createdAt": "2026-02-10T11:00:00Z",
+  "updatedAt": "2026-02-10T11:00:00Z"
+}
+```
+
+#### Field Definitions
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned ATR identifier |
+| `href` | string | read-only | Canonical URI for this ATR |
+| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `clientRef` | ClientRef | read-only | Reference to client |
+| `assessmentDate` | date | required-on-create | Date assessment was completed |
+| `assessmentMethod.code` | enum | required-on-create | Assessment method code |
+| `assessmentMethod.display` | string | read-only | Human-readable assessment method |
+| `questionnaireUsed` | string | optional | Name of questionnaire tool (max 200 chars) |
+| `riskScore` | integer | optional | Numerical risk score (0-100) |
+| `riskProfile.code` | enum | required-on-create | Risk profile code |
+| `riskProfile.display` | string | read-only | Human-readable risk profile |
+| `riskLevel` | integer | optional | Risk level (1-10 scale) |
+| `investmentObjective.code` | enum | optional | Investment objective code |
+| `investmentObjective.display` | string | read-only | Human-readable objective |
+| `timeHorizon` | TimeHorizonValue | optional | Investment time horizon |
+| `capacityForLoss.code` | enum | required-on-create | Capacity for loss code |
+| `capacityForLoss.display` | string | read-only | Human-readable capacity |
+| `knowledgeAndExperience` | KnowledgeValue | optional | Knowledge and experience details |
+| `volatilityTolerance` | VolatilityToleranceValue | optional | Tolerance for volatility |
+| `recommendedAssetAllocation` | AssetAllocationValue | optional | Recommended asset mix percentages |
+| `isValid` | boolean | optional | Assessment is currently valid (default: true) |
+| `validUntil` | date | optional | Date assessment expires |
+| `reviewRequired` | boolean | optional | Assessment needs review (default: false) |
+| `notes` | string | optional | Additional notes (max 2000 chars) |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+#### Risk Profile Codes
+
+| Code | Display Name | Risk Level |
+|------|-------------|------------|
+| `VERY_CAUTIOUS` | Very Cautious | 1-2 |
+| `CAUTIOUS` | Cautious | 3-4 |
+| `BALANCED` | Balanced | 5-6 |
+| `ADVENTUROUS` | Adventurous | 7-8 |
+| `VERY_ADVENTUROUS` | Very Adventurous | 9-10 |
+
+#### Investment Objective Codes
+
+| Code | Display Name |
+|------|-------------|
+| `CAPITAL_PRESERVATION` | Capital Preservation |
+| `INCOME` | Income Generation |
+| `INCOME_AND_GROWTH` | Income and Growth |
+| `GROWTH` | Growth |
+| `AGGRESSIVE_GROWTH` | Aggressive Growth |
+
+---
+
+### 13.33 Professional Contact Contract
+
+The `ProfessionalContact` contract represents a client's professional adviser (solicitor, accountant, IFA, mortgage broker, etc.).
+
+**Reference Type:** ProfessionalContact is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Multiple professional types
+- Contact information
+- Firm/organization details
+- Relationship tracking
+- Referral source designation
+
+#### Complete Professional Contact Contract
+
+```json
+{
+  "id": 4444,
+  "href": "/api/v1/factfinds/679/clients/client-123/professional-contacts/4444",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "professionalType": {
+    "code": "SOLICITOR",
+    "display": "Solicitor"
+  },
+  "title": "Mr",
+  "firstName": "David",
+  "lastName": "Williams",
+  "fullName": "Mr David Williams",
+  "jobTitle": "Partner",
+  "firmName": "Williams & Associates Solicitors",
+  "email": "david.williams@wandassoc.co.uk",
+  "phone": "020 7123 4567",
+  "mobile": "07700 900123",
+  "address": {
+    "line1": "45 Legal Square",
+    "line2": "Suite 300",
+    "city": "London",
+    "postcode": "EC4A 1BR",
+    "country": {
+      "code": "GB",
+      "display": "United Kingdom"
+    }
+  },
+  "website": "www.wandassoc.co.uk",
+  "isReferralSource": false,
+  "canContactDirectly": true,
+  "relationshipNotes": "Client's solicitor for 10+ years - handles all legal matters including will and LPA",
+  "createdAt": "2026-01-10T09:00:00Z",
+  "updatedAt": "2026-01-10T09:00:00Z"
+}
+```
+
+#### Professional Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `SOLICITOR` | Solicitor |
+| `ACCOUNTANT` | Accountant |
+| `FINANCIAL_ADVISER` | Financial Adviser |
+| `MORTGAGE_BROKER` | Mortgage Broker |
+| `ESTATE_AGENT` | Estate Agent |
+| `INVESTMENT_MANAGER` | Investment Manager |
+| `TAX_ADVISER` | Tax Adviser |
+| `PENSION_ADVISER` | Pension Adviser |
+| `OTHER` | Other Professional |
+
+---
+
+### 13.34 Vulnerability Contract
+
+The `Vulnerability` contract represents a client vulnerability indicator for Consumer Duty compliance.
+
+**Reference Type:** Vulnerability is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Multiple vulnerability categories (Health, Life Events, Resilience, Capability)
+- FCA Consumer Duty compliance
+- Specific vulnerability indicators
+- Impact assessment
+- Support needs identification
+- Regular review tracking
+
+#### Complete Vulnerability Contract
+
+```json
+{
+  "id": 5555,
+  "href": "/api/v1/factfinds/679/clients/client-123/vulnerabilities/5555",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "hasVulnerabilities": true,
+  "identifiedDate": "2026-01-15",
+  "vulnerabilityCategories": [
+    {
+      "category": {
+        "code": "HEALTH",
+        "display": "Health"
+      },
+      "indicators": [
+        {
+          "code": "PHYSICAL_DISABILITY",
+          "display": "Physical Disability",
+          "description": "Client has limited mobility - uses wheelchair"
+        }
+      ],
+      "impactLevel": {
+        "code": "MODERATE",
+        "display": "Moderate Impact"
+      },
+      "supportNeeds": [
+        "Home visits preferred",
+        "Accessible venue for meetings",
+        "Additional time for discussions"
+      ]
+    },
+    {
+      "category": {
+        "code": "CAPABILITY",
+        "display": "Capability"
+      },
+      "indicators": [
+        {
+          "code": "LOW_FINANCIAL_LITERACY",
+          "display": "Low Financial Literacy",
+          "description": "Client has limited understanding of financial products"
+        }
+      ],
+      "impactLevel": {
+        "code": "MODERATE",
+        "display": "Moderate Impact"
+      },
+      "supportNeeds": [
+        "Use plain language",
+        "Provide written summaries",
+        "Allow extra time for explanations"
+      ]
+    }
+  ],
+  "reasonableAdjustments": [
+    "Home visits arranged",
+    "Extra time allowed for meetings",
+    "Partner invited to attend meetings for support",
+    "All documents provided in large print"
+  ],
+  "consumerDutyCompliance": {
+    "needsIdentified": true,
+    "adjustmentsMade": true,
+    "communicationTailored": true,
+    "ongoingMonitoring": true
+  },
+  "reviewDate": "2026-07-15",
+  "isReviewRequired": false,
+  "notes": "Client appreciates extra care taken. Partner very supportive and usually attends meetings.",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z"
+}
+```
+
+#### Vulnerability Category Codes
+
+| Code | Display Name |
+|------|-------------|
+| `HEALTH` | Health (physical, mental health, illness, disability) |
+| `LIFE_EVENTS` | Life Events (bereavement, relationship breakdown, caring responsibilities) |
+| `RESILIENCE` | Resilience (low income, debt, unemployment) |
+| `CAPABILITY` | Capability (low literacy, financial inexperience, learning difficulties) |
+
+#### Health Vulnerability Indicators
+
+| Code | Display Name |
+|------|-------------|
+| `PHYSICAL_DISABILITY` | Physical Disability |
+| `MENTAL_HEALTH` | Mental Health Condition |
+| `LEARNING_DISABILITY` | Learning Disability |
+| `HEARING_IMPAIRMENT` | Hearing Impairment |
+| `VISUAL_IMPAIRMENT` | Visual Impairment |
+| `CHRONIC_ILLNESS` | Chronic Illness |
+| `DEMENTIA` | Dementia/Cognitive Impairment |
+
+---
+
+### 13.35 Marketing Preferences Contract
+
+The `MarketingPreferences` contract represents a client's marketing consent and communication preferences.
+
+**Reference Type:** MarketingPreferences is a reference type with identity (has `id` field).
+
+**Key Features:**
+- GDPR-compliant consent tracking
+- Channel-specific preferences (email, phone, post, SMS)
+- Product/service interest categories
+- Consent date and source tracking
+- Opt-out management
+- Third-party marketing consent
+
+#### Complete Marketing Preferences Contract
+
+```json
+{
+  "id": 6666,
+  "href": "/api/v1/factfinds/679/clients/client-123/marketing-preferences/6666",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "lastUpdated": "2026-01-15",
+  "overallConsent": true,
+  "channelPreferences": {
+    "email": {
+      "optIn": true,
+      "consentDate": "2026-01-15",
+      "consentMethod": "Online Form"
+    },
+    "phone": {
+      "optIn": false,
+      "consentDate": null,
+      "consentMethod": null
+    },
+    "post": {
+      "optIn": true,
+      "consentDate": "2026-01-15",
+      "consentMethod": "Written Consent"
+    },
+    "sms": {
+      "optIn": false,
+      "consentDate": null,
+      "consentMethod": null
+    }
+  },
+  "productInterests": [
+    {
+      "category": "Pensions",
+      "interestedIn": true
+    },
+    {
+      "category": "Investments",
+      "interestedIn": true
+    },
+    {
+      "category": "Mortgages",
+      "interestedIn": false
+    },
+    {
+      "category": "Protection",
+      "interestedIn": true
+    }
+  ],
+  "thirdPartyMarketing": {
+    "optIn": false,
+    "consentDate": null
+  },
+  "suppressionList": false,
+  "dataRetentionConsent": true,
+  "privacyNoticeVersion": "2.1",
+  "privacyNoticeAcceptedDate": "2026-01-15",
+  "notes": "Client prefers email contact for newsletters and updates",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z"
+}
+```
+
+---
+
+### 13.36 Estate Planning - Will Contract
+
+The `Will` contract represents a client's last will and testament details.
+
+**Reference Type:** Will is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Will existence and validity tracking
+- Executor information
+- Location of will documents
+- Review dates and update requirements
+- Mirror will designation for couples
+
+#### Complete Will Contract
+
+```json
+{
+  "id": 7777,
+  "href": "/api/v1/factfinds/679/clients/client-123/estate-planning/wills/7777",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "hasWill": true,
+  "willDate": "2023-06-15",
+  "lastReviewedDate": "2025-12-10",
+  "nextReviewDate": "2026-12-10",
+  "willType": {
+    "code": "MIRROR_WILL",
+    "display": "Mirror Will"
+  },
+  "isMirrorWill": true,
+  "mirrorWillClientRef": {
+    "id": "client-124",
+    "href": "/api/v1/factfinds/679/clients/client-124"
+  },
+  "executors": [
+    {
+      "name": "Sarah Smith",
+      "relationship": "Spouse",
+      "contactDetails": {
+        "email": "sarah.smith@example.com",
+        "phone": "07700 900456"
+      },
+      "isProfessionalExecutor": false
+    },
+    {
+      "name": "Williams & Associates Solicitors",
+      "relationship": "Professional Executor",
+      "contactDetails": {
+        "email": "executors@wandassoc.co.uk",
+        "phone": "020 7123 4567"
+      },
+      "isProfessionalExecutor": true
+    }
+  ],
+  "mainBeneficiaries": [
+    "Spouse (Sarah Smith)",
+    "Children (Emily and Thomas Smith)"
+  ],
+  "hasResidenceNilRateBand": true,
+  "willLocation": {
+    "heldBy": "Williams & Associates Solicitors",
+    "address": "45 Legal Square, London, EC4A 1BR",
+    "notes": "Original will held by solicitor - copy at home"
+  },
+  "needsUpdate": false,
+  "updateReason": null,
+  "notes": "Will reviewed in December 2025 - no changes required. Mirror will arrangement with spouse.",
+  "createdAt": "2026-01-10T10:00:00Z",
+  "updatedAt": "2026-02-10T09:00:00Z"
+}
+```
+
+#### Will Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `STANDARD_WILL` | Standard Will |
+| `MIRROR_WILL` | Mirror Will |
+| `PROPERTY_TRUST_WILL` | Property Trust Will |
+| `DISCRETIONARY_TRUST_WILL` | Discretionary Trust Will |
+| `LIFE_INTEREST_TRUST_WILL` | Life Interest Trust Will |
+
+---
+
+### 13.37 Estate Planning - Lasting Power of Attorney (LPA) Contract
+
+The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
+
+**Reference Type:** LastingPowerOfAttorney is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Multiple LPA types (Property & Financial Affairs, Health & Welfare)
+- Attorney details and restrictions
+- Registration status tracking
+- Location of LPA documents
+
+#### Complete LPA Contract
+
+```json
+{
+  "id": 8888,
+  "href": "/api/v1/factfinds/679/clients/client-123/estate-planning/lpas/8888",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "hasLPA": true,
+  "lpaType": {
+    "code": "PROPERTY_FINANCIAL",
+    "display": "Property and Financial Affairs"
+  },
+  "registrationDate": "2023-09-20",
+  "isRegistered": true,
+  "registrationNumber": "LPA-2023-987654",
+  "attorneys": [
+    {
+      "name": "Sarah Smith",
+      "relationship": "Spouse",
+      "contactDetails": {
+        "email": "sarah.smith@example.com",
+        "phone": "07700 900456"
+      },
+      "appointmentType": {
+        "code": "JOINTLY_AND_SEVERALLY",
+        "display": "Jointly and Severally"
+      },
+      "isPrimary": true
+    },
+    {
+      "name": "Emily Smith",
+      "relationship": "Daughter",
+      "contactDetails": {
+        "email": "emily.smith@example.com",
+        "phone": "07700 900789"
+      },
+      "appointmentType": {
+        "code": "REPLACEMENT",
+        "display": "Replacement Attorney"
+      },
+      "isPrimary": false
+    }
+  ],
+  "restrictions": "Attorney must consult with family before selling primary residence",
+  "guidance": "Preference to remain at home as long as possible",
+  "certificateProvider": {
+    "name": "Dr. Michael Brown",
+    "relationship": "GP",
+    "contactDetails": {
+      "phone": "020 7456 7890"
+    }
+  },
+  "lpaLocation": {
+    "heldBy": "Home Safe",
+    "notes": "Original registered LPA stored in home safe. Copy with solicitor."
+  },
+  "needsUpdate": false,
+  "notes": "Property and Financial Affairs LPA registered with Office of Public Guardian. Health and Welfare LPA also in place (separate record).",
+  "createdAt": "2023-09-25T10:00:00Z",
+  "updatedAt": "2026-01-15T09:00:00Z"
+}
+```
+
+#### LPA Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `PROPERTY_FINANCIAL` | Property and Financial Affairs |
+| `HEALTH_WELFARE` | Health and Welfare |
+
+#### Attorney Appointment Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `JOINTLY` | Jointly |
+| `JOINTLY_AND_SEVERALLY` | Jointly and Severally |
+| `JOINTLY_FOR_SOME_SEVERALLY_FOR_OTHERS` | Jointly for Some, Severally for Others |
+| `REPLACEMENT` | Replacement Attorney |
+
+---
+
+### 13.38 Estate Planning - Gift Contract
+
+The `Gift` contract represents gifts made or planned by the client for inheritance tax planning.
+
+**Reference Type:** Gift is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Gift tracking for IHT purposes
+- 7-year taper relief consideration
+- Potentially Exempt Transfer (PET) status
+- Regular gifts out of income exemption
+- Gift valuation and recipient tracking
+
+#### Complete Gift Contract
+
+```json
+{
+  "id": 9999,
+  "href": "/api/v1/factfinds/679/clients/client-123/estate-planning/gifts/9999",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "giftDate": "2024-12-25",
+  "giftType": {
+    "code": "POTENTIALLY_EXEMPT_TRANSFER",
+    "display": "Potentially Exempt Transfer (PET)"
+  },
+  "recipient": {
+    "name": "Emily Smith",
+    "relationship": "Daughter",
+    "dateOfBirth": "1995-03-15"
+  },
+  "giftValue": {
+    "amount": 25000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "giftDescription": "Cash gift to help with house deposit",
+  "isRegularGift": false,
+  "isOutOfIncome": false,
+  "exemptionsClaimed": [
+    {
+      "exemptionType": {
+        "code": "ANNUAL_EXEMPTION",
+        "display": "Annual Exemption"
+      },
+      "exemptionAmount": {
+        "amount": 3000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "taxYear": "2024/25"
+    }
+  ],
+  "potentiallyExemptTransfer": {
+    "isPET": true,
+    "sevenYearAnniversary": "2031-12-25",
+    "yearsRemaining": 5.85,
+    "taperRelief": {
+      "applicableRate": 100,
+      "reliefAmount": 0
+    }
+  },
+  "ihtImplications": {
+    "includedInEstate": true,
+    "currentTaxableAmount": {
+      "amount": 22000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "notes": "Gift to daughter for house purchase. Annual exemption of £3,000 applied. Balance of £22,000 is PET.",
+  "createdAt": "2024-12-26T10:00:00Z",
+  "updatedAt": "2026-02-15T09:00:00Z"
+}
+```
+
+#### Gift Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `POTENTIALLY_EXEMPT_TRANSFER` | Potentially Exempt Transfer (PET) |
+| `CHARGEABLE_LIFETIME_TRANSFER` | Chargeable Lifetime Transfer (CLT) |
+| `EXEMPT_TRANSFER` | Exempt Transfer |
+| `REGULAR_GIFTS_OUT_OF_INCOME` | Regular Gifts Out of Income |
+| `SMALL_GIFTS` | Small Gifts (£250 exemption) |
+
+#### Exemption Type Codes
+
+| Code | Display Name | Amount Limit |
+|------|-------------|--------------|
+| `ANNUAL_EXEMPTION` | Annual Exemption | £3,000 per year |
+| `SMALL_GIFTS` | Small Gifts Exemption | £250 per recipient |
+| `WEDDING_GIFTS` | Wedding Gifts | Varies by relationship |
+| `NORMAL_EXPENDITURE_OUT_OF_INCOME` | Normal Expenditure Out of Income | No limit |
+| `SPOUSE_EXEMPTION` | Spouse/Civil Partner Exemption | Unlimited |
+| `CHARITY_EXEMPTION` | Charity Exemption | Unlimited |
+
+---
+
+### 13.39 Estate Planning - Trust Contract
+
+The `Trust` contract represents trusts established by or benefiting the client.
+
+**Reference Type:** Trust is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Trust type classification
+- Trustee and beneficiary tracking
+- Asset valuation
+- Tax treatment
+- Trust deed location
+
+#### Complete Trust Contract
+
+```json
+{
+  "id": 10001,
+  "href": "/api/v1/factfinds/679/clients/client-123/estate-planning/trusts/10001",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "trustName": "The Smith Family Discretionary Trust",
+  "trustType": {
+    "code": "DISCRETIONARY_TRUST",
+    "display": "Discretionary Trust"
+  },
+  "establishedDate": "2020-03-15",
+  "clientRole": {
+    "code": "SETTLOR",
+    "display": "Settlor"
+  },
+  "trustees": [
+    {
+      "name": "Sarah Smith",
+      "relationship": "Spouse",
+      "appointedDate": "2020-03-15",
+      "isProfessionalTrustee": false
+    },
+    {
+      "name": "David Williams",
+      "relationship": "Solicitor",
+      "appointedDate": "2020-03-15",
+      "isProfessionalTrustee": true,
+      "firm": "Williams & Associates Solicitors"
+    }
+  ],
+  "beneficiaries": [
+    {
+      "name": "Emily Smith",
+      "relationship": "Daughter",
+      "beneficiaryClass": "Primary Beneficiary",
+      "hasReceivedDistributions": true
+    },
+    {
+      "name": "Thomas Smith",
+      "relationship": "Son",
+      "beneficiaryClass": "Primary Beneficiary",
+      "hasReceivedDistributions": false
+    }
+  ],
+  "trustAssets": {
+    "currentValue": {
+      "amount": 150000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "assetTypes": [
+      "Cash",
+      "Investment Portfolio"
+    ],
+    "lastValuationDate": "2026-01-31"
+  },
+  "taxTreatment": {
+    "taxYear": "2025/26",
+    "trustTaxRate": 45,
+    "dividendTaxRate": 39.35,
+    "lastTaxReturn": "2025-10-31",
+    "nextTaxReturnDue": "2026-10-31"
+  },
+  "trustDeedLocation": {
+    "heldBy": "Williams & Associates Solicitors",
+    "address": "45 Legal Square, London, EC4A 1BR"
+  },
+  "lastReviewDate": "2025-06-15",
+  "nextReviewDate": "2026-06-15",
+  "notes": "Discretionary trust established for children's benefit. Funds from inheritance. Professional trustee manages investments.",
+  "createdAt": "2020-03-20T10:00:00Z",
+  "updatedAt": "2026-02-01T09:00:00Z"
+}
+```
+
+#### Trust Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `DISCRETIONARY_TRUST` | Discretionary Trust |
+| `BARE_TRUST` | Bare Trust |
+| `INTEREST_IN_POSSESSION_TRUST` | Interest in Possession Trust |
+| `ACCUMULATION_AND_MAINTENANCE_TRUST` | Accumulation and Maintenance Trust |
+| `DISABLED_PERSONS_TRUST` | Disabled Person's Trust |
+| `BEREAVED_MINORS_TRUST` | Bereaved Minor's Trust |
+| `ASSET_PROTECTION_TRUST` | Asset Protection Trust |
+
+#### Client Role in Trust Codes
+
+| Code | Display Name |
+|------|-------------|
+| `SETTLOR` | Settlor |
+| `TRUSTEE` | Trustee |
+| `BENEFICIARY` | Beneficiary |
+| `SETTLOR_AND_TRUSTEE` | Settlor and Trustee |
+| `SETTLOR_AND_BENEFICIARY` | Settlor and Beneficiary |
+
+---
+
+### 13.40 Identity Verification & Data Protection Consent Contract
+
+The `IdentityVerification` contract represents identity verification checks and data protection consents.
+
+**Reference Type:** IdentityVerification is a reference type with identity (has `id` field).
+
+**Key Features:**
+- KYC (Know Your Customer) compliance
+- AML (Anti-Money Laundering) checks
+- Identity document verification
+- GDPR consent tracking
+- Data processing agreements
+
+#### Complete Identity Verification Contract
+
+```json
+{
+  "id": 11111,
+  "href": "/api/v1/factfinds/679/clients/client-123/identity-verification/11111",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "verificationDate": "2026-01-05",
+  "verificationMethod": {
+    "code": "ELECTRONIC_VERIFICATION",
+    "display": "Electronic Verification"
+  },
+  "verificationProvider": "Experian Identity Check",
+  "verificationReference": "EXP-2026-123456",
+  "verificationStatus": {
+    "code": "VERIFIED",
+    "display": "Verified"
+  },
+  "identityDocuments": [
+    {
+      "documentType": {
+        "code": "PASSPORT",
+        "display": "Passport"
+      },
+      "documentNumber": "123456789",
+      "issuingCountry": {
+        "code": "GB",
+        "display": "United Kingdom"
+      },
+      "issueDate": "2021-06-15",
+      "expiryDate": "2031-06-15",
+      "isVerified": true,
+      "verifiedDate": "2026-01-05"
+    },
+    {
+      "documentType": {
+        "code": "UTILITY_BILL",
+        "display": "Utility Bill"
+      },
+      "documentDescription": "Council Tax Bill",
+      "documentDate": "2025-12-15",
+      "isVerified": true,
+      "verifiedDate": "2026-01-05"
+    }
+  ],
+  "amlChecks": {
+    "sanctionsCheck": {
+      "performed": true,
+      "checkDate": "2026-01-05",
+      "result": "Clear",
+      "provider": "World-Check"
+    },
+    "pepCheck": {
+      "performed": true,
+      "checkDate": "2026-01-05",
+      "isPoliticallyExposed": false,
+      "result": "Clear"
+    },
+    "adverseMediaCheck": {
+      "performed": true,
+      "checkDate": "2026-01-05",
+      "result": "Clear"
+    }
+  },
+  "sourceOfWealth": {
+    "primarySource": {
+      "code": "EMPLOYMENT",
+      "display": "Employment Income"
+    },
+    "description": "Senior Software Engineer - employed for 15 years",
+    "isVerified": true
+  },
+  "dataProtectionConsent": {
+    "consentGiven": true,
+    "consentDate": "2026-01-05",
+    "consentMethod": "Electronic Signature",
+    "privacyNoticeVersion": "2.1",
+    "privacyNoticeProvided": true,
+    "dataProcessingPurposes": [
+      "Providing financial advice",
+      "Regulatory compliance",
+      "Customer service",
+      "Marketing (opted in)"
+    ],
+    "rightToWithdrawConsent": true,
+    "dataRetentionPeriod": "7 years from last contact",
+    "thirdPartyDisclosure": {
+      "consentGiven": true,
+      "disclosureReasons": [
+        "Product providers",
+        "Regulatory bodies",
+        "Professional indemnity insurers"
+      ]
+    }
+  },
+  "gdprRights": {
+    "rightToAccess": true,
+    "rightToRectification": true,
+    "rightToErasure": true,
+    "rightToRestriction": true,
+    "rightToDataPortability": true,
+    "rightToObject": true
+  },
+  "nextReviewDate": "2027-01-05",
+  "notes": "Full identity verification completed via Experian. All AML checks clear. GDPR consents obtained.",
+  "createdAt": "2026-01-05T10:00:00Z",
+  "updatedAt": "2026-01-05T10:00:00Z"
+}
+```
+
+#### Verification Method Codes
+
+| Code | Display Name |
+|------|-------------|
+| `ELECTRONIC_VERIFICATION` | Electronic Verification |
+| `FACE_TO_FACE` | Face-to-Face with Documents |
+| `CERTIFIED_DOCUMENTS` | Certified Documents |
+| `VIDEO_VERIFICATION` | Video Verification |
+
+#### Document Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `PASSPORT` | Passport |
+| `DRIVING_LICENCE` | Driving Licence |
+| `NATIONAL_ID_CARD` | National ID Card |
+| `UTILITY_BILL` | Utility Bill |
+| `BANK_STATEMENT` | Bank Statement |
+| `COUNCIL_TAX_BILL` | Council Tax Bill |
+
+#### Source of Wealth Codes
+
+| Code | Display Name |
+|------|-------------|
+| `EMPLOYMENT` | Employment Income |
+| `BUSINESS_INCOME` | Business Income |
+| `INVESTMENTS` | Investments |
+| `INHERITANCE` | Inheritance |
+| `PROPERTY_SALE` | Property Sale |
+| `PENSION` | Pension Income |
+| `GIFT` | Gift |
+
+---
+
+### 13.41 Arrangement - Mortgage Contract
+
+The `MortgageArrangement` contract represents a mortgage or secured lending product.
+
+**Reference Type:** MortgageArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Mortgage product details
+- Lender and intermediary information
+- Rate type and payment structure
+- Overpayment and redemption terms
+- Links to liability and property
+
+#### Complete Mortgage Arrangement Contract
+
+```json
+{
+  "id": 12001,
+  "href": "/api/v1/factfinds/679/arrangements/mortgages/12001",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "arrangementCategory": {
+    "code": "MORTGAGE",
+    "display": "Mortgage"
+  },
+  "productName": "First Direct 5 Year Fixed Rate Mortgage",
+  "providerName": "First Direct",
+  "providerRef": {
+    "id": "provider-123",
+    "href": "/api/v1/providers/provider-123"
+  },
+  "liabilityRef": {
+    "id": 5678,
+    "href": "/api/v1/factfinds/679/clients/346/liabilities/5678"
+  },
+  "propertyRef": {
+    "id": 1111,
+    "href": "/api/v1/factfinds/679/clients/346/property-details/1111"
+  },
+  "accountNumber": "12345678",
+  "sortCode": "40-47-84",
+  "mortgageAmount": {
+    "amount": 350000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "outstandingBalance": {
+    "amount": 325000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "startDate": "2023-01-15",
+  "maturityDate": "2048-01-15",
+  "termRemaining": {
+    "years": 21,
+    "months": 11
+  },
+  "interestRate": 4.49,
+  "rateType": {
+    "code": "FIXED",
+    "display": "Fixed Rate"
+  },
+  "fixedRateEndDate": "2028-01-15",
+  "repaymentType": {
+    "code": "CAPITAL_AND_INTEREST",
+    "display": "Capital and Interest"
+  },
+  "monthlyPayment": {
+    "amount": 1945.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "overpaymentAllowance": {
+    "allowedPercentage": 10,
+    "allowedAmount": {
+      "amount": 35000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "earlyRepaymentCharge": {
+      "applicable": true,
+      "percentage": 3,
+      "expiryDate": "2028-01-15"
+    }
+  },
+  "loanToValue": 70.0,
+  "propertyValue": {
+    "amount": 464285.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "purpose": {
+    "code": "RESIDENTIAL_PURCHASE",
+    "display": "Residential Purchase"
+  },
+  "isInterestOnly": false,
+  "hasAssociatedProtection": true,
+  "protectionRefs": [
+    {
+      "id": 20001,
+      "href": "/api/v1/factfinds/679/arrangements/protection/20001"
+    }
+  ],
+  "adviserDetails": {
+    "adviserName": "John Adviser",
+    "firmName": "ABC Mortgage Services",
+    "adviceDate": "2022-12-10"
+  },
+  "notes": "5-year fixed rate mortgage. Fixed rate ends January 2028. Review options 6 months before.",
+  "createdAt": "2023-01-20T10:00:00Z",
+  "updatedAt": "2026-02-15T09:00:00Z"
+}
+```
+
+#### Mortgage Purpose Codes
+
+| Code | Display Name |
+|------|-------------|
+| `RESIDENTIAL_PURCHASE` | Residential Purchase |
+| `RESIDENTIAL_REMORTGAGE` | Residential Remortgage |
+| `BUY_TO_LET_PURCHASE` | Buy-to-Let Purchase |
+| `BUY_TO_LET_REMORTGAGE` | Buy-to-Let Remortgage |
+| `CAPITAL_RAISING` | Capital Raising |
+| `DEBT_CONSOLIDATION` | Debt Consolidation |
+
+---
+
+### 13.42 Arrangement - Investment Contract (General Investment Account)
+
+The `InvestmentArrangement` contract represents investment products including GIAs, ISAs, Investment Bonds, and Platform Accounts.
+
+**Reference Type:** InvestmentArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Investment type classification
+- Provider and platform details
+- Asset allocation and fund holdings
+- Valuation tracking
+- Links to attitude to risk
+- Contribution and withdrawal tracking
+
+#### Complete Investment Arrangement Contract (GIA Example)
+
+```json
+{
+  "id": 13001,
+  "href": "/api/v1/factfinds/679/arrangements/investments/13001",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "arrangementCategory": {
+    "code": "INVESTMENT",
+    "display": "Investment"
+  },
+  "investmentType": {
+    "code": "GENERAL_INVESTMENT_ACCOUNT",
+    "display": "General Investment Account (GIA)"
+  },
+  "productName": "Vanguard Investment Account",
+  "providerName": "Vanguard",
+  "providerRef": {
+    "id": "provider-456",
+    "href": "/api/v1/providers/provider-456"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "accountNumber": "GIA-987654321",
+  "startDate": "2020-03-15",
+  "currentValue": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalContributions": {
+    "amount": 60000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "gainLoss": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 25.0
+  },
+  "assetAllocation": {
+    "equities": 65.0,
+    "bonds": 25.0,
+    "cash": 5.0,
+    "alternatives": 5.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Vanguard LifeStrategy 80% Equity Fund",
+      "fundCode": "GB00B4PQW151",
+      "units": 5234.567,
+      "currentValue": {
+        "amount": 45000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 60.0
+    },
+    {
+      "fundName": "Vanguard FTSE Global All Cap Index Fund",
+      "fundCode": "GB00BD3RZ582",
+      "units": 1876.234,
+      "currentValue": {
+        "amount": 25000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 33.3
+    },
+    {
+      "fundName": "Vanguard UK Government Bond Index Fund",
+      "fundCode": "GB00B1S74Q32",
+      "units": 567.890,
+      "currentValue": {
+        "amount": 5000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 6.7
+    }
+  ],
+  "regularContributions": {
+    "amount": {
+      "amount": 500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "frequency": {
+      "code": "MONTHLY",
+      "display": "Monthly"
+    },
+    "startDate": "2020-03-15",
+    "isActive": true
+  },
+  "withdrawals": {
+    "hasRegularWithdrawals": false
+  },
+  "charges": {
+    "platformFee": 0.25,
+    "fundCharges": 0.22,
+    "totalAnnualCharge": 0.47
+  },
+  "riskProfile": {
+    "targetRiskLevel": 6,
+    "atrRef": {
+      "id": 3333,
+      "href": "/api/v1/factfinds/679/clients/client-123/attitude-to-risk/3333"
+    }
+  },
+  "taxWrapper": {
+    "code": "TAXABLE",
+    "display": "Taxable (GIA)"
+  },
+  "investmentObjective": "Long-term capital growth for retirement planning",
+  "adviserDetails": {
+    "adviserName": "Jane Financial Adviser",
+    "firmName": "XYZ Wealth Management",
+    "adviceDate": "2020-02-28",
+    "lastReviewDate": "2025-11-15"
+  },
+  "notes": "General Investment Account with monthly contributions. Balanced risk profile aligned with ATR.",
+  "createdAt": "2020-03-20T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Investment Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `GENERAL_INVESTMENT_ACCOUNT` | General Investment Account (GIA) |
+| `STOCKS_SHARES_ISA` | Stocks & Shares ISA |
+| `CASH_ISA` | Cash ISA |
+| `LIFETIME_ISA` | Lifetime ISA |
+| `JUNIOR_ISA` | Junior ISA |
+| `INVESTMENT_BOND` | Investment Bond |
+| `OFFSHORE_BOND` | Offshore Bond |
+| `UNIT_TRUSTS` | Unit Trusts |
+| `OEICS` | OEICs (Open-Ended Investment Companies) |
+| `INVESTMENT_TRUSTS` | Investment Trusts |
+| `ETFS` | ETFs (Exchange-Traded Funds) |
+| `DIRECT_EQUITIES` | Direct Equities |
+| `PLATFORM_ACCOUNT` | Platform Account |
+
+---
+
+### 13.43 Arrangement - Protection Contract (Life Assurance)
+
+The `ProtectionArrangement` contract represents protection products including Life Assurance, Critical Illness Cover, and Income Protection.
+
+**Reference Type:** ProtectionArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Protection type classification
+- Sum assured and premium details
+- Beneficiary information
+- Policy term and expiry
+- Trust arrangement status
+- Claims tracking
+
+#### Complete Protection Arrangement Contract (Life Assurance Example)
+
+```json
+{
+  "id": 20001,
+  "href": "/api/v1/factfinds/679/arrangements/protection/20001",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "arrangementCategory": {
+    "code": "PROTECTION",
+    "display": "Protection"
+  },
+  "protectionType": {
+    "code": "LIFE_ASSURANCE",
+    "display": "Life Assurance"
+  },
+  "policyType": {
+    "code": "DECREASING_TERM",
+    "display": "Decreasing Term Assurance"
+  },
+  "productName": "Mortgage Protection Plan",
+  "providerName": "Aviva",
+  "providerRef": {
+    "id": "provider-789",
+    "href": "/api/v1/providers/provider-789"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "policyNumber": "LA-12345678",
+  "startDate": "2023-01-15",
+  "endDate": "2048-01-15",
+  "termRemaining": {
+    "years": 21,
+    "months": 11
+  },
+  "sumAssured": {
+    "amount": 350000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "currentSumAssured": {
+    "amount": 325000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "note": "Decreasing with mortgage balance"
+  },
+  "premium": {
+    "amount": 45.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "premiumFrequency": {
+    "code": "MONTHLY",
+    "display": "Monthly"
+  },
+  "premiumType": {
+    "code": "GUARANTEED",
+    "display": "Guaranteed Premium"
+  },
+  "isInTrust": true,
+  "trustDetails": {
+    "trustType": "Bare Trust",
+    "trustees": [
+      "Sarah Smith"
+    ],
+    "beneficiaries": [
+      "Emily Smith",
+      "Thomas Smith"
+    ]
+  },
+  "beneficiaries": [
+    {
+      "name": "Sarah Smith",
+      "relationship": "Spouse",
+      "percentage": 100
+    }
+  ],
+  "linkedTo": {
+    "mortgageRef": {
+      "id": 12001,
+      "href": "/api/v1/factfinds/679/arrangements/mortgages/12001"
+    },
+    "liabilityRef": {
+      "id": 5678,
+      "href": "/api/v1/factfinds/679/clients/346/liabilities/5678"
+    }
+  },
+  "underwriting": {
+    "underwritingType": "Full Medical Underwriting",
+    "completedDate": "2023-01-10",
+    "exclusions": []
+  },
+  "indexation": {
+    "isIndexLinked": false
+  },
+  "adviserDetails": {
+    "adviserName": "John Adviser",
+    "firmName": "ABC Protection Services",
+    "adviceDate": "2022-12-10"
+  },
+  "reviewDate": "2027-01-15",
+  "notes": "Decreasing term assurance to protect mortgage. Written in trust for estate planning. Policy decreases in line with mortgage balance.",
+  "createdAt": "2023-01-20T10:00:00Z",
+  "updatedAt": "2026-02-15T09:00:00Z"
+}
+```
+
+#### Protection Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `LIFE_ASSURANCE` | Life Assurance |
+| `CRITICAL_ILLNESS_COVER` | Critical Illness Cover |
+| `INCOME_PROTECTION` | Income Protection |
+| `LIFE_AND_CRITICAL_ILLNESS` | Life and Critical Illness |
+| `FAMILY_INCOME_BENEFIT` | Family Income Benefit |
+| `ACCIDENT_SICKNESS_UNEMPLOYMENT` | Accident, Sickness and Unemployment (ASU) |
+
+#### Policy Type Codes (Life Assurance)
+
+| Code | Display Name |
+|------|-------------|
+| `LEVEL_TERM` | Level Term Assurance |
+| `DECREASING_TERM` | Decreasing Term Assurance |
+| `INCREASING_TERM` | Increasing Term Assurance |
+| `WHOLE_OF_LIFE` | Whole of Life Assurance |
+| `FAMILY_INCOME_BENEFIT` | Family Income Benefit |
+| `CONVERTIBLE_TERM` | Convertible Term Assurance |
+
+---
+
+### 13.44 Arrangement - Pension Contract (Personal Pension)
+
+The `PensionArrangement` contract represents pension products including Personal Pensions, SIPPs, Workplace Pensions, Final Salary schemes, and Annuities.
+
+**Reference Type:** PensionArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Pension type classification
+- Fund value and contribution tracking
+- Retirement age and projection
+- Death benefits
+- Investment allocation
+- Tax relief tracking
+
+#### Complete Pension Arrangement Contract (Personal Pension Example)
+
+```json
+{
+  "id": 30001,
+  "href": "/api/v1/factfinds/679/arrangements/pensions/30001",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v1/factfinds/679"
+  },
+  "arrangementCategory": {
+    "code": "PENSION",
+    "display": "Pension"
+  },
+  "pensionType": {
+    "code": "PERSONAL_PENSION",
+    "display": "Personal Pension"
+  },
+  "productName": "Vanguard Personal Pension",
+  "providerName": "Vanguard",
+  "providerRef": {
+    "id": "provider-456",
+    "href": "/api/v1/providers/provider-456"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v1/factfinds/679/clients/client-123"
+  },
+  "policyNumber": "PP-123456789",
+  "startDate": "2010-04-06",
+  "currentValue": {
+    "amount": 185000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalContributions": {
+    "amount": 120000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "growthToDate": {
+    "amount": 65000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 54.2
+  },
+  "regularContributions": {
+    "grossAmount": {
+      "amount": 800.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "netAmount": {
+      "amount": 640.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "taxRelief": {
+      "amount": 160.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "frequency": {
+      "code": "MONTHLY",
+      "display": "Monthly"
+    },
+    "startDate": "2010-04-06",
+    "isActive": true
+  },
+  "retirementAge": 67,
+  "selectedRetirementAge": 65,
+  "stateRetirementAge": 67,
+  "crystallisedAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "uncrystallisedAmount": {
+    "amount": 185000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "taxFreeCashAvailable": {
+    "amount": 46250.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 25
+  },
+  "lifetimeAllowanceUsed": {
+    "amount": 185000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 16.4,
+    "note": "Lifetime Allowance abolished from April 2024"
+  },
+  "assetAllocation": {
+    "equities": 80.0,
+    "bonds": 15.0,
+    "cash": 3.0,
+    "alternatives": 2.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Vanguard LifeStrategy 100% Equity Fund",
+      "fundCode": "GB00B41XG308",
+      "units": 8234.567,
+      "currentValue": {
+        "amount": 148000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 80.0
+    },
+    {
+      "fundName": "Vanguard UK Government Bond Index Fund",
+      "fundCode": "GB00B1S74Q32",
+      "units": 3456.789,
+      "currentValue": {
+        "amount": 27750.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 15.0
+    },
+    {
+      "fundName": "Cash Fund",
+      "fundCode": "CASH001",
+      "currentValue": {
+        "amount": 9250.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 5.0
+    }
+  ],
+  "projectedValueAtRetirement": {
+    "lowGrowth": {
+      "amount": 285000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "mediumGrowth": {
+      "amount": 340000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "highGrowth": {
+      "amount": 410000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "assumedRetirementAge": 65
+  },
+  "deathBenefits": {
+    "beforeRetirement": {
+      "type": "Full fund value",
+      "amount": {
+        "amount": 185000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "isInTrust": true,
+    "nominatedBeneficiaries": [
+      {
+        "name": "Sarah Smith",
+        "relationship": "Spouse",
+        "percentage": 100
+      }
+    ]
+  },
+  "charges": {
+    "platformFee": 0.15,
+    "fundCharges": 0.22,
+    "totalAnnualCharge": 0.37
+  },
+  "adviserDetails": {
+    "adviserName": "Jane Financial Adviser",
+    "firmName": "XYZ Wealth Management",
+    "adviceDate": "2010-03-15",
+    "lastReviewDate": "2025-09-20"
+  },
+  "notes": "Personal pension with regular monthly contributions. Good growth to date. Review allocation as retirement approaches.",
+  "createdAt": "2010-04-10T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Pension Type Codes
+
+| Code | Display Name |
+|------|-------------|
+| `PERSONAL_PENSION` | Personal Pension |
+| `SIPP` | Self-Invested Personal Pension (SIPP) |
+| `WORKPLACE_PENSION` | Workplace Pension |
+| `GROUP_PERSONAL_PENSION` | Group Personal Pension |
+| `STAKEHOLDER_PENSION` | Stakeholder Pension |
+| `FINAL_SALARY` | Final Salary / Defined Benefit |
+| `STATE_PENSION` | State Pension |
+| `DRAWDOWN` | Pension Drawdown |
+| `ANNUITY` | Annuity |
+| `UNFUNDED_PUBLIC_SECTOR` | Unfunded Public Sector Scheme |
+
+---
+
+
 ---
 
 ## Appendices
