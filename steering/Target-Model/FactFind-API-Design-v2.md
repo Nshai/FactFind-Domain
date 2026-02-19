@@ -7874,11 +7874,11 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | **Assets** | | | |
-| GET | `/api/v1/factfinds/{id}/assets` | List all assets | `assets:read` |
-| POST | `/api/v1/factfinds/{id}/assets` | Add asset | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}` | Get asset details | `assets:read` |
-| PATCH | `/api/v1/factfinds/{id}/assets/{assetId}` | Update asset | `assets:write` |
-| DELETE | `/api/v1/factfinds/{id}/assets/{assetId}` | Delete asset | `assets:write` |
+| GET | `/api/v1/factfinds/{id}/clients/{clientId}/assets` | List all assets | `assets:read` |
+| POST | `/api/v1/factfinds/{id}/clients/{clientId}/assets` | Add asset | `assets:write` |
+| GET | `/api/v1/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Get asset details | `assets:read` |
+| PUT | `/api/v1/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Update asset | `assets:write` |
+| DELETE | `/api/v1/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Delete asset | `assets:write` |
 | **Liabilities** | | | |
 | GET | `/api/v1/factfinds/{id}/liabilities` | List all liabilities | `liabilities:read` |
 | POST | `/api/v1/factfinds/{id}/liabilities` | Add liability | `liabilities:write` |
@@ -7886,22 +7886,22 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 | PATCH | `/api/v1/factfinds/{id}/liabilities/{liabilityId}` | Update liability | `liabilities:write` |
 | DELETE | `/api/v1/factfinds/{id}/liabilities/{liabilityId}` | Delete liability | `liabilities:write` |
 | **Property Details** | | | |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail` | Get property detail | `assets:read` |
-| PATCH | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail` | Update property detail | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/valuations` | Get valuation history | `assets:read` |
-| POST | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/valuations` | Add property valuation | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/ltv` | Calculate LTV | `assets:read` |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/rental-yield` | Calculate rental yield | `assets:read` |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/capital-gains` | Calculate CGT | `assets:read` |
+| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}` | Get property detail | `assets:read` |
+| PUT | `/api/v1/factfinds/{id}/property-detail/{propertyId}` | Update property detail | `assets:write` |
+| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}/valuations` | Get valuation history | `assets:read` |
+| POST | `/api/v1/factfinds/{id}/property-detail/{propertyId}/valuations` | Add property valuation | `assets:write` |
+| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}/ltv` | Calculate LTV | `assets:read` |
+| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}/rental-yield` | Calculate rental yield | `assets:read` |
+| GET | `/api/v1/factfinds/{id}/property-detail/{propertyId}/capital-gains` | Calculate CGT | `assets:read` |
 | **Business Asset Details** | | | |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/business-asset` | Get business asset detail | `assets:read` |
-| PATCH | `/api/v1/factfinds/{id}/assets/{assetId}/business-asset` | Update business asset | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/business-asset/valuations` | Get valuation history | `assets:read` |
-| POST | `/api/v1/factfinds/{id}/assets/{assetId}/business-asset/valuations` | Add business valuation | `assets:write` |
+| GET | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}` | Get business asset detail | `assets:read` |
+| PUT | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}` | Update business asset | `assets:write` |
+| GET | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}/valuations` | Get valuation history | `assets:read` |
+| POST | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}/valuations` | Add business valuation | `assets:write` |
 | **Aggregated Views** | | | |
-| GET | `/api/v1/factfinds/{id}/assets/summary` | Get assets summary | `assets:read` |
+| GET | `/api/v1/factfinds/{id}/clients/{clientId}/assets/summary` | Get client assets summary | `assets:read` |
 | GET | `/api/v1/factfinds/{id}/liabilities/summary` | Get liabilities summary | `liabilities:read` |
-| GET | `/api/v1/factfinds/{id}/net-worth` | Calculate net worth | `assets:read` |
+| GET | `/api/v1/factfinds/{id}/clients/{clientId}/net-worth` | Calculate client net worth | `assets:read` |
 
 **Total Endpoints:** 24
 
@@ -7909,14 +7909,14 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.1 List Assets
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/assets`
+**Endpoint:** `GET /api/v1/factfinds/{id}/clients/{clientId}/assets`
 
-**Description:** Retrieve all assets associated with a factfind. Assets can be owned by individual clients or jointly owned.
+**Description:** Retrieve all assets associated with a client in a factfind. Assets can be owned solely or jointly.
 
 **Query Parameters:**
-- `assetType` - Filter by asset type (property, business, investment, cash, other)
-- `clientId` - Filter by owning client
-- `includeDetails` - Include embedded property/business details (default: false)
+- `assetType` - Filter by asset type codes (MAIN_RESIDENCE, CASH, INVESTMENTS, etc.)
+- `ownershipType` - Filter by ownership type (SOLE_CLIENT1, SOLE_CLIENT2, JOINT)
+- `hasIncome` - Filter assets with linked income (true/false)
 
 **Response:**
 
@@ -7924,18 +7924,14 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 {
   "assets": [
     {
-      "id": "asset-123",
-      "factfindRef": { "id": "ff-456", "href": "/api/v1/factfinds/ff-456" },
+      "id": 1234,
+      "href": "/api/v1/factfinds/679/clients/346/assets/1234",
+      "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
       "assetType": {
-        "code": "PROPERTY",
-        "display": "Property"
+        "code": "MAIN_RESIDENCE",
+        "display": "Main Residence"
       },
       "description": "Primary Residence - 123 Main Street",
-      "currentValue": {
-        "amount": 450000.00,
-        "currency": { "code": "GBP", "symbol": "£" },
-        "valuationDate": "2026-01-15"
-      },
       "ownership": {
         "ownershipType": {
           "code": "JOINT",
@@ -7943,22 +7939,29 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
         },
         "owners": [
           {
-            "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+            "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
             "ownershipShare": 50.0
           },
           {
-            "clientRef": { "id": "client-124", "href": "/api/v1/factfinds/ff-456/clients/client-124" },
+            "clientRef": { "id": "client-124", "href": "/api/v1/factfinds/679/clients/client-124" },
             "ownershipShare": 50.0
           }
         ]
       },
-      "hasPropertyDetail": true,
+      "currentValue": {
+        "amount": 450000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "valuedOn": "2026-01-15",
+      "originalValue": {
+        "amount": 350000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "purchasedOn": "2020-05-10",
+      "propertyRef": { "id": 1234, "href": "/api/v1/factfinds/679/property-detail/1234" },
+      "arrangementRef": { "id": 5678, "href": "/api/v1/factfinds/679/clients/346/arrangements/5678" },
       "createdAt": "2026-02-01T10:00:00Z",
-      "updatedAt": "2026-02-15T14:30:00Z",
-      "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/assets/asset-123" },
-        "property-detail": { "href": "/api/v1/factfinds/ff-456/assets/asset-123/property-detail" }
-      }
+      "updatedAt": "2026-02-15T14:30:00Z"
     }
   ],
   "totalCount": 1,
@@ -7971,25 +7974,24 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.2 Create Asset
 
-**Endpoint:** `POST /api/v1/factfinds/{id}/assets`
+**Endpoint:** `POST /api/v1/factfinds/{id}/clients/{clientId}/assets`
 
-**Description:** Add a new asset to the factfind.
+**Description:** Add a new asset to the client's portfolio.
 
 **Request Body:**
 
 ```json
 {
   "assetType": {
-    "code": "PROPERTY"
+    "code": "RENTAL_PROPERTY_OTHER_PROPERTY",
+    "display": "Rental Property / Other Property"
   },
   "description": "Buy-to-Let Property - 45 Oak Avenue",
-  "currentValue": {
-    "amount": 275000.00,
-    "currency": { "code": "GBP" },
-    "valuationDate": "2026-02-01"
-  },
   "ownership": {
-    "ownershipType": { "code": "SOLE" },
+    "ownershipType": {
+      "code": "SOLE_CLIENT1",
+      "display": "Sole Client 1"
+    },
     "owners": [
       {
         "clientRef": { "id": "client-123" },
@@ -7997,29 +7999,36 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       }
     ]
   },
-  "purchaseDetails": {
-    "purchaseDate": "2020-03-15",
-    "purchasePrice": {
-      "amount": 220000.00,
-      "currency": { "code": "GBP" }
-    }
-  }
+  "currentValue": {
+    "amount": 275000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "valuedOn": "2026-02-01",
+  "originalValue": {
+    "amount": 220000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "purchasedOn": "2020-03-15",
+  "propertyRef": { "id": 5001 },
+  "incomeRef": { "id": 3456 }
 }
 ```
 
-**Response:** 201 Created with complete asset entity including server-generated fields.
+**Response:** 201 Created with complete asset entity including server-generated fields (`id`, `href`, `factfindRef`, `createdAt`, `updatedAt`).
 
 #### 9.3.3 Get Property Details
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/assets/{assetId}/property-detail`
+**Endpoint:** `GET /api/v1/factfinds/{id}/property-detail/{propertyId}`
 
-**Description:** Get detailed property information for a property asset. This embedded resource contains property-specific fields.
+**Description:** Get detailed property information for a property asset. Property details are stored separately and referenced from the asset via `propertyRef`.
 
 **Response:**
 
 ```json
 {
-  "assetRef": { "id": "asset-123", "href": "/api/v1/factfinds/ff-456/assets/asset-123" },
+  "id": 1234,
+  "href": "/api/v1/factfinds/679/property-detail/1234",
+  "assetRef": { "id": 1234, "href": "/api/v1/factfinds/679/clients/346/assets/1234" },
   "propertyType": {
     "code": "RESIDENTIAL_OWNER_OCCUPIED",
     "display": "Residential - Owner Occupied"
@@ -8074,19 +8083,19 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     }
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/assets/asset-123/property-detail" },
-    "asset": { "href": "/api/v1/factfinds/ff-456/assets/asset-123" },
-    "valuations": { "href": "/api/v1/factfinds/ff-456/assets/asset-123/property-detail/valuations" },
-    "ltv": { "href": "/api/v1/factfinds/ff-456/assets/asset-123/property-detail/ltv" },
-    "rental-yield": { "href": "/api/v1/factfinds/ff-456/assets/asset-123/property-detail/rental-yield" },
-    "capital-gains": { "href": "/api/v1/factfinds/ff-456/assets/asset-123/property-detail/capital-gains" }
+    "self": { "href": "/api/v1/factfinds/679/property-detail/1234" },
+    "asset": { "href": "/api/v1/factfinds/679/clients/346/assets/1234" },
+    "valuations": { "href": "/api/v1/factfinds/679/property-detail/1234/valuations" },
+    "ltv": { "href": "/api/v1/factfinds/679/property-detail/1234/ltv" },
+    "rental-yield": { "href": "/api/v1/factfinds/679/property-detail/1234/rental-yield" },
+    "capital-gains": { "href": "/api/v1/factfinds/679/property-detail/1234/capital-gains" }
   }
 }
 ```
 
 #### 9.3.4 Calculate LTV (Loan-to-Value)
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/assets/{assetId}/property-detail/ltv`
+**Endpoint:** `GET /api/v1/factfinds/{id}/property-detail/{propertyId}/ltv`
 
 **Description:** Calculate the Loan-to-Value ratio for a property by comparing linked mortgages to current property value.
 
@@ -8123,7 +8132,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.5 Calculate Rental Yield
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/assets/{assetId}/property-detail/rental-yield`
+**Endpoint:** `GET /api/v1/factfinds/{id}/property-detail/{propertyId}/rental-yield`
 
 **Description:** Calculate gross and net rental yield for a buy-to-let property.
 
@@ -8222,9 +8231,9 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.7 Get Assets Summary
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/assets/summary`
+**Endpoint:** `GET /api/v1/factfinds/{id}/clients/{clientId}/assets/summary`
 
-**Description:** Get aggregated summary of all assets by type.
+**Description:** Get aggregated summary of all assets for a client by type.
 
 **Response:**
 
@@ -8237,13 +8246,22 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   },
   "assetsByType": [
     {
-      "assetType": { "code": "PROPERTY", "display": "Property" },
-      "count": 2,
+      "assetType": { "code": "MAIN_RESIDENCE", "display": "Main Residence" },
+      "count": 1,
       "totalValue": {
-        "amount": 725000.00,
+        "amount": 450000.00,
         "currency": { "code": "GBP" }
       },
-      "percentage": 100.0
+      "percentage": 62.07
+    },
+    {
+      "assetType": { "code": "RENTAL_PROPERTY_OTHER_PROPERTY", "display": "Rental Property / Other Property" },
+      "count": 1,
+      "totalValue": {
+        "amount": 275000.00,
+        "currency": { "code": "GBP" }
+      },
+      "percentage": 37.93
     }
   ],
   "assetsByClient": [
@@ -8270,17 +8288,18 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.8 Calculate Net Worth
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/net-worth`
+**Endpoint:** `GET /api/v1/factfinds/{id}/clients/{clientId}/net-worth`
 
-**Description:** Calculate net worth (total assets minus total liabilities) for the factfind.
+**Description:** Calculate net worth (total assets minus total liabilities) for a specific client.
 
 **Response:**
 
 ```json
 {
-  "factfindRef": { "id": "ff-456" },
+  "factfindRef": { "id": 679 },
+  "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
   "totalAssets": {
-    "amount": 725000.00,
+    "amount": 475000.00,
     "currency": { "code": "GBP" }
   },
   "totalLiabilities": {
@@ -8288,21 +8307,17 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     "currency": { "code": "GBP" }
   },
   "netWorth": {
-    "amount": 545000.00,
+    "amount": 295000.00,
     "currency": { "code": "GBP" }
   },
-  "byClient": [
+  "assetBreakdown": [
     {
-      "clientRef": { "id": "client-123", "name": "John Smith" },
-      "assets": { "amount": 500000.00, "currency": { "code": "GBP" } },
-      "liabilities": { "amount": 90000.00, "currency": { "code": "GBP" } },
-      "netWorth": { "amount": 410000.00, "currency": { "code": "GBP" } }
+      "assetType": { "code": "MAIN_RESIDENCE", "display": "Main Residence" },
+      "value": { "amount": 450000.00, "currency": { "code": "GBP" } }
     },
     {
-      "clientRef": { "id": "client-124", "name": "Jane Smith" },
-      "assets": { "amount": 225000.00, "currency": { "code": "GBP" } },
-      "liabilities": { "amount": 90000.00, "currency": { "code": "GBP" } },
-      "netWorth": { "amount": 135000.00, "currency": { "code": "GBP" } }
+      "assetType": { "code": "CASH", "display": "Cash" },
+      "value": { "amount": 25000.00, "currency": { "code": "GBP" } }
     }
   ],
   "calculatedAt": "2026-02-18T10:30:00Z"
