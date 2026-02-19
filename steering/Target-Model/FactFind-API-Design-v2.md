@@ -5,17 +5,16 @@
 
 **Document Version:** 2.0
 **Date:** 2026-02-18
-**Status:** Design Specification v2.0 
+**Status:** Design Specification v2.0 - Enhanced with Missing Entities
 **API Version:** v1
 **Base URL:** `https://api.factfind.com`
-**Source:** Complete Domain Coverage (50+ entities, 2,000+ fields)
+**Source:** Greenfield ERD Enhanced - Complete Domain Coverage (50+ entities, 2,000+ fields)
 
 ---
 
 ## Executive Summary
 
-This document presents a comprehensive RESTful API design for the FactFind system, a wealth management platform built on Domain-Driven Design (DDD) principles. 
-The API architecture follows industry best practices and provides complete coverage of all business capabilities required for modern financial advisory services.
+This document presents a comprehensive RESTful API design for the FactFind system, a wealth management platform built on Domain-Driven Design (DDD) principles. The API architecture follows industry best practices and provides complete coverage of all business capabilities required for modern financial advisory services.
 
 ### Overview
 
@@ -56,6 +55,46 @@ The FactFind API provides comprehensive digital capabilities for:
 - **Architects:** System designers reviewing architectural decisions
 - **Compliance Teams:** Regulatory compliance verification
 
+
+
+### What's New in v2.0
+
+**PRIORITY 1: Risk Assessment Enhancements (Compliance Critical)**
+- **Section 10.4:** Risk Questionnaire API - Template management, versioning, regulatory approval
+- **Section 10.5:** Risk Assessment History API - Risk Replay mechanism, audit trail, comparison
+- **Section 10.6:** Supplementary Questions API - Additional risk and compliance questions
+- **Section 10.7:** Enhanced Declaration Capture - Comprehensive consent and signature management
+
+**PRIORITY 2: New Investment Capabilities**
+- **Section 9A:** NEW - Savings & Investments API - Dedicated investment operations, performance tracking, rebalancing
+
+**PRIORITY 3: Assets & Liabilities Enhancements**
+- **Section 9.4:** Property Management API - Property portfolio, valuations, LTV calculations
+- **Section 9.5:** Equities Portfolio API - Direct stock holdings, performance tracking
+
+**PRIORITY 3A: Circumstances & Credit Assessment**
+- **Section 6.5:** Credit History API - Credit scores, payment history, adverse credit tracking, mortgage suitability
+
+**PRIORITY 4: Client Profile Enhancements**
+- **Section 5.5:** Identity Verification API - KYC workflow, AML checks, document verification (REMOVED in v2.1 - now embedded)
+- **Section 5.6:** Data Protection & Consent API - GDPR compliance, consent management (REMOVED in v2.1 - now embedded)
+- **Section 5.7:** Marketing Preferences API - Channel preferences, opt-in/opt-out management (REMOVED in v2.1 - now embedded)
+
+**PRIORITY 5: Financial Position Tracking**
+- **Section 4.4:** Current Position Summary API - Net worth, asset allocation, financial health
+
+**New Entity Contracts (Section 12)**
+- Investment Contract (12.8)
+- Property Contract (12.9)
+- Equity Contract (12.10)
+
+**Coverage Improvements:**
+- Risk Assessment domain coverage increased from 38% to 95%
+- Savings & Investments now has dedicated API section
+- Client Profile domain coverage increased from 64% to 90%
+- Assets & Liabilities domain coverage increased from 67% to 95%
+- Overall API coverage increased from 77% to 95%
+
 ### What's New in v2.1 (This Release)
 
 **MAJOR ARCHITECTURAL CHANGES:**
@@ -79,12 +118,22 @@ The FactFind API provides comprehensive digital capabilities for:
    - Transactional boundaries
    - Entity lifecycle management
 
+4. **Breaking Changes** - All endpoints restructured (see Migration Guide in Appendix)
+   - Old: `/api/v1/factfinds/{factfindId}/clients/{clientId}` → New: `/api/v1/factfinds/{factfindId}/clients/{clientId}`
+   - Old: `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` → New: `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}`
+   - All HATEOAS links updated to reflect new structure
+
 **BENEFITS:**
 - Clearer data ownership and boundaries
 - Better multi-tenancy and security
 - Improved caching and performance
 - More discoverable API structure
 - Enforced transactional consistency
+
+**MIGRATION REQUIRED:**
+- All API consumers must update endpoint URLs
+- See Migration Guide for detailed mapping of old → new endpoints
+- Backward compatibility NOT maintained (major version bump required)
 
 ## Table of Contents
 
@@ -243,6 +292,11 @@ The FactFind API provides comprehensive digital capabilities for:
 
 ---
 
+**Appendices**
+
+- [Appendix A: Migration Guide - v2.0 to v2.1](#appendix-a-migration-guide---v20-to-v21) **NEW v2.1**
+
+---
 
 ## 1. API Design Principles
 
