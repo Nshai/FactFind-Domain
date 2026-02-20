@@ -908,6 +908,8 @@ The `Income` contract represents an income source within a FactFind.
 | id | Text | Unique system identifier for this record | income-101 |
 | incomePeriod | Complex Data |  | Complex object |
 | incomeType | Text |  | Employment |
+| isTaxable | Yes/No | Is this income taxable? Some income like Child Benefit or ISA interest may be tax-free. | Yes |
+| assetRef | Link to Asset | Link to the asset (property, investment, business) that generates this income. For example, rental income links to the rental property. | Property #5001 - Rental Property on High Street |
 | isGuaranteed | Yes/No |  | Yes |
 | isOngoing | Yes/No |  | Yes |
 | isPrimary | Yes/No | Whether this is the primary/main address | Yes |
@@ -998,6 +1000,47 @@ The `Income` contract represents an income source within a FactFind.
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | display | Text |  | British Pound |
 | symbol | Text |  | £ |
+
+**assetRef:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique identifier for the asset that generates this income | 5001 |
+| href | Text | Link to the asset resource | /api/v2/factfinds/679/assets/5001 |
+| assetType | Text | Type of asset (Property, Investment, Business, Other) | Property |
+| description | Text | Description of the asset | Rental Property - 45 High Street, Manchester |
+
+### Business Validation Rules
+
+**Tax Status:**
+- `isTaxable` should be set to "Yes" for most income types (employment, rental, dividends above allowances, interest above allowances, pension income)
+- `isTaxable` should be set to "No" for tax-free income such as:
+  - Child Benefit (if household income is under £50,000)
+  - ISA interest and dividends
+  - Premium Bonds prizes
+  - Certain disability benefits (PIP, DLA)
+  - Guardian's Allowance
+
+**Asset Reference Requirements:**
+- `assetRef` is required when the income type is:
+  - **Rental Income** → Must link to a Property asset
+  - **Dividend Income** → Must link to an Investment asset
+  - **Interest Income** → Must link to a Savings or Investment asset
+  - **Business Profit** → Must link to a Business asset
+- `assetRef` should be blank (null) for income types that don't originate from assets:
+  - Employment income (salary, wages, bonuses)
+  - Pension income (state pension, private pension in payment)
+  - Benefits (state benefits, welfare payments)
+  - Other income sources not tied to specific assets
+
+**Income-Asset Relationship Examples:**
+
+| Income Type | Asset Type | Description |
+|-------------|-----------|-------------|
+| Rental Income | Property | Links to residential or commercial property generating rental income |
+| Dividend Income | Investment | Links to stocks, shares, or investment accounts paying dividends |
+| Interest Income | Savings/Investment | Links to bank accounts, bonds, or other interest-bearing investments |
+| Business Profit | Business | Links to self-employed business or company generating profit distributions |
 
 ---
 

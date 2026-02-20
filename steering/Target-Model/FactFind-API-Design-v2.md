@@ -5849,6 +5849,7 @@ Use: Demonstrate suitability in file review
       "startDate": "2020-03-01",
       "endDate": null,
       "isTaxable": true,
+      "assetRef": null,
       "_links": {
         "self": {
           "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-111"
@@ -5871,6 +5872,12 @@ Use: Demonstrate suitability in file review
       "startDate": "2019-01-01",
       "endDate": null,
       "isTaxable": true,
+      "assetRef": {
+        "id": 5001,
+        "href": "/api/v2/factfinds/{factfindId}/assets/5001",
+        "assetType": "Property",
+        "description": "Buy-to-Let Property - 42 Elm Street"
+      },
       "_links": {
         "self": {
           "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-222"
@@ -5912,7 +5919,8 @@ Use: Demonstrate suitability in file review
   "frequency": "Annual",
   "startDate": "2027-01-01",
   "endDate": null,
-  "isTaxable": true
+  "isTaxable": true,
+  "assetRef": null
 }
 ```
 
@@ -5937,6 +5945,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333
   "startDate": "2027-01-01",
   "endDate": null,
   "isTaxable": true,
+  "assetRef": null,
   "createdAt": "2026-02-18T10:15:00Z",
   "updatedAt": "2026-02-18T10:15:00Z",
   "_links": {
@@ -17558,6 +17567,8 @@ The `Income` contract represents an income source within a FactFind.
   },
   "incomeType": "Employment",
   "description": "Salary from Tech Corp Ltd",
+  "isTaxable": true,
+  "assetRef": null,
   "grossAmount": {
     "amount": 75000.00,
     "currency": {
@@ -17615,6 +17626,8 @@ The `Income` contract represents an income source within a FactFind.
 - `employmentRef` - optional, updatable, reference to Employment
 - `incomeType` - required-on-create, updatable
 - `description` - optional, updatable
+- `isTaxable` - optional, updatable (boolean, defaults to true)
+- `assetRef` - optional, updatable, reference to Asset/Arrangement
 - `grossAmount` - required-on-create, updatable (MoneyValue)
 - `netAmount` - optional, updatable (MoneyValue)
 - `frequency` - required-on-create, updatable
@@ -17622,6 +17635,281 @@ The `Income` contract represents an income source within a FactFind.
 - `isOngoing`, `isPrimary`, `isGuaranteed` - optional, updatable
 - `taxDeducted`, `nationalInsuranceDeducted` - optional, updatable (MoneyValue)
 - `createdAt`, `updatedAt` - read-only
+
+**Field Definitions:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `isTaxable` | boolean | optional, updatable | Indicates whether the income is subject to taxation. Defaults to `true` if not specified. Set to `false` for tax-free income such as certain benefits, ISA income, or other non-taxable sources. Required for accurate affordability assessments and tax calculations. |
+| `assetRef` | AssetReference | optional, updatable | Reference to the asset that generates this income. Required for rental income (links to property), dividend income (links to investment), interest income (links to savings), or business profit (links to business). Includes `id`, `href`, `assetType`, and `description`. Enables traceability between income and underlying assets. |
+
+**AssetReference Structure:**
+
+```json
+{
+  "id": 5001,
+  "href": "/api/v2/factfinds/{factfindId}/assets/5001",
+  "assetType": "Property",
+  "description": "Rental Property - 45 High Street, Manchester"
+}
+```
+
+**Validation Rules:**
+
+**Tax Status Validation:**
+- `isTaxable` is optional; if omitted, defaults to `true`
+- For accurate affordability assessments, should be explicitly set for all income sources
+- Non-taxable income examples: Child Benefit (under threshold), Premium Bonds winnings, certain disability benefits, ISA interest/dividends
+- Taxable income examples: Employment income, self-employment profit, rental income, dividends (above allowance), interest (above allowance), pension income
+
+**Asset Reference Validation:**
+- `assetRef` is required when `incomeType` is one of: "Rental", "Dividend", "Interest", "BusinessProfit"
+- `assetRef.id` must reference an existing asset or arrangement in the factfind
+- `assetRef.assetType` must match the income type:
+  - "Rental" income → "Property" asset
+  - "Dividend" or "Interest" income → "Investment" asset
+  - "BusinessProfit" income → "Business" asset
+- `assetRef` should be `null` for income types that don't originate from assets (Employment, Pension, Benefits, etc.)
+
+**Business Rules:**
+
+**Tax Calculation:**
+- Taxable income (`isTaxable: true`) is included in tax liability calculations
+- Non-taxable income (`isTaxable: false`) is excluded from tax calculations but included in gross income totals
+- Mortgage affordability assessments may treat taxable and non-taxable income differently
+
+**Asset Linkage:**
+- When `assetRef` is provided, the income is directly associated with the generating asset
+- Enables impact analysis: if asset is sold, associated income ceases
+- Supports portfolio analysis: total return from an asset = capital growth + income generated
+- Required for regulatory reporting of asset-generated income
+
+**UK Tax-Free Income Types:**
+
+Common non-taxable income sources in the UK:
+- **ISA Income** - Interest and dividends from Individual Savings Accounts (ISAs) are tax-free
+- **Premium Bonds Prizes** - Winnings from NS&I Premium Bonds are not subject to income tax
+- **Child Benefit** - Tax-free if household income is under £50,000; subject to High Income Child Benefit Charge above this threshold
+- **Certain Disability Benefits** - Personal Independence Payment (PIP), Disability Living Allowance (DLA)
+- **Guardian's Allowance** - Financial support for children whose parents have died
+- **Bereavement Benefits** - Some bereavement benefits are tax-free
+- **Child Trust Fund Income** - Income generated within a Child Trust Fund is tax-free
+- **Scholarship Income** - In some cases, scholarship or grant income may be non-taxable
+
+**Income-Asset Relationships:**
+
+Income types that typically have asset references:
+
+| Income Type | Asset Type | Example |
+|-------------|-----------|---------|
+| **Rental Income** | Property Asset | Residential or commercial property generating rental income |
+| **Dividend Income** | Investment/Share Portfolio | Stocks, shares, or investment accounts paying dividends |
+| **Interest Income** | Savings Account or Investment | Bank accounts, bonds, or other interest-bearing investments |
+| **Business Profit** | Business Asset | Self-employed business or company generating profit distributions |
+| **Capital Growth/Gains** | Any Investment or Property | Realized or unrealized gains from asset appreciation |
+
+Income types that typically do NOT have asset references:
+- Employment income (salary, wages, bonuses)
+- Pension income (state pension, private pension in payment)
+- Benefits (state benefits, welfare payments)
+- Other income sources not tied to specific assets
+
+**Example Scenarios:**
+
+**Example 1: Rental Income (with assetRef, taxable)**
+```json
+{
+  "id": 2001,
+  "href": "/api/v2/factfinds/679/clients/456/incomes/2001",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "clientRef": {
+    "id": 456,
+    "href": "/api/v2/factfinds/679/clients/456",
+    "name": "John Smith",
+    "clientNumber": "C00123",
+    "type": "Person"
+  },
+  "employmentRef": null,
+  "incomeType": "Rental",
+  "description": "Rental income from investment property",
+  "isTaxable": true,
+  "assetRef": {
+    "id": 5001,
+    "href": "/api/v2/factfinds/679/assets/5001",
+    "assetType": "Property",
+    "description": "Rental Property - 45 High Street, Manchester"
+  },
+  "grossAmount": {
+    "amount": 18000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netAmount": {
+    "amount": 14400.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": {
+    "code": "M",
+    "display": "Monthly",
+    "periodsPerYear": 12
+  },
+  "incomePeriod": {
+    "startDate": "2020-06-01",
+    "endDate": null
+  },
+  "isOngoing": true,
+  "isPrimary": false,
+  "isGuaranteed": false,
+  "taxDeducted": {
+    "amount": 3600.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "nationalInsuranceDeducted": null,
+  "notes": "Buy-to-let property - managed by letting agent",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+**Example 2: Child Benefit (no assetRef, non-taxable under threshold)**
+```json
+{
+  "id": 2002,
+  "href": "/api/v2/factfinds/679/clients/456/incomes/2002",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "clientRef": {
+    "id": 456,
+    "href": "/api/v2/factfinds/679/clients/456",
+    "name": "John Smith",
+    "clientNumber": "C00123",
+    "type": "Person"
+  },
+  "employmentRef": null,
+  "incomeType": "Benefit",
+  "description": "Child Benefit - 2 children",
+  "isTaxable": false,
+  "assetRef": null,
+  "grossAmount": {
+    "amount": 2074.80,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netAmount": {
+    "amount": 2074.80,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": {
+    "code": "A",
+    "display": "Annually",
+    "periodsPerYear": 1
+  },
+  "incomePeriod": {
+    "startDate": "2022-01-15",
+    "endDate": null
+  },
+  "isOngoing": true,
+  "isPrimary": false,
+  "isGuaranteed": true,
+  "taxDeducted": null,
+  "nationalInsuranceDeducted": null,
+  "notes": "Income under £50,000 - no high income charge applies",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+**Example 3: Dividend Income (with assetRef, taxable)**
+```json
+{
+  "id": 2003,
+  "href": "/api/v2/factfinds/679/clients/456/incomes/2003",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "clientRef": {
+    "id": 456,
+    "href": "/api/v2/factfinds/679/clients/456",
+    "name": "John Smith",
+    "clientNumber": "C00123",
+    "type": "Person"
+  },
+  "employmentRef": null,
+  "incomeType": "Dividend",
+  "description": "Dividends from share portfolio",
+  "isTaxable": true,
+  "assetRef": {
+    "id": 13001,
+    "href": "/api/v2/factfinds/679/arrangements/investments/13001",
+    "assetType": "Investment",
+    "description": "Vanguard Investment Account"
+  },
+  "grossAmount": {
+    "amount": 8500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "netAmount": {
+    "amount": 7437.50,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "frequency": {
+    "code": "Q",
+    "display": "Quarterly",
+    "periodsPerYear": 4
+  },
+  "incomePeriod": {
+    "startDate": "2021-04-01",
+    "endDate": null
+  },
+  "isOngoing": true,
+  "isPrimary": false,
+  "isGuaranteed": false,
+  "taxDeducted": {
+    "amount": 1062.50,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "nationalInsuranceDeducted": null,
+  "notes": "Dividend income above £500 allowance - subject to dividend tax",
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
 
 ---
 
