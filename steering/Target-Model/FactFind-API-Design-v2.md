@@ -254,7 +254,7 @@ The FactFind API provides comprehensive digital capabilities for:
       - [10.4.5 Final Salary (Defined Benefit)](#1045-final-salary-defined-benefit)
       - [10.4.6 Pension Drawdown](#1046-pension-drawdown)
       - [10.4.7 Annuity](#1047-annuity)
-    - [10.5 Secured Lending Arrangements](#105-secured-lending-arrangements)
+    - [10.5 Mortgage Arrangements](#105-mortgage-arrangements)
     - [10.6 Protection Arrangements](#106-protection-arrangements)
       - [10.6.1 Personal Protection (Life, CI, IP)](#1061-personal-protection-life-ci-ip)
       - [10.6.2 General Insurance](#1062-general-insurance)
@@ -313,7 +313,7 @@ The FactFind API provides comprehensive digital capabilities for:
     - [13.38 Estate Planning - Gift Contract](#1338-estate-planning---gift-contract)
     - [13.39 Estate Planning - Trust Contract](#1339-estate-planning---trust-contract)
     - [13.40 Identity Verification & Data Protection Consent Contract](#1340-identity-verification--data-protection-consent-contract)
-    - [13.41 Arrangement - Secured Lending Contract](#1341-arrangement---secured-lending-contract)
+    - [13.41 Arrangement - Mortgage Contract](#1341-arrangement---mortgage-contract)
     - [13.42 Arrangement - Investment Contract (General Investment Account)](#1342-arrangement---investment-contract-general-investment-account)
     - [13.43 Arrangement - Protection Contract (Life Assurance)](#1343-arrangement---protection-contract-life-assurance)
     - [13.44 Arrangement - Pension Contract (Personal Pension)](#1344-arrangement---pension-contract-personal-pension)
@@ -491,8 +491,8 @@ Resources are organized into **business contexts** that reflect the domain model
 | **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Consent, Vulnerabilities, ID Verification, Professional Contacts | `/api/v1/factfinds/{id}/clients/{id}/*` |
 | **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v1/factfinds/{id}/clients/{id}/*` |
 | **Assets & Liabilities** | Assets, Business Assets, Property Details, Credit History, Valuations | `/api/v1/factfinds/{id}/assets` |
-| **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Secured Lending Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v1/factfinds/{id}/arrangements/{type}` |
-| **Goals & Objectives** | Objectives (investment, pension, protection, secured-lending, budget, estate-planning), Needs | `/api/v1/factfinds/{id}/objectives/{type}` |
+| **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v1/factfinds/{id}/arrangements/{type}` |
+| **Goals & Objectives** | Objectives (investment, pension, protection, mortgages, budget, estate-planning), Needs | `/api/v1/factfinds/{id}/objectives/{type}` |
 | **Risk Profiling** | ATR (client ATR), Supplementary Questions | `/api/v1/factfinds/{id}/attitude-to-risk` |
 | **Estate Planning** | Gifts, Trusts (nested under clients) | `/api/v1/factfinds/{id}/clients/{id}/estate-planning` |
 
@@ -9937,27 +9937,27 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-### 10.5 Secured Lending Arrangements
+### 10.5 Mortgage Arrangements
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/secured-lending`
+**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/mortgages`
 
-**Purpose:** Manage secured lending arrangements including traditional mortgages and equity release products linked to property assets.
+**Purpose:** Manage mortgage arrangements including traditional mortgages and equity release products linked to property assets.
 
 **Operations:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending` | Create Secured Lending | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending` | List Secured Lending | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending/{arrangementId}` | Get Secured Lending details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending/{arrangementId}` | Update Secured Lending | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/secured-lending/{arrangementId}` | Delete Secured Lending | `arrangements:write` |
+| POST | `/api/v1/factfinds/{factfindId}/arrangements/mortgages` | Create Mortgage | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/mortgages` | List Mortgages | `arrangements:read` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Get Mortgage details | `arrangements:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Update Mortgage | `arrangements:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Delete Mortgage | `arrangements:write` |
 
-**Create Secured Lending Request:**
+**Create Mortgage Request:**
 
 ```json
 {
-  "arrangementCategory": "SECURED_LENDING",
+  "arrangementCategory": "MORTGAGE",
   "accountNumber": "NBS-MORT-123456",
   "owners": [
     {
@@ -10093,12 +10093,12 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-secl-005",
-  "href": "/api/v1/factfinds/ff-456/arrangements/secured-lending/arr-secl-005",
+  "href": "/api/v1/factfinds/ff-456/arrangements/mortgages/arr-secl-005",
   "factfindRef": {
     "id": "ff-456",
     "href": "/api/v1/factfinds/ff-456"
   },
-  "arrangementCategory": "SECURED_LENDING",
+  "arrangementCategory": "MORTGAGE",
   "accountNumber": "NBS-MORT-123456",
   "policyNumber": null,
   "illustrationReference": null,
@@ -10246,7 +10246,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T10:50:00Z",
   "updatedAt": "2026-02-18T10:50:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/secured-lending/arr-secl-005" },
+    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/mortgages/arr-secl-005" },
     "factfind": { "href": "/api/v1/factfinds/ff-456" },
     "property": { "href": "/api/v1/factfinds/ff-456/properties/asset-prop-001" },
     "propertyDetail": { "href": "/api/v1/factfinds/ff-456/property-details/asset-prop-001" },
@@ -10259,7 +10259,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```
 
 **Validation Rules:**
-- `arrangementCategory` - Required, must be "SECURED_LENDING"
+- `arrangementCategory` - Required, must be "MORTGAGE"
 - `productType` - Required, see Product Type Codes (FixedRateMortgage, LifetimeMortgage, etc.)
 - `propertyDetail` - Required, must link to existing property detail record
 - `owners` - Required, at least one owner with sum of ownershipPercentage = 100
@@ -24606,31 +24606,31 @@ The `IdentityVerification` contract represents identity verification checks and 
 
 ---
 
-### 13.41 Arrangement - Secured Lending Contract
+### 13.41 Arrangement - Mortgage Contract
 
-The `SecuredLendingArrangement` contract represents secured lending products including traditional mortgages and equity release products (lifetime mortgages, home reversion plans). This unified contract uses a product type discriminator to handle both mortgage and equity release scenarios with industry-standard field grouping.
+The `MortgageArrangement` contract represents mortgage and equity release secured lending products including traditional mortgages, lifetime mortgages, and home reversion plans. This unified contract uses a product type discriminator to handle both mortgage and equity release scenarios with industry-standard field grouping.
 
-**Reference Type:** SecuredLendingArrangement is a reference type with identity (has `id` field).
+**Reference Type:** MortgageArrangement is a reference type with identity (has `id` field).
 
 **Key Features:**
-- Unified contract for mortgages and equity release products
-- Product type discriminator (FixedRateMortgage, LifetimeMortgage, etc.)
+- Unified contract for traditional mortgages and equity release products
+- Product type discriminator (FixedRateMortgage, LifetimeMortgage, HomeReversionPlan, etc.)
 - Industry-standard 14 field group structure
 - Owner array supporting multiple ownership percentages
 - Comprehensive interest rate and repayment structures
 - Support for shared ownership and offset features
 
-#### Complete Secured Lending Arrangement Contract
+#### Complete Mortgage Arrangement Contract
 
 ```json
 {
   "id": 5001,
-  "href": "/api/v1/factfinds/679/arrangements/secured-lending/5001",
+  "href": "/api/v1/factfinds/679/arrangements/mortgages/5001",
   "factfindRef": {
     "id": 679,
     "href": "/api/v1/factfinds/679"
   },
-  "arrangementCategory": "SECURED_LENDING",
+  "arrangementCategory": "MORTGAGE",
 
   "accountNumber": "MTG-001234",
   "policyNumber": "POL-98765",
@@ -24881,13 +24881,13 @@ The `SecuredLendingArrangement` contract represents secured lending products inc
 
 #### Field Definitions
 
-The SecuredLending contract is organized into 14 logical field groups for clarity and industry-standard alignment.
+The Mortgage contract is organized into 14 logical field groups for clarity and industry-standard alignment.
 
 ##### 1. Core Identification
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
-| `id` | integer | Required | Unique identifier for the secured lending arrangement |
+| `id` | integer | Required | Unique identifier for the mortgage arrangement |
 | `href` | string (URI) | Required | Self-referencing URI for this resource |
 | `accountNumber` | string | Optional | Lender's account reference number |
 | `policyNumber` | string | Optional | Policy or plan number |
@@ -25496,7 +25496,7 @@ The `ProtectionArrangement` contract represents protection products including Li
   "linkedTo": {
     "mortgageRef": {
       "id": 12001,
-      "href": "/api/v1/factfinds/679/arrangements/secured-lending/12001"
+      "href": "/api/v1/factfinds/679/arrangements/mortgages/12001"
     },
     "liabilityRef": {
       "id": 5678,
@@ -26139,7 +26139,7 @@ Version 2.1 introduces **breaking changes** to all API endpoints. The API has be
 |------|----------|
 | Investments | `GET /api/v1/factfinds/{factfindId}/arrangements/investments` |
 | Pensions | `GET /api/v1/factfinds/{factfindId}/arrangements/pensions` |
-| Secured Lending | `GET /api/v1/factfinds/{factfindId}/arrangements/secured-lending` |
+| Mortgages | `GET /api/v1/factfinds/{factfindId}/arrangements/mortgages` |
 | Protection | `GET /api/v1/factfinds/{factfindId}/arrangements/protection` |
 
 #### Goals & Objectives APIs
