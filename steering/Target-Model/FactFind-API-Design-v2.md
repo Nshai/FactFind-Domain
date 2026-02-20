@@ -62,10 +62,32 @@ The FactFind API provides comprehensive digital capabilities for:
    - [1.2 Naming Conventions](#12-naming-conventions)
    - [1.3 HTTP Methods & Status Codes](#13-http-methods--status-codes)
    - [1.4 Error Response Format](#14-error-response-format-rfc-7807)
-   - [1.5 API Architecture & Aggregate Root Pattern](#15-api-architecture--aggregate-root-pattern)   - [1.6 Versioning Strategy](#16-versioning-strategy)
+   - [1.5 API Architecture & Aggregate Root Pattern](#15-api-architecture--aggregate-root-pattern)
+      - [1.5.1 Hierarchical Structure](#151-hierarchical-structure)
+      - [1.5.2 FactFind as Aggregate Root](#152-factfind-as-aggregate-root)
+      - [1.5.3 Context-Based Organization](#153-context-based-organization)
+      - [1.5.4 Benefits of This Approach](#154-benefits-of-this-approach)
+      - [1.5.5 Transactional Boundaries](#155-transactional-boundaries)
+      - [1.5.6 Entity Lifecycle](#156-entity-lifecycle)
+      - [1.5.7 Special Considerations](#157-special-considerations)
+   - [1.6 Versioning Strategy](#16-versioning-strategy)
    - [1.7 Single Contract Principle](#17-single-contract-principle)
    - [1.8 Value and Reference Type Semantics](#18-value-and-reference-type-semantics)
+      - [1.8.1 Value Types](#181-value-types)
+      - [1.8.2 Reference Types](#182-reference-types)
+      - [1.8.3 When to Use Value vs Reference Types](#183-when-to-use-value-vs-reference-types)
+      - [1.8.4 Benefits of Value/Reference Semantics](#184-benefits-of-valuereference-semantics)
+      - [1.8.5 Resource Expansion](#185-resource-expansion)
+      - [1.8.6 Creating and Updating References](#186-creating-and-updating-references)
    - [1.9 Aggregate Root Pattern](#19-aggregate-root-pattern)
+      - [1.9.1 What is an Aggregate Root?](#191-what-is-an-aggregate-root)
+      - [1.9.2 Why FactFind is the Aggregate Root](#192-why-factfind-is-the-aggregate-root)
+      - [1.9.3 What This Means for API Consumers](#193-what-this-means-for-api-consumers)
+      - [1.9.4 Transactional Boundaries](#194-transactional-boundaries)
+      - [1.9.5 Entity Lifecycle](#195-entity-lifecycle)
+      - [1.9.6 Special Operations](#196-special-operations)
+      - [1.9.7 Benefits of This Approach](#197-benefits-of-this-approach)
+      - [1.9.8 Reference Data Exception](#198-reference-data-exception)
 2. [Authentication & Authorization](#2-authentication--authorization)
    - [2.1 OAuth 2.0 with JWT](#21-oauth-20-with-jwt)
    - [2.2 Authorization Scopes](#22-authorization-scopes)
@@ -75,88 +97,133 @@ The FactFind API provides comprehensive digital capabilities for:
 3. [Common Patterns](#3-common-patterns)
    - [3.1 Pagination](#31-pagination)
    - [3.2 Filtering & Sorting](#32-filtering--sorting)
-   - [3.3 Field Selection](#33-field-selection-sparse-fieldsets)
+   - [3.3 Field Selection (Sparse Fieldsets)](#33-field-selection-sparse-fieldsets)
    - [3.4 Resource Expansion](#34-resource-expansion)
    - [3.5 Optimistic Concurrency Control](#35-optimistic-concurrency-control)
    - [3.6 Batch Operations](#36-batch-operations)
-   - [3.7 HATEOAS](#37-hateoas-hypermedia-controls)
+   - [3.7 HATEOAS (Hypermedia Controls)](#37-hateoas-hypermedia-controls)
    - [3.8 Data Types](#38-data-types)
 4. [FactFind API (Root Aggregate)](#4-factfind-api-root-aggregate)
    - [4.1 Overview](#41-overview)
    - [4.2 Operations Summary](#42-operations-summary)
    - [4.3 Key Endpoints](#43-key-endpoints)
-   - [4.4 Current Position Summary API](#44-current-position-summary-api)5. [Client Management API](#5-client-management-api)
+      - [4.3.1 Create Client](#431-create-client)
+      - [4.3.2 Get Client](#432-get-client)
+      - [4.3.3 List Clients](#433-list-clients)
+      - [4.3.4 Add Address](#434-add-address)
+      - [4.3.5 Update Vulnerability Assessment](#435-update-vulnerability-assessment)
+   - [4.4 Current Position Summary API](#44-current-position-summary-api)
+      - [4.4.1 Operations Summary](#441-operations-summary)
+      - [4.4.2 Key Endpoints](#442-key-endpoints)
+         - [4.4.2.1 Get Current Position Summary](#4421-get-current-position-summary)
+5. [Client Management API](#5-client-management-api)
    - [5.1 Overview](#51-overview)
    - [5.2 Operations Summary](#52-operations-summary)
    - [5.3 Key Endpoints](#53-key-endpoints)
-   - [5.4 Estate Planning](#54-estate-planning)     - [5.4.1 Operations Summary](#541-operations-summary)
-     - [5.4.2 Get Estate Planning Overview](#542-get-estate-planning-overview)
-     - [5.4.3 Update Estate Planning Details](#543-update-estate-planning-details)
-     - [5.4.4 Record Gift](#544-record-gift)
-     - [5.4.5 List Gifts](#545-list-gifts)
-     - [5.4.6 Create Gift Trust](#546-create-gift-trust)
-   - [5.5 Dependants](#55-dependants)     - [5.5.1 Operations Summary](#551-operations-summary)
-     - [5.5.2 List Dependants](#552-list-dependants)
-     - [5.5.3 Create Dependant](#553-create-dependant)
-     - [5.5.4 Get Dependant Details](#554-get-dependant-details)
-     - [5.5.5 Update Dependant](#555-update-dependant)
-     - [5.5.6 Delete Dependant](#556-delete-dependant)
-   - [5.6 Notes](#56-notes)     - [5.6.1 Operations Summary](#561-operations-summary)
-     - [5.6.2 List Notes](#562-list-notes)
-     - [5.6.3 Create Note](#563-create-note)
-     - [5.6.4 Update Note](#564-update-note)
-     - [5.6.5 Delete Note](#565-delete-note)
-   - [5.7 Custom Questions (Supplementary Questions)](#57-custom-questions-supplementary-questions)     - [5.7.1 Operations Summary](#571-operations-summary)
-     - [5.7.2 List Custom Questions](#572-list-custom-questions)
-     - [5.7.3 Create Custom Question](#573-create-custom-question)
-     - [5.7.4 Get Custom Question Details](#574-get-custom-question-details)
-     - [5.7.5 Update Custom Question](#575-update-custom-question)
-     - [5.7.6 Delete Custom Question](#576-delete-custom-question)
-     - [5.7.7 Submit Question Answers](#577-submit-question-answers)
-     - [5.7.8 Get Question Answers](#578-get-question-answers)
+      - [5.3.1 Create FactFind](#531-create-factfind)
+      - [5.3.2 Add Income](#532-add-income)
+      - [5.3.3 Add Expenditure](#533-add-expenditure)
+      - [5.3.4 Get FactFind Summary](#534-get-factfind-summary)
+   - [5.4 Estate Planning](#54-estate-planning)
+      - [5.4.1 Operations Summary](#541-operations-summary)
+      - [5.4.2 Get Estate Planning Overview](#542-get-estate-planning-overview)
+      - [5.4.3 Update Estate Planning Details](#543-update-estate-planning-details)
+      - [5.4.4 Record Gift](#544-record-gift)
+      - [5.4.5 List Gifts](#545-list-gifts)
+      - [5.4.6 Create Gift Trust](#546-create-gift-trust)
+   - [5.5 Dependants](#55-dependants)
+      - [5.5.1 Operations Summary](#551-operations-summary)
+      - [5.5.2 List Dependants](#552-list-dependants)
+      - [5.5.3 Create Dependant](#553-create-dependant)
+      - [5.5.4 Get Dependant Details](#554-get-dependant-details)
+      - [5.5.5 Update Dependant](#555-update-dependant)
+      - [5.5.6 Delete Dependant](#556-delete-dependant)
+   - [5.6 Notes](#56-notes)
+      - [5.6.1 Operations Summary](#561-operations-summary)
+      - [5.6.2 List Notes](#562-list-notes)
+      - [5.6.3 Create Note](#563-create-note)
+      - [5.6.4 Update Note](#564-update-note)
+      - [5.6.5 Delete Note](#565-delete-note)
+   - [5.7 Custom Questions (Supplementary Questions)](#57-custom-questions-supplementary-questions)
+      - [5.7.1 Operations Summary](#571-operations-summary)
+      - [5.7.2 List Custom Questions](#572-list-custom-questions)
+      - [5.7.3 Create Custom Question](#573-create-custom-question)
+      - [5.7.4 Get Custom Question Details](#574-get-custom-question-details)
+      - [5.7.5 Update Custom Question](#575-update-custom-question)
+      - [5.7.6 Delete Custom Question](#576-delete-custom-question)
+      - [5.7.7 Submit Question Answers](#577-submit-question-answers)
+      - [5.7.8 Get Question Answers](#578-get-question-answers)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
    - [6.3 Key Endpoints](#63-key-endpoints)
-     - [6.3.1 List Employment Records](#631-list-employment-records)
-     - [6.3.2 Create Employment Record](#632-create-employment-record)
-     - [6.3.3 List Income Sources](#633-list-income-sources)
-     - [6.3.4 Create Income Source](#634-create-income-source)
-     - [6.3.5 Create Income Change](#635-create-income-change)
-     - [6.3.6 List Expenditure Items](#636-list-expenditure-items)
-     - [6.3.7 Create Expenditure Item](#637-create-expenditure-item)
-     - [6.3.8 Create Expenditure Change](#638-create-expenditure-change)
-   - [6.4 Affordability](#64-affordability)     - [6.4.1 Operations Summary](#641-operations-summary)
-     - [6.4.2 Calculate Affordability](#642-calculate-affordability)
-     - [6.4.3 List Affordability Calculations](#643-list-affordability-calculations)
-     - [6.4.4 Update Affordability Calculation](#644-update-affordability-calculation)
-     - [6.4.5 Delete Affordability Calculation](#645-delete-affordability-calculation)
-7. [Employment API (Part of Circumstances Context)](#7-employment-api-part-of-circumstances-context)
+      - [6.3.1 List Income Sources](#631-list-income-sources)
+      - [6.3.2 Create Income Source](#632-create-income-source)
+      - [6.3.3 Create Income Change](#633-create-income-change)
+      - [6.3.4 List Expenditure Items](#634-list-expenditure-items)
+      - [6.3.5 Create Expenditure Item](#635-create-expenditure-item)
+      - [6.3.6 Create Expenditure Change](#636-create-expenditure-change)
+   - [6.4 Affordability](#64-affordability)
+      - [6.4.1 Operations Summary](#641-operations-summary)
+      - [6.4.2 Calculate Affordability](#642-calculate-affordability)
+      - [6.4.3 List Affordability Calculations](#643-list-affordability-calculations)
+      - [6.4.4 Update Affordability Calculation](#644-update-affordability-calculation)
+      - [6.4.5 Delete Affordability Calculation](#645-delete-affordability-calculation)
+7. [Employment API (Circumstances Context)](#7-employment-api-circumstances-context)
    - [7.1 Overview](#71-overview)
    - [7.2 Operations Summary](#72-operations-summary)
    - [7.3 Key Endpoints](#73-key-endpoints)
+      - [7.3.1 List Employment Records](#731-list-employment-records)
+      - [7.3.2 Get Employment Details (Self-Employed Example)](#732-get-employment-details-self-employed-example)
+      - [7.3.3 Get Employment Details (Employed Example)](#733-get-employment-details-employed-example)
+      - [7.3.4 Create Employment Record (Self-Employed)](#734-create-employment-record-self-employed)
+      - [7.3.5 Create Employment Record (Employed)](#735-create-employment-record-employed)
+      - [7.3.6 Update Employment Record](#736-update-employment-record)
+      - [7.3.7 Delete Employment Record](#737-delete-employment-record)
+   - [7.4 Employment Status Types](#74-employment-status-types)
+   - [7.5 Employment Business Type (Self-Employed)](#75-employment-business-type-self-employed)
+   - [7.6 Field Definitions](#76-field-definitions)
+   - [7.7 Validation Rules](#77-validation-rules)
+   - [7.8 Business Rules](#78-business-rules)
+   - [7.9 Use Cases](#79-use-cases)
 8. [Credit History API](#8-credit-history-api)
    - [8.1 Overview](#81-overview)
    - [8.2 Operations Summary](#82-operations-summary)
    - [8.3 Key Endpoints](#83-key-endpoints)
-     - [8.3.1 Get Credit History](#831-get-credit-history)
-     - [8.3.2 Create Credit History Record](#832-create-credit-history-record)
-     - [8.3.3 Update Credit History Record](#833-update-credit-history-record)
-     - [8.3.4 Add Adverse Credit Event](#834-add-adverse-credit-event)
+      - [8.3.1 Get Credit History](#831-get-credit-history)
+      - [8.3.2 Create Credit History Record](#832-create-credit-history-record)
+      - [8.3.3 Update Credit History Record](#833-update-credit-history-record)
+      - [8.3.4 Add Adverse Credit Event](#834-add-adverse-credit-event)
    - [8.4 Field Definitions](#84-field-definitions)
    - [8.5 Validation Rules](#85-validation-rules)
    - [8.6 Business Rules](#86-business-rules)
 9. [Goals & Objectives API (Goals Context)](#9-goals--objectives-api-goals-context)
    - [9.1 Overview](#91-overview)
    - [9.2 Operations Summary](#92-operations-summary)
-   - [9.3 Key Endpoints](#93-key-endpoints)
+   - [9.3 Objective Types and Contracts](#93-objective-types-and-contracts)
+      - [9.3.1 Investment Objectives](#931-investment-objectives)
+      - [9.3.2 Pension Objectives](#932-pension-objectives)
+      - [9.3.3 Protection Objectives](#933-protection-objectives)
+      - [9.3.4 Mortgage Objectives](#934-mortgage-objectives)
+      - [9.3.5 Budget Objectives](#935-budget-objectives)
+      - [9.3.6 Estate Planning Objectives](#936-estate-planning-objectives)
+   - [9.4 Needs Sub-Resources](#94-needs-sub-resources)
 10. [Assets & Liabilities API](#10-assets--liabilities-api)
    - [10.1 Overview](#101-overview)
    - [10.2 Operations Summary](#102-operations-summary)
    - [10.3 Key Endpoints](#103-key-endpoints)
-11. [Arrangements API (Type-Based Routing)](#11-arrangements-api-type-based-routing)    - [11.1 Overview](#111-overview)
-    - [11.2 Arrangement Types and Routing](#112-arrangement-types-and-routing)
-    - [11.3 Investment Arrangements](#113-investment-arrangements)
+      - [10.3.1 List Assets](#1031-list-assets)
+      - [10.3.2 Create Asset](#1032-create-asset)
+      - [10.3.3 Get Property Details](#1033-get-property-details)
+      - [10.3.4 Calculate LTV (Loan-to-Value)](#1034-calculate-ltv-loan-to-value)
+      - [10.3.5 Calculate Rental Yield](#1035-calculate-rental-yield)
+      - [10.3.6 List Liabilities](#1036-list-liabilities)
+      - [10.3.7 Get Assets Summary](#1037-get-assets-summary)
+      - [10.3.8 Calculate Net Worth](#1038-calculate-net-worth)
+11. [Arrangements API (Type-Based Routing)](#11-arrangements-api-type-based-routing)
+   - [11.1 Overview](#111-overview)
+   - [11.2 Arrangement Types and Routing](#112-arrangement-types-and-routing)
+   - [11.3 Investment Arrangements](#113-investment-arrangements)
       - [11.3.1 GIA (General Investment Account)](#1131-gia-general-investment-account)
       - [11.3.2 ISA (Individual Savings Account)](#1132-isa-individual-savings-account)
       - [11.3.3 Investment Bonds](#1133-investment-bonds)
@@ -164,7 +231,7 @@ The FactFind API provides comprehensive digital capabilities for:
       - [11.3.5 Platform Accounts](#1135-platform-accounts)
       - [11.3.6 Offshore Bonds](#1136-offshore-bonds)
       - [11.3.7 Cash Accounts](#1137-cash-accounts)
-    - [11.4 Pension Arrangements](#114-pension-arrangements)
+   - [11.4 Pension Arrangements](#114-pension-arrangements)
       - [11.4.1 Personal Pension](#1141-personal-pension)
       - [11.4.2 State Pension](#1142-state-pension)
       - [11.4.3 Workplace Pension](#1143-workplace-pension)
@@ -173,67 +240,148 @@ The FactFind API provides comprehensive digital capabilities for:
       - [11.4.6 Pension Drawdown](#1146-pension-drawdown)
       - [11.4.7 Annuity](#1147-annuity)
       - [11.4.8 Money Purchase](#1148-money-purchase)
-    - [11.5 Mortgage Arrangements](#115-mortgage-arrangements)
-    - [11.6 Protection Arrangements](#116-protection-arrangements)
+   - [11.5 Mortgage Arrangements](#115-mortgage-arrangements)
+   - [11.6 Protection Arrangements](#116-protection-arrangements)
       - [11.6.1 Personal Protection (Life, CI, IP)](#1161-personal-protection-life-ci-ip)
       - [11.6.2 General Insurance](#1162-general-insurance)
-    - [11.7 Arrangement Sub-Resources](#117-arrangement-sub-resources)
+   - [11.7 Arrangement Sub-Resources](#117-arrangement-sub-resources)
       - [11.7.1 Contributions](#1171-contributions)
       - [11.7.2 Withdrawals](#1172-withdrawals)
       - [11.7.3 Beneficiaries](#1173-beneficiaries)
       - [11.7.4 Valuations](#1174-valuations)
 12. [Risk Profile API](#12-risk-profile-api)
-    - [12.1 Overview](#121-overview)
-    - [12.2 Operations Summary](#122-operations-summary)
-    - [12.3 Key Endpoints](#123-key-endpoints)
-    - [12.4 ATR Templates Reference Data](#124-atr-templates-reference-data)    - [12.5 Risk Assessment History API](#125-risk-assessment-history-api)    - [12.6 Integration with FactFind Workflow](#126-integration-with-factfind-workflow)
+   - [12.1 Overview](#121-overview)
+   - [12.2 Operations Summary](#122-operations-summary)
+   - [12.3 Key Endpoints](#123-key-endpoints)
+      - [12.3.1 Get Current ATR Assessment](#1231-get-current-atr-assessment)
+      - [12.3.2 Submit/Update ATR Assessment](#1232-submitupdate-atr-assessment)
+      - [12.3.3 Choose Risk Profile](#1233-choose-risk-profile)
+      - [12.3.4 Get ATR Assessment History (Risk Replay)](#1234-get-atr-assessment-history-risk-replay)
+   - [12.4 ATR Templates Reference Data](#124-atr-templates-reference-data)
+      - [12.4.1 List Available ATR Templates](#1241-list-available-atr-templates)
+      - [12.4.2 Get ATR Template Details](#1242-get-atr-template-details)
+   - [12.5 Risk Assessment History API](#125-risk-assessment-history-api)
+      - [12.5.1 Compare Two Assessments](#1251-compare-two-assessments)
+   - [12.6 Integration with FactFind Workflow](#126-integration-with-factfind-workflow)
 13. [Reference Data API](#13-reference-data-api)
-    - Reference data APIs remain unchanged (not scoped to factfinds)
+   - [13.1 Performance Considerations](#131-performance-considerations)
+   - [13.2 Caching Strategy](#132-caching-strategy)
+   - [13.3 Rate Limiting](#133-rate-limiting)
+   - [13.4 API Versioning](#134-api-versioning)
+   - [13.5 Security Best Practices](#135-security-best-practices)
 14. [Entity Contracts](#14-entity-contracts)
-    - [14.1 Client Contract](#141-client-contract)
-    - [14.2 FactFind Contract](#142-factfind-contract)
-    - [14.3 Address Contract](#143-address-contract)
-    - [14.4 Income Contract](#144-income-contract)
-    - [14.5 Arrangement Contract](#145-arrangement-contract)
-    - [14.6 Goal Contract](#146-goal-contract)
-    - [14.7 RiskProfile Contract](#147-riskprofile-contract)
-    - [14.8 Investment Contract](#148-investment-contract)
-    - [14.9 Property Contract](#149-property-contract)
-    - [14.10 Equity Contract](#1410-equity-contract)
-    - [14.11 IdentityVerification Contract](#1411-identityverification-contract)
-    - [14.12 Consent Contract](#1412-consent-contract)
-    - [14.13 Collection Response Wrapper](#1413-collection-response-wrapper)
-    - [14.14 Contract Extension for Other Entities](#1414-contract-extension-for-other-entities)
-    - [14.15 Standard Value Types](#1415-standard-value-types)
-    - [14.16 Standard Reference Types](#1416-standard-reference-types)
-    - [14.17 Asset Contract](#1417-asset-contract)
-    - [14.18 Liability Contract](#1418-liability-contract)
-    - [14.19 Employment Contract](#1419-employment-contract)
-    - [14.20 Budget Contract](#1420-budget-contract)
-    - [14.21 Expenditure Contract](#1421-expenditure-contract)
-    - [14.22 Expense Contract](#1422-expense-contract)
-    - [14.23 Credit History Contract](#1423-credit-history-contract)
-    - [14.24 Property Detail Contract](#1424-property-detail-contract)
-    - [14.25 Business Asset Contract](#1425-business-asset-contract)
-    - [14.26 Notes Contract](#1426-notes-contract)
-    - [14.27 Dependant Contract](#1427-dependant-contract)
-    - [14.28 Income Changes Contract](#1428-income-changes-contract)
-    - [14.29 Expenditure Changes Contract](#1429-expenditure-changes-contract)
-    - [14.30 Affordability Assessment Contract](#1430-affordability-assessment-contract)
-    - [14.31 Contact Contract](#1431-contact-contract)
-    - [14.32 Attitude to Risk (ATR) Contract](#1432-attitude-to-risk-atr-contract)
-    - [14.33 Professional Contact Contract](#1433-professional-contact-contract)
-    - [14.34 Vulnerability Contract](#1434-vulnerability-contract)
-    - [14.35 Marketing Preferences Contract](#1435-marketing-preferences-contract)
-    - [14.36 Estate Planning - Will Contract](#1436-estate-planning---will-contract)
-    - [14.37 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1437-estate-planning---lasting-power-of-attorney-lpa-contract)
-    - [14.38 Estate Planning - Gift Contract](#1438-estate-planning---gift-contract)
-    - [14.39 Estate Planning - Trust Contract](#1439-estate-planning---trust-contract)
-    - [14.40 Identity Verification & Data Protection Consent Contract](#1440-identity-verification--data-protection-consent-contract)
-    - [14.41 Arrangement - Mortgage Contract](#1441-arrangement---mortgage-contract)
-    - [14.42 Arrangement - Investment Contract (General Investment Account)](#1442-arrangement---investment-contract-general-investment-account)
-    - [14.43 Arrangement - Protection Contract (Life Assurance)](#1443-arrangement---protection-contract-life-assurance)
-    - [14.44 Arrangement - Pension Contract (Personal Pension)](#1444-arrangement---pension-contract-personal-pension)
+   - [14.1 Client Contract](#141-client-contract)
+      - [14.1.1 Person Client Example](#1411-person-client-example)
+      - [14.1.2 Corporate Client Example](#1412-corporate-client-example)
+      - [14.1.3 Trust Client Example](#1413-trust-client-example)
+      - [14.1.4 Field Behaviors (Composition Pattern)](#1414-field-behaviors-composition-pattern)
+      - [14.1.5 PersonValue Type Definition](#1415-personvalue-type-definition)
+      - [14.1.6 CorporateValue Type Definition](#1416-corporatevalue-type-definition)
+      - [14.1.7 TrustValue Type Definition](#1417-trustvalue-type-definition)
+      - [14.1.8 AddressValue Type](#1418-addressvalue-type)
+      - [14.1.9 ContactValue Type](#1419-contactvalue-type)
+      - [14.1.10 IdentityVerificationValue Type](#14110-identityverificationvalue-type)
+      - [14.1.11 VulnerabilityValue Type](#14111-vulnerabilityvalue-type)
+      - [14.1.12 DataProtectionValue Type](#14112-dataprotectionvalue-type)
+      - [14.1.13 MarketingPreferencesValue Type](#14113-marketingpreferencesvalue-type)
+      - [14.1.14 EstatePlanningValue Type](#14114-estateplanningvalue-type)
+      - [14.1.15 FinancialProfileValue Type](#14115-financialprofilevalue-type)
+      - [14.1.16 TerritorialProfileValue Type](#14116-territorialprofilevalue-type)
+      - [14.1.17 Validation Rules by Client Type](#14117-validation-rules-by-client-type)
+      - [14.1.18 Usage Examples](#14118-usage-examples)
+   - [14.2 FactFind Contract](#142-factfind-contract)
+      - [14.2.1 MeetingDetailsValue Type](#1421-meetingdetailsvalue-type)
+      - [14.2.2 FinancialSummaryValue Type](#1422-financialsummaryvalue-type)
+      - [14.2.3 AssetHoldingsValue Type](#1423-assetholdingsvalue-type)
+      - [14.2.4 InvestmentCapacityValue Type](#1424-investmentcapacityvalue-type)
+      - [14.2.5 CompletionStatusValue Type](#1425-completionstatusvalue-type)
+   - [14.3 Address Contract](#143-address-contract)
+   - [14.4 Income Contract](#144-income-contract)
+   - [14.5 Arrangement Contract](#145-arrangement-contract)
+   - [14.6 Goal Contract](#146-goal-contract)
+   - [14.7 RiskProfile Contract](#147-riskprofile-contract)
+   - [14.8 Investment Contract](#148-investment-contract)
+   - [14.9 Property Contract](#149-property-contract)
+   - [14.10 Equity Contract](#1410-equity-contract)
+   - [14.11 IdentityVerification Contract](#1411-identityverification-contract)
+   - [14.12 Consent Contract](#1412-consent-contract)
+   - [14.13 Collection Response Wrapper](#1413-collection-response-wrapper)
+   - [14.14 Contract Extension for Other Entities](#1414-contract-extension-for-other-entities)
+   - [14.15 Standard Value Types](#1415-standard-value-types)
+      - [14.15.1 MoneyValue](#14151-moneyvalue)
+      - [14.15.2 AddressValue](#14152-addressvalue)
+      - [14.15.3 DateRangeValue](#14153-daterangevalue)
+      - [14.15.4 NameValue](#14154-namevalue)
+      - [14.15.5 ContactValue](#14155-contactvalue)
+      - [14.15.6 PercentageValue](#14156-percentagevalue)
+      - [14.15.7 RateValue](#14157-ratevalue)
+      - [14.15.8 TaxDetailsValue](#14158-taxdetailsvalue)
+      - [14.15.9 AdverseCreditEvent](#14159-adversecreditevent)
+      - [14.15.10 Enumeration Value Types](#141510-enumeration-value-types)
+   - [14.16 Standard Reference Types](#1416-standard-reference-types)
+      - [14.16.1 ClientRef](#14161-clientref)
+      - [14.16.2 AdviserRef](#14162-adviserref)
+      - [14.16.3 ProviderRef](#14163-providerref)
+      - [14.16.4 ArrangementRef](#14164-arrangementref)
+      - [14.16.5 EmploymentRef](#14165-employmentref)
+      - [14.16.6 GoalRef](#14166-goalref)
+      - [14.16.7 FactFindRef](#14167-factfindref)
+   - [14.17 Asset Contract](#1417-asset-contract)
+   - [14.18 Liability Contract](#1418-liability-contract)
+   - [14.19 Employment Contract](#1419-employment-contract)
+   - [14.20 Budget Contract](#1420-budget-contract)
+   - [14.21 Expenditure Contract](#1421-expenditure-contract)
+   - [14.22 Expense Contract](#1422-expense-contract)
+   - [14.23 Credit History Contract](#1423-credit-history-contract)
+   - [14.24 Property Detail Contract](#1424-property-detail-contract)
+   - [14.25 Business Asset Contract](#1425-business-asset-contract)
+   - [14.26 Notes Contract](#1426-notes-contract)
+   - [14.27 Dependant Contract](#1427-dependant-contract)
+   - [14.28 Income Changes Contract](#1428-income-changes-contract)
+   - [14.29 Expenditure Changes Contract](#1429-expenditure-changes-contract)
+   - [14.30 Affordability Assessment Contract](#1430-affordability-assessment-contract)
+   - [14.31 Contact Contract](#1431-contact-contract)
+   - [14.32 Attitude to Risk (ATR) Contract](#1432-attitude-to-risk-atr-contract)
+   - [14.33 Professional Contact Contract](#1433-professional-contact-contract)
+   - [14.34 Vulnerability Contract](#1434-vulnerability-contract)
+   - [14.35 Marketing Preferences Contract](#1435-marketing-preferences-contract)
+   - [14.36 Estate Planning - Will Contract](#1436-estate-planning---will-contract)
+   - [14.37 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1437-estate-planning---lasting-power-of-attorney-lpa-contract)
+   - [14.38 Estate Planning - Gift Contract](#1438-estate-planning---gift-contract)
+   - [14.39 Estate Planning - Trust Contract](#1439-estate-planning---trust-contract)
+   - [14.40 Identity Verification & Data Protection Consent Contract](#1440-identity-verification--data-protection-consent-contract)
+   - [14.41 Arrangement - Mortgage Contract](#1441-arrangement---mortgage-contract)
+   - [14.42 Arrangement - Investment Contract (General Investment Account)](#1442-arrangement---investment-contract-general-investment-account)
+   - [14.43 Arrangement - Protection Contract (Life Assurance)](#1443-arrangement---protection-contract-life-assurance)
+   - [14.44 Arrangement - Pension Contract (Personal Pension)](#1444-arrangement---pension-contract-personal-pension)
+   - [14.45 Arrangement - Pension Contract (SIPP)](#1445-arrangement---pension-contract-sipp)
+   - [14.46 Arrangement - Pension Contract (Final Salary / Defined Benefit)](#1446-arrangement---pension-contract-final-salary--defined-benefit)
+   - [14.47 Arrangement - Pension Contract (Money Purchase)](#1447-arrangement---pension-contract-money-purchase)
+   - [14.48 Arrangement - Pension Contract (State Pension)](#1448-arrangement---pension-contract-state-pension)
+   - [14.49 Arrangement - Pension Contract (Stakeholder Pension)](#1449-arrangement---pension-contract-stakeholder-pension)
+   - [14.50 Arrangement - Pension Contract (Group Personal Pension)](#1450-arrangement---pension-contract-group-personal-pension)
+   - [14.51 Arrangement - Pension Contract (Executive Pension Plan)](#1451-arrangement---pension-contract-executive-pension-plan)
+   - [14.52 Arrangement - Investment Contract (Stocks & Shares ISA)](#1452-arrangement---investment-contract-stocks--shares-isa)
+   - [14.53 Arrangement - Investment Contract (Cash ISA)](#1453-arrangement---investment-contract-cash-isa)
+   - [14.54 Arrangement - Investment Contract (Lifetime ISA)](#1454-arrangement---investment-contract-lifetime-isa)
+   - [14.55 Arrangement - Investment Contract (Investment Bond - Onshore)](#1455-arrangement---investment-contract-investment-bond---onshore)
+   - [14.56 Arrangement - Investment Contract (Investment Bond - Offshore)](#1456-arrangement---investment-contract-investment-bond---offshore)
+   - [14.57 Arrangement - Investment Contract (Savings Account / Cash Deposit)](#1457-arrangement---investment-contract-savings-account--cash-deposit)
+   - [14.58 Arrangement - Protection Contract (Critical Illness Cover)](#1458-arrangement---protection-contract-critical-illness-cover)
+   - [14.59 Arrangement - Protection Contract (Income Protection Insurance)](#1459-arrangement---protection-contract-income-protection-insurance)
+   - [14.60 Arrangement - Protection Contract (Buildings Insurance)](#1460-arrangement---protection-contract-buildings-insurance)
+   - [14.61 Arrangement - Protection Contract (Contents Insurance)](#1461-arrangement---protection-contract-contents-insurance)
+   - [14.62 Arrangement - Protection Contract (Private Medical Insurance)](#1462-arrangement---protection-contract-private-medical-insurance)
+   - [14.63 Arrangement - Mortgage Contract (Lifetime Mortgage - Equity Release)](#1463-arrangement---mortgage-contract-lifetime-mortgage---equity-release)
+   - [14.64 Arrangement - Mortgage Contract (Buy-to-Let Mortgage)](#1464-arrangement---mortgage-contract-buy-to-let-mortgage)
+
+
+**Appendices:**
+- [Appendix A: Complete Entity-to-Endpoint Mapping](#appendix-a-complete-entity-to-endpoint-mapping)
+- [Appendix B: HTTP Status Code Reference](#appendix-b-http-status-code-reference)
+- [Appendix C: Data Type Formats](#appendix-c-data-type-formats)
+- [Appendix D: Common Enumerations](#appendix-d-common-enumerations)
+- [Appendix E: Security Considerations](#appendix-e-security-considerations)
 
 ---
 
@@ -7705,7 +7853,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 
 ### 8.3 Key Endpoints
 
-#### 8.3.1 Get Credit History
+#### 10.3.1 Get Credit History
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
 
@@ -7816,7 +7964,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 - `401 Unauthorized` - Missing or invalid authentication
 - `403 Forbidden` - Insufficient permissions
 
-#### 8.3.2 Create Credit History Record
+#### 10.3.2 Create Credit History Record
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
 
@@ -7978,7 +8126,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 - `401 Unauthorized` - Missing or invalid authentication
 - `403 Forbidden` - Insufficient permissions
 
-#### 8.3.3 Update Credit History Record
+#### 10.3.3 Update Credit History Record
 
 **Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{creditHistoryId}`
 
@@ -8043,7 +8191,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 - `401 Unauthorized` - Missing or invalid authentication
 - `403 Forbidden` - Insufficient permissions
 
-#### 8.3.4 Add Adverse Credit Event
+#### 10.3.4 Add Adverse Credit Event
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{creditHistoryId}/adverse-events`
 
@@ -8575,7 +8723,7 @@ Mortgage impact:
 - Consumer Duty (Delivering good outcomes)
 - PROD (Target Market assessment)
 
-### 10.2 Operations Summary
+### 9.2 Operations Summary
 
 **Objective Type Operations (6 types × 4 operations + 1 list + 1 delete = 26 endpoints):**
 
@@ -8622,11 +8770,11 @@ Mortgage impact:
 
 **Total Endpoints:** 31 (26 objective operations + 5 needs operations)
 
-### 8.3 Objective Types and Contracts
+### 9.3 Objective Types and Contracts
 
 Each objective type has specific fields relevant to that goal category. All objectives share common fields (id, factfindRef, clientRef, description, priority, targetDate, status) plus type-specific fields.
 
-#### 8.3.1 Investment Objectives
+#### 10.3.1 Investment Objectives
 
 **Purpose:** Track investment goals and savings targets.
 
@@ -8640,7 +8788,7 @@ Each objective type has specific fields relevant to that goal category. All obje
 
 For detailed request/response examples, see API Endpoints Catalog Section 6.3.1.
 
-#### 8.3.2 Pension Objectives
+#### 10.3.2 Pension Objectives
 
 **Purpose:** Track retirement planning goals.
 
@@ -8653,7 +8801,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.3.1.
 
 For detailed request/response examples, see API Endpoints Catalog Section 6.3.2.
 
-#### 8.3.3 Protection Objectives
+#### 10.3.3 Protection Objectives
 
 **Purpose:** Track protection needs (life, critical illness, income protection).
 
@@ -8667,7 +8815,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.3.2.
 
 For detailed request/response examples, see API Endpoints Catalog Section 6.3.3.
 
-#### 8.3.4 Mortgage Objectives
+#### 10.3.4 Mortgage Objectives
 
 **Purpose:** Track mortgage and property purchase goals.
 
@@ -8681,7 +8829,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.3.3.
 
 For detailed request/response examples, see API Endpoints Catalog Section 6.3.4.
 
-#### 8.3.5 Budget Objectives
+#### 10.3.5 Budget Objectives
 
 **Purpose:** Track budget and spending goals.
 
@@ -8693,7 +8841,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.3.4.
 
 For detailed request/response examples, see API Endpoints Catalog Section 6.3.5.
 
-#### 8.3.6 Estate Planning Objectives
+#### 10.3.6 Estate Planning Objectives
 
 **Purpose:** Track estate planning and inheritance goals.
 
@@ -8707,7 +8855,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.3.5.
 
 For detailed request/response examples, see API Endpoints Catalog Section 6.3.6.
 
-### 8.4 Needs Sub-Resources
+### 9.4 Needs Sub-Resources
 
 **Purpose:** Capture detailed needs and questions under each objective.
 
@@ -8800,7 +8948,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ### 10.3 Key Endpoints
 
-#### 9.3.1 List Assets
+#### 10.3.1 List Assets
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/assets`
 
@@ -8915,7 +9063,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 }
 ```
 
-#### 9.3.2 Create Asset
+#### 10.3.2 Create Asset
 
 **Endpoint:** `POST /api/v2/factfinds/{id}/clients/{clientId}/assets`
 
@@ -9006,7 +9154,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 }
 ```
 
-#### 9.3.3 Get Property Details
+#### 10.3.3 Get Property Details
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/property-details/{propertyId}`
 
@@ -9057,7 +9205,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 }
 ```
 
-#### 9.3.4 Calculate LTV (Loan-to-Value)
+#### 10.3.4 Calculate LTV (Loan-to-Value)
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/property-details/{propertyId}/ltv`
 
@@ -9094,7 +9242,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 }
 ```
 
-#### 9.3.5 Calculate Rental Yield
+#### 10.3.5 Calculate Rental Yield
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/property-details/{propertyId}/rental-yield`
 
@@ -9128,7 +9276,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 }
 ```
 
-#### 9.3.6 List Liabilities
+#### 10.3.6 List Liabilities
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/liabilities`
 
@@ -9188,7 +9336,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 }
 ```
 
-#### 9.3.7 Get Assets Summary
+#### 10.3.7 Get Assets Summary
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/assets/summary`
 
@@ -9245,7 +9393,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 }
 ```
 
-#### 9.3.8 Calculate Net Worth
+#### 10.3.8 Calculate Net Worth
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/net-worth`
 
@@ -9434,7 +9582,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.3.1 GIA (General Investment Account)
+#### 13.3.1 GIA (General Investment Account)
 
 **Operations:**
 
@@ -9614,7 +9762,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - Regular contribution tracking for cash flow planning
 - Performance comparison against benchmark indices
 
-#### 11.3.2 ISA (Individual Savings Account)
+#### 13.3.2 ISA (Individual Savings Account)
 
 **Operations:**
 
@@ -9840,7 +9988,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - Lifetime ISA bonus tracking (25% government bonus up to £1,000/year)
 - Transfer tracking maintains tax-free status
 
-#### 11.3.3 Investment Bonds
+#### 13.3.3 Investment Bonds
 
 **Operations:**
 
@@ -9896,7 +10044,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - 5% withdrawal allowance tracking
 - Top-slicing relief calculations
 
-#### 11.3.4 Investment Trusts
+#### 13.3.4 Investment Trusts
 
 **Operations:**
 
@@ -9930,7 +10078,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.3.5 Platform Accounts
+#### 13.3.5 Platform Accounts
 
 **Operations:**
 
@@ -9954,7 +10102,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.3.6 Offshore Bonds
+#### 13.3.6 Offshore Bonds
 
 **Operations:**
 
@@ -9982,7 +10130,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.3.7 Cash Accounts
+#### 13.3.7 Cash Accounts
 
 **Operations:**
 
@@ -10263,7 +10411,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.4.1 Personal Pension
+#### 13.4.1 Personal Pension
 
 **Operations:**
 
@@ -10488,7 +10636,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - Tapered annual allowance for high earners
 - Tax-free cash capped at 25% of fund value
 
-#### 11.4.2 State Pension
+#### 13.4.2 State Pension
 
 **Operations:**
 
@@ -10529,7 +10677,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.4.3 Workplace Pension
+#### 13.4.3 Workplace Pension
 
 **Operations:**
 
@@ -10571,7 +10719,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.4.4 SIPP (Self-Invested Personal Pension)
+#### 13.4.4 SIPP (Self-Invested Personal Pension)
 
 **Operations:**
 
@@ -10609,7 +10757,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.4.5 Final Salary (Defined Benefit)
+#### 13.4.5 Final Salary (Defined Benefit)
 
 **Operations:**
 
@@ -11122,7 +11270,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.4.6 Pension Drawdown
+#### 13.4.6 Pension Drawdown
 
 **Operations:**
 
@@ -11173,7 +11321,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.4.7 Annuity
+#### 13.4.7 Annuity
 
 **Operations:**
 
@@ -11226,7 +11374,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 11.4.8 Money Purchase
+#### 13.4.8 Money Purchase
 
 **Operations:**
 
@@ -13011,7 +13159,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ---
 ## 12. Risk Profile API
 
-### 12.1 Overview
+### 13.1 Overview
 
 **Purpose:** Capture and manage client Attitude to Risk (ATR) assessment as an embedded part of the FactFind.
 
@@ -13040,7 +13188,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 - FCA Handbook COBS 9 Annex 2 (Risk Profiling)
 - Consumer Duty (Understanding Customer Risk Tolerance)
 
-### 12.2 Operations Summary
+### 13.2 Operations Summary
 
 **ATR Assessment Endpoints:**
 
@@ -13060,9 +13208,9 @@ The ATR Assessment is a critical component of the FactFind that captures:
 | GET | `/api/v2/reference/atr-templates` | List available ATR templates | Public |
 | GET | `/api/v2/reference/atr-templates/{templateId}` | Get template details | Public |
 
-### 12.3 Key Endpoints
+### 13.3 Key Endpoints
 
-#### 11.3.1 Get Current ATR Assessment
+#### 13.3.1 Get Current ATR Assessment
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment`
 
@@ -13227,7 +13375,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-#### 11.3.2 Submit/Update ATR Assessment
+#### 13.3.2 Submit/Update ATR Assessment
 
 **Endpoint:** `PUT /api/v2/factfinds/{factfindId}/atr-assessment`
 
@@ -13313,7 +13461,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-#### 11.3.3 Choose Risk Profile
+#### 13.3.3 Choose Risk Profile
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/atr-assessment/choose-profile`
 
@@ -13363,7 +13511,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-#### 11.3.4 Get ATR Assessment History (Risk Replay)
+#### 13.3.4 Get ATR Assessment History (Risk Replay)
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment/history`
 
@@ -13441,7 +13589,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-### 12.4 ATR Templates Reference Data
+### 13.4 ATR Templates Reference Data
 
 **Purpose:** ATR questionnaire templates are system configuration and reference data. They are not managed via the main API but can be queried to see available templates.
 
@@ -13451,7 +13599,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 - Templates include the full questionnaire structure, scoring algorithms, and risk rating categories
 - Multiple template versions can exist but only one is "active" at any time
 
-#### 11.4.1 List Available ATR Templates
+#### 13.4.1 List Available ATR Templates
 
 **Endpoint:** `GET /api/v2/reference/atr-templates`
 
@@ -13506,7 +13654,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-#### 11.4.2 Get ATR Template Details
+#### 13.4.2 Get ATR Template Details
 
 **Endpoint:** `GET /api/v2/reference/atr-templates/{templateId}`
 
@@ -13620,7 +13768,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-### 12.5 Risk Assessment History API
+### 13.5 Risk Assessment History API
 
 **Purpose:** Historical tracking and comparison of ATR assessments over time (Risk Replay).
 
@@ -13632,7 +13780,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 See Section 10.3.4 for the main history endpoint.
 
-#### 11.5.1 Compare Two Assessments
+#### 13.5.1 Compare Two Assessments
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment/compare`
 
@@ -13701,7 +13849,7 @@ See Section 10.3.4 for the main history endpoint.
 
 ---
 
-### 12.6 Integration with FactFind Workflow
+### 13.6 Integration with FactFind Workflow
 
 **ATR Assessment Lifecycle:**
 
@@ -13732,7 +13880,7 @@ See Section 10.3.4 for the main history endpoint.
 ---
 ## 13. Reference Data API
 
-### 12.1 Performance Considerations
+### 13.1 Performance Considerations
 
 **Query Optimization:**
 - Index all foreign keys for fast joins
@@ -13752,7 +13900,7 @@ See Section 10.3.4 for the main history endpoint.
 - Default page size: 20
 - Maximum page size: 100
 
-### 12.2 Caching Strategy
+### 13.2 Caching Strategy
 
 **HTTP Caching:**
 - ETags for all GET requests on single resources
@@ -13772,7 +13920,7 @@ See Section 10.3.4 for the main history endpoint.
 - Publish cache invalidation events
 - Subscribers update local caches
 
-### 12.3 Rate Limiting
+### 13.3 Rate Limiting
 
 **Per-User Limits:**
 - 1,000 requests per hour per user
@@ -13804,7 +13952,7 @@ Retry-After: 3600
 }
 ```
 
-### 12.4 API Versioning
+### 13.4 API Versioning
 
 **Version Lifecycle:**
 1. **Development** - Not publicly available
@@ -13827,7 +13975,7 @@ Sunset: Sun, 01 Jul 2028 00:00:00 GMT
 Link: <https://docs.factfind.com/migration/v1-to-v2>; rel="deprecation"
 ```
 
-### 12.5 Security Best Practices
+### 13.5 Security Best Practices
 
 **Input Validation:**
 - Validate all inputs against schema
@@ -13895,7 +14043,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 ---
 
-#### 13.1.1 Person Client Example
+#### 14.1.1 Person Client Example
 
 **Person client** with full PersonValue embedded:
 
@@ -14630,7 +14778,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 ---
 
-#### 13.1.2 Corporate Client Example
+#### 14.1.2 Corporate Client Example
 
 **Corporate client** with full CorporateValue embedded:
 
@@ -15119,7 +15267,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 ---
 
-#### 13.1.3 Trust Client Example
+#### 14.1.3 Trust Client Example
 
 **Trust client** with full TrustValue embedded:
 
@@ -15665,7 +15813,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 ---
 
-#### 13.1.4 Field Behaviors (Composition Pattern)
+#### 14.1.4 Field Behaviors (Composition Pattern)
 
 | Field | Type | Required | Validation Rules | Notes |
 |-------|------|----------|------------------|-------|
@@ -15687,7 +15835,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 ---
 
-#### 13.1.5 PersonValue Type Definition
+#### 14.1.5 PersonValue Type Definition
 
 Embedded value type for Person-specific fields. Only present when `clientType="Person"`.
 
@@ -15739,7 +15887,7 @@ HealthMetricsValue {
 
 ---
 
-#### 13.1.6 CorporateValue Type Definition
+#### 14.1.6 CorporateValue Type Definition
 
 Embedded value type for Corporate-specific fields. Only present when `clientType="Corporate"`.
 
@@ -15805,7 +15953,7 @@ SicCodeValue {
 
 ---
 
-#### 13.1.7 TrustValue Type Definition
+#### 14.1.7 TrustValue Type Definition
 
 Embedded value type for Trust-specific fields. Only present when `clientType="Trust"`.
 
@@ -15926,7 +16074,7 @@ DistributionValue {
 
 ---
 
-#### 13.1.8 AddressValue Type
+#### 14.1.8 AddressValue Type
 
 Embedded value type representing an address. Addresses have history (fromDate, toDate) but no separate identity.
 
@@ -15975,7 +16123,7 @@ Embedded value type representing an address. Addresses have history (fromDate, t
 
 ---
 
-#### 13.1.9 ContactValue Type
+#### 14.1.9 ContactValue Type
 
 Embedded value type representing a contact method.
 
@@ -16005,7 +16153,7 @@ Embedded value type representing a contact method.
 
 ---
 
-#### 13.1.10 IdentityVerificationValue Type
+#### 14.1.10 IdentityVerificationValue Type
 
 Embedded value type representing KYC, AML, and MLR compliance.
 
@@ -16020,7 +16168,7 @@ See full examples in the client JSON examples above.
 
 ---
 
-#### 13.1.11 VulnerabilityValue Type
+#### 14.1.11 VulnerabilityValue Type
 
 Embedded value type representing client vulnerabilities (Consumer Duty requirement). **Only applicable to Person clients** - embedded in `personValue.vulnerabilities` array.
 
@@ -16050,7 +16198,7 @@ Embedded value type representing client vulnerabilities (Consumer Duty requireme
 
 ---
 
-#### 13.1.12 DataProtectionValue Type
+#### 14.1.12 DataProtectionValue Type
 
 Embedded value type representing GDPR compliance and data protection.
 
@@ -16065,7 +16213,7 @@ See full examples in the client JSON examples above.
 
 ---
 
-#### 13.1.13 MarketingPreferencesValue Type
+#### 14.1.13 MarketingPreferencesValue Type
 
 Embedded value type representing marketing consent and preferences.
 
@@ -16080,7 +16228,7 @@ See full examples in the client JSON examples above.
 
 ---
 
-#### 13.1.14 EstatePlanningValue Type
+#### 14.1.14 EstatePlanningValue Type
 
 Embedded value type representing estate planning information. **Only applicable to Person clients.**
 
@@ -16096,7 +16244,7 @@ See full example in the Person Client JSON above.
 
 ---
 
-#### 13.1.15 FinancialProfileValue Type
+#### 14.1.15 FinancialProfileValue Type
 
 Embedded value type representing client financial snapshot and computed wealth metrics. **Value type** with no identity, embedded in Client aggregate root.
 
@@ -16174,7 +16322,7 @@ Embedded value type representing client financial snapshot and computed wealth m
 
 ---
 
-#### 13.1.16 TerritorialProfileValue Type
+#### 14.1.16 TerritorialProfileValue Type
 
 Embedded value type representing territorial status, residency, domicile, and citizenship information. **Value type** with no identity, embedded in Client aggregate root.
 
@@ -16312,7 +16460,7 @@ Embedded value type representing territorial status, residency, domicile, and ci
 
 ---
 
-#### 13.1.17 Validation Rules by Client Type
+#### 14.1.17 Validation Rules by Client Type
 
 **Person Client:**
 - `personValue` is required
@@ -16366,7 +16514,7 @@ Embedded value type representing territorial status, residency, domicile, and ci
 
 ---
 
-#### 13.1.18 Usage Examples
+#### 14.1.18 Usage Examples
 
 **Creating a Person Client:**
 
@@ -16963,7 +17111,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 
 ---
 
-#### 13.2.1 MeetingDetailsValue Type
+#### 14.2.1 MeetingDetailsValue Type
 
 The `MeetingDetailsValue` groups all information related to the consultation meeting itself. This aligns with FCA and MiFID II requirements for documenting client interactions.
 
@@ -17005,7 +17153,7 @@ The `MeetingDetailsValue` groups all information related to the consultation mee
 
 ---
 
-#### 13.2.2 FinancialSummaryValue Type
+#### 14.2.2 FinancialSummaryValue Type
 
 The `FinancialSummaryValue` provides a read-only snapshot of the client's financial position, computed from child entities. This aligns with wealth management platform terminology.
 
@@ -17086,7 +17234,7 @@ The `FinancialSummaryValue` provides a read-only snapshot of the client's financ
 
 ---
 
-#### 13.2.3 AssetHoldingsValue Type
+#### 14.2.3 AssetHoldingsValue Type
 
 The `AssetHoldingsValue` provides boolean indicators of what financial products and arrangements the client currently holds. This uses standard portfolio management terminology.
 
@@ -17154,7 +17302,7 @@ The `AssetHoldingsValue` provides boolean indicators of what financial products 
 
 ---
 
-#### 13.2.4 InvestmentCapacityValue Type
+#### 14.2.4 InvestmentCapacityValue Type
 
 The `InvestmentCapacityValue` captures the client's capacity and budget for new investments or advice. This aligns with FCA suitability terminology around "capacity for loss" and "investment capacity."
 
@@ -17231,7 +17379,7 @@ The `InvestmentCapacityValue` captures the client's capacity and budget for new 
 
 ---
 
-#### 13.2.5 CompletionStatusValue Type
+#### 14.2.5 CompletionStatusValue Type
 
 The `CompletionStatusValue` tracks the completion status of the fact find and associated compliance checks.
 
@@ -21334,7 +21482,7 @@ Each entity contract follows the same field annotation pattern:
 
 Value types are embedded data structures with no independent identity. They are named with a "Value" suffix and never have an `id` field. Value types are always embedded within their parent entity and have no separate API endpoints.
 
-#### 13.10.1 MoneyValue
+#### 14.15.1 MoneyValue
 
 Represents a monetary amount with currency.
 
@@ -21385,7 +21533,7 @@ Represents a monetary amount with currency.
 }
 ```
 
-#### 13.10.2 AddressValue
+#### 14.15.2 AddressValue
 
 Represents a physical address.
 
@@ -21444,7 +21592,7 @@ Represents a physical address.
 }
 ```
 
-#### 13.10.3 DateRangeValue
+#### 14.15.3 DateRangeValue
 
 Represents a date range with start and optional end date.
 
@@ -21477,7 +21625,7 @@ Represents a date range with start and optional end date.
 }
 ```
 
-#### 13.10.4 NameValue
+#### 14.15.4 NameValue
 
 Represents a person's name.
 
@@ -21514,7 +21662,7 @@ Represents a person's name.
 }
 ```
 
-#### 13.10.5 ContactValue
+#### 14.15.5 ContactValue
 
 Represents contact information (email, phone).
 
@@ -21556,7 +21704,7 @@ Represents contact information (email, phone).
 }
 ```
 
-#### 13.10.6 PercentageValue
+#### 14.15.6 PercentageValue
 
 Represents a percentage as a decimal value.
 
@@ -21588,7 +21736,7 @@ Represents a percentage as a decimal value.
 }
 ```
 
-#### 13.10.7 RateValue
+#### 14.15.7 RateValue
 
 Represents an interest rate or other rate.
 
@@ -21621,7 +21769,7 @@ Represents an interest rate or other rate.
 }
 ```
 
-#### 13.10.8 TaxDetailsValue
+#### 14.15.8 TaxDetailsValue
 
 Represents tax identification details.
 
@@ -21654,7 +21802,7 @@ Represents tax identification details.
 }
 ```
 
-#### 13.10.9 AdverseCreditEvent
+#### 14.15.9 AdverseCreditEvent
 
 Represents a single adverse credit event in a client's credit history. This is a value type embedded within the CreditHistory entity's `adverseCreditEvents` array.
 
@@ -21882,7 +22030,7 @@ Represents a single adverse credit event in a client's credit history. This is a
 
 ---
 
-#### 13.10.10 Enumeration Value Types
+#### 14.15.10 Enumeration Value Types
 
 Enumeration value types represent categorical data using a structured code/display pattern. Unlike simple string enumerations, enumeration value types are self-documenting, internationalization-ready, and can carry rich metadata.
 
@@ -22430,7 +22578,7 @@ Represents a person's health status for insurance purposes as a simple string en
 
 Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `clientRef`, `adviserRef`).
 
-#### 13.11.1 ClientRef
+#### 14.16.1 ClientRef
 
 Reference to a Client entity.
 
@@ -22475,7 +22623,7 @@ Reference to a Client entity.
 }
 ```
 
-#### 13.11.2 AdviserRef
+#### 14.16.2 AdviserRef
 
 Reference to an Adviser entity.
 
@@ -22510,7 +22658,7 @@ Reference to an Adviser entity.
 }
 ```
 
-#### 13.11.3 ProviderRef
+#### 14.16.3 ProviderRef
 
 Reference to a financial product Provider entity.
 
@@ -22545,7 +22693,7 @@ Reference to a financial product Provider entity.
 }
 ```
 
-#### 13.11.4 ArrangementRef
+#### 14.16.4 ArrangementRef
 
 Reference to an Arrangement entity (pension, investment, protection, mortgage).
 
@@ -22583,7 +22731,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 }
 ```
 
-#### 13.11.5 EmploymentRef
+#### 14.16.5 EmploymentRef
 
 Reference to an Employment entity.
 
@@ -22618,7 +22766,7 @@ Reference to an Employment entity.
 }
 ```
 
-#### 13.11.6 GoalRef
+#### 14.16.6 GoalRef
 
 Reference to a Goal entity.
 
@@ -22653,7 +22801,7 @@ Reference to a Goal entity.
 }
 ```
 
-#### 13.11.7 FactFindRef
+#### 14.16.7 FactFindRef
 
 Reference to a FactFind (ADVICE_CASE) entity.
 
@@ -26898,7 +27046,7 @@ The Mortgage contract is organized into 14 logical field groups for clarity and 
 | `sharedOwnershipDetails.sharedOwnershipHousingAssociation` | string | Conditional | Name of housing association (required if sharedOwnershipPercentageOwned is set) |
 | `sharedOwnershipDetails.sharedOwnershipMonthlyRent` | MoneyValue | Conditional | Monthly rent on unowned portion (required if sharedOwnershipPercentageOwned is set) |
 
-##### 12. Offset Features
+##### 13. Offset Features
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
