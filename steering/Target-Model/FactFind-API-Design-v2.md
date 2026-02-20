@@ -1,14 +1,13 @@
 
-<!-- FactFind API Design v2.0 - Generated: 2026-02-17T14:59:30.880008 -->
+<!-- FactFind API Design Specification -->
 # FactFind System API Design Specification
 ## Comprehensive RESTful API for Wealth Management Platform
 
-**Document Version:** 2.0
-**Date:** 2026-02-18
-**Status:** Design Specification v2.0 - Enhanced with Missing Entities
-**API Version:** v1
+**Date:** 2026-02-19
+**Status:** Design Specification
+**API Version:** v2
 **Base URL:** `https://api.factfind.com`
-**Source:** Greenfield ERD Enhanced - Complete Domain Coverage (50+ entities, 2,000+ fields)
+**Source:** Complete Domain Coverage (50+ entities, 2,000+ fields)
 
 ---
 
@@ -19,7 +18,7 @@ This document presents a comprehensive RESTful API design for the FactFind syste
 ### Overview
 
 **Business Domain:** Wealth Management & Financial Advisory
-**Total Entities:** 50+ entities across 8 bounded contexts (enhanced with 11+ new entities)
+**Total Entities:** 50+ entities across 8 bounded contexts
 **Total Fields:** 1,786 business fields from Excel specification
 **Regulatory Compliance:** FCA Handbook, MiFID II, IDD, Consumer Duty, GDPR, MLR 2017
 **Industry Standards:** Aligned with Intelligent Office, Salesforce FSC, Xplan, MoneyHub
@@ -56,85 +55,6 @@ The FactFind API provides comprehensive digital capabilities for:
 - **Compliance Teams:** Regulatory compliance verification
 
 
-
-### What's New in v2.0
-
-**PRIORITY 1: Risk Assessment Enhancements (Compliance Critical)**
-- **Section 10.4:** Risk Questionnaire API - Template management, versioning, regulatory approval
-- **Section 10.5:** Risk Assessment History API - Risk Replay mechanism, audit trail, comparison
-- **Section 10.6:** Supplementary Questions API - Additional risk and compliance questions
-- **Section 10.7:** Enhanced Declaration Capture - Comprehensive consent and signature management
-
-**PRIORITY 2: New Investment Capabilities**
-- **Section 9A:** NEW - Savings & Investments API - Dedicated investment operations, performance tracking, rebalancing
-
-**PRIORITY 3: Assets & Liabilities Enhancements**
-- **Section 9.4:** Property Management API - Property portfolio, valuations, LTV calculations
-- **Section 9.5:** Equities Portfolio API - Direct stock holdings, performance tracking
-
-**PRIORITY 3A: Circumstances & Credit Assessment**
-- **Section 6.5:** Credit History API - Credit scores, payment history, adverse credit tracking, mortgage suitability
-
-**PRIORITY 4: Client Profile Enhancements**
-- **Section 5.5:** Identity Verification API - KYC workflow, AML checks, document verification (REMOVED in v2.1 - now embedded)
-- **Section 5.6:** Data Protection & Consent API - GDPR compliance, consent management (REMOVED in v2.1 - now embedded)
-- **Section 5.7:** Marketing Preferences API - Channel preferences, opt-in/opt-out management (REMOVED in v2.1 - now embedded)
-
-**PRIORITY 5: Financial Position Tracking**
-- **Section 4.4:** Current Position Summary API - Net worth, asset allocation, financial health
-
-**New Entity Contracts (Section 12)**
-- Investment Contract (12.8)
-- Property Contract (12.9)
-- Equity Contract (12.10)
-
-**Coverage Improvements:**
-- Risk Assessment domain coverage increased from 38% to 95%
-- Savings & Investments now has dedicated API section
-- Client Profile domain coverage increased from 64% to 90%
-- Assets & Liabilities domain coverage increased from 67% to 95%
-- Overall API coverage increased from 77% to 95%
-
-### What's New in v2.1 (This Release)
-
-**MAJOR ARCHITECTURAL CHANGES:**
-
-1. **FactFind as Aggregate Root** - All API operations now scoped to a fact-find instance
-   - All endpoints now follow pattern: `/api/v1/factfinds/{factfindId}/{resource}`
-   - Clear hierarchical structure with explicit parent-child relationships
-   - Better transactional consistency and data isolation
-
-2. **Context-Based Organization** - Resources grouped by business context
-   - Client Onboarding & KYC: `/api/v1/factfinds/{factfindId}/clients`
-   - Circumstances: `/api/v1/factfinds/{factfindId}/income`, `/employment`, `/expenditure`
-   - Assets & Liabilities: `/api/v1/factfinds/{factfindId}/assets`
-   - Arrangements: `/api/v1/factfinds/{factfindId}/arrangements/{type}`
-   - Goals: `/api/v1/factfinds/{factfindId}/objectives`
-
-3. **Enhanced API Architecture (Section 1.5)** - New comprehensive section covering:
-   - Aggregate root pattern and benefits
-   - Hierarchical structure and URL design
-   - Context-based organization
-   - Transactional boundaries
-   - Entity lifecycle management
-
-4. **Breaking Changes** - All endpoints restructured (see Migration Guide in Appendix)
-   - Old: `/api/v1/factfinds/{factfindId}/clients/{clientId}` → New: `/api/v1/factfinds/{factfindId}/clients/{clientId}`
-   - Old: `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` → New: `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}`
-   - All HATEOAS links updated to reflect new structure
-
-**BENEFITS:**
-- Clearer data ownership and boundaries
-- Better multi-tenancy and security
-- Improved caching and performance
-- More discoverable API structure
-- Enforced transactional consistency
-
-**MIGRATION REQUIRED:**
-- All API consumers must update endpoint URLs
-- See Migration Guide for detailed mapping of old → new endpoints
-- Backward compatibility NOT maintained (major version bump required)
-
 ## Table of Contents
 
 1. [API Design Principles](#1-api-design-principles)
@@ -142,8 +62,7 @@ The FactFind API provides comprehensive digital capabilities for:
    - [1.2 Naming Conventions](#12-naming-conventions)
    - [1.3 HTTP Methods & Status Codes](#13-http-methods--status-codes)
    - [1.4 Error Response Format](#14-error-response-format-rfc-7807)
-   - [1.5 API Architecture & Aggregate Root Pattern](#15-api-architecture--aggregate-root-pattern) **NEW v2.1**
-   - [1.6 Versioning Strategy](#16-versioning-strategy)
+   - [1.5 API Architecture & Aggregate Root Pattern](#15-api-architecture--aggregate-root-pattern)   - [1.6 Versioning Strategy](#16-versioning-strategy)
    - [1.7 Single Contract Principle](#17-single-contract-principle)
    - [1.8 Value and Reference Type Semantics](#18-value-and-reference-type-semantics)
    - [1.9 Aggregate Root Pattern](#19-aggregate-root-pattern)
@@ -166,33 +85,28 @@ The FactFind API provides comprehensive digital capabilities for:
    - [4.1 Overview](#41-overview)
    - [4.2 Operations Summary](#42-operations-summary)
    - [4.3 Key Endpoints](#43-key-endpoints)
-   - [4.4 Current Position Summary API](#44-current-position-summary-api) **NEW v2.0**
-5. [Client Management API](#5-client-management-api)
+   - [4.4 Current Position Summary API](#44-current-position-summary-api)5. [Client Management API](#5-client-management-api)
    - [5.1 Overview](#51-overview)
    - [5.2 Operations Summary](#52-operations-summary)
    - [5.3 Key Endpoints](#53-key-endpoints)
-   - [5.4 Estate Planning](#54-estate-planning) **NEW v3.0**
-     - [5.4.1 Operations Summary](#541-operations-summary)
+   - [5.4 Estate Planning](#54-estate-planning)     - [5.4.1 Operations Summary](#541-operations-summary)
      - [5.4.2 Get Estate Planning Overview](#542-get-estate-planning-overview)
      - [5.4.3 Update Estate Planning Details](#543-update-estate-planning-details)
      - [5.4.4 Record Gift](#544-record-gift)
      - [5.4.5 List Gifts](#545-list-gifts)
      - [5.4.6 Create Gift Trust](#546-create-gift-trust)
-   - [5.5 Dependants](#55-dependants) **NEW v3.0**
-     - [5.5.1 Operations Summary](#551-operations-summary)
+   - [5.5 Dependants](#55-dependants)     - [5.5.1 Operations Summary](#551-operations-summary)
      - [5.5.2 List Dependants](#552-list-dependants)
      - [5.5.3 Create Dependant](#553-create-dependant)
      - [5.5.4 Get Dependant Details](#554-get-dependant-details)
      - [5.5.5 Update Dependant](#555-update-dependant)
      - [5.5.6 Delete Dependant](#556-delete-dependant)
-   - [5.6 Notes](#56-notes) **NEW v3.0**
-     - [5.6.1 Operations Summary](#561-operations-summary)
+   - [5.6 Notes](#56-notes)     - [5.6.1 Operations Summary](#561-operations-summary)
      - [5.6.2 List Notes](#562-list-notes)
      - [5.6.3 Create Note](#563-create-note)
      - [5.6.4 Update Note](#564-update-note)
      - [5.6.5 Delete Note](#565-delete-note)
-   - [5.7 Custom Questions (Supplementary Questions)](#57-custom-questions-supplementary-questions) **NEW v3.0**
-     - [5.7.1 Operations Summary](#571-operations-summary)
+   - [5.7 Custom Questions (Supplementary Questions)](#57-custom-questions-supplementary-questions)     - [5.7.1 Operations Summary](#571-operations-summary)
      - [5.7.2 List Custom Questions](#572-list-custom-questions)
      - [5.7.3 Create Custom Question](#573-create-custom-question)
      - [5.7.4 Get Custom Question Details](#574-get-custom-question-details)
@@ -212,14 +126,12 @@ The FactFind API provides comprehensive digital capabilities for:
      - [6.3.6 List Expenditure Items](#636-list-expenditure-items)
      - [6.3.7 Create Expenditure Item](#637-create-expenditure-item)
      - [6.3.8 Create Expenditure Change](#638-create-expenditure-change)
-   - [6.4 Affordability](#64-affordability) **MOVED from 5.6 v3.0**
-     - [6.4.1 Operations Summary](#641-operations-summary)
+   - [6.4 Affordability](#64-affordability)     - [6.4.1 Operations Summary](#641-operations-summary)
      - [6.4.2 Calculate Affordability](#642-calculate-affordability)
      - [6.4.3 List Affordability Calculations](#643-list-affordability-calculations)
      - [6.4.4 Update Affordability Calculation](#644-update-affordability-calculation)
      - [6.4.5 Delete Affordability Calculation](#645-delete-affordability-calculation)
-   - [6.5 Credit History](#65-credit-history) **NEW v3.0**
-     - [6.5.1 Operations Summary](#651-operations-summary)
+   - [6.5 Credit History](#65-credit-history)     - [6.5.1 Operations Summary](#651-operations-summary)
      - [6.5.2 List Credit History](#652-list-credit-history)
      - [6.5.3 Create Credit History Record](#653-create-credit-history-record)
      - [6.5.4 Update Credit History Record](#654-update-credit-history-record)
@@ -236,8 +148,7 @@ The FactFind API provides comprehensive digital capabilities for:
    - [9.1 Overview](#91-overview)
    - [9.2 Operations Summary](#92-operations-summary)
    - [9.3 Key Endpoints](#93-key-endpoints)
-10. [Arrangements API (Type-Based Routing)](#10-arrangements-api-type-based-routing) **NEW v3.0**
-    - [10.1 Overview](#101-overview)
+10. [Arrangements API (Type-Based Routing)](#10-arrangements-api-type-based-routing)    - [10.1 Overview](#101-overview)
     - [10.2 Arrangement Types and Routing](#102-arrangement-types-and-routing)
     - [10.3 Investment Arrangements](#103-investment-arrangements)
       - [10.3.1 GIA (General Investment Account)](#1031-gia-general-investment-account)
@@ -269,9 +180,7 @@ The FactFind API provides comprehensive digital capabilities for:
     - [11.1 Overview](#111-overview)
     - [11.2 Operations Summary](#112-operations-summary)
     - [11.3 Key Endpoints](#113-key-endpoints)
-    - [11.4 ATR Templates Reference Data](#114-atr-templates-reference-data) **NEW v2.0**
-    - [11.5 Risk Assessment History API](#115-risk-assessment-history-api) **NEW v2.0**
-    - [11.6 Integration with FactFind Workflow](#116-integration-with-factfind-workflow)
+    - [11.4 ATR Templates Reference Data](#114-atr-templates-reference-data)    - [11.5 Risk Assessment History API](#115-risk-assessment-history-api)    - [11.6 Integration with FactFind Workflow](#116-integration-with-factfind-workflow)
 12. [Reference Data API](#12-reference-data-api)
     - Reference data APIs remain unchanged (not scoped to factfinds)
 13. [Entity Contracts](#13-entity-contracts)
@@ -322,12 +231,6 @@ The FactFind API provides comprehensive digital capabilities for:
 
 ---
 
-**Appendices**
-
-- [Appendix A: Migration Guide - v2.0 to v2.1](#appendix-a-migration-guide---v20-to-v21) **NEW v2.1**
-
----
-
 ## 1. API Design Principles
 
 ### 1.1 RESTful Architecture
@@ -335,7 +238,7 @@ The FactFind API provides comprehensive digital capabilities for:
 The FactFind API strictly follows REST architectural principles:
 
 **Resource-Oriented Design:**
-- Resources are identified by URIs (e.g., `/api/v1/factfinds/{factfindId}/clients/123`)
+- Resources are identified by URIs (e.g., `/api/v2/factfinds/{factfindId}/clients/123`)
 - Resources are nouns, not verbs (clients, factfinds, arrangements)
 - HTTP methods define operations (GET, POST, PUT, PATCH, DELETE)
 - Proper HTTP status codes indicate outcomes
@@ -361,10 +264,10 @@ The FactFind API strictly follows REST architectural principles:
 
 **Resource URIs:**
 ```
-/api/v1/factfinds/{factfindId}/clients                     (collection)
-/api/v1/factfinds/{factfindId}/clients/{id}                (single resource)
-/api/v1/factfinds/{factfindId}/clients/{id}/addresses      (sub-resource collection)
-/api/v1/factfinds/{id}/income       (nested resource)
+/api/v2/factfinds/{factfindId}/clients                     (collection)
+/api/v2/factfinds/{factfindId}/clients/{id}                (single resource)
+/api/v2/factfinds/{factfindId}/clients/{id}/addresses      (sub-resource collection)
+/api/v2/factfinds/{id}/income       (nested resource)
 ```
 
 **Naming Rules:**
@@ -421,7 +324,7 @@ All error responses follow RFC 7807 Problem Details format:
   "title": "Validation Failed",
   "status": 400,
   "detail": "One or more validation errors occurred",
-  "instance": "/api/v1/factfinds/{factfindId}/clients/123/income",
+  "instance": "/api/v2/factfinds/{factfindId}/clients/123/income",
   "traceId": "00-4bf92f3577b34da6a3ce929d0e0e4736-00",
   "errors": [
     {
@@ -457,17 +360,17 @@ The FactFind API follows a **hierarchical, context-based structure** where **Fac
 
 **Design Principle:**
 ```
-/api/v1/factfinds/{factfindId}/{context}/{resource}
+/api/v2/factfinds/{factfindId}/{context}/{resource}
 ```
 
 **Examples:**
 ```
-/api/v1/factfinds/12345/clients                                    # Client context
-/api/v1/factfinds/12345/clients/67890/income                       # Circumstances context (per client)
-/api/v1/factfinds/12345/arrangements/investments/isa               # Arrangements context (type-based)
-/api/v1/factfinds/12345/arrangements/pensions/personal-pension     # Pension arrangements (type-based)
-/api/v1/factfinds/12345/objectives/investment                      # Goals context (type-based)
-/api/v1/factfinds/12345/attitude-to-risk                           # Risk profiling context
+/api/v2/factfinds/12345/clients                                    # Client context
+/api/v2/factfinds/12345/clients/67890/income                       # Circumstances context (per client)
+/api/v2/factfinds/12345/arrangements/investments/isa               # Arrangements context (type-based)
+/api/v2/factfinds/12345/arrangements/pensions/personal-pension     # Pension arrangements (type-based)
+/api/v2/factfinds/12345/objectives/investment                      # Goals context (type-based)
+/api/v2/factfinds/12345/attitude-to-risk                           # Risk profiling context
 ```
 
 #### 1.5.2 FactFind as Aggregate Root
@@ -490,13 +393,13 @@ Resources are organized into **business contexts** that reflect the domain model
 
 | Context | Resources | Base Path |
 |---------|-----------|-----------|
-| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Consent, Vulnerabilities, ID Verification, Professional Contacts | `/api/v1/factfinds/{id}/clients/{id}/*` |
-| **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v1/factfinds/{id}/clients/{id}/*` |
-| **Assets & Liabilities** | Assets, Business Assets, Property Details, Credit History, Valuations | `/api/v1/factfinds/{id}/assets` |
-| **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v1/factfinds/{id}/arrangements/{type}` |
-| **Goals & Objectives** | Objectives (investment, pension, protection, mortgages, budget, estate-planning), Needs | `/api/v1/factfinds/{id}/objectives/{type}` |
-| **Risk Profiling** | ATR (client ATR), Supplementary Questions | `/api/v1/factfinds/{id}/attitude-to-risk` |
-| **Estate Planning** | Gifts, Trusts (nested under clients) | `/api/v1/factfinds/{id}/clients/{id}/estate-planning` |
+| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Consent, Vulnerabilities, ID Verification, Professional Contacts | `/api/v2/factfinds/{id}/clients/{id}/*` |
+| **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v2/factfinds/{id}/clients/{id}/*` |
+| **Assets & Liabilities** | Assets, Business Assets, Property Details, Credit History, Valuations | `/api/v2/factfinds/{id}/assets` |
+| **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v2/factfinds/{id}/arrangements/{type}` |
+| **Goals & Objectives** | Objectives (investment, pension, protection, mortgages, budget, estate-planning), Needs | `/api/v2/factfinds/{id}/objectives/{type}` |
+| **Risk Profiling** | ATR (client ATR), Supplementary Questions | `/api/v2/factfinds/{id}/attitude-to-risk` |
+| **Estate Planning** | Gifts, Trusts (nested under clients) | `/api/v2/factfinds/{id}/clients/{id}/estate-planning` |
 
 #### 1.5.4 Benefits of This Approach
 
@@ -543,7 +446,7 @@ All changes within a fact-find aggregate should be:
 **Example - Adding Income to a Client:**
 
 ```http
-POST /api/v1/factfinds/12345/clients/67890/income
+POST /api/v2/factfinds/12345/clients/67890/income
 ```
 
 This operation:
@@ -569,27 +472,27 @@ All these changes happen atomically within the fact-find aggregate boundary.
 
 ```http
 # 1. Create a fact-find
-POST /api/v1/factfinds
-Response: 201 Created, Location: /api/v1/factfinds/12345
+POST /api/v2/factfinds
+Response: 201 Created, Location: /api/v2/factfinds/12345
 
 # 2. Add a client to the fact-find
-POST /api/v1/factfinds/12345/clients
-Response: 201 Created, Location: /api/v1/factfinds/12345/clients/67890
+POST /api/v2/factfinds/12345/clients
+Response: 201 Created, Location: /api/v2/factfinds/12345/clients/67890
 
 # 3. Add an address to the client
-POST /api/v1/factfinds/12345/clients/67890/addresses
-Response: 201 Created, Location: /api/v1/factfinds/12345/clients/67890/addresses/11111
+POST /api/v2/factfinds/12345/clients/67890/addresses
+Response: 201 Created, Location: /api/v2/factfinds/12345/clients/67890/addresses/11111
 
 # 4. Update the address
-PATCH /api/v1/factfinds/12345/clients/67890/addresses/11111
+PATCH /api/v2/factfinds/12345/clients/67890/addresses/11111
 Response: 200 OK
 
 # 5. Delete the address
-DELETE /api/v1/factfinds/12345/clients/67890/addresses/11111
+DELETE /api/v2/factfinds/12345/clients/67890/addresses/11111
 Response: 204 No Content
 
 # 6. Archive the fact-find (archives all children)
-POST /api/v1/factfinds/12345/archive
+POST /api/v2/factfinds/12345/archive
 Response: 200 OK
 ```
 
@@ -605,8 +508,8 @@ Some entities may need to reference entities in other fact-finds (e.g., comparin
 **Reference Data Exception**
 
 Reference data (lookup tables, templates, provider data) is **not** scoped to a fact-find:
-- `/api/v1/reference/income-types` - NOT `/api/v1/factfinds/{id}/reference/income-types`
-- `/api/v1/reference/providers` - NOT `/api/v1/factfinds/{id}/reference/providers`
+- `/api/v2/reference/income-types` - NOT `/api/v2/factfinds/{id}/reference/income-types`
+- `/api/v2/reference/providers` - NOT `/api/v2/factfinds/{id}/reference/providers`
 
 Reference data is **shared across all fact-finds** and managed separately.
 
@@ -615,12 +518,12 @@ Reference data is **shared across all fact-finds** and managed separately.
 
 **URL-Based Versioning:**
 ```
-https://api.factfind.com/api/v1/factfinds/{factfindId}/clients
+https://api.factfind.com/api/v2/factfinds/{factfindId}/clients
 https://api.factfind.com/api/v2/clients (future)
 ```
 
 **Version Support Policy:**
-- Current version (v1): Full support
+- Current version (v2): Full support
 - Previous version: Maintenance mode (12 months)
 - Deprecated version: Security fixes only (6 months)
 - Sunset: Returns 410 Gone
@@ -688,22 +591,22 @@ Each field in the unified contract is annotated with behavioral characteristics:
 
 **HTTP Method Handling:**
 
-**POST /api/v1/factfinds/{factfindId}/clients** (Create)
+**POST /api/v2/factfinds/{factfindId}/clients** (Create)
 - Request: `Client` contract with required-on-create fields
 - Server ignores: `id`, `createdAt`, `updatedAt`, and any read-only fields
 - Response: Complete `Client` contract with all fields populated
 
-**PUT /api/v1/factfinds/{factfindId}/clients/{clientId}** (Full Update)
+**PUT /api/v2/factfinds/{factfindId}/clients/{clientId}** (Full Update)
 - Request: `Client` contract with all updatable fields (full replacement)
 - Server ignores: `id`, `createdAt`, `updatedAt`, `write-once` fields
 - Response: Complete `Client` contract with updated values
 
-**PATCH /api/v1/factfinds/{factfindId}/clients/{id}** (Partial Update)
+**PATCH /api/v2/factfinds/{factfindId}/clients/{id}** (Partial Update)
 - Request: `Client` contract with subset of updatable fields
 - Server ignores: `id`, `createdAt`, `updatedAt`, `write-once` fields
 - Response: Complete `Client` contract with updated values
 
-**GET /api/v1/factfinds/{factfindId}/clients/{id}** (Retrieve)
+**GET /api/v2/factfinds/{factfindId}/clients/{id}** (Retrieve)
 - Response: Complete `Client` contract with all fields
 
 **Benefits:**
@@ -741,7 +644,7 @@ When retrieving (GET): Server returns complete contract with all fields.
 For partial responses, use field selection query parameters rather than separate DTOs:
 
 ```http
-GET /api/v1/factfinds/{factfindId}/clients/123?fields=id,firstName,lastName,email
+GET /api/v2/factfinds/{factfindId}/clients/123?fields=id,firstName,lastName,email
 ```
 
 Response returns the same `Client` contract with only requested fields populated.
@@ -932,7 +835,7 @@ When one entity references another, use an expanded reference object containing:
 {
   "clientRef": {
     "id": "uuid-123",                    // Required: Unique identifier
-    "href": "/api/v1/factfinds/{factfindId}/clients/uuid-123",  // Required: URL to resource
+    "href": "/api/v2/factfinds/{factfindId}/clients/uuid-123",  // Required: URL to resource
     "name": "John Smith",                // Required: Human-readable display name
     "clientNumber": "C00001234",         // Optional: Business identifier
     "type": "Person"                     // Optional: Discriminator for polymorphic types
@@ -953,13 +856,13 @@ When one entity references another, use an expanded reference object containing:
 
 | Reference Type | Display Fields | Example |
 |----------------|----------------|---------|
-| `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": "uuid", "href": "/api/v1/factfinds/{factfindId}/clients/uuid", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
-| `AdviserRef` | `name`<br>`code` | `{ "id": "uuid", "href": "/api/v1/advisers/uuid", "name": "Sarah Johnson", "code": "ADV001" }` |
-| `ProviderRef` | `name`<br>`frnNumber` | `{ "id": "uuid", "href": "/api/v1/providers/uuid", "name": "Aviva", "frnNumber": "123456" }` |
-| `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": "uuid", "href": "/api/v1/factfinds/{factfindId}/arrangements/uuid", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
-| `EmploymentRef` | `employerName`<br>`status` | `{ "id": "uuid", "href": "/api/v1/employments/uuid", "employerName": "Acme Corp", "status": "Current" }` |
-| `GoalRef` | `goalName`<br>`priority` | `{ "id": "uuid", "href": "/api/v1/factfinds/{factfindId}/goals/uuid", "goalName": "Retirement Planning", "priority": "High" }` |
-| `FactFindRef` | `factFindNumber`<br>`status` | `{ "id": "uuid", "href": "/api/v1/factfinds/uuid", "factFindNumber": "FF001234", "status": "InProgress" }` |
+| `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": "uuid", "href": "/api/v2/factfinds/{factfindId}/clients/uuid", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
+| `AdviserRef` | `name`<br>`code` | `{ "id": "uuid", "href": "/api/v2/advisers/uuid", "name": "Sarah Johnson", "code": "ADV001" }` |
+| `ProviderRef` | `name`<br>`frnNumber` | `{ "id": "uuid", "href": "/api/v2/providers/uuid", "name": "Aviva", "frnNumber": "123456" }` |
+| `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": "uuid", "href": "/api/v2/factfinds/{factfindId}/arrangements/uuid", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
+| `EmploymentRef` | `employerName`<br>`status` | `{ "id": "uuid", "href": "/api/v2/employments/uuid", "employerName": "Acme Corp", "status": "Current" }` |
+| `GoalRef` | `goalName`<br>`priority` | `{ "id": "uuid", "href": "/api/v2/factfinds/{factfindId}/goals/uuid", "goalName": "Retirement Planning", "priority": "High" }` |
+| `FactFindRef` | `factFindNumber`<br>`status` | `{ "id": "uuid", "href": "/api/v2/factfinds/uuid", "factFindNumber": "FF001234", "status": "InProgress" }` |
 
 **Reference Type Usage Example:**
 
@@ -969,21 +872,21 @@ When one entity references another, use an expanded reference object containing:
   "factFindNumber": "FF001234",
   "clientRef": {                          // ClientRef - reference to Client entity
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "jointClientRef": {                     // Optional second client reference
     "id": "client-124",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-124",
     "name": "Jane Smith",
     "clientNumber": "C00001235",
     "type": "Person"
   },
   "adviserRef": {                         // AdviserRef - reference to Adviser entity
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Sarah Johnson",
     "code": "ADV001"
   },
@@ -1050,7 +953,7 @@ Reference types support expansion to include the full referenced entity inline:
 
 **Default Response (Minimal):**
 ```http
-GET /api/v1/factfinds/factfind-456
+GET /api/v2/factfinds/factfind-456
 ```
 
 ```json
@@ -1058,7 +961,7 @@ GET /api/v1/factfinds/factfind-456
   "id": "factfind-456",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234"
   }
@@ -1067,7 +970,7 @@ GET /api/v1/factfinds/factfind-456
 
 **Expanded Response:**
 ```http
-GET /api/v1/factfinds/factfind-456?expand=clientRef,adviserRef
+GET /api/v2/factfinds/factfind-456?expand=clientRef,adviserRef
 ```
 
 ```json
@@ -1075,7 +978,7 @@ GET /api/v1/factfinds/factfind-456?expand=clientRef,adviserRef
   "id": "factfind-456",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person",
@@ -1115,7 +1018,7 @@ GET /api/v1/factfinds/factfind-456?expand=clientRef,adviserRef
 When creating an entity that references others, provide only the reference `id`:
 
 ```json
-POST /api/v1/factfinds
+POST /api/v2/factfinds
 
 {
   "clientRef": {
@@ -1140,13 +1043,13 @@ Response:
   "id": "factfind-456",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",           // Server populates display fields
     "clientNumber": "C00001234"
   },
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Sarah Johnson",
     "code": "ADV001"
   },
@@ -1169,7 +1072,7 @@ Response:
 To change a reference, provide the new reference `id`:
 
 ```json
-PATCH /api/v1/factfinds/factfind-456
+PATCH /api/v2/factfinds/factfind-456
 
 {
   "adviserRef": {
@@ -1182,7 +1085,7 @@ Response:
   "id": "factfind-456",
   "adviserRef": {
     "id": "adviser-999",
-    "href": "/api/v1/advisers/adviser-999",
+    "href": "/api/v2/advisers/adviser-999",
     "name": "Michael Brown",        // Server updates display fields
     "code": "ADV002"
   },
@@ -1230,34 +1133,34 @@ In Domain-Driven Design (DDD), an **aggregate** is a cluster of domain objects t
 
 FactFind is the ONLY top-level business resource:
 ```
-POST /api/v1/factfinds          (Create a new fact find - the only top-level POST)
-GET  /api/v1/factfinds          (List fact finds)
-GET  /api/v1/factfinds/{id}     (Get a fact find)
-PUT  /api/v1/factfinds/{id}     (Update fact find metadata)
-DELETE /api/v1/factfinds/{id}   (Delete entire fact find and all data)
+POST /api/v2/factfinds          (Create a new fact find - the only top-level POST)
+GET  /api/v2/factfinds          (List fact finds)
+GET  /api/v2/factfinds/{id}     (Get a fact find)
+PUT  /api/v2/factfinds/{id}     (Update fact find metadata)
+DELETE /api/v2/factfinds/{id}   (Delete entire fact find and all data)
 ```
 
 **All Other Entities are Nested:**
 
 Clients, arrangements, goals, etc. are accessed through the fact find:
 ```
-POST /api/v1/factfinds/{factfindId}/clients
-GET  /api/v1/factfinds/{factfindId}/clients/{clientId}
-POST /api/v1/factfinds/{factfindId}/arrangements
-GET  /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}
-POST /api/v1/factfinds/{factfindId}/goals
-GET  /api/v1/factfinds/{factfindId}/goals/{goalId}
+POST /api/v2/factfinds/{factfindId}/clients
+GET  /api/v2/factfinds/{factfindId}/clients/{clientId}
+POST /api/v2/factfinds/{factfindId}/arrangements
+GET  /api/v2/factfinds/{factfindId}/arrangements/{arrangementId}
+POST /api/v2/factfinds/{factfindId}/goals
+GET  /api/v2/factfinds/{factfindId}/goals/{goalId}
 ```
 
 **No Independent Entity Access:**
 
 You CANNOT create or access these entities without a fact find context:
 ```
-❌ POST /api/v1/factfinds/{factfindId}/clients               (Not supported)
-❌ GET  /api/v1/factfinds/{factfindId}/clients/{id}          (Not supported)
-❌ POST /api/v1/factfinds/{factfindId}/arrangements          (Not supported)
-❌ GET  /api/v1/factfinds/{factfindId}/arrangements/{id}     (Not supported)
-❌ POST /api/v1/factfinds/{factfindId}/goals                 (Not supported)
+❌ POST /api/v2/factfinds/{factfindId}/clients               (Not supported)
+❌ GET  /api/v2/factfinds/{factfindId}/clients/{id}          (Not supported)
+❌ POST /api/v2/factfinds/{factfindId}/arrangements          (Not supported)
+❌ GET  /api/v2/factfinds/{factfindId}/arrangements/{id}     (Not supported)
+❌ POST /api/v2/factfinds/{factfindId}/goals                 (Not supported)
 ```
 
 #### 1.9.4 Transactional Boundaries
@@ -1265,9 +1168,9 @@ You CANNOT create or access these entities without a fact find context:
 **Within Aggregate (Atomic):**
 ```http
 # These operations are transactionally consistent
-POST /api/v1/factfinds/{id}/income
-POST /api/v1/factfinds/{id}/expenditure
-PUT  /api/v1/factfinds/{id}
+POST /api/v2/factfinds/{id}/income
+POST /api/v2/factfinds/{id}/expenditure
+PUT  /api/v2/factfinds/{id}
 ```
 
 All operations on the same fact find aggregate are guaranteed to be consistent. For example:
@@ -1279,8 +1182,8 @@ All operations on the same fact find aggregate are guaranteed to be consistent. 
 
 Reference data and lookups are separate aggregates:
 ```http
-GET /api/v1/reference/countries     (Separate aggregate)
-GET /api/v1/reference/providers     (Separate aggregate)
+GET /api/v2/reference/countries     (Separate aggregate)
+GET /api/v2/reference/providers     (Separate aggregate)
 ```
 
 Changes to reference data do not affect existing fact finds immediately; they use eventual consistency patterns.
@@ -1289,20 +1192,20 @@ Changes to reference data do not affect existing fact finds immediately; they us
 
 **FactFind Lifecycle:**
 ```
-1. Create fact find         POST /api/v1/factfinds
-2. Add client data         POST /api/v1/factfinds/{id}/clients
-3. Record income           POST /api/v1/factfinds/{id}/income
-4. Record expenditure      POST /api/v1/factfinds/{id}/expenditure
-5. Identify arrangements   POST /api/v1/factfinds/{id}/arrangements
-6. Set goals               POST /api/v1/factfinds/{id}/goals
-7. Complete fact find      POST /api/v1/factfinds/{id}/complete
+1. Create fact find         POST /api/v2/factfinds
+2. Add client data         POST /api/v2/factfinds/{id}/clients
+3. Record income           POST /api/v2/factfinds/{id}/income
+4. Record expenditure      POST /api/v2/factfinds/{id}/expenditure
+5. Identify arrangements   POST /api/v2/factfinds/{id}/arrangements
+6. Set goals               POST /api/v2/factfinds/{id}/goals
+7. Complete fact find      POST /api/v2/factfinds/{id}/complete
 ```
 
 **Cascading Deletes:**
 
 Deleting a fact find cascades to ALL nested entities:
 ```http
-DELETE /api/v1/factfinds/456   # Deletes:
+DELETE /api/v2/factfinds/456   # Deletes:
                                 # - All clients in this fact find
                                 # - All income records
                                 # - All expenditure records
@@ -1320,7 +1223,7 @@ DELETE /api/v1/factfinds/456   # Deletes:
 A special endpoint retrieves the entire aggregate in a single request:
 
 ```http
-GET /api/v1/factfinds/{id}/complete
+GET /api/v2/factfinds/{id}/complete
 ```
 
 **Response:**
@@ -1413,10 +1316,10 @@ GET /api/v1/factfinds/{id}/complete
 **System-Wide Reference Data** remains independent and is NOT part of the FactFind aggregate:
 
 ```
-/api/v1/reference/genders           (System-wide enum)
-/api/v1/reference/countries         (System-wide lookup)
-/api/v1/reference/providers         (System-wide directory)
-/api/v1/reference/product-types     (System-wide catalog)
+/api/v2/reference/genders           (System-wide enum)
+/api/v2/reference/countries         (System-wide lookup)
+/api/v2/reference/providers         (System-wide directory)
+/api/v2/reference/product-types     (System-wide catalog)
 ```
 
 **Rationale:**
@@ -1492,7 +1395,7 @@ Examples:
 
 **Tenant Context:**
 ```http
-GET /api/v1/factfinds/{factfindId}/clients HTTP/1.1
+GET /api/v2/factfinds/{factfindId}/clients HTTP/1.1
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 X-Tenant-ID: tenant-456
 
@@ -1585,7 +1488,7 @@ All write operations (POST, PUT, PATCH, DELETE) are logged:
 
 Request:
 ```http
-GET /api/v1/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTAwfQ==
+GET /api/v2/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTAwfQ==
 ```
 
 Response:
@@ -1603,10 +1506,10 @@ Response:
   },
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTAwfQ=="
+      "href": "/api/v2/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTAwfQ=="
     },
     "next": {
-      "href": "/api/v1/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTIwfQ=="
+      "href": "/api/v2/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTIwfQ=="
     }
   }
 }
@@ -1616,7 +1519,7 @@ Response:
 
 Request:
 ```http
-GET /api/v1/factfinds/{factfindId}/clients?page=2&pageSize=20
+GET /api/v2/factfinds/{factfindId}/clients?page=2&pageSize=20
 ```
 
 Response:
@@ -1630,11 +1533,11 @@ Response:
     "totalCount": 195
   },
   "_links": {
-    "first": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
-    "prev": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients?page=2&pageSize=20" },
-    "next": { "href": "/api/v1/factfinds/{factfindId}/clients?page=3&pageSize=20" },
-    "last": { "href": "/api/v1/factfinds/{factfindId}/clients?page=10&pageSize=20" }
+    "first": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "prev": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients?page=2&pageSize=20" },
+    "next": { "href": "/api/v2/factfinds/{factfindId}/clients?page=3&pageSize=20" },
+    "last": { "href": "/api/v2/factfinds/{factfindId}/clients?page=10&pageSize=20" }
   }
 }
 ```
@@ -1644,7 +1547,7 @@ Response:
 **Query Parameters:**
 
 ```http
-GET /api/v1/factfinds/{factfindId}/clients?status=Active&clientType=Person&sortBy=lastName&sortOrder=asc
+GET /api/v2/factfinds/{factfindId}/clients?status=Active&clientType=Person&sortBy=lastName&sortOrder=asc
 ```
 
 **Supported Filters:**
@@ -1665,7 +1568,7 @@ Following the Single Contract Principle (see Section 1.7), the API uses field se
 
 **Select Specific Fields:**
 ```http
-GET /api/v1/factfinds/{factfindId}/clients/123?fields=id,firstName,lastName,dateOfBirth
+GET /api/v2/factfinds/{factfindId}/clients/123?fields=id,firstName,lastName,dateOfBirth
 ```
 
 Response returns the `Client` contract with only requested fields populated:
@@ -1680,7 +1583,7 @@ Response returns the `Client` contract with only requested fields populated:
 
 **Exclude Fields:**
 ```http
-GET /api/v1/factfinds/{factfindId}/clients/123?exclude=notes,medicalConditions
+GET /api/v2/factfinds/{factfindId}/clients/123?exclude=notes,medicalConditions
 ```
 
 ### 3.4 Resource Expansion
@@ -1691,7 +1594,7 @@ Reference types (entities with identity) can be expanded to include their full e
 
 **Default response (minimal references):**
 ```http
-GET /api/v1/factfinds/factfind-123
+GET /api/v2/factfinds/factfind-123
 ```
 ```json
 {
@@ -1699,14 +1602,14 @@ GET /api/v1/factfinds/factfind-123
   "factFindNumber": "FF001234",
   "clientRef": {
     "id": "client-456",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-456",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-456",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -1723,7 +1626,7 @@ GET /api/v1/factfinds/factfind-123
 
 **Expanded response (full referenced entities):**
 ```http
-GET /api/v1/factfinds/factfind-123?expand=clientRef,adviserRef
+GET /api/v2/factfinds/factfind-123?expand=clientRef,adviserRef
 ```
 ```json
 {
@@ -1731,7 +1634,7 @@ GET /api/v1/factfinds/factfind-123?expand=clientRef,adviserRef
   "factFindNumber": "FF001234",
   "clientRef": {
     "id": "client-456",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-456",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-456",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person",
@@ -1757,7 +1660,7 @@ GET /api/v1/factfinds/factfind-123?expand=clientRef,adviserRef
   },
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001",
     // Full Adviser entity expanded
@@ -1789,7 +1692,7 @@ GET /api/v1/factfinds/factfind-123?expand=clientRef,adviserRef
 
 1. Client retrieves resource:
 ```http
-GET /api/v1/factfinds/{factfindId}/clients/123
+GET /api/v2/factfinds/{factfindId}/clients/123
 
 Response:
 ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
@@ -1797,7 +1700,7 @@ ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 
 2. Client updates resource with If-Match:
 ```http
-PUT /api/v1/factfinds/{factfindId}/clients/123
+PUT /api/v2/factfinds/{factfindId}/clients/123
 If-Match: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 
 {
@@ -1824,7 +1727,7 @@ Conflict (409 Conflict):
 
 **Bulk Create:**
 ```http
-POST /api/v1/factfinds/{factfindId}/clients/bulk
+POST /api/v2/factfinds/{factfindId}/clients/bulk
 Content-Type: application/json
 
 {
@@ -1848,7 +1751,7 @@ Response (207 Multi-Status):
     {
       "status": 201,
       "id": 101,
-      "href": "/api/v1/factfinds/{factfindId}/clients/101"
+      "href": "/api/v2/factfinds/{factfindId}/clients/101"
     },
     {
       "status": 400,
@@ -1872,21 +1775,21 @@ Response (207 Multi-Status):
   "lastName": "Smith",
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123"
     },
     "update": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/123",
+      "href": "/api/v2/factfinds/{factfindId}/clients/123",
       "method": "PUT"
     },
     "delete": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/123",
+      "href": "/api/v2/factfinds/{factfindId}/clients/123",
       "method": "DELETE"
     },
     "addresses": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/123/addresses"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/addresses"
     },
     "factfinds": {
-      "href": "/api/v1/factfinds?clientId=123"
+      "href": "/api/v2/factfinds?clientId=123"
     }
   }
 }
@@ -1902,14 +1805,14 @@ Response (207 Multi-Status):
     "display": "Draft"
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/123" },
+    "self": { "href": "/api/v2/factfinds/123" },
     "complete": {
-      "href": "/api/v1/factfinds/123/complete",
+      "href": "/api/v2/factfinds/123/complete",
       "method": "POST",
       "enabled": true
     },
     "archive": {
-      "href": "/api/v1/factfinds/123/archive",
+      "href": "/api/v2/factfinds/123/archive",
       "method": "POST",
       "enabled": false,
       "reason": "Cannot archive draft fact find"
@@ -2008,15 +1911,15 @@ See Section 12.10.9 for complete enumeration value type definitions.
 ## 4. FactFind API (Root Aggregate)
 
 
-**ARCHITECTURAL NOTE (v2.1):**
+**ARCHITECTURAL NOTE:**
 
 FactFind is the **aggregate root** for all business operations. All other resources (clients, income, arrangements, etc.) are accessed through the FactFind context:
 
-- `/api/v1/factfinds` - Root collection
-- `/api/v1/factfinds/{factfindId}` - Specific fact-find
-- `/api/v1/factfinds/{factfindId}/clients` - Clients within a fact-find
-- `/api/v1/factfinds/{factfindId}/arrangements` - Arrangements within a fact-find
-- `/api/v1/factfinds/{factfindId}/objectives` - Objectives within a fact-find
+- `/api/v2/factfinds` - Root collection
+- `/api/v2/factfinds/{factfindId}` - Specific fact-find
+- `/api/v2/factfinds/{factfindId}/clients` - Clients within a fact-find
+- `/api/v2/factfinds/{factfindId}/arrangements` - Arrangements within a fact-find
+- `/api/v2/factfinds/{factfindId}/objectives` - Objectives within a fact-find
 
 All subsequent API sections (5-11) document resources that are **nested under** the FactFind aggregate root.
 
@@ -2048,40 +1951,40 @@ All subsequent API sections (5-11) document resources that are **nested under** 
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients` | List clients with filtering | `client:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients` | Create new client | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}` | Get client details | `client:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}` | Update client | `client:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}` | Delete client (soft delete) | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | `client:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` | Add address | `client:write` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Update address | `client:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Remove address | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact details | `client:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact detail | `client:write` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Update contact | `client:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Remove contact | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` | List relationships | `client:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` | Create relationship | `client:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/relationships/{id}` | Remove relationship | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | List dependants | `client:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | Add dependant | `client:write` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Update dependant | `client:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Remove dependant | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get ID verification docs | `client:pii:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/id-verification` | Upload ID document | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Get data protection consent | `client:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Update DPA consent | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Get marketing preferences | `client:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Update marketing consent | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` | Get vulnerability assessment | `client:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` | Update vulnerability | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients` | List clients with filtering | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients` | Create new client | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Get client details | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Update client | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Delete client (soft delete) | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | Add address | `client:write` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Update address | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Remove address | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact details | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact detail | `client:write` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Update contact | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Remove contact | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | List relationships | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | Create relationship | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{id}` | Remove relationship | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List dependants | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add dependant | `client:write` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Update dependant | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Remove dependant | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get ID verification docs | `client:pii:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Upload ID document | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Get data protection consent | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Update DPA consent | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Get marketing preferences | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Update marketing consent | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerability` | Get vulnerability assessment | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerability` | Update vulnerability | `client:write` |
 
 ### 4.3 Key Endpoints
 
 #### 4.3.1 Create Client
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients`
 
 **Description:** Create a new client record (Person, Corporate, or Trust).
 
@@ -2149,7 +2052,7 @@ Complete `Client` contract with all fields populated, including server-generated
 
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/{factfindId}/clients/123
+Location: /api/v2/factfinds/{factfindId}/clients/123
 ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 Content-Type: application/json
 
@@ -2203,7 +2106,7 @@ Content-Type: application/json
     "id": 789,
     "firstName": "Jane",
     "lastName": "Doe",
-    "href": "/api/v1/advisers/789"
+    "href": "/api/v2/advisers/789"
   },
   "serviceStatus": "Active",
   "clientSegment": "A",
@@ -2219,23 +2122,23 @@ Content-Type: application/json
   },
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123"
     },
     "update": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/123",
+      "href": "/api/v2/factfinds/{factfindId}/clients/123",
       "method": "PUT"
     },
     "addresses": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/123/addresses"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/addresses"
     },
     "contacts": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/123/contacts"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/contacts"
     },
     "factfinds": {
-      "href": "/api/v1/factfinds?clientId=123"
+      "href": "/api/v2/factfinds?clientId=123"
     },
     "arrangements": {
-      "href": "/api/v1/factfinds/{factfindId}/arrangements?clientId=123"
+      "href": "/api/v2/factfinds/{factfindId}/arrangements?clientId=123"
     }
   }
 }
@@ -2265,7 +2168,7 @@ Content-Type: application/json
 
 #### 4.3.2 Get Client
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}`
 
 **Description:** Retrieve complete client details including demographic information.
 
@@ -2374,20 +2277,20 @@ Complete `Client` contract.
     "firstName": "Jane",
     "lastName": "Doe",
     "email": "jane.doe@example.com",
-    "href": "/api/v1/advisers/789"
+    "href": "/api/v2/advisers/789"
   },
   "createdAt": "2020-01-15T10:30:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/123" },
-    "update": { "href": "/api/v1/factfinds/{factfindId}/clients/123", "method": "PUT" },
-    "addresses": { "href": "/api/v1/factfinds/{factfindId}/clients/123/addresses" },
-    "contacts": { "href": "/api/v1/factfinds/{factfindId}/clients/123/contacts" },
-    "relationships": { "href": "/api/v1/factfinds/{factfindId}/clients/123/relationships" },
-    "dependants": { "href": "/api/v1/factfinds/{factfindId}/clients/123/dependants" },
-    "factfinds": { "href": "/api/v1/factfinds?clientId=123" },
-    "arrangements": { "href": "/api/v1/factfinds/{factfindId}/arrangements?clientId=123" },
-    "goals": { "href": "/api/v1/factfinds/{factfindId}/objectives?clientId=123" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
+    "update": { "href": "/api/v2/factfinds/{factfindId}/clients/123", "method": "PUT" },
+    "addresses": { "href": "/api/v2/factfinds/{factfindId}/clients/123/addresses" },
+    "contacts": { "href": "/api/v2/factfinds/{factfindId}/clients/123/contacts" },
+    "relationships": { "href": "/api/v2/factfinds/{factfindId}/clients/123/relationships" },
+    "dependants": { "href": "/api/v2/factfinds/{factfindId}/clients/123/dependants" },
+    "factfinds": { "href": "/api/v2/factfinds?clientId=123" },
+    "arrangements": { "href": "/api/v2/factfinds/{factfindId}/arrangements?clientId=123" },
+    "goals": { "href": "/api/v2/factfinds/{factfindId}/objectives?clientId=123" }
   }
 }
 ```
@@ -2400,7 +2303,7 @@ Complete `Client` contract.
 
 #### 4.3.3 List Clients
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients`
 
 **Description:** List clients with filtering, sorting, and pagination.
 
@@ -2439,10 +2342,10 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
       "primaryAdviser": {
         "id": 789,
         "name": "Jane Doe",
-        "href": "/api/v1/advisers/789"
+        "href": "/api/v2/advisers/789"
       },
       "_links": {
-        "self": { "href": "/api/v1/factfinds/{factfindId}/clients/123" }
+        "self": { "href": "/api/v2/factfinds/{factfindId}/clients/123" }
       }
     },
     {
@@ -2458,10 +2361,10 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
       "primaryAdviser": {
         "id": 789,
         "name": "Jane Doe",
-        "href": "/api/v1/advisers/789"
+        "href": "/api/v2/advisers/789"
       },
       "_links": {
-        "self": { "href": "/api/v1/factfinds/{factfindId}/clients/124" }
+        "self": { "href": "/api/v2/factfinds/{factfindId}/clients/124" }
       }
     }
   ],
@@ -2473,10 +2376,10 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
   },
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients?limit=20"
+      "href": "/api/v2/factfinds/{factfindId}/clients?limit=20"
     },
     "next": {
-      "href": "/api/v1/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTI0fQ=="
+      "href": "/api/v2/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTI0fQ=="
     }
   }
 }
@@ -2484,7 +2387,7 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
 
 #### 4.3.4 Add Address
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{id}/addresses`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{id}/addresses`
 
 **Description:** Add a new address for a client (residential, correspondence, etc.).
 
@@ -2514,13 +2417,13 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-456
+Location: /api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-456
 
 {
   "id": "address-456",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -2545,8 +2448,8 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-45
   "durationAtAddressMonths": 1,
   "createdAt": "2026-02-16T14:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-456" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-456" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" }
   }
 }
 ```
@@ -2561,7 +2464,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-45
 
 #### 4.3.5 Update Vulnerability Assessment
 
-**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability`
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerability`
 
 **Description:** Update client vulnerability assessment for Consumer Duty compliance.
 
@@ -2585,7 +2488,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-45
   "id": "vulnerability-789",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -2604,9 +2507,9 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-45
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/123/vulnerability" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/123" },
-    "history": { "href": "/api/v1/factfinds/{factfindId}/clients/123/vulnerability/history" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/123/vulnerability" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
+    "history": { "href": "/api/v2/factfinds/{factfindId}/clients/123/vulnerability/history" }
   }
 }
 ```
@@ -2651,17 +2554,17 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-45
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/current-position` | Get comprehensive financial position summary | `factfind:read` |
-| GET | `/api/v1/factfinds/{factfindId}/current-position/net-worth` | Get detailed net worth breakdown | `factfind:read` |
-| GET | `/api/v1/factfinds/{factfindId}/current-position/financial-health` | Get financial health score and analysis | `factfind:read` |
-| GET | `/api/v1/factfinds/{factfindId}/current-position/cash-flow` | Get cash flow analysis | `factfind:read` |
-| GET | `/api/v1/factfinds/{factfindId}/current-position/asset-allocation` | Get detailed asset allocation | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/current-position` | Get comprehensive financial position summary | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/current-position/net-worth` | Get detailed net worth breakdown | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/current-position/financial-health` | Get financial health score and analysis | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/current-position/cash-flow` | Get cash flow analysis | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/current-position/asset-allocation` | Get detailed asset allocation | `factfind:read` |
 
 ### 4.4.2 Key Endpoints
 
 #### 4.4.2.1 Get Current Position Summary
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/current-position`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/current-position`
 
 **Description:** Get comprehensive financial position summary for a fact find including net worth, asset allocation, cash flow, and financial health score.
 
@@ -2851,12 +2754,12 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/addresses/address-45
     ]
   },
   "_links": {
-    "self": {"href": "/api/v1/factfinds/factfind-456/current-position"},
-    "factfind": {"href": "/api/v1/factfinds/factfind-456"},
-    "net-worth": {"href": "/api/v1/factfinds/factfind-456/current-position/net-worth"},
-    "financial-health": {"href": "/api/v1/factfinds/factfind-456/current-position/financial-health"},
-    "cash-flow": {"href": "/api/v1/factfinds/factfind-456/current-position/cash-flow"},
-    "asset-allocation": {"href": "/api/v1/factfinds/factfind-456/current-position/asset-allocation"}
+    "self": {"href": "/api/v2/factfinds/factfind-456/current-position"},
+    "factfind": {"href": "/api/v2/factfinds/factfind-456"},
+    "net-worth": {"href": "/api/v2/factfinds/factfind-456/current-position/net-worth"},
+    "financial-health": {"href": "/api/v2/factfinds/factfind-456/current-position/financial-health"},
+    "cash-flow": {"href": "/api/v2/factfinds/factfind-456/current-position/cash-flow"},
+    "asset-allocation": {"href": "/api/v2/factfinds/factfind-456/current-position/asset-allocation"}
   }
 }
 ```
@@ -2929,7 +2832,7 @@ The financial health score is calculated on a 0-100 scale with five components:
 ### 5.1 Overview
 
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/clients`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients`
 
 **Purpose:** Capture comprehensive client circumstances and current financial position for financial planning.
 
@@ -2953,37 +2856,37 @@ The financial health score is calculated on a 0-100 scale with five components:
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds` | List fact finds | `factfind:read` |
-| POST | `/api/v1/factfinds` | Create new fact find | `factfind:write` |
-| GET | `/api/v1/factfinds/{id}` | Get fact find summary | `factfind:read` |
-| PUT | `/api/v1/factfinds/{id}` | Update fact find | `factfind:write` |
-| DELETE | `/api/v1/factfinds/{id}` | Delete fact find | `factfind:write` |
-| POST | `/api/v1/factfinds/{id}/complete` | Mark fact find as complete | `factfind:write` |
-| GET | `/api/v1/factfinds/{id}/summary` | Get financial summary | `factfind:read` |
-| GET | `/api/v1/factfinds/{id}/employment` | List employment records | `factfind:read` |
-| POST | `/api/v1/factfinds/{id}/employment` | Add employment | `factfind:write` |
-| PUT | `/api/v1/factfinds/{id}/employment/{empId}` | Update employment | `factfind:write` |
-| DELETE | `/api/v1/factfinds/{id}/employment/{empId}` | Remove employment | `factfind:write` |
-| GET | `/api/v1/factfinds/{id}/income` | List income sources | `factfind:read` |
-| POST | `/api/v1/factfinds/{id}/income` | Add income | `factfind:write` |
-| PUT | `/api/v1/factfinds/{id}/income/{incomeId}` | Update income | `factfind:write` |
-| DELETE | `/api/v1/factfinds/{id}/income/{incomeId}` | Remove income | `factfind:write` |
-| GET | `/api/v1/factfinds/{id}/expenditure` | List expenditure | `factfind:read` |
-| POST | `/api/v1/factfinds/{id}/expenditure` | Add expenditure | `factfind:write` |
-| PUT | `/api/v1/factfinds/{id}/expenditure/{expId}` | Update expenditure | `factfind:write` |
-| DELETE | `/api/v1/factfinds/{id}/expenditure/{expId}` | Remove expenditure | `factfind:write` |
-| GET | `/api/v1/factfinds/{id}/income-changes` | List expected income changes | `factfind:read` |
-| POST | `/api/v1/factfinds/{id}/income-changes` | Add income change | `factfind:write` |
-| GET | `/api/v1/factfinds/{id}/expenditure-changes` | List expected expenditure changes | `factfind:read` |
-| POST | `/api/v1/factfinds/{id}/expenditure-changes` | Add expenditure change | `factfind:write` |
-| GET | `/api/v1/factfinds/{id}/affordability` | Calculate affordability | `factfind:read` |
-| GET | `/api/v1/factfinds/{id}/complete` | Get complete aggregate | `factfind:read` |
+| GET | `/api/v2/factfinds` | List fact finds | `factfind:read` |
+| POST | `/api/v2/factfinds` | Create new fact find | `factfind:write` |
+| GET | `/api/v2/factfinds/{id}` | Get fact find summary | `factfind:read` |
+| PUT | `/api/v2/factfinds/{id}` | Update fact find | `factfind:write` |
+| DELETE | `/api/v2/factfinds/{id}` | Delete fact find | `factfind:write` |
+| POST | `/api/v2/factfinds/{id}/complete` | Mark fact find as complete | `factfind:write` |
+| GET | `/api/v2/factfinds/{id}/summary` | Get financial summary | `factfind:read` |
+| GET | `/api/v2/factfinds/{id}/employment` | List employment records | `factfind:read` |
+| POST | `/api/v2/factfinds/{id}/employment` | Add employment | `factfind:write` |
+| PUT | `/api/v2/factfinds/{id}/employment/{empId}` | Update employment | `factfind:write` |
+| DELETE | `/api/v2/factfinds/{id}/employment/{empId}` | Remove employment | `factfind:write` |
+| GET | `/api/v2/factfinds/{id}/income` | List income sources | `factfind:read` |
+| POST | `/api/v2/factfinds/{id}/income` | Add income | `factfind:write` |
+| PUT | `/api/v2/factfinds/{id}/income/{incomeId}` | Update income | `factfind:write` |
+| DELETE | `/api/v2/factfinds/{id}/income/{incomeId}` | Remove income | `factfind:write` |
+| GET | `/api/v2/factfinds/{id}/expenditure` | List expenditure | `factfind:read` |
+| POST | `/api/v2/factfinds/{id}/expenditure` | Add expenditure | `factfind:write` |
+| PUT | `/api/v2/factfinds/{id}/expenditure/{expId}` | Update expenditure | `factfind:write` |
+| DELETE | `/api/v2/factfinds/{id}/expenditure/{expId}` | Remove expenditure | `factfind:write` |
+| GET | `/api/v2/factfinds/{id}/income-changes` | List expected income changes | `factfind:read` |
+| POST | `/api/v2/factfinds/{id}/income-changes` | Add income change | `factfind:write` |
+| GET | `/api/v2/factfinds/{id}/expenditure-changes` | List expected expenditure changes | `factfind:read` |
+| POST | `/api/v2/factfinds/{id}/expenditure-changes` | Add expenditure change | `factfind:write` |
+| GET | `/api/v2/factfinds/{id}/affordability` | Calculate affordability | `factfind:read` |
+| GET | `/api/v2/factfinds/{id}/complete` | Get complete aggregate | `factfind:read` |
 
 ### 5.3 Key Endpoints
 
 #### 5.3.1 Create FactFind
 
-**Endpoint:** `POST /api/v1/factfinds`
+**Endpoint:** `POST /api/v2/factfinds`
 
 **Description:** Create a new fact find session for a client or joint clients.
 
@@ -3026,7 +2929,7 @@ Complete `FactFind` contract with all fields populated.
 
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/456
+Location: /api/v2/factfinds/456
 ETag: "a1b2c3d4e5f6"
 
 {
@@ -3034,12 +2937,12 @@ ETag: "a1b2c3d4e5f6"
   "client": {
     "id": 123,
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/{factfindId}/clients/123"
+    "href": "/api/v2/factfinds/{factfindId}/clients/123"
   },
   "jointClient": {
     "id": 124,
     "fullName": "Sarah Smith",
-    "href": "/api/v1/factfinds/{factfindId}/clients/124"
+    "href": "/api/v2/factfinds/{factfindId}/clients/124"
   },
   "dateOfMeeting": "2026-02-16",
   "typeOfMeeting": "InitialConsultation",
@@ -3051,7 +2954,7 @@ ETag: "a1b2c3d4e5f6"
   "primaryAdviser": {
     "id": 789,
     "fullName": "Jane Doe",
-    "href": "/api/v1/advisers/789"
+    "href": "/api/v2/advisers/789"
   },
   "isComplete": false,
   "dateFactFindCompleted": null,
@@ -3063,12 +2966,12 @@ ETag: "a1b2c3d4e5f6"
   "createdAt": "2026-02-16T14:30:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/456" },
-    "complete": { "href": "/api/v1/factfinds/456/complete", "method": "POST" },
-    "employment": { "href": "/api/v1/factfinds/456/employment" },
-    "income": { "href": "/api/v1/factfinds/456/income" },
-    "expenditure": { "href": "/api/v1/factfinds/456/expenditure" },
-    "summary": { "href": "/api/v1/factfinds/456/summary" }
+    "self": { "href": "/api/v2/factfinds/456" },
+    "complete": { "href": "/api/v2/factfinds/456/complete", "method": "POST" },
+    "employment": { "href": "/api/v2/factfinds/456/employment" },
+    "income": { "href": "/api/v2/factfinds/456/income" },
+    "expenditure": { "href": "/api/v2/factfinds/456/expenditure" },
+    "summary": { "href": "/api/v2/factfinds/456/summary" }
   }
 }
 ```
@@ -3087,7 +2990,7 @@ ETag: "a1b2c3d4e5f6"
 
 #### 5.3.2 Add Income
 
-**Endpoint:** `POST /api/v1/factfinds/{id}/income`
+**Endpoint:** `POST /api/v2/factfinds/{id}/income`
 
 **Description:** Add an income source to the fact find.
 
@@ -3170,7 +3073,7 @@ Income contract with required-on-create fields.
     "id": 789,
     "employer": "ACME Corporation Ltd",
     "occupation": "Senior Software Engineer",
-    "href": "/api/v1/factfinds/456/employment/789"
+    "href": "/api/v2/factfinds/456/employment/789"
   },
   "basicIncomeGross": {
     "amount": 75000.00,
@@ -3256,9 +3159,9 @@ Income contract with required-on-create fields.
   "endDate": null,
   "createdAt": "2026-02-16T14:35:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/456/income/999" },
-    "factfind": { "href": "/api/v1/factfinds/456" },
-    "employment": { "href": "/api/v1/factfinds/456/employment/789" }
+    "self": { "href": "/api/v2/factfinds/456/income/999" },
+    "factfind": { "href": "/api/v2/factfinds/456" },
+    "employment": { "href": "/api/v2/factfinds/456/employment/789" }
   }
 }
 ```
@@ -3285,7 +3188,7 @@ Income contract with required-on-create fields.
 
 #### 5.3.3 Add Expenditure
 
-**Endpoint:** `POST /api/v1/factfinds/{id}/expenditure`
+**Endpoint:** `POST /api/v2/factfinds/{id}/expenditure`
 
 **Description:** Add an expenditure item (essential or discretionary).
 
@@ -3371,13 +3274,13 @@ Income contract with required-on-create fields.
     "id": 555,
     "type": "Mortgage",
     "provider": "UK Building Society",
-    "href": "/api/v1/factfinds/{factfindId}/arrangements/555"
+    "href": "/api/v2/factfinds/{factfindId}/arrangements/555"
   },
   "createdAt": "2026-02-16T14:40:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/456/expenditure/888" },
-    "factfind": { "href": "/api/v1/factfinds/456" },
-    "liability": { "href": "/api/v1/factfinds/{factfindId}/arrangements/555" }
+    "self": { "href": "/api/v2/factfinds/456/expenditure/888" },
+    "factfind": { "href": "/api/v2/factfinds/456" },
+    "liability": { "href": "/api/v2/factfinds/{factfindId}/arrangements/555" }
   }
 }
 ```
@@ -3409,7 +3312,7 @@ Income contract with required-on-create fields.
 
 #### 5.3.4 Get FactFind Summary
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/summary`
+**Endpoint:** `GET /api/v2/factfinds/{id}/summary`
 
 **Description:** Get comprehensive financial summary with calculated totals.
 
@@ -3609,10 +3512,10 @@ Income contract with required-on-create fields.
   },
   "calculatedAt": "2026-02-16T14:45:00Z",
   "_links": {
-    "factfind": { "href": "/api/v1/factfinds/456" },
-    "income": { "href": "/api/v1/factfinds/456/income" },
-    "expenditure": { "href": "/api/v1/factfinds/456/expenditure" },
-    "affordability": { "href": "/api/v1/factfinds/456/affordability" }
+    "factfind": { "href": "/api/v2/factfinds/456" },
+    "income": { "href": "/api/v2/factfinds/456/income" },
+    "expenditure": { "href": "/api/v2/factfinds/456/expenditure" },
+    "affordability": { "href": "/api/v2/factfinds/456/affordability" }
   }
 }
 ```
@@ -3629,7 +3532,7 @@ Income contract with required-on-create fields.
 
 ### 5.4 Estate Planning
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
 
 **Purpose:** Manage client-specific estate planning information including wills, powers of attorney, trusts, and gift planning for inheritance tax (IHT) mitigation.
 
@@ -3662,26 +3565,26 @@ Income contract with required-on-create fields.
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | **Estate Planning Overview** | | | |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
 | **Gifts Management** | | | |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Record a new gift | `estate:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts by client | `estate:read` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get gift details | `estate:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift record | `estate:write` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Record a new gift | `estate:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts by client | `estate:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get gift details | `estate:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift record | `estate:write` |
 | **Trusts Management** | | | |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | Create gift trust | `estate:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | List client's trusts | `estate:read` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Get trust details | `estate:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Update trust | `estate:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | Create gift trust | `estate:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | List client's trusts | `estate:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Get trust details | `estate:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Update trust | `estate:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |
 
 **Total Endpoints:** 12
 
 #### 5.4.2 Get Estate Planning Overview
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
 
 **Description:** Retrieve comprehensive estate planning information for a client including wills, powers of attorney, total gifts made, and IHT exposure.
 
@@ -3692,7 +3595,7 @@ Income contract with required-on-create fields.
   "clientRef": {
     "id": "client-123",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-456/clients/client-123"
+    "href": "/api/v2/factfinds/ff-456/clients/client-123"
   },
   "estatePlanning": {
     "hasWill": true,
@@ -3767,17 +3670,17 @@ Income contract with required-on-create fields.
   },
   "lastReviewed": "2026-01-15",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning" },
-    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "gifts": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts" },
-    "trusts": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/trusts" }
+    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning" },
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "gifts": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts" },
+    "trusts": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/trusts" }
   }
 }
 ```
 
 #### 5.4.3 Update Estate Planning Details
 
-**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
 
 **Description:** Update estate planning information such as will status, powers of attorney, and inheritance wishes.
 
@@ -3801,7 +3704,7 @@ Income contract with required-on-create fields.
 
 #### 5.4.4 Record Gift
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
 
 **Description:** Record a gift made by the client for IHT planning and PET tracking.
 
@@ -3848,7 +3751,7 @@ Income contract with required-on-create fields.
   "clientRef": {
     "id": "client-123",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-456/clients/client-123"
+    "href": "/api/v2/factfinds/ff-456/clients/client-123"
   },
   "giftDate": "2026-01-15",
   "giftType": {
@@ -3862,7 +3765,7 @@ Income contract with required-on-create fields.
   },
   "recipientRef": {
     "id": "dependent-789",
-    "href": "/api/v1/factfinds/ff-456/clients/client-123/dependents/dependent-789"
+    "href": "/api/v2/factfinds/ff-456/clients/client-123/dependents/dependent-789"
   },
   "giftValue": {
     "amount": 15000.00,
@@ -3896,9 +3799,9 @@ Income contract with required-on-create fields.
   "createdAt": "2026-02-18T10:30:00Z",
   "updatedAt": "2026-02-18T10:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-123" },
-    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "estate-planning": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning" }
+    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-123" },
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning" }
   }
 }
 ```
@@ -3918,7 +3821,7 @@ Income contract with required-on-create fields.
 
 #### 5.4.5 List Gifts
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
 
 **Description:** Retrieve all gifts made by the client, with optional filtering by status and date range.
 
@@ -3958,7 +3861,7 @@ Income contract with required-on-create fields.
         "currency": { "code": "GBP", "symbol": "£" }
       },
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-123" }
+        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-123" }
       }
     },
     {
@@ -3980,7 +3883,7 @@ Income contract with required-on-create fields.
         "currency": { "code": "GBP", "symbol": "£" }
       },
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-124" }
+        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-124" }
       }
     },
     {
@@ -4003,7 +3906,7 @@ Income contract with required-on-create fields.
         "currency": { "code": "GBP", "symbol": "£" }
       },
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-125" }
+        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-125" }
       }
     }
   ],
@@ -4018,15 +3921,15 @@ Income contract with required-on-create fields.
     "currency": { "code": "GBP", "symbol": "£" }
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts" },
-    "estate-planning": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning" }
+    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts" },
+    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning" }
   }
 }
 ```
 
 #### 5.4.6 Create Gift Trust
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts`
 
 **Description:** Create a gift trust for estate planning and IHT mitigation.
 
@@ -4089,7 +3992,7 @@ Income contract with required-on-create fields.
   "clientRef": {
     "id": "client-123",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-456/clients/client-123"
+    "href": "/api/v2/factfinds/ff-456/clients/client-123"
   },
   "trustName": "Smith Family Education Trust",
   "trustType": {
@@ -4110,12 +4013,12 @@ Income contract with required-on-create fields.
     {
       "name": "John Smith",
       "relationshipToClient": "Self",
-      "contactRef": { "id": "client-123", "href": "/api/v1/factfinds/ff-456/clients/client-123" }
+      "contactRef": { "id": "client-123", "href": "/api/v2/factfinds/ff-456/clients/client-123" }
     },
     {
       "name": "Sarah Smith",
       "relationshipToClient": "Spouse",
-      "contactRef": { "id": "client-124", "href": "/api/v1/factfinds/ff-456/clients/client-124" }
+      "contactRef": { "id": "client-124", "href": "/api/v2/factfinds/ff-456/clients/client-124" }
     }
   ],
   "beneficiaries": [
@@ -4136,7 +4039,7 @@ Income contract with required-on-create fields.
   ],
   "linkedGifts": [
     {
-      "giftRef": { "id": "gift-126", "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-126" },
+      "giftRef": { "id": "gift-126", "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-126" },
       "giftDate": "2026-02-01",
       "giftValue": { "amount": 100000.00, "currency": { "code": "GBP" } }
     }
@@ -4150,9 +4053,9 @@ Income contract with required-on-create fields.
   "createdAt": "2026-02-18T11:00:00Z",
   "updatedAt": "2026-02-18T11:00:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning/trusts/trust-456" },
-    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "estate-planning": { "href": "/api/v1/factfinds/ff-456/clients/client-123/estate-planning" }
+    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/trusts/trust-456" },
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning" }
   }
 }
 ```
@@ -4182,7 +4085,7 @@ Income contract with required-on-create fields.
 
 ### 5.5 Dependants
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants`
 
 **Purpose:** Manage client's dependants including children, elderly parents, and other financially dependent individuals for protection planning and financial forecasting.
 
@@ -4213,17 +4116,17 @@ Income contract with required-on-create fields.
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | List all client's dependants | `clients:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | Add new dependant | `clients:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | `clients:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Update dependant | `clients:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Delete dependant | `clients:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List all client's dependants | `clients:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add new dependant | `clients:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | `clients:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Update dependant | `clients:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Delete dependant | `clients:write` |
 
 **Total Endpoints:** 5
 
 #### 5.5.2 List Dependants
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/dependants`
 
 **Description:** Retrieve all dependants associated with a client.
 
@@ -4241,7 +4144,7 @@ Income contract with required-on-create fields.
   "clientRef": {
     "id": "client-123",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-456/clients/client-123"
+    "href": "/api/v2/factfinds/ff-456/clients/client-123"
   },
   "dependants": [
     {
@@ -4260,16 +4163,16 @@ Income contract with required-on-create fields.
         {
           "id": "client-123",
           "fullName": "John Smith",
-          "href": "/api/v1/factfinds/ff-456/clients/client-123"
+          "href": "/api/v2/factfinds/ff-456/clients/client-123"
         },
         {
           "id": "client-124",
           "fullName": "Sarah Smith",
-          "href": "/api/v1/factfinds/ff-456/clients/client-124"
+          "href": "/api/v2/factfinds/ff-456/clients/client-124"
         }
       ],
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001" }
+        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001" }
       }
     },
     {
@@ -4288,31 +4191,31 @@ Income contract with required-on-create fields.
         {
           "id": "client-123",
           "fullName": "John Smith",
-          "href": "/api/v1/factfinds/ff-456/clients/client-123"
+          "href": "/api/v2/factfinds/ff-456/clients/client-123"
         },
         {
           "id": "client-124",
           "fullName": "Sarah Smith",
-          "href": "/api/v1/factfinds/ff-456/clients/client-124"
+          "href": "/api/v2/factfinds/ff-456/clients/client-124"
         }
       ],
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-002" }
+        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-002" }
       }
     }
   ],
   "totalCount": 2,
   "financiallyDependantCount": 2,
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants" },
-    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" }
+    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants" },
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" }
   }
 }
 ```
 
 #### 5.5.3 Create Dependant
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/dependants`
 
 **Description:** Add a new dependant to a client's record.
 
@@ -4360,19 +4263,19 @@ Income contract with required-on-create fields.
     {
       "id": "client-123",
       "fullName": "John Smith",
-      "href": "/api/v1/factfinds/ff-456/clients/client-123"
+      "href": "/api/v2/factfinds/ff-456/clients/client-123"
     },
     {
       "id": "client-124",
       "fullName": "Sarah Smith",
-      "href": "/api/v1/factfinds/ff-456/clients/client-124"
+      "href": "/api/v2/factfinds/ff-456/clients/client-124"
     }
   ],
   "createdAt": "2026-02-18T12:00:00Z",
   "updatedAt": "2026-02-18T12:00:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001" },
-    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" }
+    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001" },
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" }
   }
 }
 ```
@@ -4394,7 +4297,7 @@ Income contract with required-on-create fields.
 
 #### 5.5.4 Get Dependant Details
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
 
 **Description:** Retrieve detailed information about a specific dependant.
 
@@ -4421,13 +4324,13 @@ Income contract with required-on-create fields.
       "id": "client-123",
       "fullName": "John Smith",
       "relationshipToClient": "Father",
-      "href": "/api/v1/factfinds/ff-456/clients/client-123"
+      "href": "/api/v2/factfinds/ff-456/clients/client-123"
     },
     {
       "id": "client-124",
       "fullName": "Sarah Smith",
       "relationshipToClient": "Mother",
-      "href": "/api/v1/factfinds/ff-456/clients/client-124"
+      "href": "/api/v2/factfinds/ff-456/clients/client-124"
     }
   ],
   "protectionNeeds": {
@@ -4444,10 +4347,10 @@ Income contract with required-on-create fields.
   "createdAt": "2026-02-18T12:00:00Z",
   "updatedAt": "2026-02-18T12:00:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001" },
-    "client": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "update": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001", "method": "PATCH" },
-    "delete": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependants/dep-001", "method": "DELETE" }
+    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001" },
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "update": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001", "method": "PATCH" },
+    "delete": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001", "method": "DELETE" }
   }
 }
 ```
@@ -4459,7 +4362,7 @@ Income contract with required-on-create fields.
 
 #### 5.5.5 Update Dependant
 
-**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
 
 **Description:** Update dependant information. Commonly used to update living arrangements, financial dependency status, or custom age threshold.
 
@@ -4486,7 +4389,7 @@ Income contract with required-on-create fields.
 
 #### 5.5.6 Delete Dependant
 
-**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}`
 
 **Description:** Remove a dependant record from the client.
 
@@ -4647,7 +4550,7 @@ Where:
 
 ### 5.6 Notes
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes`
 
 **Purpose:** Capture and manage advisor notes across different areas of the fact find, providing context, observations, and important information related to specific aspects of the client's financial planning.
 
@@ -4683,17 +4586,17 @@ Where:
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes` | List all notes for client | `notes:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes` | Create new note | `notes:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Get specific note | `notes:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Update note | `notes:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Delete note | `notes:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes` | List all notes for client | `notes:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes` | Create new note | `notes:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Get specific note | `notes:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Update note | `notes:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Delete note | `notes:write` |
 
 **Total Endpoints:** 5
 
 #### 5.6.2 List Notes
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/notes`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/notes`
 
 **Description:** Retrieve all notes for a client with optional filtering by discriminator.
 
@@ -4710,12 +4613,12 @@ Where:
   "clientRef": {
     "id": "client-456",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-423/clients/client-456"
+    "href": "/api/v2/factfinds/ff-423/clients/client-456"
   },
   "notes": [
     {
       "id": "note-789",
-      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-789",
+      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-789",
       "discriminator": "Profile",
       "notes": "Client recently married, spouse is self-employed. Planning to start a family within 2 years. Important for protection planning.",
       "createdAt": "2026-02-18T10:30:00Z",
@@ -4723,7 +4626,7 @@ Where:
     },
     {
       "id": "note-790",
-      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-790",
+      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-790",
       "discriminator": "Mortgage",
       "notes": "Client's fixed rate ends in 6 months. Should review remortgage options. Considering moving to larger property in next 2-3 years.",
       "createdAt": "2026-02-18T11:00:00Z",
@@ -4731,7 +4634,7 @@ Where:
     },
     {
       "id": "note-791",
-      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-791",
+      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-791",
       "discriminator": "Protection",
       "notes": "Client has no life insurance. High priority due to mortgage and planned family. Spouse has chronic condition - may affect premiums.",
       "createdAt": "2026-02-18T11:15:00Z",
@@ -4741,10 +4644,10 @@ Where:
   "totalCount": 3,
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes"
+      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes"
     },
     "client": {
-      "href": "/api/v1/factfinds/ff-423/clients/client-456"
+      "href": "/api/v2/factfinds/ff-423/clients/client-456"
     }
   }
 }
@@ -4752,7 +4655,7 @@ Where:
 
 #### 5.6.3 Create Note
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/notes`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/notes`
 
 **Description:** Create a new note for the client in a specific category.
 
@@ -4770,11 +4673,11 @@ Where:
 ```json
 {
   "id": "note-792",
-  "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-792",
+  "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-792",
   "clientRef": {
     "id": "client-456",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-423/clients/client-456"
+    "href": "/api/v2/factfinds/ff-423/clients/client-456"
   },
   "discriminator": "Investment",
   "notes": "Client has limited investment experience. Previously held only cash ISAs. Risk profile indicates balanced approach. Recommend gradual introduction to equity funds with clear education on volatility.",
@@ -4782,10 +4685,10 @@ Where:
   "updatedAt": "2026-02-18T14:20:00Z",
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/ff-423/clients/client-456/notes/note-792"
+      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-792"
     },
     "client": {
-      "href": "/api/v1/factfinds/ff-423/clients/client-456"
+      "href": "/api/v2/factfinds/ff-423/clients/client-456"
     }
   }
 }
@@ -4804,7 +4707,7 @@ Where:
 
 #### 5.6.4 Update Note
 
-**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}`
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}`
 
 **Description:** Update the text content of an existing note.
 
@@ -4822,7 +4725,7 @@ Where:
 
 #### 5.6.5 Delete Note
 
-**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}`
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}`
 
 **Description:** Delete a note (soft delete for audit trail).
 
@@ -4904,7 +4807,7 @@ Use: Demonstrate suitability in file review
 
 ### 5.7 Custom Questions (Supplementary Questions)
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions`
 
 **Purpose:** Capture additional client information through configurable custom questions beyond standard fact-find fields. Supports dynamic questionnaires with conditional logic, validation rules, and flexible answer types.
 
@@ -4943,24 +4846,24 @@ Use: Demonstrate suitability in file review
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions` | List all custom questions | `client:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions` | Create custom question | `client:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Get question details | `client:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Update custom question | `client:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Delete custom question | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions` | List all custom questions | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions` | Create custom question | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Get question details | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Update custom question | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Delete custom question | `client:write` |
 
 **Answer Management Endpoints:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers` | Get all question answers | `client:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers` | Submit/update question answers | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers` | Get all question answers | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers` | Submit/update question answers | `client:write` |
 
 ---
 
 #### 5.7.2 List Custom Questions
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions`
 
 **Description:** Retrieves all custom questions configured for a client, including archived questions. Use query parameters to filter by tags, subcategory, or archived status.
 
@@ -4979,15 +4882,15 @@ Use: Demonstrate suitability in file review
 
 ```json
 {
-  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions",
-  "first_href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions?page=1",
-  "last_href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions?page=1",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions",
+  "first_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions?page=1",
+  "last_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions?page=1",
   "next_href": null,
   "prev_href": null,
   "items": [
     {
       "id": 1234,
-      "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1234",
+      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1234",
       "questionType": "YesNo",
       "subcategory": {
         "id": 10,
@@ -5013,7 +4916,7 @@ Use: Demonstrate suitability in file review
     },
     {
       "id": 1235,
-      "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1235",
+      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1235",
       "questionType": "Checkbox",
       "subcategory": {
         "id": 10,
@@ -5071,7 +4974,7 @@ Use: Demonstrate suitability in file review
     },
     {
       "id": 1236,
-      "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1236",
+      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1236",
       "questionType": "Monetary",
       "subcategory": {
         "id": 11,
@@ -5097,9 +5000,9 @@ Use: Demonstrate suitability in file review
   ],
   "count": 3,
   "_links": {
-    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" },
-    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
-    "answers": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers" }
+    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" },
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
+    "answers": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers" }
   }
 }
 ```
@@ -5119,7 +5022,7 @@ Use: Demonstrate suitability in file review
 
 #### 5.7.3 Create Custom Question
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions`
 
 **Description:** Creates a new custom question for a client. The question can include validation rules, conditional logic, and custom attributes.
 
@@ -5180,7 +5083,7 @@ Use: Demonstrate suitability in file review
 ```json
 {
   "id": 1240,
-  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1240",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1240",
   "questionType": "DropDownList",
   "subcategory": {
     "id": 12,
@@ -5223,10 +5126,10 @@ Use: Demonstrate suitability in file review
   },
   "logic": [],
   "_links": {
-    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1240" },
-    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
-    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" },
-    "answers": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers" }
+    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1240" },
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" },
+    "answers": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers" }
   }
 }
 ```
@@ -5251,7 +5154,7 @@ Use: Demonstrate suitability in file review
 
 #### 5.7.4 Get Custom Question Details
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
 
 **Description:** Retrieves full details of a specific custom question including all logic rules and options.
 
@@ -5265,7 +5168,7 @@ Use: Demonstrate suitability in file review
 ```json
 {
   "id": 1237,
-  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1237",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1237",
   "questionType": "NumberDecimal",
   "subcategory": {
     "id": 13,
@@ -5299,10 +5202,10 @@ Use: Demonstrate suitability in file review
     }
   ],
   "_links": {
-    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1237" },
-    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
-    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" },
-    "parentQuestion": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1234" }
+    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1237" },
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" },
+    "parentQuestion": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1234" }
   }
 }
 ```
@@ -5314,7 +5217,7 @@ Use: Demonstrate suitability in file review
 
 #### 5.7.5 Update Custom Question
 
-**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
 
 **Description:** Updates an existing custom question. Cannot change question type. All fields are replaced (not merged).
 
@@ -5357,7 +5260,7 @@ Use: Demonstrate suitability in file review
 ```json
 {
   "id": 1238,
-  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1238",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1238",
   "questionType": "Text",
   "subcategory": {
     "id": 14,
@@ -5381,9 +5284,9 @@ Use: Demonstrate suitability in file review
   },
   "logic": [],
   "_links": {
-    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1238" },
-    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
-    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" }
+    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1238" },
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" }
   }
 }
 ```
@@ -5407,7 +5310,7 @@ Use: Demonstrate suitability in file review
 
 #### 5.7.6 Delete Custom Question
 
-**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}`
 
 **Description:** Soft deletes a custom question by marking it as archived. Historical answers are retained for audit purposes.
 
@@ -5432,7 +5335,7 @@ Use: Demonstrate suitability in file review
 
 #### 5.7.7 Submit Question Answers
 
-**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers`
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers`
 
 **Description:** Submits or updates answers to custom questions. Replaces all answers (upsert operation). Missing questions in request remain unchanged.
 
@@ -5489,9 +5392,9 @@ Use: Demonstrate suitability in file review
   "totalQuestions": 5,
   "completionPercentage": 60.0,
   "_links": {
-    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers" },
-    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" },
-    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" }
+    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" },
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" }
   }
 }
 ```
@@ -5525,7 +5428,7 @@ Use: Demonstrate suitability in file review
 
 #### 5.7.8 Get Question Answers
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers`
 
 **Description:** Retrieves all answers to custom questions for a client, including the question details for context.
 
@@ -5542,16 +5445,16 @@ Use: Demonstrate suitability in file review
 
 ```json
 {
-  "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers",
-  "first_href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers?page=1",
-  "last_href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers?page=1",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers",
+  "first_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers?page=1",
+  "last_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers?page=1",
   "next_href": null,
   "prev_href": null,
   "items": [
     {
       "question": {
         "id": 1234,
-        "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1234",
+        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1234",
         "questionType": "YesNo",
         "subcategory": {
           "id": 10,
@@ -5583,7 +5486,7 @@ Use: Demonstrate suitability in file review
     {
       "question": {
         "id": 1235,
-        "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1235",
+        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1235",
         "questionType": "Checkbox",
         "subcategory": {
           "id": 10,
@@ -5657,7 +5560,7 @@ Use: Demonstrate suitability in file review
     {
       "question": {
         "id": 1236,
-        "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/1236",
+        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1236",
         "questionType": "Monetary",
         "subcategory": {
           "id": 11,
@@ -5689,9 +5592,9 @@ Use: Demonstrate suitability in file review
   ],
   "count": 3,
   "_links": {
-    "self": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions/answers" },
-    "client": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456" },
-    "questions": { "href": "https://api.factfind.com/api/v1/factfinds/ff-123/clients/client-456/custom-questions" }
+    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers" },
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" }
   }
 }
 ```
@@ -5883,11 +5786,11 @@ Use: Demonstrate suitability in file review
 ### 6.1 Overview
 
 **Base Paths:**
-- Employment: `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment`
-- Income: `/api/v1/factfinds/{factfindId}/clients/{clientId}/income`
-- Income Changes: `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes`
-- Expenditure: `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure`
-- Expenditure Changes: `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
+- Employment: `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
+- Income: `/api/v2/factfinds/{factfindId}/clients/{clientId}/income`
+- Income Changes: `/api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes`
+- Expenditure: `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
+- Expenditure Changes: `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
 
 **Purpose:** Track client's actual income sources, employment history, expenditure, and expected changes to their financial circumstances.
 
@@ -5919,51 +5822,51 @@ Use: Demonstrate suitability in file review
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment` | List employment records | `circumstances:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment` | Create employment record | `circumstances:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Get employment details | `circumstances:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Update employment record | `circumstances:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Delete employment record | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | List employment records | `circumstances:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | Create employment record | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Get employment details | `circumstances:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Update employment record | `circumstances:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Delete employment record | `circumstances:write` |
 
 **Income Operations:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income` | List income sources | `circumstances:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income` | Create income source | `circumstances:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Get income details | `circumstances:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Update income source | `circumstances:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Delete income source | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income` | List income sources | `circumstances:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income` | Create income source | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Get income details | `circumstances:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Update income source | `circumstances:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income/{id}` | Delete income source | `circumstances:write` |
 
 **Income Changes Operations:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes` | List expected income changes | `circumstances:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes` | Create income change | `circumstances:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Get income change details | `circumstances:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Update income change | `circumstances:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Delete income change | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes` | List expected income changes | `circumstances:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes` | Create income change | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Get income change details | `circumstances:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Update income change | `circumstances:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes/{id}` | Delete income change | `circumstances:write` |
 
 **Expenditure Operations:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure` | List expenditure items | `circumstances:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure` | Create expenditure item | `circumstances:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Get expenditure details | `circumstances:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Update expenditure item | `circumstances:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Delete expenditure item | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure` | List expenditure items | `circumstances:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure` | Create expenditure item | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Get expenditure details | `circumstances:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Update expenditure item | `circumstances:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Delete expenditure item | `circumstances:write` |
 
 **Expenditure Changes Operations:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes` | List expected expenditure changes | `circumstances:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes` | Create expenditure change | `circumstances:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Get expenditure change details | `circumstances:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Update expenditure change | `circumstances:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Delete expenditure change | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes` | List expected expenditure changes | `circumstances:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes` | Create expenditure change | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Get expenditure change details | `circumstances:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Update expenditure change | `circumstances:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes/{id}` | Delete expenditure change | `circumstances:write` |
 
 ### 6.3 Key Endpoints
 
@@ -5971,7 +5874,7 @@ Use: Demonstrate suitability in file review
 
 #### 6.3.1 List Employment Records
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/employment`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
 
 **Description:** Retrieve all employment records for a client, including current and historical employment.
 
@@ -6025,17 +5928,17 @@ Use: Demonstrate suitability in file review
       },
       "_links": {
         "self": {
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-456"
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-456"
         }
       }
     }
   ],
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment"
     },
     "create": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment",
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment",
       "method": "POST"
     }
   }
@@ -6044,7 +5947,7 @@ Use: Demonstrate suitability in file review
 
 #### 6.3.2 Create Employment Record
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/employment`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
 
 **Description:** Create a new employment record for a client.
 
@@ -6084,7 +5987,7 @@ Use: Demonstrate suitability in file review
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789
+Location: /api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-789
 
 {
   "id": "emp-789",
@@ -6119,14 +6022,14 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789
   "updatedAt": "2026-02-18T10:00:00Z",
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-789"
     },
     "update": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789",
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-789",
       "method": "PATCH"
     },
     "client": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
     }
   }
 }
@@ -6141,7 +6044,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789
 
 #### 6.3.3 List Income Sources
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/income`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/income`
 
 **Description:** Retrieve all income sources for a client.
 
@@ -6182,7 +6085,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789
       "isTaxable": true,
       "_links": {
         "self": {
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-111"
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-111"
         }
       }
     },
@@ -6204,17 +6107,17 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789
       "isTaxable": true,
       "_links": {
         "self": {
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-222"
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-222"
         }
       }
     }
   ],
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income"
     },
     "create": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income",
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income",
       "method": "POST"
     }
   }
@@ -6223,7 +6126,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789
 
 #### 6.3.4 Create Income Source
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/income`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/income`
 
 **Description:** Create a new income source for a client.
 
@@ -6250,7 +6153,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/employment/emp-789
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333
+Location: /api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333
 
 {
   "id": "inc-333",
@@ -6272,14 +6175,14 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333
   "updatedAt": "2026-02-18T10:15:00Z",
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333"
     },
     "update": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333",
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333",
       "method": "PATCH"
     },
     "client": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
     }
   }
 }
@@ -6298,7 +6201,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333
 
 #### 6.3.5 Create Income Change
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/income-changes`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes`
 
 **Description:** Record an expected change to income (e.g., retirement, promotion, bonus ending).
 
@@ -6319,14 +6222,14 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income/inc-333
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-change-444
+Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-change-444
 
 {
   "id": "inc-change-444",
   "incomeRef": {
     "id": "inc-111",
     "description": "Salary from ABC Technology",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-111"
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-111"
   },
   "changeType": "Stop",
   "effectiveDate": "2027-03-01",
@@ -6336,13 +6239,13 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
   "updatedAt": "2026-02-18T10:30:00Z",
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-change-444"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-change-444"
     },
     "income": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/income/inc-111"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-111"
     },
     "client": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
     }
   }
 }
@@ -6356,7 +6259,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
 
 #### 6.3.6 List Expenditure Items
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
 
 **Description:** Retrieve all expenditure items for a client.
 
@@ -6396,7 +6299,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
       "endDate": "2040-05-31",
       "_links": {
         "self": {
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
         }
       }
     },
@@ -6418,17 +6321,17 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
       "endDate": null,
       "_links": {
         "self": {
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-666"
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-666"
         }
       }
     }
   ],
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure"
     },
     "create": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure",
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure",
       "method": "POST"
     }
   }
@@ -6437,7 +6340,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
 
 #### 6.3.7 Create Expenditure Item
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
 
 **Description:** Create a new expenditure item for a client.
 
@@ -6464,7 +6367,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
+Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
 
 {
   "id": "exp-777",
@@ -6486,14 +6389,14 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
   "updatedAt": "2026-02-18T11:00:00Z",
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777"
     },
     "update": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777",
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777",
       "method": "PATCH"
     },
     "client": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
     }
   }
 }
@@ -6512,7 +6415,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
 
 #### 6.3.8 Create Expenditure Change
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
 
 **Description:** Record an expected change to expenditure (e.g., mortgage payoff, lifestyle changes).
 
@@ -6533,14 +6436,14 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/exp-change-888
+Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure-changes/exp-change-888
 
 {
   "id": "exp-change-888",
   "expenditureRef": {
     "id": "exp-555",
     "description": "Mortgage payment - main residence",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
   },
   "changeType": "Stop",
   "effectiveDate": "2040-05-31",
@@ -6550,13 +6453,13 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
   "updatedAt": "2026-02-18T11:15:00Z",
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/exp-change-888"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure-changes/exp-change-888"
     },
     "expenditure": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
     },
     "client": {
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
     }
   }
 }
@@ -6570,7 +6473,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
 
 ### 6.4 Affordability
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability`
 
 **Purpose:** Calculate comprehensive affordability assessments for clients based on their income and expenditure, supporting mortgage applications, protection planning, investment planning, and debt consolidation scenarios.
 
@@ -6606,17 +6509,17 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability` | Calculate affordability | `affordability:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability` | List all affordability calculations | `affordability:read` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Get specific calculation | `affordability:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Update calculation parameters | `affordability:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Delete calculation | `affordability:write` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability` | Calculate affordability | `affordability:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability` | List all affordability calculations | `affordability:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Get specific calculation | `affordability:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Update calculation parameters | `affordability:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Delete calculation | `affordability:write` |
 
 **Total Endpoints:** 5
 
 #### 6.4.2 Calculate Affordability
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/affordability`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/affordability`
 
 **Description:** Perform a comprehensive affordability calculation based on selected income and expenditure items, with configurable scenario options.
 
@@ -6681,11 +6584,11 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
 ```json
 {
   "id": "afford-1001",
-  "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+  "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001",
   "clientRef": {
     "id": "client-456",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-234/clients/client-456"
+    "href": "/api/v2/factfinds/ff-234/clients/client-456"
   },
   "incomes": [
     {
@@ -6695,7 +6598,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
         "amount": 3500.00,
         "currencyCode": "GBP"
       },
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/income/income-001"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/income/income-001"
     },
     {
       "id": "income-002",
@@ -6704,7 +6607,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
         "amount": 1000.00,
         "currencyCode": "GBP"
       },
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/income/income-002"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/income/income-002"
     }
   ],
   "expenditures": [
@@ -6716,7 +6619,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
         "currencyCode": "GBP"
       },
       "isEssential": true,
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/expenditure/exp-001"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/expenditure/exp-001"
     },
     {
       "id": "exp-002",
@@ -6726,7 +6629,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
         "currencyCode": "GBP"
       },
       "isEssential": true,
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/expenditure/exp-002"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/expenditure/exp-002"
     },
     {
       "id": "exp-003",
@@ -6736,7 +6639,7 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
         "currencyCode": "GBP"
       },
       "isEssential": false,
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/expenditure/exp-003"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/expenditure/exp-003"
     }
   ],
   "monthly": {
@@ -6824,17 +6727,17 @@ Location: /api/v1/factfinds/{factfindId}/clients/client-123/expenditure-changes/
   "concurrencyId": 5,
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001"
     },
     "client": {
-      "href": "/api/v1/factfinds/ff-234/clients/client-456"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456"
     },
     "update": {
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001",
       "method": "PATCH"
     },
     "delete": {
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001",
       "method": "DELETE"
     }
   }
@@ -6905,7 +6808,7 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
 
 #### 6.4.3 List Affordability Calculations
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/affordability`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/affordability`
 
 **Description:** Retrieve all affordability calculations for a client.
 
@@ -6921,7 +6824,7 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
   "clientRef": {
     "id": "client-456",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-234/clients/client-456"
+    "href": "/api/v2/factfinds/ff-234/clients/client-456"
   },
   "calculations": [
     {
@@ -6938,7 +6841,7 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
         }
       },
       "notes": "Client has variable income from bonus",
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1001"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001"
     },
     {
       "id": "afford-1000",
@@ -6954,16 +6857,16 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
         }
       },
       "notes": "Initial assessment",
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability/afford-1000"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1000"
     }
   ],
   "totalCount": 2,
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/ff-234/clients/client-456/affordability"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability"
     },
     "client": {
-      "href": "/api/v1/factfinds/ff-234/clients/client-456"
+      "href": "/api/v2/factfinds/ff-234/clients/client-456"
     }
   }
 }
@@ -6971,7 +6874,7 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
 
 #### 6.4.4 Update Affordability Calculation
 
-**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}`
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}`
 
 **Description:** Update scenario options or add/remove income/expenditure items, triggering recalculation.
 
@@ -7002,7 +6905,7 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
 
 #### 6.4.5 Delete Affordability Calculation
 
-**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}`
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}`
 
 **Description:** Delete an affordability calculation.
 
@@ -7174,7 +7077,7 @@ shortfall = requiredAmount - committedAmount
 
 ### 6.5 Credit History
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
 
 **Purpose:** Track and manage client credit history including adverse credit events, missed payments, defaults, IVAs, bankruptcies, and repossessions to support mortgage applications, creditworthiness assessments, and financial planning.
 
@@ -7211,17 +7114,17 @@ shortfall = requiredAmount - committedAmount
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` | List all credit history records | `credit:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` | Add credit history record | `credit:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Get specific record | `credit:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Update credit record | `credit:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Delete credit record | `credit:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history` | List all credit history records | `credit:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history` | Add credit history record | `credit:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Get specific record | `credit:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Update credit record | `credit:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Delete credit record | `credit:write` |
 
 **Total Endpoints:** 5
 
 #### 6.5.2 List Credit History
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
 
 **Description:** Retrieve all credit history records for a client.
 
@@ -7238,16 +7141,16 @@ shortfall = requiredAmount - committedAmount
   "clientRef": {
     "id": "client-456",
     "fullName": "John Smith",
-    "href": "/api/v1/factfinds/ff-423/clients/client-456"
+    "href": "/api/v2/factfinds/ff-423/clients/client-456"
   },
   "creditHistory": [
     {
       "id": "ch-789",
-      "href": "/api/v1/factfinds/ff-423/clients/client-456/credit-history/ch-789",
+      "href": "/api/v2/factfinds/ff-423/clients/client-456/credit-history/ch-789",
       "owners": [
         {
           "id": "client-456",
-          "href": "/api/v1/factfinds/ff-423/clients/client-456",
+          "href": "/api/v2/factfinds/ff-423/clients/client-456",
           "name": "John Smith",
           "ownershipType": "Primary"
         }
@@ -7269,7 +7172,7 @@ shortfall = requiredAmount - committedAmount
       "lender": "High Street Bank",
       "liability": {
         "id": "liab-1001",
-        "href": "/api/v1/factfinds/ff-423/liabilities/liab-1001",
+        "href": "/api/v2/factfinds/ff-423/liabilities/liab-1001",
         "description": "Credit Card Debt"
       }
     }
@@ -7286,10 +7189,10 @@ shortfall = requiredAmount - committedAmount
   },
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/ff-423/clients/client-456/credit-history"
+      "href": "/api/v2/factfinds/ff-423/clients/client-456/credit-history"
     },
     "client": {
-      "href": "/api/v1/factfinds/ff-423/clients/client-456"
+      "href": "/api/v2/factfinds/ff-423/clients/client-456"
     }
   }
 }
@@ -7297,7 +7200,7 @@ shortfall = requiredAmount - committedAmount
 
 #### 6.5.3 Create Credit History Record
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
 
 **Description:** Add a new credit history event for the client.
 
@@ -7346,11 +7249,11 @@ shortfall = requiredAmount - committedAmount
 ```json
 {
   "id": "ch-789",
-  "href": "/api/v1/factfinds/ff-423/clients/client-456/credit-history/ch-789",
+  "href": "/api/v2/factfinds/ff-423/clients/client-456/credit-history/ch-789",
   "owners": [
     {
       "id": "client-456",
-      "href": "/api/v1/factfinds/ff-423/clients/client-456",
+      "href": "/api/v2/factfinds/ff-423/clients/client-456",
       "name": "John Smith",
       "ownershipType": "Primary"
     }
@@ -7381,7 +7284,7 @@ shortfall = requiredAmount - committedAmount
   "lender": "High Street Bank",
   "liability": {
     "id": "liab-1001",
-    "href": "/api/v1/factfinds/ff-423/liabilities/liab-1001",
+    "href": "/api/v2/factfinds/ff-423/liabilities/liab-1001",
     "description": "Credit Card Debt"
   },
   "concurrencyId": 1,
@@ -7389,13 +7292,13 @@ shortfall = requiredAmount - committedAmount
   "updatedAt": "2026-02-18T15:30:00Z",
   "_links": {
     "self": {
-      "href": "/api/v1/factfinds/ff-423/clients/client-456/credit-history/ch-789"
+      "href": "/api/v2/factfinds/ff-423/clients/client-456/credit-history/ch-789"
     },
     "client": {
-      "href": "/api/v1/factfinds/ff-423/clients/client-456"
+      "href": "/api/v2/factfinds/ff-423/clients/client-456"
     },
     "liability": {
-      "href": "/api/v1/factfinds/ff-423/liabilities/liab-1001"
+      "href": "/api/v2/factfinds/ff-423/liabilities/liab-1001"
     }
   }
 }
@@ -7420,7 +7323,7 @@ shortfall = requiredAmount - committedAmount
 
 #### 6.5.4 Update Credit History Record
 
-**Endpoint:** `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}`
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}`
 
 **Description:** Update an existing credit history record, typically to mark as satisfied/cleared or update outstanding amount.
 
@@ -7449,7 +7352,7 @@ shortfall = requiredAmount - committedAmount
 
 #### 6.5.5 Delete Credit History Record
 
-**Endpoint:** `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}`
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}`
 
 **Description:** Delete a credit history record (soft delete for audit).
 
@@ -7604,7 +7507,7 @@ Impact:
 
 ### 7.1 Overview
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
 
 **Purpose:** Track client's employment history and current employment status.
 
@@ -7633,11 +7536,11 @@ Impact:
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment` | List employment history | `employment:read` |
-| POST | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment` | Add employment record | `employment:write` |
-| GET | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Get employment details | `employment:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Update employment | `employment:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Delete employment | `employment:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | List employment history | `employment:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | Add employment record | `employment:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Get employment details | `employment:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Update employment | `employment:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Delete employment | `employment:write` |
 
 ### 7.3 Key Endpoints
 
@@ -7655,7 +7558,7 @@ See Section 6.3.1 and 6.3.2 for detailed employment endpoint documentation inclu
 
 ### 8.1 Overview
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/objectives`
+**Base Path:** `/api/v2/factfinds/{factfindId}/objectives`
 
 **Purpose:** Capture and track client financial goals and objectives across different life areas using type-based routing.
 
@@ -7690,32 +7593,32 @@ See Section 6.3.1 and 6.3.2 for detailed employment endpoint documentation inclu
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/objectives` | List all objectives (all types) | `objectives:read` |
-| POST | `/api/v1/factfinds/{factfindId}/objectives/investment` | Create Investment Objective | `objectives:write` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/investment` | List Investment Objectives | `objectives:read` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Get Investment Objective | `objectives:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Update Investment Objective | `objectives:write` |
-| POST | `/api/v1/factfinds/{factfindId}/objectives/pension` | Create Pension Objective | `objectives:write` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/pension` | List Pension Objectives | `objectives:read` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Get Pension Objective | `objectives:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Update Pension Objective | `objectives:write` |
-| POST | `/api/v1/factfinds/{factfindId}/objectives/protection` | Create Protection Objective | `objectives:write` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/protection` | List Protection Objectives | `objectives:read` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Get Protection Objective | `objectives:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Update Protection Objective | `objectives:write` |
-| POST | `/api/v1/factfinds/{factfindId}/objectives/mortgage` | Create Mortgage Objective | `objectives:write` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/mortgage` | List Mortgage Objectives | `objectives:read` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Get Mortgage Objective | `objectives:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Update Mortgage Objective | `objectives:write` |
-| POST | `/api/v1/factfinds/{factfindId}/objectives/budget` | Create Budget Objective | `objectives:write` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/budget` | List Budget Objectives | `objectives:read` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Get Budget Objective | `objectives:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Update Budget Objective | `objectives:write` |
-| POST | `/api/v1/factfinds/{factfindId}/objectives/estate-planning` | Create Estate Planning Objective | `objectives:write` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/estate-planning` | List Estate Planning Objectives | `objectives:read` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Get Estate Planning Objective | `objectives:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Update Estate Planning Objective | `objectives:write` |
-| **DELETE** | **`/api/v1/factfinds/{factfindId}/objectives/{objectiveId}`** | **Delete any objective (all types)** | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives` | List all objectives (all types) | `objectives:read` |
+| POST | `/api/v2/factfinds/{factfindId}/objectives/investment` | Create Investment Objective | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/investment` | List Investment Objectives | `objectives:read` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Get Investment Objective | `objectives:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/objectives/investment/{objectiveId}` | Update Investment Objective | `objectives:write` |
+| POST | `/api/v2/factfinds/{factfindId}/objectives/pension` | Create Pension Objective | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/pension` | List Pension Objectives | `objectives:read` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Get Pension Objective | `objectives:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/objectives/pension/{objectiveId}` | Update Pension Objective | `objectives:write` |
+| POST | `/api/v2/factfinds/{factfindId}/objectives/protection` | Create Protection Objective | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/protection` | List Protection Objectives | `objectives:read` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Get Protection Objective | `objectives:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/objectives/protection/{objectiveId}` | Update Protection Objective | `objectives:write` |
+| POST | `/api/v2/factfinds/{factfindId}/objectives/mortgage` | Create Mortgage Objective | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/mortgage` | List Mortgage Objectives | `objectives:read` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Get Mortgage Objective | `objectives:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/objectives/mortgage/{objectiveId}` | Update Mortgage Objective | `objectives:write` |
+| POST | `/api/v2/factfinds/{factfindId}/objectives/budget` | Create Budget Objective | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/budget` | List Budget Objectives | `objectives:read` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Get Budget Objective | `objectives:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/objectives/budget/{objectiveId}` | Update Budget Objective | `objectives:write` |
+| POST | `/api/v2/factfinds/{factfindId}/objectives/estate-planning` | Create Estate Planning Objective | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/estate-planning` | List Estate Planning Objectives | `objectives:read` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Get Estate Planning Objective | `objectives:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/objectives/estate-planning/{objectiveId}` | Update Estate Planning Objective | `objectives:write` |
+| **DELETE** | **`/api/v2/factfinds/{factfindId}/objectives/{objectiveId}`** | **Delete any objective (all types)** | `objectives:write` |
 
 **Note:** DELETE operation does not require type in the path. The objective ID is sufficient to identify and delete the objective regardless of its type. The type is determined from the existing objective record.
 
@@ -7723,11 +7626,11 @@ See Section 6.3.1 and 6.3.2 for detailed employment endpoint documentation inclu
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` | List needs | `objectives:read` |
-| POST | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` | Add need | `objectives:write` |
-| GET | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Get need details | `objectives:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Update need | `objectives:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Delete need | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs` | List needs | `objectives:read` |
+| POST | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs` | Add need | `objectives:write` |
+| GET | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Get need details | `objectives:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Update need | `objectives:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Delete need | `objectives:write` |
 
 **Total Endpoints:** 31 (26 objective operations + 5 needs operations)
 
@@ -7820,7 +7723,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.3.6.
 
 **Purpose:** Capture detailed needs and questions under each objective.
 
-**Endpoint Pattern:** `/api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs`
+**Endpoint Pattern:** `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs`
 
 **Need Contract:**
 - `id` - Unique identifier
@@ -7838,7 +7741,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ### 9.1 Overview
 
-**Base Path:** `/api/v1/factfinds/{id}/assets`
+**Base Path:** `/api/v2/factfinds/{id}/assets`
 
 **Purpose:** Manage factfind-level assets and liabilities with comprehensive tracking, valuations, and financial calculations.
 
@@ -7876,34 +7779,34 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | **Assets** | | | |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/assets` | List all assets | `assets:read` |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/assets` | Add asset | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Get asset details | `assets:read` |
-| PUT | `/api/v1/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Update asset | `assets:write` |
-| DELETE | `/api/v1/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Delete asset | `assets:write` |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/assets` | List all assets | `assets:read` |
+| POST | `/api/v2/factfinds/{id}/clients/{clientId}/assets` | Add asset | `assets:write` |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Get asset details | `assets:read` |
+| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Update asset | `assets:write` |
+| DELETE | `/api/v2/factfinds/{id}/clients/{clientId}/assets/{assetId}` | Delete asset | `assets:write` |
 | **Liabilities** | | | |
-| GET | `/api/v1/factfinds/{id}/liabilities` | List all liabilities | `liabilities:read` |
-| POST | `/api/v1/factfinds/{id}/liabilities` | Add liability | `liabilities:write` |
-| GET | `/api/v1/factfinds/{id}/liabilities/{liabilityId}` | Get liability details | `liabilities:read` |
-| PATCH | `/api/v1/factfinds/{id}/liabilities/{liabilityId}` | Update liability | `liabilities:write` |
-| DELETE | `/api/v1/factfinds/{id}/liabilities/{liabilityId}` | Delete liability | `liabilities:write` |
+| GET | `/api/v2/factfinds/{id}/liabilities` | List all liabilities | `liabilities:read` |
+| POST | `/api/v2/factfinds/{id}/liabilities` | Add liability | `liabilities:write` |
+| GET | `/api/v2/factfinds/{id}/liabilities/{liabilityId}` | Get liability details | `liabilities:read` |
+| PATCH | `/api/v2/factfinds/{id}/liabilities/{liabilityId}` | Update liability | `liabilities:write` |
+| DELETE | `/api/v2/factfinds/{id}/liabilities/{liabilityId}` | Delete liability | `liabilities:write` |
 | **Property Details** | | | |
-| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}` | Get property detail | `assets:read` |
-| PUT | `/api/v1/factfinds/{id}/property-details/{propertyId}` | Update property detail | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}/valuations` | Get valuation history | `assets:read` |
-| POST | `/api/v1/factfinds/{id}/property-details/{propertyId}/valuations` | Add property valuation | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}/ltv` | Calculate LTV | `assets:read` |
-| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}/rental-yield` | Calculate rental yield | `assets:read` |
-| GET | `/api/v1/factfinds/{id}/property-details/{propertyId}/capital-gains` | Calculate CGT | `assets:read` |
+| GET | `/api/v2/factfinds/{id}/property-details/{propertyId}` | Get property detail | `assets:read` |
+| PUT | `/api/v2/factfinds/{id}/property-details/{propertyId}` | Update property detail | `assets:write` |
+| GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/valuations` | Get valuation history | `assets:read` |
+| POST | `/api/v2/factfinds/{id}/property-details/{propertyId}/valuations` | Add property valuation | `assets:write` |
+| GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/ltv` | Calculate LTV | `assets:read` |
+| GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/rental-yield` | Calculate rental yield | `assets:read` |
+| GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/capital-gains` | Calculate CGT | `assets:read` |
 | **Business Asset Details** | | | |
-| GET | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}` | Get business asset detail | `assets:read` |
-| PUT | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}` | Update business asset | `assets:write` |
-| GET | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}/valuations` | Get valuation history | `assets:read` |
-| POST | `/api/v1/factfinds/{id}/business-assets/{businessAssetId}/valuations` | Add business valuation | `assets:write` |
+| GET | `/api/v2/factfinds/{id}/business-assets/{businessAssetId}` | Get business asset detail | `assets:read` |
+| PUT | `/api/v2/factfinds/{id}/business-assets/{businessAssetId}` | Update business asset | `assets:write` |
+| GET | `/api/v2/factfinds/{id}/business-assets/{businessAssetId}/valuations` | Get valuation history | `assets:read` |
+| POST | `/api/v2/factfinds/{id}/business-assets/{businessAssetId}/valuations` | Add business valuation | `assets:write` |
 | **Aggregated Views** | | | |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/assets/summary` | Get client assets summary | `assets:read` |
-| GET | `/api/v1/factfinds/{id}/liabilities/summary` | Get liabilities summary | `liabilities:read` |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/net-worth` | Calculate client net worth | `assets:read` |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/assets/summary` | Get client assets summary | `assets:read` |
+| GET | `/api/v2/factfinds/{id}/liabilities/summary` | Get liabilities summary | `liabilities:read` |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/net-worth` | Calculate client net worth | `assets:read` |
 
 **Total Endpoints:** 24
 
@@ -7911,7 +7814,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.1 List Assets
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/clients/{clientId}/assets`
+**Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/assets`
 
 **Description:** Retrieve all assets associated with a client in a factfind. Assets can be owned solely or jointly.
 
@@ -7928,19 +7831,19 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "assets": [
     {
       "id": 1234,
-      "href": "/api/v1/factfinds/679/clients/346/assets/1234",
-      "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
+      "href": "/api/v2/factfinds/679/clients/346/assets/1234",
+      "factfindRef": { "id": 679, "href": "/api/v2/factfinds/679" },
       "assetType": "PROPERTY",
       "description": "Primary Residence - 123 Main Street",
       "ownership": {
         "ownershipType": "JOINT",
         "owners": [
           {
-            "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
+            "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
             "ownershipShare": 50.0
           },
           {
-            "clientRef": { "id": "client-124", "href": "/api/v1/factfinds/679/clients/client-124" },
+            "clientRef": { "id": "client-124", "href": "/api/v2/factfinds/679/clients/client-124" },
             "ownershipShare": 50.0
           }
         ]
@@ -7963,24 +7866,24 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "rnrbEligibility": "Not Eligible",
       "isBusinessReliefQualifying": false,
       "isHolding": false,
-      "propertyRef": { "id": 1234, "href": "/api/v1/factfinds/679/property-details/1234" },
-      "arrangementRef": { "id": 1234, "href": "/api/v1/factfinds/679/clients/4436/arrangements/1234" },
-      "incomeRef": { "id": 1234, "href": "/api/v1/factfinds/679/clients/4436/income/1234" },
+      "propertyRef": { "id": 1234, "href": "/api/v2/factfinds/679/property-details/1234" },
+      "arrangementRef": { "id": 1234, "href": "/api/v2/factfinds/679/clients/4436/arrangements/1234" },
+      "incomeRef": { "id": 1234, "href": "/api/v2/factfinds/679/clients/4436/income/1234" },
       "notes": "Rental property - managed by external agent",
       "createdAt": "2026-02-01T10:00:00Z",
       "updatedAt": "2026-02-15T14:30:00Z"
     },
     {
       "id": 1235,
-      "href": "/api/v1/factfinds/679/clients/346/assets/1235",
-      "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
+      "href": "/api/v2/factfinds/679/clients/346/assets/1235",
+      "factfindRef": { "id": 679, "href": "/api/v2/factfinds/679" },
       "assetType": "OWN_BUSINESS",
       "description": "Smith & Co Limited - Software Consulting",
       "ownership": {
         "ownershipType": "SOLE_CLIENT1",
         "owners": [
           {
-            "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
+            "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
             "ownershipShare": 100.0
           }
         ]
@@ -7988,7 +7891,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "dividends": {
         "owners": [
           {
-            "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
+            "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
             "dividend": { "amount": 5000.00, "currency": "GBP" },
             "withdrawalType": "Regular",
             "frequency": "Monthly"
@@ -8026,7 +7929,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.2 Create Asset
 
-**Endpoint:** `POST /api/v1/factfinds/{id}/clients/{clientId}/assets`
+**Endpoint:** `POST /api/v2/factfinds/{id}/clients/{clientId}/assets`
 
 **Description:** Add a new asset to the client's portfolio.
 
@@ -8076,15 +7979,15 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 ```json
 {
   "id": 1236,
-  "href": "/api/v1/factfinds/679/clients/346/assets/1236",
-  "factfindRef": { "id": 679, "href": "/api/v1/factfinds/679" },
+  "href": "/api/v2/factfinds/679/clients/346/assets/1236",
+  "factfindRef": { "id": 679, "href": "/api/v2/factfinds/679" },
   "assetType": "PROPERTY",
   "description": "Buy-to-Let Property - 45 Oak Avenue",
   "ownership": {
     "ownershipType": "SOLE_CLIENT1",
     "owners": [
       {
-        "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
+        "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
         "ownershipShare": 100.0
       }
     ]
@@ -8107,8 +8010,8 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "rnrbEligibility": "Eligible",
   "isBusinessReliefQualifying": false,
   "isHolding": false,
-  "propertyRef": { "id": 5001, "href": "/api/v1/factfinds/679/property-details/5001" },
-  "incomeRef": { "id": 3456, "href": "/api/v1/factfinds/679/clients/346/income/3456" },
+  "propertyRef": { "id": 5001, "href": "/api/v2/factfinds/679/property-details/5001" },
+  "incomeRef": { "id": 3456, "href": "/api/v2/factfinds/679/clients/346/income/3456" },
   "notes": "Rental property generating monthly income",
   "createdAt": "2026-02-19T10:15:00Z",
   "updatedAt": "2026-02-19T10:15:00Z"
@@ -8117,7 +8020,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.3 Get Property Details
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/property-details/{propertyId}`
+**Endpoint:** `GET /api/v2/factfinds/{id}/property-details/{propertyId}`
 
 **Description:** Get detailed property information including construction details, tenure, and physical characteristics.
 
@@ -8126,7 +8029,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 ```json
 {
   "id": 1234,
-  "href": "/api/v1/factfinds/679/property-details/1234",
+  "href": "/api/v2/factfinds/679/property-details/1234",
   "propertyType": "DETACHED",
   "tenureType": "Freehold",
   "leaseholdEndsOn": null,
@@ -8162,15 +8065,15 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-02-10T14:20:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/679/property-details/1234" },
-    "factfind": { "href": "/api/v1/factfinds/679" }
+    "self": { "href": "/api/v2/factfinds/679/property-details/1234" },
+    "factfind": { "href": "/api/v2/factfinds/679" }
   }
 }
 ```
 
 #### 9.3.4 Calculate LTV (Loan-to-Value)
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/property-details/{propertyId}/ltv`
+**Endpoint:** `GET /api/v2/factfinds/{id}/property-details/{propertyId}/ltv`
 
 **Description:** Calculate the Loan-to-Value ratio for a property by comparing linked mortgages to current property value.
 
@@ -8207,7 +8110,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.5 Calculate Rental Yield
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/property-details/{propertyId}/rental-yield`
+**Endpoint:** `GET /api/v2/factfinds/{id}/property-details/{propertyId}/rental-yield`
 
 **Description:** Calculate gross and net rental yield for a buy-to-let property.
 
@@ -8241,7 +8144,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.6 List Liabilities
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/liabilities`
+**Endpoint:** `GET /api/v2/factfinds/{id}/liabilities`
 
 **Description:** Retrieve all liabilities associated with a factfind.
 
@@ -8274,7 +8177,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
         "months": 6
       },
       "linkedAsset": {
-        "assetRef": { "id": "asset-123", "href": "/api/v1/factfinds/ff-456/assets/asset-123" },
+        "assetRef": { "id": "asset-123", "href": "/api/v2/factfinds/ff-456/assets/asset-123" },
         "description": "Primary Residence"
       },
       "responsibleClients": [
@@ -8288,8 +8191,8 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
         }
       ],
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/liabilities/liability-789" },
-        "linked-asset": { "href": "/api/v1/factfinds/ff-456/assets/asset-123" }
+        "self": { "href": "/api/v2/factfinds/ff-456/liabilities/liability-789" },
+        "linked-asset": { "href": "/api/v2/factfinds/ff-456/assets/asset-123" }
       }
     }
   ],
@@ -8303,7 +8206,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.7 Get Assets Summary
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/clients/{clientId}/assets/summary`
+**Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/assets/summary`
 
 **Description:** Get aggregated summary of all assets for a client by type.
 
@@ -8360,7 +8263,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 #### 9.3.8 Calculate Net Worth
 
-**Endpoint:** `GET /api/v1/factfinds/{id}/clients/{clientId}/net-worth`
+**Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/net-worth`
 
 **Description:** Calculate net worth (total assets minus total liabilities) for a specific client.
 
@@ -8369,7 +8272,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 ```json
 {
   "factfindRef": { "id": 679 },
-  "clientRef": { "id": "client-123", "href": "/api/v1/factfinds/679/clients/client-123" },
+  "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
   "totalAssets": {
     "amount": 700000.00,
     "currency": { "code": "GBP" }
@@ -8403,7 +8306,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 **Purpose:** Manage all financial arrangements held by clients including investments, pensions, mortgages, and protection policies with type-specific endpoints and operations.
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements`
 
 **Key Features:**
 
@@ -8440,7 +8343,7 @@ The Arrangements API provides comprehensive management of client financial produ
 **Hierarchical URL Structure:**
 
 ```
-/api/v1/factfinds/{factfindId}/arrangements
+/api/v2/factfinds/{factfindId}/arrangements
 ├── /investments
 │   ├── /GIA
 │   ├── /ISA
@@ -8466,11 +8369,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint Pattern | Description |
 |--------|-----------------|-------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{category}/{type}` | Create new arrangement |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{category}/{type}` | List arrangements by type |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Get specific arrangement |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Update arrangement |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Delete arrangement (soft) |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}` | Create new arrangement |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}` | List arrangements by type |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Get specific arrangement |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Update arrangement |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Delete arrangement (soft) |
 
 **Common Fields (All Arrangements):**
 
@@ -8507,7 +8410,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ### 10.3 Investment Arrangements
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/investments`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/investments`
 
 **Purpose:** Manage investment products including tax-wrappers (ISA, GIA), bonds, trusts, and platform-based investments.
 
@@ -8555,11 +8458,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/investments/GIA` | Create GIA | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/GIA` | List GIAs | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/GIA/{arrangementId}` | Get GIA details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/investments/GIA/{arrangementId}` | Update GIA | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/investments/GIA/{arrangementId}` | Delete GIA | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/investments/GIA` | Create GIA | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/GIA` | List GIAs | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/GIA/{arrangementId}` | Get GIA details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/investments/GIA/{arrangementId}` | Update GIA | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/investments/GIA/{arrangementId}` | Delete GIA | `arrangements:write` |
 
 **Create GIA Request:**
 
@@ -8640,7 +8543,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-gia-001",
-  "href": "/api/v1/factfinds/ff-456/arrangements/investments/GIA/arr-gia-001",
+  "href": "/api/v2/factfinds/ff-456/arrangements/investments/GIA/arr-gia-001",
   "arrangementType": "GIA",
   "arrangementCategory": "INVESTMENT",
   "provider": {
@@ -8664,7 +8567,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-123",
         "fullName": "John Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/client-123"
       },
       "ownershipPercentage": 100.0
     }
@@ -8723,12 +8626,12 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T10:30:00Z",
   "updatedAt": "2026-02-18T10:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/investments/GIA/arr-gia-001" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "contributions": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-gia-001/contributions" },
-    "withdrawals": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-gia-001/withdrawals" },
-    "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-gia-001/valuations" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/investments/GIA/arr-gia-001" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "contributions": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-gia-001/contributions" },
+    "withdrawals": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-gia-001/withdrawals" },
+    "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-gia-001/valuations" }
   }
 }
 ```
@@ -8755,11 +8658,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/investments/ISA` | Create ISA | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/ISA` | List ISAs | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/ISA/{arrangementId}` | Get ISA details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/investments/ISA/{arrangementId}` | Update ISA | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/investments/ISA/{arrangementId}` | Delete ISA | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/investments/ISA` | Create ISA | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/ISA` | List ISAs | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/ISA/{arrangementId}` | Get ISA details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/investments/ISA/{arrangementId}` | Update ISA | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/investments/ISA/{arrangementId}` | Delete ISA | `arrangements:write` |
 
 **Create ISA Request:**
 
@@ -8858,7 +8761,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-isa-002",
-  "href": "/api/v1/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
+  "href": "/api/v2/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
   "arrangementType": "ISA",
   "arrangementCategory": "INVESTMENT",
   "isaType": {
@@ -8886,7 +8789,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-123",
         "fullName": "John Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/client-123"
       },
       "ownershipPercentage": 100.0
     }
@@ -8973,12 +8876,12 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T10:35:00Z",
   "updatedAt": "2026-02-18T10:35:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "contributions": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-isa-002/contributions" },
-    "withdrawals": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-isa-002/withdrawals" },
-    "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-isa-002/valuations" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "contributions": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-isa-002/contributions" },
+    "withdrawals": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-isa-002/withdrawals" },
+    "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-isa-002/valuations" }
   }
 }
 ```
@@ -9007,11 +8910,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/investments/Bonds` | Create Investment Bond | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Bonds` | List Investment Bonds | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Bonds/{arrangementId}` | Get Bond details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/investments/Bonds/{arrangementId}` | Update Bond | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/investments/Bonds/{arrangementId}` | Delete Bond | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/investments/Bonds` | Create Investment Bond | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Bonds` | List Investment Bonds | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Bonds/{arrangementId}` | Get Bond details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/investments/Bonds/{arrangementId}` | Update Bond | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/investments/Bonds/{arrangementId}` | Delete Bond | `arrangements:write` |
 
 **Bond-Specific Fields:**
 
@@ -9066,11 +8969,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/investments/Investment-Trust` | Create Investment Trust | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Investment-Trust` | List Investment Trusts | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Investment-Trust/{arrangementId}` | Get Trust details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/investments/Investment-Trust/{arrangementId}` | Update Trust | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/investments/Investment-Trust/{arrangementId}` | Delete Trust | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/investments/Investment-Trust` | Create Investment Trust | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Investment-Trust` | List Investment Trusts | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Investment-Trust/{arrangementId}` | Get Trust details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/investments/Investment-Trust/{arrangementId}` | Update Trust | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/investments/Investment-Trust/{arrangementId}` | Delete Trust | `arrangements:write` |
 
 **Trust-Specific Fields:**
 
@@ -9100,11 +9003,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/investments/Platform-Account` | Create Platform Account | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Platform-Account` | List Platform Accounts | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Platform-Account/{arrangementId}` | Get Account details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/investments/Platform-Account/{arrangementId}` | Update Account | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/investments/Platform-Account/{arrangementId}` | Delete Account | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/investments/Platform-Account` | Create Platform Account | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Platform-Account` | List Platform Accounts | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Platform-Account/{arrangementId}` | Get Account details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/investments/Platform-Account/{arrangementId}` | Update Account | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/investments/Platform-Account/{arrangementId}` | Delete Account | `arrangements:write` |
 
 **Platform-Specific Fields:**
 
@@ -9130,11 +9033,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/investments/Offshore-Bond` | Create Offshore Bond | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Offshore-Bond` | List Offshore Bonds | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Offshore-Bond/{arrangementId}` | Get Offshore Bond details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/investments/Offshore-Bond/{arrangementId}` | Update Offshore Bond | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/investments/Offshore-Bond/{arrangementId}` | Delete Offshore Bond | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/investments/Offshore-Bond` | Create Offshore Bond | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Offshore-Bond` | List Offshore Bonds | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Offshore-Bond/{arrangementId}` | Get Offshore Bond details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/investments/Offshore-Bond/{arrangementId}` | Update Offshore Bond | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/investments/Offshore-Bond/{arrangementId}` | Delete Offshore Bond | `arrangements:write` |
 
 **Offshore Bond-Specific Fields:**
 
@@ -9161,11 +9064,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash` | Create Cash Account | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash` | List Cash Accounts | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Get Cash Account details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Update Cash Account | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Delete Cash Account | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/investments/Cash` | Create Cash Account | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Cash` | List Cash Accounts | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Get Cash Account details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Update Cash Account | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Delete Cash Account | `arrangements:write` |
 
 **Create Cash Account Request:**
 
@@ -9237,7 +9140,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-cash-001",
-  "href": "/api/v1/factfinds/ff-456/arrangements/investments/Cash/arr-cash-001",
+  "href": "/api/v2/factfinds/ff-456/arrangements/investments/Cash/arr-cash-001",
   "arrangementType": "Cash",
   "arrangementCategory": "INVESTMENT",
   "provider": {
@@ -9260,7 +9163,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-123",
         "fullName": "John Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/client-123"
       },
       "ownershipPercentage": 100.0
     }
@@ -9269,7 +9172,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "id": "adviser-456",
     "name": "Jane Adviser",
     "firmName": "ABC Financial Services",
-    "href": "/api/v1/advisers/adviser-456"
+    "href": "/api/v2/advisers/adviser-456"
   },
   "agencyStatus": "NotUnderAgency",
   "agencyStatusDate": "2023-01-15",
@@ -9390,7 +9293,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ### 10.4 Pension Arrangements
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/pensions`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/pensions`
 
 **Purpose:** Manage all pension arrangements including workplace, personal, SIPPs, money purchase, defined benefit schemes, drawdown, and annuities.
 
@@ -9442,11 +9345,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/personal-pension` | Create Personal Pension | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/personal-pension` | List Personal Pensions | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/personal-pension/{arrangementId}` | Get Personal Pension | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/personal-pension/{arrangementId}` | Update Personal Pension | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/personal-pension/{arrangementId}` | Delete Personal Pension | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/pensions/personal-pension` | Create Personal Pension | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/personal-pension` | List Personal Pensions | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/personal-pension/{arrangementId}` | Get Personal Pension | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/pensions/personal-pension/{arrangementId}` | Update Personal Pension | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/pensions/personal-pension/{arrangementId}` | Delete Personal Pension | `arrangements:write` |
 
 **Create Personal Pension Request:**
 
@@ -9544,7 +9447,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-pp-003",
-  "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003",
+  "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003",
   "arrangementType": "PERSONAL_PENSION",
   "arrangementCategory": "PENSION",
   "provider": {
@@ -9567,7 +9470,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-123",
         "fullName": "John Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/client-123"
       },
       "ownershipPercentage": 100.0
     }
@@ -9662,12 +9565,12 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T10:40:00Z",
   "updatedAt": "2026-02-18T10:40:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "contributions": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/contributions" },
-    "beneficiaries": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries" },
-    "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/valuations" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "contributions": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions" },
+    "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries" },
+    "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations" }
   }
 }
 ```
@@ -9687,11 +9590,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/state-pension` | Create State Pension | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/state-pension` | List State Pensions | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/state-pension/{arrangementId}` | Get State Pension | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/state-pension/{arrangementId}` | Update State Pension | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/state-pension/{arrangementId}` | Delete State Pension | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/pensions/state-pension` | Create State Pension | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/state-pension` | List State Pensions | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/state-pension/{arrangementId}` | Get State Pension | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/pensions/state-pension/{arrangementId}` | Update State Pension | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/pensions/state-pension/{arrangementId}` | Delete State Pension | `arrangements:write` |
 
 **State Pension-Specific Fields:**
 
@@ -9728,11 +9631,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/workplace-pension` | Create Workplace Pension | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/workplace-pension` | List Workplace Pensions | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/workplace-pension/{arrangementId}` | Get Workplace Pension | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/workplace-pension/{arrangementId}` | Update Workplace Pension | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/workplace-pension/{arrangementId}` | Delete Workplace Pension | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/pensions/workplace-pension` | Create Workplace Pension | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/workplace-pension` | List Workplace Pensions | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/workplace-pension/{arrangementId}` | Get Workplace Pension | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/pensions/workplace-pension/{arrangementId}` | Update Workplace Pension | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/pensions/workplace-pension/{arrangementId}` | Delete Workplace Pension | `arrangements:write` |
 
 **Workplace Pension-Specific Fields:**
 
@@ -9770,11 +9673,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/SIPP` | Create SIPP | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/SIPP` | List SIPPs | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/SIPP/{arrangementId}` | Get SIPP | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/SIPP/{arrangementId}` | Update SIPP | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/SIPP/{arrangementId}` | Delete SIPP | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/pensions/SIPP` | Create SIPP | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/SIPP` | List SIPPs | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/SIPP/{arrangementId}` | Get SIPP | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/pensions/SIPP/{arrangementId}` | Update SIPP | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/pensions/SIPP/{arrangementId}` | Delete SIPP | `arrangements:write` |
 
 **SIPP-Specific Fields:**
 
@@ -9811,11 +9714,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/final-salary` | Create Final Salary | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/final-salary` | List Final Salary Pensions | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/final-salary/{arrangementId}` | Get Final Salary | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/final-salary/{arrangementId}` | Update Final Salary | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/final-salary/{arrangementId}` | Delete Final Salary | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/pensions/final-salary` | Create Final Salary | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/final-salary` | List Final Salary Pensions | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/final-salary/{arrangementId}` | Get Final Salary | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/pensions/final-salary/{arrangementId}` | Update Final Salary | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/pensions/final-salary/{arrangementId}` | Delete Final Salary | `arrangements:write` |
 
 **Create Final Salary Request:**
 
@@ -9931,20 +9834,20 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-db-004",
-  "href": "/api/v1/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004",
+  "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004",
   "arrangementType": "FINAL_SALARY",
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "NHS Pension Scheme",
     "reference": "NHS-PS-001",
-    "href": "/api/v1/providers/NHS-PS-001"
+    "href": "/api/v2/providers/NHS-PS-001"
   },
   "employer": "Royal London Hospital Trust",
   "sellingAdviser": {
     "id": "adviser-456",
     "name": "Jane Adviser",
     "firmName": "ABC Financial Services",
-    "href": "/api/v1/advisers/adviser-456"
+    "href": "/api/v2/advisers/adviser-456"
   },
   "agencyStatus": "NotUnderAgency",
   "agencyStatusDate": "2023-01-15",
@@ -9969,7 +9872,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-123",
         "fullName": "John Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/client-123"
       },
       "ownershipPercentage": 100.0
     }
@@ -10072,13 +9975,13 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T10:45:00Z",
   "updatedAt": "2026-02-18T10:45:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "provider": { "href": "/api/v1/providers/NHS-PS-001" },
-    "sellingAdviser": { "href": "/api/v1/advisers/adviser-456" },
-    "beneficiaries": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-db-004/beneficiaries" },
-    "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-db-004/valuations" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "provider": { "href": "/api/v2/providers/NHS-PS-001" },
+    "sellingAdviser": { "href": "/api/v2/advisers/adviser-456" },
+    "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-db-004/beneficiaries" },
+    "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-db-004/valuations" }
   }
 }
 ```
@@ -10236,7 +10139,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-db-005",
-  "href": "/api/v1/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005",
+  "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005",
   "arrangementType": "FINAL_SALARY",
   "arrangementCategory": "PENSION",
   "provider": {
@@ -10258,7 +10161,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-125",
         "fullName": "Sarah Jones",
-        "href": "/api/v1/factfinds/ff-456/clients/client-125"
+        "href": "/api/v2/factfinds/ff-456/clients/client-125"
       },
       "ownershipPercentage": 100.0
     }
@@ -10351,12 +10254,12 @@ The Arrangements API provides comprehensive management of client financial produ
     "Scheme closed - may have higher transfer values to encourage transfers"
   ],
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-125" },
-    "provider": { "href": "/api/v1/providers/AVIVA-DB-001" },
-    "beneficiaries": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-db-005/beneficiaries" },
-    "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-db-005/valuations" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-125" },
+    "provider": { "href": "/api/v2/providers/AVIVA-DB-001" },
+    "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-db-005/beneficiaries" },
+    "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-db-005/valuations" }
   }
 }
 ```
@@ -10367,11 +10270,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/drawdown` | Create Drawdown | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/drawdown` | List Drawdowns | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/drawdown/{arrangementId}` | Get Drawdown | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/drawdown/{arrangementId}` | Update Drawdown | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/drawdown/{arrangementId}` | Delete Drawdown | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/pensions/drawdown` | Create Drawdown | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/drawdown` | List Drawdowns | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/drawdown/{arrangementId}` | Get Drawdown | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/pensions/drawdown/{arrangementId}` | Update Drawdown | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/pensions/drawdown/{arrangementId}` | Delete Drawdown | `arrangements:write` |
 
 **Drawdown-Specific Fields:**
 
@@ -10421,11 +10324,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/annuity` | Create Annuity | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/annuity` | List Annuities | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/annuity/{arrangementId}` | Get Annuity | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/annuity/{arrangementId}` | Update Annuity | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/annuity/{arrangementId}` | Delete Annuity | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/pensions/annuity` | Create Annuity | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/annuity` | List Annuities | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/annuity/{arrangementId}` | Get Annuity | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/pensions/annuity/{arrangementId}` | Update Annuity | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/pensions/annuity/{arrangementId}` | Delete Annuity | `arrangements:write` |
 
 **Annuity-Specific Fields:**
 
@@ -10483,11 +10386,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase` | Create Money Purchase | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase` | List Money Purchase Pensions | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Get Money Purchase | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Update Money Purchase | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Delete Money Purchase | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/pensions/money-purchase` | Create Money Purchase | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/money-purchase` | List Money Purchase Pensions | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Get Money Purchase | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Update Money Purchase | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Delete Money Purchase | `arrangements:write` |
 
 **Create Money Purchase Request:**
 
@@ -10577,20 +10480,20 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-mp-001",
-  "href": "/api/v1/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001",
+  "href": "/api/v2/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001",
   "arrangementType": "MONEY_PURCHASE",
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "Scottish Widows",
     "reference": "SW-001",
-    "href": "/api/v1/providers/SW-001"
+    "href": "/api/v2/providers/SW-001"
   },
   "employer": "ABC Corporation Ltd",
   "sellingAdviser": {
     "id": "adviser-789",
     "name": "Michael Smith",
     "firmName": "XYZ Wealth Management",
-    "href": "/api/v1/advisers/adviser-789"
+    "href": "/api/v2/advisers/adviser-789"
   },
   "agencyStatus": "NotUnderAgency",
   "agencyStatusDate": "2023-01-15",
@@ -10607,7 +10510,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-123",
         "fullName": "John Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/client-123"
       },
       "ownershipPercentage": 100.0
     }
@@ -10703,14 +10606,14 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T14:30:00Z",
   "updatedAt": "2026-02-18T14:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "provider": { "href": "/api/v1/providers/SW-001" },
-    "sellingAdviser": { "href": "/api/v1/advisers/adviser-789" },
-    "beneficiaries": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-mp-001/beneficiaries" },
-    "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-mp-001/valuations" },
-    "contributions": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-mp-001/contributions" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "provider": { "href": "/api/v2/providers/SW-001" },
+    "sellingAdviser": { "href": "/api/v2/advisers/adviser-789" },
+    "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-mp-001/beneficiaries" },
+    "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-mp-001/valuations" },
+    "contributions": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-mp-001/contributions" }
   }
 }
 ```
@@ -10920,20 +10823,20 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-mp-002",
-  "href": "/api/v1/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002",
+  "href": "/api/v2/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002",
   "arrangementType": "MONEY_PURCHASE",
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "Standard Life",
     "reference": "SL-002",
-    "href": "/api/v1/providers/SL-002"
+    "href": "/api/v2/providers/SL-002"
   },
   "employer": null,
   "sellingAdviser": {
     "id": "adviser-234",
     "name": "David Brown",
     "firmName": "Legacy Financial Advisers",
-    "href": "/api/v1/advisers/adviser-234"
+    "href": "/api/v2/advisers/adviser-234"
   },
   "agencyStatus": null,
   "agencyStatusDate": null,
@@ -10950,7 +10853,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-456",
         "fullName": "Emma Wilson",
-        "href": "/api/v1/factfinds/ff-789/clients/client-456"
+        "href": "/api/v2/factfinds/ff-789/clients/client-456"
       },
       "ownershipPercentage": 100.0
     }
@@ -11028,20 +10931,20 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T15:00:00Z",
   "updatedAt": "2026-02-18T15:00:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002" },
-    "factfind": { "href": "/api/v1/factfinds/ff-789" },
-    "owner": { "href": "/api/v1/factfinds/ff-789/clients/client-456" },
-    "provider": { "href": "/api/v1/providers/SL-002" },
-    "sellingAdviser": { "href": "/api/v1/advisers/adviser-234" },
-    "beneficiaries": { "href": "/api/v1/factfinds/ff-789/arrangements/arr-mp-002/beneficiaries" },
-    "valuations": { "href": "/api/v1/factfinds/ff-789/arrangements/arr-mp-002/valuations" }
+    "self": { "href": "/api/v2/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002" },
+    "factfind": { "href": "/api/v2/factfinds/ff-789" },
+    "owner": { "href": "/api/v2/factfinds/ff-789/clients/client-456" },
+    "provider": { "href": "/api/v2/providers/SL-002" },
+    "sellingAdviser": { "href": "/api/v2/advisers/adviser-234" },
+    "beneficiaries": { "href": "/api/v2/factfinds/ff-789/arrangements/arr-mp-002/beneficiaries" },
+    "valuations": { "href": "/api/v2/factfinds/ff-789/arrangements/arr-mp-002/valuations" }
   }
 }
 ```
 
 ### 10.5 Mortgage Arrangements
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/mortgages`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/mortgages`
 
 **Purpose:** Manage mortgage arrangements including traditional mortgages and equity release products linked to property assets.
 
@@ -11049,11 +10952,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/mortgages` | Create Mortgage | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/mortgages` | List Mortgages | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Get Mortgage details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Update Mortgage | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Delete Mortgage | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/mortgages` | Create Mortgage | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/mortgages` | List Mortgages | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Get Mortgage details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Update Mortgage | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Delete Mortgage | `arrangements:write` |
 
 **Create Mortgage Request:**
 
@@ -11064,12 +10967,12 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "id": "client-123",
-      "href": "/api/v1/factfinds/ff-456/clients/client-123",
+      "href": "/api/v2/factfinds/ff-456/clients/client-123",
       "ownershipPercentage": 50.0
     },
     {
       "id": "client-124",
-      "href": "/api/v1/factfinds/ff-456/clients/client-124",
+      "href": "/api/v2/factfinds/ff-456/clients/client-124",
       "ownershipPercentage": 50.0
     }
   ],
@@ -11184,7 +11087,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "propertyDetail": {
     "id": "asset-prop-001",
-    "href": "/api/v1/factfinds/ff-456/property-details/asset-prop-001"
+    "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001"
   },
   "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before."
 }
@@ -11195,10 +11098,10 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-secl-005",
-  "href": "/api/v1/factfinds/ff-456/arrangements/mortgages/arr-secl-005",
+  "href": "/api/v2/factfinds/ff-456/arrangements/mortgages/arr-secl-005",
   "factfindRef": {
     "id": "ff-456",
-    "href": "/api/v1/factfinds/ff-456"
+    "href": "/api/v2/factfinds/ff-456"
   },
   "arrangementCategory": "MORTGAGE",
   "accountNumber": "NBS-MORT-123456",
@@ -11207,13 +11110,13 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "id": "client-123",
-      "href": "/api/v1/factfinds/ff-456/clients/client-123",
+      "href": "/api/v2/factfinds/ff-456/clients/client-123",
       "fullName": "John Smith",
       "ownershipPercentage": 50.0
     },
     {
       "id": "client-124",
-      "href": "/api/v1/factfinds/ff-456/clients/client-124",
+      "href": "/api/v2/factfinds/ff-456/clients/client-124",
       "fullName": "Jane Smith",
       "ownershipPercentage": 50.0
     }
@@ -11336,25 +11239,25 @@ The Arrangements API provides comprehensive management of client financial produ
   "asset": null,
   "property": {
     "id": "asset-prop-001",
-    "href": "/api/v1/factfinds/ff-456/properties/asset-prop-001",
+    "href": "/api/v2/factfinds/ff-456/properties/asset-prop-001",
     "address": "123 High Street, London"
   },
   "propertyDetail": {
     "id": "asset-prop-001",
-    "href": "/api/v1/factfinds/ff-456/property-details/asset-prop-001"
+    "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001"
   },
   "linkedArrangements": [],
   "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before.",
   "createdAt": "2026-02-18T10:50:00Z",
   "updatedAt": "2026-02-18T10:50:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/mortgages/arr-secl-005" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "property": { "href": "/api/v1/factfinds/ff-456/properties/asset-prop-001" },
-    "propertyDetail": { "href": "/api/v1/factfinds/ff-456/property-details/asset-prop-001" },
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/mortgages/arr-secl-005" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" },
+    "property": { "href": "/api/v2/factfinds/ff-456/properties/asset-prop-001" },
+    "propertyDetail": { "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001" },
     "owners": [
-      { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-      { "href": "/api/v1/factfinds/ff-456/clients/client-124" }
+      { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+      { "href": "/api/v2/factfinds/ff-456/clients/client-124" }
     ]
   }
 }
@@ -11381,7 +11284,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ### 10.6 Protection Arrangements
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/protections`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/protections`
 
 **Purpose:** Manage protection policies including life insurance, critical illness, income protection, and general insurance.
 
@@ -11391,11 +11294,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/protections/personal-protection` | Create Personal Protection | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/protections/personal-protection` | List Personal Protection | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Get Protection details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Update Protection | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Delete Protection | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection` | Create Personal Protection | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection` | List Personal Protection | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Get Protection details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Update Protection | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Delete Protection | `arrangements:write` |
 
 **Create Personal Protection Request:**
 
@@ -11492,7 +11395,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "arr-prot-006",
-  "href": "/api/v1/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006",
+  "href": "/api/v2/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006",
   "arrangementType": "PROTECTION",
   "arrangementCategory": "PROTECTION",
   "protectionType": {
@@ -11520,7 +11423,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "clientRef": {
         "id": "client-123",
         "fullName": "John Smith",
-        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/client-123"
       },
       "ownershipPercentage": 100.0
     }
@@ -11573,7 +11476,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "percentage": 100.0,
       "ref": {
         "id": "client-124",
-        "href": "/api/v1/factfinds/ff-456/clients/client-124"
+        "href": "/api/v2/factfinds/ff-456/clients/client-124"
       }
     }
   ],
@@ -11613,10 +11516,10 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T10:55:00Z",
   "updatedAt": "2026-02-18T10:55:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" },
-    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
-    "beneficiaries": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-prot-006/beneficiaries" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-prot-006/beneficiaries" }
   }
 }
 ```
@@ -11668,11 +11571,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/protections/general-insurance` | Create General Insurance | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/protections/general-insurance` | List General Insurance | `arrangements:read` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Get Insurance details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Update Insurance | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Delete Insurance | `arrangements:write` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance` | Create General Insurance | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance` | List General Insurance | `arrangements:read` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Get Insurance details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Update Insurance | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Delete Insurance | `arrangements:write` |
 
 **General Insurance Types:**
 - Buildings Insurance
@@ -11721,7 +11624,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 #### 10.7.1 Contributions
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions`
 
 **Purpose:** Track contributions made to investment and pension arrangements.
 
@@ -11729,11 +11632,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | List contributions | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | Add contribution | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Get contribution details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Update contribution | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Delete contribution | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | List contributions | `arrangements:read` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | Add contribution | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Get contribution details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Update contribution | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Delete contribution | `arrangements:write` |
 
 **Create Contribution Request:**
 
@@ -11773,10 +11676,10 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "contrib-001",
-  "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001",
+  "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001",
   "arrangementRef": {
     "id": "arr-pp-003",
-    "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
+    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "contributionDate": "2026-02-15",
   "contributionType": {
@@ -11816,9 +11719,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T11:00:00Z",
   "updatedAt": "2026-02-18T11:00:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001" },
-    "arrangement": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001" },
+    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" }
   }
 }
 ```
@@ -11829,7 +11732,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "arrangementRef": {
     "id": "arr-pp-003",
-    "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
+    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "contributions": [
     {
@@ -11841,7 +11744,7 @@ The Arrangements API provides comprehensive management of client financial produ
       },
       "contributionType": { "code": "REGULAR", "display": "Regular Contribution" },
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001" }
+        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001" }
       }
     },
     {
@@ -11853,7 +11756,7 @@ The Arrangements API provides comprehensive management of client financial produ
       },
       "contributionType": { "code": "REGULAR", "display": "Regular Contribution" },
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-002" }
+        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-002" }
       }
     }
   ],
@@ -11874,8 +11777,8 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "totalCount": 24,
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/contributions" },
-    "arrangement": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions" },
+    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
   }
 }
 ```
@@ -11888,7 +11791,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 #### 10.7.2 Withdrawals
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals`
 
 **Purpose:** Track withdrawals from investment, pension, and drawdown arrangements.
 
@@ -11896,11 +11799,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | List withdrawals | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | Add withdrawal | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Get withdrawal details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Update withdrawal | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Delete withdrawal | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | List withdrawals | `arrangements:read` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | Add withdrawal | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Get withdrawal details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Update withdrawal | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Delete withdrawal | `arrangements:write` |
 
 **Create Withdrawal Request (Pension Drawdown):**
 
@@ -11945,10 +11848,10 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "withdraw-001",
-  "href": "/api/v1/factfinds/ff-456/arrangements/arr-dd-007/withdrawals/withdraw-001",
+  "href": "/api/v2/factfinds/ff-456/arrangements/arr-dd-007/withdrawals/withdraw-001",
   "arrangementRef": {
     "id": "arr-dd-007",
-    "href": "/api/v1/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007"
+    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007"
   },
   "withdrawalDate": "2026-02-15",
   "withdrawalType": {
@@ -11986,9 +11889,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T11:05:00Z",
   "updatedAt": "2026-02-18T11:05:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-dd-007/withdrawals/withdraw-001" },
-    "arrangement": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007" },
-    "factfind": { "href": "/api/v1/factfinds/ff-456" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-dd-007/withdrawals/withdraw-001" },
+    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007" },
+    "factfind": { "href": "/api/v2/factfinds/ff-456" }
   }
 }
 ```
@@ -12028,7 +11931,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 #### 10.7.3 Beneficiaries
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries`
 
 **Purpose:** Manage beneficiary designations for pensions and protection policies.
 
@@ -12036,11 +11939,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | List beneficiaries | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | Add beneficiary | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Get beneficiary details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Update beneficiary | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Delete beneficiary | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | List beneficiaries | `arrangements:read` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | Add beneficiary | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Get beneficiary details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Update beneficiary | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Delete beneficiary | `arrangements:write` |
 
 **Create Beneficiary Request:**
 
@@ -12075,10 +11978,10 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "ben-002",
-  "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002",
+  "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002",
   "arrangementRef": {
     "id": "arr-pp-003",
-    "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
+    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "beneficiaryType": {
     "code": "PERSON",
@@ -12095,7 +11998,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "contingent": false,
   "contactRef": {
     "id": "dependent-789",
-    "href": "/api/v1/factfinds/ff-456/clients/client-123/dependents/dependent-789"
+    "href": "/api/v2/factfinds/ff-456/clients/client-123/dependents/dependent-789"
   },
   "address": {
     "line1": "123 High Street",
@@ -12106,9 +12009,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T11:10:00Z",
   "updatedAt": "2026-02-18T11:10:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002" },
-    "arrangement": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
-    "dependent": { "href": "/api/v1/factfinds/ff-456/clients/client-123/dependents/dependent-789" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002" },
+    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
+    "dependent": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependents/dependent-789" }
   }
 }
 ```
@@ -12119,7 +12022,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "arrangementRef": {
     "id": "arr-pp-003",
-    "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
+    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "beneficiaries": [
     {
@@ -12129,7 +12032,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "percentage": 50.0,
       "contingent": false,
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002" }
+        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002" }
       }
     },
     {
@@ -12139,15 +12042,15 @@ The Arrangements API provides comprehensive management of client financial produ
       "percentage": 50.0,
       "contingent": false,
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-003" }
+        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-003" }
       }
     }
   ],
   "totalCount": 2,
   "totalPercentage": 100.0,
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries" },
-    "arrangement": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries" },
+    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
   }
 }
 ```
@@ -12160,7 +12063,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 #### 10.7.4 Valuations
 
-**Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations`
+**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations`
 
 **Purpose:** Track historical valuation of arrangements over time for performance analysis.
 
@@ -12168,11 +12071,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | List valuations | `arrangements:read` |
-| POST | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | Add valuation | `arrangements:write` |
-| GET | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Get valuation details | `arrangements:read` |
-| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Update valuation | `arrangements:write` |
-| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Delete valuation | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | List valuations | `arrangements:read` |
+| POST | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | Add valuation | `arrangements:write` |
+| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Get valuation details | `arrangements:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Update valuation | `arrangements:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Delete valuation | `arrangements:write` |
 
 **Create Valuation Request:**
 
@@ -12209,10 +12112,10 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "id": "val-001",
-  "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001",
+  "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001",
   "arrangementRef": {
     "id": "arr-pp-003",
-    "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
+    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "valuationDate": "2026-02-18",
   "valuationType": {
@@ -12245,9 +12148,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "createdAt": "2026-02-18T11:15:00Z",
   "updatedAt": "2026-02-18T11:15:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001" },
-    "arrangement": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
-    "document": { "href": "/api/v1/factfinds/ff-456/documents/statement-2026-02.pdf" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001" },
+    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
+    "document": { "href": "/api/v2/factfinds/ff-456/documents/statement-2026-02.pdf" }
   }
 }
 ```
@@ -12258,7 +12161,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "arrangementRef": {
     "id": "arr-pp-003",
-    "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
+    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "valuations": [
     {
@@ -12271,7 +12174,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "valuationType": { "code": "STATEMENT", "display": "Provider Statement" },
       "percentageChange": 4.17,
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001" }
+        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001" }
       }
     },
     {
@@ -12284,7 +12187,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "valuationType": { "code": "STATEMENT", "display": "Provider Statement" },
       "percentageChange": 3.45,
       "_links": {
-        "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-002" }
+        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-002" }
       }
     }
   ],
@@ -12307,8 +12210,8 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "totalCount": 8,
   "_links": {
-    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-pp-003/valuations" },
-    "arrangement": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
+    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations" },
+    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
   }
 }
 ```
@@ -12375,7 +12278,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "title": "Validation Failed",
   "status": 400,
   "detail": "ISA allowance exceeded for tax year 2025/26",
-  "instance": "/api/v1/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
+  "instance": "/api/v2/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
   "errors": [
     {
       "field": "isaAllowance.usedThisYear",
@@ -12417,8 +12320,8 @@ The Arrangements API provides comprehensive management of client financial produ
 
 **Purpose:** Capture and manage client Attitude to Risk (ATR) assessment as an embedded part of the FactFind.
 
-**Key Changes in v2.1:**
-- **ATR is now embedded in the FactFind entity** - No more separate template management API
+**Key Features:**
+- **ATR is embedded in the FactFind entity** - No separate template management API required
 - **Templates are reference data** - Risk questionnaire templates are system configuration, not managed via API
 - **Simplified assessment flow** - Submit, view, and choose risk profiles directly on the fact find
 - **Historical tracking** - Risk Replay mechanism for viewing past assessments and comparing changes
@@ -12448,25 +12351,25 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/factfinds/{factfindId}/atr-assessment` | Get current ATR assessment | `factfind:read` |
-| PUT | `/api/v1/factfinds/{factfindId}/atr-assessment` | Submit/update ATR assessment | `factfind:write` |
-| POST | `/api/v1/factfinds/{factfindId}/atr-assessment/choose-profile` | Choose risk profile from options | `factfind:write` |
-| GET | `/api/v1/factfinds/{factfindId}/atr-assessment/history` | Get ATR history (Risk Replay) | `factfind:read` |
-| GET | `/api/v1/factfinds/{factfindId}/atr-assessment/history/{assessmentId}` | Get specific historical assessment | `factfind:read` |
-| GET | `/api/v1/factfinds/{factfindId}/atr-assessment/compare` | Compare two assessments | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/atr-assessment` | Get current ATR assessment | `factfind:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/atr-assessment` | Submit/update ATR assessment | `factfind:write` |
+| POST | `/api/v2/factfinds/{factfindId}/atr-assessment/choose-profile` | Choose risk profile from options | `factfind:write` |
+| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/history` | Get ATR history (Risk Replay) | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/history/{assessmentId}` | Get specific historical assessment | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/compare` | Compare two assessments | `factfind:read` |
 
 **Reference Data Endpoints:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v1/reference/atr-templates` | List available ATR templates | Public |
-| GET | `/api/v1/reference/atr-templates/{templateId}` | Get template details | Public |
+| GET | `/api/v2/reference/atr-templates` | List available ATR templates | Public |
+| GET | `/api/v2/reference/atr-templates/{templateId}` | Get template details | Public |
 
 ### 11.3 Key Endpoints
 
 #### 11.3.1 Get Current ATR Assessment
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/atr-assessment`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment`
 
 **Description:** Retrieves the current ATR assessment for a fact find, including all questions, answers, risk profiles, and declarations.
 
@@ -12616,10 +12519,10 @@ The ATR Assessment is a critical component of the FactFind that captures:
     "reviewDate": "2027-02-18"
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/factfind-123/atr-assessment" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "history": { "href": "/api/v1/factfinds/factfind-123/atr-assessment/history" },
-    "chooseProfile": { "href": "/api/v1/factfinds/factfind-123/atr-assessment/choose-profile", "method": "POST" }
+    "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "history": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history" },
+    "chooseProfile": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/choose-profile", "method": "POST" }
   }
 }
 ```
@@ -12633,7 +12536,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 #### 11.3.2 Submit/Update ATR Assessment
 
-**Endpoint:** `PUT /api/v1/factfinds/{factfindId}/atr-assessment`
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/atr-assessment`
 
 **Description:** Submit or update the ATR assessment for a fact find. This includes all 15 standard questions, 45 supplementary questions, and capacity for loss assessment.
 
@@ -12696,9 +12599,9 @@ The ATR Assessment is a critical component of the FactFind that captures:
     // ... full assessment with generated risk profiles
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/factfind-123/atr-assessment" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "chooseProfile": { "href": "/api/v1/factfinds/factfind-123/atr-assessment/choose-profile", "method": "POST" }
+    "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "chooseProfile": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/choose-profile", "method": "POST" }
   }
 }
 ```
@@ -12721,7 +12624,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 #### 11.3.3 Choose Risk Profile
 
-**Endpoint:** `POST /api/v1/factfinds/{factfindId}/atr-assessment/choose-profile`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/atr-assessment/choose-profile`
 
 **Description:** Client chooses their preferred risk profile from the 3 generated options (main, lower, higher).
 
@@ -12771,7 +12674,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 #### 11.3.4 Get ATR Assessment History (Risk Replay)
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/atr-assessment/history`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment/history`
 
 **Description:** Retrieve historical ATR assessments for a fact find. Supports "Risk Replay" - the ability to review how a client's risk profile has changed over time.
 
@@ -12805,8 +12708,8 @@ The ATR Assessment is a critical component of the FactFind that captures:
         "significantChange": false
       },
       "_links": {
-        "self": { "href": "/api/v1/factfinds/factfind-123/atr-assessment/history/atr-20260218-001" },
-        "fullDetails": { "href": "/api/v1/factfinds/factfind-123/atr-assessment/history/atr-20260218-001" }
+        "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history/atr-20260218-001" },
+        "fullDetails": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history/atr-20260218-001" }
       }
     },
     {
@@ -12822,7 +12725,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
       },
       "changeFromPrevious": null,
       "_links": {
-        "self": { "href": "/api/v1/factfinds/factfind-123/atr-assessment/history/atr-20250215-001" }
+        "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history/atr-20250215-001" }
       }
     }
   ],
@@ -12833,9 +12736,9 @@ The ATR Assessment is a critical component of the FactFind that captures:
     "totalPages": 1
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/factfind-123/atr-assessment/history" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "compare": { "href": "/api/v1/factfinds/factfind-123/atr-assessment/compare?from={assessmentId1}&to={assessmentId2}" }
+    "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "compare": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/compare?from={assessmentId1}&to={assessmentId2}" }
   }
 }
 ```
@@ -12865,7 +12768,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 #### 11.4.1 List Available ATR Templates
 
-**Endpoint:** `GET /api/v1/reference/atr-templates`
+**Endpoint:** `GET /api/v2/reference/atr-templates`
 
 **Description:** List available ATR questionnaire templates with metadata.
 
@@ -12920,7 +12823,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 #### 11.4.2 Get ATR Template Details
 
-**Endpoint:** `GET /api/v1/reference/atr-templates/{templateId}`
+**Endpoint:** `GET /api/v2/reference/atr-templates/{templateId}`
 
 **Description:** Get full details of an ATR template including all questions, answer options, and scoring.
 
@@ -13046,7 +12949,7 @@ See Section 10.3.4 for the main history endpoint.
 
 #### 11.5.1 Compare Two Assessments
 
-**Endpoint:** `GET /api/v1/factfinds/{factfindId}/atr-assessment/compare`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment/compare`
 
 **Description:** Compare two ATR assessments to see what changed.
 
@@ -13291,7 +13194,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 - Corporate-specific fields only present when `clientType="Corporate"`
 - Trust-specific fields only present when `clientType="Trust"`
 
-**Key Enhancements in v2.1:**
+**Key Features:**
 - **Composition Pattern** - Conditional value types based on client type discriminator
 - **PersonValue** - Person-specific demographics (DOB, gender, marital status, health, occupation, vulnerabilities)
 - **CorporateValue** - Corporate-specific details (company name, registration, directors, shareholders)
@@ -13316,7 +13219,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "id": "client-123",
   "factFindRef": {
     "id": "factfind-456",
-    "href": "/api/v1/factfinds/factfind-456",
+    "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -13642,7 +13545,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "privacyPolicy": {
       "version": "2.1",
       "acceptedDate": "2020-01-15",
-      "url": "https://api.factfind.com/privacy-policy/v2.1",
+      "url": "https://api.factfind.com/privacy-policy",
       "acceptanceMethod": "Electronic"
     },
     "dataRetention": {
@@ -13967,7 +13870,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "isJoint": true,
   "spouseRef": {
     "id": "client-124",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-124",
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
@@ -14049,13 +13952,13 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
   "paraplannerRef": {
     "id": "adviser-790",
-    "href": "/api/v1/advisers/adviser-790",
+    "href": "/api/v2/advisers/adviser-790",
     "name": "Tom Johnson",
     "code": "PP001"
   },
@@ -14076,10 +13979,10 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "_etag": "W/\"v2-20260216-143000\"",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-456" },
-    "spouse": { "href": "/api/v1/factfinds/{factfindId}/clients/client-124" },
-    "adviser": { "href": "/api/v1/advisers/adviser-789" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-456" },
+    "spouse": { "href": "/api/v2/factfinds/{factfindId}/clients/client-124" },
+    "adviser": { "href": "/api/v2/advisers/adviser-789" }
   }
 }
 ```
@@ -14095,7 +13998,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "id": "client-567",
   "factFindRef": {
     "id": "factfind-890",
-    "href": "/api/v1/factfinds/factfind-890",
+    "href": "/api/v2/factfinds/factfind-890",
     "factFindNumber": "FF-2025-00456",
     "status": {
       "code": "INP",
@@ -14141,7 +14044,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       {
         "personRef": {
           "id": "client-568",
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-568",
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-568",
           "name": "Robert Johnson",
           "clientNumber": "C00005679"
         },
@@ -14153,7 +14056,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       {
         "personRef": {
           "id": "client-569",
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-569",
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-569",
           "name": "Amanda Chen",
           "clientNumber": "C00005680"
         },
@@ -14449,7 +14352,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "privacyPolicy": {
       "version": "2.1",
       "acceptedDate": "2015-03-20",
-      "url": "https://api.factfind.com/privacy-policy/v2.1",
+      "url": "https://api.factfind.com/privacy-policy",
       "acceptanceMethod": "Written"
     },
     "dataRetention": {
@@ -14580,13 +14483,13 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "adviserRef": {
     "id": "adviser-800",
-    "href": "/api/v1/advisers/adviser-800",
+    "href": "/api/v2/advisers/adviser-800",
     "name": "Michael Brown",
     "code": "ADV002"
   },
   "paraplannerRef": {
     "id": "adviser-801",
-    "href": "/api/v1/advisers/adviser-801",
+    "href": "/api/v2/advisers/adviser-801",
     "name": "Lisa Wong",
     "code": "PP002"
   },
@@ -14607,9 +14510,9 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "_etag": "W/\"v2-20260216-143000\"",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-567" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-890" },
-    "adviser": { "href": "/api/v1/advisers/adviser-800" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/client-567" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-890" },
+    "adviser": { "href": "/api/v2/advisers/adviser-800" }
   }
 }
 ```
@@ -14625,7 +14528,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "id": "client-999",
   "factFindRef": {
     "id": "factfind-1111",
-    "href": "/api/v1/factfinds/factfind-1111",
+    "href": "/api/v2/factfinds/factfind-1111",
     "factFindNumber": "FF-2025-00789",
     "status": {
       "code": "INP",
@@ -14653,7 +14556,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "settlor": {
       "personRef": {
         "id": "client-1000",
-        "href": "/api/v1/factfinds/{factfindId}/clients/client-1000",
+        "href": "/api/v2/factfinds/{factfindId}/clients/client-1000",
         "name": "William Smith",
         "clientNumber": "C00010000"
       },
@@ -14672,7 +14575,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       {
         "personRef": {
           "id": "client-1001",
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-1001",
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-1001",
           "name": "Margaret Smith",
           "clientNumber": "C00010001"
         },
@@ -14684,7 +14587,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       {
         "personRef": {
           "id": "client-1002",
-          "href": "/api/v1/factfinds/{factfindId}/clients/client-1002",
+          "href": "/api/v2/factfinds/{factfindId}/clients/client-1002",
           "name": "James Harrison",
           "clientNumber": "C00010002"
         },
@@ -15039,7 +14942,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "privacyPolicy": {
       "version": "2.1",
       "acceptedDate": "2018-04-15",
-      "url": "https://api.factfind.com/privacy-policy/v2.1",
+      "url": "https://api.factfind.com/privacy-policy",
       "acceptanceMethod": "Written"
     },
     "dataRetention": {
@@ -15152,13 +15055,13 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "adviserRef": {
     "id": "adviser-810",
-    "href": "/api/v1/advisers/adviser-810",
+    "href": "/api/v2/advisers/adviser-810",
     "name": "Patricia Davies",
     "code": "ADV003"
   },
   "paraplannerRef": {
     "id": "adviser-811",
-    "href": "/api/v1/advisers/adviser-811",
+    "href": "/api/v2/advisers/adviser-811",
     "name": "Andrew Wilson",
     "code": "PP003"
   },
@@ -15179,9 +15082,9 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "_etag": "W/\"v2-20260216-143000\"",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/client-999" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-1111" },
-    "adviser": { "href": "/api/v1/advisers/adviser-810" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/client-999" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-1111" },
+    "adviser": { "href": "/api/v2/advisers/adviser-810" }
   }
 }
 ```
@@ -15909,7 +15812,7 @@ Embedded value type representing territorial status, residency, domicile, and ci
 **Creating a Person Client:**
 
 ```http
-POST /api/v1/factfinds/{factfindId}/clients
+POST /api/v2/factfinds/{factfindId}/clients
 Content-Type: application/json
 
 {
@@ -15964,7 +15867,7 @@ Content-Type: application/json
 **Creating a Corporate Client:**
 
 ```http
-POST /api/v1/factfinds/{factfindId}/clients
+POST /api/v2/factfinds/{factfindId}/clients
 Content-Type: application/json
 
 {
@@ -16013,7 +15916,7 @@ Content-Type: application/json
 **Creating a Trust Client:**
 
 ```http
-POST /api/v1/factfinds/{factfindId}/clients
+POST /api/v2/factfinds/{factfindId}/clients
 Content-Type: application/json
 
 {
@@ -16069,7 +15972,7 @@ Content-Type: application/json
 ### 13.2 FactFind Contract
 
 
-**IMPORTANT NOTE - v2.1 Enhancement:**
+**IMPORTANT NOTE:**
 The FactFind Contract now includes an embedded `atrAssessment` object containing:
 - 15 standard ATR questions with answers
 - 45 supplementary questions
@@ -16114,8 +16017,8 @@ The `FactFind` contract (also known as ADVICE_CASE) represents a fact-finding se
 
 Complete fact find aggregate root with summary calculations.
 
-**ENHANCED v2.2 - Industry-Aligned Value Types:**
-The FactFind contract has been refactored to group related fields into industry-standard value types:
+**Industry-Aligned Value Types:**
+The FactFind contract groups related fields into industry-standard value types:
 - **MeetingDetailsValue** (Section 12.2.1) - Meeting/consultation information (FCA/MiFID II terminology)
 - **FinancialSummaryValue** (Section 12.2.2) - Computed financial totals and metrics (read-only snapshot)
 - **AssetHoldingsValue** (Section 12.2.3) - Indicators of what financial products client holds (portfolio management terminology)
@@ -16130,21 +16033,21 @@ This grouping improves clarity, aligns with industry standards, and makes the co
   "factFindNumber": "FF001234",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "jointClientRef": {
     "id": "client-124",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-124",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-124",
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
   },
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -16424,13 +16327,13 @@ This grouping improves clarity, aligns with industry standards, and makes the co
   "createdAt": "2026-02-16T14:30:00Z",
   "updatedAt": "2026-02-16T15:45:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/factfind-456" },
-    "complete": { "href": "/api/v1/factfinds/factfind-456/complete", "method": "POST" },
-    "summary": { "href": "/api/v1/factfinds/factfind-456/summary" },
-    "employment": { "href": "/api/v1/factfinds/factfind-456/employment" },
-    "income": { "href": "/api/v1/factfinds/factfind-456/income" },
-    "expenditure": { "href": "/api/v1/factfinds/factfind-456/expenditure" },
-    "affordability": { "href": "/api/v1/factfinds/factfind-456/affordability" }
+    "self": { "href": "/api/v2/factfinds/factfind-456" },
+    "complete": { "href": "/api/v2/factfinds/factfind-456/complete", "method": "POST" },
+    "summary": { "href": "/api/v2/factfinds/factfind-456/summary" },
+    "employment": { "href": "/api/v2/factfinds/factfind-456/employment" },
+    "income": { "href": "/api/v2/factfinds/factfind-456/income" },
+    "expenditure": { "href": "/api/v2/factfinds/factfind-456/expenditure" },
+    "affordability": { "href": "/api/v2/factfinds/factfind-456/affordability" }
   }
 }
 ```
@@ -16449,7 +16352,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 | **`assetHoldings`** | **AssetHoldingsValue** | **ignored** | **partial** | **included** | **Mostly computed, credit fields updatable (Section 12.2.3)** |
 | **`investmentCapacity`** | **InvestmentCapacityValue** | **optional** | **updatable** | **included** | **Value type group (Section 12.2.4)** |
 | **`completionStatus`** | **CompletionStatusValue** | **optional** | **updatable** | **included** | **Value type group (Section 12.2.5)** |
-| `atrAssessment` | ATRAssessmentValue | optional | updatable | included | Embedded ATR from v2.1 (Section 10) |
+| `atrAssessment` | ATRAssessmentValue | optional | updatable | included | Embedded ATR assessment (Section 10) |
 | `notes` | string | optional | updatable | included | - |
 | `additionalNotes` | string | optional | updatable | included | - |
 | `customQuestions` | array | optional | updatable | included | - |
@@ -16457,53 +16360,9 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 | `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
 
-**Field Mapping from v2.1 to v2.2:**
-
-| v2.1 Root Field | v2.2 Location | Behavior |
-|----------------|---------------|----------|
-| `dateOfMeeting` | `meetingDetails.meetingDate` | updatable |
-| `typeOfMeeting` | `meetingDetails.meetingType` | updatable |
-| `clientsPresent` | `meetingDetails.clientsPresent` | updatable |
-| `anybodyElsePresent` | `meetingDetails.othersPresent` | updatable |
-| `anybodyElsePresentDetails` | `meetingDetails.othersPresentDetails` | updatable |
-| `scopeOfAdvice` | `meetingDetails.scopeOfAdvice` | updatable |
-| `totalEarnedAnnualIncomeGross` | `financialSummary.income.annualGross` | read-only, computed |
-| `totalNetMonthlyIncome` | `financialSummary.income.monthlyNet` | read-only, computed |
-| `totalNetRelevantEarnings` | `financialSummary.income.netRelevantEarnings` | read-only, computed |
-| `totalMonthlyExpenditure` | `financialSummary.expenditure.monthlyTotal` | read-only, computed |
-| `totalMonthlyDisposableIncome` | `financialSummary.expenditure.monthlyDisposable` | read-only, computed |
-| `totalFundsAvailable` | `financialSummary.liquidity.totalFundsAvailable` | read-only, computed |
-| `totalLumpSumAvailableForAdvice` | `financialSummary.liquidity.availableForAdvice` | read-only, computed |
-| `highestTaxRate` | `financialSummary.taxation.highestRate` | read-only, computed |
-| `sourceOfInvestmentFunds` | `financialSummary.sourceOfFunds` | updatable |
-| `hasEmployments` | `assetHoldings.employment.hasEmployments` | read-only, computed |
-| `hasDcPensionPersonal` | `assetHoldings.pensions.hasPersonalPension` | read-only, computed |
-| `hasDcPensionMoneyPurchase` | `assetHoldings.pensions.hasMoneyPurchasePension` | read-only, computed |
-| `hasDbPension` | `assetHoldings.pensions.hasDefinedBenefitPension` | read-only, computed |
-| `hasAnnuity` | `assetHoldings.pensions.hasAnnuity` | read-only, computed |
-| `hasSavings` | `assetHoldings.investments.hasSavings` | read-only, computed |
-| `hasInvestments` | `assetHoldings.investments.hasInvestments` | read-only, computed |
-| `hasExistingMortgage` | `assetHoldings.borrowing.hasMortgage` | read-only, computed |
-| `hasEquityRelease` | `assetHoldings.borrowing.hasEquityRelease` | read-only, computed |
-| `hasLiabilities` | `assetHoldings.borrowing.hasOtherLiabilities` | read-only, computed |
-| `hasProtection` | `assetHoldings.protection.hasProtection` | read-only, computed |
-| `hasAdverseCredit` | `assetHoldings.credit.hasAdverseCredit` | updatable |
-| `hasBeenRefusedCredit` | `assetHoldings.credit.hasBeenRefusedCredit` | updatable |
-| `hasAssets` | `assetHoldings.other.hasOtherAssets` | read-only, computed |
-| `emergencyFund` | `investmentCapacity.emergencyFund` | updatable |
-| `agreedMonthlyBudget` | `investmentCapacity.regularContributions.agreedMonthlyBudget` | updatable |
-| `agreedSingleInvestmentAmount` | `investmentCapacity.lumpSumInvestment.agreedAmount` | updatable |
-| `incomeChangesExpected` | `investmentCapacity.futureChanges.incomeChangesExpected` | updatable |
-| `expenditureChangesExpected` | `investmentCapacity.futureChanges.expenditureChangesExpected` | updatable |
-| `isComplete` | `completionStatus.isComplete` | read-only, computed |
-| `status` | `completionStatus.status` | updatable |
-| `dateFactFindCompleted` | `completionStatus.completionDate` | updatable |
-| `dateDeclarationSigned` | `completionStatus.declarationSignedDate` | updatable |
-| `dateIdAmlChecked` | `completionStatus.compliance.idCheckedDate` | updatable |
-
 **Usage Examples:**
 
-**Creating a FactFind (POST /api/v1/factfinds):**
+**Creating a FactFind (POST /api/v2/factfinds):**
 ```json
 {
   "clientRef": { "id": "client-123" },
@@ -16535,7 +16394,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 }
 ```
 
-**Updating a FactFind (PATCH /api/v1/factfinds/456):**
+**Updating a FactFind (PATCH /api/v2/factfinds/456):**
 ```json
 {
   "completionStatus": {
@@ -16896,7 +16755,7 @@ The `Address` contract represents a client's address with additional metadata fo
   "id": "address-789",
   "factFindRef": {
     "id": "factfind-456",
-    "href": "/api/v1/factfinds/factfind-456",
+    "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -16905,7 +16764,7 @@ The `Address` contract represents a client's address with additional metadata fo
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -16956,20 +16815,20 @@ The `Income` contract represents an income source within a FactFind.
   "id": "income-101",
   "factFindRef": {
     "id": "factfind-456",
-    "href": "/api/v1/factfinds/factfind-456",
+    "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF001234",
     "status": "InProgress"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "employmentRef": {
     "id": "employment-222",
-    "href": "/api/v1/employments/employment-222",
+    "href": "/api/v2/employments/employment-222",
     "employerName": "Tech Corp Ltd",
     "status": "Current"
   },
@@ -17053,7 +16912,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "id": "arrangement-555",
   "factFindRef": {
     "id": "factfind-456",
-    "href": "/api/v1/factfinds/factfind-456",
+    "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -17066,7 +16925,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "clientOwners": [
     {
       "id": "client-123",
-      "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+      "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
       "name": "John Smith",
       "clientNumber": "C00001234",
       "type": "Person"
@@ -17074,14 +16933,14 @@ The `Arrangement` contract represents financial products (pensions, investments,
   ],
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
   "productName": "ABC SIPP",
   "providerRef": {
     "id": "provider-456",
-    "href": "/api/v1/providers/provider-456",
+    "href": "/api/v2/providers/provider-456",
     "name": "ABC Pension Provider Ltd",
     "frnNumber": "123456"
   },
@@ -17133,9 +16992,9 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "createdAt": "2015-01-01T10:00:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555" },
-    "contributions": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555/contributions" },
-    "valuations": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-555/valuations" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-555" },
+    "contributions": { "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-555/contributions" },
+    "valuations": { "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-555/valuations" }
   }
 }
 ```
@@ -17167,7 +17026,7 @@ The `Goal` contract represents a client's financial goal.
   "id": "goal-888",
   "factFindRef": {
     "id": "factfind-456",
-    "href": "/api/v1/factfinds/factfind-456",
+    "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -17176,7 +17035,7 @@ The `Goal` contract represents a client's financial goal.
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -17257,7 +17116,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
   "id": "riskprofile-999",
   "factFindRef": {
     "id": "factfind-456",
-    "href": "/api/v1/factfinds/factfind-456",
+    "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -17266,14 +17125,14 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -17337,7 +17196,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "arrangementId": "arrangement-456",
   "factFindRef": {
     "id": "factfind-123",
-    "href": "/api/v1/factfinds/factfind-123",
+    "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -17346,7 +17205,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -17954,7 +17813,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   },
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -17970,7 +17829,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
       },
       "name": "ISA Annual Statement 2025",
       "date": "2025-12-31",
-      "url": "/api/v1/documents/doc-001"
+      "url": "/api/v2/documents/doc-001"
     }
   ],
   "createdAt": "2020-04-06T10:00:00Z",
@@ -17984,18 +17843,18 @@ The `Investment` contract extends the Arrangement contract with investment-speci
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/investments/investment-789" },
-    "update": { "href": "/api/v1/investments/investment-789", "method": "PUT" },
-    "delete": { "href": "/api/v1/investments/investment-789", "method": "DELETE" },
-    "arrangement": { "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-456" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "holdings": { "href": "/api/v1/investments/investment-789/holdings" },
-    "contributions": { "href": "/api/v1/investments/investment-789/contributions" },
-    "withdrawals": { "href": "/api/v1/investments/investment-789/withdrawals" },
-    "transactions": { "href": "/api/v1/investments/investment-789/transactions" },
-    "documents": { "href": "/api/v1/investments/investment-789/documents" },
-    "performance": { "href": "/api/v1/investments/investment-789/performance" }
+    "self": { "href": "/api/v2/investments/investment-789" },
+    "update": { "href": "/api/v2/investments/investment-789", "method": "PUT" },
+    "delete": { "href": "/api/v2/investments/investment-789", "method": "DELETE" },
+    "arrangement": { "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-456" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "holdings": { "href": "/api/v2/investments/investment-789/holdings" },
+    "contributions": { "href": "/api/v2/investments/investment-789/contributions" },
+    "withdrawals": { "href": "/api/v2/investments/investment-789/withdrawals" },
+    "transactions": { "href": "/api/v2/investments/investment-789/transactions" },
+    "documents": { "href": "/api/v2/investments/investment-789/documents" },
+    "performance": { "href": "/api/v2/investments/investment-789/performance" }
   }
 }
 ```
@@ -18074,7 +17933,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 
 **Usage Examples:**
 
-**Creating an Investment ISA (POST /api/v1/investments):**
+**Creating an Investment ISA (POST /api/v2/investments):**
 ```json
 {
   "arrangementId": "arrangement-456",
@@ -18096,7 +17955,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 ```
 Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields like `unrealizedGain`, `totalReturn`, etc. Returns complete contract.
 
-**Updating Asset Allocation (PUT /api/v1/investments/investment-789):**
+**Updating Asset Allocation (PUT /api/v2/investments/investment-789):**
 ```json
 {
   "currentValue": { "amount": 190000.00, "currency": { "code": "GBP" } },
@@ -18111,7 +17970,7 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields l
 ```
 Server updates `updatedAt` and recalculates computed fields. Returns complete contract.
 
-**Adding a Holding (PATCH /api/v1/investments/investment-789):**
+**Adding a Holding (PATCH /api/v2/investments/investment-789):**
 ```json
 {
   "holdings": [
@@ -18154,7 +18013,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "id": "property-456",
   "factFindRef": {
     "id": "factfind-123",
-    "href": "/api/v1/factfinds/factfind-123",
+    "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -18299,7 +18158,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
     {
       "clientRef": {
         "id": "client-123",
-        "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+        "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
         "name": "John Smith",
         "clientNumber": "C00001234",
         "type": "Person"
@@ -18362,7 +18221,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
     {
       "mortgageRef": {
         "id": "mortgage-789",
-        "href": "/api/v1/factfinds/{factfindId}/arrangements/mortgage-789",
+        "href": "/api/v2/factfinds/{factfindId}/arrangements/mortgage-789",
         "arrangementType": "Mortgage",
         "provider": "Nationwide Building Society",
         "policyNumber": "MTG-987654321"
@@ -18830,7 +18689,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       },
       "name": "Desktop Valuation February 2026",
       "date": "2026-02-10",
-      "url": "/api/v1/documents/doc-prop-001"
+      "url": "/api/v2/documents/doc-prop-001"
     }
   ],
   "createdAt": "2018-06-15T10:00:00Z",
@@ -18844,16 +18703,16 @@ The `Property` contract represents a property asset with valuation tracking, mor
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456" },
-    "update": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456", "method": "PUT" },
-    "delete": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456", "method": "DELETE" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "owners": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/owners" },
-    "mortgages": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/mortgages" },
-    "expenses": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/expenses" },
-    "rental": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/rental" },
-    "valuations": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/valuations" },
-    "documents": { "href": "/api/v1/factfinds/{factfindId}/assets/property-456/documents" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456" },
+    "update": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456", "method": "PUT" },
+    "delete": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456", "method": "DELETE" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "owners": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/owners" },
+    "mortgages": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/mortgages" },
+    "expenses": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/expenses" },
+    "rental": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/rental" },
+    "valuations": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/valuations" },
+    "documents": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/documents" }
   }
 }
 ```
@@ -18932,7 +18791,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
 
 **Usage Examples:**
 
-**Creating a Buy-To-Let Property (POST /api/v1/factfinds/{factfindId}/assets):**
+**Creating a Buy-To-Let Property (POST /api/v2/factfinds/{factfindId}/assets):**
 ```json
 {
   "factFindRef": { "id": "factfind-123" },
@@ -18963,7 +18822,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
 ```
 Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields. Returns complete contract.
 
-**Updating Property Valuation (PUT /api/v1/properties/property-456):**
+**Updating Property Valuation (PUT /api/v2/properties/property-456):**
 ```json
 {
   "currentValue": { "amount": 435000.00, "currency": { "code": "GBP" } },
@@ -18976,7 +18835,7 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields. 
 ```
 Server updates `updatedAt` and recalculates equity, LTV, capital growth. Returns complete contract.
 
-**Updating Rental Income (PATCH /api/v1/properties/property-456):**
+**Updating Rental Income (PATCH /api/v2/properties/property-456):**
 ```json
 {
   "rentalIncome": {
@@ -19015,7 +18874,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
   "id": "equity-321",
   "factFindRef": {
     "id": "factfind-123",
-    "href": "/api/v1/factfinds/factfind-123",
+    "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -19024,7 +18883,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -19710,7 +19569,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
   "isAdvised": true,
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -19725,7 +19584,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
       },
       "name": "Purchase Contract Note - March 2021",
       "date": "2021-03-15",
-      "url": "/api/v1/documents/doc-eq-001"
+      "url": "/api/v2/documents/doc-eq-001"
     }
   ],
   "createdAt": "2021-03-15T10:00:00Z",
@@ -19739,16 +19598,16 @@ The `Equity` contract represents a direct stock holding with performance trackin
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321" },
-    "update": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321", "method": "PUT" },
-    "delete": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321", "method": "DELETE" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "transactions": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/transactions" },
-    "dividends": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/dividends" },
-    "corporateActions": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/corporate-actions" },
-    "performance": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/performance" },
-    "documents": { "href": "/api/v1/factfinds/{factfindId}/assets/equity-321/documents" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321" },
+    "update": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321", "method": "PUT" },
+    "delete": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321", "method": "DELETE" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "transactions": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321/transactions" },
+    "dividends": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321/dividends" },
+    "corporateActions": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321/corporate-actions" },
+    "performance": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321/performance" },
+    "documents": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321/documents" }
   }
 }
 ```
@@ -19794,7 +19653,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 
 **Usage Examples:**
 
-**Creating an Equity Holding (POST /api/v1/factfinds/{factfindId}/assets):**
+**Creating an Equity Holding (POST /api/v2/factfinds/{factfindId}/assets):**
 ```json
 {
   "factFindRef": { "id": "factfind-123" },
@@ -19817,7 +19676,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 ```
 Server generates `id`, `createdAt`, `updatedAt`, and computes performance metrics. Returns complete contract.
 
-**Recording a Purchase (PUT /api/v1/equities/equity-321):**
+**Recording a Purchase (PUT /api/v2/equities/equity-321):**
 ```json
 {
   "purchases": [
@@ -19840,7 +19699,7 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes performance metric
 ```
 Server updates `updatedAt`, recalculates performance and Section 104 pool. Returns complete contract.
 
-**Recording a Dividend (PATCH /api/v1/equities/equity-321):**
+**Recording a Dividend (PATCH /api/v2/equities/equity-321):**
 ```json
 {
   "dividends": [
@@ -19885,14 +19744,14 @@ The `IdentityVerification` contract represents identity verification status with
   "id": "idverify-987",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "factFindRef": {
     "id": "factfind-123",
-    "href": "/api/v1/factfinds/factfind-123",
+    "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -20231,7 +20090,7 @@ The `IdentityVerification` contract represents identity verification status with
       },
       "name": "Onfido Verification Report - Feb 2026",
       "date": "2026-02-10",
-      "url": "/api/v1/documents/doc-verify-001"
+      "url": "/api/v2/documents/doc-verify-001"
     },
     {
       "documentId": "doc-verify-002",
@@ -20241,7 +20100,7 @@ The `IdentityVerification` contract represents identity verification status with
       },
       "name": "World-Check AML Report - Feb 2026",
       "date": "2026-02-10",
-      "url": "/api/v1/documents/doc-verify-002"
+      "url": "/api/v2/documents/doc-verify-002"
     }
   ],
   "createdAt": "2026-02-10T14:30:00Z",
@@ -20255,15 +20114,15 @@ The `IdentityVerification` contract represents identity verification status with
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/identity-verification/idverify-987" },
-    "update": { "href": "/api/v1/identity-verification/idverify-987", "method": "PUT" },
-    "delete": { "href": "/api/v1/identity-verification/idverify-987", "method": "DELETE" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "verificationReport": { "href": "/api/v1/documents/doc-verify-001" },
-    "amlReport": { "href": "/api/v1/documents/doc-verify-002" },
-    "history": { "href": "/api/v1/identity-verification/idverify-987/history" },
-    "renew": { "href": "/api/v1/identity-verification/idverify-987/renew", "method": "POST" }
+    "self": { "href": "/api/v2/identity-verification/idverify-987" },
+    "update": { "href": "/api/v2/identity-verification/idverify-987", "method": "PUT" },
+    "delete": { "href": "/api/v2/identity-verification/idverify-987", "method": "DELETE" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "verificationReport": { "href": "/api/v2/documents/doc-verify-001" },
+    "amlReport": { "href": "/api/v2/documents/doc-verify-002" },
+    "history": { "href": "/api/v2/identity-verification/idverify-987/history" },
+    "renew": { "href": "/api/v2/identity-verification/idverify-987/renew", "method": "POST" }
   }
 }
 ```
@@ -20312,7 +20171,7 @@ The `IdentityVerification` contract represents identity verification status with
 
 **Usage Examples:**
 
-**Submitting Identity Verification (POST /api/v1/identity-verification):**
+**Submitting Identity Verification (POST /api/v2/identity-verification):**
 ```json
 {
   "clientRef": { "id": "client-123" },
@@ -20342,7 +20201,7 @@ The `IdentityVerification` contract represents identity verification status with
 ```
 Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
 
-**Updating Verification Status (PUT /api/v1/identity-verification/idverify-987):**
+**Updating Verification Status (PUT /api/v2/identity-verification/idverify-987):**
 ```json
 {
   "verificationStatus": { "code": "VERIFIED" },
@@ -20373,7 +20232,7 @@ Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
 ```
 Server updates `updatedAt`. Returns complete contract with verification complete.
 
-**Adding AML Result (PATCH /api/v1/identity-verification/idverify-987):**
+**Adding AML Result (PATCH /api/v2/identity-verification/idverify-987):**
 ```json
 {
   "amlChecks": {
@@ -20419,14 +20278,14 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   "id": "consent-555",
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "factFindRef": {
     "id": "factfind-123",
-    "href": "/api/v1/factfinds/factfind-123",
+    "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
     "status": {
       "code": "INP",
@@ -20776,7 +20635,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         "code": "CHECKBOX",
         "display": "Checkbox Selection"
       },
-      "evidenceUrl": "/api/v1/consent-evidence/consent-555",
+      "evidenceUrl": "/api/v2/consent-evidence/consent-555",
       "evidenceTimestamp": "2026-02-10T14:00:00Z",
       "witnessRequired": false
     },
@@ -20802,7 +20661,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         "code": "MARKETING",
         "display": "Marketing Communications"
       },
-      "href": "/api/v1/consents/consent-556"
+      "href": "/api/v2/consents/consent-556"
     },
     {
       "consentId": "consent-557",
@@ -20810,7 +20669,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         "code": "THIRD_PARTY_SHARING",
         "display": "Third Party Data Sharing"
       },
-      "href": "/api/v1/consents/consent-557"
+      "href": "/api/v2/consents/consent-557"
     }
   ],
   "notes": "Initial consent obtained during client onboarding. Client fully informed of data processing activities and rights. Marketing consent given for email and post only.",
@@ -20823,7 +20682,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
       },
       "name": "Data Processing Consent Form - Signed",
       "date": "2026-02-10",
-      "url": "/api/v1/documents/doc-consent-001"
+      "url": "/api/v2/documents/doc-consent-001"
     },
     {
       "documentId": "doc-consent-002",
@@ -20831,9 +20690,9 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         "code": "PRIVACY_NOTICE",
         "display": "Privacy Notice"
       },
-      "name": "Privacy Notice v2.1",
+      "name": "Privacy Notice",
       "date": "2026-01-01",
-      "url": "/api/v1/documents/doc-consent-002"
+      "url": "/api/v2/documents/doc-consent-002"
     }
   ],
   "createdAt": "2026-02-10T14:00:00Z",
@@ -20847,18 +20706,18 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
     "name": "Jane Doe"
   },
   "_links": {
-    "self": { "href": "/api/v1/consents/consent-555" },
-    "update": { "href": "/api/v1/consents/consent-555", "method": "PUT" },
-    "withdraw": { "href": "/api/v1/consents/consent-555/withdraw", "method": "POST" },
-    "renew": { "href": "/api/v1/consents/consent-555/renew", "method": "POST" },
-    "delete": { "href": "/api/v1/consents/consent-555", "method": "DELETE" },
-    "client": { "href": "/api/v1/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v1/factfinds/factfind-123" },
-    "consentForm": { "href": "/api/v1/documents/doc-consent-001" },
-    "privacyNotice": { "href": "/api/v1/documents/doc-consent-002" },
-    "evidence": { "href": "/api/v1/consent-evidence/consent-555" },
-    "dsarRequests": { "href": "/api/v1/consents/consent-555/dsar-requests" },
-    "history": { "href": "/api/v1/consents/consent-555/history" }
+    "self": { "href": "/api/v2/consents/consent-555" },
+    "update": { "href": "/api/v2/consents/consent-555", "method": "PUT" },
+    "withdraw": { "href": "/api/v2/consents/consent-555/withdraw", "method": "POST" },
+    "renew": { "href": "/api/v2/consents/consent-555/renew", "method": "POST" },
+    "delete": { "href": "/api/v2/consents/consent-555", "method": "DELETE" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
+    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "consentForm": { "href": "/api/v2/documents/doc-consent-001" },
+    "privacyNotice": { "href": "/api/v2/documents/doc-consent-002" },
+    "evidence": { "href": "/api/v2/consent-evidence/consent-555" },
+    "dsarRequests": { "href": "/api/v2/consents/consent-555/dsar-requests" },
+    "history": { "href": "/api/v2/consents/consent-555/history" }
   }
 }
 ```
@@ -20907,7 +20766,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 
 **Usage Examples:**
 
-**Recording Consent (POST /api/v1/consents):**
+**Recording Consent (POST /api/v2/consents):**
 ```json
 {
   "clientRef": { "id": "client-123" },
@@ -20949,7 +20808,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 ```
 Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
 
-**Updating Marketing Preferences (PUT /api/v1/consents/consent-555):**
+**Updating Marketing Preferences (PUT /api/v2/consents/consent-555):**
 ```json
 {
   "marketingConsent": {
@@ -20972,7 +20831,7 @@ Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
 ```
 Server updates `updatedAt`. Returns complete contract with updated preferences.
 
-**Withdrawing Consent (PATCH /api/v1/consents/consent-555/withdraw):**
+**Withdrawing Consent (PATCH /api/v2/consents/consent-555/withdraw):**
 ```json
 {
   "consentStatus": { "code": "WITHDRAWN" },
@@ -21015,11 +20874,11 @@ All list/collection endpoints use a standard wrapper contract:
     "hasMore": true
   },
   "_links": {
-    "first": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "first": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
     "prev": null,
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients?page=1&pageSize=20" },
-    "next": { "href": "/api/v1/factfinds/{factfindId}/clients?page=2&pageSize=20" },
-    "last": { "href": "/api/v1/factfinds/{factfindId}/clients?page=5&pageSize=20" }
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "next": { "href": "/api/v2/factfinds/{factfindId}/clients?page=2&pageSize=20" },
+    "last": { "href": "/api/v2/factfinds/{factfindId}/clients?page=5&pageSize=20" }
   }
 }
 ```
@@ -21991,7 +21850,7 @@ Reference to a Client entity.
 ```json
 {
   "id": "client-123",
-  "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+  "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
   "name": "John Michael Smith",
   "clientNumber": "C00001234",
   "type": "Person"
@@ -22013,7 +21872,7 @@ Reference to a Client entity.
 {
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/{factfindId}/clients/client-123",
+    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -22029,7 +21888,7 @@ Reference to an Adviser entity.
 ```json
 {
   "id": "adviser-789",
-  "href": "/api/v1/advisers/adviser-789",
+  "href": "/api/v2/advisers/adviser-789",
   "name": "Sarah Johnson",
   "code": "ADV001"
 }
@@ -22049,7 +21908,7 @@ Reference to an Adviser entity.
 {
   "adviserRef": {
     "id": "adviser-789",
-    "href": "/api/v1/advisers/adviser-789",
+    "href": "/api/v2/advisers/adviser-789",
     "name": "Sarah Johnson",
     "code": "ADV001"
   }
@@ -22064,7 +21923,7 @@ Reference to a financial product Provider entity.
 ```json
 {
   "id": "provider-456",
-  "href": "/api/v1/providers/provider-456",
+  "href": "/api/v2/providers/provider-456",
   "name": "Aviva Life & Pensions UK Limited",
   "frnNumber": "185896"
 }
@@ -22084,7 +21943,7 @@ Reference to a financial product Provider entity.
 {
   "providerRef": {
     "id": "provider-456",
-    "href": "/api/v1/providers/provider-456",
+    "href": "/api/v2/providers/provider-456",
     "name": "Aviva",
     "frnNumber": "185896"
   }
@@ -22099,7 +21958,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 ```json
 {
   "id": "arrangement-111",
-  "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-111",
+  "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-111",
   "policyNumber": "POL123456",
   "productType": "Pension",
   "provider": "Aviva"
@@ -22121,7 +21980,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 {
   "arrangementRef": {
     "id": "arrangement-111",
-    "href": "/api/v1/factfinds/{factfindId}/arrangements/arrangement-111",
+    "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-111",
     "policyNumber": "SIPP123456",
     "productType": "Pension",
     "provider": "Aviva"
@@ -22137,7 +21996,7 @@ Reference to an Employment entity.
 ```json
 {
   "id": "employment-222",
-  "href": "/api/v1/employments/employment-222",
+  "href": "/api/v2/employments/employment-222",
   "employerName": "Acme Corporation Ltd",
   "status": "Current"
 }
@@ -22157,7 +22016,7 @@ Reference to an Employment entity.
 {
   "employmentRef": {
     "id": "employment-222",
-    "href": "/api/v1/employments/employment-222",
+    "href": "/api/v2/employments/employment-222",
     "employerName": "Acme Corp",
     "status": "Current"
   }
@@ -22172,7 +22031,7 @@ Reference to a Goal entity.
 ```json
 {
   "id": "goal-333",
-  "href": "/api/v1/factfinds/{factfindId}/objectives/goal-333",
+  "href": "/api/v2/factfinds/{factfindId}/objectives/goal-333",
   "goalName": "Retirement at 65",
   "priority": "High"
 }
@@ -22192,7 +22051,7 @@ Reference to a Goal entity.
 {
   "goalRef": {
     "id": "goal-333",
-    "href": "/api/v1/factfinds/{factfindId}/objectives/goal-333",
+    "href": "/api/v2/factfinds/{factfindId}/objectives/goal-333",
     "goalName": "Retirement Planning",
     "priority": "High"
   }
@@ -22207,7 +22066,7 @@ Reference to a FactFind (ADVICE_CASE) entity.
 ```json
 {
   "id": "factfind-444",
-  "href": "/api/v1/factfinds/factfind-444",
+  "href": "/api/v2/factfinds/factfind-444",
   "factFindNumber": "FF001234",
   "status": "InProgress"
 }
@@ -22227,7 +22086,7 @@ Reference to a FactFind (ADVICE_CASE) entity.
 {
   "factFindRef": {
     "id": "factfind-444",
-    "href": "/api/v1/factfinds/factfind-444",
+    "href": "/api/v2/factfinds/factfind-444",
     "factFindNumber": "FF001234",
     "status": "InProgress"
   }
@@ -22255,10 +22114,10 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 ```json
 {
   "id": 1234,
-  "href": "/api/v1/factfinds/679/clients/346/assets/1234",
+  "href": "/api/v2/factfinds/679/clients/346/assets/1234",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "assetType": "PROPERTY",
   "description": "Primary Residence - 123 Main Street",
@@ -22268,14 +22127,14 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
       {
         "clientRef": {
           "id": "client-123",
-          "href": "/api/v1/factfinds/679/clients/client-123"
+          "href": "/api/v2/factfinds/679/clients/client-123"
         },
         "ownershipShare": 50.0
       },
       {
         "clientRef": {
           "id": "client-124",
-          "href": "/api/v1/factfinds/679/clients/client-124"
+          "href": "/api/v2/factfinds/679/clients/client-124"
         },
         "ownershipShare": 50.0
       }
@@ -22286,7 +22145,7 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
       {
         "clientRef": {
           "id": "client-123",
-          "href": "/api/v1/factfinds/679/clients/client-123"
+          "href": "/api/v2/factfinds/679/clients/client-123"
         },
         "dividend": {
           "amount": 5000.00,
@@ -22326,15 +22185,15 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
   "isHolding": false,
   "propertyRef": {
     "id": 1234,
-    "href": "/api/v1/factfinds/679/property-details/1234"
+    "href": "/api/v2/factfinds/679/property-details/1234"
   },
   "arrangementRef": {
     "id": 1234,
-    "href": "/api/v1/factfinds/679/clients/346/arrangements/1234"
+    "href": "/api/v2/factfinds/679/clients/346/arrangements/1234"
   },
   "incomeRef": {
     "id": 1234,
-    "href": "/api/v1/factfinds/679/clients/346/income/1234"
+    "href": "/api/v2/factfinds/679/clients/346/income/1234"
   },
   "notes": "Rental property - managed by external agent",
   "createdAt": "2026-02-01T10:00:00Z",
@@ -22448,15 +22307,15 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 ```json
 {
   "id": 789,
-  "href": "/api/v1/factfinds/679/clients/346/liabilities/789",
+  "href": "/api/v2/factfinds/679/clients/346/liabilities/789",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "owner": {
     "clientRef": {
       "id": "client-123",
-      "href": "/api/v1/factfinds/679/clients/client-123",
+      "href": "/api/v2/factfinds/679/clients/client-123",
       "name": "Bob Byblik"
     }
   },
@@ -22523,11 +22382,11 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "isGuarantorMortgage": false,
   "linkedAssetRef": {
     "id": 1234,
-    "href": "/api/v1/factfinds/679/clients/346/assets/1234"
+    "href": "/api/v2/factfinds/679/clients/346/assets/1234"
   },
   "protectionArrangementRef": {
     "id": 555,
-    "href": "/api/v1/factfinds/679/arrangements/555"
+    "href": "/api/v2/factfinds/679/arrangements/555"
   },
   "createdAt": "2026-01-15T09:00:00Z",
   "updatedAt": "2026-02-10T11:30:00Z"
@@ -22659,15 +22518,15 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 ```json
 {
   "id": 790,
-  "href": "/api/v1/factfinds/679/clients/346/liabilities/790",
+  "href": "/api/v2/factfinds/679/clients/346/liabilities/790",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "owner": {
     "clientRef": {
       "id": "client-123",
-      "href": "/api/v1/factfinds/679/clients/client-123",
+      "href": "/api/v2/factfinds/679/clients/client-123",
       "name": "Bob Byblik"
     }
   },
@@ -22729,15 +22588,15 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 ```json
 {
   "id": 791,
-  "href": "/api/v1/factfinds/679/clients/346/liabilities/791",
+  "href": "/api/v2/factfinds/679/clients/346/liabilities/791",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "owner": {
     "clientRef": {
       "id": "client-123",
-      "href": "/api/v1/factfinds/679/clients/client-123",
+      "href": "/api/v2/factfinds/679/clients/client-123",
       "name": "Bob Byblik"
     }
   },
@@ -22784,15 +22643,15 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 ```json
 {
   "id": 792,
-  "href": "/api/v1/factfinds/679/clients/346/liabilities/792",
+  "href": "/api/v2/factfinds/679/clients/346/liabilities/792",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "owner": {
     "clientRef": {
       "id": "client-124",
-      "href": "/api/v1/factfinds/679/clients/client-124",
+      "href": "/api/v2/factfinds/679/clients/client-124",
       "name": "Jane Byblik"
     }
   },
@@ -22854,7 +22713,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "linkedAssetRef": null,
   "protectionArrangementRef": {
     "id": 556,
-    "href": "/api/v1/factfinds/679/arrangements/556"
+    "href": "/api/v2/factfinds/679/arrangements/556"
   },
   "createdAt": "2023-06-15T09:00:00Z",
   "updatedAt": "2026-02-05T10:15:00Z"
@@ -22884,7 +22743,7 @@ The `Employment` contract represents a client's employment history with employer
 ```json
 {
   "id": 567,
-  "href": "/api/v1/factfinds/679/clients/346/employments/567",
+  "href": "/api/v2/factfinds/679/clients/346/employments/567",
   "employmentStatus": "Employed",
   "employmentBusinessType": null,
   "employmentStatusDescription": "Full-time permanent employee",
@@ -22919,7 +22778,7 @@ The `Employment` contract represents a client's employment history with employer
     "id": 346
   },
   "selfEmployedIncome": null,
-  "incomesHref": "/api/v1/factfinds/679/clients/346/incomes?filter=employment.id eq 567"
+  "incomesHref": "/api/v2/factfinds/679/clients/346/incomes?filter=employment.id eq 567"
 }
 ```
 
@@ -22928,7 +22787,7 @@ The `Employment` contract represents a client's employment history with employer
 ```json
 {
   "id": 568,
-  "href": "/api/v1/factfinds/679/clients/347/employments/568",
+  "href": "/api/v2/factfinds/679/clients/347/employments/568",
   "employmentStatus": "SelfEmployed",
   "employmentBusinessType": "PrivateLimitedCompany",
   "employmentStatusDescription": "Director and majority shareholder of limited company",
@@ -23130,7 +22989,7 @@ The `Employment` contract represents a client's employment history with employer
       }
     }
   },
-  "incomesHref": "/api/v1/factfinds/679/clients/347/incomes?filter=employment.id eq 568"
+  "incomesHref": "/api/v2/factfinds/679/clients/347/incomes?filter=employment.id eq 568"
 }
 ```
 
@@ -23234,14 +23093,14 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 ```json
 {
   "id": 445,
-  "href": "/api/v1/factfinds/679/clients/346/budget/445",
+  "href": "/api/v2/factfinds/679/clients/346/budget/445",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "category": "Housing",
   "amount": {
@@ -23290,14 +23149,14 @@ The `Expenditure` contract represents a client's actual expenditure aggregate, c
 ```json
 {
   "id": 667,
-  "href": "/api/v1/factfinds/679/clients/346/expenditure/667",
+  "href": "/api/v2/factfinds/679/clients/346/expenditure/667",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "isDetailed": true,
   "totalMonthlyExpenditure": {
@@ -23311,7 +23170,7 @@ The `Expenditure` contract represents a client's actual expenditure aggregate, c
   "expenses": [
     {
       "id": 1001,
-      "href": "/api/v1/factfinds/679/clients/346/expenditure/667/expenses/1001",
+      "href": "/api/v2/factfinds/679/clients/346/expenditure/667/expenses/1001",
       "category": "Mortgage",
       "amount": {
         "amount": 1200.00,
@@ -23323,7 +23182,7 @@ The `Expenditure` contract represents a client's actual expenditure aggregate, c
     },
     {
       "id": 1002,
-      "href": "/api/v1/factfinds/679/clients/346/expenditure/667/expenses/1002",
+      "href": "/api/v2/factfinds/679/clients/346/expenditure/667/expenses/1002",
       "category": "Groceries",
       "amount": {
         "amount": 600.00,
@@ -23375,10 +23234,10 @@ The `Expense` contract represents a single expense line item within an expenditu
 ```json
 {
   "id": 1001,
-  "href": "/api/v1/factfinds/679/clients/346/expenditure/667/expenses/1001",
+  "href": "/api/v2/factfinds/679/clients/346/expenditure/667/expenses/1001",
   "expenditureRef": {
     "id": 667,
-    "href": "/api/v1/factfinds/679/clients/346/expenditure/667"
+    "href": "/api/v2/factfinds/679/clients/346/expenditure/667"
   },
   "category": {
     "code": "MORTGAGE",
@@ -23448,14 +23307,14 @@ The `CreditHistory` contract represents a client's credit history items includin
 ```json
 {
   "id": 334,
-  "href": "/api/v1/factfinds/679/clients/346/credit-history/334",
+  "href": "/api/v2/factfinds/679/clients/346/credit-history/334",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "creditScore": {
     "score": 780,
@@ -23536,7 +23395,7 @@ The `PropertyDetail` contract represents detailed property information including
 ```json
 {
   "id": 1,
-  "href": "/api/v1/factfinds/679/property-details/1",
+  "href": "/api/v2/factfinds/679/property-details/1",
   "propertyType": "DETACHED",
   "tenureType": "Freehold",
   "leaseholdEndsOn": null,
@@ -23765,13 +23624,13 @@ The `PropertyDetail` contract represents detailed property information including
 
 **Create Property Detail:**
 ```
-POST /api/v1/factfinds/{factfindId}/property-details
+POST /api/v2/factfinds/{factfindId}/property-details
 ```
 Returns: `201 Created` with Location header
 
 **Update Property Detail:**
 ```
-PATCH /api/v1/factfinds/{factfindId}/property-details/{id}
+PATCH /api/v2/factfinds/{factfindId}/property-details/{id}
 ```
 Returns: `200 OK`
 - All fields optional (partial updates allowed)
@@ -23779,13 +23638,13 @@ Returns: `200 OK`
 
 **Get Property Detail:**
 ```
-GET /api/v1/factfinds/{factfindId}/property-details/{id}
+GET /api/v2/factfinds/{factfindId}/property-details/{id}
 ```
 Returns: `200 OK`
 
 **Delete Property Detail:**
 ```
-DELETE /api/v1/factfinds/{factfindId}/property-details/{id}
+DELETE /api/v2/factfinds/{factfindId}/property-details/{id}
 ```
 Returns: `204 No Content`
 
@@ -23809,10 +23668,10 @@ The `BusinessAsset` contract represents detailed business asset information incl
 ```json
 {
   "id": 555,
-  "href": "/api/v1/factfinds/679/business-assets/555",
+  "href": "/api/v2/factfinds/679/business-assets/555",
   "assetRef": {
     "id": 1235,
-    "href": "/api/v1/factfinds/679/clients/346/assets/1235"
+    "href": "/api/v2/factfinds/679/clients/346/assets/1235"
   },
   "businessName": "Smith & Co Limited",
   "companyNumber": "12345678",
@@ -23962,10 +23821,10 @@ The `Notes` contract represents a note attached to a fact find entity using a un
 ```json
 {
   "id": 888,
-  "href": "/api/v1/factfinds/679/notes/888",
+  "href": "/api/v2/factfinds/679/notes/888",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "noteDiscriminator": {
     "code": "ASSET_NOTES",
@@ -23974,7 +23833,7 @@ The `Notes` contract represents a note attached to a fact find entity using a un
   "entityRef": {
     "type": "Asset",
     "id": 1234,
-    "href": "/api/v1/factfinds/679/clients/346/assets/1234"
+    "href": "/api/v2/factfinds/679/clients/346/assets/1234"
   },
   "subject": "Property Valuation Discussion",
   "content": "Discussed recent property valuation with client. Market conditions favorable for sale in 2027.",
@@ -23991,7 +23850,7 @@ The `Notes` contract represents a note attached to a fact find entity using a un
       "filename": "valuation_report.pdf",
       "mimeType": "application/pdf",
       "sizeBytes": 524288,
-      "href": "/api/v1/factfinds/679/notes/888/attachments/att-111"
+      "href": "/api/v2/factfinds/679/notes/888/attachments/att-111"
     }
   ],
   "createdAt": "2026-02-10T14:00:00Z",
@@ -24055,19 +23914,19 @@ The `Dependant` contract represents a dependent family member of one or more cli
 ```json
 {
   "id": 999,
-  "href": "/api/v1/factfinds/679/dependants/999",
+  "href": "/api/v2/factfinds/679/dependants/999",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clients": [
     {
       "id": 123,
-      "href": "/api/v1/factfinds/679/clients/123"
+      "href": "/api/v2/factfinds/679/clients/123"
     },
     {
       "id": 124,
-      "href": "/api/v1/factfinds/679/clients/124"
+      "href": "/api/v2/factfinds/679/clients/124"
     }
   ],
   "firstName": "Emily",
@@ -24190,18 +24049,18 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 ```json
 {
   "id": 345,
-  "href": "/api/v1/factfinds/679/clients/346/income-changes/345",
+  "href": "/api/v2/factfinds/679/clients/346/income-changes/345",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "incomeRef": {
     "id": 890,
-    "href": "/api/v1/factfinds/679/clients/346/income/890"
+    "href": "/api/v2/factfinds/679/clients/346/income/890"
   },
   "changeType": {
     "code": "INCREASE",
@@ -24315,18 +24174,18 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 ```json
 {
   "id": 456,
-  "href": "/api/v1/factfinds/679/clients/346/expenditure-changes/456",
+  "href": "/api/v2/factfinds/679/clients/346/expenditure-changes/456",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "expenseRef": {
     "id": 1001,
-    "href": "/api/v1/factfinds/679/clients/346/expenditure/667/expenses/1001"
+    "href": "/api/v2/factfinds/679/clients/346/expenditure/667/expenses/1001"
   },
   "changeType": {
     "code": "CEASE",
@@ -24423,10 +24282,10 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
 ```json
 {
   "id": 1111,
-  "href": "/api/v1/factfinds/679/affordability-assessments/1111",
+  "href": "/api/v2/factfinds/679/affordability-assessments/1111",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "assessmentDate": "2026-02-19",
   "assessmentType": {
@@ -24437,13 +24296,13 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
     {
       "clientRef": {
         "id": "client-123",
-        "href": "/api/v1/factfinds/679/clients/client-123"
+        "href": "/api/v2/factfinds/679/clients/client-123"
       }
     },
     {
       "clientRef": {
         "id": "client-124",
-        "href": "/api/v1/factfinds/679/clients/client-124"
+        "href": "/api/v2/factfinds/679/clients/client-124"
       }
     }
   ],
@@ -24643,14 +24502,14 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 ```json
 {
   "id": 2222,
-  "href": "/api/v1/factfinds/679/clients/client-123/contacts/2222",
+  "href": "/api/v2/factfinds/679/clients/client-123/contacts/2222",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "contactType": {
     "code": "EMAIL",
@@ -24722,14 +24581,14 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 ```json
 {
   "id": 3333,
-  "href": "/api/v1/factfinds/679/clients/client-123/attitude-to-risk/3333",
+  "href": "/api/v2/factfinds/679/clients/client-123/attitude-to-risk/3333",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "assessmentDate": "2026-02-10",
   "assessmentMethod": {
@@ -24858,14 +24717,14 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 ```json
 {
   "id": 4444,
-  "href": "/api/v1/factfinds/679/clients/client-123/professional-contacts/4444",
+  "href": "/api/v2/factfinds/679/clients/client-123/professional-contacts/4444",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "professionalType": {
     "code": "SOLICITOR",
@@ -24934,14 +24793,14 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 ```json
 {
   "id": 5555,
-  "href": "/api/v1/factfinds/679/clients/client-123/vulnerabilities/5555",
+  "href": "/api/v2/factfinds/679/clients/client-123/vulnerabilities/5555",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "hasVulnerabilities": true,
   "identifiedDate": "2026-01-15",
@@ -25053,14 +24912,14 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 ```json
 {
   "id": 6666,
-  "href": "/api/v1/factfinds/679/clients/client-123/marketing-preferences/6666",
+  "href": "/api/v2/factfinds/679/clients/client-123/marketing-preferences/6666",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "lastUpdated": "2026-01-15",
   "overallConsent": true,
@@ -25138,14 +24997,14 @@ The `Will` contract represents a client's last will and testament details.
 ```json
 {
   "id": 7777,
-  "href": "/api/v1/factfinds/679/clients/client-123/estate-planning/wills/7777",
+  "href": "/api/v2/factfinds/679/clients/client-123/estate-planning/wills/7777",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "hasWill": true,
   "willDate": "2023-06-15",
@@ -25158,7 +25017,7 @@ The `Will` contract represents a client's last will and testament details.
   "isMirrorWill": true,
   "mirrorWillClientRef": {
     "id": "client-124",
-    "href": "/api/v1/factfinds/679/clients/client-124"
+    "href": "/api/v2/factfinds/679/clients/client-124"
   },
   "executors": [
     {
@@ -25227,14 +25086,14 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 ```json
 {
   "id": 8888,
-  "href": "/api/v1/factfinds/679/clients/client-123/estate-planning/lpas/8888",
+  "href": "/api/v2/factfinds/679/clients/client-123/estate-planning/lpas/8888",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "hasLPA": true,
   "lpaType": {
@@ -25328,14 +25187,14 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 ```json
 {
   "id": 9999,
-  "href": "/api/v1/factfinds/679/clients/client-123/estate-planning/gifts/9999",
+  "href": "/api/v2/factfinds/679/clients/client-123/estate-planning/gifts/9999",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "giftDate": "2024-12-25",
   "giftType": {
@@ -25439,14 +25298,14 @@ The `Trust` contract represents trusts established by or benefiting the client.
 ```json
 {
   "id": 10001,
-  "href": "/api/v1/factfinds/679/clients/client-123/estate-planning/trusts/10001",
+  "href": "/api/v2/factfinds/679/clients/client-123/estate-planning/trusts/10001",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "trustName": "The Smith Family Discretionary Trust",
   "trustType": {
@@ -25562,14 +25421,14 @@ The `IdentityVerification` contract represents identity verification checks and 
 ```json
 {
   "id": 11111,
-  "href": "/api/v1/factfinds/679/clients/client-123/identity-verification/11111",
+  "href": "/api/v2/factfinds/679/clients/client-123/identity-verification/11111",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "verificationDate": "2026-01-05",
   "verificationMethod": {
@@ -25727,10 +25586,10 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
 ```json
 {
   "id": 5001,
-  "href": "/api/v1/factfinds/679/arrangements/mortgages/5001",
+  "href": "/api/v2/factfinds/679/arrangements/mortgages/5001",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "arrangementCategory": "MORTGAGE",
 
@@ -25741,13 +25600,13 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
   "owners": [
     {
       "id": 456,
-      "href": "/api/v1/factfinds/679/clients/456",
+      "href": "/api/v2/factfinds/679/clients/456",
       "ownershipPercentage": 100.00
     }
   ],
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v1/advisers/123",
+    "href": "/api/v2/advisers/123",
     "name": "John Adviser",
     "firmName": "ABC Mortgage Services"
   },
@@ -25957,20 +25816,20 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
 
   "asset": {
     "id": 67890,
-    "href": "/api/v1/factfinds/679/assets/67890"
+    "href": "/api/v2/factfinds/679/assets/67890"
   },
   "property": {
     "id": 12345,
-    "href": "/api/v1/factfinds/679/properties/12345"
+    "href": "/api/v2/factfinds/679/properties/12345"
   },
   "propertyDetail": {
     "id": 5,
-    "href": "/api/v1/factfinds/679/property-details/5"
+    "href": "/api/v2/factfinds/679/property-details/5"
   },
   "linkedArrangements": [
     {
       "id": 99999,
-      "href": "/api/v1/factfinds/679/arrangements/99999",
+      "href": "/api/v2/factfinds/679/arrangements/99999",
       "arrangementType": "Endowment"
     }
   ],
@@ -26338,10 +26197,10 @@ The `InvestmentArrangement` contract represents investment products including GI
 ```json
 {
   "id": 13001,
-  "href": "/api/v1/factfinds/679/arrangements/investments/13001",
+  "href": "/api/v2/factfinds/679/arrangements/investments/13001",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "arrangementCategory": "INVESTMENT",
   "investmentType": {
@@ -26352,11 +26211,11 @@ The `InvestmentArrangement` contract represents investment products including GI
   "providerName": "Vanguard",
   "providerRef": {
     "id": "provider-456",
-    "href": "/api/v1/providers/provider-456"
+    "href": "/api/v2/providers/provider-456"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "accountNumber": "GIA-987654321",
   "startDate": "2020-03-15",
@@ -26457,7 +26316,7 @@ The `InvestmentArrangement` contract represents investment products including GI
     "targetRiskLevel": 6,
     "atrRef": {
       "id": 3333,
-      "href": "/api/v1/factfinds/679/clients/client-123/attitude-to-risk/3333"
+      "href": "/api/v2/factfinds/679/clients/client-123/attitude-to-risk/3333"
     }
   },
   "taxWrapper": {
@@ -26520,10 +26379,10 @@ The `ProtectionArrangement` contract represents protection products including Li
 ```json
 {
   "id": 20001,
-  "href": "/api/v1/factfinds/679/arrangements/protection/20001",
+  "href": "/api/v2/factfinds/679/arrangements/protection/20001",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "arrangementCategory": "PROTECTION",
   "protectionType": {
@@ -26538,11 +26397,11 @@ The `ProtectionArrangement` contract represents protection products including Li
   "providerName": "Aviva",
   "providerRef": {
     "id": "provider-789",
-    "href": "/api/v1/providers/provider-789"
+    "href": "/api/v2/providers/provider-789"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "policyNumber": "LA-12345678",
   "startDate": "2023-01-15",
@@ -26602,11 +26461,11 @@ The `ProtectionArrangement` contract represents protection products including Li
   "linkedTo": {
     "mortgageRef": {
       "id": 12001,
-      "href": "/api/v1/factfinds/679/arrangements/mortgages/12001"
+      "href": "/api/v2/factfinds/679/arrangements/mortgages/12001"
     },
     "liabilityRef": {
       "id": 5678,
-      "href": "/api/v1/factfinds/679/clients/346/liabilities/5678"
+      "href": "/api/v2/factfinds/679/clients/346/liabilities/5678"
     }
   },
   "underwriting": {
@@ -26672,10 +26531,10 @@ The `PensionArrangement` contract represents pension products including Personal
 ```json
 {
   "id": 30001,
-  "href": "/api/v1/factfinds/679/arrangements/pensions/30001",
+  "href": "/api/v2/factfinds/679/arrangements/pensions/30001",
   "factfindRef": {
     "id": 679,
-    "href": "/api/v1/factfinds/679"
+    "href": "/api/v2/factfinds/679"
   },
   "arrangementCategory": "PENSION",
   "pensionType": {
@@ -26686,11 +26545,11 @@ The `PensionArrangement` contract represents pension products including Personal
   "providerName": "Vanguard",
   "providerRef": {
     "id": "provider-456",
-    "href": "/api/v1/providers/provider-456"
+    "href": "/api/v2/providers/provider-456"
   },
   "clientRef": {
     "id": "client-123",
-    "href": "/api/v1/factfinds/679/clients/client-123"
+    "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "policyNumber": "PP-123456789",
   "startDate": "2010-04-06",
@@ -26913,49 +26772,49 @@ The `PensionArrangement` contract represents pension products including Personal
 ### Appendix A: Complete Entity-to-Endpoint Mapping
 
 **Client Onboarding & KYC Context:**
-- CLIENT → `/api/v1/factfinds/{factfindId}/clients`
-- ADDRESS → `/api/v1/factfinds/{factfindId}/clients/{id}/addresses`
-- CONTACT_DETAIL → `/api/v1/factfinds/{factfindId}/clients/{id}/contacts`
-- PROFESSIONAL_CONTACT → `/api/v1/factfinds/{factfindId}/clients/{id}/professional-contacts`
-- CLIENT_RELATIONSHIP → `/api/v1/factfinds/{factfindId}/clients/{id}/relationships`
-- DPA_CONSENT → `/api/v1/factfinds/{factfindId}/clients/{id}/dpa-consent`
-- MARKETING_CONSENT → `/api/v1/factfinds/{factfindId}/clients/{id}/marketing-consent`
-- VULNERABLE_CUSTOMER_FLAG → `/api/v1/factfinds/{factfindId}/clients/{id}/vulnerability`
-- DEPENDANT → `/api/v1/factfinds/{factfindId}/clients/{id}/dependants`
+- CLIENT → `/api/v2/factfinds/{factfindId}/clients`
+- ADDRESS → `/api/v2/factfinds/{factfindId}/clients/{id}/addresses`
+- CONTACT_DETAIL → `/api/v2/factfinds/{factfindId}/clients/{id}/contacts`
+- PROFESSIONAL_CONTACT → `/api/v2/factfinds/{factfindId}/clients/{id}/professional-contacts`
+- CLIENT_RELATIONSHIP → `/api/v2/factfinds/{factfindId}/clients/{id}/relationships`
+- DPA_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/dpa-consent`
+- MARKETING_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/marketing-consent`
+- VULNERABLE_CUSTOMER_FLAG → `/api/v2/factfinds/{factfindId}/clients/{id}/vulnerability`
+- DEPENDANT → `/api/v2/factfinds/{factfindId}/clients/{id}/dependants`
 
 **Circumstances Context:**
-- ADVICE_CASE → `/api/v1/factfinds`
-- EMPLOYMENT → `/api/v1/factfinds/{id}/employment`
-- INCOME → `/api/v1/factfinds/{id}/income`
-- INCOME_CHANGE → `/api/v1/factfinds/{id}/income-changes`
-- EXPENDITURE → `/api/v1/factfinds/{id}/expenditure`
-- EXPENDITURE_CHANGE → `/api/v1/factfinds/{id}/expenditure-changes`
+- ADVICE_CASE → `/api/v2/factfinds`
+- EMPLOYMENT → `/api/v2/factfinds/{id}/employment`
+- INCOME → `/api/v2/factfinds/{id}/income`
+- INCOME_CHANGE → `/api/v2/factfinds/{id}/income-changes`
+- EXPENDITURE → `/api/v2/factfinds/{id}/expenditure`
+- EXPENDITURE_CHANGE → `/api/v2/factfinds/{id}/expenditure-changes`
 
 **Assets & Liabilities Context:**
-- ASSET → `/api/v1/factfinds/{factfindId}/assets`
-- BUSINESS_ASSET → `/api/v1/factfinds/{factfindId}/assets/{id}` (embedded in ASSET)
-- PROPERTY_DETAIL → `/api/v1/factfinds/{factfindId}/assets/{id}` (embedded in ASSET)
-- CREDIT_HISTORY → `/api/v1/factfinds/{factfindId}/clients/{id}/credit-history`
-- VALUATION → `/api/v1/factfinds/{factfindId}/arrangements/{id}/valuations`
+- ASSET → `/api/v2/factfinds/{factfindId}/assets`
+- BUSINESS_ASSET → `/api/v2/factfinds/{factfindId}/assets/{id}` (embedded in ASSET)
+- PROPERTY_DETAIL → `/api/v2/factfinds/{factfindId}/assets/{id}` (embedded in ASSET)
+- CREDIT_HISTORY → `/api/v2/factfinds/{factfindId}/clients/{id}/credit-history`
+- VALUATION → `/api/v2/factfinds/{factfindId}/arrangements/{id}/valuations`
 
 **Arrangements Context:**
-- ARRANGEMENT → `/api/v1/factfinds/{factfindId}/arrangements`
-- CONTRIBUTION → `/api/v1/factfinds/{factfindId}/arrangements/{id}/contributions`
-- WITHDRAWAL → `/api/v1/factfinds/{factfindId}/arrangements/{id}/withdrawals`
-- BENEFICIARY → `/api/v1/factfinds/{factfindId}/arrangements/{id}/beneficiaries`
-- CLIENT_PENSION → `/api/v1/factfinds/{factfindId}/clients/{id}/pension-summary`
+- ARRANGEMENT → `/api/v2/factfinds/{factfindId}/arrangements`
+- CONTRIBUTION → `/api/v2/factfinds/{factfindId}/arrangements/{id}/contributions`
+- WITHDRAWAL → `/api/v2/factfinds/{factfindId}/arrangements/{id}/withdrawals`
+- BENEFICIARY → `/api/v2/factfinds/{factfindId}/arrangements/{id}/beneficiaries`
+- CLIENT_PENSION → `/api/v2/factfinds/{factfindId}/clients/{id}/pension-summary`
 
 **Goals Context:**
-- GOAL → `/api/v1/factfinds/{factfindId}/objectives`
-- OBJECTIVE → `/api/v1/factfinds/{factfindId}/goals/{id}/objectives`
-- NEED → `/api/v1/factfinds/{factfindId}/goals/{id}/needs`
+- GOAL → `/api/v2/factfinds/{factfindId}/objectives`
+- OBJECTIVE → `/api/v2/factfinds/{factfindId}/goals/{id}/objectives`
+- NEED → `/api/v2/factfinds/{factfindId}/goals/{id}/needs`
 
 **Risk Profile Context:**
-- RISK_PROFILE → `/api/v1/factfinds/{factfindId}/risk-profile`
+- RISK_PROFILE → `/api/v2/factfinds/{factfindId}/risk-profile`
 
 **Estate Planning Context:**
-- GIFT → `/api/v1/factfinds/{factfindId}/gifts`
-- GIFT_TRUST → `/api/v1/gift-trusts`
+- GIFT → `/api/v2/factfinds/{factfindId}/gifts`
+- GIFT_TRUST → `/api/v2/gift-trusts`
 
 ### Appendix B: HTTP Status Code Reference
 
@@ -27118,16 +26977,13 @@ The `PensionArrangement` contract represents pension products including Personal
 
 ## Document Metadata
 
-**Document Version:** 2.0
-**Status:** Design Specification v2.0 - Enhanced with Missing Entities
-**Date:** 2026-02-18
+**Status:** Design Specification
+**Date:** 2026-02-19
 **Author:** Principal API Designer
 **Reviewers:** Architecture Team, Product Owners, Compliance Team
-**Next Review:** 2026-03-16
 
-**Change Log:**
-- 2026-02-16: Initial comprehensive API design created (v1.0)
-- Complete coverage of 39 entities from Greenfield ERD
+**Scope:**
+- Complete coverage of 50+ entities
 - 8 bounded contexts with RESTful API specifications
 - Full request/response contracts with validation rules
 - Industry-standard terminology and compliance alignment
@@ -27146,413 +27002,4 @@ The `PensionArrangement` contract represents pension products including Personal
 **END OF SPECIFICATION**
 
 This comprehensive API design provides production-ready specifications for implementing the complete FactFind system. All endpoints follow RESTful principles, industry standards, and regulatory requirements for wealth management platforms.
-
-
----
-
-## Appendix A: Migration Guide - v2.0 to v2.1
-
-### Overview
-
-Version 2.1 introduces **breaking changes** to all API endpoints. The API has been restructured to follow a hierarchical, context-based design with **FactFind as the aggregate root**.
-
-**Impact:** ALL API consumers must update their endpoint URLs.
-
-**Timeline:** Immediate (no backward compatibility maintained - requires major version bump)
-
-### Endpoint Migration Map
-
-#### Client Management APIs
-
-| Old Endpoint (v2.0) | New Endpoint (v2.1) |
-|---------------------|---------------------|
-| `POST /api/v1/factfinds/{factfindId}/clients` | `POST /api/v1/factfinds/{factfindId}/clients` |
-| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}` |
-| `GET /api/v1/factfinds/{factfindId}/clients` | `GET /api/v1/factfinds/{factfindId}/clients` |
-| `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}` | `PATCH /api/v1/factfinds/{factfindId}/clients/{clientId}` |
-| `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}` | `DELETE /api/v1/factfinds/{factfindId}/clients/{clientId}` |
-| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` |
-| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/addresses` |
-| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/contacts` |
-| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/professional-contacts` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/professional-contacts` |
-| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/relationships` |
-| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` |
-| `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | `PUT /api/v1/factfinds/{factfindId}/clients/{clientId}/dpa-consent` |
-| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/marketing-consent` |
-| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/vulnerability` |
-| `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` | `POST /api/v1/factfinds/{factfindId}/clients/{clientId}/dependants` |
-| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/credit-history` |
-| `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/pension-summary` | `GET /api/v1/factfinds/{factfindId}/clients/{clientId}/pension-summary` |
-
-#### Employment APIs
-
-| Old Endpoint (v2.0) | New Endpoint (v2.1) |
-|---------------------|---------------------|
-| `POST /api/v1/employment` | `POST /api/v1/factfinds/{factfindId}/employment` |
-| `GET /api/v1/employment` | `GET /api/v1/factfinds/{factfindId}/employment` |
-| `GET /api/v1/employment/{employmentId}` | `GET /api/v1/factfinds/{factfindId}/employment/{employmentId}` |
-| `PATCH /api/v1/employment/{employmentId}` | `PATCH /api/v1/factfinds/{factfindId}/employment/{employmentId}` |
-| `DELETE /api/v1/employment/{employmentId}` | `DELETE /api/v1/factfinds/{factfindId}/employment/{employmentId}` |
-
-#### Income & Expenditure APIs
-
-| Old Endpoint (v2.0) | New Endpoint (v2.1) |
-|---------------------|---------------------|
-| `POST /api/v1/income` | `POST /api/v1/factfinds/{factfindId}/income` |
-| `GET /api/v1/income` | `GET /api/v1/factfinds/{factfindId}/income` |
-| `GET /api/v1/income/{incomeId}` | `GET /api/v1/factfinds/{factfindId}/income/{incomeId}` |
-| `PATCH /api/v1/income/{incomeId}` | `PATCH /api/v1/factfinds/{factfindId}/income/{incomeId}` |
-| `DELETE /api/v1/income/{incomeId}` | `DELETE /api/v1/factfinds/{factfindId}/income/{incomeId}` |
-| `POST /api/v1/income-changes` | `POST /api/v1/factfinds/{factfindId}/income-changes` |
-| `POST /api/v1/expenditure` | `POST /api/v1/factfinds/{factfindId}/expenditure` |
-| `GET /api/v1/expenditure` | `GET /api/v1/factfinds/{factfindId}/expenditure` |
-| `GET /api/v1/expenditure/{expenditureId}` | `GET /api/v1/factfinds/{factfindId}/expenditure/{expenditureId}` |
-| `PATCH /api/v1/expenditure/{expenditureId}` | `PATCH /api/v1/factfinds/{factfindId}/expenditure/{expenditureId}` |
-| `DELETE /api/v1/expenditure/{expenditureId}` | `DELETE /api/v1/factfinds/{factfindId}/expenditure/{expenditureId}` |
-| `POST /api/v1/expenditure-changes` | `POST /api/v1/factfinds/{factfindId}/expenditure-changes` |
-
-#### Assets & Liabilities APIs
-
-| Old Endpoint (v2.0) | New Endpoint (v2.1) |
-|---------------------|---------------------|
-| `POST /api/v1/factfinds/{factfindId}/assets` | `POST /api/v1/factfinds/{factfindId}/assets` |
-| `GET /api/v1/factfinds/{factfindId}/assets` | `GET /api/v1/factfinds/{factfindId}/assets` |
-| `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
-| `PATCH /api/v1/factfinds/{factfindId}/assets/{assetId}` | `PATCH /api/v1/factfinds/{factfindId}/assets/{assetId}` |
-| `DELETE /api/v1/factfinds/{factfindId}/assets/{assetId}` | `DELETE /api/v1/factfinds/{factfindId}/assets/{assetId}` |
-| `POST /api/v1/properties` | `POST /api/v1/factfinds/{factfindId}/assets` (type=property) |
-| `GET /api/v1/properties/{propertyId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
-| `POST /api/v1/equities` | `POST /api/v1/factfinds/{factfindId}/assets` (type=equity) |
-| `GET /api/v1/equities/{equityId}` | `GET /api/v1/factfinds/{factfindId}/assets/{assetId}` |
-
-#### Arrangements APIs
-
-| Old Endpoint (v2.0) | New Endpoint (v2.1) |
-|---------------------|---------------------|
-| `POST /api/v1/factfinds/{factfindId}/arrangements` | `POST /api/v1/factfinds/{factfindId}/arrangements` |
-| `GET /api/v1/factfinds/{factfindId}/arrangements` | `GET /api/v1/factfinds/{factfindId}/arrangements` |
-| `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
-| `PATCH /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | `PATCH /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
-| `DELETE /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` | `DELETE /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}` |
-| `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` |
-| `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | `GET /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` |
-| `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` |
-| `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` |
-| `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | `POST /api/v1/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` |
-
-**Type-Specific Arrangement Endpoints (NEW in v2.1):**
-
-| Type | Endpoint |
-|------|----------|
-| Investments | `GET /api/v1/factfinds/{factfindId}/arrangements/investments` |
-| Pensions | `GET /api/v1/factfinds/{factfindId}/arrangements/pensions` |
-| Mortgages | `GET /api/v1/factfinds/{factfindId}/arrangements/mortgages` |
-| Protection | `GET /api/v1/factfinds/{factfindId}/arrangements/protection` |
-
-#### Goals & Objectives APIs
-
-| Old Endpoint (v2.0) | New Endpoint (v2.1) |
-|---------------------|---------------------|
-| `POST /api/v1/factfinds/{factfindId}/goals` | `POST /api/v1/factfinds/{factfindId}/objectives` |
-| `GET /api/v1/factfinds/{factfindId}/goals` | `GET /api/v1/factfinds/{factfindId}/objectives` |
-| `GET /api/v1/factfinds/{factfindId}/goals/{goalId}` | `GET /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
-| `PATCH /api/v1/factfinds/{factfindId}/goals/{goalId}` | `PATCH /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
-| `DELETE /api/v1/factfinds/{factfindId}/goals/{goalId}` | `DELETE /api/v1/factfinds/{factfindId}/objectives/{objectiveId}` |
-| `POST /api/v1/factfinds/{factfindId}/objectives` | `POST /api/v1/factfinds/{factfindId}/objectives` |
-| `POST /api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` | `POST /api/v1/factfinds/{factfindId}/objectives/{objectiveId}/needs` |
-
-#### Risk Profile APIs
-
-| Old Endpoint (v2.0) | New Endpoint (v2.1) |
-|---------------------|---------------------|
-| `GET /api/v1/risk-profiles` | `GET /api/v1/factfinds/{factfindId}/risk-profile` |
-| `POST /api/v1/risk-profiles` | `POST /api/v1/factfinds/{factfindId}/risk-profile` |
-| `GET /api/v1/risk-profiles/{riskProfileId}` | `GET /api/v1/factfinds/{factfindId}/risk-profile` |
-| `PATCH /api/v1/risk-profiles/{riskProfileId}` | `PATCH /api/v1/factfinds/{factfindId}/risk-profile` |
-
-**Note:** Risk profile is now a singleton within each fact-find (one risk profile per fact-find).
-
-#### Estate Planning APIs
-
-| Old Endpoint (v2.0) | New Endpoint (v2.1) |
-|---------------------|---------------------|
-| `POST /api/v1/factfinds/{factfindId}/gifts` | `POST /api/v1/factfinds/{factfindId}/gifts` |
-| `GET /api/v1/factfinds/{factfindId}/gifts` | `GET /api/v1/factfinds/{factfindId}/gifts` |
-| `GET /api/v1/factfinds/{factfindId}/gifts/{giftId}` | `GET /api/v1/factfinds/{factfindId}/gifts/{giftId}` |
-| `POST /api/v1/factfinds/{factfindId}/trusts` | `POST /api/v1/factfinds/{factfindId}/trusts` |
-| `GET /api/v1/factfinds/{factfindId}/trusts` | `GET /api/v1/factfinds/{factfindId}/trusts` |
-| `GET /api/v1/factfinds/{factfindId}/trusts/{trustId}` | `GET /api/v1/factfinds/{factfindId}/trusts/{trustId}` |
-
-### Migration Steps
-
-#### 1. Identify FactFind Context
-
-Before migrating, you need to determine the `factfindId` for each operation:
-
-**Option A: From UI Context**
-```javascript
-// In a typical SPA, the factfindId is in the URL
-const factfindId = window.location.pathname.split('/')[2]; // /factfinds/12345/...
-```
-
-**Option B: From Client/User Context**
-```javascript
-// Get active fact-find for current user
-const response = await fetch('/api/v1/factfinds?status=active&limit=1');
-const factfind = await response.json();
-const factfindId = factfind.data[0].factfindId;
-```
-
-**Option C: Create New FactFind First**
-```javascript
-// Create a new fact-find if none exists
-const response = await fetch('/api/v1/factfinds', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    title: 'New Fact-Find',
-    clientType: 'INDIVIDUAL'
-  })
-});
-const factfind = await response.json();
-const factfindId = factfind.factfindId;
-```
-
-#### 2. Update Base URLs
-
-**Before (v2.0):**
-```javascript
-const BASE_URL = '/api/v1';
-const clientsUrl = `${BASE_URL}/clients`;
-```
-
-**After (v2.1):**
-```javascript
-const BASE_URL = '/api/v1';
-const factfindId = getCurrentFactfindId(); // Your implementation
-const clientsUrl = `${BASE_URL}/factfinds/${factfindId}/clients`;
-```
-
-#### 3. Update API Client
-
-**Before (v2.0):**
-```javascript
-class ClientAPI {
-  async getClient(clientId) {
-    return fetch(`/api/v1/clients/${clientId}`);
-  }
-
-  async createAddress(clientId, address) {
-    return fetch(`/api/v1/clients/${clientId}/addresses`, {
-      method: 'POST',
-      body: JSON.stringify(address)
-    });
-  }
-}
-```
-
-**After (v2.1):**
-```javascript
-class ClientAPI {
-  constructor(factfindId) {
-    this.factfindId = factfindId;
-  }
-
-  async getClient(clientId) {
-    return fetch(`/api/v1/factfinds/${this.factfindId}/clients/${clientId}`);
-  }
-
-  async createAddress(clientId, address) {
-    return fetch(`/api/v1/factfinds/${this.factfindId}/clients/${clientId}/addresses`, {
-      method: 'POST',
-      body: JSON.stringify(address)
-    });
-  }
-}
-
-// Usage
-const factfindId = getCurrentFactfindId();
-const api = new ClientAPI(factfindId);
-```
-
-#### 4. Update HATEOAS Link Following
-
-**Before (v2.0):**
-```javascript
-// Old HATEOAS links
-{
-  "_links": {
-    "self": { "href": "/api/v1/factfinds/{factfindId}/clients/12345" },
-    "addresses": { "href": "/api/v1/factfinds/{factfindId}/clients/12345/addresses" }
-  }
-}
-```
-
-**After (v2.1):**
-```javascript
-// New HATEOAS links (factfindId embedded)
-{
-  "_links": {
-    "self": { "href": "/api/v1/factfinds/999/clients/12345" },
-    "addresses": { "href": "/api/v1/factfinds/999/clients/12345/addresses" }
-  }
-}
-```
-
-**Migration Strategy:**
-- If your code follows HATEOAS links (recommended), minimal changes needed
-- Links are now absolute and include factfindId
-- Continue using `_links.self.href` for navigation
-
-#### 5. Update Query Parameters
-
-Query parameters remain the same, but base URLs change:
-
-**Before (v2.0):**
-```
-GET /api/v1/factfinds/{factfindId}/clients?page=1&limit=20&sort=lastName
-```
-
-**After (v2.1):**
-```
-GET /api/v1/factfinds/{factfindId}/clients?page=1&limit=20&sort=lastName
-```
-
-#### 6. Update Response Handling
-
-Response structure remains the same - only URLs change:
-
-**Before (v2.0):**
-```javascript
-const response = await fetch('/api/v1/factfinds/{factfindId}/clients/12345');
-const client = await response.json();
-console.log(client.clientId); // Still works
-```
-
-**After (v2.1):**
-```javascript
-const response = await fetch(`/api/v1/factfinds/${factfindId}/clients/12345`);
-const client = await response.json();
-console.log(client.clientId); // Same response structure
-```
-
-### Breaking Changes Summary
-
-| Category | Change | Impact |
-|----------|--------|--------|
-| **URLs** | All endpoints now require `factfindId` in path | HIGH - All API calls affected |
-| **Response Structure** | HATEOAS `_links` now include `factfindId` | LOW - Follow links as before |
-| **Request Bodies** | No changes | NONE |
-| **Query Parameters** | No changes | NONE |
-| **HTTP Methods** | No changes | NONE |
-| **Status Codes** | No changes | NONE |
-| **Headers** | No changes | NONE |
-
-### Non-Breaking Changes
-
-The following remain unchanged:
-
-1. **Request/Response payloads** - Same JSON structure
-2. **Authentication** - Same OAuth 2.0 flow
-3. **Error format** - Same RFC 7807 format
-4. **Pagination** - Same cursor-based pagination
-5. **Filtering** - Same query syntax
-6. **Field selection** - Same `fields` parameter
-7. **Resource expansion** - Same `expand` parameter
-8. **Optimistic concurrency** - Same `If-Match` / `ETag` headers
-
-### Reference Data (No Changes)
-
-Reference data APIs are **NOT affected** by this migration:
-
-```
-GET /api/v1/reference/income-types        ✓ No change
-GET /api/v1/reference/providers           ✓ No change
-GET /api/v1/reference/risk-templates      ✓ No change
-```
-
-These remain global and are not scoped to a fact-find.
-
-### Testing Your Migration
-
-#### 1. Unit Tests
-
-Update base URLs in your API mocks:
-
-```javascript
-// Before
-const mockClientUrl = '/api/v1/factfinds/{factfindId}/clients/12345';
-
-// After
-const mockFactfindId = '999';
-const mockClientUrl = `/api/v1/factfinds/${mockFactfindId}/clients/12345`;
-```
-
-#### 2. Integration Tests
-
-Update test fixtures:
-
-```javascript
-// Before
-describe('Client API', () => {
-  it('should fetch client', async () => {
-    const response = await fetch('/api/v1/factfinds/{factfindId}/clients/12345');
-    expect(response.status).toBe(200);
-  });
-});
-
-// After
-describe('Client API', () => {
-  const factfindId = 'test-factfind-123';
-
-  it('should fetch client', async () => {
-    const response = await fetch(`/api/v1/factfinds/${factfindId}/clients/12345`);
-    expect(response.status).toBe(200);
-  });
-});
-```
-
-#### 3. End-to-End Tests
-
-Update page objects:
-
-```javascript
-// Before
-class ClientPage {
-  async getClient(clientId) {
-    return this.page.goto(`/api/v1/clients/${clientId}`);
-  }
-}
-
-// After
-class ClientPage {
-  constructor(page, factfindId) {
-    this.page = page;
-    this.factfindId = factfindId;
-  }
-
-  async getClient(clientId) {
-    return this.page.goto(`/api/v1/factfinds/${this.factfindId}/clients/${clientId}`);
-  }
-}
-```
-
-### Rollback Strategy
-
-If you need to rollback to v2.0:
-
-1. **Version pinning**: Use `Accept: application/vnd.factfind.v2+json` header
-2. **Feature flag**: Enable v2.0 endpoints via feature flag
-3. **Dual writes**: Temporarily support both v2.0 and v2.1 endpoints
-
-**Note:** Rollback should be temporary. Plan to fully migrate to v2.1 as v2.0 will be deprecated.
-
-### Support & Questions
-
-- **Documentation**: See Section 1.5 for architectural details
-- **Examples**: All sections include updated examples
-- **Issues**: Report migration issues to API support team
-- **Timeline**: All API consumers must migrate within 90 days
-
----
 
