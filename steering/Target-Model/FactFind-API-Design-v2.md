@@ -131,103 +131,109 @@ The FactFind API provides comprehensive digital capabilities for:
      - [6.4.3 List Affordability Calculations](#643-list-affordability-calculations)
      - [6.4.4 Update Affordability Calculation](#644-update-affordability-calculation)
      - [6.4.5 Delete Affordability Calculation](#645-delete-affordability-calculation)
-   - [6.5 Credit History](#65-credit-history)     - [6.5.1 Operations Summary](#651-operations-summary)
-     - [6.5.2 List Credit History](#652-list-credit-history)
-     - [6.5.3 Create Credit History Record](#653-create-credit-history-record)
-     - [6.5.4 Update Credit History Record](#654-update-credit-history-record)
-     - [6.5.5 Delete Credit History Record](#655-delete-credit-history-record)
 7. [Employment API (Part of Circumstances Context)](#7-employment-api-part-of-circumstances-context)
    - [7.1 Overview](#71-overview)
    - [7.2 Operations Summary](#72-operations-summary)
    - [7.3 Key Endpoints](#73-key-endpoints)
-8. [Goals & Objectives API (Goals Context)](#8-goals--objectives-api-goals-context)
+8. [Credit History API](#8-credit-history-api)
    - [8.1 Overview](#81-overview)
    - [8.2 Operations Summary](#82-operations-summary)
    - [8.3 Key Endpoints](#83-key-endpoints)
-9. [Assets & Liabilities API](#9-assets--liabilities-api)
+     - [8.3.1 Get Credit History](#831-get-credit-history)
+     - [8.3.2 Create Credit History Record](#832-create-credit-history-record)
+     - [8.3.3 Update Credit History Record](#833-update-credit-history-record)
+     - [8.3.4 Add Adverse Credit Event](#834-add-adverse-credit-event)
+   - [8.4 Field Definitions](#84-field-definitions)
+   - [8.5 Validation Rules](#85-validation-rules)
+   - [8.6 Business Rules](#86-business-rules)
+9. [Goals & Objectives API (Goals Context)](#9-goals--objectives-api-goals-context)
    - [9.1 Overview](#91-overview)
    - [9.2 Operations Summary](#92-operations-summary)
    - [9.3 Key Endpoints](#93-key-endpoints)
-10. [Arrangements API (Type-Based Routing)](#10-arrangements-api-type-based-routing)    - [10.1 Overview](#101-overview)
-    - [10.2 Arrangement Types and Routing](#102-arrangement-types-and-routing)
-    - [10.3 Investment Arrangements](#103-investment-arrangements)
-      - [10.3.1 GIA (General Investment Account)](#1031-gia-general-investment-account)
-      - [10.3.2 ISA (Individual Savings Account)](#1032-isa-individual-savings-account)
-      - [10.3.3 Investment Bonds](#1033-investment-bonds)
-      - [10.3.4 Investment Trusts](#1034-investment-trusts)
-      - [10.3.5 Platform Accounts](#1035-platform-accounts)
-      - [10.3.6 Offshore Bonds](#1036-offshore-bonds)
-      - [10.3.7 Cash Accounts](#1037-cash-accounts)
-    - [10.4 Pension Arrangements](#104-pension-arrangements)
-      - [10.4.1 Personal Pension](#1041-personal-pension)
-      - [10.4.2 State Pension](#1042-state-pension)
-      - [10.4.3 Workplace Pension](#1043-workplace-pension)
-      - [10.4.4 SIPP (Self-Invested Personal Pension)](#1044-sipp-self-invested-personal-pension)
-      - [10.4.5 Final Salary (Defined Benefit)](#1045-final-salary-defined-benefit)
-      - [10.4.6 Pension Drawdown](#1046-pension-drawdown)
-      - [10.4.7 Annuity](#1047-annuity)
-      - [10.4.8 Money Purchase](#1048-money-purchase)
-    - [10.5 Mortgage Arrangements](#105-mortgage-arrangements)
-    - [10.6 Protection Arrangements](#106-protection-arrangements)
-      - [10.6.1 Personal Protection (Life, CI, IP)](#1061-personal-protection-life-ci-ip)
-      - [10.6.2 General Insurance](#1062-general-insurance)
-    - [10.7 Arrangement Sub-Resources](#107-arrangement-sub-resources)
-      - [10.7.1 Contributions](#1071-contributions)
-      - [10.7.2 Withdrawals](#1072-withdrawals)
-      - [10.7.3 Beneficiaries](#1073-beneficiaries)
-      - [10.7.4 Valuations](#1074-valuations)
-11. [Risk Profile API](#11-risk-profile-api)
-    - [11.1 Overview](#111-overview)
-    - [11.2 Operations Summary](#112-operations-summary)
-    - [11.3 Key Endpoints](#113-key-endpoints)
-    - [11.4 ATR Templates Reference Data](#114-atr-templates-reference-data)    - [11.5 Risk Assessment History API](#115-risk-assessment-history-api)    - [11.6 Integration with FactFind Workflow](#116-integration-with-factfind-workflow)
-12. [Reference Data API](#12-reference-data-api)
+10. [Assets & Liabilities API](#10-assets--liabilities-api)
+   - [10.1 Overview](#101-overview)
+   - [10.2 Operations Summary](#102-operations-summary)
+   - [10.3 Key Endpoints](#103-key-endpoints)
+11. [Arrangements API (Type-Based Routing)](#11-arrangements-api-type-based-routing)    - [11.1 Overview](#111-overview)
+    - [11.2 Arrangement Types and Routing](#112-arrangement-types-and-routing)
+    - [11.3 Investment Arrangements](#113-investment-arrangements)
+      - [11.3.1 GIA (General Investment Account)](#1131-gia-general-investment-account)
+      - [11.3.2 ISA (Individual Savings Account)](#1132-isa-individual-savings-account)
+      - [11.3.3 Investment Bonds](#1133-investment-bonds)
+      - [11.3.4 Investment Trusts](#1134-investment-trusts)
+      - [11.3.5 Platform Accounts](#1135-platform-accounts)
+      - [11.3.6 Offshore Bonds](#1136-offshore-bonds)
+      - [11.3.7 Cash Accounts](#1137-cash-accounts)
+    - [11.4 Pension Arrangements](#114-pension-arrangements)
+      - [11.4.1 Personal Pension](#1141-personal-pension)
+      - [11.4.2 State Pension](#1142-state-pension)
+      - [11.4.3 Workplace Pension](#1143-workplace-pension)
+      - [11.4.4 SIPP (Self-Invested Personal Pension)](#1144-sipp-self-invested-personal-pension)
+      - [11.4.5 Final Salary (Defined Benefit)](#1145-final-salary-defined-benefit)
+      - [11.4.6 Pension Drawdown](#1146-pension-drawdown)
+      - [11.4.7 Annuity](#1147-annuity)
+      - [11.4.8 Money Purchase](#1148-money-purchase)
+    - [11.5 Mortgage Arrangements](#115-mortgage-arrangements)
+    - [11.6 Protection Arrangements](#116-protection-arrangements)
+      - [11.6.1 Personal Protection (Life, CI, IP)](#1161-personal-protection-life-ci-ip)
+      - [11.6.2 General Insurance](#1162-general-insurance)
+    - [11.7 Arrangement Sub-Resources](#117-arrangement-sub-resources)
+      - [11.7.1 Contributions](#1171-contributions)
+      - [11.7.2 Withdrawals](#1172-withdrawals)
+      - [11.7.3 Beneficiaries](#1173-beneficiaries)
+      - [11.7.4 Valuations](#1174-valuations)
+12. [Risk Profile API](#12-risk-profile-api)
+    - [12.1 Overview](#121-overview)
+    - [12.2 Operations Summary](#122-operations-summary)
+    - [12.3 Key Endpoints](#123-key-endpoints)
+    - [12.4 ATR Templates Reference Data](#124-atr-templates-reference-data)    - [12.5 Risk Assessment History API](#125-risk-assessment-history-api)    - [12.6 Integration with FactFind Workflow](#126-integration-with-factfind-workflow)
+13. [Reference Data API](#13-reference-data-api)
     - Reference data APIs remain unchanged (not scoped to factfinds)
-13. [Entity Contracts](#13-entity-contracts)
-    - [13.1 Client Contract](#131-client-contract)
-    - [13.2 FactFind Contract](#132-factfind-contract)
-    - [13.3 Address Contract](#133-address-contract)
-    - [13.4 Income Contract](#134-income-contract)
-    - [13.5 Arrangement Contract](#135-arrangement-contract)
-    - [13.6 Goal Contract](#136-goal-contract)
-    - [13.7 RiskProfile Contract](#137-riskprofile-contract)
-    - [13.8 Investment Contract](#138-investment-contract)
-    - [13.9 Property Contract](#139-property-contract)
-    - [13.10 Equity Contract](#1310-equity-contract)
-    - [13.11 IdentityVerification Contract](#1311-identityverification-contract)
-    - [13.12 Consent Contract](#1312-consent-contract)
-    - [13.13 Collection Response Wrapper](#1313-collection-response-wrapper)
-    - [13.14 Contract Extension for Other Entities](#1314-contract-extension-for-other-entities)
-    - [13.15 Standard Value Types](#1315-standard-value-types)
-    - [13.16 Standard Reference Types](#1316-standard-reference-types)
-    - [13.17 Asset Contract](#1317-asset-contract)
-    - [13.18 Liability Contract](#1318-liability-contract)
-    - [13.19 Employment Contract](#1319-employment-contract)
-    - [13.20 Budget Contract](#1320-budget-contract)
-    - [13.21 Expenditure Contract](#1321-expenditure-contract)
-    - [13.22 Expense Contract](#1322-expense-contract)
-    - [13.23 Credit History Contract](#1323-credit-history-contract)
-    - [13.24 Property Detail Contract](#1324-property-detail-contract)
-    - [13.25 Business Asset Contract](#1325-business-asset-contract)
-    - [13.26 Notes Contract](#1326-notes-contract)
-    - [13.27 Dependant Contract](#1327-dependant-contract)
-    - [13.28 Income Changes Contract](#1328-income-changes-contract)
-    - [13.29 Expenditure Changes Contract](#1329-expenditure-changes-contract)
-    - [13.30 Affordability Assessment Contract](#1330-affordability-assessment-contract)
-    - [13.31 Contact Contract](#1331-contact-contract)
-    - [13.32 Attitude to Risk (ATR) Contract](#1332-attitude-to-risk-atr-contract)
-    - [13.33 Professional Contact Contract](#1333-professional-contact-contract)
-    - [13.34 Vulnerability Contract](#1334-vulnerability-contract)
-    - [13.35 Marketing Preferences Contract](#1335-marketing-preferences-contract)
-    - [13.36 Estate Planning - Will Contract](#1336-estate-planning---will-contract)
-    - [13.37 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1337-estate-planning---lasting-power-of-attorney-lpa-contract)
-    - [13.38 Estate Planning - Gift Contract](#1338-estate-planning---gift-contract)
-    - [13.39 Estate Planning - Trust Contract](#1339-estate-planning---trust-contract)
-    - [13.40 Identity Verification & Data Protection Consent Contract](#1340-identity-verification--data-protection-consent-contract)
-    - [13.41 Arrangement - Mortgage Contract](#1341-arrangement---mortgage-contract)
-    - [13.42 Arrangement - Investment Contract (General Investment Account)](#1342-arrangement---investment-contract-general-investment-account)
-    - [13.43 Arrangement - Protection Contract (Life Assurance)](#1343-arrangement---protection-contract-life-assurance)
-    - [13.44 Arrangement - Pension Contract (Personal Pension)](#1344-arrangement---pension-contract-personal-pension)
+14. [Entity Contracts](#14-entity-contracts)
+    - [14.1 Client Contract](#141-client-contract)
+    - [14.2 FactFind Contract](#142-factfind-contract)
+    - [14.3 Address Contract](#143-address-contract)
+    - [14.4 Income Contract](#144-income-contract)
+    - [14.5 Arrangement Contract](#145-arrangement-contract)
+    - [14.6 Goal Contract](#146-goal-contract)
+    - [14.7 RiskProfile Contract](#147-riskprofile-contract)
+    - [14.8 Investment Contract](#148-investment-contract)
+    - [14.9 Property Contract](#149-property-contract)
+    - [14.10 Equity Contract](#1410-equity-contract)
+    - [14.11 IdentityVerification Contract](#1411-identityverification-contract)
+    - [14.12 Consent Contract](#1412-consent-contract)
+    - [14.13 Collection Response Wrapper](#1413-collection-response-wrapper)
+    - [14.14 Contract Extension for Other Entities](#1414-contract-extension-for-other-entities)
+    - [14.15 Standard Value Types](#1415-standard-value-types)
+    - [14.16 Standard Reference Types](#1416-standard-reference-types)
+    - [14.17 Asset Contract](#1417-asset-contract)
+    - [14.18 Liability Contract](#1418-liability-contract)
+    - [14.19 Employment Contract](#1419-employment-contract)
+    - [14.20 Budget Contract](#1420-budget-contract)
+    - [14.21 Expenditure Contract](#1421-expenditure-contract)
+    - [14.22 Expense Contract](#1422-expense-contract)
+    - [14.23 Credit History Contract](#1423-credit-history-contract)
+    - [14.24 Property Detail Contract](#1424-property-detail-contract)
+    - [14.25 Business Asset Contract](#1425-business-asset-contract)
+    - [14.26 Notes Contract](#1426-notes-contract)
+    - [14.27 Dependant Contract](#1427-dependant-contract)
+    - [14.28 Income Changes Contract](#1428-income-changes-contract)
+    - [14.29 Expenditure Changes Contract](#1429-expenditure-changes-contract)
+    - [14.30 Affordability Assessment Contract](#1430-affordability-assessment-contract)
+    - [14.31 Contact Contract](#1431-contact-contract)
+    - [14.32 Attitude to Risk (ATR) Contract](#1432-attitude-to-risk-atr-contract)
+    - [14.33 Professional Contact Contract](#1433-professional-contact-contract)
+    - [14.34 Vulnerability Contract](#1434-vulnerability-contract)
+    - [14.35 Marketing Preferences Contract](#1435-marketing-preferences-contract)
+    - [14.36 Estate Planning - Will Contract](#1436-estate-planning---will-contract)
+    - [14.37 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1437-estate-planning---lasting-power-of-attorney-lpa-contract)
+    - [14.38 Estate Planning - Gift Contract](#1438-estate-planning---gift-contract)
+    - [14.39 Estate Planning - Trust Contract](#1439-estate-planning---trust-contract)
+    - [14.40 Identity Verification & Data Protection Consent Contract](#1440-identity-verification--data-protection-consent-contract)
+    - [14.41 Arrangement - Mortgage Contract](#1441-arrangement---mortgage-contract)
+    - [14.42 Arrangement - Investment Contract (General Investment Account)](#1442-arrangement---investment-contract-general-investment-account)
+    - [14.43 Arrangement - Protection Contract (Life Assurance)](#1443-arrangement---protection-contract-life-assurance)
+    - [14.44 Arrangement - Pension Contract (Personal Pension)](#1444-arrangement---pension-contract-personal-pension)
 
 ---
 
@@ -6835,432 +6841,6 @@ shortfall = requiredAmount - committedAmount
    - Create sustainable budget
 ```
 
-### 6.5 Credit History
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
-
-**Purpose:** Track and manage client credit history including adverse credit events, missed payments, defaults, IVAs, bankruptcies, and repossessions to support mortgage applications, creditworthiness assessments, and financial planning.
-
-**Scope:**
-- Credit refusal tracking
-- Adverse credit events (defaults, CCJs, IVAs, bankruptcies)
-- Missed payment history
-- Payment arrears tracking
-- Debt outstanding status
-- Repossession history
-- Lender relationships
-- Liability linkage
-
-**Key Features:**
-- **Adverse Credit Flags** - Track refused credit and adverse events
-- **Event Dating** - Register, satisfy, discharge, and repossession dates
-- **Amount Tracking** - Original and outstanding debt amounts
-- **Payment History** - Missed and consecutive missed payments
-- **Arrears Management** - Track arrears and clearance status
-- **IVA Tracking** - Current IVA status and years maintained
-- **Liability Linking** - Connect credit history to specific liabilities
-- **Multiple Owners** - Support joint credit accounts
-
-**Aggregate Root:** Client (credit history nested under client)
-
-**Regulatory Compliance:**
-- MCOB (Mortgage Conduct of Business) - Credit history disclosure for mortgages
-- FCA Handbook - Understanding client creditworthiness
-- Consumer Credit Act - Credit history accuracy requirements
-- Data Protection Act 2018 - Sensitive credit data handling
-- GDPR - Right to rectification of credit data
-
-#### 6.5.1 Operations Summary
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history` | List all credit history records | `credit:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history` | Add credit history record | `credit:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Get specific record | `credit:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Update credit record | `credit:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}` | Delete credit record | `credit:write` |
-
-**Total Endpoints:** 5
-
-#### 6.5.2 List Credit History
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
-
-**Description:** Retrieve all credit history records for a client.
-
-**Query Parameters:**
-- `hasAdverseCredit` - Filter by adverse credit flag (true/false)
-- `type` - Filter by event type (Default, CCJ, IVA, Bankruptcy, Repossession)
-- `isDebtOutstanding` - Filter by outstanding debt status
-- `sort` - Sort by dateRegisteredOn, updatedAt (default: dateRegisteredOn desc)
-
-**Response:**
-
-```json
-{
-  "clientRef": {
-    "id": "client-456",
-    "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-423/clients/client-456"
-  },
-  "creditHistory": [
-    {
-      "id": "ch-789",
-      "href": "/api/v2/factfinds/ff-423/clients/client-456/credit-history/ch-789",
-      "owners": [
-        {
-          "id": "client-456",
-          "href": "/api/v2/factfinds/ff-423/clients/client-456",
-          "name": "John Smith",
-          "ownershipType": "Primary"
-        }
-      ],
-      "hasBeenRefusedCredit": false,
-      "hasAdverseCredit": true,
-      "type": "Default",
-      "dateRegisteredOn": "2020-06-15",
-      "dateSatisfiedOrClearedOn": "2023-12-20",
-      "amountRegistered": {
-        "amount": 5000.00,
-        "currency": "GBP"
-      },
-      "amountOutstanding": {
-        "amount": 0.00,
-        "currency": "GBP"
-      },
-      "isDebtOutstanding": false,
-      "lender": "High Street Bank",
-      "liability": {
-        "id": "liab-1001",
-        "href": "/api/v2/factfinds/ff-423/liabilities/liab-1001",
-        "description": "Credit Card Debt"
-      }
-    }
-  ],
-  "summary": {
-    "totalRecords": 1,
-    "hasRefusedCredit": false,
-    "hasAdverseCredit": true,
-    "adverseEventCount": 1,
-    "totalDebtOutstanding": {
-      "amount": 0.00,
-      "currency": "GBP"
-    }
-  },
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/ff-423/clients/client-456/credit-history"
-    },
-    "client": {
-      "href": "/api/v2/factfinds/ff-423/clients/client-456"
-    }
-  }
-}
-```
-
-#### 6.5.3 Create Credit History Record
-
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
-
-**Description:** Add a new credit history event for the client.
-
-**Request Body:**
-
-```json
-{
-  "owners": [
-    {
-      "id": "client-456",
-      "ownershipType": "Primary"
-    }
-  ],
-  "hasBeenRefusedCredit": false,
-  "refusedCreditDetails": null,
-  "hasAdverseCredit": true,
-  "type": "Default",
-  "dateRegisteredOn": "2020-06-15",
-  "dateSatisfiedOrClearedOn": "2023-12-20",
-  "dateReposessedOn": null,
-  "dateDischargedOn": null,
-  "amountRegistered": {
-    "amount": 5000.00,
-    "currency": "GBP"
-  },
-  "amountOutstanding": {
-    "amount": 3500.00,
-    "currency": "GBP"
-  },
-  "isDebtOutstanding": true,
-  "numberOfPaymentsMissed": 2,
-  "consecutivePaymentsMissed": 2,
-  "numberOfPaymentsInArrears": 1,
-  "isArrearsClearedUponCompletion": true,
-  "isIvaCurrent": false,
-  "yearsMaintained": 5,
-  "lender": "High Street Bank",
-  "liability": {
-    "id": "liab-1001"
-  }
-}
-```
-
-**Response:**
-
-```json
-{
-  "id": "ch-789",
-  "href": "/api/v2/factfinds/ff-423/clients/client-456/credit-history/ch-789",
-  "owners": [
-    {
-      "id": "client-456",
-      "href": "/api/v2/factfinds/ff-423/clients/client-456",
-      "name": "John Smith",
-      "ownershipType": "Primary"
-    }
-  ],
-  "hasBeenRefusedCredit": false,
-  "refusedCreditDetails": null,
-  "hasAdverseCredit": true,
-  "type": "Default",
-  "dateRegisteredOn": "2020-06-15",
-  "dateSatisfiedOrClearedOn": "2023-12-20",
-  "dateReposessedOn": null,
-  "dateDischargedOn": null,
-  "amountRegistered": {
-    "amount": 5000.00,
-    "currency": "GBP"
-  },
-  "amountOutstanding": {
-    "amount": 3500.00,
-    "currency": "GBP"
-  },
-  "isDebtOutstanding": true,
-  "numberOfPaymentsMissed": 2,
-  "consecutivePaymentsMissed": 2,
-  "numberOfPaymentsInArrears": 1,
-  "isArrearsClearedUponCompletion": true,
-  "isIvaCurrent": false,
-  "yearsMaintained": 5,
-  "lender": "High Street Bank",
-  "liability": {
-    "id": "liab-1001",
-    "href": "/api/v2/factfinds/ff-423/liabilities/liab-1001",
-    "description": "Credit Card Debt"
-  },
-  "concurrencyId": 1,
-  "createdAt": "2026-02-18T15:30:00Z",
-  "updatedAt": "2026-02-18T15:30:00Z",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/ff-423/clients/client-456/credit-history/ch-789"
-    },
-    "client": {
-      "href": "/api/v2/factfinds/ff-423/clients/client-456"
-    },
-    "liability": {
-      "href": "/api/v2/factfinds/ff-423/liabilities/liab-1001"
-    }
-  }
-}
-```
-
-**Validation Rules:**
-- `owners` - At least one owner required
-- `type` - Required if hasAdverseCredit = true
-- `dateRegisteredOn` - Required if hasAdverseCredit = true
-- `amountRegistered` - Required for defaults, CCJs
-- `amountOutstanding` - Must be <= amountRegistered
-- `yearsMaintained` - Required if isIvaCurrent = true
-- All dates cannot be in future
-
-**Business Rules:**
-- Adverse credit flag automatically set if type is specified
-- Satisfied date must be after registered date
-- Discharged date must be after registered date
-- Credit history affects mortgage affordability assessments
-- IVA affects creditworthiness for 6 years
-- Defaults remain on file for 6 years from registration date
-
-#### 6.5.4 Update Credit History Record
-
-**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}`
-
-**Description:** Update an existing credit history record, typically to mark as satisfied/cleared or update outstanding amount.
-
-**Request Body:**
-
-```json
-{
-  "dateSatisfiedOrClearedOn": "2024-01-15",
-  "amountOutstanding": {
-    "amount": 0.00,
-    "currency": "GBP"
-  },
-  "isDebtOutstanding": false,
-  "concurrencyId": 12
-}
-```
-
-**Response:** 200 OK with updated credit history entity.
-
-**Common Updates:**
-- Mark default as satisfied
-- Update outstanding debt amount
-- Clear arrears status
-- Complete IVA
-- Discharge bankruptcy
-
-#### 6.5.5 Delete Credit History Record
-
-**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{historyId}`
-
-**Description:** Delete a credit history record (soft delete for audit).
-
-**Response:** 204 No Content
-
-**Business Rules:**
-- Soft delete (retained for compliance)
-- Cannot delete if referenced in active mortgage application
-- Deletion logged for audit trail
-
----
-
-**Credit History Types (Enum):**
-
-| Code | Display | Description | Typical Duration on File |
-|------|---------|-------------|-------------------------|
-| DEFAULT | Default | Payment default registered | 6 years from registration |
-| CCJ | County Court Judgment | Court judgment for unpaid debt | 6 years from judgment |
-| IVA | Individual Voluntary Arrangement | Formal agreement with creditors | 6 years from start |
-| BANKRUPTCY | Bankruptcy | Declared bankrupt | 6 years from discharge |
-| REPOSSESSION | Repossession | Property repossessed | 6 years from repossession |
-| MISSED_PAYMENT | Missed Payment | Late or missed payment | 6 years from missed payment |
-| DEBT_RELIEF_ORDER | Debt Relief Order | DRO for debts under £30k | 6 years from DRO |
-
----
-
-**Ownership Types (Enum):**
-
-| Code | Display | Description |
-|------|---------|-------------|
-| PRIMARY | Primary | Primary account holder |
-| JOINT | Joint | Joint account holder (equal responsibility) |
-| GUARANTOR | Guarantor | Guarantor for account |
-| LINKED | Linked | Financial association (e.g., spouse) |
-
----
-
-**Use Cases:**
-
-### Use Case 1: Record Satisfied Default for Mortgage Application
-
-**Scenario:** Client had credit card default, now satisfied, applying for mortgage
-
-**API Flow:**
-```
-POST /clients/client-456/credit-history
-{
-  "hasAdverseCredit": true,
-  "type": "Default",
-  "dateRegisteredOn": "2020-06-15",
-  "dateSatisfiedOrClearedOn": "2023-12-20",
-  "amountRegistered": { "amount": 5000.00, "currency": "GBP" },
-  "amountOutstanding": { "amount": 0.00, "currency": "GBP" },
-  "isDebtOutstanding": false,
-  "lender": "High Street Bank"
-}
-
-Response: Credit history created
-
-Impact on mortgage:
-- Default satisfied 1+ years ago: Good
-- Original amount only £5k: Minimal impact
-- Zero outstanding: Positive
-- Lender assessment: Consider specialist or mainstream with larger deposit
-```
-
-### Use Case 2: Track Active IVA
-
-**Scenario:** Client in IVA, need to track for creditworthiness
-
-**API Flow:**
-```
-POST /clients/client-456/credit-history
-{
-  "hasAdverseCredit": true,
-  "type": "IVA",
-  "dateRegisteredOn": "2022-03-01",
-  "isIvaCurrent": true,
-  "yearsMaintained": 2,
-  "amountRegistered": { "amount": 45000.00, "currency": "GBP" },
-  "amountOutstanding": { "amount": 15000.00, "currency": "GBP" }
-}
-
-Response: IVA credit history created
-
-Impact:
-- Active IVA: Cannot obtain mainstream credit
-- Years maintained: 2 of typical 5-6 year term
-- Must complete IVA before mortgage application
-- Review annually for IVA completion
-```
-
-### Use Case 3: Update Credit History - Default Satisfied
-
-**Scenario:** Client pays off default during fact find process
-
-**API Flow:**
-```
-GET /clients/client-456/credit-history/ch-789
-Current state: amountOutstanding = £3,500
-
-PATCH /clients/client-456/credit-history/ch-789
-{
-  "dateSatisfiedOrClearedOn": "2026-02-18",
-  "amountOutstanding": { "amount": 0.00, "currency": "GBP" },
-  "isDebtOutstanding": false
-}
-
-Response: Updated credit history
-
-Impact on mortgage application:
-- Recently satisfied: Better than outstanding
-- Shows commitment to clearing debt
-- May improve mortgage terms
-- Recommend waiting 3-6 months for credit score improvement
-```
-
-### Use Case 4: Joint Credit History
-
-**Scenario:** Joint clients have shared CCJ
-
-**API Flow:**
-```
-POST /clients/client-456/credit-history
-{
-  "owners": [
-    { "id": "client-456", "ownershipType": "Joint" },
-    { "id": "client-457", "ownershipType": "Joint" }
-  ],
-  "hasAdverseCredit": true,
-  "type": "CCJ",
-  "dateRegisteredOn": "2021-08-10",
-  "dateSatisfiedOrClearedOn": "2022-12-15",
-  "amountRegistered": { "amount": 8500.00, "currency": "GBP" },
-  "amountOutstanding": { "amount": 0.00, "currency": "GBP" },
-  "isDebtOutstanding": false,
-  "lender": "Utility Company"
-}
-
-Response: Joint credit history created
-
-Impact:
-- Affects both clients equally
-- CCJ satisfied 1+ year ago: Acceptable for many lenders
-- Joint mortgage application affected
-- Consider specialist broker
-```
-
 ---
 
 ## 7. Employment API (Circumstances Context)
@@ -8178,9 +7758,917 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 
 ---
 
-## 8. Goals & Objectives API (Goals Context)
+## 8. Credit History API
 
 ### 8.1 Overview
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
+
+**Purpose:** Track and manage comprehensive client credit history including adverse credit events, missed payments, defaults, CCJs, IVAs, bankruptcies, and repossessions to support mortgage applications, creditworthiness assessments, and financial planning.
+
+**Scope:**
+- Comprehensive credit history tracking per client
+- Summary dashboard with aggregate statistics
+- Adverse credit event recording (CCJ, Default, IVA, Bankruptcy, Arrears, Repossession)
+- Payment history tracking (missed payments over 12 months and 6 years)
+- Outstanding debt aggregation
+- Credit event timeline management
+- Liability linking for debt tracking
+- Mortgage lending impact assessment
+
+**Key Features:**
+- **Aggregate Summary** - Calculated summary of all adverse events and outstanding debts
+- **Event-Based Tracking** - Individual adverse credit events with full lifecycle
+- **Timeline Management** - Track registration, satisfaction, discharge, and repossession dates
+- **Amount Tracking** - Monitor original and outstanding debt amounts
+- **Payment Analysis** - Track missed and consecutive missed payments
+- **Arrears Management** - Monitor payment arrears and clearance status
+- **Liability Integration** - Link credit events to specific liability records
+- **Mortgage Suitability** - Assess impact on mortgage lending eligibility
+
+**Aggregate Root:** Client (credit history nested under client within factfind context)
+
+**Regulatory Compliance:**
+- MCOB (Mortgage Conduct of Business) - Credit history disclosure for mortgage applications
+- FCA Handbook - Understanding client creditworthiness
+- Consumer Credit Act - Credit history accuracy requirements
+- Data Protection Act 2018 - Sensitive credit data handling
+- GDPR - Right to rectification of credit data
+- Consumer Duty - Fair treatment in lending decisions
+
+### 8.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history` | Get credit history with summary | `credit:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history` | Create or update credit history record | `credit:write` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{creditHistoryId}` | Update credit history | `credit:write` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{creditHistoryId}/adverse-events` | Add adverse credit event | `credit:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{creditHistoryId}` | Delete credit history (soft delete) | `credit:write` |
+
+**Total Endpoints:** 5
+
+**Business Operations:**
+- Record clean credit history for mortgage application
+- Add adverse credit event (CCJ, Default, IVA, etc.)
+- Update event when debt satisfied or discharged
+- Track payment history for affordability assessment
+- Link credit events to specific liabilities
+- Calculate total outstanding debt
+- Generate mortgage suitability assessment
+
+### 8.3 Key Endpoints
+
+#### 8.3.1 Get Credit History
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
+
+**Description:** Retrieve the credit history record for a client, including aggregated summary and all adverse credit events.
+
+**Query Parameters:**
+- `expand` - Expand related resources (liability)
+
+**Response:**
+
+```json
+{
+  "id": 334,
+  "href": "/api/v2/factfinds/679/clients/346/credit-history/334",
+
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+
+  "client": {
+    "id": 346,
+    "href": "/api/v2/factfinds/679/clients/346",
+    "fullName": "John Smith"
+  },
+
+  "summary": {
+    "totalRecords": 1,
+    "hasAdverseCredit": true,
+    "hasCCJ": false,
+    "hasBeenRefusedCredit": false,
+    "ivaHistory": false,
+    "hasDefault": true,
+    "hasBankruptcyHistory": false,
+    "hasArrears": false,
+
+    "totalDebtOutstanding": {
+      "amount": 3500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+
+    "missedPayments": {
+      "last12Months": 0,
+      "last6Years": 2
+    }
+  },
+
+  "adverseCreditEvents": [{
+    "type": "Default",
+    "registeredOn": "2020-06-15T00:00:00Z",
+    "satisfiedOrClearedOn": null,
+    "reposessedOn": null,
+    "dischargedOn": null,
+    "amountRegistered": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "amountOutstanding": {
+      "amount": 3500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "isDebtOutstanding": true,
+    "numberOfPaymentsMissed": 2,
+    "consecutivePaymentsMissed": 2,
+    "numberOfPaymentsInArrears": 1,
+    "isArrearsClearedUponCompletion": false,
+    "yearsMaintained": 0,
+    "lender": "High Street Bank",
+    "liability": {
+      "id": 1001,
+      "href": "/api/v2/factfinds/679/liabilities/1001",
+      "description": "Credit Card Debt"
+    },
+    "concurrencyId": 1,
+    "createdAt": "2026-01-15T10:30:00Z",
+    "lastUpdatedAt": "2026-01-15T10:30:00Z"
+  }],
+
+  "notes": "Client has one outstanding default from 2020. Currently making regular payments to clear the debt.",
+
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z",
+
+  "_links": {
+    "self": {
+      "href": "/api/v2/factfinds/679/clients/346/credit-history/334"
+    },
+    "client": {
+      "href": "/api/v2/factfinds/679/clients/346"
+    },
+    "factfind": {
+      "href": "/api/v2/factfinds/679"
+    }
+  }
+}
+```
+
+**Status Codes:**
+- `200 OK` - Credit history retrieved successfully
+- `404 Not Found` - Client or factfind not found
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+
+#### 8.3.2 Create Credit History Record
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
+
+**Description:** Create a new credit history record for a client. This is typically done once per client and then updated as needed.
+
+**Request Body:**
+
+```json
+{
+  "summary": {
+    "hasAdverseCredit": true,
+    "hasCCJ": false,
+    "hasBeenRefusedCredit": false,
+    "ivaHistory": false,
+    "hasDefault": true,
+    "hasBankruptcyHistory": false,
+    "hasArrears": false
+  },
+
+  "adverseCreditEvents": [{
+    "type": "Default",
+    "registeredOn": "2020-06-15T00:00:00Z",
+    "amountRegistered": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "amountOutstanding": {
+      "amount": 3500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "isDebtOutstanding": true,
+    "numberOfPaymentsMissed": 2,
+    "consecutivePaymentsMissed": 2,
+    "numberOfPaymentsInArrears": 1,
+    "isArrearsClearedUponCompletion": false,
+    "lender": "High Street Bank",
+    "liability": {
+      "id": 1001
+    }
+  }],
+
+  "notes": "Client has one outstanding default from 2020. Currently making regular payments to clear the debt."
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": 334,
+  "href": "/api/v2/factfinds/679/clients/346/credit-history/334",
+
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+
+  "client": {
+    "id": 346,
+    "href": "/api/v2/factfinds/679/clients/346",
+    "fullName": "John Smith"
+  },
+
+  "summary": {
+    "totalRecords": 1,
+    "hasAdverseCredit": true,
+    "hasCCJ": false,
+    "hasBeenRefusedCredit": false,
+    "ivaHistory": false,
+    "hasDefault": true,
+    "hasBankruptcyHistory": false,
+    "hasArrears": false,
+
+    "totalDebtOutstanding": {
+      "amount": 3500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+
+    "missedPayments": {
+      "last12Months": 0,
+      "last6Years": 2
+    }
+  },
+
+  "adverseCreditEvents": [{
+    "type": "Default",
+    "registeredOn": "2020-06-15T00:00:00Z",
+    "satisfiedOrClearedOn": null,
+    "reposessedOn": null,
+    "dischargedOn": null,
+    "amountRegistered": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "amountOutstanding": {
+      "amount": 3500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "isDebtOutstanding": true,
+    "numberOfPaymentsMissed": 2,
+    "consecutivePaymentsMissed": 2,
+    "numberOfPaymentsInArrears": 1,
+    "isArrearsClearedUponCompletion": false,
+    "yearsMaintained": 0,
+    "lender": "High Street Bank",
+    "liability": {
+      "id": 1001,
+      "href": "/api/v2/factfinds/679/liabilities/1001",
+      "description": "Credit Card Debt"
+    },
+    "concurrencyId": 1,
+    "createdAt": "2026-01-15T10:30:00Z",
+    "lastUpdatedAt": "2026-01-15T10:30:00Z"
+  }],
+
+  "notes": "Client has one outstanding default from 2020. Currently making regular payments to clear the debt.",
+
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-01-15T10:00:00Z",
+
+  "_links": {
+    "self": {
+      "href": "/api/v2/factfinds/679/clients/346/credit-history/334"
+    },
+    "client": {
+      "href": "/api/v2/factfinds/679/clients/346"
+    },
+    "factfind": {
+      "href": "/api/v2/factfinds/679"
+    },
+    "add-event": {
+      "href": "/api/v2/factfinds/679/clients/346/credit-history/334/adverse-events",
+      "method": "POST"
+    }
+  }
+}
+```
+
+**Status Codes:**
+- `201 Created` - Credit history record created successfully
+- `400 Bad Request` - Invalid request body or validation failure
+- `404 Not Found` - Client or factfind not found
+- `409 Conflict` - Credit history record already exists for this client
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+
+#### 8.3.3 Update Credit History Record
+
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{creditHistoryId}`
+
+**Description:** Update an existing credit history record. Typically used to mark adverse events as satisfied, update outstanding amounts, or add notes.
+
+**Request Body:**
+
+```json
+{
+  "adverseCreditEvents": [{
+    "type": "Default",
+    "registeredOn": "2020-06-15T00:00:00Z",
+    "satisfiedOrClearedOn": "2026-02-01T00:00:00Z",
+    "amountRegistered": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "amountOutstanding": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "isDebtOutstanding": false,
+    "numberOfPaymentsMissed": 2,
+    "consecutivePaymentsMissed": 2,
+    "numberOfPaymentsInArrears": 0,
+    "isArrearsClearedUponCompletion": true,
+    "lender": "High Street Bank",
+    "liability": {
+      "id": 1001
+    }
+  }],
+
+  "notes": "Default satisfied in full on 2026-02-01. Client now has clean credit history.",
+
+  "concurrencyId": 12
+}
+```
+
+**Response:** 200 OK with updated credit history entity (same structure as GET response).
+
+**Common Update Scenarios:**
+- Mark default or CCJ as satisfied
+- Update outstanding debt amount as client makes payments
+- Clear arrears status
+- Complete and discharge IVA
+- Discharge bankruptcy
+- Add notes about credit improvement
+
+**Status Codes:**
+- `200 OK` - Credit history updated successfully
+- `400 Bad Request` - Invalid request body or validation failure
+- `404 Not Found` - Credit history, client, or factfind not found
+- `409 Conflict` - Concurrency conflict (stale concurrencyId)
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+
+#### 8.3.4 Add Adverse Credit Event
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/{creditHistoryId}/adverse-events`
+
+**Description:** Add a new adverse credit event to an existing credit history record. This is a convenience endpoint for appending events without replacing the entire array.
+
+**Request Body:**
+
+```json
+{
+  "type": "CCJ",
+  "registeredOn": "2023-11-15T00:00:00Z",
+  "amountRegistered": {
+    "amount": 2500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "amountOutstanding": {
+    "amount": 2500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "isDebtOutstanding": true,
+  "lender": "Council Tax Authority"
+}
+```
+
+**Response:** 201 Created with the updated credit history entity including the new event.
+
+**Status Codes:**
+- `201 Created` - Adverse event added successfully
+- `400 Bad Request` - Invalid event data
+- `404 Not Found` - Credit history record not found
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+
+### 8.4 Field Definitions
+
+**Identification Fields**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned credit history record identifier |
+| `href` | string | read-only | Canonical URI for this credit history record |
+| `factfindRef` | FactfindRef | read-only | Reference to parent factfind |
+| `client` | ClientRef | read-only | Reference to the client this credit history belongs to |
+
+**Summary Object (Aggregate Fields)**
+
+The summary object provides a calculated overview of the client's entire credit history:
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `summary` | object | read-only | Calculated summary of credit history status |
+| `summary.totalRecords` | integer | read-only | Count of adverse credit events in the array |
+| `summary.hasAdverseCredit` | boolean | read-only | True if adverseCreditEvents array is not empty |
+| `summary.hasCCJ` | boolean | required | Has County Court Judgment(s) registered |
+| `summary.hasBeenRefusedCredit` | boolean | required | Has been refused credit in the past |
+| `summary.ivaHistory` | boolean | required | Has Individual Voluntary Arrangement (IVA) history |
+| `summary.hasDefault` | boolean | required | Has default(s) registered on credit file |
+| `summary.hasBankruptcyHistory` | boolean | required | Has bankruptcy history on record |
+| `summary.hasArrears` | boolean | required | Currently has or had payment arrears |
+| `summary.totalDebtOutstanding` | MoneyValue | read-only | Sum of all amountOutstanding where isDebtOutstanding = true |
+| `summary.missedPayments` | object | read-only | Summary of missed payment history |
+| `summary.missedPayments.last12Months` | integer | read-only | Count of missed payments in last 12 months (aggregated from events) |
+| `summary.missedPayments.last6Years` | integer | read-only | Count of missed payments in last 6 years (aggregated from events) |
+
+**Adverse Credit Events Array**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `adverseCreditEvents[]` | AdverseCreditEvent[] | optional | Array of adverse credit events (see AdverseCreditEvent value type) |
+
+**AdverseCreditEvent Value Type Fields:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `type` | enum | required | Type of adverse event: "CCJ", "Default", "IVA", "Bankruptcy", "Arrears", "Repossession" |
+| `registeredOn` | datetime | required | Date event was registered with Credit Reference Agencies (ISO 8601) |
+| `satisfiedOrClearedOn` | datetime | optional | Date the debt was satisfied or cleared (ISO 8601) |
+| `reposessedOn` | datetime | optional | Date of property repossession if applicable (ISO 8601) |
+| `dischargedOn` | datetime | optional | Date bankruptcy or IVA was discharged (ISO 8601) |
+| `amountRegistered` | MoneyValue | required | Original amount registered when event occurred |
+| `amountOutstanding` | MoneyValue | required | Current outstanding amount (can be 0 if satisfied) |
+| `isDebtOutstanding` | boolean | required | Whether debt is still outstanding (true) or fully paid (false) |
+| `numberOfPaymentsMissed` | integer | optional | Total number of payments missed for this event |
+| `consecutivePaymentsMissed` | integer | optional | Number of consecutive payments missed (maximum consecutive period) |
+| `numberOfPaymentsInArrears` | integer | optional | Number of payments currently in arrears |
+| `isArrearsClearedUponCompletion` | boolean | optional | Whether arrears were cleared when arrangement completed |
+| `yearsMaintained` | integer | optional | Number of years successfully maintained after event (for IVA/payment plans) |
+| `lender` | string | optional | Name of lender or creditor involved in the adverse event (max 200 chars) |
+| `liability` | LiabilityRef | optional | Reference to related liability record if applicable |
+| `concurrencyId` | integer | read-only | Concurrency control identifier for optimistic locking |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp when event record was created |
+| `lastUpdatedAt` | datetime | read-only | ISO 8601 timestamp when event record was last updated |
+
+**Additional Information**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `notes` | string | optional | Free-text notes about credit history, mitigating circumstances, or additional context (max 2000 chars) |
+
+**Audit Trail**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `createdAt` | datetime | read-only | ISO 8601 timestamp when credit history record was created |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp when credit history record was last updated |
+
+### 8.5 Validation Rules
+
+**Summary Validation:**
+- `summary.totalRecords` must equal the count of items in `adverseCreditEvents` array
+- `summary.hasAdverseCredit` must be true if `adverseCreditEvents` is not empty
+- `summary.totalDebtOutstanding` must equal the sum of all `adverseCreditEvents[].amountOutstanding` where `isDebtOutstanding` = true
+- Summary boolean flags must align with events in array:
+  - If `summary.hasCCJ` = true, there must be at least one event with `type` = "CCJ"
+  - If `summary.hasDefault` = true, there must be at least one event with `type` = "Default"
+  - If `summary.ivaHistory` = true, there must be at least one event with `type` = "IVA"
+  - If `summary.hasBankruptcyHistory` = true, there must be at least one event with `type` = "Bankruptcy"
+  - If `summary.hasArrears` = true, there must be at least one event with `type` = "Arrears"
+
+**Adverse Credit Event Validations:**
+- `type` is required when event is present
+- `registeredOn` is required and cannot be in the future
+- If `satisfiedOrClearedOn` is provided, it must be after `registeredOn`
+- If `dischargedOn` is provided, it must be after `registeredOn`
+- If `reposessedOn` is provided, it must be after `registeredOn`
+- `amountOutstanding` cannot exceed `amountRegistered`
+- If `isDebtOutstanding` = false, `amountOutstanding.amount` should be 0
+- `numberOfPaymentsMissed` must be >= 0
+- `consecutivePaymentsMissed` must be <= `numberOfPaymentsMissed`
+- `numberOfPaymentsInArrears` must be >= 0
+- `yearsMaintained` must be >= 0 and <= 10
+- `lender` max length 200 characters
+- All dates must be valid ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ)
+- Currency codes must be valid ISO 4217 codes
+
+**Date Validations:**
+- All event dates must not be in the future
+- Timeline must be logical: registeredOn < satisfiedOrClearedOn < dischargedOn
+- For repossession events, reposessedOn must be between registeredOn and dischargedOn
+
+### 8.6 Business Rules
+
+**Credit Event Types and Impact:**
+
+1. **CCJ (County Court Judgment)**
+   - Court order requiring debt repayment
+   - Stays on credit file for 6 years from judgment date
+   - Can be marked as "satisfied" when paid
+   - CCJs over £500 within 3 years typically exclude standard mortgages
+   - Significant impact on credit score and lending terms
+
+2. **Default**
+   - Creditor has written off debt (typically 3-6 months of missed payments)
+   - Stays on credit file for 6 years from default date
+   - Even if paid, remains on file for full 6 years
+   - Impact reduces over time
+   - Multiple defaults severely impact lending options
+
+3. **IVA (Individual Voluntary Arrangement)**
+   - Formal agreement to pay reduced debt over time
+   - Typically 5-6 year payment plan
+   - Stays on credit file for 6 years from approval date
+   - Can apply for mortgages after 3 years with good payment record
+   - Must disclose to lenders
+   - `yearsMaintained` tracks compliance with IVA terms
+
+4. **Bankruptcy**
+   - Legal process to write off unaffordable debts
+   - Typically discharged after 12 months
+   - Stays on credit file for 6 years from bankruptcy date
+   - Severely restricts access to credit during bankruptcy
+   - Can obtain credit after discharge, but with higher rates
+   - May prevent certain professional roles
+
+5. **Arrears**
+   - Currently behind on payment schedule
+   - Track with `numberOfPaymentsInArrears`
+   - Active arrears seriously impact mortgage applications
+   - `isArrearsClearedUponCompletion` indicates if cleared with final payment
+
+6. **Repossession**
+   - Property has been repossessed by lender
+   - Very serious adverse event
+   - Stays on file for 6 years
+   - Makes obtaining new mortgage extremely difficult
+   - May require specialist lender
+
+**Summary Calculation Rules:**
+- `totalRecords` = count of all items in `adverseCreditEvents` array
+- `hasAdverseCredit` = true if array length > 0, otherwise false
+- `totalDebtOutstanding` = sum of all `adverseCreditEvents[].amountOutstanding.amount` where `isDebtOutstanding` = true
+- `missedPayments.last12Months` = sum of all `numberOfPaymentsMissed` where event was within last 12 months
+- `missedPayments.last6Years` = sum of all `numberOfPaymentsMissed` where event was within last 6 years
+- Boolean flags (`hasCCJ`, `hasDefault`, etc.) are set based on presence of corresponding event types in array
+
+**Mortgage Lending Impact:**
+
+Standard UK mortgage lending typically requires:
+- No missed payments in last 6 months
+- No CCJs in last 3 years, or if older and satisfied, may be acceptable
+- No defaults in last 3 years, or if older and satisfied with good explanation
+- No active IVA (must be completed and discharged)
+- No bankruptcy in last 6 years
+- No repossession history in last 6 years
+- Clean payment record on existing credit commitments
+
+Specialist lenders may accept:
+- Recent defaults if satisfied and with larger deposit (25-40%)
+- Discharged bankruptcy after 3+ years
+- Completed IVA after 3+ years
+- Historical CCJs if satisfied
+- But typically with higher interest rates (2-5% premium)
+
+**Affordability Assessment Integration:**
+- Total outstanding debt feeds into debt-to-income calculations
+- Missed payments in last 12 months are red flags for lenders
+- Active IVA means no new borrowing until completion
+- Credit history directly affects maximum loan-to-value (LTV) ratios
+- Adverse events within 3 years typically reduce borrowing capacity by 20-30%
+
+**Compliance Requirements:**
+- Credit history must be disclosed honestly for mortgage applications (Consumer Duty)
+- Inaccurate credit history can be challenged under GDPR right to rectification
+- Lenders must assess creditworthiness under MCOB rules
+- Advisers must consider credit history when recommending products
+- Soft delete policy for credit history records (retain for 7 years for audit)
+
+**Business Process Notes:**
+- Credit history should be reviewed annually and updated as events are satisfied
+- Link adverse events to liability records for complete financial picture
+- Use notes field to record mitigating circumstances or explanation
+- For joint clients, credit events may appear on both client records
+- Credit score can be tracked separately via external Credit Reference Agency integration
+
+---
+
+**Adverse Credit Event Type Enum:**
+
+| Code | Display | Description | Duration on File | Typical Mortgage Impact |
+|------|---------|-------------|-----------------|------------------------|
+| CCJ | County Court Judgment | Court judgment for unpaid debt | 6 years from judgment | Significant - may require specialist lender |
+| Default | Default | Payment default registered by creditor | 6 years from default date | Moderate to significant depending on age and amount |
+| IVA | Individual Voluntary Arrangement | Formal debt repayment arrangement | 6 years from approval | Severe during arrangement, moderate after 3+ years |
+| Bankruptcy | Bankruptcy | Declared bankrupt | 6 years from bankruptcy date | Very severe - specialist lenders only |
+| Arrears | Payment Arrears | Currently in arrears on payments | Ongoing until cleared | Severe if active, moderate if historical |
+| Repossession | Repossession | Property repossessed by lender | 6 years from repossession | Very severe - extremely difficult to obtain mortgage |
+
+---
+
+**Use Cases:**
+
+**Use Case 1: Clean Credit History - Standard Mortgage Application**
+
+**Scenario:** Client has no adverse credit, applying for standard residential mortgage.
+
+**API Flow:**
+```
+POST /api/v2/factfinds/679/clients/346/credit-history
+{
+  "summary": {
+    "hasAdverseCredit": false,
+    "hasCCJ": false,
+    "hasBeenRefusedCredit": false,
+    "ivaHistory": false,
+    "hasDefault": false,
+    "hasBankruptcyHistory": false,
+    "hasArrears": false
+  },
+  "adverseCreditEvents": [],
+  "notes": "Excellent credit history. Eligible for best mortgage rates."
+}
+
+Response: Credit history created with clean record
+Summary shows: totalDebtOutstanding = £0, missedPayments = 0
+
+Mortgage impact:
+- Eligible for standard mortgage products
+- Can access best interest rates
+- Maximum LTV available (up to 95% with 5% deposit)
+- No credit-related restrictions
+```
+
+**Use Case 2: Satisfied Default - Explaining to Lender**
+
+**Scenario:** Client had credit card default 4 years ago, now satisfied. Needs documentation for mortgage broker.
+
+**API Flow:**
+```
+POST /api/v2/factfinds/679/clients/346/credit-history
+{
+  "summary": {
+    "hasAdverseCredit": true,
+    "hasDefault": true,
+    "hasCCJ": false,
+    "ivaHistory": false,
+    "hasBankruptcyHistory": false
+  },
+  "adverseCreditEvents": [{
+    "type": "Default",
+    "registeredOn": "2020-06-15T00:00:00Z",
+    "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
+    "amountRegistered": {
+      "amount": 5000.00,
+      "currency": { "code": "GBP" }
+    },
+    "amountOutstanding": {
+      "amount": 0.00,
+      "currency": { "code": "GBP" }
+    },
+    "isDebtOutstanding": false,
+    "numberOfPaymentsMissed": 2,
+    "lender": "High Street Bank"
+  }],
+  "notes": "Default occurred due to temporary unemployment. Client secured new job and satisfied debt in full 3 years later. No other adverse credit."
+}
+
+Response: Credit history created
+Summary shows: totalDebtOutstanding = £0, totalRecords = 1
+
+Mortgage impact:
+- Default over 3 years old and satisfied: Acceptable to most lenders
+- May need to provide letter of explanation
+- Might require 10-15% deposit (instead of 5%)
+- Interest rates may be 0.5-1% higher than best rates
+- Mainstream lenders will consider with good income
+```
+
+**Use Case 3: Active IVA - Cannot Obtain Mortgage**
+
+**Scenario:** Client in active IVA, wants to know when they can apply for mortgage.
+
+**API Flow:**
+```
+POST /api/v2/factfinds/679/clients/346/credit-history
+{
+  "summary": {
+    "hasAdverseCredit": true,
+    "ivaHistory": true,
+    "hasCCJ": false,
+    "hasDefault": false
+  },
+  "adverseCreditEvents": [{
+    "type": "IVA",
+    "registeredOn": "2022-03-01T00:00:00Z",
+    "amountRegistered": {
+      "amount": 45000.00,
+      "currency": { "code": "GBP" }
+    },
+    "amountOutstanding": {
+      "amount": 15000.00,
+      "currency": { "code": "GBP" }
+    },
+    "isDebtOutstanding": true,
+    "yearsMaintained": 2,
+    "lender": "Various Creditors"
+  }],
+  "notes": "IVA started March 2022, typically 5-6 year term. Client maintaining regular payments. Expected completion 2027-2028."
+}
+
+Response: Credit history created
+Summary shows: totalDebtOutstanding = £15,000, ivaHistory = true
+
+Mortgage impact:
+- Cannot obtain mortgage during active IVA
+- Must complete IVA and have it discharged
+- After discharge, wait 3 years for mainstream lenders
+- Specialist lenders may consider after 1 year of completion
+- Will need larger deposit (25-40%) and face higher rates
+- Advise client to focus on completing IVA first
+```
+
+**Use Case 4: Multiple Adverse Events - Specialist Lending**
+
+**Scenario:** Client with CCJ and default, both satisfied, applying through specialist broker.
+
+**API Flow:**
+```
+POST /api/v2/factfinds/679/clients/346/credit-history
+{
+  "summary": {
+    "hasAdverseCredit": true,
+    "hasCCJ": true,
+    "hasDefault": true,
+    "ivaHistory": false,
+    "hasBankruptcyHistory": false
+  },
+  "adverseCreditEvents": [
+    {
+      "type": "CCJ",
+      "registeredOn": "2021-08-10T00:00:00Z",
+      "satisfiedOrClearedOn": "2022-12-15T00:00:00Z",
+      "amountRegistered": {
+        "amount": 2500.00,
+        "currency": { "code": "GBP" }
+      },
+      "amountOutstanding": {
+        "amount": 0.00,
+        "currency": { "code": "GBP" }
+      },
+      "isDebtOutstanding": false,
+      "lender": "Council Tax Authority"
+    },
+    {
+      "type": "Default",
+      "registeredOn": "2020-06-15T00:00:00Z",
+      "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
+      "amountRegistered": {
+        "amount": 5000.00,
+        "currency": { "code": "GBP" }
+      },
+      "amountOutstanding": {
+        "amount": 0.00,
+        "currency": { "code": "GBP" }
+      },
+      "isDebtOutstanding": false,
+      "numberOfPaymentsMissed": 3,
+      "lender": "Credit Card Provider"
+    }
+  ],
+  "notes": "Both adverse events satisfied in full. Client has stable employment and clean record since 2023."
+}
+
+Response: Credit history created
+Summary shows: totalDebtOutstanding = £0, totalRecords = 2
+
+Mortgage impact:
+- Multiple adverse events = specialist lender required
+- Both satisfied = positive factor
+- CCJ over 3 years old = less impact
+- Default over 3 years old = acceptable
+- Will need 20-25% deposit minimum
+- Interest rates 2-3% higher than standard rates
+- Recommend specialist mortgage broker
+- Can improve situation by building 12 months clean credit
+```
+
+**Use Case 5: Updating Event When Debt Satisfied**
+
+**Scenario:** Client makes final payment to clear outstanding default during factfind process.
+
+**API Flow:**
+```
+Step 1: Get current credit history
+GET /api/v2/factfinds/679/clients/346/credit-history/334
+
+Response shows:
+- Default with amountOutstanding = £3,500
+- isDebtOutstanding = true
+- satisfiedOrClearedOn = null
+
+Step 2: Client pays off debt, update the event
+PATCH /api/v2/factfinds/679/clients/346/credit-history/334
+{
+  "adverseCreditEvents": [{
+    "type": "Default",
+    "registeredOn": "2020-06-15T00:00:00Z",
+    "satisfiedOrClearedOn": "2026-02-18T00:00:00Z",
+    "amountRegistered": {
+      "amount": 5000.00,
+      "currency": { "code": "GBP" }
+    },
+    "amountOutstanding": {
+      "amount": 0.00,
+      "currency": { "code": "GBP" }
+    },
+    "isDebtOutstanding": false,
+    "numberOfPaymentsMissed": 2,
+    "consecutivePaymentsMissed": 2,
+    "numberOfPaymentsInArrears": 0,
+    "isArrearsClearedUponCompletion": true,
+    "lender": "High Street Bank",
+    "liability": { "id": 1001 }
+  }],
+  "notes": "Default satisfied in full on 2026-02-18. Demonstrates commitment to clearing debts.",
+  "concurrencyId": 12
+}
+
+Response: Updated credit history
+Summary recalculated: totalDebtOutstanding = £0
+
+Mortgage impact:
+- Recently satisfied = better than outstanding
+- Shows commitment to debt management
+- May improve mortgage terms
+- Recommend waiting 3-6 months for credit file to update
+- Can now approach more mainstream lenders
+```
+
+---
+
+## 9. Goals & Objectives API (Goals Context)
+
+### 9.1 Overview
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/objectives`
 
@@ -8211,7 +8699,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 - Consumer Duty (Delivering good outcomes)
 - PROD (Target Market assessment)
 
-### 8.2 Operations Summary
+### 10.2 Operations Summary
 
 **Objective Type Operations (6 types × 4 operations + 1 list + 1 delete = 26 endpoints):**
 
@@ -8361,9 +8849,9 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ---
 
-## 9. Assets & Liabilities API
+## 10. Assets & Liabilities API
 
-### 9.1 Overview
+### 10.1 Overview
 
 **Base Path:** `/api/v2/factfinds/{id}/assets`
 
@@ -8398,7 +8886,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 - HMRC Stamp Duty Land Tax requirements
 - Data Protection Act 2018 - Asset data retention
 
-### 9.2 Operations Summary
+### 10.2 Operations Summary
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
@@ -8434,7 +8922,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 **Total Endpoints:** 24
 
-### 9.3 Key Endpoints
+### 10.3 Key Endpoints
 
 #### 9.3.1 List Assets
 
@@ -8924,9 +9412,9 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 ```
 
 ---
-## 10. Arrangements API (Type-Based Routing)
+## 11. Arrangements API (Type-Based Routing)
 
-### 10.1 Overview
+### 11.1 Overview
 
 **Purpose:** Manage all financial arrangements held by clients including investments, pensions, mortgages, and protection policies with type-specific endpoints and operations.
 
@@ -8962,7 +9450,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - IDD (Insurance Distribution Directive)
 - GDPR (Data Protection for Financial Records)
 
-### 10.2 Arrangement Types and Routing
+### 11.2 Arrangement Types and Routing
 
 **Hierarchical URL Structure:**
 
@@ -9031,7 +9519,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-### 10.3 Investment Arrangements
+### 11.3 Investment Arrangements
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/investments`
 
@@ -9075,7 +9563,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.3.1 GIA (General Investment Account)
+#### 11.3.1 GIA (General Investment Account)
 
 **Operations:**
 
@@ -9257,7 +9745,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - Regular contribution tracking for cash flow planning
 - Performance comparison against benchmark indices
 
-#### 10.3.2 ISA (Individual Savings Account)
+#### 11.3.2 ISA (Individual Savings Account)
 
 **Operations:**
 
@@ -9485,7 +9973,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - Lifetime ISA bonus tracking (25% government bonus up to £1,000/year)
 - Transfer tracking maintains tax-free status
 
-#### 10.3.3 Investment Bonds
+#### 11.3.3 Investment Bonds
 
 **Operations:**
 
@@ -9541,7 +10029,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - 5% withdrawal allowance tracking
 - Top-slicing relief calculations
 
-#### 10.3.4 Investment Trusts
+#### 11.3.4 Investment Trusts
 
 **Operations:**
 
@@ -9575,7 +10063,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.3.5 Platform Accounts
+#### 11.3.5 Platform Accounts
 
 **Operations:**
 
@@ -9599,7 +10087,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.3.6 Offshore Bonds
+#### 11.3.6 Offshore Bonds
 
 **Operations:**
 
@@ -9627,7 +10115,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.3.7 Cash Accounts
+#### 11.3.7 Cash Accounts
 
 **Operations:**
 
@@ -9860,7 +10348,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ---
 
-### 10.4 Pension Arrangements
+### 11.4 Pension Arrangements
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/pensions`
 
@@ -9908,7 +10396,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.4.1 Personal Pension
+#### 11.4.1 Personal Pension
 
 **Operations:**
 
@@ -10135,7 +10623,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - Tapered annual allowance for high earners
 - Tax-free cash capped at 25% of fund value
 
-#### 10.4.2 State Pension
+#### 11.4.2 State Pension
 
 **Operations:**
 
@@ -10176,7 +10664,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.4.3 Workplace Pension
+#### 11.4.3 Workplace Pension
 
 **Operations:**
 
@@ -10218,7 +10706,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.4.4 SIPP (Self-Invested Personal Pension)
+#### 11.4.4 SIPP (Self-Invested Personal Pension)
 
 **Operations:**
 
@@ -10256,7 +10744,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.4.5 Final Salary (Defined Benefit)
+#### 11.4.5 Final Salary (Defined Benefit)
 
 **Operations:**
 
@@ -10773,7 +11261,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.4.6 Pension Drawdown
+#### 11.4.6 Pension Drawdown
 
 **Operations:**
 
@@ -10824,7 +11312,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.4.7 Annuity
+#### 11.4.7 Annuity
 
 **Operations:**
 
@@ -10877,7 +11365,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.4.8 Money Purchase
+#### 11.4.8 Money Purchase
 
 **Operations:**
 
@@ -11424,7 +11912,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-### 10.5 Mortgage Arrangements
+### 11.5 Mortgage Arrangements
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/mortgages`
 
@@ -11764,13 +12252,13 @@ The Arrangements API provides comprehensive management of client financial produ
 - Remortgage review when deal expiry within 6 months
 - Affordability based on debt-to-income ratio (typically max 4.5x)
 
-### 10.6 Protection Arrangements
+### 11.6 Protection Arrangements
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/protections`
 
 **Purpose:** Manage protection policies including life insurance, critical illness, income protection, and general insurance.
 
-#### 10.6.1 Personal Protection (Life, CI, IP)
+#### 11.6.1 Personal Protection (Life, CI, IP)
 
 **Operations:**
 
@@ -12002,7 +12490,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.6.2 General Insurance
+#### 11.6.2 General Insurance
 
 **Operations:**
 
@@ -12052,11 +12540,11 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-### 10.7 Arrangement Sub-Resources
+### 11.7 Arrangement Sub-Resources
 
 **Purpose:** Manage detailed transaction history and associated data for arrangements including contributions, withdrawals, beneficiaries, and valuations.
 
-#### 10.7.1 Contributions
+#### 11.7.1 Contributions
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions`
 
@@ -12211,7 +12699,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - `contributionType` - Filter by type (REGULAR, AD_HOC, TRANSFER, EMPLOYER)
 - `taxYear` - Filter by tax year (e.g., "2025/26")
 
-#### 10.7.2 Withdrawals
+#### 11.7.2 Withdrawals
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals`
 
@@ -12333,7 +12821,7 @@ The Arrangements API provides comprehensive management of client financial produ
 }
 ```
 
-#### 10.7.3 Beneficiaries
+#### 11.7.3 Beneficiaries
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries`
 
@@ -12453,7 +12941,7 @@ The Arrangements API provides comprehensive management of client financial produ
 - Beneficiary age restrictions apply for certain arrangements
 - Relationship to policyholder must be declared
 
-#### 10.7.4 Valuations
+#### 11.7.4 Valuations
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations`
 
@@ -12694,9 +13182,9 @@ The Arrangements API provides comprehensive management of client financial produ
 **Total Arrangement Endpoints:** 110
 
 ---
-## 11. Risk Profile API
+## 12. Risk Profile API
 
-### 11.1 Overview
+### 12.1 Overview
 
 **Purpose:** Capture and manage client Attitude to Risk (ATR) assessment as an embedded part of the FactFind.
 
@@ -12725,7 +13213,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 - FCA Handbook COBS 9 Annex 2 (Risk Profiling)
 - Consumer Duty (Understanding Customer Risk Tolerance)
 
-### 11.2 Operations Summary
+### 12.2 Operations Summary
 
 **ATR Assessment Endpoints:**
 
@@ -12745,7 +13233,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 | GET | `/api/v2/reference/atr-templates` | List available ATR templates | Public |
 | GET | `/api/v2/reference/atr-templates/{templateId}` | Get template details | Public |
 
-### 11.3 Key Endpoints
+### 12.3 Key Endpoints
 
 #### 11.3.1 Get Current ATR Assessment
 
@@ -13136,7 +13624,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-### 11.4 ATR Templates Reference Data
+### 12.4 ATR Templates Reference Data
 
 **Purpose:** ATR questionnaire templates are system configuration and reference data. They are not managed via the main API but can be queried to see available templates.
 
@@ -13315,7 +13803,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-### 11.5 Risk Assessment History API
+### 12.5 Risk Assessment History API
 
 **Purpose:** Historical tracking and comparison of ATR assessments over time (Risk Replay).
 
@@ -13396,7 +13884,7 @@ See Section 10.3.4 for the main history endpoint.
 
 ---
 
-### 11.6 Integration with FactFind Workflow
+### 12.6 Integration with FactFind Workflow
 
 **ATR Assessment Lifecycle:**
 
@@ -13425,7 +13913,7 @@ See Section 10.3.4 for the main history endpoint.
 5. **Regulatory Documentation** - All assessments preserved for audit trail
 
 ---
-## 12. Reference Data API
+## 13. Reference Data API
 
 ### 12.1 Performance Considerations
 
@@ -13550,7 +14038,7 @@ Link: <https://docs.factfind.com/migration/v1-to-v2>; rel="deprecation"
 ---
 
 
-## 13. Entity Contracts
+## 14. Entity Contracts
 
 This section defines the unified entity contracts used throughout the FactFind API. Following the **Single Contract Principle** (Section 1.7), each entity has one canonical contract used for both requests (POST, PUT, PATCH) and responses (GET).
 
@@ -13561,7 +14049,7 @@ Each field is annotated with its behavioral characteristics:
 - **write-once** - Can only be set on create, immutable thereafter
 - **updatable** - Can be modified via PUT/PATCH operations
 
-### 13.1 Client Contract
+### 14.1 Client Contract
 
 The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic, regulatory, and preference information using a **composition pattern** with conditional types.
 
@@ -16229,7 +16717,7 @@ Content-Type: application/json
 
 ---
 
-### 13.2 FactFind Contract
+### 14.2 FactFind Contract
 
 
 **IMPORTANT NOTE:**
@@ -16981,7 +17469,7 @@ The `CompletionStatusValue` tracks the completion status of the fact find and as
 
 ---
 
-### 13.3 Address Contract
+### 14.3 Address Contract
 
 The `Address` contract represents a client's address with additional metadata for residency tracking. When an address needs independent lifecycle management (e.g., address history), it becomes a reference type with identity.
 
@@ -17040,7 +17528,7 @@ The `Address` contract represents a client's address with additional metadata fo
 
 ---
 
-### 13.4 Income Contract
+### 14.4 Income Contract
 
 The `Income` contract represents an income source within a FactFind.
 
@@ -17137,7 +17625,7 @@ The `Income` contract represents an income source within a FactFind.
 
 ---
 
-### 13.5 Arrangement Contract
+### 14.5 Arrangement Contract
 
 The `Arrangement` contract represents financial products (pensions, investments, protection, mortgages). This is a polymorphic contract with type-specific fields.
 
@@ -17245,7 +17733,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
 
 ---
 
-### 13.6 Goal Contract
+### 14.6 Goal Contract
 
 The `Goal` contract represents a client's financial goal.
 
@@ -17332,7 +17820,7 @@ The `Goal` contract represents a client's financial goal.
 
 ---
 
-### 13.7 RiskProfile Contract
+### 14.7 RiskProfile Contract
 
 The `RiskProfile` contract represents a client's risk assessment and attitude to risk.
 
@@ -17408,7 +17896,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 
 ---
 
-### 13.8 Investment Contract
+### 14.8 Investment Contract
 
 The `Investment` contract extends the Arrangement contract with investment-specific fields for ISAs, GIAs, Bonds, and Investment Trusts.
 
@@ -18164,7 +18652,7 @@ Only specified fields are updated. Returns complete contract with new holding ad
 
 ---
 
-### 13.9 Property Contract
+### 14.9 Property Contract
 
 The `Property` contract represents a property asset with valuation tracking, mortgage linking, and rental income management.
 
@@ -18950,7 +19438,7 @@ Only specified fields are updated. Server recalculates rental yield and net inco
 
 ---
 
-### 13.10 Equity Contract
+### 14.10 Equity Contract
 
 The `Equity` contract represents a direct stock holding with performance tracking and dividend history.
 
@@ -19787,7 +20275,7 @@ Only specified fields are updated. Server recalculates total dividends and yield
 
 ---
 
-### 13.11 IdentityVerification Contract
+### 14.11 IdentityVerification Contract
 
 The `IdentityVerification` contract represents identity verification status with KYC and AML checks.
 
@@ -20216,7 +20704,7 @@ Only specified fields are updated. Returns complete contract.
 
 ---
 
-### 13.12 Consent Contract
+### 14.12 Consent Contract
 
 The `Consent` contract represents GDPR consent tracking with purpose-specific consents and audit trail.
 
@@ -20706,7 +21194,7 @@ Server updates status and withdrawal date. Returns complete contract.
 
 ---
 
-### 13.13 Collection Response Wrapper
+### 14.13 Collection Response Wrapper
 
 All list/collection endpoints use a standard wrapper contract:
 
@@ -20737,7 +21225,7 @@ The `data` array contains complete entity contracts. Clients can use field selec
 
 ---
 
-### 13.14 Contract Extension for Other Entities
+### 14.14 Contract Extension for Other Entities
 
 All other entities in the FactFind system follow the same Single Contract Principle:
 
@@ -20768,7 +21256,7 @@ Each entity contract follows the same field annotation pattern:
 - Collection responses wrapped in standard pagination envelope
 - Field selection supported via `?fields` query parameter
 
-### 13.15 Standard Value Types
+### 14.15 Standard Value Types
 
 Value types are embedded data structures with no independent identity. They are named with a "Value" suffix and never have an `id` field. Value types are always embedded within their parent entity and have no separate API endpoints.
 
@@ -21092,7 +21580,235 @@ Represents tax identification details.
 }
 ```
 
-#### 13.10.9 Enumeration Value Types
+#### 13.10.9 AdverseCreditEvent
+
+Represents a single adverse credit event in a client's credit history. This is a value type embedded within the CreditHistory entity's `adverseCreditEvents` array.
+
+**Value Type:** No `id` field - embedded within CreditHistory entity
+
+**Purpose:**
+- Record individual adverse credit events (CCJ, Default, IVA, Bankruptcy, Arrears, Repossession)
+- Track complete timeline from registration to satisfaction/discharge
+- Monitor outstanding debt amounts
+- Link credit events to specific liability records
+- Support mortgage lending impact assessment
+
+**Contract:**
+```json
+{
+  "type": "Default",
+  "registeredOn": "2020-06-15T00:00:00Z",
+  "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
+  "reposessedOn": null,
+  "dischargedOn": null,
+  "amountRegistered": {
+    "amount": 5000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "amountOutstanding": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "isDebtOutstanding": false,
+  "numberOfPaymentsMissed": 2,
+  "consecutivePaymentsMissed": 2,
+  "numberOfPaymentsInArrears": 0,
+  "isArrearsClearedUponCompletion": true,
+  "yearsMaintained": 0,
+  "lender": "High Street Bank",
+  "liability": {
+    "id": 1001,
+    "href": "/api/v2/factfinds/679/liabilities/1001",
+    "description": "Credit Card Debt"
+  },
+  "concurrencyId": 1,
+  "createdAt": "2026-01-15T10:30:00Z",
+  "lastUpdatedAt": "2026-01-15T10:30:00Z"
+}
+```
+
+**Fields:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | enum | Yes | Type of adverse event: "CCJ", "Default", "IVA", "Bankruptcy", "Arrears", "Repossession" |
+| `registeredOn` | datetime | Yes | Date event was registered with Credit Reference Agencies (ISO 8601) |
+| `satisfiedOrClearedOn` | datetime | No | Date the debt was satisfied or cleared (ISO 8601) |
+| `reposessedOn` | datetime | No | Date of property repossession if applicable (ISO 8601) |
+| `dischargedOn` | datetime | No | Date bankruptcy or IVA was discharged (ISO 8601) |
+| `amountRegistered` | MoneyValue | Yes | Original amount registered when event occurred |
+| `amountOutstanding` | MoneyValue | Yes | Current outstanding amount (can be 0.00 if satisfied) |
+| `isDebtOutstanding` | boolean | Yes | Whether debt is still outstanding (true) or fully paid (false) |
+| `numberOfPaymentsMissed` | integer | No | Total number of payments missed for this event |
+| `consecutivePaymentsMissed` | integer | No | Number of consecutive payments missed (maximum consecutive period) |
+| `numberOfPaymentsInArrears` | integer | No | Number of payments currently in arrears |
+| `isArrearsClearedUponCompletion` | boolean | No | Whether arrears were cleared when arrangement completed |
+| `yearsMaintained` | integer | No | Number of years successfully maintained (for IVA/payment plans, typically 0-6) |
+| `lender` | string | No | Name of lender or creditor involved (max 200 characters) |
+| `liability` | LiabilityRef | No | Reference to related liability record if applicable |
+| `concurrencyId` | integer | read-only | Concurrency control identifier for optimistic locking |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp when this event was created |
+| `lastUpdatedAt` | datetime | read-only | ISO 8601 timestamp when this event was last updated |
+
+**Validation Rules:**
+- `type` is required
+- `registeredOn` is required and cannot be in the future
+- If `satisfiedOrClearedOn` is provided, it must be after `registeredOn`
+- If `dischargedOn` is provided, it must be after `registeredOn`
+- If `reposessedOn` is provided, it must be after `registeredOn`
+- `amountOutstanding` cannot exceed `amountRegistered`
+- If `isDebtOutstanding` = false, `amountOutstanding.amount` should be 0.00
+- `consecutivePaymentsMissed` must be <= `numberOfPaymentsMissed` if both provided
+- `yearsMaintained` must be between 0 and 10 if provided
+- All dates must be valid ISO 8601 datetime format with timezone
+- Currency codes must be valid ISO 4217 codes
+
+**Event Type Enumeration:**
+
+| Code | Display | Description | Duration on File | Mortgage Impact |
+|------|---------|-------------|-----------------|-----------------|
+| CCJ | County Court Judgment | Court judgment for unpaid debt | 6 years | Significant - may require specialist lender |
+| Default | Default | Payment default registered by creditor | 6 years | Moderate to significant |
+| IVA | Individual Voluntary Arrangement | Formal debt repayment arrangement | 6 years | Severe during, moderate after 3+ years |
+| Bankruptcy | Bankruptcy | Declared bankrupt | 6 years | Very severe - specialist lenders only |
+| Arrears | Payment Arrears | Currently in arrears on payments | Ongoing until cleared | Severe if active |
+| Repossession | Repossession | Property repossessed by lender | 6 years | Very severe |
+
+**Business Context:**
+
+**CCJ (County Court Judgment):**
+- Court order requiring debt repayment
+- Stays on credit file for 6 years from judgment date
+- Can be marked as "satisfied" via `satisfiedOrClearedOn`
+- CCJs over £500 within 3 years typically exclude standard mortgages
+- Use `amountRegistered` for judgment amount, `amountOutstanding` for balance owed
+
+**Default:**
+- Creditor has written off debt (typically after 3-6 months of missed payments)
+- Stays on credit file for 6 years from default date
+- Even if satisfied, remains on file for full 6 years
+- Track missed payments via `numberOfPaymentsMissed` and `consecutivePaymentsMissed`
+- Impact reduces over time
+
+**IVA (Individual Voluntary Arrangement):**
+- Formal agreement to pay reduced debt over time (typically 5-6 year plan)
+- Stays on credit file for 6 years from approval date
+- Use `yearsMaintained` to track years in good standing (0-6 typical range)
+- `dischargedOn` indicates successful completion
+- Can apply for mortgages after 3 years with good payment record
+
+**Bankruptcy:**
+- Legal process to write off unaffordable debts
+- Typically discharged after 12 months (record `dischargedOn` date)
+- Stays on credit file for 6 years from bankruptcy date
+- Severely restricts access to credit during and after
+- Specialist lenders only, typically 3+ years after discharge
+
+**Arrears:**
+- Currently behind on payment schedule
+- Track with `numberOfPaymentsInArrears`
+- Active arrears seriously impact mortgage applications
+- `isArrearsClearedUponCompletion` indicates if cleared with final payment
+- Different from "missed payments" which are historical
+
+**Repossession:**
+- Property has been repossessed by lender
+- Very serious adverse event
+- `reposessedOn` date is when property was taken
+- Stays on file for 6 years
+- Makes obtaining new mortgage extremely difficult
+
+**Usage Examples:**
+
+**Example 1: Satisfied Default**
+```json
+{
+  "type": "Default",
+  "registeredOn": "2020-06-15T00:00:00Z",
+  "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
+  "amountRegistered": {
+    "amount": 5000.00,
+    "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+  },
+  "amountOutstanding": {
+    "amount": 0.00,
+    "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+  },
+  "isDebtOutstanding": false,
+  "numberOfPaymentsMissed": 3,
+  "consecutivePaymentsMissed": 2,
+  "lender": "Credit Card Provider",
+  "liability": { "id": 1001, "href": "/api/v2/factfinds/679/liabilities/1001" }
+}
+```
+
+**Example 2: Active IVA**
+```json
+{
+  "type": "IVA",
+  "registeredOn": "2022-03-01T00:00:00Z",
+  "amountRegistered": {
+    "amount": 45000.00,
+    "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+  },
+  "amountOutstanding": {
+    "amount": 15000.00,
+    "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+  },
+  "isDebtOutstanding": true,
+  "yearsMaintained": 2,
+  "lender": "Various Creditors"
+}
+```
+
+**Example 3: Satisfied CCJ**
+```json
+{
+  "type": "CCJ",
+  "registeredOn": "2021-08-10T00:00:00Z",
+  "satisfiedOrClearedOn": "2022-12-15T00:00:00Z",
+  "amountRegistered": {
+    "amount": 2500.00,
+    "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+  },
+  "amountOutstanding": {
+    "amount": 0.00,
+    "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+  },
+  "isDebtOutstanding": false,
+  "lender": "Council Tax Authority"
+}
+```
+
+**Example 4: Discharged Bankruptcy**
+```json
+{
+  "type": "Bankruptcy",
+  "registeredOn": "2019-05-01T00:00:00Z",
+  "dischargedOn": "2020-05-01T00:00:00Z",
+  "amountRegistered": {
+    "amount": 85000.00,
+    "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+  },
+  "amountOutstanding": {
+    "amount": 0.00,
+    "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+  },
+  "isDebtOutstanding": false
+}
+```
+
+---
+
+#### 13.10.10 Enumeration Value Types
 
 Enumeration value types represent categorical data using a structured code/display pattern. Unlike simple string enumerations, enumeration value types are self-documenting, internationalization-ready, and can carry rich metadata.
 
@@ -21636,7 +22352,7 @@ Represents a person's health status for insurance purposes as a simple string en
 
 ---
 
-### 13.16 Standard Reference Types
+### 14.16 Standard Reference Types
 
 Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `clientRef`, `adviserRef`).
 
@@ -21898,7 +22614,7 @@ Reference to a FactFind (ADVICE_CASE) entity.
 }
 ```
 
-### 13.17 Asset Contract
+### 14.17 Asset Contract
 
 The `Asset` contract represents a client's asset (property, business, cash, investments, etc.) with ownership, valuation, and tax planning information.
 
@@ -22091,7 +22807,7 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 
 ---
 
-### 13.18 Liability Contract
+### 14.18 Liability Contract
 
 The `Liability` contract represents a client's debt obligation (mortgage, loan, credit card, maintenance/alimony, etc.) with repayment details and protection coverage tracking.
 
@@ -22488,7 +23204,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 
 ---
 
-### 13.19 Employment Contract
+### 14.19 Employment Contract
 
 The `Employment` contract represents a client's comprehensive employment record including employment history, status, self-employed income with 3 years of accounts, and all information required for UK mortgage applications and affordability assessments.
 
@@ -23043,7 +23759,7 @@ Partnership:
 
 ---
 
-### 13.20 Budget Contract
+### 14.20 Budget Contract
 
 The `Budget` contract represents a client's budgeted/planned monthly expenditure by category.
 
@@ -23099,7 +23815,7 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 
 ---
 
-### 13.21 Expenditure Contract
+### 14.21 Expenditure Contract
 
 The `Expenditure` contract represents a client's actual expenditure aggregate, containing either summarized monthly expenditure or detailed expense breakdown.
 
@@ -23184,7 +23900,7 @@ The `Expenditure` contract represents a client's actual expenditure aggregate, c
 
 ---
 
-### 13.22 Expense Contract
+### 14.22 Expense Contract
 
 The `Expense` contract represents a single expense line item within an expenditure aggregate.
 
@@ -23251,31 +23967,42 @@ The `Expense` contract represents a single expense line item within an expenditu
 
 ---
 
-### 13.23 Credit History Contract
+### 14.23 Credit History Contract
 
-The `CreditHistory` contract represents a comprehensive record of a client's credit history, including credit scores, adverse credit events, payment history, and mortgage lending suitability assessments. This contract is essential for affordability assessments and mortgage lending decisions, ensuring compliance with FCA regulations and responsible lending requirements.
+The `CreditHistory` contract represents a comprehensive record of a client's credit history, including adverse credit events, payment history, and aggregate summary statistics. This contract is essential for affordability assessments and mortgage lending decisions, ensuring compliance with FCA regulations and responsible lending requirements.
 
 **Reference Type:** CreditHistory is a reference type with identity (has `id` field).
 
 **Purpose:**
 - Track client credit history for affordability and lending decisions
-- Record credit scores from major Credit Reference Agencies (CRAs)
-- Document adverse credit events and their impact on lending eligibility
-- Assess mortgage suitability based on credit profile
-- Support regulatory compliance for mortgage affordability assessments
+- Document adverse credit events (CCJ, Default, IVA, Bankruptcy, Arrears, Repossession)
+- Provide calculated summary of credit status and outstanding debt
+- Support mortgage suitability assessments
+- Ensure regulatory compliance for mortgage affordability assessments
 
 **Key Features:**
-- Credit score tracking from major providers (Experian, Equifax, TransUnion)
-- Detailed adverse credit event recording with financial impact tracking
+- Aggregate summary dashboard with calculated statistics
+- Detailed adverse credit event tracking with full lifecycle
 - Payment history analysis (12-month and 6-year views)
-- Automated mortgage suitability assessment
+- Outstanding debt aggregation
+- Timeline management for each credit event
+- Liability linking for debt tracking
 - Regulatory compliance support for FCA mortgage lending rules
+
+**Key Structure Changes (v2.2):**
+- **REMOVED:** `creditScore` object (moved to external CRA integration)
+- **REMOVED:** `mortgageSuitability` object (calculated at application time)
+- **ADDED:** `summary` object with aggregate statistics and calculated fields
+- **UPDATED:** All summary boolean flags moved into `summary` object
+- **UPDATED:** `totalDebtOutstanding` calculated from adverseCreditEvents array
+- **UPDATED:** `missedPayments` summary moved into `summary` object
 
 **Regulatory Context:**
 - FCA Mortgage Conduct of Business (MCOB) rules require thorough credit assessment
 - Affordability assessments must consider credit history and repayment capacity
 - Adverse credit events impact lending decisions and interest rates
 - Credit Reference Agency data forms basis of responsible lending decisions
+- Consumer Duty requires fair treatment in lending decisions
 
 #### Complete Credit History Contract
 
@@ -23288,33 +24015,44 @@ The `CreditHistory` contract represents a comprehensive record of a client's cre
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
+
   "client": {
-    "id": 1234,
-    "href": "/api/v2/factfinds/679/clients/1234"
+    "id": 346,
+    "href": "/api/v2/factfinds/679/clients/346",
+    "fullName": "John Smith"
   },
 
-  "creditScore": {
-    "score": 780,
-    "maxScore": 999,
-    "rating": "Excellent",
-    "provider": "Experian",
-    "checkedDate": "2026-01-15"
-  },
+  "summary": {
+    "totalRecords": 1,
+    "hasAdverseCredit": true,
+    "hasCCJ": false,
+    "hasBeenRefusedCredit": false,
+    "ivaHistory": false,
+    "hasDefault": true,
+    "hasBankruptcyHistory": false,
+    "hasArrears": false,
 
-  "hasAdverseCredit": false,
-  "hasCCJ": false,
-  "hasBeenRefusedCredit": false,
-  "ivaHistory": false,
-  "hasDefault": false,
-  "hasBankruptcyHistory": false,
-  "hasArrears": false,
+    "totalDebtOutstanding": {
+      "amount": 3500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+
+    "missedPayments": {
+      "last12Months": 0,
+      "last6Years": 2
+    }
+  },
 
   "adverseCreditEvents": [{
     "type": "Default",
     "registeredOn": "2020-06-15T00:00:00Z",
-    "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
-    "reposessedOn": "2022-08-10T00:00:00Z",
-    "dischargedOn": "2023-12-20T00:00:00Z",
+    "satisfiedOrClearedOn": null,
+    "reposessedOn": null,
+    "dischargedOn": null,
     "amountRegistered": {
       "amount": 5000.00,
       "currency": {
@@ -23335,34 +24073,20 @@ The `CreditHistory` contract represents a comprehensive record of a client's cre
     "numberOfPaymentsMissed": 2,
     "consecutivePaymentsMissed": 2,
     "numberOfPaymentsInArrears": 1,
-    "isArrearsClearedUponCompletion": true,
-    "yearsMaintained": 5,
+    "isArrearsClearedUponCompletion": false,
+    "yearsMaintained": 0,
     "lender": "High Street Bank",
     "liability": {
       "id": 1001,
-      "href": "/api/v2/clients/456/liabilities/1001",
+      "href": "/api/v2/factfinds/679/liabilities/1001",
       "description": "Credit Card Debt"
     },
-    "concurrencyId": 12,
+    "concurrencyId": 1,
     "createdAt": "2026-01-15T10:30:00Z",
-    "lastUpdatedAt": "2026-01-29T14:45:00Z"
+    "lastUpdatedAt": "2026-01-15T10:30:00Z"
   }],
 
-  "missedPayments": {
-    "last12Months": 0,
-    "last6Years": 0
-  },
-
-  "mortgageSuitability": {
-    "isEligible": true,
-    "factors": [
-      "Good credit score (780)",
-      "No adverse credit",
-      "No missed payments"
-    ]
-  },
-
-  "notes": "Excellent credit history - eligible for best mortgage rates",
+  "notes": "Client has one outstanding default from 2020. Currently making regular payments to clear the debt.",
 
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-01-15T10:00:00Z"
@@ -23377,126 +24101,115 @@ The `CreditHistory` contract represents a comprehensive record of a client's cre
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned credit history record identifier |
 | `href` | string | read-only | Canonical URI for this credit history record |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `factfindRef` | FactfindRef | read-only | Reference to parent factfind |
 | `client` | ClientRef | read-only | Reference to the client this credit history belongs to |
 
-**Credit Score Assessment**
+**Summary Object (Aggregate Calculated Fields)**
+
+The `summary` object provides a calculated overview of the client's entire credit history. All fields in this object are calculated from the `adverseCreditEvents` array and should be treated as read-only derived data.
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
-| `creditScore` | object | optional | Complete credit score assessment from Credit Reference Agency |
-| `creditScore.score` | integer | optional | Credit score value (typically 0-999 for Experian, 0-700 for Equifax, 0-710 for TransUnion) |
-| `creditScore.maxScore` | integer | optional | Maximum possible score for this provider's scoring system |
-| `creditScore.rating` | string | optional | Rating category: "Excellent" (961-999), "Good" (881-960), "Fair" (721-880), "Poor" (561-720), "Very Poor" (0-560) |
-| `creditScore.provider` | string | optional | Credit Reference Agency: "Experian", "Equifax", "TransUnion" |
-| `creditScore.checkedDate` | date | optional | Date the credit score was obtained (ISO 8601 format: YYYY-MM-DD) |
+| `summary` | object | read-only | Calculated summary of credit history status (derived from adverseCreditEvents) |
+| `summary.totalRecords` | integer | read-only | Count of items in the adverseCreditEvents array |
+| `summary.hasAdverseCredit` | boolean | read-only | True if adverseCreditEvents array is not empty |
+| `summary.hasCCJ` | boolean | required | Indicates if client has County Court Judgment(s) - set based on events in array |
+| `summary.hasBeenRefusedCredit` | boolean | required | Indicates if client has been refused credit in the past |
+| `summary.ivaHistory` | boolean | required | Indicates if client has Individual Voluntary Arrangement (IVA) history |
+| `summary.hasDefault` | boolean | required | Indicates if client has default(s) registered on credit file |
+| `summary.hasBankruptcyHistory` | boolean | required | Indicates if client has bankruptcy history on record |
+| `summary.hasArrears` | boolean | required | Indicates if client currently has or had payment arrears |
+| `summary.totalDebtOutstanding` | MoneyValue | read-only | Sum of all adverseCreditEvents[].amountOutstanding where isDebtOutstanding = true |
+| `summary.missedPayments` | object | read-only | Summary of missed payment history aggregated from all events |
+| `summary.missedPayments.last12Months` | integer | read-only | Count of missed payments in last 12 months (aggregated from events within that period) |
+| `summary.missedPayments.last6Years` | integer | read-only | Count of missed payments in last 6 years (aggregated from all events) |
 
-**Adverse Credit Indicators (Summary Flags)**
-
-| Field | Type | Behavior | Description |
-|-------|------|----------|-------------|
-| `hasAdverseCredit` | boolean | optional | Indicates if client has any adverse credit events (default: false) |
-| `hasCCJ` | boolean | optional | Has County Court Judgment(s) registered (default: false) |
-| `hasBeenRefusedCredit` | boolean | optional | Has been refused credit in the past (default: false) |
-| `ivaHistory` | boolean | optional | Has Individual Voluntary Arrangement (IVA) history (default: false) |
-| `hasDefault` | boolean | optional | Has default(s) registered on credit file (default: false) |
-| `hasBankruptcyHistory` | boolean | optional | Has bankruptcy history on record (default: false) |
-| `hasArrears` | boolean | optional | Currently has or had payment arrears (default: false) |
-
-**Adverse Credit Events (Detailed Records)**
+**Adverse Credit Events Array**
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
-| `adverseCreditEvents[]` | array | optional | Detailed list of adverse credit events with full financial and timeline information |
-| `adverseCreditEvents[].type` | string | required | Type of adverse event: "CCJ" (County Court Judgment), "Default", "IVA" (Individual Voluntary Arrangement), "Bankruptcy", "Arrears", "Repossession", "Debt Relief Order" |
-| `adverseCreditEvents[].registeredOn` | datetime | optional | Date event was registered with Credit Reference Agencies (ISO 8601) |
-| `adverseCreditEvents[].satisfiedOrClearedOn` | datetime | optional | Date the debt was satisfied or cleared (ISO 8601) |
-| `adverseCreditEvents[].reposessedOn` | datetime | optional | Date of property repossession if applicable (ISO 8601) |
-| `adverseCreditEvents[].dischargedOn` | datetime | optional | Date bankruptcy or IVA was discharged (ISO 8601) |
-| `adverseCreditEvents[].amountRegistered` | MoneyValue | optional | Original amount registered when event occurred |
-| `adverseCreditEvents[].amountOutstanding` | MoneyValue | optional | Current outstanding amount (if any) |
-| `adverseCreditEvents[].isDebtOutstanding` | boolean | optional | Whether debt is still outstanding (true) or fully paid (false) |
-| `adverseCreditEvents[].numberOfPaymentsMissed` | integer | optional | Total number of payments missed for this event |
-| `adverseCreditEvents[].consecutivePaymentsMissed` | integer | optional | Number of consecutive payments missed (maximum consecutive period) |
-| `adverseCreditEvents[].numberOfPaymentsInArrears` | integer | optional | Number of payments currently in arrears |
-| `adverseCreditEvents[].isArrearsClearedUponCompletion` | boolean | optional | Whether arrears were cleared when arrangement completed |
-| `adverseCreditEvents[].yearsMaintained` | integer | optional | Number of years successfully maintained after event (for IVA/payment plans) |
-| `adverseCreditEvents[].lender` | string | optional | Name of lender or creditor involved in the adverse event |
-| `adverseCreditEvents[].liability` | LiabilityRef | optional | Reference to related liability record if applicable |
-| `adverseCreditEvents[].concurrencyId` | integer | read-only | Concurrency control identifier for optimistic locking |
-| `adverseCreditEvents[].createdAt` | datetime | read-only | ISO 8601 timestamp when event record was created |
-| `adverseCreditEvents[].lastUpdatedAt` | datetime | read-only | ISO 8601 timestamp when event record was last updated |
+| `adverseCreditEvents[]` | AdverseCreditEvent[] | optional | Array of adverse credit events (see AdverseCreditEvent value type below) |
 
-**Missed Payments Summary**
+Each item in the `adverseCreditEvents` array is an **AdverseCreditEvent** value type (no `id` field) with the following structure:
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
-| `missedPayments` | object | optional | Summary of missed payment history across different time periods |
-| `missedPayments.last12Months` | integer | optional | Count of missed payments in the last 12 months (0 = clean record) |
-| `missedPayments.last6Years` | integer | optional | Count of missed payments in the last 6 years (used for mortgage affordability) |
-
-**Mortgage Suitability Assessment**
-
-| Field | Type | Behavior | Description |
-|-------|------|----------|-------------|
-| `mortgageSuitability` | object | read-only | Automated assessment of mortgage lending eligibility based on credit profile |
-| `mortgageSuitability.isEligible` | boolean | read-only | Whether client is eligible for standard mortgage products (calculated field) |
-| `mortgageSuitability.factors[]` | array[string] | read-only | List of factors affecting mortgage suitability (positive or negative) |
+| `type` | enum | required | Type of adverse event: "CCJ", "Default", "IVA", "Bankruptcy", "Arrears", "Repossession" |
+| `registeredOn` | datetime | required | Date event was registered with Credit Reference Agencies (ISO 8601 format) |
+| `satisfiedOrClearedOn` | datetime | optional | Date the debt was satisfied or cleared (ISO 8601 format) |
+| `reposessedOn` | datetime | optional | Date of property repossession if applicable (ISO 8601 format) |
+| `dischargedOn` | datetime | optional | Date bankruptcy or IVA was discharged (ISO 8601 format) |
+| `amountRegistered` | MoneyValue | required | Original amount registered when event occurred |
+| `amountOutstanding` | MoneyValue | required | Current outstanding amount (can be 0.00 if satisfied) |
+| `isDebtOutstanding` | boolean | required | Whether debt is still outstanding (true) or fully paid (false) |
+| `numberOfPaymentsMissed` | integer | optional | Total number of payments missed for this event |
+| `consecutivePaymentsMissed` | integer | optional | Number of consecutive payments missed (maximum consecutive period) |
+| `numberOfPaymentsInArrears` | integer | optional | Number of payments currently in arrears |
+| `isArrearsClearedUponCompletion` | boolean | optional | Whether arrears were cleared when arrangement completed |
+| `yearsMaintained` | integer | optional | Number of years successfully maintained after event (for IVA/payment plans, typically 0-6) |
+| `lender` | string | optional | Name of lender or creditor involved in the adverse event (max 200 characters) |
+| `liability` | LiabilityRef | optional | Reference to related liability record if applicable |
+| `concurrencyId` | integer | read-only | Concurrency control identifier for optimistic locking of this specific event |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp when this event record was created |
+| `lastUpdatedAt` | datetime | read-only | ISO 8601 timestamp when this event record was last updated |
 
 **Additional Information**
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
-| `notes` | string | optional | Free-text notes about credit history, mitigating circumstances, or additional context (max 2000 chars) |
+| `notes` | string | optional | Free-text notes about credit history, mitigating circumstances, or additional context (max 2000 characters) |
 
 **Audit Trail**
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
-| `createdAt` | datetime | read-only | ISO 8601 timestamp when credit history record was created |
-| `updatedAt` | datetime | read-only | ISO 8601 timestamp when credit history record was last updated |
+| `createdAt` | datetime | read-only | ISO 8601 timestamp when the credit history record was created |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp when the credit history record was last updated |
 
 #### Validation Rules
 
-**Credit Score Validations:**
-- `creditScore.score` must be between 0 and `creditScore.maxScore`
-- Experian scores: 0-999 (max: 999)
-- Equifax scores: 0-700 (max: 700)
-- TransUnion scores: 0-710 (max: 710)
-- `creditScore.checkedDate` cannot be in the future
-- `creditScore.provider` must be one of: "Experian", "Equifax", "TransUnion"
-
-**Adverse Credit Business Logic:**
-- If `hasAdverseCredit` = true, then `adverseCreditEvents[]` array must not be empty
-- If `adverseCreditEvents[]` contains any items, then `hasAdverseCredit` must be true
-- Specific type flags (`hasCCJ`, `hasDefault`, etc.) should align with `adverseCreditEvents[].type` values
-- If `hasCCJ` = true, there should be at least one event with `type` = "CCJ"
-- If `hasDefault` = true, there should be at least one event with `type` = "Default"
+**Summary Object Validation:**
+- `summary.totalRecords` must equal the count of items in `adverseCreditEvents` array
+- `summary.hasAdverseCredit` must be true if `adverseCreditEvents` array is not empty
+- `summary.totalDebtOutstanding.amount` must equal the sum of all `adverseCreditEvents[].amountOutstanding.amount` where `isDebtOutstanding` = true
+- Summary boolean flags must align with events in array:
+  - If `summary.hasCCJ` = true, there must be at least one event with `type` = "CCJ"
+  - If `summary.hasDefault` = true, there must be at least one event with `type` = "Default"
+  - If `summary.ivaHistory` = true, there must be at least one event with `type` = "IVA"
+  - If `summary.hasBankruptcyHistory` = true, there must be at least one event with `type` = "Bankruptcy"
+  - If `summary.hasArrears` = true, there must be at least one event with `type` = "Arrears"
+- `summary.missedPayments.last12Months` must equal sum of `numberOfPaymentsMissed` for events within last 12 months
+- `summary.missedPayments.last6Years` must equal sum of `numberOfPaymentsMissed` for events within last 6 years
 
 **Adverse Credit Event Validations:**
-- `adverseCreditEvents[].type` is required when event is present
-- `adverseCreditEvents[].registeredOn` cannot be in the future
+- `type` is required when event is present
+- `type` must be one of: "CCJ", "Default", "IVA", "Bankruptcy", "Arrears", "Repossession"
+- `registeredOn` is required and cannot be in the future
 - If `satisfiedOrClearedOn` is provided, it must be after `registeredOn`
 - If `dischargedOn` is provided, it must be after `registeredOn`
-- `amountOutstanding` cannot exceed `amountRegistered`
-- If `isDebtOutstanding` = false, `amountOutstanding.amount` should be 0
-- `numberOfPaymentsMissed` must be >= 0
-- `consecutivePaymentsMissed` must be <= `numberOfPaymentsMissed`
-- `yearsMaintained` must be >= 0
+- If `reposessedOn` is provided, it must be after `registeredOn`
+- Timeline must be logical: `registeredOn` < `satisfiedOrClearedOn` < `dischargedOn`
+- `amountRegistered` is required and must be > 0
+- `amountOutstanding` is required and cannot exceed `amountRegistered`
+- If `isDebtOutstanding` = false, `amountOutstanding.amount` should be 0.00
+- `isDebtOutstanding` is required
+- `numberOfPaymentsMissed` must be >= 0 if provided
+- `consecutivePaymentsMissed` must be <= `numberOfPaymentsMissed` if provided
+- `numberOfPaymentsInArrears` must be >= 0 if provided
+- `yearsMaintained` must be >= 0 and <= 10 if provided
+- `lender` max length 200 characters
+- Currency codes must be valid ISO 4217 codes
 
-**Date Validations:**
-- All dates must be valid ISO 8601 format
-- `creditScore.checkedDate`: YYYY-MM-DD format
-- Event dates: ISO 8601 datetime with timezone (YYYY-MM-DDTHH:mm:ssZ)
-- Historical dates should not be in the future
+**Date Format Validations:**
+- All dates must be valid ISO 8601 datetime format with timezone: YYYY-MM-DDTHH:mm:ssZ
+- Event dates (`registeredOn`, `satisfiedOrClearedOn`, `reposessedOn`, `dischargedOn`) cannot be in the future
+- Dates must be internally consistent within each event
 
-**Mortgage Suitability Calculation:**
-- `mortgageSuitability.isEligible` is calculated based on:
-  - Credit score (typically 650+ for standard mortgages)
-  - Adverse credit recency (CCJs older than 3 years, defaults satisfied for 3+ years)
-  - Missed payments in last 12 months (ideally 0)
-  - Outstanding adverse credit debt amounts
-- `mortgageSuitability.factors[]` is auto-generated list of assessment criteria
+**Business Rule Validations:**
+- If event `type` = "IVA", `yearsMaintained` should typically be 0-6 (standard IVA term is 5-6 years)
+- If event `type` = "Repossession", `reposessedOn` date should be provided
+- If event `type` = "Bankruptcy", `dischargedOn` date should be provided when bankruptcy is discharged
+- If `isDebtOutstanding` = true, `amountOutstanding` must be > 0
 
 #### Business Rules and Context
 
@@ -23589,7 +24302,7 @@ Under FCA MCOB (Mortgage Conduct of Business) rules:
 
 ---
 
-### 13.24 Property Detail Contract
+### 14.24 Property Detail Contract
 
 The `PropertyDetail` contract represents detailed property information including physical characteristics, construction details, and tenure information.
 
@@ -23863,7 +24576,7 @@ Returns: `204 No Content`
 
 ---
 
-### 13.25 Business Asset Contract
+### 14.25 Business Asset Contract
 
 The `BusinessAsset` contract represents detailed business asset information including valuation basis, dividend tracking, and tax relief eligibility.
 
@@ -24004,7 +24717,7 @@ The `BusinessAsset` contract represents detailed business asset information incl
 
 ---
 
-### 13.26 Notes Contract
+### 14.26 Notes Contract
 
 The `Notes` contract represents a note attached to a fact find entity using a unified discriminator pattern.
 
@@ -24093,7 +24806,7 @@ The `Notes` contract represents a note attached to a fact find entity using a un
 
 ---
 
-### 13.27 Dependant Contract
+### 14.27 Dependant Contract
 
 The `Dependant` contract represents a dependent family member of one or more clients.
 
@@ -24226,7 +24939,7 @@ The `Dependant` contract represents a dependent family member of one or more cli
 
 ---
 
-### 13.28 Income Changes Contract
+### 14.28 Income Changes Contract
 
 The `IncomeChanges` contract represents anticipated changes to a client's income, used for affordability and cash flow planning.
 
@@ -24345,7 +25058,7 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 
 ---
 
-### 13.29 Expenditure Changes Contract
+### 14.29 Expenditure Changes Contract
 
 The `ExpenditureChanges` contract represents anticipated changes to a client's expenditure, used for affordability and cash flow planning.
 
@@ -24446,7 +25159,7 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 
 ---
 
-### 13.30 Affordability Assessment Contract
+### 14.30 Affordability Assessment Contract
 
 The `AffordabilityAssessment` contract represents a mortgage affordability calculation with stress testing and regulatory compliance checks.
 
@@ -24664,7 +25377,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
 
 ---
 
-### 13.31 Contact Contract
+### 14.31 Contact Contract
 
 The `Contact` contract represents a contact method (email, phone, mobile, work phone, website) for a client.
 
@@ -24739,7 +25452,7 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 
 ---
 
-### 13.32 Attitude to Risk (ATR) Contract
+### 14.32 Attitude to Risk (ATR) Contract
 
 The `AttitudeToRisk` contract represents a client's risk tolerance assessment, typically completed via questionnaire for investment and pension advice.
 
@@ -24861,7 +25574,7 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 
 ---
 
-### 13.33 Professional Contact Contract
+### 14.33 Professional Contact Contract
 
 The `ProfessionalContact` contract represents a client's professional adviser (solicitor, accountant, IFA, mortgage broker, etc.).
 
@@ -24930,7 +25643,7 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 
 ---
 
-### 13.34 Vulnerability Contract
+### 14.34 Vulnerability Contract
 
 The `Vulnerability` contract represents a client vulnerability indicator for Consumer Duty compliance.
 
@@ -25037,7 +25750,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 
 ---
 
-### 13.35 Marketing Preferences Contract
+### 14.35 Marketing Preferences Contract
 
 The `MarketingPreferences` contract represents a client's marketing consent and communication preferences.
 
@@ -25123,7 +25836,7 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 
 ---
 
-### 13.36 Estate Planning - Will Contract
+### 14.36 Estate Planning - Will Contract
 
 The `Will` contract represents a client's last will and testament details.
 
@@ -25210,7 +25923,7 @@ The `Will` contract represents a client's last will and testament details.
 
 ---
 
-### 13.37 Estate Planning - Lasting Power of Attorney (LPA) Contract
+### 14.37 Estate Planning - Lasting Power of Attorney (LPA) Contract
 
 The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
@@ -25301,7 +26014,7 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
 ---
 
-### 13.38 Estate Planning - Gift Contract
+### 14.38 Estate Planning - Gift Contract
 
 The `Gift` contract represents gifts made or planned by the client for inheritance tax planning.
 
@@ -25406,7 +26119,7 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 
 ---
 
-### 13.39 Estate Planning - Trust Contract
+### 14.39 Estate Planning - Trust Contract
 
 The `Trust` contract represents trusts established by or benefiting the client.
 
@@ -25523,7 +26236,7 @@ The `Trust` contract represents trusts established by or benefiting the client.
 
 ---
 
-### 13.40 Identity Verification & Data Protection Consent Contract
+### 14.40 Identity Verification & Data Protection Consent Contract
 
 The `IdentityVerification` contract represents identity verification checks and data protection consents.
 
@@ -25669,7 +26382,7 @@ The `IdentityVerification` contract represents identity verification checks and 
 
 ---
 
-### 13.41 Arrangement - Mortgage Contract
+### 14.41 Arrangement - Mortgage Contract
 
 The `MortgageArrangement` contract represents mortgage and equity release secured lending products including traditional mortgages, lifetime mortgages, and home reversion plans. This unified contract uses a product type discriminator to handle both mortgage and equity release scenarios with industry-standard field grouping.
 
@@ -26280,7 +26993,7 @@ initialRatePeriodEndsOn ≤ earlyRepaymentChargeEndsOn
 
 ---
 
-### 13.42 Arrangement - Investment Contract (General Investment Account)
+### 14.42 Arrangement - Investment Contract (General Investment Account)
 
 The `InvestmentArrangement` contract represents investment products including GIAs, ISAs, Investment Bonds, Platform Accounts, and Cash Accounts (savings, current accounts, cash deposits).
 
@@ -26453,7 +27166,7 @@ The `InvestmentArrangement` contract represents investment products including GI
 
 ---
 
-### 13.43 Arrangement - Protection Contract (Life Assurance)
+### 14.43 Arrangement - Protection Contract (Life Assurance)
 
 The `ProtectionArrangement` contract represents protection products including Life Assurance, Critical Illness Cover, and Income Protection.
 
@@ -26593,7 +27306,7 @@ The `ProtectionArrangement` contract represents protection products including Li
 
 ---
 
-### 13.44 Arrangement - Pension Contract (Personal Pension)
+### 14.44 Arrangement - Pension Contract (Personal Pension)
 
 The `PensionArrangement` contract represents pension products including Personal Pensions, SIPPs, Workplace Pensions, Final Salary schemes, and Annuities.
 
@@ -26839,7 +27552,7 @@ The `PensionArrangement` contract represents pension products including Personal
 
 ---
 
-### 13.45 Arrangement - Pension Contract (SIPP - Self-Invested Personal Pension)
+### 14.45 Arrangement - Pension Contract (SIPP - Self-Invested Personal Pension)
 
 The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which offer greater investment flexibility and control compared to standard personal pensions.
 
@@ -27219,7 +27932,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
 
 ---
 
-### 13.46 Arrangement - Pension Contract (Final Salary / Defined Benefit Pension)
+### 14.46 Arrangement - Pension Contract (Final Salary / Defined Benefit Pension)
 
 The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defined Benefit pensions, which provide a guaranteed income in retirement based on salary and years of service.
 
@@ -27587,7 +28300,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
 
 ---
 
-### 13.47 Arrangement - Pension Contract (Money Purchase / Defined Contribution Pension)
+### 14.47 Arrangement - Pension Contract (Money Purchase / Defined Contribution Pension)
 
 The `MoneyPurchasePensionArrangement` contract represents Defined Contribution pensions including workplace Money Purchase schemes, typically employer-sponsored with matched contributions.
 
@@ -27946,7 +28659,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
 
 ---
 
-### 13.48 Arrangement - Pension Contract (State Pension)
+### 14.48 Arrangement - Pension Contract (State Pension)
 
 The `StatePensionArrangement` contract represents State Pension entitlement, including forecast amounts and National Insurance contribution history.
 
@@ -28274,7 +28987,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
 
 ---
 
-### 13.49 Arrangement - Pension Contract (Stakeholder Pension)
+### 14.49 Arrangement - Pension Contract (Stakeholder Pension)
 
 The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, which are low-cost, flexible personal pensions with capped charges and minimum contribution requirements.
 
@@ -28551,7 +29264,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
 
 ---
 
-### 13.50 Arrangement - Pension Contract (Group Personal Pension)
+### 14.50 Arrangement - Pension Contract (Group Personal Pension)
 
 The `GroupPersonalPensionArrangement` contract represents Group Personal Pensions (GPP), employer-sponsored arrangements where each member has individual personal pension with negotiated group terms.
 
@@ -28927,7 +29640,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
 
 ---
 
-### 13.51 Arrangement - Pension Contract (Executive Pension Plan)
+### 14.51 Arrangement - Pension Contract (Executive Pension Plan)
 
 The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plans (EPP), typically high-value arrangements for company directors and senior executives with enhanced benefits.
 
@@ -29409,7 +30122,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
 
 ---
 
-### 13.52 Arrangement - Investment Contract (Stocks & Shares ISA)
+### 14.52 Arrangement - Investment Contract (Stocks & Shares ISA)
 
 The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-efficient investment wrappers that shelter investment returns from income tax and capital gains tax.
 
@@ -29799,7 +30512,7 @@ effectiveAllowanceRemaining = (annualAllowance - usedThisYear) + withdrawalsThis
 
 ---
 
-### 13.53 Arrangement - Investment Contract (Cash ISA)
+### 14.53 Arrangement - Investment Contract (Cash ISA)
 
 The `CashISAArrangement` contract represents Cash ISAs, tax-free savings accounts that shelter interest from income tax.
 
@@ -30043,7 +30756,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
 
 ---
 
-### 13.54 Arrangement - Investment Contract (Lifetime ISA)
+### 14.54 Arrangement - Investment Contract (Lifetime ISA)
 
 The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed for first-time home buyers or retirement savings with 25% government bonus.
 
@@ -30390,7 +31103,7 @@ maxBonusPerYear = £1,000 (on £4,000 contributions)
 
 ---
 
-### 13.55 Arrangement - Investment Contract (Investment Bond - Onshore)
+### 14.55 Arrangement - Investment Contract (Investment Bond - Onshore)
 
 The `OnshoreInvestmentBondArrangement` contract represents onshore investment bonds (life insurance wrappers) with tax-efficient growth and 5% annual withdrawal allowance.
 
@@ -30485,7 +31198,7 @@ maxTaxDeferredWithdrawal = cumulativeAllowance - withdrawalsTaken
 
 ---
 
-### 13.56 Arrangement - Investment Contract (Investment Bond - Offshore)
+### 14.56 Arrangement - Investment Contract (Investment Bond - Offshore)
 
 The `OffshoreInvestmentBondArrangement` contract represents offshore investment bonds with gross roll-up and wider investment choice.
 
@@ -30563,7 +31276,7 @@ The `OffshoreInvestmentBondArrangement` contract represents offshore investment 
 
 ---
 
-### 13.57 Arrangement - Investment Contract (Savings Account / Cash Deposit)
+### 14.57 Arrangement - Investment Contract (Savings Account / Cash Deposit)
 
 The `SavingsAccountArrangement` contract represents savings accounts, fixed-term deposits, and instant access cash accounts.
 
@@ -30639,7 +31352,7 @@ The `SavingsAccountArrangement` contract represents savings accounts, fixed-term
 
 ---
 
-### 13.58 Arrangement - Protection Contract (Critical Illness Cover)
+### 14.58 Arrangement - Protection Contract (Critical Illness Cover)
 
 The `CriticalIllnessCoverArrangement` contract represents critical illness insurance providing lump sum on diagnosis of specified conditions.
 
@@ -30734,7 +31447,7 @@ The `CriticalIllnessCoverArrangement` contract represents critical illness insur
 
 ---
 
-### 13.59 Arrangement - Protection Contract (Income Protection Insurance)
+### 14.59 Arrangement - Protection Contract (Income Protection Insurance)
 
 The `IncomeProtectionArrangement` contract represents income protection insurance providing replacement income during illness or injury.
 
@@ -30824,7 +31537,7 @@ The `IncomeProtectionArrangement` contract represents income protection insuranc
 
 ---
 
-### 13.60 Arrangement - Protection Contract (Buildings Insurance)
+### 14.60 Arrangement - Protection Contract (Buildings Insurance)
 
 The `BuildingsInsuranceArrangement` contract represents buildings insurance for property structural protection.
 
@@ -30900,7 +31613,7 @@ The `BuildingsInsuranceArrangement` contract represents buildings insurance for 
 
 ---
 
-### 13.61 Arrangement - Protection Contract (Contents Insurance)
+### 14.61 Arrangement - Protection Contract (Contents Insurance)
 
 The `ContentsInsuranceArrangement` contract represents contents insurance for possessions within property.
 
@@ -30959,7 +31672,7 @@ The `ContentsInsuranceArrangement` contract represents contents insurance for po
 
 ---
 
-### 13.62 Arrangement - Protection Contract (Private Medical Insurance)
+### 14.62 Arrangement - Protection Contract (Private Medical Insurance)
 
 The `PrivateMedicalInsuranceArrangement` contract represents private medical insurance (PMI) for healthcare treatment.
 
@@ -31019,7 +31732,7 @@ The `PrivateMedicalInsuranceArrangement` contract represents private medical ins
 
 ---
 
-### 13.63 Arrangement - Mortgage Contract (Lifetime Mortgage - Equity Release)
+### 14.63 Arrangement - Mortgage Contract (Lifetime Mortgage - Equity Release)
 
 The `LifetimeMortgageArrangement` contract represents lifetime mortgages (equity release) for over-55s with no monthly repayments.
 
@@ -31115,7 +31828,7 @@ Example: £85,000 at 5.95% for 20 years = £255,800
 
 ---
 
-### 13.64 Arrangement - Mortgage Contract (Buy-to-Let Mortgage)
+### 14.64 Arrangement - Mortgage Contract (Buy-to-Let Mortgage)
 
 The `BuyToLetMortgageArrangement` contract represents buy-to-let mortgages for investment properties with rental income assessment.
 
