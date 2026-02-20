@@ -48,7 +48,7 @@ Each contract section includes:
 - [13.19 Employment Contract](#1319-employment-contract)
 - [13.20 Budget Contract](#1320-budget-contract)
 - [13.21 Expenditure Contract](#1321-expenditure-contract)
-- [13.22 Expense Contract](#1322-expense-contract)
+- [13.22 Expense Contract - DEPRECATED](#1322-expense-contract)
 - [13.23 Credit History Contract](#1323-credit-history-contract)
 - [13.24 Property Detail Contract](#1324-property-detail-contract)
 - [13.25 Business Asset Contract](#1325-business-asset-contract)
@@ -3549,55 +3549,104 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 
 ### Business Purpose
 
-Represents the client's regular spending and outgoings, used for budget planning and affordability assessments.
+Represents a single expenditure item (outgoing payment) for a client, used for budget planning and affordability assessments. Each expenditure represents a specific payment such as mortgage, rent, utilities, food shopping, or other regular expenses.
 
 ### Key Features
 
-- Categorizes spending (housing, transport, food, etc.)
-- Distinguishes essential vs discretionary spending
-- Supports different frequencies (monthly, annual)
-- Used in affordability calculations
+- Tracks individual expenditure items by type and frequency
+- Links to liabilities being repaid (e.g., mortgage, credit card payments)
+- Supports debt consolidation scenarios with consolidation flag
+- Categorizes expenditure for affordability assessment (Essential vs Non-Essential)
+- Period tracking with start and end dates
 
 ### Fields
-
 
 #### Main Fields
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| clientRef | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2026-01-15T11:00:00Z |
-| expenses | List of Complex Data |  | List with 2 item(s) |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Number | Unique system identifier for this record | 667 |
-| includeInAffordability | Yes/No |  | Yes |
-| isDetailed | Yes/No |  | Yes |
-| notes | Text |  | Monthly expenditure based on bank statements revie... |
-| totalMonthlyExpenditure | Currency Amount |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-08T14:30:00Z |
+|-----------|------|-------------|---------------|
+| id | Number | Unique identifier for the expenditure | 1001 |
+| href | Text | Link to this expenditure resource | /api/v2/factfinds/234/clients/456/expenditures/1001 |
+| client | Link to Client | The client who has this expenditure | Client #456 |
+| description | Text | Description of the expenditure | Monthly mortgage payment |
+| expenditureType | Selection | Type/category of expenditure | Mortgage, Rent, Council Tax, etc. |
+| netAmount | Currency Amount | Amount paid (after tax if applicable) | £1,500.00 |
+| frequency | Selection | How often the payment is made | Monthly, Weekly, Annually |
+| startsOn | Date | When the expenditure started | 2025-01-01 |
+| endsOn | Date | When the expenditure ends (if known) | null (ongoing) |
+| isConsolidated | Yes/No | Is this part of a debt consolidation? | No |
+| isLiabilityToBeRepaid | Yes/No | Is this paying off a specific debt? | Yes |
+| liability | Link to Liability | The debt/liability being repaid | Liability #5001 - Mortgage |
+| notes | Text | Additional notes | Fixed rate until 2027 |
+| createdAt | Date | When this record was created in the system | 2026-01-15T10:00:00Z |
+| updatedAt | Date | When this record was last modified | 2026-02-18T14:30:00Z |
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
+|-----------|------|-------------|---------------|
+| id | Number | Client identifier | 456 |
+| href | Text | Link to the client | /api/v2/factfinds/234/clients/456 |
 
-**factfindRef:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-
-**totalMonthlyExpenditure:**
+**netAmount:**
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 3250.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
+|-----------|------|-------------|---------------|
+| currencyCode | Text | Currency code (ISO 4217) | GBP |
+| amount | Number | Amount paid | 1500.00 |
+
+**liability (optional):**
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| id | Number | Liability identifier | 5001 |
+| href | Text | Link to the liability | /api/v2/factfinds/234/liabilities/5001 |
+| description | Text | Description of the liability | Residential Mortgage - Main Home |
+
+---
+
+### Expenditure Types
+
+Expenditure types are organized into three categories based on their importance for affordability assessments:
+
+#### Basic Essential Expenditure
+
+| Expenditure Type | Description | Category |
+|-----------------|-------------|----------|
+| Rent | Monthly or periodic rent payments | Essential |
+| Mortgage | Mortgage payment (principal + interest) | Essential |
+| Council Tax | Local authority council tax | Essential |
+| Gas | Gas utilities | Essential |
+| Electricity | Electricity utilities | Essential |
+| Water | Water and sewerage charges | Essential |
+| Telephone/Mobile | Phone and mobile services | Essential |
+| Food & Personal Care | Groceries, toiletries, personal care | Essential |
+| Car/Travelling Expenses | Vehicle running costs, fuel, public transport | Essential |
+| Housekeeping | General household running costs | Essential |
+| Ground Rent/Service charge | Service charges for leasehold properties | Essential |
+
+#### Basic Quality of Living
+
+| Expenditure Type | Description | Category |
+|-----------------|-------------|----------|
+| Clothing | Clothing and footwear | Quality of Living |
+| Furniture/Appliances/Repairs | Household goods and repairs | Quality of Living |
+| TV/Satellite/Internet/Basic Recreation | Media subscriptions and basic entertainment | Quality of Living |
+| Pension | Personal pension contributions | Quality of Living |
+| School Fee/Childcare | Education and childcare costs | Quality of Living |
+
+#### Non-Essential Outgoings
+
+| Expenditure Type | Description | Category |
+|-----------------|-------------|----------|
+| Sports and Recreation | Sports memberships, hobbies | Non-Essential |
+| Holidays | Annual holidays and travel | Non-Essential |
+| Entertainment | Dining out, cinema, events | Non-Essential |
+| Life/General Assurance Premium | Insurance premiums | Non-Essential |
+| Investments | Investment contributions | Non-Essential |
+| Credit Card | Credit card payment (minimum or regular) | Non-Essential |
 
 ---
 
@@ -3606,66 +3655,64 @@ Represents the client's regular spending and outgoings, used for budget planning
 This contract connects to:
 
 - Belongs to a Client
-- Belongs to a FactFind
+- May link to a Liability (if repaying debt)
 - Used by Affordability Assessment
 - Part of Budget calculations
 
 ### Business Validation Rules
 
-- amount must be > 0
-- frequency is required
-- category is required
+- Every expenditure must have a type and amount
+- Amount must be greater than zero
+- Frequency is required (Daily, Weekly, Fortnightly, Monthly, Quarterly, Annually)
+- If end date is provided, it must be after start date
+- Essential expenditures (rent, mortgage, utilities) are prioritized for affordability
+- If paying off a debt, link to the liability for tracking
+- Consolidated debts are flagged for refinancing scenarios
+- Frequency must match how often the payment is actually made
+
+### Affordability Assessment Impact
+
+**How Expenditure Categories Affect Affordability:**
+
+1. **Basic Essential Expenditure:**
+   - Always included in minimum expenditure calculations
+   - Cannot be reduced or excluded in stress testing
+   - Forms the baseline for sustainable living costs
+   - Lenders verify against industry benchmarks
+
+2. **Basic Quality of Living:**
+   - Typically included in standard affordability models
+   - Represents normal standard of living
+   - May be adjusted based on household size
+   - Pension contributions maintain retirement quality
+
+3. **Non-Essential Outgoings:**
+   - May be excluded or reduced in affordability stress tests
+   - Demonstrates capacity to absorb payment increases
+   - Can be forgone temporarily in financial difficulty
+   - Shows discretionary spending flexibility
+
+**Regulatory Context:**
+- FCA MCOB (Mortgage Conduct of Business) requires thorough expenditure assessment
+- Lenders must ensure borrowers can afford payments under stressed scenarios
+- Consumer Duty requires fair treatment and consideration of actual living costs
+- Expenditure verification may require bank statements or evidence
 
 ---
 
 
 ## 13.22 Expense Contract
-### Overview
-The `Expense` contract represents a single expense line item within an expenditure aggregate.
 
-### Fields
+**DEPRECATED:** This contract has been replaced by the simplified Expenditure Contract (13.21).
 
-#### Main Fields
+In v2.2, the separate Expense entity has been removed. Individual expenditure items are now tracked directly as Expenditure entities, eliminating the need for a nested aggregate structure.
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Currency Amount | Amount spent | Complex object |
-| category | Text | Expenditure category (Housing, Transport, Food, etc.) | MORTGAGE |
-| createdAt | Date | When this record was created in the system | 2026-01-15T11:00:00Z |
-| description | Text | Description of the goal | Primary residence mortgage payment |
-| expenditureRef | Reference Link |  | Complex object |
-| frequency | Text | How often (Monthly, Annual, etc.) | MONTHLY |
-| id | Number | Unique system identifier for this record | 1001 |
-| includeInAffordability | Yes/No |  | Yes |
-| monthlyAmount | Currency Amount | Amount spent | Complex object |
-| notes | Text |  | Fixed rate until June 2027 |
-| updatedAt | Date | When this record was last modified | 2026-02-08T14:30:00Z |
+**Migration Note:**
+- Old `Expense` records should be migrated to `Expenditure` entities
+- The `expenditureRef` parent relationship is no longer needed
+- Each expense becomes a standalone expenditure item with direct client reference
 
-#### Nested Field Groups
-
-**amount:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 1200.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**expenditureRef:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 667 |
-
-**monthlyAmount:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 1200.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
+See **Section 13.21 Expenditure Contract** for the current structure.
 
 ---
 

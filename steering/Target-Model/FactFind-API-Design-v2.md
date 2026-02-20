@@ -331,22 +331,21 @@ The FactFind API provides comprehensive digital capabilities for:
    - [14.19 Employment Contract](#1419-employment-contract)
    - [14.20 Budget Contract](#1420-budget-contract)
    - [14.21 Expenditure Contract](#1421-expenditure-contract)
-   - [14.22 Expense Contract](#1422-expense-contract)
-   - [14.23 Credit History Contract](#1423-credit-history-contract)
-   - [14.24 Property Detail Contract](#1424-property-detail-contract)
-   - [14.25 Business Asset Contract](#1425-business-asset-contract)
-   - [14.26 Notes Contract](#1426-notes-contract)
-   - [14.27 Dependant Contract](#1427-dependant-contract)
-   - [14.28 Income Changes Contract](#1428-income-changes-contract)
-   - [14.29 Expenditure Changes Contract](#1429-expenditure-changes-contract)
-   - [14.30 Affordability Assessment Contract](#1430-affordability-assessment-contract)
-   - [14.31 Contact Contract](#1431-contact-contract)
-   - [14.32 Attitude to Risk (ATR) Contract](#1432-attitude-to-risk-atr-contract)
-   - [14.33 Professional Contact Contract](#1433-professional-contact-contract)
-   - [14.34 Vulnerability Contract](#1434-vulnerability-contract)
-   - [14.35 Marketing Preferences Contract](#1435-marketing-preferences-contract)
-   - [14.36 Estate Planning - Will Contract](#1436-estate-planning---will-contract)
-   - [14.37 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1437-estate-planning---lasting-power-of-attorney-lpa-contract)
+   - [14.22 Credit History Contract](#1422-credit-history-contract)
+   - [14.23 Property Detail Contract](#1423-property-detail-contract)
+   - [14.24 Business Asset Contract](#1424-business-asset-contract)
+   - [14.25 Notes Contract](#1425-notes-contract)
+   - [14.26 Dependant Contract](#1426-dependant-contract)
+   - [14.27 Income Changes Contract](#1427-income-changes-contract)
+   - [14.28 Expenditure Changes Contract](#1428-expenditure-changes-contract)
+   - [14.29 Affordability Assessment Contract](#1429-affordability-assessment-contract)
+   - [14.30 Contact Contract](#1430-contact-contract)
+   - [14.31 Attitude to Risk (ATR) Contract](#1431-attitude-to-risk-atr-contract)
+   - [14.32 Professional Contact Contract](#1432-professional-contact-contract)
+   - [14.33 Vulnerability Contract](#1433-vulnerability-contract)
+   - [14.34 Marketing Preferences Contract](#1434-marketing-preferences-contract)
+   - [14.35 Estate Planning - Will Contract](#1435-estate-planning---will-contract)
+   - [14.36 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1436-estate-planning---lasting-power-of-attorney-lpa-contract)
    - [14.38 Estate Planning - Gift Contract](#1438-estate-planning---gift-contract)
    - [14.39 Estate Planning - Trust Contract](#1439-estate-planning---trust-contract)
    - [14.40 Identity Verification & Data Protection Consent Contract](#1440-identity-verification--data-protection-consent-contract)
@@ -5801,7 +5800,7 @@ Use: Demonstrate suitability in file review
 **Base Paths:**
 - Income: `/api/v2/factfinds/{factfindId}/clients/{clientId}/income`
 - Income Changes: `/api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes`
-- Expenditure: `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
+- Expenditure: `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditures`
 - Expenditure Changes: `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
 
 **Purpose:** Track client's actual income sources, expenditure, and expected changes to their financial circumstances.
@@ -5855,11 +5854,11 @@ Use: Demonstrate suitability in file review
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure` | List expenditure items | `circumstances:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure` | Create expenditure item | `circumstances:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Get expenditure details | `circumstances:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Update expenditure item | `circumstances:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{id}` | Delete expenditure item | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditures` | List expenditure items | `circumstances:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditures` | Create expenditure item | `circumstances:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditures/{id}` | Get expenditure details | `circumstances:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditures/{id}` | Update expenditure item | `circumstances:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditures/{id}` | Delete expenditure item | `circumstances:write` |
 
 **Expenditure Changes Operations:**
 
@@ -6086,70 +6085,90 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
 
 #### 6.3.4 List Expenditure Items
 
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditures`
 
 **Description:** Retrieve all expenditure items for a client.
 
 **Query Parameters:**
-- `expenditureType` - Filter by type (Mortgage, Rent, Utilities, Food, Transport, Insurance, Debt, Discretionary)
-- `isDiscretionary` - Filter by discretionary status (true/false)
+- `expenditureType` - Filter by type (see Expenditure Types in Section 14.21)
+- `isConsolidated` - Filter by consolidation status (true/false)
+- `isLiabilityToBeRepaid` - Filter expenditures linked to liabilities (true/false)
 
 **Response:**
 ```json
 {
-  "clientId": 123,
-  "clientName": "John Smith",
-  "totalExpenditure": {
-    "amount": 48000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+  "client": {
+    "id": 456,
+    "href": "/api/v2/factfinds/234/clients/456",
+    "fullName": "John Smith"
   },
-  "expenditure": [
+  "totalMonthlyExpenditure": {
+    "currencyCode": "GBP",
+    "amount": 3855.00
+  },
+  "expenditures": [
     {
-      "id": 555,
+      "id": 1001,
+      "href": "/api/v2/factfinds/234/clients/456/expenditures/1001",
+      "description": "Monthly mortgage payment - main residence",
       "expenditureType": "Mortgage",
-      "description": "Mortgage payment - main residence",
-      "amount": {
-        "amount": 18000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
+      "netAmount": {
+        "currencyCode": "GBP",
+        "amount": 1500.00
       },
-      "frequency": "Annual",
-      "isDiscretionary": false,
-      "startDate": "2015-06-01",
-      "endDate": "2040-05-31"/clients/123/expenditure/exp-555"
-        }
-      }
+      "frequency": "Monthly",
+      "startsOn": "2020-06-01",
+      "endsOn": null,
+      "isConsolidated": false,
+      "isLiabilityToBeRepaid": true,
+      "liability": {
+        "id": 5001,
+        "href": "/api/v2/factfinds/234/liabilities/5001",
+        "description": "Residential Mortgage - Main Home"
+      },
+      "notes": "Fixed rate until 2027"
     },
     {
-      "id": 666,
-      "expenditureType": "Utilities",
-      "description": "Gas, electricity, water",
-      "amount": {
-        "amount": 2400.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
+      "id": 1002,
+      "href": "/api/v2/factfinds/234/clients/456/expenditures/1002",
+      "description": "Council tax - Band D property",
+      "expenditureType": "Council Tax",
+      "netAmount": {
+        "currencyCode": "GBP",
+        "amount": 185.00
       },
-      "frequency": "Annual",
-      "isDiscretionary": false,
-      "startDate": "2015-06-01",
-      "endDate": null/clients/123/expenditure/exp-666"
-        }
-      }
+      "frequency": "Monthly",
+      "startsOn": "2025-04-01",
+      "endsOn": null,
+      "isConsolidated": false,
+      "isLiabilityToBeRepaid": false,
+      "liability": null,
+      "notes": "10 monthly payments (April-January)"
+    },
+    {
+      "id": 1004,
+      "href": "/api/v2/factfinds/234/clients/456/expenditures/1004",
+      "description": "Weekly food shopping and personal care items",
+      "expenditureType": "Food & Personal Care",
+      "netAmount": {
+        "currencyCode": "GBP",
+        "amount": 120.00
+      },
+      "frequency": "Weekly",
+      "startsOn": "2025-01-01",
+      "endsOn": null,
+      "isConsolidated": false,
+      "isLiabilityToBeRepaid": false,
+      "liability": null,
+      "notes": "Family of 4"
     }
-  ]/clients/123/expenditure"
+  ],
+  "_links": {
+    "self": {
+      "href": "/api/v2/factfinds/234/clients/456/expenditures"
     },
     "create": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/123/expenditure",
+      "href": "/api/v2/factfinds/234/clients/456/expenditures",
       "method": "POST"
     }
   }
@@ -6158,75 +6177,88 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
 
 #### 6.3.5 Create Expenditure Item
 
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditures`
 
 **Description:** Create a new expenditure item for a client.
 
 **Request Body:**
 ```json
 {
-  "expenditureType": "Transport",
   "description": "Car lease payment",
-  "amount": {
-    "amount": 3600.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+  "expenditureType": "Car/Travelling Expenses",
+  "netAmount": {
+    "currencyCode": "GBP",
+    "amount": 300.00
   },
-  "frequency": "Annual",
-  "isDiscretionary": true,
-  "startDate": "2024-01-01",
-  "endDate": "2027-12-31"
+  "frequency": "Monthly",
+  "startsOn": "2024-01-01",
+  "endsOn": "2027-12-31",
+  "isConsolidated": false,
+  "isLiabilityToBeRepaid": false,
+  "notes": "3-year lease agreement"
 }
 ```
 
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/123/expenditure/exp-777
+Location: /api/v2/factfinds/234/clients/456/expenditures/1005
 
 {
-  "id": 777,
-  "expenditureType": "Transport",
-  "description": "Car lease payment",
-  "amount": {
-    "amount": 3600.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
+  "id": 1005,
+  "href": "/api/v2/factfinds/234/clients/456/expenditures/1005",
+  "client": {
+    "id": 456,
+    "href": "/api/v2/factfinds/234/clients/456"
   },
-  "frequency": "Annual",
-  "isDiscretionary": true,
-  "startDate": "2024-01-01",
-  "endDate": "2027-12-31",
+  "description": "Car lease payment",
+  "expenditureType": "Car/Travelling Expenses",
+  "netAmount": {
+    "currencyCode": "GBP",
+    "amount": 300.00
+  },
+  "frequency": "Monthly",
+  "startsOn": "2024-01-01",
+  "endsOn": "2027-12-31",
+  "isConsolidated": false,
+  "isLiabilityToBeRepaid": false,
+  "liability": null,
+  "notes": "3-year lease agreement",
   "createdAt": "2026-02-18T11:00:00Z",
-  "updatedAt": "2026-02-18T11:00:00Z"/clients/123/expenditure/exp-777"
+  "updatedAt": "2026-02-18T11:00:00Z",
+  "_links": {
+    "self": {
+      "href": "/api/v2/factfinds/234/clients/456/expenditures/1005"
     },
     "update": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/123/expenditure/exp-777",
+      "href": "/api/v2/factfinds/234/clients/456/expenditures/1005",
       "method": "PATCH"
     },
     "client": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/123"
+      "href": "/api/v2/factfinds/234/clients/456"
     }
   }
 }
 ```
 
 **Expenditure Types:**
-- `Mortgage` - Mortgage or rent payments
-- `Rent` - Rental payments
-- `Utilities` - Gas, electricity, water, council tax
-- `Food` - Groceries and dining
-- `Transport` - Car, fuel, public transport
-- `Insurance` - Home, car, life insurance premiums
-- `Debt` - Loan payments, credit card payments
-- `Discretionary` - Entertainment, holidays, hobbies
-- `Other` - Other expenses
+
+See Section 14.21 for the complete list of expenditure types organized by category:
+
+**Basic Essential Expenditure:**
+- Rent, Mortgage, Council Tax
+- Gas, Electricity, Water, Telephone/Mobile
+- Food & Personal Care, Car/Travelling Expenses
+- Housekeeping, Ground Rent/Service charge
+
+**Basic Quality of Living:**
+- Clothing, Furniture/Appliances/Repairs
+- TV/Satellite/Internet/Basic Recreation
+- Pension, School Fee/Childcare
+
+**Non-Essential Outgoings:**
+- Sports and Recreation, Holidays, Entertainment
+- Life/General Assurance Premium, Investments, Credit Card
 
 #### 6.3.6 Create Expenditure Change
 
@@ -24039,157 +24071,332 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 
 ### 14.21 Expenditure Contract
 
-The `Expenditure` contract represents a client's actual expenditure aggregate, containing either summarized monthly expenditure or detailed expense breakdown.
+The `Expenditure` contract represents a single expenditure item (outgoing payment) for a client, used for budget planning and affordability assessments. Each expenditure represents a specific payment such as mortgage, rent, utilities, food shopping, or other regular expenses.
 
 **Reference Type:** Expenditure is a reference type with identity (has `id` field).
 
 **Key Features:**
-- Can represent summarized or detailed expenditure
-- Links to detailed expenses
-- Supports affordability calculations
-- Total monthly expenditure tracking
+- Tracks individual expenditure items by type and frequency
+- Links to liabilities being repaid (e.g., mortgage, credit card payments)
+- Supports debt consolidation scenarios with `isConsolidated` flag
+- Categorizes expenditure for affordability assessment (Essential vs Non-Essential)
+- Period tracking with start and end dates
 
-#### Complete Expenditure Contract
+**Key Structure Changes (v2.2):**
+- **REMOVED:** `factfindRef` field (client reference provides context)
+- **REMOVED:** `grossAmount` field (now only `netAmount`)
+- **CHANGED:** `netAmount` structure simplified to `{"currencyCode": "GBP", "amount": 1500.00}`
+- **ADDED:** `isConsolidated` flag for debt consolidation scenarios
+- **ADDED:** `isLiabilityToBeRepaid` flag to indicate debt repayment
+- **ADDED:** `liability` reference to link to the liability being repaid
+
+#### Complete Expenditure Contract Examples
+
+**Example 1: Mortgage Payment (with liability link)**
 
 ```json
 {
-  "id": 667,
-  "href": "/api/v2/factfinds/679/clients/346/expenditure/667",
-  "factfindRef": {
-    "id": 679,
-    "href": "/api/v2/factfinds/679"
+  "id": 1001,
+  "href": "/api/v2/factfinds/234/clients/456/expenditures/1001",
+  "client": {
+    "id": 456,
+    "href": "/api/v2/factfinds/234/clients/456"
   },
-  "clientRef": {
-    "id": 123,
-    "href": "/api/v2/factfinds/679/clients/123"
+
+  "description": "Monthly mortgage payment - main residence",
+  "expenditureType": "Mortgage",
+  "netAmount": {
+    "currencyCode": "GBP",
+    "amount": 1500.00
   },
-  "isDetailed": true,
-  "totalMonthlyExpenditure": {
-    "amount": 3250.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+  "frequency": "Monthly",
+  "startsOn": "2020-06-01",
+  "endsOn": null,
+
+  "isConsolidated": false,
+  "isLiabilityToBeRepaid": true,
+  "liability": {
+    "id": 5001,
+    "href": "/api/v2/factfinds/234/liabilities/5001",
+    "description": "Residential Mortgage - Main Home"
   },
-  "includeInAffordability": true,
-  "expenses": [
-    {
-      "id": 1001,
-      "href": "/api/v2/factfinds/679/clients/346/expenditure/667/expenses/1001",
-      "category": "Mortgage",
-      "amount": {
-        "amount": 1200.00,
-        "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
-      }
-    },
-    {
-      "id": 1002,
-      "href": "/api/v2/factfinds/679/clients/346/expenditure/667/expenses/1002",
-      "category": "Groceries",
-      "amount": {
-        "amount": 600.00,
-        "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
-      }
-    }
-  ],
-  "notes": "Monthly expenditure based on bank statements review",
-  "createdAt": "2026-01-15T11:00:00Z",
-  "updatedAt": "2026-02-08T14:30:00Z"
+
+  "notes": "Fixed rate until 2027",
+
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+**Example 2: Council Tax (essential expense, no liability)**
+
+```json
+{
+  "id": 1002,
+  "href": "/api/v2/factfinds/234/clients/456/expenditures/1002",
+  "client": {
+    "id": 456,
+    "href": "/api/v2/factfinds/234/clients/456"
+  },
+
+  "description": "Council tax - Band D property",
+  "expenditureType": "Council Tax",
+  "netAmount": {
+    "currencyCode": "GBP",
+    "amount": 185.00
+  },
+  "frequency": "Monthly",
+  "startsOn": "2025-04-01",
+  "endsOn": null,
+
+  "isConsolidated": false,
+  "isLiabilityToBeRepaid": false,
+  "liability": null,
+
+  "notes": "10 monthly payments (April-January)",
+
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+**Example 3: Credit Card Payment (consolidated debt)**
+
+```json
+{
+  "id": 1003,
+  "href": "/api/v2/factfinds/234/clients/456/expenditures/1003",
+  "client": {
+    "id": 456,
+    "href": "/api/v2/factfinds/234/clients/456"
+  },
+
+  "description": "Credit card minimum payment",
+  "expenditureType": "Credit Card",
+  "netAmount": {
+    "currencyCode": "GBP",
+    "amount": 150.00
+  },
+  "frequency": "Monthly",
+  "startsOn": "2024-01-01",
+  "endsOn": null,
+
+  "isConsolidated": true,
+  "isLiabilityToBeRepaid": true,
+  "liability": {
+    "id": 6001,
+    "href": "/api/v2/factfinds/234/liabilities/6001",
+    "description": "Barclaycard - Balance £4,500"
+  },
+
+  "notes": "To be consolidated into remortgage",
+
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+**Example 4: Food & Personal Care (essential, no liability)**
+
+```json
+{
+  "id": 1004,
+  "href": "/api/v2/factfinds/234/clients/456/expenditures/1004",
+  "client": {
+    "id": 456,
+    "href": "/api/v2/factfinds/234/clients/456"
+  },
+
+  "description": "Weekly food shopping and personal care items",
+  "expenditureType": "Food & Personal Care",
+  "netAmount": {
+    "currencyCode": "GBP",
+    "amount": 120.00
+  },
+  "frequency": "Weekly",
+  "startsOn": "2025-01-01",
+  "endsOn": null,
+
+  "isConsolidated": false,
+  "isLiabilityToBeRepaid": false,
+  "liability": null,
+
+  "notes": "Family of 4",
+
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
 }
 ```
 
 #### Field Definitions
+
+**Identification**
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned expenditure identifier |
 | `href` | string | read-only | Canonical URI for this expenditure |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to client |
-| `isDetailed` | boolean | required-on-create | True if detailed expenses tracked |
-| `totalMonthlyExpenditure` | MoneyValue | read-only | Calculated total monthly expenditure |
-| `includeInAffordability` | boolean | optional | Include in affordability calculations (default: false) |
-| `expenses[]` | array | read-only | Array of detailed expense items |
-| `notes` | string | optional | Additional notes (max 2000 chars) |
-| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
-| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+| `client` | ClientReference | required-on-create | Reference to the client who has this expenditure |
 
----
-
-### 14.22 Expense Contract
-
-The `Expense` contract represents a single expense line item within an expenditure aggregate.
-
-**Reference Type:** Expense is a reference type with identity (has `id` field).
-
-**Key Features:**
-- Granular expense tracking
-- Category-based classification
-- Frequency support
-- Links to parent expenditure
-
-#### Complete Expense Contract
-
-```json
-{
-  "id": 1001,
-  "href": "/api/v2/factfinds/679/clients/346/expenditure/667/expenses/1001",
-  "expenditureRef": {
-    "id": 667,
-    "href": "/api/v2/factfinds/679/clients/346/expenditure/667"
-  },
-  "category": "MORTGAGE",
-  "description": "Primary residence mortgage payment",
-  "amount": {
-    "amount": 1200.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "frequency": "MONTHLY",
-  "monthlyAmount": {
-    "amount": 1200.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "includeInAffordability": true,
-  "notes": "Fixed rate until June 2027",
-  "createdAt": "2026-01-15T11:00:00Z",
-  "updatedAt": "2026-02-08T14:30:00Z"
-}
-```
-
-#### Field Definitions
+**Expenditure Details**
 
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
-| `id` | integer | read-only | System-assigned expense identifier |
-| `href` | string | read-only | Canonical URI for this expense |
-| `expenditureRef` | ExpenditureRef | read-only | Reference to parent expenditure |
-| `category.code` | enum | required-on-create | Expense category code |
-| `category.display` | string | read-only | Human-readable category |
-| `description` | string | optional | Expense description (max 500 chars) |
-| `amount` | MoneyValue | required-on-create | Expense amount at specified frequency |
-| `frequency.code` | enum | required-on-create | Payment frequency code |
-| `frequency.display` | string | read-only | Human-readable frequency |
-| `monthlyAmount` | MoneyValue | read-only | Calculated monthly amount |
-| `includeInAffordability` | boolean | optional | Include in affordability (default: false) |
-| `notes` | string | optional | Additional notes (max 1000 chars) |
+| `description` | string | optional | Description of the expenditure (max 500 chars) |
+| `expenditureType` | enum | required-on-create | Type/category of expenditure (see Expenditure Types below) |
+| `netAmount` | MoneyValue | required-on-create | Amount paid after tax (if applicable) - simplified structure with `currencyCode` and `amount` |
+| `frequency` | enum | required-on-create | Payment frequency: Daily, Weekly, Fortnightly, Monthly, Quarterly, Annually |
+
+**Period**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `startsOn` | date | optional | When the expenditure started (ISO 8601 date format: YYYY-MM-DD) |
+| `endsOn` | date | optional | When the expenditure ends (null if ongoing) |
+
+**Debt Management**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `isConsolidated` | boolean | optional | Is this part of a debt consolidation scenario? (default: false) |
+| `isLiabilityToBeRepaid` | boolean | optional | Is this paying off a specific debt/liability? (default: false) |
+| `liability` | LiabilityReference | optional | Reference to the debt/liability being repaid (should be populated when `isLiabilityToBeRepaid` is true) |
+
+**Additional Information**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `notes` | string | optional | Additional notes about this expenditure (max 2000 chars) |
+
+**Audit Trail**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
 | `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
 | `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
 
+#### Expenditure Types
+
+Expenditure types are organized into three categories based on their importance for affordability assessments:
+
+| Category | Expenditure Type | Description |
+|----------|-----------------|-------------|
+| **Basic Essential Expenditure** | | |
+| | Rent | Monthly or periodic rent payments |
+| | Mortgage | Mortgage payment (principal + interest) |
+| | Council Tax | Local authority council tax |
+| | Gas | Gas utilities |
+| | Electricity | Electricity utilities |
+| | Water | Water and sewerage charges |
+| | Telephone/Mobile | Phone and mobile services |
+| | Food & Personal Care | Groceries, toiletries, personal care |
+| | Car/Travelling Expenses | Vehicle running costs, fuel, public transport |
+| | Housekeeping | General household running costs |
+| | Ground Rent/Service charge | Service charges for leasehold properties |
+| **Basic Quality of Living** | | |
+| | Clothing | Clothing and footwear |
+| | Furniture/Appliances/Repairs | Household goods and repairs |
+| | TV/Satellite/Internet/Basic Recreation | Media subscriptions and basic entertainment |
+| | Pension | Personal pension contributions |
+| | School Fee/Childcare | Education and childcare costs |
+| **Non-Essential Outgoings** | | |
+| | Sports and Recreation | Sports memberships, hobbies |
+| | Holidays | Annual holidays and travel |
+| | Entertainment | Dining out, cinema, events |
+| | Life/General Assurance Premium | Insurance premiums |
+| | Investments | Investment contributions |
+| | Credit Card | Credit card payment (minimum or regular) |
+
+#### Validation Rules
+
+- `id` is read-only, auto-generated by the system
+- `client` is required on create
+- `expenditureType` is required, must be one of the enum values from the table above
+- `netAmount` is required, must be positive (> 0)
+- `netAmount.currencyCode` must be valid ISO 4217 currency code (e.g., GBP, EUR, USD)
+- `frequency` is required, must be one of: Daily, Weekly, Fortnightly, Monthly, Quarterly, Annually
+- `endsOn` must be after `startsOn` if both provided
+- If `startsOn` is provided, it cannot be in the future (cannot start payments that haven't begun)
+- `liability` should only be populated when `isLiabilityToBeRepaid` is true
+- If `isLiabilityToBeRepaid` is true, `liability` reference should be provided
+- `description` max length 500 characters
+- `notes` max length 2000 characters
+
+#### Business Rules
+
+**Liability Linking:**
+- Expenditures linked to liabilities (via `liability` field) enable debt repayment tracking
+- When a liability is repaid or settled, the associated expenditure should be ended (`endsOn` set)
+- Mortgage expenditures should link to the corresponding mortgage liability for accurate tracking
+
+**Debt Consolidation:**
+- `isConsolidated` flag indicates expenditure is part of debt consolidation scenario
+- Consolidated expenditures are typically credit card payments, personal loans, or other debts being rolled into a new arrangement
+- When debts are consolidated, the old expenditures should be ended and new expenditure created for the consolidated payment
+
+**Affordability Assessment Categories:**
+- **Basic Essential Expenditure:** Always included in minimum expenditure calculations for affordability
+  - Housing (Mortgage, Rent, Council Tax, Ground Rent/Service charge)
+  - Utilities (Gas, Electricity, Water, Telephone/Mobile)
+  - Living costs (Food & Personal Care, Housekeeping)
+  - Transport (Car/Travelling Expenses)
+- **Basic Quality of Living:** Typically included in standard affordability models
+  - Clothing, Furniture/Appliances/Repairs
+  - TV/Satellite/Internet/Basic Recreation
+  - Pension, School Fee/Childcare
+- **Non-Essential Outgoings:** May be excluded or reduced in affordability stress tests
+  - Sports and Recreation, Holidays, Entertainment
+  - Life/General Assurance Premium (may be excluded if being replaced)
+  - Investments (discretionary)
+
+**Mortgage Application Context:**
+- For mortgage applications, lenders focus on Basic Essential and Basic Quality of Living expenses
+- Non-Essential Outgoings may be excluded from minimum expenditure calculations
+- Lenders stress-test affordability by excluding discretionary spending
+- Credit card payments marked as `isConsolidated=true` indicate debt consolidation scenarios
+- Consolidated debt expenditures will cease when the new mortgage completes (set `endsOn` date)
+
+**Payment Frequency:**
+- All expenditure amounts should be captured at their actual payment frequency
+- Systems should calculate monthly equivalents for affordability calculations:
+  - Daily: amount × 365 ÷ 12
+  - Weekly: amount × 52 ÷ 12
+  - Fortnightly: amount × 26 ÷ 12
+  - Monthly: amount × 1
+  - Quarterly: amount × 4 ÷ 12
+  - Annually: amount × 1 ÷ 12
+
+#### Affordability Context
+
+**How Expenditure Categories Affect Affordability Assessments:**
+
+1. **Basic Essential Expenditure:**
+   - Always included in minimum expenditure calculations
+   - Cannot be reduced or excluded in stress testing
+   - Forms the baseline for sustainable living costs
+   - Lenders will verify these against industry benchmarks (e.g., Office for National Statistics data)
+
+2. **Basic Quality of Living:**
+   - Typically included in standard affordability models
+   - Represents normal standard of living for the client's circumstances
+   - May be adjusted based on household size and composition
+   - Pension contributions often required to maintain quality of life in retirement
+
+3. **Non-Essential Outgoings:**
+   - May be excluded or significantly reduced in affordability stress tests
+   - Demonstrates available capacity to absorb payment increases
+   - Lenders may exclude these when calculating minimum sustainable income
+   - Can be forgone temporarily in financial difficulty scenarios
+
+**Regulatory Context:**
+- FCA MCOB (Mortgage Conduct of Business) requires thorough expenditure assessment
+- Lenders must ensure borrowers can afford payments under stressed interest rate scenarios
+- Consumer Duty requires fair treatment and consideration of actual living costs
+- Expenditure verification may require bank statements or other evidence
+
 ---
 
-### 14.23 Credit History Contract
+### 14.22 Credit History Contract
 
 The `CreditHistory` contract represents a comprehensive record of a client's credit history, including adverse credit events, payment history, and aggregate summary statistics. This contract is essential for affordability assessments and mortgage lending decisions, ensuring compliance with FCA regulations and responsible lending requirements.
 
