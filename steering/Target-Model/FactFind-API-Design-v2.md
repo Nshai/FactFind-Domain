@@ -671,9 +671,9 @@ For entities with subtypes (e.g., Arrangement with Pension, Investment, Protecti
 ```json
 {
   "id": 456,
-  "arrangementType": "Pension",     // discriminator (read-only, required-on-create, write-once)
+  "arrangementCategory": "PENSION", // discriminator (read-only, required-on-create, write-once)
   "productName": "SIPP",            // common field
-  "pensionType": "PersonalPension", // type-specific field
+  "pensionType": "PERSONAL_PENSION",
   // ... other fields
 }
 ```
@@ -727,13 +727,13 @@ Value types include three main categories:
 | Value Type | Fields | Example |
 |------------|--------|---------|
 | `MoneyValue` | `amount: decimal`<br>`currency: CurrencyValue` | `{ "amount": 75000.00, "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" } }` |
-| `AddressValue` | `line1-4, city, county, postcode`<br>`country: CountryValue`<br>`addressType: AddressTypeValue` | `{ "line1": "123 Main St", "city": "London", "postcode": "SW1A 1AA", "country": { "code": "GB", "display": "United Kingdom" } }` |
+| `AddressValue` | `line1-4, city, county, postcode`<br>`country: CountryValue`<br>`addressType: AddressTypeValue` | `{ "line1": "123 Main St", "city": "London", "postcode": "SW1A 1AA", "country": "GB" }` |
 | `GenderValue` | `string` | `"M"` (simple string enum) |
 | `MaritalStatusValue` | `code: string`<br>`display: string`<br>`effectiveFrom: date` | `{ "code": "MAR", "display": "Married", "effectiveFrom": "2015-06-20" }` |
 | `CountryValue` | `code: string`<br>`display: string`<br>`alpha3: string` | `{ "code": "GB", "display": "United Kingdom", "alpha3": "GBR" }` |
 | `DateRangeValue` | `startDate: date`<br>`endDate: date` | `{ "startDate": "2020-01-01", "endDate": "2025-12-31" }` |
-| `NameValue` | `title: TitleValue`<br>`firstName, middleName`<br>`lastName, preferredName` | `{ "title": { "code": "MR", "display": "Mr" }, "firstName": "John", "lastName": "Smith" }` |
-| `ContactValue` | `type: ContactTypeValue`<br>`value: string`<br>`isPrimary: boolean` | `{ "type": { "code": "EMAIL", "display": "Email" }, "value": "john@example.com", "isPrimary": true }` |
+| `NameValue` | `title: TitleValue`<br>`firstName, middleName`<br>`lastName, preferredName` | `{ "title": "MR", "firstName": "John", "lastName": "Smith" }` |
+| `ContactValue` | `type: ContactTypeValue`<br>`value: string`<br>`isPrimary: boolean` | `{ "type": "EMAIL", "value": "john@example.com", "isPrimary": true }` |
 | `PercentageValue` | `value: decimal` (0.00-1.00) | `{ "value": 0.25 }` |
 | `RateValue` | `rate: decimal`<br>`type: enum` | `{ "rate": 3.5, "type": "Fixed" }` |
 | `TaxDetailsValue` | `niNumber: string`<br>`taxReference: string` | `{ "niNumber": "AB123456C", "taxReference": "1234567890" }` |
@@ -744,10 +744,7 @@ Value types include three main categories:
 {
   "id": "client-123",                     // Client entity has identity
   "name": {                               // NameValue - no id, embedded
-    "title": {                            // TitleValue (enumeration)
-      "code": "MR",
-      "display": "Mr"
-    },
+    "title": "MR",
     "firstName": "John",
     "lastName": "Smith"
   },
@@ -777,25 +774,16 @@ Value types include three main categories:
       "display": "United Kingdom",
       "alpha3": "GBR"
     },
-    "addressType": {                      // AddressTypeValue (enumeration)
-      "code": "RES",
-      "display": "Residential"
-    }
+    "addressType": "RES"
   },
   "contacts": [                           // Array of ContactValue
     {
-      "type": {                           // ContactTypeValue (enumeration)
-        "code": "EMAIL",
-        "display": "Email"
-      },
+      "type": "EMAIL",
       "value": "john@example.com",
       "isPrimary": true
     },
     {
-      "type": {                           // ContactTypeValue (enumeration)
-        "code": "MOBILE",
-        "display": "Mobile"
-      },
+      "type": "MOBILE",
       "value": "+44 7700 900123",
       "isPrimary": false
     }
@@ -1231,7 +1219,7 @@ GET /api/v2/factfinds/{id}/complete
 {
   "id": "factfind-456",
   "sessionDate": "2026-02-16",
-  "status": {"code": "COMP", "display": "Complete"},
+  "status": "COMP",
   "clients": [
     { /* Complete client data */ }
   ],
@@ -1800,10 +1788,7 @@ Response (207 Multi-Status):
 ```json
 {
   "id": 123,
-  "status": {
-    "code": "DRAFT",
-    "display": "Draft"
-  },
+  "status": "DRAFT",
   "_links": {
     "self": { "href": "/api/v2/factfinds/123" },
     "complete": {
@@ -1866,19 +1851,13 @@ Uses `AddressValue` with nested `CountryValue` and `CountyValue`:
     "line2": "Apartment 4B",
     "city": "London",
     "postcode": "SW1A 1AA",
-    "county": {
-      "code": "GLA",
-      "display": "Greater London"
-    },
+    "county": "GLA",
     "country": {
       "code": "GB",
       "display": "United Kingdom",
       "alpha3": "GBR"
     },
-    "addressType": {
-      "code": "RES",
-      "display": "Residential"
-    }
+    "addressType": "RES"
   }
 }
 ```
@@ -2002,10 +1981,7 @@ Client contract with required-on-create fields. Read-only and computed fields ar
 {
   "clientType": "Person",
   "name": {
-    "title": {
-      "code": "MR",
-      "display": "Mr"
-    },
+    "title": "MR",
     "firstName": "John",
     "middleName": "Michael",
     "lastName": "Smith",
@@ -2061,10 +2037,7 @@ Content-Type: application/json
   "clientNumber": "C00001234",
   "clientType": "Person",
   "name": {
-    "title": {
-      "code": "MR",
-      "display": "Mr"
-    },
+    "title": "MR",
     "firstName": "John",
     "middleName": "Michael",
     "lastName": "Smith",
@@ -2190,10 +2163,7 @@ Complete `Client` contract.
   "id": 123,
   "clientType": "Person",
   "name": {
-    "title": {
-      "code": "MR",
-      "display": "Mr"
-    },
+    "title": "MR",
     "firstName": "John",
     "middleName": "Michael",
     "lastName": "Smith"
@@ -2959,10 +2929,7 @@ ETag: "a1b2c3d4e5f6"
   "isComplete": false,
   "dateFactFindCompleted": null,
   "anybodyElsePresent": false,
-  "status": {
-    "code": "INPROG",
-    "display": "In Progress"
-  },
+  "status": "INPROG",
   "createdAt": "2026-02-16T14:30:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "_links": {
@@ -3713,15 +3680,9 @@ Income contract with required-on-create fields.
 ```json
 {
   "giftDate": "2026-01-15",
-  "giftType": {
-    "code": "CASH",
-    "display": "Cash Gift"
-  },
+  "giftType": "CASH",
   "recipientName": "Emma Smith",
-  "recipientRelationship": {
-    "code": "CHILD",
-    "display": "Child"
-  },
+  "recipientRelationship": "CHILD",
   "recipientRef": {
     "id": "dependent-789"
   },
@@ -3735,10 +3696,7 @@ Income contract with required-on-create fields.
   },
   "giftPurpose": "University tuition assistance",
   "isPotentiallyExemptTransfer": true,
-  "exemptionType": {
-    "code": "NONE",
-    "display": "No Exemption - Full PET"
-  },
+  "exemptionType": "NONE",
   "notes": "First of three annual payments for university costs"
 }
 ```
@@ -3754,15 +3712,9 @@ Income contract with required-on-create fields.
     "href": "/api/v2/factfinds/ff-456/clients/client-123"
   },
   "giftDate": "2026-01-15",
-  "giftType": {
-    "code": "CASH",
-    "display": "Cash Gift"
-  },
+  "giftType": "CASH",
   "recipientName": "Emma Smith",
-  "recipientRelationship": {
-    "code": "CHILD",
-    "display": "Child"
-  },
+  "recipientRelationship": "CHILD",
   "recipientRef": {
     "id": "dependent-789",
     "href": "/api/v2/factfinds/ff-456/clients/client-123/dependents/dependent-789"
@@ -3777,16 +3729,10 @@ Income contract with required-on-create fields.
   },
   "giftPurpose": "University tuition assistance",
   "isPotentiallyExemptTransfer": true,
-  "exemptionType": {
-    "code": "NONE",
-    "display": "No Exemption - Full PET"
-  },
+  "exemptionType": "NONE",
   "petExpiryDate": "2033-01-15",
   "yearsRemaining": 6.92,
-  "petStatus": {
-    "code": "ACTIVE",
-    "display": "Active PET"
-  },
+  "petStatus": "ACTIVE",
   "ihtLiability": {
     "amount": 6000.00,
     "currency": {
@@ -3845,9 +3791,9 @@ Income contract with required-on-create fields.
     {
       "id": "gift-123",
       "giftDate": "2026-01-15",
-      "giftType": { "code": "CASH", "display": "Cash Gift" },
+      "giftType": "CASH",
       "recipientName": "Emma Smith",
-      "recipientRelationship": { "code": "CHILD", "display": "Child" },
+      "recipientRelationship": "CHILD",
       "giftValue": {
         "amount": 15000.00,
         "currency": { "code": "GBP", "symbol": "£" }
@@ -3855,7 +3801,7 @@ Income contract with required-on-create fields.
       "isPotentiallyExemptTransfer": true,
       "petExpiryDate": "2033-01-15",
       "yearsRemaining": 6.92,
-      "petStatus": { "code": "ACTIVE", "display": "Active PET" },
+      "petStatus": "ACTIVE",
       "ihtLiability": {
         "amount": 6000.00,
         "currency": { "code": "GBP", "symbol": "£" }
@@ -3867,9 +3813,9 @@ Income contract with required-on-create fields.
     {
       "id": "gift-124",
       "giftDate": "2025-12-25",
-      "giftType": { "code": "CASH", "display": "Cash Gift" },
+      "giftType": "CASH",
       "recipientName": "Michael Smith",
-      "recipientRelationship": { "code": "CHILD", "display": "Child" },
+      "recipientRelationship": "CHILD",
       "giftValue": {
         "amount": 10000.00,
         "currency": { "code": "GBP", "symbol": "£" }
@@ -3877,7 +3823,7 @@ Income contract with required-on-create fields.
       "isPotentiallyExemptTransfer": true,
       "petExpiryDate": "2032-12-25",
       "yearsRemaining": 6.86,
-      "petStatus": { "code": "ACTIVE", "display": "Active PET" },
+      "petStatus": "ACTIVE",
       "ihtLiability": {
         "amount": 4000.00,
         "currency": { "code": "GBP", "symbol": "£" }
@@ -3889,18 +3835,18 @@ Income contract with required-on-create fields.
     {
       "id": "gift-125",
       "giftDate": "2019-03-10",
-      "giftType": { "code": "PROPERTY", "display": "Property Gift" },
+      "giftType": "PROPERTY",
       "recipientName": "Sarah Smith",
-      "recipientRelationship": { "code": "SPOUSE", "display": "Spouse" },
+      "recipientRelationship": "SPOUSE",
       "giftValue": {
         "amount": 200000.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
       "isPotentiallyExemptTransfer": false,
-      "exemptionType": { "code": "SPOUSE", "display": "Spouse Exemption" },
+      "exemptionType": "SPOUSE",
       "petExpiryDate": null,
       "yearsRemaining": 0,
-      "petStatus": { "code": "EXEMPT", "display": "Tax Exempt" },
+      "petStatus": "EXEMPT",
       "ihtLiability": {
         "amount": 0.00,
         "currency": { "code": "GBP", "symbol": "£" }
@@ -3938,10 +3884,7 @@ Income contract with required-on-create fields.
 ```json
 {
   "trustName": "Smith Family Education Trust",
-  "trustType": {
-    "code": "BARE_TRUST",
-    "display": "Bare Trust"
-  },
+  "trustType": "BARE_TRUST",
   "establishedDate": "2026-02-01",
   "trustValue": {
     "amount": 100000.00,
@@ -3995,10 +3938,7 @@ Income contract with required-on-create fields.
     "href": "/api/v2/factfinds/ff-456/clients/client-123"
   },
   "trustName": "Smith Family Education Trust",
-  "trustType": {
-    "code": "BARE_TRUST",
-    "display": "Bare Trust"
-  },
+  "trustType": "BARE_TRUST",
   "establishedDate": "2026-02-01",
   "trustValue": {
     "amount": 100000.00,
@@ -5894,10 +5834,7 @@ Use: Demonstrate suitability in file review
       "employmentType": "Employed",
       "employerName": "ABC Technology Ltd",
       "jobTitle": "Software Engineer",
-      "occupation": {
-        "code": "2136",
-        "display": "Programmers and software development professionals"
-      },
+      "occupation": "2136",
       "startDate": "2020-03-01",
       "endDate": null,
       "status": "Current",
@@ -5957,10 +5894,7 @@ Use: Demonstrate suitability in file review
   "employmentType": "Employed",
   "employerName": "XYZ Corporation",
   "jobTitle": "Financial Analyst",
-  "occupation": {
-    "code": "3537",
-    "display": "Financial and accounting technicians"
-  },
+  "occupation": "3537",
   "startDate": "2021-06-01",
   "endDate": null,
   "status": "Current",
@@ -5994,10 +5928,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-789
   "employmentType": "Employed",
   "employerName": "XYZ Corporation",
   "jobTitle": "Financial Analyst",
-  "occupation": {
-    "code": "3537",
-    "display": "Financial and accounting technicians"
-  },
+  "occupation": "3537",
   "startDate": "2021-06-01",
   "endDate": null,
   "status": "Current",
@@ -8381,8 +8312,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": "string",
   "href": "string",
-  "arrangementType": "CodeValue",
-  "arrangementCategory": "CodeValue",
+  "arrangementCategory": "string (enum)",
   "provider": {
     "name": "string",
     "reference": "string",
@@ -8400,7 +8330,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": "number"
     }
   ],
-  "status": "CodeValue",
+  "status": "string (enum)",
   "concurrencyId": "string",
   "createdAt": "datetime",
   "updatedAt": "datetime",
@@ -8418,9 +8348,9 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "investmentType": "CodeValue",
+  "investmentType": "string (enum)",
   "platformName": "string",
-  "investmentObjective": "CodeValue",
+  "investmentObjective": "string (enum)",
   "assetAllocation": {
     "cash": "number",
     "equities": "number",
@@ -8491,14 +8421,8 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
-  "investmentObjective": {
-    "code": "GROWTH",
-    "display": "Capital Growth"
-  },
+  "status": "ACTIVE",
+  "investmentObjective": "GROWTH",
   "assetAllocation": {
     "cash": 5.0,
     "equities": 70.0,
@@ -8528,10 +8452,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 500.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "frequency": "MONTHLY",
     "startDate": "2020-04-01",
     "endDate": null
   }
@@ -8572,14 +8493,8 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
-  "investmentObjective": {
-    "code": "GROWTH",
-    "display": "Capital Growth"
-  },
+  "status": "ACTIVE",
+  "investmentObjective": "GROWTH",
   "assetAllocation": {
     "cash": 5.0,
     "equities": 70.0,
@@ -8615,10 +8530,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 500.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "frequency": "MONTHLY",
     "startDate": "2020-04-01",
     "endDate": null
   },
@@ -8669,10 +8581,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "arrangementType": "ISA",
-  "isaType": {
-    "code": "STOCKS_SHARES",
-    "display": "Stocks & Shares ISA"
-  },
+  "isaType": "STOCKS_SHARES",
   "provider": {
     "name": "Hargreaves Lansdown",
     "reference": "HL-UK-001",
@@ -8695,14 +8604,8 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
-  "investmentObjective": {
-    "code": "BALANCED",
-    "display": "Balanced Growth"
-  },
+  "status": "ACTIVE",
+  "investmentObjective": "BALANCED",
   "assetAllocation": {
     "cash": 10.0,
     "equities": 60.0,
@@ -8746,10 +8649,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 1250.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "frequency": "MONTHLY",
     "startDate": "2025-04-06",
     "endDate": null
   }
@@ -8764,10 +8664,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "href": "/api/v2/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
   "arrangementType": "ISA",
   "arrangementCategory": "INVESTMENT",
-  "isaType": {
-    "code": "STOCKS_SHARES",
-    "display": "Stocks & Shares ISA"
-  },
+  "isaType": "STOCKS_SHARES",
   "provider": {
     "name": "Hargreaves Lansdown",
     "reference": "HL-UK-001",
@@ -8794,14 +8691,8 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
-  "investmentObjective": {
-    "code": "BALANCED",
-    "display": "Balanced Growth"
-  },
+  "status": "ACTIVE",
+  "investmentObjective": "BALANCED",
   "assetAllocation": {
     "cash": 10.0,
     "equities": 60.0,
@@ -8855,10 +8746,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 1250.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "frequency": "MONTHLY",
     "startDate": "2025-04-06",
     "endDate": null
   },
@@ -8920,10 +8808,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "bondType": {
-    "code": "ONSHORE",
-    "display": "Onshore Investment Bond"
-  },
+  "bondType": "ONSHORE",
   "segments": 101,
   "segmentsRemaining": 95,
   "topSlicing": {
@@ -9014,15 +8899,9 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "platformName": "Interactive Investor",
-  "platformType": {
-    "code": "DISCRETIONARY",
-    "display": "Discretionary Managed"
-  },
+  "platformType": "DISCRETIONARY",
   "modelPortfolio": "Aggressive Growth Portfolio",
-  "rebalancingFrequency": {
-    "code": "QUARTERLY",
-    "display": "Quarterly"
-  },
+  "rebalancingFrequency": "QUARTERLY",
   "lastRebalance": "2026-01-15"
 }
 ```
@@ -9043,10 +8922,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "bondJurisdiction": {
-    "code": "IOM",
-    "display": "Isle of Man"
-  },
+  "bondJurisdiction": "IOM",
   "segments": 0,
   "foreignTaxCredit": {
     "amount": 0.00,
@@ -9301,11 +9177,11 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "pensionType": "CodeValue",
+  "pensionType": "string (enum)",
   "employerContribution": "Money",
   "employeeContribution": "Money",
   "taxRelief": {
-    "method": "CodeValue",
+    "method": "string (enum)",
     "amount": "Money"
   },
   "crystallisedAmount": "Money",
@@ -9334,7 +9210,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "used": "Money",
     "remaining": "Money",
     "hasProtection": "boolean",
-    "protectionType": "CodeValue"
+    "protectionType": "string (enum)"
   }
 }
 ```
@@ -9377,10 +9253,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
+  "status": "ACTIVE",
   "uncrystallisedAmount": {
     "amount": 125000.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -9402,10 +9275,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 125.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    }
+    "frequency": "MONTHLY"
   },
   "employeeContribution": {
     "amount": 500.00,
@@ -9432,10 +9302,7 @@ The Arrangements API provides comprehensive management of client financial produ
     }
   },
   "investmentStrategy": {
-    "riskProfile": {
-      "code": "MODERATE",
-      "display": "Moderate Risk"
-    },
+    "riskProfile": "MODERATE",
     "lifestyling": true,
     "lifestylingStartAge": 55
   }
@@ -9475,10 +9342,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
+  "status": "ACTIVE",
   "uncrystallisedAmount": {
     "amount": 125000.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -9504,10 +9368,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 125.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    }
+    "frequency": "MONTHLY"
   },
   "employeeContribution": {
     "amount": 500.00,
@@ -9539,10 +9400,7 @@ The Arrangements API provides comprehensive management of client financial produ
     }
   },
   "investmentStrategy": {
-    "riskProfile": {
-      "code": "MODERATE",
-      "display": "Moderate Risk"
-    },
+    "riskProfile": "MODERATE",
     "lifestyling": true,
     "lifestylingStartAge": 55
   },
@@ -9701,10 +9559,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "currency": { "code": "GBP", "symbol": "£" }
     }
   },
-  "investmentFlexibility": {
-    "code": "HIGH",
-    "display": "High - Full investment control"
-  }
+  "investmentFlexibility": "HIGH"
 }
 ```
 
@@ -9749,17 +9604,11 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active - In Service"
-  },
+  "status": "ACTIVE",
   "normalRetirementAge": 60,
   "earlyRetirementAge": 55,
   "accrualRate": "1/80th",
-  "schemeType": {
-    "code": "PUBLIC_SECTOR",
-    "display": "Public Sector DB"
-  },
+  "schemeType": "PUBLIC_SECTOR",
   "dateSchemeJoined": "1995-09-01",
   "expectedYearsOfService": 35.0,
   "totalService": 28.5,
@@ -9803,15 +9652,9 @@ The Arrangements API provides comprehensive management of client financial produ
       "currency": { "code": "GBP", "symbol": "£" }
     }
   },
-  "escalationRate": {
-    "code": "CPI",
-    "display": "CPI (Consumer Price Index)"
-  },
+  "escalationRate": "CPI",
   "escalationPercentage": 2.5,
-  "revaluationMethod": {
-    "code": "CAREER_AVERAGE",
-    "display": "Career Average Revalued Earnings (CARE)"
-  },
+  "revaluationMethod": "CAREER_AVERAGE",
   "cashEquivalentTransferValue": {
     "amount": 950000.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -9863,10 +9706,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
   },
   "valuationDate": "2026-01-15",
-  "valuationType": {
-    "code": "CETV",
-    "display": "Cash Equivalent Transfer Value"
-  },
+  "valuationType": "CETV",
   "owners": [
     {
       "clientRef": {
@@ -9877,17 +9717,11 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active - In Service"
-  },
+  "status": "ACTIVE",
   "normalRetirementAge": 60,
   "earlyRetirementAge": 55,
   "accrualRate": "1/80th",
-  "schemeType": {
-    "code": "PUBLIC_SECTOR",
-    "display": "Public Sector DB"
-  },
+  "schemeType": "PUBLIC_SECTOR",
   "dateSchemeJoined": "1995-09-01",
   "expectedYearsOfService": 35.0,
   "totalService": 28.5,
@@ -9932,19 +9766,13 @@ The Arrangements API provides comprehensive management of client financial produ
       "currency": { "code": "GBP", "symbol": "£" }
     }
   },
-  "escalationRate": {
-    "code": "CPI",
-    "display": "CPI (Consumer Price Index)"
-  },
+  "escalationRate": "CPI",
   "escalationPercentage": 2.5,
   "lifetimeValue": {
     "amount": 462000.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
-  "revaluationMethod": {
-    "code": "CAREER_AVERAGE",
-    "display": "Career Average Revalued Earnings (CARE)"
-  },
+  "revaluationMethod": "CAREER_AVERAGE",
   "cashEquivalentTransferValue": {
     "amount": 950000.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -10166,17 +9994,11 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "DEFERRED",
-    "display": "Deferred - Preserved Benefits"
-  },
+  "status": "DEFERRED",
   "normalRetirementAge": 65,
   "earlyRetirementAge": 55,
   "accrualRate": "1/60th",
-  "schemeType": {
-    "code": "PRIVATE_SECTOR",
-    "display": "Private Sector DB"
-  },
+  "schemeType": "PRIVATE_SECTOR",
   "dateSchemeJoined": "2005-04-01",
   "dateLeft": "2018-08-31",
   "expectedYearsOfService": 13.4,
@@ -10222,15 +10044,9 @@ The Arrangements API provides comprehensive management of client financial produ
       "currency": { "code": "GBP", "symbol": "£" }
     }
   },
-  "escalationRate": {
-    "code": "LPI",
-    "display": "LPI (Limited Price Indexation)"
-  },
+  "escalationRate": "LPI",
   "escalationPercentage": 2.5,
-  "revaluationMethod": {
-    "code": "FINAL_SALARY",
-    "display": "Final Salary"
-  },
+  "revaluationMethod": "FINAL_SALARY",
   "cashEquivalentTransferValue": {
     "amount": 185000.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -10297,10 +10113,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 12000.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "frequency": "MONTHLY",
     "nextReviewDate": "2026-06-01"
   },
   "sustainabilityAnalysis": {
@@ -10334,23 +10147,14 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "annuityType": {
-    "code": "LIFETIME",
-    "display": "Lifetime Annuity"
-  },
+  "annuityType": "LIFETIME",
   "guaranteedAnnualIncome": {
     "amount": 8500.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
-  "paymentFrequency": {
-    "code": "MONTHLY",
-    "display": "Monthly"
-  },
+  "paymentFrequency": "MONTHLY",
   "escalation": {
-    "type": {
-      "code": "RPI",
-      "display": "RPI Linked"
-    },
+    "type": "RPI",
     "rate": 3.0,
     "cappedAt": 5.0
   },
@@ -10422,10 +10226,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active - Contributing"
-  },
+  "status": "ACTIVE",
   "dateSchemeJoined": "2018-03-15",
   "retirementAge": 65,
   "taxWrapper": "RegisteredPension",
@@ -10515,10 +10316,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active - Contributing"
-  },
+  "status": "ACTIVE",
   "dateSchemeJoined": "2018-03-15",
   "retirementAge": 65,
   "taxWrapper": "RegisteredPension",
@@ -10530,10 +10328,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
   },
   "valuationDate": "2026-02-18",
-  "valuationType": {
-    "code": "STATEMENT",
-    "display": "Provider Statement Value"
-  },
+  "valuationType": "STATEMENT",
   "regularContributions": {
     "memberContribution": {
       "amount": 400.00,
@@ -10858,10 +10653,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "PAID_UP",
-    "display": "Paid-Up - No Further Contributions"
-  },
+  "status": "PAID_UP",
   "dateSchemeJoined": "2008-06-01",
   "dateContributionsStopped": "2015-12-31",
   "retirementAge": 65,
@@ -10874,10 +10666,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
   },
   "valuationDate": "2026-01-31",
-  "valuationType": {
-    "code": "STATEMENT",
-    "display": "Provider Statement Value"
-  },
+  "valuationType": "STATEMENT",
   "regularContributions": null,
   "lumpSumContributions": null,
   "employerMatchingDetails": null,
@@ -11305,10 +11094,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "arrangementType": "PROTECTION",
-  "protectionType": {
-    "code": "LIFE_COVER",
-    "display": "Life Cover"
-  },
+  "protectionType": "LIFE_COVER",
   "provider": {
     "name": "Legal & General",
     "reference": "LG-UK-001",
@@ -11326,10 +11112,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active - In Force"
-  },
+  "status": "ACTIVE",
   "coverDetails": {
     "coverAmount": {
       "amount": 500000.00,
@@ -11350,40 +11133,28 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 426.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "paymentFrequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "paymentFrequency": "MONTHLY",
     "reviewable": false,
     "guaranteed": true
   },
   "beneficiaries": [
     {
       "name": "Jane Smith",
-      "relationship": {
-        "code": "SPOUSE",
-        "display": "Spouse"
-      },
+      "relationship": "SPOUSE",
       "percentage": 100.0,
       "ref": { "id": "client-124" }
     }
   ],
   "trustDetails": {
     "inTrust": true,
-    "trustType": {
-      "code": "SPLIT_TRUST",
-      "display": "Split Trust"
-    },
+    "trustType": "SPLIT_TRUST",
     "trustees": [
       "Jane Smith",
       "David Smith"
     ]
   },
   "underwritingDetails": {
-    "underwritingType": {
-      "code": "FULL_MEDICAL",
-      "display": "Full Medical Underwriting"
-    },
+    "underwritingType": "FULL_MEDICAL",
     "loadings": [],
     "exclusions": []
   }
@@ -11398,10 +11169,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "href": "/api/v2/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006",
   "arrangementType": "PROTECTION",
   "arrangementCategory": "PROTECTION",
-  "protectionType": {
-    "code": "LIFE_COVER",
-    "display": "Life Cover"
-  },
+  "protectionType": "LIFE_COVER",
   "provider": {
     "name": "Legal & General",
     "reference": "LG-UK-001",
@@ -11428,10 +11196,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "ownershipPercentage": 100.0
     }
   ],
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active - In Force"
-  },
+  "status": "ACTIVE",
   "coverDetails": {
     "coverAmount": {
       "amount": 500000.00,
@@ -11453,10 +11218,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "amount": 426.00,
       "currency": { "code": "GBP", "symbol": "£" }
     },
-    "paymentFrequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "paymentFrequency": "MONTHLY",
     "totalPremiumsPaid": {
       "amount": 2982.00,
       "currency": { "code": "GBP", "symbol": "£" }
@@ -11469,10 +11231,7 @@ The Arrangements API provides comprehensive management of client financial produ
     {
       "id": "ben-001",
       "name": "Jane Smith",
-      "relationship": {
-        "code": "SPOUSE",
-        "display": "Spouse"
-      },
+      "relationship": "SPOUSE",
       "percentage": 100.0,
       "ref": {
         "id": "client-124",
@@ -11482,10 +11241,7 @@ The Arrangements API provides comprehensive management of client financial produ
   ],
   "trustDetails": {
     "inTrust": true,
-    "trustType": {
-      "code": "SPLIT_TRUST",
-      "display": "Split Trust"
-    },
+    "trustType": "SPLIT_TRUST",
     "trustees": [
       "Jane Smith",
       "David Smith"
@@ -11493,10 +11249,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "ihtBenefit": "Policy proceeds excluded from estate for IHT purposes"
   },
   "underwritingDetails": {
-    "underwritingType": {
-      "code": "FULL_MEDICAL",
-      "display": "Full Medical Underwriting"
-    },
+    "underwritingType": "FULL_MEDICAL",
     "loadings": [],
     "exclusions": [],
     "terms": "Standard Terms"
@@ -11529,10 +11282,7 @@ The Arrangements API provides comprehensive management of client financial produ
 **Critical Illness Cover:**
 ```json
 {
-  "protectionType": {
-    "code": "CRITICAL_ILLNESS",
-    "display": "Critical Illness Cover"
-  },
+  "protectionType": "CRITICAL_ILLNESS",
   "coverDetails": {
     "conditionsCovered": 50,
     "partialPayment": true,
@@ -11544,10 +11294,7 @@ The Arrangements API provides comprehensive management of client financial produ
 **Income Protection:**
 ```json
 {
-  "protectionType": {
-    "code": "INCOME_PROTECTION",
-    "display": "Income Protection"
-  },
+  "protectionType": "INCOME_PROTECTION",
   "coverDetails": {
     "monthlyBenefit": {
       "amount": 3000.00,
@@ -11556,10 +11303,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "deferredPeriod": {
       "weeks": 13
     },
-    "benefitPeriod": {
-      "code": "AGE_65",
-      "display": "To Age 65"
-    },
+    "benefitPeriod": "AGE_65",
     "indexation": true
   }
 }
@@ -11590,10 +11334,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "arrangementType": "GENERAL_INSURANCE",
-  "insuranceType": {
-    "code": "BUILDINGS",
-    "display": "Buildings Insurance"
-  },
+  "insuranceType": "BUILDINGS",
   "provider": {
     "name": "Aviva",
     "reference": "AVIVA-UK-001"
@@ -11643,10 +11384,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "contributionDate": "2026-02-15",
-  "contributionType": {
-    "code": "REGULAR",
-    "display": "Regular Contribution"
-  },
+  "contributionType": "REGULAR",
   "grossAmount": {
     "amount": 625.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -11663,10 +11401,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "amount": 250.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
-  "source": {
-    "code": "SALARY",
-    "display": "Salary Deduction"
-  },
+  "source": "SALARY",
   "notes": "Standard monthly contribution"
 }
 ```
@@ -11682,10 +11417,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "contributionDate": "2026-02-15",
-  "contributionType": {
-    "code": "REGULAR",
-    "display": "Regular Contribution"
-  },
+  "contributionType": "REGULAR",
   "grossAmount": {
     "amount": 625.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -11706,10 +11438,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "amount": 875.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
-  "source": {
-    "code": "SALARY",
-    "display": "Salary Deduction"
-  },
+  "source": "SALARY",
   "taxYear": "2025/26",
   "annualAllowanceUsed": {
     "amount": 875.00,
@@ -11742,7 +11471,7 @@ The Arrangements API provides comprehensive management of client financial produ
         "amount": 625.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
-      "contributionType": { "code": "REGULAR", "display": "Regular Contribution" },
+      "contributionType": "REGULAR",
       "_links": {
         "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001" }
       }
@@ -11754,7 +11483,7 @@ The Arrangements API provides comprehensive management of client financial produ
         "amount": 625.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
-      "contributionType": { "code": "REGULAR", "display": "Regular Contribution" },
+      "contributionType": "REGULAR",
       "_links": {
         "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-002" }
       }
@@ -11810,10 +11539,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "withdrawalDate": "2026-02-15",
-  "withdrawalType": {
-    "code": "INCOME",
-    "display": "Regular Income Withdrawal"
-  },
+  "withdrawalType": "INCOME",
   "grossAmount": {
     "amount": 1000.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -11835,10 +11561,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "amount": 0.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
-  "reason": {
-    "code": "REGULAR_INCOME",
-    "display": "Regular Income Requirement"
-  },
+  "reason": "REGULAR_INCOME",
   "notes": "Monthly drawdown payment"
 }
 ```
@@ -11854,10 +11577,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007"
   },
   "withdrawalDate": "2026-02-15",
-  "withdrawalType": {
-    "code": "INCOME",
-    "display": "Regular Income Withdrawal"
-  },
+  "withdrawalType": "INCOME",
   "grossAmount": {
     "amount": 1000.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -11881,10 +11601,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "currency": { "code": "GBP", "symbol": "£" }
   },
   "taxYear": "2025/26",
-  "reason": {
-    "code": "REGULAR_INCOME",
-    "display": "Regular Income Requirement"
-  },
+  "reason": "REGULAR_INCOME",
   "notes": "Monthly drawdown payment",
   "createdAt": "2026-02-18T11:05:00Z",
   "updatedAt": "2026-02-18T11:05:00Z",
@@ -11901,10 +11618,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "withdrawalDate": "2026-02-15",
-  "withdrawalType": {
-    "code": "TAX_DEFERRED",
-    "display": "5% Tax-Deferred Withdrawal"
-  },
+  "withdrawalType": "TAX_DEFERRED",
   "grossAmount": {
     "amount": 3750.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -11922,10 +11636,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "currency": { "code": "GBP", "symbol": "£" }
   },
   "taxYear": "2025/26",
-  "reason": {
-    "code": "INCOME_REQUIREMENT",
-    "display": "Income Requirement"
-  }
+  "reason": "INCOME_REQUIREMENT"
 }
 ```
 
@@ -11949,15 +11660,9 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "beneficiaryType": {
-    "code": "PERSON",
-    "display": "Individual Person"
-  },
+  "beneficiaryType": "PERSON",
   "name": "Sarah Smith",
-  "relationship": {
-    "code": "CHILD",
-    "display": "Child"
-  },
+  "relationship": "CHILD",
   "dateOfBirth": "2005-08-15",
   "percentage": 50.0,
   "contingent": false,
@@ -11983,15 +11688,9 @@ The Arrangements API provides comprehensive management of client financial produ
     "id": "arr-pp-003",
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
-  "beneficiaryType": {
-    "code": "PERSON",
-    "display": "Individual Person"
-  },
+  "beneficiaryType": "PERSON",
   "name": "Sarah Smith",
-  "relationship": {
-    "code": "CHILD",
-    "display": "Child"
-  },
+  "relationship": "CHILD",
   "dateOfBirth": "2005-08-15",
   "age": 20,
   "percentage": 50.0,
@@ -12028,7 +11727,7 @@ The Arrangements API provides comprehensive management of client financial produ
     {
       "id": "ben-002",
       "name": "Sarah Smith",
-      "relationship": { "code": "CHILD", "display": "Child" },
+      "relationship": "CHILD",
       "percentage": 50.0,
       "contingent": false,
       "_links": {
@@ -12038,7 +11737,7 @@ The Arrangements API provides comprehensive management of client financial produ
     {
       "id": "ben-003",
       "name": "Michael Smith",
-      "relationship": { "code": "CHILD", "display": "Child" },
+      "relationship": "CHILD",
       "percentage": 50.0,
       "contingent": false,
       "_links": {
@@ -12082,18 +11781,12 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "valuationDate": "2026-02-18",
-  "valuationType": {
-    "code": "STATEMENT",
-    "display": "Provider Statement"
-  },
+  "valuationType": "STATEMENT",
   "value": {
     "amount": 125000.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
-  "source": {
-    "code": "PROVIDER",
-    "display": "Provider Statement"
-  },
+  "source": "PROVIDER",
   "crystallisedValue": {
     "amount": 0.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -12118,18 +11811,12 @@ The Arrangements API provides comprehensive management of client financial produ
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "valuationDate": "2026-02-18",
-  "valuationType": {
-    "code": "STATEMENT",
-    "display": "Provider Statement"
-  },
+  "valuationType": "STATEMENT",
   "value": {
     "amount": 125000.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
-  "source": {
-    "code": "PROVIDER",
-    "display": "Provider Statement"
-  },
+  "source": "PROVIDER",
   "crystallisedValue": {
     "amount": 0.00,
     "currency": { "code": "GBP", "symbol": "£" }
@@ -12171,7 +11858,7 @@ The Arrangements API provides comprehensive management of client financial produ
         "amount": 125000.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
-      "valuationType": { "code": "STATEMENT", "display": "Provider Statement" },
+      "valuationType": "STATEMENT",
       "percentageChange": 4.17,
       "_links": {
         "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001" }
@@ -12184,7 +11871,7 @@ The Arrangements API provides comprehensive management of client financial produ
         "amount": 120000.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
-      "valuationType": { "code": "STATEMENT", "display": "Provider Statement" },
+      "valuationType": "STATEMENT",
       "percentageChange": 3.45,
       "_links": {
         "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-002" }
@@ -13221,18 +12908,12 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "id": "factfind-456",
     "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "clientNumber": "C00001234",
   "clientType": "Person",
   "personValue": {
-    "title": {
-      "code": "MR",
-      "display": "Mr"
-    },
+    "title": "MR",
     "firstName": "John",
     "middleNames": "Michael Robert",
     "lastName": "Smith",
@@ -13267,10 +12948,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "deceasedDate": null,
     "vulnerabilities": [
       {
-        "vulnerabilityType": {
-          "code": "HEALTH",
-          "display": "Health-related"
-        },
+        "vulnerabilityType": "HEALTH",
         "severity": "Medium",
         "description": "Requires large print documents due to visual impairment",
         "assessmentDate": "2020-01-15",
@@ -13322,28 +13000,19 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         },
         "isPrimary": true,
         "acquisitionDate": "1980-05-15",
-        "acquisitionMethod": {
-          "code": "BIRTH",
-          "display": "Birth"
-        }
+        "acquisitionMethod": "BIRTH"
       }
     ]
   },
   "addresses": [
     {
-      "addressType": {
-        "code": "RES",
-        "display": "Residential"
-      },
+      "addressType": "RES",
       "line1": "123 Main Street",
       "line2": "Apartment 4B",
       "line3": null,
       "line4": null,
       "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
+      "county": "GLA",
       "postcode": "SW1A 1AA",
       "country": {
         "code": "GB",
@@ -13356,19 +13025,13 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "yearsAtAddress": 6
     },
     {
-      "addressType": {
-        "code": "PREV",
-        "display": "Previous Address"
-      },
+      "addressType": "PREV",
       "line1": "45 Old Road",
       "line2": null,
       "line3": null,
       "line4": null,
       "city": "Manchester",
-      "county": {
-        "code": "GTM",
-        "display": "Greater Manchester"
-      },
+      "county": "GTM",
       "postcode": "M1 1AA",
       "country": {
         "code": "GB",
@@ -13383,39 +13046,27 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   ],
   "contacts": [
     {
-      "contactType": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
+      "contactType": "EMAIL",
       "value": "john.smith@example.com",
       "isPrimary": true,
       "isVerified": true,
       "verifiedDate": "2020-01-15"
     },
     {
-      "contactType": {
-        "code": "MOBILE",
-        "display": "Mobile Phone"
-      },
+      "contactType": "MOBILE",
       "value": "+44 7700 900123",
       "isPrimary": true,
       "isVerified": true,
       "verifiedDate": "2020-01-15"
     },
     {
-      "contactType": {
-        "code": "PHONE",
-        "display": "Home Phone"
-      },
+      "contactType": "PHONE",
       "value": "+44 20 7946 0958",
       "isPrimary": false,
       "isVerified": false
     },
     {
-      "contactType": {
-        "code": "WORK_PHONE",
-        "display": "Work Phone"
-      },
+      "contactType": "WORK_PHONE",
       "value": "+44 20 7946 0123",
       "isPrimary": false,
       "isVerified": false
@@ -13437,10 +13088,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         "documentNumber": "502135321",
         "issueDate": "2020-05-15",
         "expiryDate": "2030-05-15",
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
+        "issuingCountry": "GB",
         "verified": true,
         "verifiedDate": "2020-01-15",
         "verificationSource": "GOV.UK Verify"
@@ -13450,10 +13098,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         "documentNumber": "SMITH801055JM9IJ",
         "issueDate": "2020-05-15",
         "expiryDate": "2030-05-15",
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
+        "issuingCountry": "GB",
         "verified": true,
         "verifiedDate": "2020-01-15",
         "verificationSource": "DVLA"
@@ -14000,10 +13645,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "id": "factfind-890",
     "href": "/api/v2/factfinds/factfind-890",
     "factFindNumber": "FF-2025-00456",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "clientNumber": "C00005678",
   "clientType": "Corporate",
@@ -14012,15 +13654,9 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "tradingName": "TechVenture",
     "registrationNumber": "09876543",
     "incorporationDate": "2015-03-20",
-    "companyType": {
-      "code": "LTD",
-      "display": "Private Limited Company"
-    },
+    "companyType": "LTD",
     "vatNumber": "GB123456789",
-    "companyStatus": {
-      "code": "ACTIVE",
-      "display": "Active"
-    },
+    "companyStatus": "ACTIVE",
     "sicCodes": [
       {
         "code": "62012",
@@ -14110,10 +13746,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "line3": null,
       "line4": null,
       "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
+      "county": "GLA",
       "postcode": "EC2A 4DN",
       "country": {
         "code": "GB",
@@ -14127,19 +13760,13 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "addresses": [
     {
-      "addressType": {
-        "code": "REGISTERED",
-        "display": "Registered Office"
-      },
+      "addressType": "REGISTERED",
       "line1": "Tech Park Building 5",
       "line2": "Silicon Street",
       "line3": null,
       "line4": null,
       "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
+      "county": "GLA",
       "postcode": "EC2A 4DN",
       "country": {
         "code": "GB",
@@ -14152,19 +13779,13 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "yearsAtAddress": 11
     },
     {
-      "addressType": {
-        "code": "TRADING",
-        "display": "Trading Address"
-      },
+      "addressType": "TRADING",
       "line1": "Innovation Hub",
       "line2": "25 Tech Square",
       "line3": null,
       "line4": null,
       "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
+      "county": "GLA",
       "postcode": "E1 6AN",
       "country": {
         "code": "GB",
@@ -14179,30 +13800,21 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   ],
   "contacts": [
     {
-      "contactType": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
+      "contactType": "EMAIL",
       "value": "info@techventure.com",
       "isPrimary": true,
       "isVerified": true,
       "verifiedDate": "2015-03-20"
     },
     {
-      "contactType": {
-        "code": "PHONE",
-        "display": "Main Office Phone"
-      },
+      "contactType": "PHONE",
       "value": "+44 20 7946 1234",
       "isPrimary": true,
       "isVerified": true,
       "verifiedDate": "2015-03-20"
     },
     {
-      "contactType": {
-        "code": "WEBSITE",
-        "display": "Website"
-      },
+      "contactType": "WEBSITE",
       "value": "https://www.techventure.com",
       "isPrimary": false,
       "isVerified": true,
@@ -14225,10 +13837,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         "documentNumber": "09876543",
         "issueDate": "2015-03-20",
         "expiryDate": null,
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
+        "issuingCountry": "GB",
         "verified": true,
         "verifiedDate": "2015-03-20",
         "verificationSource": "Companies House"
@@ -14238,10 +13847,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         "documentNumber": "GB123456789",
         "issueDate": "2015-04-15",
         "expiryDate": null,
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
+        "issuingCountry": "GB",
         "verified": true,
         "verifiedDate": "2015-04-20",
         "verificationSource": "HMRC"
@@ -14530,19 +14136,13 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "id": "factfind-1111",
     "href": "/api/v2/factfinds/factfind-1111",
     "factFindNumber": "FF-2025-00789",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "clientNumber": "C00009999",
   "clientType": "Trust",
   "trustValue": {
     "trustName": "The Smith Family Discretionary Trust",
-    "trustType": {
-      "code": "DISCRETIONARY",
-      "display": "Discretionary Trust"
-    },
+    "trustType": "DISCRETIONARY",
     "settlementDate": "2018-04-15",
     "trustRegistrationNumber": "TRN12345678",
     "taxReference": "1234567890",
@@ -14752,19 +14352,13 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   },
   "addresses": [
     {
-      "addressType": {
-        "code": "TRUST_CORRESPONDENCE",
-        "display": "Trust Correspondence Address"
-      },
+      "addressType": "TRUST_CORRESPONDENCE",
       "line1": "Harrison & Partners Solicitors",
       "line2": "Regency House",
       "line3": "25 High Street",
       "line4": null,
       "city": "London",
-      "county": {
-        "code": "GLA",
-        "display": "Greater London"
-      },
+      "county": "GLA",
       "postcode": "WC2N 5DU",
       "country": {
         "code": "GB",
@@ -14779,20 +14373,14 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   ],
   "contacts": [
     {
-      "contactType": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
+      "contactType": "EMAIL",
       "value": "trustees@smithfamilytrust.com",
       "isPrimary": true,
       "isVerified": true,
       "verifiedDate": "2018-04-15"
     },
     {
-      "contactType": {
-        "code": "PHONE",
-        "display": "Trustee Contact Phone"
-      },
+      "contactType": "PHONE",
       "value": "+44 20 7946 5678",
       "isPrimary": true,
       "isVerified": true,
@@ -14815,10 +14403,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         "documentNumber": "DEED-2018-04-15-SMITH",
         "issueDate": "2018-04-15",
         "expiryDate": null,
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
+        "issuingCountry": "GB",
         "verified": true,
         "verifiedDate": "2018-04-15",
         "verificationSource": "Solicitor Certification"
@@ -14828,10 +14413,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         "documentNumber": "TRN12345678",
         "issueDate": "2018-04-20",
         "expiryDate": null,
-        "issuingCountry": {
-          "code": "GB",
-          "display": "United Kingdom"
-        },
+        "issuingCountry": "GB",
         "verified": true,
         "verifiedDate": "2018-04-25",
         "verificationSource": "HMRC"
@@ -15358,19 +14940,13 @@ Embedded value type representing an address. Addresses have history (fromDate, t
 
 ```json
 {
-  "addressType": {
-    "code": "RES",
-    "display": "Residential"
-  },
+  "addressType": "RES",
   "line1": "123 Main Street",
   "line2": "Apartment 4B",
   "line3": null,
   "line4": null,
   "city": "London",
-  "county": {
-    "code": "GLA",
-    "display": "Greater London"
-  },
+  "county": "GLA",
   "postcode": "SW1A 1AA",
   "country": {
     "code": "GB",
@@ -15413,10 +14989,7 @@ Embedded value type representing a contact method.
 
 ```json
 {
-  "contactType": {
-    "code": "EMAIL",
-    "display": "Email"
-  },
+  "contactType": "EMAIL",
   "value": "john.smith@example.com",
   "isPrimary": true,
   "isVerified": true,
@@ -15461,10 +15034,7 @@ Embedded value type representing client vulnerabilities (Consumer Duty requireme
 
 ```json
 {
-  "vulnerabilityType": {
-    "code": "HEALTH",
-    "display": "Health-related"
-  },
+  "vulnerabilityType": "HEALTH",
   "severity": "Medium",
   "description": "Requires large print documents due to visual impairment",
   "assessmentDate": "2020-01-15",
@@ -15681,10 +15251,7 @@ Embedded value type representing territorial status, residency, domicile, and ci
         },
         "isPrimary": true,
         "acquisitionDate": "1980-05-15",
-        "acquisitionMethod": {
-          "code": "BIRTH",
-          "display": "Birth"
-        }
+        "acquisitionMethod": "BIRTH"
       }
     ]
   }
@@ -15819,7 +15386,7 @@ Content-Type: application/json
   "clientNumber": "C00001234",
   "clientType": "Person",
   "personValue": {
-    "title": { "code": "MR", "display": "Mr" },
+    "title": "MR",
     "firstName": "John",
     "lastName": "Smith",
     "dateOfBirth": "1980-05-15",
@@ -15834,7 +15401,7 @@ Content-Type: application/json
   },
   "addresses": [
     {
-      "addressType": { "code": "RES", "display": "Residential" },
+      "addressType": "RES",
       "line1": "123 Main Street",
       "city": "London",
       "postcode": "SW1A 1AA",
@@ -15845,7 +15412,7 @@ Content-Type: application/json
   ],
   "contacts": [
     {
-      "contactType": { "code": "EMAIL", "display": "Email" },
+      "contactType": "EMAIL",
       "value": "john.smith@example.com",
       "isPrimary": true
     }
@@ -15878,12 +15445,12 @@ Content-Type: application/json
     "tradingName": "TechVenture",
     "registrationNumber": "09876543",
     "incorporationDate": "2015-03-20",
-    "companyType": { "code": "LTD", "display": "Private Limited Company" },
+    "companyType": "LTD",
     "countryOfIncorporation": { "code": "GB", "display": "United Kingdom", "alpha3": "GBR" }
   },
   "addresses": [
     {
-      "addressType": { "code": "REGISTERED", "display": "Registered Office" },
+      "addressType": "REGISTERED",
       "line1": "Tech Park Building 5",
       "city": "London",
       "postcode": "EC2A 4DN",
@@ -15894,7 +15461,7 @@ Content-Type: application/json
   ],
   "contacts": [
     {
-      "contactType": { "code": "EMAIL", "display": "Email" },
+      "contactType": "EMAIL",
       "value": "info@techventure.com",
       "isPrimary": true
     }
@@ -15924,7 +15491,7 @@ Content-Type: application/json
   "clientType": "Trust",
   "trustValue": {
     "trustName": "The Smith Family Discretionary Trust",
-    "trustType": { "code": "DISCRETIONARY", "display": "Discretionary Trust" },
+    "trustType": "DISCRETIONARY",
     "settlementDate": "2018-04-15",
     "trustRegistrationNumber": "TRN12345678",
     "settlor": {
@@ -15941,7 +15508,7 @@ Content-Type: application/json
   },
   "addresses": [
     {
-      "addressType": { "code": "TRUST_CORRESPONDENCE", "display": "Trust Correspondence Address" },
+      "addressType": "TRUST_CORRESPONDENCE",
       "line1": "Harrison & Partners Solicitors",
       "city": "London",
       "postcode": "WC2N 5DU",
@@ -15952,7 +15519,7 @@ Content-Type: application/json
   ],
   "contacts": [
     {
-      "contactType": { "code": "EMAIL", "display": "Email" },
+      "contactType": "EMAIL",
       "value": "trustees@smithfamilytrust.com",
       "isPrimary": true
     }
@@ -16054,10 +15621,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 
   "meetingDetails": {
     "meetingDate": "2026-02-16",
-    "meetingType": {
-      "code": "INIT",
-      "display": "Initial Consultation"
-    },
+    "meetingType": "INIT",
     "clientsPresent": "BothClients",
     "othersPresent": false,
     "othersPresentDetails": null,
@@ -16235,10 +15799,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 
   "completionStatus": {
     "isComplete": false,
-    "status": {
-      "code": "INPROG",
-      "display": "In Progress"
-    },
+    "status": "INPROG",
     "completionDate": null,
     "declarationSignedDate": null,
     "compliance": {
@@ -16259,10 +15820,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
       {
         "questionId": "Q1",
         "text": "What is your investment experience?",
-        "answer": {
-          "code": "EXPERIENCED",
-          "display": "Experienced - I have invested for more than 5 years"
-        },
+        "answer": "EXPERIENCED",
         "score": 4
       }
     ],
@@ -16370,10 +15928,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
   "adviserRef": { "id": "adviser-789" },
   "meetingDetails": {
     "meetingDate": "2026-02-16",
-    "meetingType": {
-      "code": "INIT",
-      "display": "Initial Consultation"
-    },
+    "meetingType": "INIT",
     "scopeOfAdvice": {
       "retirementPlanning": true,
       "protection": true
@@ -16398,10 +15953,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 ```json
 {
   "completionStatus": {
-    "status": {
-      "code": "COM",
-      "display": "Complete"
-    },
+    "status": "COM",
     "completionDate": "2026-02-16"
   },
   "investmentCapacity": {
@@ -16431,10 +15983,7 @@ The `MeetingDetailsValue` groups all information related to the consultation mee
 ```json
 {
   "meetingDate": "2026-02-16",
-  "meetingType": {
-    "code": "INIT",
-    "display": "Initial Consultation"
-  },
+  "meetingType": "INIT",
   "clientsPresent": "BothClients",
   "othersPresent": false,
   "othersPresentDetails": null,
@@ -16702,10 +16251,7 @@ The `CompletionStatusValue` tracks the completion status of the fact find and as
 ```json
 {
   "isComplete": false,
-  "status": {
-    "code": "INPROG",
-    "display": "In Progress"
-  },
+  "status": "INPROG",
   "completionDate": null,
   "declarationSignedDate": null,
   "compliance": {
@@ -16757,10 +16303,7 @@ The `Address` contract represents a client's address with additional metadata fo
     "id": "factfind-456",
     "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "clientRef": {
     "id": "client-123",
@@ -16914,14 +16457,11 @@ The `Arrangement` contract represents financial products (pensions, investments,
     "id": "factfind-456",
     "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "arrangementNumber": "ARR123456",
-  "arrangementType": "Pension",
-  "pensionType": "PersonalPension",
+  "arrangementCategory": "PENSION",
+  "pensionType": "PERSONAL_PENSION",
   "clientOwners": [
     {
       "id": "client-123",
@@ -16945,10 +16485,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
     "frnNumber": "123456"
   },
   "policyNumber": "POL123456",
-  "status": {
-    "code": "ACT",
-    "display": "Active"
-  },
+  "status": "ACT",
   "arrangementPeriod": {
     "startDate": "2015-01-01",
     "endDate": null
@@ -17002,7 +16539,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
 **Key Field Behaviors:**
 - `id` - read-only, server-generated
 - `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
-- `arrangementType` - required-on-create, write-once (discriminator)
+- `arrangementCategory` - required-on-create, write-once (discriminator)
 - `pensionType`, `investmentType`, `protectionType`, `mortgageType` - required-on-create (type-specific), write-once
 - `clientId` - required-on-create, write-once
 - `productName`, `providerName`, `policyNumber` - required-on-create, updatable
@@ -17010,7 +16547,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
 - `startDate`, `endDate` - optional, updatable
 - `currentValue` - optional, updatable
 - `valuationDate` - optional, updatable (should match currentValue update)
-- Type-specific fields - vary by arrangementType
+- Type-specific fields - vary by arrangementCategory
 - `createdAt`, `updatedAt` - read-only
 
 ---
@@ -17028,10 +16565,7 @@ The `Goal` contract represents a client's financial goal.
     "id": "factfind-456",
     "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "clientRef": {
     "id": "client-123",
@@ -17118,10 +16652,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
     "id": "factfind-456",
     "href": "/api/v2/factfinds/factfind-456",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "clientRef": {
     "id": "client-123",
@@ -17198,10 +16729,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
     "id": "factfind-123",
     "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "clientRef": {
     "id": "client-123",
@@ -17210,8 +16738,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
     "clientNumber": "C00001234",
     "type": "Person"
   },
-  "arrangementType": "INV",
-  "productType": "ISA",
+  "arrangementCategory": "INVESTMENT",
+  "investmentType": "STOCKS_SHARES_ISA",
   "provider": {
     "code": "VANGUARD",
     "display": "Vanguard Asset Management",
@@ -17222,18 +16750,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "planName": "Vanguard ISA Portfolio",
   "startDate": "2020-04-06",
   "maturityDate": null,
-  "status": {
-    "code": "ACTIVE",
-    "display": "Active"
-  },
-  "investmentType": {
-    "code": "STOCKS_SHARES_ISA",
-    "display": "Stocks & Shares ISA"
-  },
-  "isaType": {
-    "code": "STOCKS_SHARES",
-    "display": "Stocks & Shares ISA"
-  },
+  "status": "ACTIVE",
+  "isaType": "STOCKS_SHARES",
   "taxYear": "2025/2026",
   "annualIsaAllowance": {
     "amount": 20000.00,
@@ -17259,10 +16777,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
       "symbol": "£"
     }
   },
-  "taxWrapperType": {
-    "code": "ISA",
-    "display": "ISA Tax Wrapper"
-  },
+  "taxWrapperType": "ISA",
   "isTaxable": false,
   "currentValue": {
     "amount": 185000.00,
@@ -17422,14 +16937,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
       "sedol": "B3X7QG6",
       "fundName": "Vanguard FTSE Global All Cap Index Fund",
       "ticker": "VWRL",
-      "fundType": {
-        "code": "INDEX",
-        "display": "Index Fund"
-      },
-      "assetClass": {
-        "code": "EQUITY",
-        "display": "Equity"
-      },
+      "fundType": "INDEX",
+      "assetClass": "EQUITY",
       "units": 15000.00,
       "unitPrice": {
         "amount": 6.25,
@@ -17474,14 +16983,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
       "sedol": "B4PQW15",
       "fundName": "Vanguard U.K. Government Bond Index Fund",
       "ticker": "VGOV",
-      "fundType": {
-        "code": "INDEX",
-        "display": "Index Fund"
-      },
-      "assetClass": {
-        "code": "BOND",
-        "display": "Fixed Income"
-      },
+      "fundType": "INDEX",
+      "assetClass": "BOND",
       "units": 28000.00,
       "unitPrice": {
         "amount": 1.65,
@@ -17526,14 +17029,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
       "sedol": "BPN5P23",
       "fundName": "Vanguard LifeStrategy 60% Equity Fund",
       "ticker": "VLS60",
-      "fundType": {
-        "code": "MIXED",
-        "display": "Mixed Asset Fund"
-      },
-      "assetClass": {
-        "code": "MIXED",
-        "display": "Mixed Assets"
-      },
+      "fundType": "MIXED",
+      "assetClass": "MIXED",
       "units": 12500.00,
       "unitPrice": {
         "amount": 2.80,
@@ -17576,14 +17073,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
       "holdingId": "holding-004",
       "isin": "CASH001",
       "fundName": "Cash Holding",
-      "fundType": {
-        "code": "CASH",
-        "display": "Cash"
-      },
-      "assetClass": {
-        "code": "CASH",
-        "display": "Cash"
-      },
+      "fundType": "CASH",
+      "assetClass": "CASH",
       "currentValue": {
         "amount": 10050.00,
         "currency": {
@@ -17627,10 +17118,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
           "symbol": "£"
         }
       },
-      "type": {
-        "code": "REGULAR",
-        "display": "Regular Contribution"
-      },
+      "type": "REGULAR",
       "taxYear": "2025/2026",
       "notes": "Annual ISA contribution for tax year 2025/26"
     },
@@ -17645,10 +17133,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
           "symbol": "£"
         }
       },
-      "type": {
-        "code": "REGULAR",
-        "display": "Regular Contribution"
-      },
+      "type": "REGULAR",
       "taxYear": "2024/2025",
       "notes": "Annual ISA contribution for tax year 2024/25"
     }
@@ -17673,10 +17158,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
           "symbol": "£"
         }
       },
-      "type": {
-        "code": "ADHOC",
-        "display": "Ad-hoc Withdrawal"
-      },
+      "type": "ADHOC",
       "reason": "Home improvement",
       "taxableAmount": {
         "amount": 0.00,
@@ -17713,10 +17195,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
       "symbol": "£"
     }
   },
-  "regularContributionFrequency": {
-    "code": "MONTHLY",
-    "display": "Monthly"
-  },
+  "regularContributionFrequency": "MONTHLY",
   "nextContributionDate": "2026-03-01",
   "isRegularContributionActive": true,
   "taxFields": {
@@ -17800,17 +17279,11 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   },
   "investmentObjective": "Long-term capital growth with moderate risk exposure",
   "benchmarkIndex": "FTSE All-World Index",
-  "rebalancingFrequency": {
-    "code": "QUARTERLY",
-    "display": "Quarterly"
-  },
+  "rebalancingFrequency": "QUARTERLY",
   "lastRebalancingDate": "2026-01-15",
   "nextRebalancingDate": "2026-04-15",
   "isAdvised": true,
-  "adviceType": {
-    "code": "ONGOING",
-    "display": "Ongoing Advice"
-  },
+  "adviceType": "ONGOING",
   "adviserRef": {
     "id": "adviser-789",
     "href": "/api/v2/advisers/adviser-789",
@@ -17823,10 +17296,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "documents": [
     {
       "documentId": "doc-001",
-      "type": {
-        "code": "STATEMENT",
-        "display": "Account Statement"
-      },
+      "type": "STATEMENT",
       "name": "ISA Annual Statement 2025",
       "date": "2025-12-31",
       "url": "/api/v2/documents/doc-001"
@@ -17867,8 +17337,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | `arrangementId` | uuid | required | ignored | included | write-once, link to parent Arrangement |
 | `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
 | `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
-| `arrangementType` | string | required | ignored | included | write-once, discriminator field |
-| `productType` | string | required | ignored | included | write-once, ISA/GIA/Bond/Investment Trust |
+| `arrangementCategory` | string | required | ignored | included | write-once, discriminator field (INVESTMENT) |
+| `investmentType` | string (enum) | required | ignored | included | write-once, specific type (GIA/ISA/Bond/etc) |
 | `provider` | ProviderValue | required | updatable | included | Provider details with FRN |
 | `policyNumber` | string | required | ignored | included | write-once, unique identifier |
 | `accountNumber` | string | optional | updatable | included | Account reference number |
@@ -17939,14 +17409,13 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "arrangementId": "arrangement-456",
   "factFindRef": { "id": "factfind-123" },
   "clientRef": { "id": "client-123" },
-  "arrangementType": "INV",
-  "productType": "ISA",
+  "arrangementCategory": "INVESTMENT",
   "provider": "VANGUARD",
   "policyNumber": "ISA-987654321",
   "startDate": "2020-04-06",
   "inceptionDate": "2020-04-06",
-  "investmentType": { "code": "STOCKS_SHARES_ISA" },
-  "isaType": { "code": "STOCKS_SHARES" },
+  "investmentType": "STOCKS_SHARES_ISA",
+  "isaType": "STOCKS_SHARES",
   "taxYear": "2025/2026",
   "currentValue": { "amount": 185000.00, "currency": { "code": "GBP" } },
   "valuationDate": "2026-02-16",
@@ -17989,8 +17458,8 @@ Only specified fields are updated. Returns complete contract with new holding ad
 
 **Validation Rules:**
 
-1. **Required Fields on Create:** `arrangementId`, `factFindRef`, `clientRef`, `arrangementType`, `productType`, `provider`, `policyNumber`, `startDate`, `inceptionDate`, `currentValue`, `valuationDate`
-2. **Write-Once Fields:** Cannot be changed after creation: `arrangementId`, `factFindRef`, `clientRef`, `arrangementType`, `productType`, `policyNumber`, `startDate`, `inceptionDate`
+1. **Required Fields on Create:** `arrangementId`, `factFindRef`, `clientRef`, `arrangementCategory`, `investmentType`, `provider`, `policyNumber`, `startDate`, `inceptionDate`, `currentValue`, `valuationDate`
+2. **Write-Once Fields:** Cannot be changed after creation: `arrangementId`, `factFindRef`, `clientRef`, `arrangementCategory`, `investmentType`, `policyNumber`, `startDate`, `inceptionDate`
 3. **ISA Validation:** If `productType` is ISA, `isaType` must be provided (Stocks/Cash/Innovative/Lifetime)
 4. **ISA Allowance:** `isaAllowanceUsed` cannot exceed `annualIsaAllowance` (£20,000 for 2025/26)
 5. **Asset Allocation:** Sum of percentages in `assetAllocation` must equal 100%
@@ -18015,35 +17484,23 @@ The `Property` contract represents a property asset with valuation tracking, mor
     "id": "factfind-123",
     "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "propertyType": "BTL",
-  "propertySubType": {
-    "code": "APARTMENT",
-    "display": "Apartment/Flat"
-  },
+  "propertySubType": "APARTMENT",
   "ownershipType": "FREEHOLD",
   "address": {
     "line1": "Flat 12, Riverside Apartments",
     "line2": "45 Thames Street",
     "city": "London",
-    "county": {
-      "code": "GLA",
-      "display": "Greater London"
-    },
+    "county": "GLA",
     "postcode": "SE1 9PH",
     "country": {
       "code": "GB",
       "display": "United Kingdom",
       "alpha3": "GBR"
     },
-    "addressType": {
-      "code": "BTL",
-      "display": "Buy To Let"
-    },
+    "addressType": "BTL",
     "uprn": "100023456789",
     "coordinates": {
       "latitude": 51.5074,
@@ -18058,10 +17515,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
     "value": 850,
     "unit": "sqft"
   },
-  "tenure": {
-    "code": "LEASEHOLD",
-    "display": "Leasehold"
-  },
+  "tenure": "LEASEHOLD",
   "leaseRemaining": 95,
   "groundRent": {
     "amount": 250.00,
@@ -18070,10 +17524,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "display": "British Pound",
       "symbol": "£"
     },
-    "frequency": {
-      "code": "ANNUAL",
-      "display": "Annually"
-    }
+    "frequency": "ANNUAL"
   },
   "serviceCharge": {
     "amount": 150.00,
@@ -18082,10 +17533,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "display": "British Pound",
       "symbol": "£"
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    }
+    "frequency": "MONTHLY"
   },
   "purchaseDate": "2018-06-15",
   "purchasePrice": {
@@ -18168,10 +17616,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "ownershipType": "SOLE"
     }
   ],
-  "ownershipStructure": {
-    "code": "SOLE",
-    "display": "Sole Ownership"
-  },
+  "ownershipStructure": "SOLE",
   "isJointOwnership": false,
   "jointOwnershipType": null,
   "currentValue": {
@@ -18183,10 +17628,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
     }
   },
   "valuationDate": "2026-02-10",
-  "valuationType": {
-    "code": "DESKTOP",
-    "display": "Desktop Valuation"
-  },
+  "valuationType": "DESKTOP",
   "valuationProvider": "Zoopla",
   "valuationReference": "VAL-2026-02-12345",
   "previousValuation": {
@@ -18284,10 +17726,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
         "symbol": "£"
       }
     },
-    "tenancyType": {
-      "code": "AST",
-      "display": "Assured Shorthold Tenancy"
-    },
+    "tenancyType": "AST",
     "tenancyStartDate": "2025-08-01",
     "tenancyEndDate": "2026-07-31",
     "tenancyRenewalDate": "2026-07-31",
@@ -18312,10 +17751,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
   },
   "expenses": [
     {
-      "expenseType": {
-        "code": "MORTGAGE_INTEREST",
-        "display": "Mortgage Interest"
-      },
+      "expenseType": "MORTGAGE_INTEREST",
       "amount": {
         "amount": 750.00,
         "currency": {
@@ -18324,10 +17760,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
           "symbol": "£"
         }
       },
-      "frequency": {
-        "code": "MONTHLY",
-        "display": "Monthly"
-      },
+      "frequency": "MONTHLY",
       "annualAmount": {
         "amount": 9000.00,
         "currency": {
@@ -18340,10 +17773,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "notes": "Interest-only mortgage"
     },
     {
-      "expenseType": {
-        "code": "BUILDINGS_INSURANCE",
-        "display": "Buildings Insurance"
-      },
+      "expenseType": "BUILDINGS_INSURANCE",
       "amount": {
         "amount": 35.00,
         "currency": {
@@ -18352,10 +17782,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
           "symbol": "£"
         }
       },
-      "frequency": {
-        "code": "MONTHLY",
-        "display": "Monthly"
-      },
+      "frequency": "MONTHLY",
       "annualAmount": {
         "amount": 420.00,
         "currency": {
@@ -18368,10 +17795,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "notes": "Landlord buildings insurance"
     },
     {
-      "expenseType": {
-        "code": "LANDLORD_INSURANCE",
-        "display": "Landlord Insurance"
-      },
+      "expenseType": "LANDLORD_INSURANCE",
       "amount": {
         "amount": 25.00,
         "currency": {
@@ -18380,10 +17804,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
           "symbol": "£"
         }
       },
-      "frequency": {
-        "code": "MONTHLY",
-        "display": "Monthly"
-      },
+      "frequency": "MONTHLY",
       "annualAmount": {
         "amount": 300.00,
         "currency": {
@@ -18396,10 +17817,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "notes": "Rent guarantee and legal expenses"
     },
     {
-      "expenseType": {
-        "code": "LETTING_AGENT",
-        "display": "Letting Agent Fees"
-      },
+      "expenseType": "LETTING_AGENT",
       "amount": {
         "amount": 165.00,
         "currency": {
@@ -18408,10 +17826,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
           "symbol": "£"
         }
       },
-      "frequency": {
-        "code": "MONTHLY",
-        "display": "Monthly"
-      },
+      "frequency": "MONTHLY",
       "annualAmount": {
         "amount": 1980.00,
         "currency": {
@@ -18424,10 +17839,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "notes": "10% management fee"
     },
     {
-      "expenseType": {
-        "code": "GROUND_RENT",
-        "display": "Ground Rent"
-      },
+      "expenseType": "GROUND_RENT",
       "amount": {
         "amount": 20.83,
         "currency": {
@@ -18436,10 +17848,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
           "symbol": "£"
         }
       },
-      "frequency": {
-        "code": "MONTHLY",
-        "display": "Monthly"
-      },
+      "frequency": "MONTHLY",
       "annualAmount": {
         "amount": 250.00,
         "currency": {
@@ -18452,10 +17861,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "notes": "Annual ground rent"
     },
     {
-      "expenseType": {
-        "code": "SERVICE_CHARGE",
-        "display": "Service Charge"
-      },
+      "expenseType": "SERVICE_CHARGE",
       "amount": {
         "amount": 150.00,
         "currency": {
@@ -18464,10 +17870,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
           "symbol": "£"
         }
       },
-      "frequency": {
-        "code": "MONTHLY",
-        "display": "Monthly"
-      },
+      "frequency": "MONTHLY",
       "annualAmount": {
         "amount": 1800.00,
         "currency": {
@@ -18480,10 +17883,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "notes": "Building maintenance and communal areas"
     },
     {
-      "expenseType": {
-        "code": "REPAIRS_MAINTENANCE",
-        "display": "Repairs & Maintenance"
-      },
+      "expenseType": "REPAIRS_MAINTENANCE",
       "amount": {
         "amount": 83.33,
         "currency": {
@@ -18492,10 +17892,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
           "symbol": "£"
         }
       },
-      "frequency": {
-        "code": "MONTHLY",
-        "display": "Monthly"
-      },
+      "frequency": "MONTHLY",
       "annualAmount": {
         "amount": 1000.00,
         "currency": {
@@ -18683,10 +18080,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "documents": [
     {
       "documentId": "doc-prop-001",
-      "type": {
-        "code": "VALUATION",
-        "display": "Property Valuation"
-      },
+      "type": "VALUATION",
       "name": "Desktop Valuation February 2026",
       "date": "2026-02-10",
       "url": "/api/v2/documents/doc-prop-001"
@@ -18807,7 +18201,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "purchasePrice": { "amount": 325000.00, "currency": { "code": "GBP" } },
   "currentValue": { "amount": 425000.00, "currency": { "code": "GBP" } },
   "valuationDate": "2026-02-10",
-  "valuationType": { "code": "DESKTOP" },
+  "valuationType": "DESKTOP",
   "owners": [
     {
       "clientRef": { "id": "client-123" },
@@ -18815,7 +18209,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "isPrimaryOwner": true
     }
   ],
-  "ownershipStructure": { "code": "SOLE" },
+  "ownershipStructure": "SOLE",
   "isBuyToLet": true,
   "isRented": true
 }
@@ -18827,7 +18221,7 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields. 
 {
   "currentValue": { "amount": 435000.00, "currency": { "code": "GBP" } },
   "valuationDate": "2026-06-15",
-  "valuationType": { "code": "SURVEYOR" },
+  "valuationType": "SURVEYOR",
   "valuationProvider": "Knight Frank",
   "previousValuation": { "amount": 425000.00, "currency": { "code": "GBP" } },
   "previousValuationDate": "2026-02-10"
@@ -18876,10 +18270,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     "id": "factfind-123",
     "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
   "clientRef": {
     "id": "client-123",
@@ -19011,10 +18402,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     {
       "transactionId": "txn-001",
       "date": "2021-03-15",
-      "transactionType": {
-        "code": "BUY",
-        "display": "Purchase"
-      },
+      "transactionType": "BUY",
       "quantity": 3000,
       "price": {
         "amount": 4.00,
@@ -19070,10 +18458,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     {
       "transactionId": "txn-002",
       "date": "2022-06-20",
-      "transactionType": {
-        "code": "BUY",
-        "display": "Purchase"
-      },
+      "transactionType": "BUY",
       "quantity": 2000,
       "price": {
         "amount": 4.60,
@@ -19131,10 +18516,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     {
       "transactionId": "txn-003",
       "date": "2024-09-10",
-      "transactionType": {
-        "code": "SELL",
-        "display": "Sale"
-      },
+      "transactionType": "SELL",
       "quantity": 500,
       "price": {
         "amount": 5.50,
@@ -19201,10 +18583,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
       "dividendId": "div-001",
       "exDividendDate": "2021-08-05",
       "paymentDate": "2021-09-27",
-      "dividendType": {
-        "code": "ORDINARY",
-        "display": "Ordinary Dividend"
-      },
+      "dividendType": "ORDINARY",
       "amountPerShare": {
         "amount": 0.05175,
         "currency": {
@@ -19254,10 +18633,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
       "dividendId": "div-002",
       "exDividendDate": "2021-11-04",
       "paymentDate": "2021-12-20",
-      "dividendType": {
-        "code": "ORDINARY",
-        "display": "Ordinary Dividend"
-      },
+      "dividendType": "ORDINARY",
       "amountPerShare": {
         "amount": 0.05250,
         "currency": {
@@ -19307,10 +18683,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
       "dividendId": "div-003",
       "exDividendDate": "2025-11-07",
       "paymentDate": "2025-12-23",
-      "dividendType": {
-        "code": "ORDINARY",
-        "display": "Ordinary Dividend"
-      },
+      "dividendType": "ORDINARY",
       "amountPerShare": {
         "amount": 0.08010,
         "currency": {
@@ -19361,10 +18734,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     {
       "actionId": "action-001",
       "date": "2023-05-15",
-      "actionType": {
-        "code": "STOCK_SPLIT",
-        "display": "Stock Split"
-      },
+      "actionType": "STOCK_SPLIT",
       "ratio": "2:1",
       "description": "2-for-1 stock split",
       "quantityBefore": 2500,
@@ -19374,10 +18744,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     {
       "actionId": "action-002",
       "date": "2024-03-20",
-      "actionType": {
-        "code": "RIGHTS_ISSUE",
-        "display": "Rights Issue"
-      },
+      "actionType": "RIGHTS_ISSUE",
       "ratio": "1:10",
       "description": "Rights issue at £4.00 per share",
       "pricePerShare": {
@@ -19394,10 +18761,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     }
   ],
   "taxCalculation": {
-    "costBasisMethod": {
-      "code": "SECTION104",
-      "display": "Section 104 Pool (UK)"
-    },
+    "costBasisMethod": "SECTION104",
     "section104Pool": {
       "quantity": 5000,
       "pooledCost": {
@@ -19578,10 +18942,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
   "documents": [
     {
       "documentId": "doc-eq-001",
-      "type": {
-        "code": "CONTRACT_NOTE",
-        "display": "Contract Note"
-      },
+      "type": "CONTRACT_NOTE",
       "name": "Purchase Contract Note - March 2021",
       "date": "2021-03-15",
       "url": "/api/v2/documents/doc-eq-001"
@@ -19662,7 +19023,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
   "isin": "GB0007980591",
   "sedol": "0798059",
   "companyName": "BP plc",
-  "exchange": { "code": "LSE" },
+  "exchange": "LSE",
   "currency": { "code": "GBP" },
   "holdings": {
     "quantity": 3000,
@@ -19682,7 +19043,7 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes performance metric
   "purchases": [
     {
       "date": "2026-02-18",
-      "transactionType": { "code": "BUY" },
+      "transactionType": "BUY",
       "quantity": 1000,
       "price": { "amount": 5.20, "currency": { "code": "GBP" } },
       "grossAmount": { "amount": 5200.00, "currency": { "code": "GBP" } },
@@ -19706,7 +19067,7 @@ Server updates `updatedAt`, recalculates performance and Section 104 pool. Retur
     {
       "exDividendDate": "2026-02-14",
       "paymentDate": "2026-03-28",
-      "dividendType": { "code": "ORDINARY" },
+      "dividendType": "ORDINARY",
       "amountPerShare": { "amount": 0.0650, "currency": { "code": "GBP" } },
       "quantityHeld": 5000,
       "grossDividend": { "amount": 325.00, "currency": { "code": "GBP" } },
@@ -19753,23 +19114,11 @@ The `IdentityVerification` contract represents identity verification status with
     "id": "factfind-123",
     "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
-  "verificationType": {
-    "code": "KYC_AML",
-    "display": "KYC & AML Verification"
-  },
-  "verificationLevel": {
-    "code": "ENHANCED",
-    "display": "Enhanced Due Diligence"
-  },
-  "verificationStatus": {
-    "code": "VERIFIED",
-    "display": "Verified"
-  },
+  "verificationType": "KYC_AML",
+  "verificationLevel": "ENHANCED",
+  "verificationStatus": "VERIFIED",
   "verificationDate": "2026-02-10T14:30:00Z",
   "verificationExpiryDate": "2027-02-10",
   "isExpired": false,
@@ -19777,10 +19126,7 @@ The `IdentityVerification` contract represents identity verification status with
   "documents": [
     {
       "documentId": "doc-001",
-      "documentType": {
-        "code": "PASSPORT",
-        "display": "Passport"
-      },
+      "documentType": "PASSPORT",
       "documentNumber": "502135321",
       "issuingCountry": {
         "code": "GB",
@@ -19789,10 +19135,7 @@ The `IdentityVerification` contract represents identity verification status with
       },
       "issueDate": "2020-05-15",
       "expiryDate": "2030-05-15",
-      "documentStatus": {
-        "code": "VERIFIED",
-        "display": "Verified"
-      },
+      "documentStatus": "VERIFIED",
       "verifiedDate": "2026-02-10T14:30:00Z",
       "documentImageUrl": "https://secure.documents.example.com/id/doc-001-encrypted",
       "isExpired": false,
@@ -19800,26 +19143,17 @@ The `IdentityVerification` contract represents identity verification status with
     },
     {
       "documentId": "doc-002",
-      "documentType": {
-        "code": "UTILITY_BILL",
-        "display": "Utility Bill"
-      },
+      "documentType": "UTILITY_BILL",
       "utilityType": "Electricity",
       "issueDate": "2026-01-15",
-      "documentStatus": {
-        "code": "VERIFIED",
-        "display": "Verified"
-      },
+      "documentStatus": "VERIFIED",
       "verifiedDate": "2026-02-10T14:30:00Z",
       "address": {
         "line1": "123 Main Street",
         "line2": "Apartment 4B",
         "city": "London",
         "postcode": "SW1A 1AA",
-        "country": {
-          "code": "GB",
-          "display": "United Kingdom"
-        }
+        "country": "GB"
       },
       "addressMatched": true,
       "documentImageUrl": "https://secure.documents.example.com/id/doc-002-encrypted",
@@ -19835,55 +19169,37 @@ The `IdentityVerification` contract represents identity verification status with
     "providerReference": "ONFIDO-CHK-123456789",
     "providerCheckId": "chk_abc123def456ghi789",
     "providerScore": 98,
-    "providerDecision": {
-      "code": "CLEAR",
-      "display": "Clear"
-    },
+    "providerDecision": "CLEAR",
     "providerReportUrl": "https://dashboard.onfido.com/checks/chk_abc123def456ghi789",
     "providerResponseDate": "2026-02-10T14:30:00Z"
   },
   "biometricVerification": {
     "faceMatch": {
-      "status": {
-        "code": "MATCHED",
-        "display": "Matched"
-      },
+      "status": "MATCHED",
       "confidence": 99.5,
       "matchDate": "2026-02-10T14:30:00Z"
     },
     "livenessCheck": {
-      "status": {
-        "code": "PASSED",
-        "display": "Passed"
-      },
+      "status": "PASSED",
       "confidence": 98.2,
       "checkDate": "2026-02-10T14:30:00Z"
     }
   },
   "addressVerification": {
     "addressVerified": true,
-    "verificationMethod": {
-      "code": "DOCUMENT",
-      "display": "Document Verification"
-    },
+    "verificationMethod": "DOCUMENT",
     "verifiedAddress": {
       "line1": "123 Main Street",
       "line2": "Apartment 4B",
       "city": "London",
       "postcode": "SW1A 1AA",
-      "country": {
-        "code": "GB",
-        "display": "United Kingdom"
-      }
+      "country": "GB"
     },
     "addressMatchScore": 100,
     "verificationDate": "2026-02-10T14:30:00Z"
   },
   "amlChecks": {
-    "amlStatus": {
-      "code": "CLEAR",
-      "display": "Clear"
-    },
+    "amlStatus": "CLEAR",
     "amlCheckDate": "2026-02-10T14:30:00Z",
     "amlProvider": {
       "code": "WORLDCHECK",
@@ -19892,10 +19208,7 @@ The `IdentityVerification` contract represents identity verification status with
     },
     "amlProviderReference": "WC-2026-02-987654321",
     "sanctionsScreening": {
-      "status": {
-        "code": "CLEAR",
-        "display": "Clear"
-      },
+      "status": "CLEAR",
       "listsChecked": [
         "UN Security Council",
         "EU Sanctions",
@@ -19907,10 +19220,7 @@ The `IdentityVerification` contract represents identity verification status with
       "checkDate": "2026-02-10T14:30:00Z"
     },
     "pepScreening": {
-      "status": {
-        "code": "NOT_PEP",
-        "display": "Not a Politically Exposed Person"
-      },
+      "status": "NOT_PEP",
       "isPep": false,
       "pepCategory": null,
       "pepRelationship": null,
@@ -19918,19 +19228,13 @@ The `IdentityVerification` contract represents identity verification status with
       "checkDate": "2026-02-10T14:30:00Z"
     },
     "adverseMediaScreening": {
-      "status": {
-        "code": "CLEAR",
-        "display": "Clear"
-      },
+      "status": "CLEAR",
       "adverseMediaChecked": true,
       "adverseMediaMatches": [],
       "checkDate": "2026-02-10T14:30:00Z"
     },
     "watchlistScreening": {
-      "status": {
-        "code": "CLEAR",
-        "display": "Clear"
-      },
+      "status": "CLEAR",
       "watchlistsChecked": [
         "FBI Most Wanted",
         "Europol Most Wanted",
@@ -19942,44 +19246,23 @@ The `IdentityVerification` contract represents identity verification status with
     }
   },
   "riskAssessment": {
-    "overallRiskRating": {
-      "code": "LOW",
-      "display": "Low Risk"
-    },
+    "overallRiskRating": "LOW",
     "riskScore": 15,
     "riskScoreMax": 100,
     "riskFactors": [
       {
-        "factor": {
-          "code": "CLEAR_AML",
-          "display": "Clear AML Check"
-        },
-        "impact": {
-          "code": "POSITIVE",
-          "display": "Positive"
-        },
+        "factor": "CLEAR_AML",
+        "impact": "POSITIVE",
         "weight": -10
       },
       {
-        "factor": {
-          "code": "VERIFIED_IDENTITY",
-          "display": "Identity Verified"
-        },
-        "impact": {
-          "code": "POSITIVE",
-          "display": "Positive"
-        },
+        "factor": "VERIFIED_IDENTITY",
+        "impact": "POSITIVE",
         "weight": -15
       },
       {
-        "factor": {
-          "code": "HIGH_CONFIDENCE_BIOMETRIC",
-          "display": "High Confidence Biometric Match"
-        },
-        "impact": {
-          "code": "POSITIVE",
-          "display": "Positive"
-        },
+        "factor": "HIGH_CONFIDENCE_BIOMETRIC",
+        "impact": "POSITIVE",
         "weight": -10
       }
     ],
@@ -20014,15 +19297,9 @@ The `IdentityVerification` contract represents identity verification status with
   "verificationHistory": [
     {
       "historyId": "hist-001",
-      "verificationType": {
-        "code": "INITIAL_KYC",
-        "display": "Initial KYC"
-      },
+      "verificationType": "INITIAL_KYC",
       "verificationDate": "2020-01-10T10:00:00Z",
-      "status": {
-        "code": "VERIFIED",
-        "display": "Verified"
-      },
+      "status": "VERIFIED",
       "provider": "Experian",
       "providerReference": "EXP-KYC-2020-01-123",
       "expiryDate": "2021-01-10",
@@ -20030,15 +19307,9 @@ The `IdentityVerification` contract represents identity verification status with
     },
     {
       "historyId": "hist-002",
-      "verificationType": {
-        "code": "ANNUAL_REVIEW",
-        "display": "Annual Review"
-      },
+      "verificationType": "ANNUAL_REVIEW",
       "verificationDate": "2021-01-15T09:00:00Z",
-      "status": {
-        "code": "VERIFIED",
-        "display": "Verified"
-      },
+      "status": "VERIFIED",
       "provider": "Experian",
       "providerReference": "EXP-KYC-2021-01-456",
       "expiryDate": "2022-01-15",
@@ -20046,15 +19317,9 @@ The `IdentityVerification` contract represents identity verification status with
     },
     {
       "historyId": "hist-003",
-      "verificationType": {
-        "code": "ENHANCED_DD",
-        "display": "Enhanced Due Diligence"
-      },
+      "verificationType": "ENHANCED_DD",
       "verificationDate": "2026-02-10T14:30:00Z",
-      "status": {
-        "code": "VERIFIED",
-        "display": "Verified"
-      },
+      "status": "VERIFIED",
       "provider": "Onfido",
       "providerReference": "ONFIDO-CHK-123456789",
       "expiryDate": "2027-02-10",
@@ -20062,10 +19327,7 @@ The `IdentityVerification` contract represents identity verification status with
     }
   ],
   "nextReviewDate": "2027-02-10",
-  "reviewFrequency": {
-    "code": "ANNUAL",
-    "display": "Annual"
-  },
+  "reviewFrequency": "ANNUAL",
   "verifiedBy": {
     "id": "user-789",
     "name": "Jane Doe",
@@ -20084,20 +19346,14 @@ The `IdentityVerification` contract represents identity verification status with
   "documents": [
     {
       "documentId": "doc-verify-001",
-      "type": {
-        "code": "VERIFICATION_REPORT",
-        "display": "Identity Verification Report"
-      },
+      "type": "VERIFICATION_REPORT",
       "name": "Onfido Verification Report - Feb 2026",
       "date": "2026-02-10",
       "url": "/api/v2/documents/doc-verify-001"
     },
     {
       "documentId": "doc-verify-002",
-      "type": {
-        "code": "AML_REPORT",
-        "display": "AML Screening Report"
-      },
+      "type": "AML_REPORT",
       "name": "World-Check AML Report - Feb 2026",
       "date": "2026-02-10",
       "url": "/api/v2/documents/doc-verify-002"
@@ -20176,22 +19432,22 @@ The `IdentityVerification` contract represents identity verification status with
 {
   "clientRef": { "id": "client-123" },
   "factFindRef": { "id": "factfind-123" },
-  "verificationType": { "code": "KYC_AML" },
-  "verificationLevel": { "code": "ENHANCED" },
-  "verificationStatus": { "code": "PENDING" },
+  "verificationType": "KYC_AML",
+  "verificationLevel": "ENHANCED",
+  "verificationStatus": "PENDING",
   "verificationDate": "2026-02-10T14:30:00Z",
   "documents": [
     {
-      "documentType": { "code": "PASSPORT" },
+      "documentType": "PASSPORT",
       "documentNumber": "502135321",
-      "issuingCountry": { "code": "GB" },
+      "issuingCountry": "GB",
       "issueDate": "2020-05-15",
       "expiryDate": "2030-05-15",
       "isPrimary": true
     }
   ],
   "amlChecks": {
-    "amlStatus": { "code": "PENDING" }
+    "amlStatus": "PENDING"
   },
   "consentGiven": true,
   "consentDate": "2026-02-10T14:00:00Z",
@@ -20204,28 +19460,28 @@ Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
 **Updating Verification Status (PUT /api/v2/identity-verification/idverify-987):**
 ```json
 {
-  "verificationStatus": { "code": "VERIFIED" },
+  "verificationStatus": "VERIFIED",
   "verificationDate": "2026-02-10T14:30:00Z",
   "verificationExpiryDate": "2027-02-10",
   "identityProvider": {
     "provider": "ONFIDO",
     "providerReference": "ONFIDO-CHK-123456789",
     "providerScore": 98,
-    "providerDecision": { "code": "CLEAR" }
+    "providerDecision": "CLEAR"
   },
   "amlChecks": {
-    "amlStatus": { "code": "CLEAR" },
+    "amlStatus": "CLEAR",
     "amlCheckDate": "2026-02-10T14:30:00Z",
     "sanctionsScreening": {
-      "status": { "code": "CLEAR" }
+      "status": "CLEAR"
     },
     "pepScreening": {
-      "status": { "code": "NOT_PEP" },
+      "status": "NOT_PEP",
       "isPep": false
     }
   },
   "riskAssessment": {
-    "overallRiskRating": { "code": "LOW" },
+    "overallRiskRating": "LOW",
     "riskScore": 15
   }
 }
@@ -20236,15 +19492,15 @@ Server updates `updatedAt`. Returns complete contract with verification complete
 ```json
 {
   "amlChecks": {
-    "amlStatus": { "code": "CLEAR" },
-    "amlProvider": { "code": "WORLDCHECK" },
+    "amlStatus": "CLEAR",
+    "amlProvider": "WORLDCHECK",
     "amlProviderReference": "WC-2026-02-987654321",
     "sanctionsScreening": {
-      "status": { "code": "CLEAR" },
+      "status": "CLEAR",
       "matches": []
     },
     "adverseMediaScreening": {
-      "status": { "code": "CLEAR" },
+      "status": "CLEAR",
       "adverseMediaMatches": []
     }
   }
@@ -20287,40 +19543,22 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
     "id": "factfind-123",
     "href": "/api/v2/factfinds/factfind-123",
     "factFindNumber": "FF-2025-00123",
-    "status": {
-      "code": "INP",
-      "display": "In Progress"
-    }
+    "status": "INP"
   },
-  "consentPurpose": {
-    "code": "DATA_PROCESSING",
-    "display": "Data Processing"
-  },
+  "consentPurpose": "DATA_PROCESSING",
   "consentPurposeDescription": "Processing of personal and financial data for the purpose of financial advice and planning",
-  "consentStatus": {
-    "code": "GIVEN",
-    "display": "Consent Given"
-  },
+  "consentStatus": "GIVEN",
   "consentGivenDate": "2026-02-10T14:00:00Z",
   "consentWithdrawnDate": null,
   "consentExpiryDate": "2028-02-10",
   "isExpired": false,
   "daysUntilExpiry": 730,
   "isActive": true,
-  "consentMethod": {
-    "code": "EXPLICIT",
-    "display": "Explicit Consent"
-  },
-  "consentChannel": {
-    "code": "WEB",
-    "display": "Web Portal"
-  },
+  "consentMethod": "EXPLICIT",
+  "consentChannel": "WEB",
   "consentVersion": "2.1",
   "consentText": "I consent to the collection, storage, and processing of my personal and financial data for the purpose of receiving financial advice and planning services. I understand that my data will be processed in accordance with the Privacy Policy and GDPR regulations.",
-  "lawfulBasis": {
-    "code": "CONSENT",
-    "display": "Consent (GDPR Article 6(1)(a))"
-  },
+  "lawfulBasis": "CONSENT",
   "lawfulBasisDetails": "Consent freely given for data processing under GDPR Article 6(1)(a)",
   "specialCategoryData": {
     "isSpecialCategory": false,
@@ -20330,10 +19568,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   "dataProcessing": {
     "dataCategories": [
       {
-        "category": {
-          "code": "PERSONAL_IDENTITY",
-          "display": "Personal Identity Data"
-        },
+        "category": "PERSONAL_IDENTITY",
         "dataTypes": [
           "Name",
           "Date of Birth",
@@ -20343,10 +19578,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         ]
       },
       {
-        "category": {
-          "code": "FINANCIAL",
-          "display": "Financial Data"
-        },
+        "category": "FINANCIAL",
         "dataTypes": [
           "Income",
           "Expenditure",
@@ -20357,10 +19589,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         ]
       },
       {
-        "category": {
-          "code": "EMPLOYMENT",
-          "display": "Employment Data"
-        },
+        "category": "EMPLOYMENT",
         "dataTypes": [
           "Employer Details",
           "Employment History",
@@ -20370,26 +19599,17 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
     ],
     "processingActivities": [
       {
-        "activity": {
-          "code": "STORAGE",
-          "display": "Data Storage"
-        },
+        "activity": "STORAGE",
         "description": "Secure storage of client data in encrypted databases",
         "purpose": "Maintaining client records for advice delivery"
       },
       {
-        "activity": {
-          "code": "ANALYSIS",
-          "display": "Data Analysis"
-        },
+        "activity": "ANALYSIS",
         "description": "Analysis of financial circumstances for advice purposes",
         "purpose": "Delivering personalized financial advice"
       },
       {
-        "activity": {
-          "code": "COMMUNICATION",
-          "display": "Communication"
-        },
+        "activity": "COMMUNICATION",
         "description": "Sending advice recommendations and updates to client",
         "purpose": "Ongoing client service and advice delivery"
       }
@@ -20401,10 +19621,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
     },
     "dataSharedWith": [
       {
-        "recipient": {
-          "code": "PRODUCT_PROVIDER",
-          "display": "Product Providers"
-        },
+        "recipient": "PRODUCT_PROVIDER",
         "recipientName": "Various Insurance and Investment Providers",
         "purpose": "Product application and policy administration",
         "dataCategories": [
@@ -20416,10 +19633,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         "isOutsideEEA": false
       },
       {
-        "recipient": {
-          "code": "REGULATOR",
-          "display": "Regulatory Bodies"
-        },
+        "recipient": "REGULATOR",
         "recipientName": "Financial Conduct Authority (FCA)",
         "purpose": "Regulatory compliance and oversight",
         "dataCategories": [
@@ -20431,10 +19645,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         "isOutsideEEA": false
       },
       {
-        "recipient": {
-          "code": "IT_PROVIDER",
-          "display": "IT Service Providers"
-        },
+        "recipient": "IT_PROVIDER",
         "recipientName": "Microsoft Azure, AWS",
         "purpose": "Cloud hosting and data processing",
         "dataCategories": [
@@ -20451,42 +19662,27 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
     "marketingConsentDate": "2026-02-10T14:00:00Z",
     "marketingChannels": [
       {
-        "channel": {
-          "code": "EMAIL",
-          "display": "Email"
-        },
+        "channel": "EMAIL",
         "isConsented": true,
         "consentDate": "2026-02-10T14:00:00Z"
       },
       {
-        "channel": {
-          "code": "PHONE",
-          "display": "Phone"
-        },
+        "channel": "PHONE",
         "isConsented": false,
         "consentDate": null
       },
       {
-        "channel": {
-          "code": "SMS",
-          "display": "SMS"
-        },
+        "channel": "SMS",
         "isConsented": false,
         "consentDate": null
       },
       {
-        "channel": {
-          "code": "POST",
-          "display": "Post"
-        },
+        "channel": "POST",
         "isConsented": true,
         "consentDate": "2026-02-10T14:00:00Z"
       }
     ],
-    "marketingFrequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "marketingFrequency": "MONTHLY",
     "marketingInterests": [
       "Investment Opportunities",
       "Retirement Planning",
@@ -20524,10 +19720,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
     "privacyPolicyEffectiveDate": "2026-01-01",
     "privacyPolicyLastUpdated": "2026-01-01",
     "privacyNoticeProvided": true,
-    "privacyNoticeMethod": {
-      "code": "ONLINE",
-      "display": "Online Privacy Notice"
-    }
+    "privacyNoticeMethod": "ONLINE"
   },
   "dataSubjectRights": {
     "rightsInformed": true,
@@ -20573,34 +19766,19 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   "dsarHistory": [
     {
       "requestId": "dsar-001",
-      "requestType": {
-        "code": "ACCESS",
-        "display": "Data Subject Access Request"
-      },
+      "requestType": "ACCESS",
       "requestDate": "2025-06-15T10:00:00Z",
-      "requestMethod": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
+      "requestMethod": "EMAIL",
       "responseDate": "2025-07-10T16:00:00Z",
-      "responseMethod": {
-        "code": "SECURE_PORTAL",
-        "display": "Secure Online Portal"
-      },
-      "status": {
-        "code": "COMPLETED",
-        "display": "Completed"
-      },
+      "responseMethod": "SECURE_PORTAL",
+      "status": "COMPLETED",
       "notes": "Full data export provided within 30 days"
     }
   ],
   "consentRenewal": {
     "renewalRequired": true,
     "renewalDate": "2028-02-10",
-    "renewalFrequency": {
-      "code": "BIENNIAL",
-      "display": "Every 2 Years"
-    },
+    "renewalFrequency": "BIENNIAL",
     "renewalReminderSent": false,
     "renewalReminderDate": null,
     "renewalHistory": [
@@ -20608,10 +19786,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
         "renewalId": "ren-001",
         "previousConsentDate": "2024-02-10",
         "renewalDate": "2026-02-10",
-        "renewalMethod": {
-          "code": "ONLINE",
-          "display": "Online Renewal"
-        },
+        "renewalMethod": "ONLINE",
         "changesFromPrevious": "Updated privacy policy version, added cloud provider information"
       }
     ]
@@ -20631,18 +19806,12 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
       "city": "London"
     },
     "consentEvidence": {
-      "evidenceType": {
-        "code": "CHECKBOX",
-        "display": "Checkbox Selection"
-      },
+      "evidenceType": "CHECKBOX",
       "evidenceUrl": "/api/v2/consent-evidence/consent-555",
       "evidenceTimestamp": "2026-02-10T14:00:00Z",
       "witnessRequired": false
     },
-    "verificationMethod": {
-      "code": "EMAIL_VERIFIED",
-      "display": "Email Verified"
-    }
+    "verificationMethod": "EMAIL_VERIFIED"
   },
   "complianceChecks": {
     "gdprCompliant": true,
@@ -20657,18 +19826,12 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   "relatedConsents": [
     {
       "consentId": "consent-556",
-      "consentPurpose": {
-        "code": "MARKETING",
-        "display": "Marketing Communications"
-      },
+      "consentPurpose": "MARKETING",
       "href": "/api/v2/consents/consent-556"
     },
     {
       "consentId": "consent-557",
-      "consentPurpose": {
-        "code": "THIRD_PARTY_SHARING",
-        "display": "Third Party Data Sharing"
-      },
+      "consentPurpose": "THIRD_PARTY_SHARING",
       "href": "/api/v2/consents/consent-557"
     }
   ],
@@ -20676,20 +19839,14 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   "documents": [
     {
       "documentId": "doc-consent-001",
-      "type": {
-        "code": "CONSENT_FORM",
-        "display": "Consent Form"
-      },
+      "type": "CONSENT_FORM",
       "name": "Data Processing Consent Form - Signed",
       "date": "2026-02-10",
       "url": "/api/v2/documents/doc-consent-001"
     },
     {
       "documentId": "doc-consent-002",
-      "type": {
-        "code": "PRIVACY_NOTICE",
-        "display": "Privacy Notice"
-      },
+      "type": "PRIVACY_NOTICE",
       "name": "Privacy Notice",
       "date": "2026-01-01",
       "url": "/api/v2/documents/doc-consent-002"
@@ -20771,17 +19928,17 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 {
   "clientRef": { "id": "client-123" },
   "factFindRef": { "id": "factfind-123" },
-  "consentPurpose": { "code": "DATA_PROCESSING" },
+  "consentPurpose": "DATA_PROCESSING",
   "consentPurposeDescription": "Processing of personal and financial data for financial advice",
-  "consentStatus": { "code": "GIVEN" },
+  "consentStatus": "GIVEN",
   "consentGivenDate": "2026-02-10T14:00:00Z",
-  "consentMethod": { "code": "EXPLICIT" },
-  "consentChannel": { "code": "WEB" },
-  "lawfulBasis": { "code": "CONSENT" },
+  "consentMethod": "EXPLICIT",
+  "consentChannel": "WEB",
+  "lawfulBasis": "CONSENT",
   "dataProcessing": {
     "dataCategories": [
       {
-        "category": { "code": "PERSONAL_IDENTITY" },
+        "category": "PERSONAL_IDENTITY",
         "dataTypes": ["Name", "Date of Birth", "Address"]
       }
     ],
@@ -20815,17 +19972,17 @@ Server generates `id`, `createdAt`, `updatedAt`. Returns complete contract.
     "hasMarketingConsent": true,
     "marketingChannels": [
       {
-        "channel": { "code": "EMAIL" },
+        "channel": "EMAIL",
         "isConsented": true,
         "consentDate": "2026-02-10T14:00:00Z"
       },
       {
-        "channel": { "code": "PHONE" },
+        "channel": "PHONE",
         "isConsented": true,
         "consentDate": "2026-02-18T10:00:00Z"
       }
     ],
-    "marketingFrequency": { "code": "MONTHLY" }
+    "marketingFrequency": "MONTHLY"
   }
 }
 ```
@@ -20834,7 +19991,7 @@ Server updates `updatedAt`. Returns complete contract with updated preferences.
 **Withdrawing Consent (PATCH /api/v2/consents/consent-555/withdraw):**
 ```json
 {
-  "consentStatus": { "code": "WITHDRAWN" },
+  "consentStatus": "WITHDRAWN",
   "consentWithdrawnDate": "2026-06-15T10:00:00Z",
   "notes": "Client requested withdrawal of marketing consent via email"
 }
@@ -20985,20 +20142,14 @@ Represents a physical address.
   "line3": null,
   "line4": null,
   "city": "London",
-  "county": {
-    "code": "GLA",
-    "display": "Greater London"
-  },
+  "county": "GLA",
   "postcode": "SW1A 1AA",
   "country": {
     "code": "GB",
     "display": "United Kingdom",
     "alpha3": "GBR"
   },
-  "addressType": {
-    "code": "RES",
-    "display": "Residential"
-  }
+  "addressType": "RES"
 }
 ```
 
@@ -21026,20 +20177,14 @@ Represents a physical address.
   "primaryAddress": {
     "line1": "10 Downing Street",
     "city": "London",
-    "county": {
-      "code": "GLA",
-      "display": "Greater London"
-    },
+    "county": "GLA",
     "postcode": "SW1A 2AA",
     "country": {
       "code": "GB",
       "display": "United Kingdom",
       "alpha3": "GBR"
     },
-    "addressType": {
-      "code": "RES",
-      "display": "Residential"
-    }
+    "addressType": "RES"
   }
 }
 ```
@@ -21084,10 +20229,7 @@ Represents a person's name.
 **Contract:**
 ```json
 {
-  "title": {
-    "code": "MR",
-    "display": "Mr"
-  },
+  "title": "MR",
   "firstName": "John",
   "middleName": "Michael",
   "lastName": "Smith",
@@ -21109,10 +20251,7 @@ Represents a person's name.
 ```json
 {
   "name": {
-    "title": {
-      "code": "DR",
-      "display": "Dr"
-    },
+    "title": "DR",
     "firstName": "Jane",
     "lastName": "Doe",
     "preferredName": "Janey"
@@ -21127,10 +20266,7 @@ Represents contact information (email, phone).
 **Contract:**
 ```json
 {
-  "type": {
-    "code": "EMAIL",
-    "display": "Email"
-  },
+  "type": "EMAIL",
   "value": "john.smith@example.com",
   "isPrimary": true
 }
@@ -21152,18 +20288,12 @@ Represents contact information (email, phone).
 {
   "contacts": [
     {
-      "type": {
-        "code": "EMAIL",
-        "display": "Email"
-      },
+      "type": "EMAIL",
       "value": "john@example.com",
       "isPrimary": true
     },
     {
-      "type": {
-        "code": "MOBILE",
-        "display": "Mobile"
-      },
+      "type": "MOBILE",
       "value": "+44 7700 900123",
       "isPrimary": false
     }
@@ -21411,10 +20541,7 @@ Represents the type of an address.
 **Usage Example:**
 ```json
 {
-  "addressType": {
-    "code": "RES",
-    "display": "Residential"
-  }
+  "addressType": "RES"
 }
 ```
 
@@ -21449,10 +20576,7 @@ Represents the type of contact information.
 **Usage Example:**
 ```json
 {
-  "type": {
-    "code": "EMAIL",
-    "display": "Email"
-  }
+  "type": "EMAIL"
 }
 ```
 
@@ -21492,10 +20616,7 @@ Represents a person's title or honorific.
 **Usage Example:**
 ```json
 {
-  "title": {
-    "code": "MR",
-    "display": "Mr"
-  }
+  "title": "MR"
 }
 ```
 
@@ -21585,10 +20706,7 @@ Represents a county or administrative region.
 {
   "code": "GLA",
   "display": "Greater London",
-  "country": {
-    "code": "GB",
-    "display": "United Kingdom"
-  }
+  "country": "GB"
 }
 ```
 
@@ -21606,10 +20724,7 @@ Represents a county or administrative region.
   "county": {
     "code": "GLA",
     "display": "Greater London",
-    "country": {
-      "code": "GB",
-      "display": "United Kingdom"
-    }
+    "country": "GB"
   }
 }
 ```
@@ -21778,10 +20893,7 @@ Represents the type of a client meeting.
 **Usage Example:**
 ```json
 {
-  "meetingType": {
-    "code": "INIT",
-    "display": "Initial Meeting"
-  }
+  "meetingType": "INIT"
 }
 ```
 
@@ -22320,10 +21432,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
     }
   },
   "liabilityAccountNumber": "MTG-123456",
-  "liabilityCategory": {
-    "code": "MAIN_RESIDENCE",
-    "display": "Main Residence"
-  },
+  "liabilityCategory": "MAIN_RESIDENCE",
   "description": "Primary Residence Mortgage - 123 Main Street",
   "originalLoanAmount": {
     "amount": 250000.00,
@@ -22332,14 +21441,8 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
       "symbol": "£"
     }
   },
-  "repaymentOrInterestOnly": {
-    "code": "REPAYMENT",
-    "display": "Repayment"
-  },
-  "rateType": {
-    "code": "FIXED",
-    "display": "Fixed"
-  },
+  "repaymentOrInterestOnly": "REPAYMENT",
+  "rateType": "FIXED",
   "amountOutstanding": {
     "amount": 180000.00,
     "currency": {
@@ -22365,10 +21468,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "lender": "Nationwide Building Society",
   "loanTermYears": 25,
   "endDate": "2040-06-01",
-  "protected": {
-    "code": "LIFE_AND_CIC",
-    "display": "Life and CIC"
-  },
+  "protected": "LIFE_AND_CIC",
   "earlyRedemptionCharge": {
     "amount": 5000.00,
     "currency": {
@@ -22531,17 +21631,11 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
     }
   },
   "liabilityAccountNumber": "****4567",
-  "liabilityCategory": {
-    "code": "CREDIT_STORE_CARDS",
-    "display": "Credit/Store Cards"
-  },
+  "liabilityCategory": "CREDIT_STORE_CARDS",
   "description": "Visa Credit Card",
   "originalLoanAmount": null,
   "repaymentOrInterestOnly": null,
-  "rateType": {
-    "code": "VARIABLE",
-    "display": "Variable"
-  },
+  "rateType": "VARIABLE",
   "amountOutstanding": {
     "amount": 3500.00,
     "currency": {
@@ -22567,10 +21661,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "lender": "HSBC",
   "loanTermYears": null,
   "endDate": null,
-  "protected": {
-    "code": "NO",
-    "display": "No"
-  },
+  "protected": "NO",
   "earlyRedemptionCharge": null,
   "consolidate": true,
   "isToBeRepaid": true,
@@ -22601,10 +21692,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
     }
   },
   "liabilityAccountNumber": null,
-  "liabilityCategory": {
-    "code": "MAINTENANCE_ALIMONY",
-    "display": "Maintenance/Alimony"
-  },
+  "liabilityCategory": "MAINTENANCE_ALIMONY",
   "description": "Child maintenance for two children",
   "originalLoanAmount": null,
   "repaymentOrInterestOnly": null,
@@ -22622,10 +21710,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "lender": null,
   "loanTermYears": null,
   "endDate": "2034-08-20",
-  "protected": {
-    "code": "NO",
-    "display": "No"
-  },
+  "protected": "NO",
   "earlyRedemptionCharge": null,
   "consolidate": false,
   "isToBeRepaid": false,
@@ -22656,10 +21741,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
     }
   },
   "liabilityAccountNumber": "PL-789012",
-  "liabilityCategory": {
-    "code": "PERSONAL_LOANS",
-    "display": "Personal Loans"
-  },
+  "liabilityCategory": "PERSONAL_LOANS",
   "description": "Home improvement loan",
   "originalLoanAmount": {
     "amount": 15000.00,
@@ -22668,14 +21750,8 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
       "symbol": "£"
     }
   },
-  "repaymentOrInterestOnly": {
-    "code": "REPAYMENT",
-    "display": "Repayment"
-  },
-  "rateType": {
-    "code": "FIXED",
-    "display": "Fixed"
-  },
+  "repaymentOrInterestOnly": "REPAYMENT",
+  "rateType": "FIXED",
   "amountOutstanding": {
     "amount": 12500.00,
     "currency": {
@@ -22695,10 +21771,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "lender": "Santander",
   "loanTermYears": 5,
   "endDate": "2028-06-15",
-  "protected": {
-    "code": "LIFE_ONLY",
-    "display": "Life Only"
-  },
+  "protected": "LIFE_ONLY",
   "earlyRedemptionCharge": {
     "amount": 500.00,
     "currency": {
@@ -23239,10 +22312,7 @@ The `Expense` contract represents a single expense line item within an expenditu
     "id": 667,
     "href": "/api/v2/factfinds/679/clients/346/expenditure/667"
   },
-  "category": {
-    "code": "MORTGAGE",
-    "display": "Mortgage"
-  },
+  "category": "MORTGAGE",
   "description": "Primary residence mortgage payment",
   "amount": {
     "amount": 1200.00,
@@ -23251,10 +22321,7 @@ The `Expense` contract represents a single expense line item within an expenditu
       "symbol": "£"
     }
   },
-  "frequency": {
-    "code": "MONTHLY",
-    "display": "Monthly"
-  },
+  "frequency": "MONTHLY",
   "monthlyAmount": {
     "amount": 1200.00,
     "currency": {
@@ -23676,24 +22743,15 @@ The `BusinessAsset` contract represents detailed business asset information incl
   "businessName": "Smith & Co Limited",
   "companyNumber": "12345678",
   "incorporationDate": "2018-03-20",
-  "businessType": {
-    "code": "LIMITED_COMPANY",
-    "display": "Limited Company"
-  },
-  "industry": {
-    "code": "SOFTWARE",
-    "display": "Software Development"
-  },
+  "businessType": "LIMITED_COMPANY",
+  "industry": "SOFTWARE",
   "ownershipStructure": {
     "totalShares": 100,
     "ownedShares": 100,
     "ownershipPercentage": 100.0,
     "shareClass": "Ordinary"
   },
-  "valuationBasis": {
-    "code": "NET_ASSET_VALUE",
-    "display": "Net Asset Value"
-  },
+  "valuationBasis": "NET_ASSET_VALUE",
   "valuations": [
     {
       "date": "2026-01-15",
@@ -23709,10 +22767,7 @@ The `BusinessAsset` contract represents detailed business asset information incl
     }
   ],
   "dividendPolicy": {
-    "paymentSchedule": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "paymentSchedule": "MONTHLY",
     "annualDividend": {
       "amount": 60000.00,
       "currency": {
@@ -23826,10 +22881,7 @@ The `Notes` contract represents a note attached to a fact find entity using a un
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "noteDiscriminator": {
-    "code": "ASSET_NOTES",
-    "display": "Asset Notes"
-  },
+  "noteDiscriminator": "ASSET_NOTES",
   "entityRef": {
     "type": "Asset",
     "id": 1234,
@@ -23936,10 +22988,7 @@ The `Dependant` contract represents a dependent family member of one or more cli
   "dateOfBirth": "2015-08-20",
   "age": 10,
   "gender": "F",
-  "relationship": {
-    "code": "CHILD",
-    "display": "Child"
-  },
+  "relationship": "CHILD",
   "isFinanciallyDependent": true,
   "dependencyDetails": {
     "estimatedDependencyEndAge": 21,
@@ -24062,10 +23111,7 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
     "id": 890,
     "href": "/api/v2/factfinds/679/clients/346/income/890"
   },
-  "changeType": {
-    "code": "INCREASE",
-    "display": "Income Increase"
-  },
+  "changeType": "INCREASE",
   "description": "Salary increase following promotion to Senior Engineer",
   "currentAmount": {
     "amount": 75000.00,
@@ -24091,10 +23137,7 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
   "changePercentage": 13.33,
   "effectiveDate": "2026-04-01",
   "isConfirmed": true,
-  "confidenceLevel": {
-    "code": "HIGH",
-    "display": "High Confidence"
-  },
+  "confidenceLevel": "HIGH",
   "impactOnAffordability": {
     "monthlyImpact": {
       "amount": 625.00,
@@ -24187,10 +23230,7 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
     "id": 1001,
     "href": "/api/v2/factfinds/679/clients/346/expenditure/667/expenses/1001"
   },
-  "changeType": {
-    "code": "CEASE",
-    "display": "Expenditure Will Cease"
-  },
+  "changeType": "CEASE",
   "description": "Mortgage will be paid off",
   "currentAmount": {
     "amount": 1200.00,
@@ -24216,10 +23256,7 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
   "changePercentage": -100.0,
   "effectiveDate": "2027-06-01",
   "isConfirmed": true,
-  "confidenceLevel": {
-    "code": "HIGH",
-    "display": "High Confidence"
-  },
+  "confidenceLevel": "HIGH",
   "impactOnAffordability": {
     "monthlyImpact": {
       "amount": 1200.00,
@@ -24288,10 +23325,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
     "href": "/api/v2/factfinds/679"
   },
   "assessmentDate": "2026-02-19",
-  "assessmentType": {
-    "code": "MORTGAGE_AFFORDABILITY",
-    "display": "Mortgage Affordability"
-  },
+  "assessmentType": "MORTGAGE_AFFORDABILITY",
   "clients": [
     {
       "clientRef": {
@@ -24511,10 +23545,7 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
     "id": "client-123",
     "href": "/api/v2/factfinds/679/clients/client-123"
   },
-  "contactType": {
-    "code": "EMAIL",
-    "display": "Email"
-  },
+  "contactType": "EMAIL",
   "value": "john.smith@example.com",
   "isPrimary": true,
   "isPreferred": true,
@@ -24591,34 +23622,19 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
     "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "assessmentDate": "2026-02-10",
-  "assessmentMethod": {
-    "code": "QUESTIONNAIRE",
-    "display": "Risk Questionnaire"
-  },
+  "assessmentMethod": "QUESTIONNAIRE",
   "questionnaireUsed": "FinaMetrica Risk Profile",
   "riskScore": 65,
-  "riskProfile": {
-    "code": "BALANCED",
-    "display": "Balanced"
-  },
+  "riskProfile": "BALANCED",
   "riskLevel": 6,
-  "investmentObjective": {
-    "code": "GROWTH",
-    "display": "Growth"
-  },
+  "investmentObjective": "GROWTH",
   "timeHorizon": {
     "years": 15,
     "category": "Long Term"
   },
-  "capacityForLoss": {
-    "code": "MEDIUM",
-    "display": "Medium Capacity"
-  },
+  "capacityForLoss": "MEDIUM",
   "knowledgeAndExperience": {
-    "investmentKnowledge": {
-      "code": "GOOD",
-      "display": "Good"
-    },
+    "investmentKnowledge": "GOOD",
     "investmentExperience": "MODERATE",
     "productsHeld": [
       "Stocks and Shares ISA",
@@ -24726,10 +23742,7 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
     "id": "client-123",
     "href": "/api/v2/factfinds/679/clients/client-123"
   },
-  "professionalType": {
-    "code": "SOLICITOR",
-    "display": "Solicitor"
-  },
+  "professionalType": "SOLICITOR",
   "title": "Mr",
   "firstName": "David",
   "lastName": "Williams",
@@ -24744,10 +23757,7 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
     "line2": "Suite 300",
     "city": "London",
     "postcode": "EC4A 1BR",
-    "country": {
-      "code": "GB",
-      "display": "United Kingdom"
-    }
+    "country": "GB"
   },
   "website": "www.wandassoc.co.uk",
   "isReferralSource": false,
@@ -24806,10 +23816,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
   "identifiedDate": "2026-01-15",
   "vulnerabilityCategories": [
     {
-      "category": {
-        "code": "HEALTH",
-        "display": "Health"
-      },
+      "category": "HEALTH",
       "indicators": [
         {
           "code": "PHYSICAL_DISABILITY",
@@ -24817,10 +23824,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
           "description": "Client has limited mobility - uses wheelchair"
         }
       ],
-      "impactLevel": {
-        "code": "MODERATE",
-        "display": "Moderate Impact"
-      },
+      "impactLevel": "MODERATE",
       "supportNeeds": [
         "Home visits preferred",
         "Accessible venue for meetings",
@@ -24828,10 +23832,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
       ]
     },
     {
-      "category": {
-        "code": "CAPABILITY",
-        "display": "Capability"
-      },
+      "category": "CAPABILITY",
       "indicators": [
         {
           "code": "LOW_FINANCIAL_LITERACY",
@@ -24839,10 +23840,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
           "description": "Client has limited understanding of financial products"
         }
       ],
-      "impactLevel": {
-        "code": "MODERATE",
-        "display": "Moderate Impact"
-      },
+      "impactLevel": "MODERATE",
       "supportNeeds": [
         "Use plain language",
         "Provide written summaries",
@@ -25010,10 +24008,7 @@ The `Will` contract represents a client's last will and testament details.
   "willDate": "2023-06-15",
   "lastReviewedDate": "2025-12-10",
   "nextReviewDate": "2026-12-10",
-  "willType": {
-    "code": "MIRROR_WILL",
-    "display": "Mirror Will"
-  },
+  "willType": "MIRROR_WILL",
   "isMirrorWill": true,
   "mirrorWillClientRef": {
     "id": "client-124",
@@ -25096,10 +24091,7 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
     "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "hasLPA": true,
-  "lpaType": {
-    "code": "PROPERTY_FINANCIAL",
-    "display": "Property and Financial Affairs"
-  },
+  "lpaType": "PROPERTY_FINANCIAL",
   "registrationDate": "2023-09-20",
   "isRegistered": true,
   "registrationNumber": "LPA-2023-987654",
@@ -25111,10 +24103,7 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
         "email": "sarah.smith@example.com",
         "phone": "07700 900456"
       },
-      "appointmentType": {
-        "code": "JOINTLY_AND_SEVERALLY",
-        "display": "Jointly and Severally"
-      },
+      "appointmentType": "JOINTLY_AND_SEVERALLY",
       "isPrimary": true
     },
     {
@@ -25124,10 +24113,7 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
         "email": "emily.smith@example.com",
         "phone": "07700 900789"
       },
-      "appointmentType": {
-        "code": "REPLACEMENT",
-        "display": "Replacement Attorney"
-      },
+      "appointmentType": "REPLACEMENT",
       "isPrimary": false
     }
   ],
@@ -25197,10 +24183,7 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
     "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "giftDate": "2024-12-25",
-  "giftType": {
-    "code": "POTENTIALLY_EXEMPT_TRANSFER",
-    "display": "Potentially Exempt Transfer (PET)"
-  },
+  "giftType": "POTENTIALLY_EXEMPT_TRANSFER",
   "recipient": {
     "name": "Emily Smith",
     "relationship": "Daughter",
@@ -25218,10 +24201,7 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
   "isOutOfIncome": false,
   "exemptionsClaimed": [
     {
-      "exemptionType": {
-        "code": "ANNUAL_EXEMPTION",
-        "display": "Annual Exemption"
-      },
+      "exemptionType": "ANNUAL_EXEMPTION",
       "exemptionAmount": {
         "amount": 3000.00,
         "currency": {
@@ -25308,15 +24288,9 @@ The `Trust` contract represents trusts established by or benefiting the client.
     "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "trustName": "The Smith Family Discretionary Trust",
-  "trustType": {
-    "code": "DISCRETIONARY_TRUST",
-    "display": "Discretionary Trust"
-  },
+  "trustType": "DISCRETIONARY_TRUST",
   "establishedDate": "2020-03-15",
-  "clientRole": {
-    "code": "SETTLOR",
-    "display": "Settlor"
-  },
+  "clientRole": "SETTLOR",
   "trustees": [
     {
       "name": "Sarah Smith",
@@ -25431,37 +24405,22 @@ The `IdentityVerification` contract represents identity verification checks and 
     "href": "/api/v2/factfinds/679/clients/client-123"
   },
   "verificationDate": "2026-01-05",
-  "verificationMethod": {
-    "code": "ELECTRONIC_VERIFICATION",
-    "display": "Electronic Verification"
-  },
+  "verificationMethod": "ELECTRONIC_VERIFICATION",
   "verificationProvider": "Experian Identity Check",
   "verificationReference": "EXP-2026-123456",
-  "verificationStatus": {
-    "code": "VERIFIED",
-    "display": "Verified"
-  },
+  "verificationStatus": "VERIFIED",
   "identityDocuments": [
     {
-      "documentType": {
-        "code": "PASSPORT",
-        "display": "Passport"
-      },
+      "documentType": "PASSPORT",
       "documentNumber": "123456789",
-      "issuingCountry": {
-        "code": "GB",
-        "display": "United Kingdom"
-      },
+      "issuingCountry": "GB",
       "issueDate": "2021-06-15",
       "expiryDate": "2031-06-15",
       "isVerified": true,
       "verifiedDate": "2026-01-05"
     },
     {
-      "documentType": {
-        "code": "UTILITY_BILL",
-        "display": "Utility Bill"
-      },
+      "documentType": "UTILITY_BILL",
       "documentDescription": "Council Tax Bill",
       "documentDate": "2025-12-15",
       "isVerified": true,
@@ -25488,10 +24447,7 @@ The `IdentityVerification` contract represents identity verification checks and 
     }
   },
   "sourceOfWealth": {
-    "primarySource": {
-      "code": "EMPLOYMENT",
-      "display": "Employment Income"
-    },
+    "primarySource": "EMPLOYMENT",
     "description": "Senior Software Engineer - employed for 15 years",
     "isVerified": true
   },
@@ -26203,10 +25159,7 @@ The `InvestmentArrangement` contract represents investment products including GI
     "href": "/api/v2/factfinds/679"
   },
   "arrangementCategory": "INVESTMENT",
-  "investmentType": {
-    "code": "GENERAL_INVESTMENT_ACCOUNT",
-    "display": "General Investment Account (GIA)"
-  },
+  "investmentType": "GENERAL_INVESTMENT_ACCOUNT",
   "productName": "Vanguard Investment Account",
   "providerName": "Vanguard",
   "providerRef": {
@@ -26297,10 +25250,7 @@ The `InvestmentArrangement` contract represents investment products including GI
         "symbol": "£"
       }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "frequency": "MONTHLY",
     "startDate": "2020-03-15",
     "isActive": true
   },
@@ -26319,10 +25269,7 @@ The `InvestmentArrangement` contract represents investment products including GI
       "href": "/api/v2/factfinds/679/clients/client-123/attitude-to-risk/3333"
     }
   },
-  "taxWrapper": {
-    "code": "TAXABLE",
-    "display": "Taxable (GIA)"
-  },
+  "taxWrapper": "TAXABLE",
   "investmentObjective": "Long-term capital growth for retirement planning",
   "adviserDetails": {
     "adviserName": "Jane Financial Adviser",
@@ -26385,14 +25332,8 @@ The `ProtectionArrangement` contract represents protection products including Li
     "href": "/api/v2/factfinds/679"
   },
   "arrangementCategory": "PROTECTION",
-  "protectionType": {
-    "code": "LIFE_ASSURANCE",
-    "display": "Life Assurance"
-  },
-  "policyType": {
-    "code": "DECREASING_TERM",
-    "display": "Decreasing Term Assurance"
-  },
+  "protectionType": "LIFE_ASSURANCE",
+  "policyType": "DECREASING_TERM",
   "productName": "Mortgage Protection Plan",
   "providerName": "Aviva",
   "providerRef": {
@@ -26432,14 +25373,8 @@ The `ProtectionArrangement` contract represents protection products including Li
       "symbol": "£"
     }
   },
-  "premiumFrequency": {
-    "code": "MONTHLY",
-    "display": "Monthly"
-  },
-  "premiumType": {
-    "code": "GUARANTEED",
-    "display": "Guaranteed Premium"
-  },
+  "premiumFrequency": "MONTHLY",
+  "premiumType": "GUARANTEED",
   "isInTrust": true,
   "trustDetails": {
     "trustType": "Bare Trust",
@@ -26537,10 +25472,7 @@ The `PensionArrangement` contract represents pension products including Personal
     "href": "/api/v2/factfinds/679"
   },
   "arrangementCategory": "PENSION",
-  "pensionType": {
-    "code": "PERSONAL_PENSION",
-    "display": "Personal Pension"
-  },
+  "pensionType": "PERSONAL_PENSION",
   "productName": "Vanguard Personal Pension",
   "providerName": "Vanguard",
   "providerRef": {
@@ -26598,10 +25530,7 @@ The `PensionArrangement` contract represents pension products including Personal
         "symbol": "£"
       }
     },
-    "frequency": {
-      "code": "MONTHLY",
-      "display": "Monthly"
-    },
+    "frequency": "MONTHLY",
     "startDate": "2010-04-06",
     "isActive": true
   },
