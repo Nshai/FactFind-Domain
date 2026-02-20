@@ -665,8 +665,7 @@ Collection endpoints use a wrapper that contains an array of complete contracts:
     { /* Complete Client contract */ },
     { /* Complete Client contract */ }
   ],
-  "pagination": { /* Pagination metadata */ },
-  "_links": { /* HATEOAS links */ }
+  "pagination": { /* Pagination metadata */ }
 }
 ```
 
@@ -748,7 +747,7 @@ Value types include three main categories:
 
 ```json
 {
-  "id": "client-123",                     // Client entity has identity
+  "id": 123,                     // Client entity has identity
   "name": {                               // NameValue - no id, embedded
     "title": "MR",
     "firstName": "John",
@@ -828,8 +827,8 @@ When one entity references another, use an expanded reference object containing:
 ```json
 {
   "clientRef": {
-    "id": "uuid-123",                    // Required: Unique identifier
-    "href": "/api/v2/factfinds/{factfindId}/clients/uuid-123",  // Required: URL to resource
+    "id": 123,                    // Required: Unique identifier (numeric)
+    "href": "/api/v2/factfinds/{factfindId}/clients/123-123",  // Required: URL to resource
     "name": "John Smith",                // Required: Human-readable display name
     "clientNumber": "C00001234",         // Optional: Business identifier
     "type": "Person"                     // Optional: Discriminator for polymorphic types
@@ -850,37 +849,37 @@ When one entity references another, use an expanded reference object containing:
 
 | Reference Type | Display Fields | Example |
 |----------------|----------------|---------|
-| `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": "uuid", "href": "/api/v2/factfinds/{factfindId}/clients/uuid", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
-| `AdviserRef` | `name`<br>`code` | `{ "id": "uuid", "href": "/api/v2/advisers/uuid", "name": "Sarah Johnson", "code": "ADV001" }` |
-| `ProviderRef` | `name`<br>`frnNumber` | `{ "id": "uuid", "href": "/api/v2/providers/uuid", "name": "Aviva", "frnNumber": "123456" }` |
-| `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": "uuid", "href": "/api/v2/factfinds/{factfindId}/arrangements/uuid", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
-| `EmploymentRef` | `employerName`<br>`status` | `{ "id": "uuid", "href": "/api/v2/employments/uuid", "employerName": "Acme Corp", "status": "Current" }` |
-| `GoalRef` | `goalName`<br>`priority` | `{ "id": "uuid", "href": "/api/v2/factfinds/{factfindId}/goals/uuid", "goalName": "Retirement Planning", "priority": "High" }` |
-| `FactFindRef` | `factFindNumber`<br>`status` | `{ "id": "uuid", "href": "/api/v2/factfinds/uuid", "factFindNumber": "FF001234", "status": "InProgress" }` |
+| `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": 953, "href": "/api/v2/factfinds/{factfindId}/clients/123", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
+| `AdviserRef` | `name`<br>`code` | `{ "id": 953, "href": "/api/v2/advisers/789", "name": "Sarah Johnson", "code": "ADV001" }` |
+| `ProviderRef` | `name`<br>`frnNumber` | `{ "id": 953, "href": "/api/v2/providers/555", "name": "Aviva", "frnNumber": "123456" }` |
+| `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": 953, "href": "/api/v2/factfinds/{factfindId}/arrangements/1001", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
+| `EmploymentRef` | `employerName`<br>`status` | `{ "id": 953, "href": "/api/v2/employments/3001", "employerName": "Acme Corp", "status": "Current" }` |
+| `GoalRef` | `goalName`<br>`priority` | `{ "id": 953, "href": "/api/v2/factfinds/{factfindId}/goals/7001", "goalName": "Retirement Planning", "priority": "High" }` |
+| `FactFindRef` | `factFindNumber`<br>`status` | `{ "id": 953, "href": "/api/v2/factfinds/456", "factFindNumber": "FF001234", "status": "InProgress" }` |
 
 **Reference Type Usage Example:**
 
 ```json
 {
-  "id": "factfind-456",                   // FactFind entity has identity
+  "id": 456,                   // FactFind entity has identity
   "factFindNumber": "FF001234",
   "clientRef": {                          // ClientRef - reference to Client entity
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "jointClientRef": {                     // Optional second client reference
-    "id": "client-124",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-124",
+    "id": 124,
+    "href": "/api/v2/factfinds/{factfindId}/clients/124",
     "name": "Jane Smith",
     "clientNumber": "C00001235",
     "type": "Person"
   },
   "adviserRef": {                         // AdviserRef - reference to Adviser entity
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Sarah Johnson",
     "code": "ADV001"
   },
@@ -947,15 +946,15 @@ Reference types support expansion to include the full referenced entity inline:
 
 **Default Response (Minimal):**
 ```http
-GET /api/v2/factfinds/factfind-456
+GET /api/v2/factfinds/456
 ```
 
 ```json
 {
-  "id": "factfind-456",
+  "id": 456,
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234"
   }
@@ -964,15 +963,15 @@ GET /api/v2/factfinds/factfind-456
 
 **Expanded Response:**
 ```http
-GET /api/v2/factfinds/factfind-456?expand=clientRef,adviserRef
+GET /api/v2/factfinds/456?expand=clientRef,adviserRef
 ```
 
 ```json
 {
-  "id": "factfind-456",
+  "id": 456,
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person",
@@ -1016,10 +1015,10 @@ POST /api/v2/factfinds
 
 {
   "clientRef": {
-    "id": "client-123"              // Only id required on create
+    "id": 123              // Only id required on create
   },
   "adviserRef": {
-    "id": "adviser-789"
+    "id": 789
   },
   "sessionDate": "2026-02-15",
   "totalNetMonthlyIncome": {        // Value type fully embedded
@@ -1034,16 +1033,16 @@ POST /api/v2/factfinds
 
 Response:
 {
-  "id": "factfind-456",
+  "id": 456,
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",           // Server populates display fields
     "clientNumber": "C00001234"
   },
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Sarah Johnson",
     "code": "ADV001"
   },
@@ -1066,20 +1065,20 @@ Response:
 To change a reference, provide the new reference `id`:
 
 ```json
-PATCH /api/v2/factfinds/factfind-456
+PATCH /api/v2/factfinds/456
 
 {
   "adviserRef": {
-    "id": "adviser-999"             // Change to different adviser
+    "id": 999             // Change to different adviser
   }
 }
 
 Response:
 {
-  "id": "factfind-456",
+  "id": 456,
   "adviserRef": {
-    "id": "adviser-999",
-    "href": "/api/v2/advisers/adviser-999",
+    "id": 999,
+    "href": "/api/v2/advisers/999",
     "name": "Michael Brown",        // Server updates display fields
     "code": "ADV002"
   },
@@ -1128,9 +1127,9 @@ In Domain-Driven Design (DDD), an **aggregate** is a cluster of domain objects t
 FactFind is the ONLY top-level business resource:
 ```
 POST /api/v2/factfinds          (Create a new fact find - the only top-level POST)
-GET  /api/v2/factfinds          (List fact finds)
-GET  /api/v2/factfinds/{id}     (Get a fact find)
-PUT  /api/v2/factfinds/{id}     (Update fact find metadata)
+GET /api/v2/factfinds          (List fact finds)
+GET /api/v2/factfinds/{id}     (Get a fact find)
+PUT /api/v2/factfinds/{id}     (Update fact find metadata)
 DELETE /api/v2/factfinds/{id}   (Delete entire fact find and all data)
 ```
 
@@ -1139,11 +1138,11 @@ DELETE /api/v2/factfinds/{id}   (Delete entire fact find and all data)
 Clients, arrangements, goals, etc. are accessed through the fact find:
 ```
 POST /api/v2/factfinds/{factfindId}/clients
-GET  /api/v2/factfinds/{factfindId}/clients/{clientId}
+GET /api/v2/factfinds/{factfindId}/clients/{clientId}
 POST /api/v2/factfinds/{factfindId}/arrangements
-GET  /api/v2/factfinds/{factfindId}/arrangements/{arrangementId}
+GET /api/v2/factfinds/{factfindId}/arrangements/{arrangementId}
 POST /api/v2/factfinds/{factfindId}/goals
-GET  /api/v2/factfinds/{factfindId}/goals/{goalId}
+GET /api/v2/factfinds/{factfindId}/goals/{goalId}
 ```
 
 **No Independent Entity Access:**
@@ -1151,9 +1150,9 @@ GET  /api/v2/factfinds/{factfindId}/goals/{goalId}
 You CANNOT create or access these entities without a fact find context:
 ```
 ❌ POST /api/v2/factfinds/{factfindId}/clients               (Not supported)
-❌ GET  /api/v2/factfinds/{factfindId}/clients/{id}          (Not supported)
+❌ GET /api/v2/factfinds/{factfindId}/clients/{id}          (Not supported)
 ❌ POST /api/v2/factfinds/{factfindId}/arrangements          (Not supported)
-❌ GET  /api/v2/factfinds/{factfindId}/arrangements/{id}     (Not supported)
+❌ GET /api/v2/factfinds/{factfindId}/arrangements/{id}     (Not supported)
 ❌ POST /api/v2/factfinds/{factfindId}/goals                 (Not supported)
 ```
 
@@ -1164,7 +1163,7 @@ You CANNOT create or access these entities without a fact find context:
 # These operations are transactionally consistent
 POST /api/v2/factfinds/{id}/income
 POST /api/v2/factfinds/{id}/expenditure
-PUT  /api/v2/factfinds/{id}
+PUT /api/v2/factfinds/{id}
 ```
 
 All operations on the same fact find aggregate are guaranteed to be consistent. For example:
@@ -1223,7 +1222,7 @@ GET /api/v2/factfinds/{id}/complete
 **Response:**
 ```json
 {
-  "id": "factfind-456",
+  "id": 456,
   "sessionDate": "2026-02-16",
   "status": "COMP",
   "clients": [
@@ -1459,7 +1458,7 @@ All write operations (POST, PUT, PATCH, DELETE) are logged:
   "userId": "user-123",
   "operation": "UPDATE",
   "resourceType": "Client",
-  "resourceId": "client-999",
+  "resourceId": "999",
   "changes": [
     {
       "field": "lastName",
@@ -1497,10 +1496,7 @@ Response:
     "hasMore": true,
     "nextCursor": "eyJpZCI6MTIwfQ==",
     "prevCursor": null
-  },
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTAwfQ=="
+  }/clients?limit=20&cursor=eyJpZCI6MTAwfQ=="
     },
     "next": {
       "href": "/api/v2/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTIwfQ=="
@@ -1525,9 +1521,7 @@ Response:
     "pageSize": 20,
     "totalPages": 10,
     "totalCount": 195
-  },
-  "_links": {
-    "first": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+  }/clients?page=1&pageSize=20" },
     "prev": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
     "self": { "href": "/api/v2/factfinds/{factfindId}/clients?page=2&pageSize=20" },
     "next": { "href": "/api/v2/factfinds/{factfindId}/clients?page=3&pageSize=20" },
@@ -1588,22 +1582,22 @@ Reference types (entities with identity) can be expanded to include their full e
 
 **Default response (minimal references):**
 ```http
-GET /api/v2/factfinds/factfind-123
+GET /api/v2/factfinds/123
 ```
 ```json
 {
-  "id": "factfind-123",
+  "id": 123,
   "factFindNumber": "FF001234",
   "clientRef": {
-    "id": "client-456",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-456",
+    "id": 456,
+    "href": "/api/v2/factfinds/{factfindId}/clients/456",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -1620,15 +1614,15 @@ GET /api/v2/factfinds/factfind-123
 
 **Expanded response (full referenced entities):**
 ```http
-GET /api/v2/factfinds/factfind-123?expand=clientRef,adviserRef
+GET /api/v2/factfinds/123?expand=clientRef,adviserRef
 ```
 ```json
 {
-  "id": "factfind-123",
+  "id": 123,
   "factFindNumber": "FF001234",
   "clientRef": {
-    "id": "client-456",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-456",
+    "id": 456,
+    "href": "/api/v2/factfinds/{factfindId}/clients/456",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person",
@@ -1653,8 +1647,8 @@ GET /api/v2/factfinds/factfind-123?expand=clientRef,adviserRef
     }
   },
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001",
     // Full Adviser entity expanded
@@ -1766,10 +1760,7 @@ Response (207 Multi-Status):
 {
   "id": 123,
   "firstName": "John",
-  "lastName": "Smith",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/123"
+  "lastName": "Smith"/clients/123"
     },
     "update": {
       "href": "/api/v2/factfinds/{factfindId}/clients/123",
@@ -1795,8 +1786,6 @@ Response (207 Multi-Status):
 {
   "id": 123,
   "status": "DRAFT",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/123" },
     "complete": {
       "href": "/api/v2/factfinds/123/complete",
       "method": "POST",
@@ -2024,7 +2013,7 @@ Client contract with required-on-create fields. Read-only and computed fields ar
   "isWillUpToDate": true,
   "isPowerOfAttorneyGranted": false,
   "adviserRef": {
-    "id": "adviser-789"
+    "id": 789
   }
 }
 ```
@@ -2039,7 +2028,7 @@ ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
 Content-Type: application/json
 
 {
-  "id": "client-123",
+  "id": 123,
   "clientNumber": "C00001234",
   "clientType": "Person",
   "name": {
@@ -2098,10 +2087,7 @@ Content-Type: application/json
   "updatedBy": {
     "id": 999,
     "name": "System Admin"
-  },
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/123"
+  }/clients/123"
     },
     "update": {
       "href": "/api/v2/factfinds/{factfindId}/clients/123",
@@ -2256,9 +2242,7 @@ Complete `Client` contract.
     "href": "/api/v2/advisers/789"
   },
   "createdAt": "2020-01-15T10:30:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
+  "updatedAt": "2026-02-16T14:30:00Z"/clients/123" },
     "update": { "href": "/api/v2/factfinds/{factfindId}/clients/123", "method": "PUT" },
     "addresses": { "href": "/api/v2/factfinds/{factfindId}/clients/123/addresses" },
     "contacts": { "href": "/api/v2/factfinds/{factfindId}/clients/123/contacts" },
@@ -2319,9 +2303,7 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
         "id": 789,
         "name": "Jane Doe",
         "href": "/api/v2/advisers/789"
-      },
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/{factfindId}/clients/123" }
+      }/clients/123" }
       }
     },
     {
@@ -2338,9 +2320,7 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
         "id": 789,
         "name": "Jane Doe",
         "href": "/api/v2/advisers/789"
-      },
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/{factfindId}/clients/124" }
+      }/clients/124" }
       }
     }
   ],
@@ -2349,10 +2329,7 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
     "hasMore": true,
     "nextCursor": "eyJpZCI6MTI0fQ==",
     "totalCount": 156
-  },
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients?limit=20"
+  }/clients?limit=20"
     },
     "next": {
       "href": "/api/v2/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTI0fQ=="
@@ -2393,13 +2370,13 @@ Collection wrapper with array of `Client` contracts (partial fields shown for br
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-456
+Location: /api/v2/factfinds/{factfindId}/clients/123/addresses/456
 
 {
-  "id": "address-456",
+  "id": 456,
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -2422,10 +2399,8 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-45
   "isOnElectoralRoll": true,
   "durationAtAddressYears": 6,
   "durationAtAddressMonths": 1,
-  "createdAt": "2026-02-16T14:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-456" },
-    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" }
+  "createdAt": "2026-02-16T14:30:00Z"/clients/123/addresses/address-456" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" }
   }
 }
 ```
@@ -2461,10 +2436,10 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-45
 **Response:**
 ```json
 {
-  "id": "vulnerability-789",
+  "id": 789,
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -2479,11 +2454,9 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-45
   "reviewDate": "2026-08-16",
   "updatedAt": "2026-02-16T14:30:00Z",
   "updatedBy": {
-    "id": "user-999",
+    "id": 999,
     "name": "Jane Doe"
-  },
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/123/vulnerability" },
+  }/clients/123/vulnerability" },
     "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
     "history": { "href": "/api/v2/factfinds/{factfindId}/clients/123/vulnerability/history" }
   }
@@ -2552,17 +2525,17 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-45
 
 ```json
 {
-  "factfindId": "factfind-456",
+  "factfindId": 456,
   "asOfDate": "2026-02-17",
   "clients": [
     {
-      "id": "client-123",
+      "id": 123,
       "name": "John Smith",
       "age": 45,
       "retirementAge": 67
     },
     {
-      "id": "client-124",
+      "id": 124,
       "name": "Jane Smith",
       "age": 43,
       "retirementAge": 67
@@ -2729,13 +2702,11 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/addresses/address-45
       "Strong emergency fund position - consider redirecting excess to investments"
     ]
   },
-  "_links": {
-    "self": {"href": "/api/v2/factfinds/factfind-456/current-position"},
-    "factfind": {"href": "/api/v2/factfinds/factfind-456"},
-    "net-worth": {"href": "/api/v2/factfinds/factfind-456/current-position/net-worth"},
-    "financial-health": {"href": "/api/v2/factfinds/factfind-456/current-position/financial-health"},
-    "cash-flow": {"href": "/api/v2/factfinds/factfind-456/current-position/cash-flow"},
-    "asset-allocation": {"href": "/api/v2/factfinds/factfind-456/current-position/asset-allocation"}
+    "factfind": {"href": "/api/v2/factfinds/456"},
+    "net-worth": {"href": "/api/v2/factfinds/456/current-position/net-worth"},
+    "financial-health": {"href": "/api/v2/factfinds/456/current-position/financial-health"},
+    "cash-flow": {"href": "/api/v2/factfinds/456/current-position/cash-flow"},
+    "asset-allocation": {"href": "/api/v2/factfinds/456/current-position/asset-allocation"}
   }
 }
 ```
@@ -2938,8 +2909,6 @@ ETag: "a1b2c3d4e5f6"
   "status": "INPROG",
   "createdAt": "2026-02-16T14:30:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/456" },
     "complete": { "href": "/api/v2/factfinds/456/complete", "method": "POST" },
     "employment": { "href": "/api/v2/factfinds/456/employment" },
     "income": { "href": "/api/v2/factfinds/456/income" },
@@ -3131,8 +3100,6 @@ Income contract with required-on-create fields.
   "startDate": "2020-01-15",
   "endDate": null,
   "createdAt": "2026-02-16T14:35:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/456/income/999" },
     "factfind": { "href": "/api/v2/factfinds/456" },
     "employment": { "href": "/api/v2/factfinds/456/employment/789" }
   }
@@ -3250,8 +3217,6 @@ Income contract with required-on-create fields.
     "href": "/api/v2/factfinds/{factfindId}/arrangements/555"
   },
   "createdAt": "2026-02-16T14:40:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/456/expenditure/888" },
     "factfind": { "href": "/api/v2/factfinds/456" },
     "liability": { "href": "/api/v2/factfinds/{factfindId}/arrangements/555" }
   }
@@ -3484,8 +3449,6 @@ Income contract with required-on-create fields.
     }
   },
   "calculatedAt": "2026-02-16T14:45:00Z",
-  "_links": {
-    "factfind": { "href": "/api/v2/factfinds/456" },
     "income": { "href": "/api/v2/factfinds/456/income" },
     "expenditure": { "href": "/api/v2/factfinds/456/expenditure" },
     "affordability": { "href": "/api/v2/factfinds/456/affordability" }
@@ -3566,9 +3529,9 @@ Income contract with required-on-create fields.
 ```json
 {
   "clientRef": {
-    "id": "client-123",
+    "id": 123,
     "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-456/clients/client-123"
+    "href": "/api/v2/factfinds/ff-456/clients/123"
   },
   "estatePlanning": {
     "hasWill": true,
@@ -3582,12 +3545,12 @@ Income contract with required-on-create fields.
       {
         "name": "Sarah Smith",
         "relationshipToClient": "Spouse",
-        "contactRef": { "id": "client-124" }
+        "contactRef": { "id": 124 }
       },
       {
         "name": "David Smith",
         "relationshipToClient": "Brother",
-        "contactRef": { "id": "contact-789" }
+        "contactRef": { "id": 789 }
       }
     ],
     "inheritanceWishes": "Estate split equally between children. Family home to spouse.",
@@ -3642,11 +3605,9 @@ Income contract with required-on-create fields.
     "effectiveRate": 16.47
   },
   "lastReviewed": "2026-01-15",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning" },
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
-    "gifts": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts" },
-    "trusts": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/trusts" }
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" },
+    "gifts": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning/gifts" },
+    "trusts": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning/trusts" }
   }
 }
 ```
@@ -3690,7 +3651,7 @@ Income contract with required-on-create fields.
   "recipientName": "Emma Smith",
   "recipientRelationship": "CHILD",
   "recipientRef": {
-    "id": "dependent-789"
+    "id": 789
   },
   "giftValue": {
     "amount": 15000.00,
@@ -3711,19 +3672,19 @@ Income contract with required-on-create fields.
 
 ```json
 {
-  "id": "gift-123",
+  "id": 123,
   "clientRef": {
-    "id": "client-123",
+    "id": 123,
     "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-456/clients/client-123"
+    "href": "/api/v2/factfinds/ff-456/clients/123"
   },
   "giftDate": "2026-01-15",
   "giftType": "CASH",
   "recipientName": "Emma Smith",
   "recipientRelationship": "CHILD",
   "recipientRef": {
-    "id": "dependent-789",
-    "href": "/api/v2/factfinds/ff-456/clients/client-123/dependents/dependent-789"
+    "id": 789,
+    "href": "/api/v2/factfinds/ff-456/clients/123/dependents/dependent-789"
   },
   "giftValue": {
     "amount": 15000.00,
@@ -3750,10 +3711,8 @@ Income contract with required-on-create fields.
   "notes": "First of three annual payments for university costs",
   "createdAt": "2026-02-18T10:30:00Z",
   "updatedAt": "2026-02-18T10:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-123" },
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
-    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning" }
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" },
+    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning" }
   }
 }
 ```
@@ -3790,12 +3749,12 @@ Income contract with required-on-create fields.
 ```json
 {
   "clientRef": {
-    "id": "client-123",
+    "id": 123,
     "fullName": "John Smith"
   },
   "gifts": [
     {
-      "id": "gift-123",
+      "id": 123,
       "giftDate": "2026-01-15",
       "giftType": "CASH",
       "recipientName": "Emma Smith",
@@ -3811,13 +3770,11 @@ Income contract with required-on-create fields.
       "ihtLiability": {
         "amount": 6000.00,
         "currency": { "code": "GBP", "symbol": "£" }
-      },
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-123" }
+      }
       }
     },
     {
-      "id": "gift-124",
+      "id": 124,
       "giftDate": "2025-12-25",
       "giftType": "CASH",
       "recipientName": "Michael Smith",
@@ -3833,13 +3790,11 @@ Income contract with required-on-create fields.
       "ihtLiability": {
         "amount": 4000.00,
         "currency": { "code": "GBP", "symbol": "£" }
-      },
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-124" }
+      }
       }
     },
     {
-      "id": "gift-125",
+      "id": 125,
       "giftDate": "2019-03-10",
       "giftType": "PROPERTY",
       "recipientName": "Sarah Smith",
@@ -3856,9 +3811,7 @@ Income contract with required-on-create fields.
       "ihtLiability": {
         "amount": 0.00,
         "currency": { "code": "GBP", "symbol": "£" }
-      },
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-125" }
+      }
       }
     }
   ],
@@ -3872,9 +3825,7 @@ Income contract with required-on-create fields.
     "amount": 10000.00,
     "currency": { "code": "GBP", "symbol": "£" }
   },
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts" },
-    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning" }
+    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning" }
   }
 }
 ```
@@ -3905,12 +3856,12 @@ Income contract with required-on-create fields.
     {
       "name": "John Smith",
       "relationshipToClient": "Self",
-      "contactRef": { "id": "client-123" }
+      "contactRef": { "id": 123 }
     },
     {
       "name": "Sarah Smith",
       "relationshipToClient": "Spouse",
-      "contactRef": { "id": "client-124" }
+      "contactRef": { "id": 124 }
     }
   ],
   "beneficiaries": [
@@ -3928,7 +3879,7 @@ Income contract with required-on-create fields.
     }
   ],
   "linkedGifts": [
-    { "giftRef": { "id": "gift-126" } }
+    { "giftRef": { "id": 126 } }
   ]
 }
 ```
@@ -3937,11 +3888,11 @@ Income contract with required-on-create fields.
 
 ```json
 {
-  "id": "trust-456",
+  "id": 456,
   "clientRef": {
-    "id": "client-123",
+    "id": 123,
     "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-456/clients/client-123"
+    "href": "/api/v2/factfinds/ff-456/clients/123"
   },
   "trustName": "Smith Family Education Trust",
   "trustType": "BARE_TRUST",
@@ -3959,12 +3910,12 @@ Income contract with required-on-create fields.
     {
       "name": "John Smith",
       "relationshipToClient": "Self",
-      "contactRef": { "id": "client-123", "href": "/api/v2/factfinds/ff-456/clients/client-123" }
+      "contactRef": { "id": 123, "href": "/api/v2/factfinds/ff-456/clients/123" }
     },
     {
       "name": "Sarah Smith",
       "relationshipToClient": "Spouse",
-      "contactRef": { "id": "client-124", "href": "/api/v2/factfinds/ff-456/clients/client-124" }
+      "contactRef": { "id": 124, "href": "/api/v2/factfinds/ff-456/clients/124" }
     }
   ],
   "beneficiaries": [
@@ -3985,7 +3936,7 @@ Income contract with required-on-create fields.
   ],
   "linkedGifts": [
     {
-      "giftRef": { "id": "gift-126", "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/gifts/gift-126" },
+      "giftRef": { "id": 126, "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning/gifts/gift-126" },
       "giftDate": "2026-02-01",
       "giftValue": { "amount": 100000.00, "currency": { "code": "GBP" } }
     }
@@ -3998,10 +3949,8 @@ Income contract with required-on-create fields.
   "nextPeriodicCharge": "2036-02-01",
   "createdAt": "2026-02-18T11:00:00Z",
   "updatedAt": "2026-02-18T11:00:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning/trusts/trust-456" },
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
-    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/client-123/estate-planning" }
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" },
+    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning" }
   }
 }
 ```
@@ -4088,13 +4037,13 @@ Income contract with required-on-create fields.
 ```json
 {
   "clientRef": {
-    "id": "client-123",
+    "id": 123,
     "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-456/clients/client-123"
+    "href": "/api/v2/factfinds/ff-456/clients/123"
   },
   "dependants": [
     {
-      "id": "dep-001",
+      "id": 1,
       "name": "James Smith",
       "dateOfBirth": "2015-06-20",
       "calculatedAge": 10,
@@ -4107,22 +4056,20 @@ Income contract with required-on-create fields.
       "yearsOfDependencyRemaining": 11,
       "clients": [
         {
-          "id": "client-123",
+          "id": 123,
           "fullName": "John Smith",
-          "href": "/api/v2/factfinds/ff-456/clients/client-123"
+          "href": "/api/v2/factfinds/ff-456/clients/123"
         },
         {
-          "id": "client-124",
+          "id": 124,
           "fullName": "Sarah Smith",
-          "href": "/api/v2/factfinds/ff-456/clients/client-124"
+          "href": "/api/v2/factfinds/ff-456/clients/124"
         }
-      ],
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001" }
+      ]
       }
     },
     {
-      "id": "dep-002",
+      "id": 2,
       "name": "Emma Smith",
       "dateOfBirth": "2018-03-15",
       "calculatedAge": 7,
@@ -4135,26 +4082,22 @@ Income contract with required-on-create fields.
       "yearsOfDependencyRemaining": 10,
       "clients": [
         {
-          "id": "client-123",
+          "id": 123,
           "fullName": "John Smith",
-          "href": "/api/v2/factfinds/ff-456/clients/client-123"
+          "href": "/api/v2/factfinds/ff-456/clients/123"
         },
         {
-          "id": "client-124",
+          "id": 124,
           "fullName": "Sarah Smith",
-          "href": "/api/v2/factfinds/ff-456/clients/client-124"
+          "href": "/api/v2/factfinds/ff-456/clients/124"
         }
-      ],
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-002" }
+      ]
       }
     }
   ],
   "totalCount": 2,
   "financiallyDependantCount": 2,
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants" },
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" }
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" }
   }
 }
 ```
@@ -4179,10 +4122,10 @@ Income contract with required-on-create fields.
   "notes": "Attending secondary school. Plans to attend university.",
   "clients": [
     {
-      "id": "client-123"
+      "id": 123
     },
     {
-      "id": "client-124"
+      "id": 124
     }
   ]
 }
@@ -4192,7 +4135,7 @@ Income contract with required-on-create fields.
 
 ```json
 {
-  "id": "dep-001",
+  "id": 1,
   "name": "James Smith",
   "dateOfBirth": "2015-06-20",
   "calculatedAge": 10,
@@ -4207,21 +4150,19 @@ Income contract with required-on-create fields.
   "notes": "Attending secondary school. Plans to attend university.",
   "clients": [
     {
-      "id": "client-123",
+      "id": 123,
       "fullName": "John Smith",
-      "href": "/api/v2/factfinds/ff-456/clients/client-123"
+      "href": "/api/v2/factfinds/ff-456/clients/123"
     },
     {
-      "id": "client-124",
+      "id": 124,
       "fullName": "Sarah Smith",
-      "href": "/api/v2/factfinds/ff-456/clients/client-124"
+      "href": "/api/v2/factfinds/ff-456/clients/124"
     }
   ],
   "createdAt": "2026-02-18T12:00:00Z",
   "updatedAt": "2026-02-18T12:00:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001" },
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" }
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" }
   }
 }
 ```
@@ -4251,7 +4192,7 @@ Income contract with required-on-create fields.
 
 ```json
 {
-  "id": "dep-001",
+  "id": 1,
   "name": "James Smith",
   "dateOfBirth": "2015-06-20",
   "calculatedAge": 10,
@@ -4267,16 +4208,16 @@ Income contract with required-on-create fields.
   "notes": "Attending secondary school. Plans to attend university.",
   "clients": [
     {
-      "id": "client-123",
+      "id": 123,
       "fullName": "John Smith",
       "relationshipToClient": "Father",
-      "href": "/api/v2/factfinds/ff-456/clients/client-123"
+      "href": "/api/v2/factfinds/ff-456/clients/123"
     },
     {
-      "id": "client-124",
+      "id": 124,
       "fullName": "Sarah Smith",
       "relationshipToClient": "Mother",
-      "href": "/api/v2/factfinds/ff-456/clients/client-124"
+      "href": "/api/v2/factfinds/ff-456/clients/124"
     }
   ],
   "protectionNeeds": {
@@ -4292,11 +4233,9 @@ Income contract with required-on-create fields.
   },
   "createdAt": "2026-02-18T12:00:00Z",
   "updatedAt": "2026-02-18T12:00:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001" },
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
-    "update": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001", "method": "PATCH" },
-    "delete": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependants/dep-001", "method": "DELETE" }
+    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" },
+    "update": { "href": "/api/v2/factfinds/ff-456/clients/123/dependants/1", "method": "PATCH" },
+    "delete": { "href": "/api/v2/factfinds/ff-456/clients/123/dependants/1", "method": "DELETE" }
   }
 }
 ```
@@ -4426,7 +4365,7 @@ Where:
 
 **API Flow:**
 ```
-1. POST /clients/client-123/dependants
+1. POST /clients/123/dependants
    Request: {
      name: "James Smith",
      dateOfBirth: "2015-06-20",
@@ -4434,7 +4373,7 @@ Where:
      isLivingWith: true,
      isFinanciallyDependant: true,
      ageCustomUntil: 21,
-     clients: [client-123, client-124]  // Both parents
+     clients: [123, 124]  // Both parents
    }
 
 2. Response includes:
@@ -4455,7 +4394,7 @@ Where:
 
 **API Flow:**
 ```
-1. PATCH /clients/client-123/dependants/dep-001
+1. PATCH /clients/123/dependants/1
    Request: {
      ageCustomUntil: 25,
      notes: "Attending university. Extended to age 25 for university and career start."
@@ -4477,7 +4416,7 @@ Where:
 
 **API Flow:**
 ```
-1. GET /clients/client-123/dependants
+1. GET /clients/123/dependants
 
 2. Response includes 3 dependants:
    - James (age 10, until 21): £132,000
@@ -4557,30 +4496,30 @@ Where:
 ```json
 {
   "clientRef": {
-    "id": "client-456",
+    "id": 456,
     "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-423/clients/client-456"
+    "href": "/api/v2/factfinds/ff-423/clients/456"
   },
   "notes": [
     {
-      "id": "note-789",
-      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-789",
+      "id": 789,
+      "href": "/api/v2/factfinds/ff-423/clients/456/notes/note-789",
       "discriminator": "Profile",
       "notes": "Client recently married, spouse is self-employed. Planning to start a family within 2 years. Important for protection planning.",
       "createdAt": "2026-02-18T10:30:00Z",
       "updatedAt": "2026-02-18T10:30:00Z"
     },
     {
-      "id": "note-790",
-      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-790",
+      "id": 790,
+      "href": "/api/v2/factfinds/ff-423/clients/456/notes/note-790",
       "discriminator": "Mortgage",
       "notes": "Client's fixed rate ends in 6 months. Should review remortgage options. Considering moving to larger property in next 2-3 years.",
       "createdAt": "2026-02-18T11:00:00Z",
       "updatedAt": "2026-02-18T11:00:00Z"
     },
     {
-      "id": "note-791",
-      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-791",
+      "id": 791,
+      "href": "/api/v2/factfinds/ff-423/clients/456/notes/note-791",
       "discriminator": "Protection",
       "notes": "Client has no life insurance. High priority due to mortgage and planned family. Spouse has chronic condition - may affect premiums.",
       "createdAt": "2026-02-18T11:15:00Z",
@@ -4588,12 +4527,8 @@ Where:
     }
   ],
   "totalCount": 3,
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes"
-    },
     "client": {
-      "href": "/api/v2/factfinds/ff-423/clients/client-456"
+      "href": "/api/v2/factfinds/ff-423/clients/456"
     }
   }
 }
@@ -4618,23 +4553,19 @@ Where:
 
 ```json
 {
-  "id": "note-792",
-  "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-792",
+  "id": 792,
+  "href": "/api/v2/factfinds/ff-423/clients/456/notes/note-792",
   "clientRef": {
-    "id": "client-456",
+    "id": 456,
     "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-423/clients/client-456"
+    "href": "/api/v2/factfinds/ff-423/clients/456"
   },
   "discriminator": "Investment",
   "notes": "Client has limited investment experience. Previously held only cash ISAs. Risk profile indicates balanced approach. Recommend gradual introduction to equity funds with clear education on volatility.",
   "createdAt": "2026-02-18T14:20:00Z",
   "updatedAt": "2026-02-18T14:20:00Z",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/ff-423/clients/client-456/notes/note-792"
-    },
     "client": {
-      "href": "/api/v2/factfinds/ff-423/clients/client-456"
+      "href": "/api/v2/factfinds/ff-423/clients/456"
     }
   }
 }
@@ -4704,7 +4635,7 @@ Where:
 
 **API Flow:**
 ```
-POST /clients/client-456/notes
+POST /clients/456/notes
 {
   "discriminator": "Protection",
   "notes": "Client disclosed pre-existing condition (Type 2 diabetes, controlled). May affect life insurance premiums. Consider specialist broker for underwriting."
@@ -4721,7 +4652,7 @@ Use: Reference during protection planning
 
 **API Flow:**
 ```
-POST /clients/client-456/notes
+POST /clients/456/notes
 {
   "discriminator": "Mortgage",
   "notes": "Fixed rate ends Aug 2026. Current rate 2.5%, reverting to 6.5% SVR. Must review options by June 2026. Client considering moving to 4-bed in next 2 years."
@@ -4738,7 +4669,7 @@ Use: Set reminders, include in regular review
 
 **API Flow:**
 ```
-POST /clients/client-456/notes
+POST /clients/456/notes
 {
   "discriminator": "Investment",
   "notes": "ATR questionnaire: Balanced risk. Client comfortable with 5-10% volatility. Lost money in 2008 crash, learned to hold long-term. Prefers diversified funds over individual stocks."
@@ -4828,15 +4759,15 @@ Use: Demonstrate suitability in file review
 
 ```json
 {
-  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions",
-  "first_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions?page=1",
-  "last_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions?page=1",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions",
+  "first_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions?page=1",
+  "last_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions?page=1",
   "next_href": null,
   "prev_href": null,
   "items": [
     {
       "id": 1234,
-      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1234",
+      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1234",
       "questionType": "YesNo",
       "subcategory": {
         "id": 10,
@@ -4862,7 +4793,7 @@ Use: Demonstrate suitability in file review
     },
     {
       "id": 1235,
-      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1235",
+      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1235",
       "questionType": "Checkbox",
       "subcategory": {
         "id": 10,
@@ -4920,7 +4851,7 @@ Use: Demonstrate suitability in file review
     },
     {
       "id": 1236,
-      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1236",
+      "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1236",
       "questionType": "Monetary",
       "subcategory": {
         "id": 11,
@@ -4945,10 +4876,8 @@ Use: Demonstrate suitability in file review
     }
   ],
   "count": 3,
-  "_links": {
-    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" },
-    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
-    "answers": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers" }
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456" },
+    "answers": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/answers" }
   }
 }
 ```
@@ -5029,7 +4958,7 @@ Use: Demonstrate suitability in file review
 ```json
 {
   "id": 1240,
-  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1240",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1240",
   "questionType": "DropDownList",
   "subcategory": {
     "id": 12,
@@ -5071,11 +5000,9 @@ Use: Demonstrate suitability in file review
     "affectsServiceLevel": "true"
   },
   "logic": [],
-  "_links": {
-    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1240" },
-    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
-    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" },
-    "answers": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers" }
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions" },
+    "answers": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/answers" }
   }
 }
 ```
@@ -5114,7 +5041,7 @@ Use: Demonstrate suitability in file review
 ```json
 {
   "id": 1237,
-  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1237",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1237",
   "questionType": "NumberDecimal",
   "subcategory": {
     "id": 13,
@@ -5147,11 +5074,9 @@ Use: Demonstrate suitability in file review
       }
     }
   ],
-  "_links": {
-    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1237" },
-    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
-    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" },
-    "parentQuestion": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1234" }
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions" },
+    "parentQuestion": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1234" }
   }
 }
 ```
@@ -5206,7 +5131,7 @@ Use: Demonstrate suitability in file review
 ```json
 {
   "id": 1238,
-  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1238",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1238",
   "questionType": "Text",
   "subcategory": {
     "id": 14,
@@ -5229,10 +5154,8 @@ Use: Demonstrate suitability in file review
     "maxLength": "1000"
   },
   "logic": [],
-  "_links": {
-    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1238" },
-    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
-    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" }
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions" }
   }
 }
 ```
@@ -5337,10 +5260,8 @@ Use: Demonstrate suitability in file review
   "answeredCount": 3,
   "totalQuestions": 5,
   "completionPercentage": 60.0,
-  "_links": {
-    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers" },
-    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" },
-    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" }
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions" },
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456" }
   }
 }
 ```
@@ -5391,16 +5312,16 @@ Use: Demonstrate suitability in file review
 
 ```json
 {
-  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers",
-  "first_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers?page=1",
-  "last_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers?page=1",
+  "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/answers",
+  "first_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/answers?page=1",
+  "last_href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/answers?page=1",
   "next_href": null,
   "prev_href": null,
   "items": [
     {
       "question": {
         "id": 1234,
-        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1234",
+        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1234",
         "questionType": "YesNo",
         "subcategory": {
           "id": 10,
@@ -5432,7 +5353,7 @@ Use: Demonstrate suitability in file review
     {
       "question": {
         "id": 1235,
-        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1235",
+        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1235",
         "questionType": "Checkbox",
         "subcategory": {
           "id": 10,
@@ -5506,7 +5427,7 @@ Use: Demonstrate suitability in file review
     {
       "question": {
         "id": 1236,
-        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/1236",
+        "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions/1236",
         "questionType": "Monetary",
         "subcategory": {
           "id": 11,
@@ -5537,10 +5458,8 @@ Use: Demonstrate suitability in file review
     }
   ],
   "count": 3,
-  "_links": {
-    "self": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions/answers" },
-    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456" },
-    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/client-456/custom-questions" }
+    "client": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456" },
+    "questions": { "href": "https://api.factfind.com/api/v2/factfinds/ff-123/clients/456/custom-questions" }
   }
 }
 ```
@@ -5822,7 +5741,7 @@ Use: Demonstrate suitability in file review
 **Response:**
 ```json
 {
-  "clientId": "client-123",
+  "clientId": 123,
   "clientName": "John Smith",
   "totalIncome": {
     "amount": 72000.00,
@@ -5834,7 +5753,7 @@ Use: Demonstrate suitability in file review
   },
   "income": [
     {
-      "id": "inc-111",
+      "id": 111,
       "incomeCategory": "Employment",
       "description": "Salary from ABC Technology",
       "amount": {
@@ -5849,15 +5768,12 @@ Use: Demonstrate suitability in file review
       "startDate": "2020-03-01",
       "endDate": null,
       "isTaxable": true,
-      "assetRef": null,
-      "_links": {
-        "self": {
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-111"
+      "assetRef": null/clients/123/income/inc-111"
         }
       }
     },
     {
-      "id": "inc-222",
+      "id": 222,
       "incomeCategory": "Rental",
       "description": "Rental income - Buy-to-Let property",
       "amount": {
@@ -5877,20 +5793,14 @@ Use: Demonstrate suitability in file review
         "href": "/api/v2/factfinds/{factfindId}/assets/5001",
         "assetType": "Property",
         "description": "Buy-to-Let Property - 42 Elm Street"
-      },
-      "_links": {
-        "self": {
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-222"
+      }/clients/123/income/inc-222"
         }
       }
     }
-  ],
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income"
+  ]/clients/123/income"
     },
     "create": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income",
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/income",
       "method": "POST"
     }
   }
@@ -5927,10 +5837,10 @@ Use: Demonstrate suitability in file review
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333
+Location: /api/v2/factfinds/{factfindId}/clients/123/income/inc-333
 
 {
-  "id": "inc-333",
+  "id": 333,
   "incomeCategory": "Pension",
   "description": "State Pension",
   "amount": {
@@ -5947,17 +5857,14 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333
   "isTaxable": true,
   "assetRef": null,
   "createdAt": "2026-02-18T10:15:00Z",
-  "updatedAt": "2026-02-18T10:15:00Z",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333"
+  "updatedAt": "2026-02-18T10:15:00Z"/clients/123/income/inc-333"
     },
     "update": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333",
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/income/inc-333",
       "method": "PATCH"
     },
     "client": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123"
     }
   }
 }
@@ -5984,7 +5891,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333
 ```json
 {
   "incomeRef": {
-    "id": "inc-111",
+    "id": 111,
     "description": "Salary from ABC Technology"
   },
   "changeType": "Stop",
@@ -5997,30 +5904,27 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-change-444
+Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-444
 
 {
-  "id": "inc-change-444",
+  "id": 444,
   "incomeRef": {
-    "id": "inc-111",
+    "id": 111,
     "description": "Salary from ABC Technology",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-111"
+    "href": "/api/v2/factfinds/{factfindId}/clients/123/income/inc-111"
   },
   "changeType": "Stop",
   "effectiveDate": "2027-03-01",
   "newAmount": null,
   "reason": "Retirement",
   "createdAt": "2026-02-18T10:30:00Z",
-  "updatedAt": "2026-02-18T10:30:00Z",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-change-444"
+  "updatedAt": "2026-02-18T10:30:00Z"/clients/123/income-changes/inc-change-444"
     },
     "income": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/income/inc-111"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/income/inc-111"
     },
     "client": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123"
     }
   }
 }
@@ -6045,7 +5949,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
 **Response:**
 ```json
 {
-  "clientId": "client-123",
+  "clientId": 123,
   "clientName": "John Smith",
   "totalExpenditure": {
     "amount": 48000.00,
@@ -6057,7 +5961,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
   },
   "expenditure": [
     {
-      "id": "exp-555",
+      "id": 555,
       "expenditureType": "Mortgage",
       "description": "Mortgage payment - main residence",
       "amount": {
@@ -6071,15 +5975,12 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
       "frequency": "Annual",
       "isDiscretionary": false,
       "startDate": "2015-06-01",
-      "endDate": "2040-05-31",
-      "_links": {
-        "self": {
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+      "endDate": "2040-05-31"/clients/123/expenditure/exp-555"
         }
       }
     },
     {
-      "id": "exp-666",
+      "id": 666,
       "expenditureType": "Utilities",
       "description": "Gas, electricity, water",
       "amount": {
@@ -6093,20 +5994,14 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
       "frequency": "Annual",
       "isDiscretionary": false,
       "startDate": "2015-06-01",
-      "endDate": null,
-      "_links": {
-        "self": {
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-666"
+      "endDate": null/clients/123/expenditure/exp-666"
         }
       }
     }
-  ],
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure"
+  ]/clients/123/expenditure"
     },
     "create": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure",
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/expenditure",
       "method": "POST"
     }
   }
@@ -6142,10 +6037,10 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
+Location: /api/v2/factfinds/{factfindId}/clients/123/expenditure/exp-777
 
 {
-  "id": "exp-777",
+  "id": 777,
   "expenditureType": "Transport",
   "description": "Car lease payment",
   "amount": {
@@ -6161,17 +6056,14 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
   "startDate": "2024-01-01",
   "endDate": "2027-12-31",
   "createdAt": "2026-02-18T11:00:00Z",
-  "updatedAt": "2026-02-18T11:00:00Z",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777"
+  "updatedAt": "2026-02-18T11:00:00Z"/clients/123/expenditure/exp-777"
     },
     "update": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777",
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/expenditure/exp-777",
       "method": "PATCH"
     },
     "client": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123"
     }
   }
 }
@@ -6198,7 +6090,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
 ```json
 {
   "expenditureRef": {
-    "id": "exp-555",
+    "id": 555,
     "description": "Mortgage payment - main residence"
   },
   "changeType": "Stop",
@@ -6211,30 +6103,27 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure-changes/exp-change-888
+Location: /api/v2/factfinds/{factfindId}/clients/123/expenditure-changes/exp-change-888
 
 {
-  "id": "exp-change-888",
+  "id": 888,
   "expenditureRef": {
-    "id": "exp-555",
+    "id": 555,
     "description": "Mortgage payment - main residence",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+    "href": "/api/v2/factfinds/{factfindId}/clients/123/expenditure/exp-555"
   },
   "changeType": "Stop",
   "effectiveDate": "2040-05-31",
   "newAmount": null,
   "reason": "Mortgage term end",
   "createdAt": "2026-02-18T11:15:00Z",
-  "updatedAt": "2026-02-18T11:15:00Z",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure-changes/exp-change-888"
+  "updatedAt": "2026-02-18T11:15:00Z"/clients/123/expenditure-changes/exp-change-888"
     },
     "expenditure": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-555"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123/expenditure/exp-555"
     },
     "client": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
+      "href": "/api/v2/factfinds/{factfindId}/clients/123"
     }
   }
 }
@@ -6303,13 +6192,13 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure-changes/
 ```json
 {
   "incomes": [
-    { "id": "income-001" },
-    { "id": "income-002" }
+    { "id": 1 },
+    { "id": 2 }
   ],
   "expenditures": [
-    { "id": "exp-001" },
-    { "id": "exp-002" },
-    { "id": "exp-003" }
+    { "id": 1 },
+    { "id": 2 },
+    { "id": 3 }
   ],
   "options": {
     "isIncludeExpectedIncomeChanges": true,
@@ -6358,63 +6247,63 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure-changes/
 
 ```json
 {
-  "id": "afford-1001",
-  "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+  "id": 1001,
+  "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1001",
   "clientRef": {
-    "id": "client-456",
+    "id": 456,
     "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-234/clients/client-456"
+    "href": "/api/v2/factfinds/ff-234/clients/456"
   },
   "incomes": [
     {
-      "id": "income-001",
+      "id": 1,
       "description": "Primary employment salary",
       "netMonthlyAmount": {
         "amount": 3500.00,
         "currencyCode": "GBP"
       },
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/income/income-001"
+      "href": "/api/v2/factfinds/ff-234/clients/456/income/001"
     },
     {
-      "id": "income-002",
+      "id": 2,
       "description": "Rental income from BTL property",
       "netMonthlyAmount": {
         "amount": 1000.00,
         "currencyCode": "GBP"
       },
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/income/income-002"
+      "href": "/api/v2/factfinds/ff-234/clients/456/income/002"
     }
   ],
   "expenditures": [
     {
-      "id": "exp-001",
+      "id": 1,
       "description": "Mortgage payment",
       "monthlyAmount": {
         "amount": 1500.00,
         "currencyCode": "GBP"
       },
       "isEssential": true,
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/expenditure/exp-001"
+      "href": "/api/v2/factfinds/ff-234/clients/456/expenditure/exp-001"
     },
     {
-      "id": "exp-002",
+      "id": 2,
       "description": "Living expenses",
       "monthlyAmount": {
         "amount": 1000.00,
         "currencyCode": "GBP"
       },
       "isEssential": true,
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/expenditure/exp-002"
+      "href": "/api/v2/factfinds/ff-234/clients/456/expenditure/exp-002"
     },
     {
-      "id": "exp-003",
+      "id": 3,
       "description": "Gym membership and leisure",
       "monthlyAmount": {
         "amount": 300.00,
         "currencyCode": "GBP"
       },
       "isEssential": false,
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/expenditure/exp-003"
+      "href": "/api/v2/factfinds/ff-234/clients/456/expenditure/exp-003"
     }
   ],
   "monthly": {
@@ -6500,19 +6389,15 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure-changes/
   "createdAt": "2026-01-15T10:30:00Z",
   "updatedAt": "2026-01-29T14:45:00Z",
   "concurrencyId": 5,
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001"
-    },
     "client": {
-      "href": "/api/v2/factfinds/ff-234/clients/client-456"
+      "href": "/api/v2/factfinds/ff-234/clients/456"
     },
     "update": {
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+      "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1001",
       "method": "PATCH"
     },
     "delete": {
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001",
+      "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1001",
       "method": "DELETE"
     }
   }
@@ -6597,13 +6482,13 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
 ```json
 {
   "clientRef": {
-    "id": "client-456",
+    "id": 456,
     "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-234/clients/client-456"
+    "href": "/api/v2/factfinds/ff-234/clients/456"
   },
   "calculations": [
     {
-      "id": "afford-1001",
+      "id": 1001,
       "createdAt": "2026-01-29T14:45:00Z",
       "monthly": {
         "totalNetIncome": {
@@ -6616,10 +6501,10 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
         }
       },
       "notes": "Client has variable income from bonus",
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1001"
+      "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1001"
     },
     {
-      "id": "afford-1000",
+      "id": 1000,
       "createdAt": "2026-01-15T10:30:00Z",
       "monthly": {
         "totalNetIncome": {
@@ -6632,16 +6517,12 @@ finalDisposableIncome = revisedIncome - adjustedExpenditure
         }
       },
       "notes": "Initial assessment",
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability/afford-1000"
+      "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1000"
     }
   ],
   "totalCount": 2,
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/ff-234/clients/client-456/affordability"
-    },
     "client": {
-      "href": "/api/v2/factfinds/ff-234/clients/client-456"
+      "href": "/api/v2/factfinds/ff-234/clients/456"
     }
   }
 }
@@ -6752,7 +6633,7 @@ shortfall = requiredAmount - committedAmount
 
 **API Flow:**
 ```
-1. POST /clients/client-456/affordability
+1. POST /clients/456/affordability
    Request: {
      incomes: [salary, rental income],
      expenditures: [all current expenditures],
@@ -6779,7 +6660,7 @@ shortfall = requiredAmount - committedAmount
 **API Flow:**
 ```
 1. Create affordability scenario with consolidation:
-   POST /clients/client-456/affordability
+   POST /clients/456/affordability
    Request: {
      options: {
        isExcludeConsolidatedLiabilities: true
@@ -6805,7 +6686,7 @@ shortfall = requiredAmount - committedAmount
 **API Flow:**
 ```
 1. Calculate current affordability:
-   GET /clients/client-456/affordability (latest)
+   GET /clients/456/affordability (latest)
    - finalDisposableIncome: £1,250/month
    - agreedBudget: £1,500/month (client's target)
 
@@ -6834,7 +6715,7 @@ shortfall = requiredAmount - committedAmount
    - Essential only: £200/month
 
 2. Model scenario:
-   PATCH /clients/client-456/affordability/afford-1001
+   PATCH /clients/456/affordability/1001
    Request: {
      options: { isForgoNonEssentialExpenditure: true }
    }
@@ -6957,10 +6838,6 @@ shortfall = requiredAmount - committedAmount
     }
   ],
   "totalCount": 2,
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/679/clients/456/employments"
-    },
     "create": {
       "href": "/api/v2/factfinds/679/clients/456/employments",
       "method": "POST"
@@ -7923,11 +7800,6 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-01-15T10:00:00Z",
-
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/679/clients/346/credit-history/334"
-    },
     "client": {
       "href": "/api/v2/factfinds/679/clients/346"
     },
@@ -8084,11 +7956,6 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-01-15T10:00:00Z",
-
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/679/clients/346/credit-history/334"
-    },
     "client": {
       "href": "/api/v2/factfinds/679/clients/346"
     },
@@ -8847,7 +8714,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.3.6.
 **Endpoint Pattern:** `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs`
 
 **Need Contract:**
-- `id` - Unique identifier
+- `id` - Unique identifier (numeric)
 - `questionId` - Question identifier
 - `question` - The question text
 - `answer` - Client's answer
@@ -8960,11 +8827,11 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
         "ownershipType": "JOINT",
         "owners": [
           {
-            "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
+            "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
             "ownershipShare": 50.0
           },
           {
-            "clientRef": { "id": "client-124", "href": "/api/v2/factfinds/679/clients/client-124" },
+            "clientRef": { "id": 124, "href": "/api/v2/factfinds/679/clients/124" },
             "ownershipShare": 50.0
           }
         ]
@@ -9004,7 +8871,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
         "ownershipType": "SOLE_CLIENT1",
         "owners": [
           {
-            "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
+            "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
             "ownershipShare": 100.0
           }
         ]
@@ -9012,7 +8879,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "dividends": {
         "owners": [
           {
-            "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
+            "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
             "dividend": { "amount": 5000.00, "currency": "GBP" },
             "withdrawalType": "Regular",
             "frequency": "Monthly"
@@ -9064,7 +8931,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     "ownershipType": "SOLE_CLIENT1",
     "owners": [
       {
-        "clientRef": { "id": "client-123" },
+        "clientRef": { "id": 123 },
         "ownershipShare": 100.0
       }
     ]
@@ -9108,7 +8975,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     "ownershipType": "SOLE_CLIENT1",
     "owners": [
       {
-        "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
+        "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
         "ownershipShare": 100.0
       }
     ]
@@ -9185,8 +9052,6 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   },
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-02-10T14:20:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/679/property-details/1234" },
     "factfind": { "href": "/api/v2/factfinds/679" }
   }
 }
@@ -9202,7 +9067,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ```json
 {
-  "assetRef": { "id": "asset-123" },
+  "assetRef": { "id": 123 },
   "currentValue": {
     "amount": 450000.00,
     "currency": { "code": "GBP" }
@@ -9218,7 +9083,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   },
   "linkedMortgages": [
     {
-      "liabilityRef": { "id": "liability-789" },
+      "liabilityRef": { "id": 789 },
       "outstandingBalance": {
         "amount": 180000.00,
         "currency": { "code": "GBP" }
@@ -9239,7 +9104,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ```json
 {
-  "assetRef": { "id": "asset-123" },
+  "assetRef": { "id": 123 },
   "propertyValue": {
     "amount": 275000.00,
     "currency": { "code": "GBP" }
@@ -9279,8 +9144,8 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 {
   "liabilities": [
     {
-      "id": "liability-789",
-      "factfindRef": { "id": "ff-456" },
+      "id": 789,
+      "factfindRef": { "id": 456 },
       "liabilityType": "MORTGAGE",
       "lender": "First National Bank",
       "accountNumber": "****1234",
@@ -9298,22 +9163,20 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
         "months": 6
       },
       "linkedAsset": {
-        "assetRef": { "id": "asset-123", "href": "/api/v2/factfinds/ff-456/assets/asset-123" },
+        "assetRef": { "id": 123, "href": "/api/v2/factfinds/ff-456/assets/123" },
         "description": "Primary Residence"
       },
       "responsibleClients": [
         {
-          "clientRef": { "id": "client-123" },
+          "clientRef": { "id": 123 },
           "responsibilityShare": 50.0
         },
         {
-          "clientRef": { "id": "client-124" },
+          "clientRef": { "id": 124 },
           "responsibilityShare": 50.0
         }
       ],
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/liabilities/liability-789" },
-        "linked-asset": { "href": "/api/v2/factfinds/ff-456/assets/asset-123" }
+        "linked-asset": { "href": "/api/v2/factfinds/ff-456/assets/123" }
       }
     }
   ],
@@ -9362,7 +9225,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   ],
   "assetsByClient": [
     {
-      "clientRef": { "id": "client-123", "name": "John Smith" },
+      "clientRef": { "id": 123, "name": "John Smith" },
       "totalValue": {
         "amount": 500000.00,
         "currency": { "code": "GBP" }
@@ -9370,7 +9233,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "percentage": 68.97
     },
     {
-      "clientRef": { "id": "client-124", "name": "Jane Smith" },
+      "clientRef": { "id": 124, "name": "Jane Smith" },
       "totalValue": {
         "amount": 225000.00,
         "currency": { "code": "GBP" }
@@ -9393,7 +9256,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 ```json
 {
   "factfindRef": { "id": 679 },
-  "clientRef": { "id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123" },
+  "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
   "totalAssets": {
     "amount": 700000.00,
     "currency": { "code": "GBP" }
@@ -9523,8 +9386,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "status": "string (enum)",
   "concurrencyId": "string",
   "createdAt": "datetime",
-  "updatedAt": "datetime",
-  "_links": {}
+  "updatedAt": "datetime"
 }
 ```
 
@@ -9607,7 +9469,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "clientRef": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -9653,7 +9515,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-gia-001",
+  "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/investments/GIA/arr-gia-001",
   "arrangementType": "GIA",
   "arrangementCategory": "INVESTMENT",
@@ -9676,9 +9538,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-123",
+        "id": 123,
         "fullName": "John Smith",
-        "href": "/api/v2/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/123"
       },
       "ownershipPercentage": 100.0
     }
@@ -9727,10 +9589,8 @@ The Arrangements API provides comprehensive management of client financial produ
   "concurrencyId": "e7b3c1a0-2f45-4e8b-9d3c-1a2b3c4d5e6f",
   "createdAt": "2026-02-18T10:30:00Z",
   "updatedAt": "2026-02-18T10:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/investments/GIA/arr-gia-001" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/123" },
     "contributions": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-gia-001/contributions" },
     "withdrawals": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-gia-001/withdrawals" },
     "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-gia-001/valuations" }
@@ -9790,7 +9650,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "clientRef": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -9850,7 +9710,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-isa-002",
+  "id": 2,
   "href": "/api/v2/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
   "arrangementType": "ISA",
   "arrangementCategory": "INVESTMENT",
@@ -9874,9 +9734,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-123",
+        "id": 123,
         "fullName": "John Smith",
-        "href": "/api/v2/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/123"
       },
       "ownershipPercentage": 100.0
     }
@@ -9953,10 +9813,8 @@ The Arrangements API provides comprehensive management of client financial produ
   "concurrencyId": "f8c4d2b1-3g56-5f9c-0e4d-2b3c4d5e6f7g",
   "createdAt": "2026-02-18T10:35:00Z",
   "updatedAt": "2026-02-18T10:35:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/123" },
     "contributions": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-isa-002/contributions" },
     "withdrawals": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-isa-002/withdrawals" },
     "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-isa-002/valuations" }
@@ -10159,12 +10017,12 @@ The Arrangements API provides comprehensive management of client financial produ
   "purpose": "EmergencyFund",
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "clientRef": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
   "sellingAdviser": {
-    "id": "adviser-456",
+    "id": 456,
     "name": "Jane Adviser",
     "firmName": "ABC Financial Services"
   },
@@ -10205,7 +10063,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-cash-001",
+  "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/investments/Cash/arr-cash-001",
   "arrangementType": "Cash",
   "arrangementCategory": "INVESTMENT",
@@ -10227,18 +10085,18 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-123",
+        "id": 123,
         "fullName": "John Smith",
-        "href": "/api/v2/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/123"
       },
       "ownershipPercentage": 100.0
     }
   ],
   "sellingAdviser": {
-    "id": "adviser-456",
+    "id": 456,
     "name": "Jane Adviser",
     "firmName": "ABC Financial Services",
-    "href": "/api/v2/advisers/adviser-456"
+    "href": "/api/v2/advisers/456"
   },
   "agencyStatus": "NotUnderAgency",
   "agencyStatusDate": "2023-01-15",
@@ -10439,7 +10297,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "clientRef": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -10503,7 +10361,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-pp-003",
+  "id": 3,
   "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003",
   "arrangementType": "PERSONAL_PENSION",
   "arrangementCategory": "PENSION",
@@ -10525,9 +10383,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-123",
+        "id": 123,
         "fullName": "John Smith",
-        "href": "/api/v2/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/123"
       },
       "ownershipPercentage": 100.0
     }
@@ -10612,10 +10470,8 @@ The Arrangements API provides comprehensive management of client financial produ
   "concurrencyId": "g9d5e3c2-4h67-6g0d-1f5e-3c4d5e6f7g8h",
   "createdAt": "2026-02-18T10:40:00Z",
   "updatedAt": "2026-02-18T10:40:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/123" },
     "contributions": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions" },
     "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries" },
     "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations" }
@@ -10690,7 +10546,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "employerName": "Tech Solutions Ltd",
-  "employerRef": { "id": "employer-456" },
+  "employerRef": { "id": 456 },
   "employerContribution": {
     "percentage": 5.0,
     "amount": {
@@ -10776,7 +10632,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "employer": "Royal London Hospital Trust",
   "sellingAdviser": {
-    "id": "adviser-456",
+    "id": 456,
     "name": "Jane Adviser",
     "firmName": "ABC Financial Services"
   },
@@ -10790,7 +10646,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "clientRef": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -10866,7 +10722,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-db-004",
+  "id": 4,
   "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004",
   "arrangementType": "FINAL_SALARY",
   "arrangementCategory": "PENSION",
@@ -10877,10 +10733,10 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "employer": "Royal London Hospital Trust",
   "sellingAdviser": {
-    "id": "adviser-456",
+    "id": 456,
     "name": "Jane Adviser",
     "firmName": "ABC Financial Services",
-    "href": "/api/v2/advisers/adviser-456"
+    "href": "/api/v2/advisers/456"
   },
   "agencyStatus": "NotUnderAgency",
   "agencyStatusDate": "2023-01-15",
@@ -10900,9 +10756,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-123",
+        "id": 123,
         "fullName": "John Smith",
-        "href": "/api/v2/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/123"
       },
       "ownershipPercentage": 100.0
     }
@@ -10992,12 +10848,10 @@ The Arrangements API provides comprehensive management of client financial produ
   "concurrencyId": "h0e6f4d3-5i78-7h1e-2g6f-4d5e6f7g8h9i",
   "createdAt": "2026-02-18T10:45:00Z",
   "updatedAt": "2026-02-18T10:45:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/123" },
     "provider": { "href": "/api/v2/providers/NHS-PS-001" },
-    "sellingAdviser": { "href": "/api/v2/advisers/adviser-456" },
+    "sellingAdviser": { "href": "/api/v2/advisers/456" },
     "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-db-004/beneficiaries" },
     "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-db-004/valuations" }
   }
@@ -11156,7 +11010,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-db-005",
+  "id": 5,
   "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005",
   "arrangementType": "FINAL_SALARY",
   "arrangementCategory": "PENSION",
@@ -11177,9 +11031,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-125",
+        "id": 125,
         "fullName": "Sarah Jones",
-        "href": "/api/v2/factfinds/ff-456/clients/client-125"
+        "href": "/api/v2/factfinds/ff-456/clients/125"
       },
       "ownershipPercentage": 100.0
     }
@@ -11259,10 +11113,8 @@ The Arrangements API provides comprehensive management of client financial produ
     "Private sector scheme - potential employer covenant risk",
     "Scheme closed - may have higher transfer values to encourage transfers"
   ],
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-125" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/125" },
     "provider": { "href": "/api/v2/providers/AVIVA-DB-001" },
     "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-db-005/beneficiaries" },
     "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-db-005/valuations" }
@@ -11397,7 +11249,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "employer": "ABC Corporation Ltd",
   "sellingAdviser": {
-    "id": "adviser-789",
+    "id": 789,
     "name": "Michael Smith",
     "firmName": "XYZ Wealth Management"
   },
@@ -11412,7 +11264,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "clientRef": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -11470,7 +11322,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-mp-001",
+  "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001",
   "arrangementType": "MONEY_PURCHASE",
   "arrangementCategory": "PENSION",
@@ -11481,10 +11333,10 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "employer": "ABC Corporation Ltd",
   "sellingAdviser": {
-    "id": "adviser-789",
+    "id": 789,
     "name": "Michael Smith",
     "firmName": "XYZ Wealth Management",
-    "href": "/api/v2/advisers/adviser-789"
+    "href": "/api/v2/advisers/789"
   },
   "agencyStatus": "NotUnderAgency",
   "agencyStatusDate": "2023-01-15",
@@ -11499,9 +11351,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-123",
+        "id": 123,
         "fullName": "John Smith",
-        "href": "/api/v2/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/123"
       },
       "ownershipPercentage": 100.0
     }
@@ -11590,12 +11442,10 @@ The Arrangements API provides comprehensive management of client financial produ
   "concurrencyId": "k3g7h9i2-9j12-5k8l-6m4n-8o9p1q2r3s4t",
   "createdAt": "2026-02-18T14:30:00Z",
   "updatedAt": "2026-02-18T14:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/123" },
     "provider": { "href": "/api/v2/providers/SW-001" },
-    "sellingAdviser": { "href": "/api/v2/advisers/adviser-789" },
+    "sellingAdviser": { "href": "/api/v2/advisers/789" },
     "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-mp-001/beneficiaries" },
     "valuations": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-mp-001/valuations" },
     "contributions": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-mp-001/contributions" }
@@ -11807,7 +11657,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-mp-002",
+  "id": 2,
   "href": "/api/v2/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002",
   "arrangementType": "MONEY_PURCHASE",
   "arrangementCategory": "PENSION",
@@ -11818,10 +11668,10 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "employer": null,
   "sellingAdviser": {
-    "id": "adviser-234",
+    "id": 234,
     "name": "David Brown",
     "firmName": "Legacy Financial Advisers",
-    "href": "/api/v2/advisers/adviser-234"
+    "href": "/api/v2/advisers/234"
   },
   "agencyStatus": null,
   "agencyStatusDate": null,
@@ -11836,9 +11686,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-456",
+        "id": 456,
         "fullName": "Emma Wilson",
-        "href": "/api/v2/factfinds/ff-789/clients/client-456"
+        "href": "/api/v2/factfinds/ff-789/clients/456"
       },
       "ownershipPercentage": 100.0
     }
@@ -11909,12 +11759,10 @@ The Arrangements API provides comprehensive management of client financial produ
   "concurrencyId": "m5n8p2q4-3r7s-9t1u-4v6w-8x9y1z2a3b4c",
   "createdAt": "2026-02-18T15:00:00Z",
   "updatedAt": "2026-02-18T15:00:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002" },
     "factfind": { "href": "/api/v2/factfinds/ff-789" },
-    "owner": { "href": "/api/v2/factfinds/ff-789/clients/client-456" },
+    "owner": { "href": "/api/v2/factfinds/ff-789/clients/456" },
     "provider": { "href": "/api/v2/providers/SL-002" },
-    "sellingAdviser": { "href": "/api/v2/advisers/adviser-234" },
+    "sellingAdviser": { "href": "/api/v2/advisers/234" },
     "beneficiaries": { "href": "/api/v2/factfinds/ff-789/arrangements/arr-mp-002/beneficiaries" },
     "valuations": { "href": "/api/v2/factfinds/ff-789/arrangements/arr-mp-002/valuations" }
   }
@@ -11945,13 +11793,13 @@ The Arrangements API provides comprehensive management of client financial produ
   "accountNumber": "NBS-MORT-123456",
   "owners": [
     {
-      "id": "client-123",
-      "href": "/api/v2/factfinds/ff-456/clients/client-123",
+      "id": 123,
+      "href": "/api/v2/factfinds/ff-456/clients/123",
       "ownershipPercentage": 50.0
     },
     {
-      "id": "client-124",
-      "href": "/api/v2/factfinds/ff-456/clients/client-124",
+      "id": 124,
+      "href": "/api/v2/factfinds/ff-456/clients/124",
       "ownershipPercentage": 50.0
     }
   ],
@@ -12065,7 +11913,7 @@ The Arrangements API provides comprehensive management of client financial produ
     "isIncomeEvidenced": true
   },
   "propertyDetail": {
-    "id": "asset-prop-001",
+    "id": 1,
     "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001"
   },
   "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before."
@@ -12076,10 +11924,10 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-secl-005",
+  "id": 5,
   "href": "/api/v2/factfinds/ff-456/arrangements/mortgages/arr-secl-005",
   "factfindRef": {
-    "id": "ff-456",
+    "id": 456,
     "href": "/api/v2/factfinds/ff-456"
   },
   "arrangementCategory": "MORTGAGE",
@@ -12088,14 +11936,14 @@ The Arrangements API provides comprehensive management of client financial produ
   "illustrationReference": null,
   "owners": [
     {
-      "id": "client-123",
-      "href": "/api/v2/factfinds/ff-456/clients/client-123",
+      "id": 123,
+      "href": "/api/v2/factfinds/ff-456/clients/123",
       "fullName": "John Smith",
       "ownershipPercentage": 50.0
     },
     {
-      "id": "client-124",
-      "href": "/api/v2/factfinds/ff-456/clients/client-124",
+      "id": 124,
+      "href": "/api/v2/factfinds/ff-456/clients/124",
       "fullName": "Jane Smith",
       "ownershipPercentage": 50.0
     }
@@ -12217,26 +12065,24 @@ The Arrangements API provides comprehensive management of client financial produ
   "offsetFeatures": null,
   "asset": null,
   "property": {
-    "id": "asset-prop-001",
+    "id": 1,
     "href": "/api/v2/factfinds/ff-456/properties/asset-prop-001",
     "address": "123 High Street, London"
   },
   "propertyDetail": {
-    "id": "asset-prop-001",
+    "id": 1,
     "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001"
   },
   "linkedArrangements": [],
   "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before.",
   "createdAt": "2026-02-18T10:50:00Z",
   "updatedAt": "2026-02-18T10:50:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/mortgages/arr-secl-005" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" },
     "property": { "href": "/api/v2/factfinds/ff-456/properties/asset-prop-001" },
     "propertyDetail": { "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001" },
     "owners": [
-      { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
-      { "href": "/api/v2/factfinds/ff-456/clients/client-124" }
+      { "href": "/api/v2/factfinds/ff-456/clients/123" },
+      { "href": "/api/v2/factfinds/ff-456/clients/124" }
     ]
   }
 }
@@ -12298,7 +12144,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "maturityDate": "2050-04-01",
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "clientRef": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -12332,7 +12178,7 @@ The Arrangements API provides comprehensive management of client financial produ
       "name": "Jane Smith",
       "relationship": "SPOUSE",
       "percentage": 100.0,
-      "ref": { "id": "client-124" }
+      "ref": { "id": 124 }
     }
   ],
   "trustDetails": {
@@ -12355,7 +12201,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "arr-prot-006",
+  "id": 6,
   "href": "/api/v2/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006",
   "arrangementType": "PROTECTION",
   "arrangementCategory": "PROTECTION",
@@ -12379,9 +12225,9 @@ The Arrangements API provides comprehensive management of client financial produ
   "owners": [
     {
       "clientRef": {
-        "id": "client-123",
+        "id": 123,
         "fullName": "John Smith",
-        "href": "/api/v2/factfinds/ff-456/clients/client-123"
+        "href": "/api/v2/factfinds/ff-456/clients/123"
       },
       "ownershipPercentage": 100.0
     }
@@ -12419,13 +12265,13 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "beneficiaries": [
     {
-      "id": "ben-001",
+      "id": 1,
       "name": "Jane Smith",
       "relationship": "SPOUSE",
       "percentage": 100.0,
       "ref": {
-        "id": "client-124",
-        "href": "/api/v2/factfinds/ff-456/clients/client-124"
+        "id": 124,
+        "href": "/api/v2/factfinds/ff-456/clients/124"
       }
     }
   ],
@@ -12458,10 +12304,8 @@ The Arrangements API provides comprehensive management of client financial produ
   "concurrencyId": "j2g8h6f5-7k90-9j3g-4i8h-6f7g8h9i0j1k",
   "createdAt": "2026-02-18T10:55:00Z",
   "updatedAt": "2026-02-18T10:55:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "owner": { "href": "/api/v2/factfinds/ff-456/clients/client-123" },
+    "owner": { "href": "/api/v2/factfinds/ff-456/clients/123" },
     "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-prot-006/beneficiaries" }
   }
 }
@@ -12544,7 +12388,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "renewalDate": "2026-06-15",
   "linkedAssetRef": {
-    "id": "asset-prop-001"
+    "id": 1
   }
 }
 ```
@@ -12600,10 +12444,10 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "contrib-001",
+  "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001",
   "arrangementRef": {
-    "id": "arr-pp-003",
+    "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "contributionDate": "2026-02-15",
@@ -12637,8 +12481,6 @@ The Arrangements API provides comprehensive management of client financial produ
   "notes": "Standard monthly contribution",
   "createdAt": "2026-02-18T11:00:00Z",
   "updatedAt": "2026-02-18T11:00:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001" },
     "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" }
   }
@@ -12650,32 +12492,28 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "arrangementRef": {
-    "id": "arr-pp-003",
+    "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "contributions": [
     {
-      "id": "contrib-001",
+      "id": 1,
       "contributionDate": "2026-02-15",
       "grossAmount": {
         "amount": 625.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
-      "contributionType": "REGULAR",
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001" }
+      "contributionType": "REGULAR"
       }
     },
     {
-      "id": "contrib-002",
+      "id": 2,
       "contributionDate": "2026-01-15",
       "grossAmount": {
         "amount": 625.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
-      "contributionType": "REGULAR",
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-002" }
+      "contributionType": "REGULAR"
       }
     }
   ],
@@ -12695,8 +12533,6 @@ The Arrangements API provides comprehensive management of client financial produ
     }
   },
   "totalCount": 24,
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions" },
     "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
   }
 }
@@ -12760,10 +12596,10 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "withdraw-001",
+  "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/arr-dd-007/withdrawals/withdraw-001",
   "arrangementRef": {
-    "id": "arr-dd-007",
+    "id": 7,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007"
   },
   "withdrawalDate": "2026-02-15",
@@ -12795,8 +12631,6 @@ The Arrangements API provides comprehensive management of client financial produ
   "notes": "Monthly drawdown payment",
   "createdAt": "2026-02-18T11:05:00Z",
   "updatedAt": "2026-02-18T11:05:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-dd-007/withdrawals/withdraw-001" },
     "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007" },
     "factfind": { "href": "/api/v2/factfinds/ff-456" }
   }
@@ -12857,7 +12691,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "percentage": 50.0,
   "contingent": false,
   "contactRef": {
-    "id": "dependent-789"
+    "id": 789
   },
   "address": {
     "line1": "123 High Street",
@@ -12872,10 +12706,10 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "ben-002",
+  "id": 2,
   "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002",
   "arrangementRef": {
-    "id": "arr-pp-003",
+    "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "beneficiaryType": "PERSON",
@@ -12886,8 +12720,8 @@ The Arrangements API provides comprehensive management of client financial produ
   "percentage": 50.0,
   "contingent": false,
   "contactRef": {
-    "id": "dependent-789",
-    "href": "/api/v2/factfinds/ff-456/clients/client-123/dependents/dependent-789"
+    "id": 789,
+    "href": "/api/v2/factfinds/ff-456/clients/123/dependents/dependent-789"
   },
   "address": {
     "line1": "123 High Street",
@@ -12897,10 +12731,8 @@ The Arrangements API provides comprehensive management of client financial produ
   "notes": "Primary beneficiary - daughter",
   "createdAt": "2026-02-18T11:10:00Z",
   "updatedAt": "2026-02-18T11:10:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002" },
     "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
-    "dependent": { "href": "/api/v2/factfinds/ff-456/clients/client-123/dependents/dependent-789" }
+    "dependent": { "href": "/api/v2/factfinds/ff-456/clients/123/dependents/dependent-789" }
   }
 }
 ```
@@ -12910,35 +12742,29 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "arrangementRef": {
-    "id": "arr-pp-003",
+    "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "beneficiaries": [
     {
-      "id": "ben-002",
+      "id": 2,
       "name": "Sarah Smith",
       "relationship": "CHILD",
       "percentage": 50.0,
-      "contingent": false,
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002" }
+      "contingent": false
       }
     },
     {
-      "id": "ben-003",
+      "id": 3,
       "name": "Michael Smith",
       "relationship": "CHILD",
       "percentage": 50.0,
-      "contingent": false,
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-003" }
+      "contingent": false
       }
     }
   ],
   "totalCount": 2,
   "totalPercentage": 100.0,
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries" },
     "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
   }
 }
@@ -12994,10 +12820,10 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "id": "val-001",
+  "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001",
   "arrangementRef": {
-    "id": "arr-pp-003",
+    "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "valuationDate": "2026-02-18",
@@ -13024,8 +12850,6 @@ The Arrangements API provides comprehensive management of client financial produ
   "notes": "Q4 2025/26 statement",
   "createdAt": "2026-02-18T11:15:00Z",
   "updatedAt": "2026-02-18T11:15:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001" },
     "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
     "document": { "href": "/api/v2/factfinds/ff-456/documents/statement-2026-02.pdf" }
   }
@@ -13037,34 +12861,30 @@ The Arrangements API provides comprehensive management of client financial produ
 ```json
 {
   "arrangementRef": {
-    "id": "arr-pp-003",
+    "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
   "valuations": [
     {
-      "id": "val-001",
+      "id": 1,
       "valuationDate": "2026-02-18",
       "value": {
         "amount": 125000.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
       "valuationType": "STATEMENT",
-      "percentageChange": 4.17,
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001" }
+      "percentageChange": 4.17
       }
     },
     {
-      "id": "val-002",
+      "id": 2,
       "valuationDate": "2025-11-18",
       "value": {
         "amount": 120000.00,
         "currency": { "code": "GBP", "symbol": "£" }
       },
       "valuationType": "STATEMENT",
-      "percentageChange": 3.45,
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-002" }
+      "percentageChange": 3.45
       }
     }
   ],
@@ -13086,8 +12906,6 @@ The Arrangements API provides comprehensive management of client financial produ
     "annualizedReturn": 6.2
   },
   "totalCount": 8,
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations" },
     "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
   }
 }
@@ -13259,14 +13077,14 @@ The ATR Assessment is a critical component of the FactFind that captures:
 {
   "atrAssessment": {
     "templateRef": {
-      "id": "atr-template-v5",
+      "id": 5407,
       "version": "5.0",
       "name": "FCA Standard ATR 2025",
       "regulatoryApprovalDate": "2025-01-01"
     },
     "assessmentDate": "2026-02-18T10:30:00Z",
     "assessedBy": {
-      "id": "adviser-789",
+      "id": 789,
       "name": "Jane Doe"
     },
     "questions": [
@@ -13387,7 +13205,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
         "signed": true,
         "signedDate": "2026-02-18T11:10:00Z",
         "signedBy": {
-          "id": "adviser-789",
+          "id": 789,
           "name": "Jane Doe"
         }
       }
@@ -13395,11 +13213,9 @@ The ATR Assessment is a critical component of the FactFind that captures:
     "completedAt": "2026-02-18T11:10:00Z",
     "reviewDate": "2027-02-18"
   },
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
-    "history": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history" },
-    "chooseProfile": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/choose-profile", "method": "POST" }
+    "factfind": { "href": "/api/v2/factfinds/123" },
+    "history": { "href": "/api/v2/factfinds/123/atr-assessment/history" },
+    "chooseProfile": { "href": "/api/v2/factfinds/123/atr-assessment/choose-profile", "method": "POST" }
   }
 }
 ```
@@ -13425,7 +13241,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 ```json
 {
   "templateRef": {
-    "id": "atr-template-v5",
+    "id": 5407,
     "version": "5.0"
   },
   "questions": [
@@ -13475,10 +13291,8 @@ The ATR Assessment is a critical component of the FactFind that captures:
   "atrAssessment": {
     // ... full assessment with generated risk profiles
   },
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
-    "chooseProfile": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/choose-profile", "method": "POST" }
+    "factfind": { "href": "/api/v2/factfinds/123" },
+    "chooseProfile": { "href": "/api/v2/factfinds/123/atr-assessment/choose-profile", "method": "POST" }
   }
 }
 ```
@@ -13576,7 +13390,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
       "chosenRiskRating": "Balanced",
       "chosenRiskScore": 45,
       "assessedBy": {
-        "id": "adviser-789",
+        "id": 789,
         "name": "Jane Doe"
       },
       "changeFromPrevious": {
@@ -13584,9 +13398,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
         "riskRatingChange": "Increased",
         "significantChange": false
       },
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history/atr-20260218-001" },
-        "fullDetails": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history/atr-20260218-001" }
+        "fullDetails": { "href": "/api/v2/factfinds/123/atr-assessment/history/atr-20260218-001" }
       }
     },
     {
@@ -13597,12 +13409,10 @@ The ATR Assessment is a critical component of the FactFind that captures:
       "chosenRiskRating": "Cautious",
       "chosenRiskScore": 40,
       "assessedBy": {
-        "id": "adviser-789",
+        "id": 789,
         "name": "Jane Doe"
       },
-      "changeFromPrevious": null,
-      "_links": {
-        "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history/atr-20250215-001" }
+      "changeFromPrevious": null
       }
     }
   ],
@@ -13612,10 +13422,8 @@ The ATR Assessment is a critical component of the FactFind that captures:
     "totalItems": 2,
     "totalPages": 1
   },
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/history" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
-    "compare": { "href": "/api/v2/factfinds/factfind-123/atr-assessment/compare?from={assessmentId1}&to={assessmentId2}" }
+    "factfind": { "href": "/api/v2/factfinds/123" },
+    "compare": { "href": "/api/v2/factfinds/123/atr-assessment/compare?from={assessmentId1}&to={assessmentId2}" }
   }
 }
 ```
@@ -13655,7 +13463,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 {
   "templates": [
     {
-      "id": "atr-template-v5",
+      "id": 5407,
       "version": "5.0",
       "name": "FCA Standard ATR 2025",
       "description": "Updated 15-question ATR with enhanced capacity for loss assessment",
@@ -13675,7 +13483,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
       ]
     },
     {
-      "id": "atr-template-v4",
+      "id": 6130,
       "version": "4.0",
       "name": "FCA Standard ATR 2024",
       "description": "Previous version - still valid for existing assessments",
@@ -13711,7 +13519,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ```json
 {
-  "id": "atr-template-v5",
+  "id": 5407,
   "version": "5.0",
   "name": "FCA Standard ATR 2025",
   "description": "Updated 15-question ATR with enhanced capacity for loss assessment",
@@ -14093,10 +13901,10 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 ```json
 {
-  "id": "client-123",
+  "id": 123,
   "factFindRef": {
-    "id": "factfind-456",
-    "href": "/api/v2/factfinds/factfind-456",
+    "id": 456,
+    "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
@@ -14150,7 +13958,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
         ],
         "isActive": true,
         "recordedBy": {
-          "id": "adviser-789",
+          "id": 789,
           "name": "Jane Doe"
         }
       }
@@ -14268,7 +14076,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "expiryDate": "2025-01-15",
     "nextReviewDate": "2025-01-15",
     "verifiedBy": {
-      "id": "adviser-789",
+      "id": 789,
       "name": "Jane Doe"
     },
     "verificationMethod": "Electronic",
@@ -14309,7 +14117,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "adverseMediaCheckSource": "LexisNexis",
       "overallStatus": "Clear",
       "checkPerformedBy": {
-        "id": "adviser-789",
+        "id": 789,
         "name": "Jane Doe"
       }
     },
@@ -14704,8 +14512,8 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
   "isHeadOfFamilyGroup": true,
   "isJoint": true,
   "spouseRef": {
-    "id": "client-124",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-124",
+    "id": 124,
+    "href": "/api/v2/factfinds/{factfindId}/clients/124",
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
@@ -14786,38 +14594,36 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "lastReviewDate": "2026-02-18"
   },
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
   "paraplannerRef": {
-    "id": "adviser-790",
-    "href": "/api/v2/advisers/adviser-790",
+    "id": 790,
+    "href": "/api/v2/advisers/790",
     "name": "Tom Johnson",
     "code": "PP001"
   },
   "officeRef": {
-    "id": "office-1",
+    "id": 1,
     "name": "London Office",
     "code": "LON"
   },
   "createdAt": "2020-01-15T10:30:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "createdBy": {
-    "id": "adviser-789",
+    "id": 789,
     "name": "Jane Doe"
   },
   "updatedBy": {
-    "id": "adviser-789",
+    "id": 789,
     "name": "Jane Doe"
   },
-  "_etag": "W/\"v2-20260216-143000\"",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-456" },
-    "spouse": { "href": "/api/v2/factfinds/{factfindId}/clients/client-124" },
-    "adviser": { "href": "/api/v2/advisers/adviser-789" }
+  "_etag": "W/\"v2-20260216-143000\""/clients/123" },
+    "factfind": { "href": "/api/v2/factfinds/456" },
+    "spouse": { "href": "/api/v2/factfinds/{factfindId}/clients/124" },
+    "adviser": { "href": "/api/v2/advisers/789" }
   }
 }
 ```
@@ -14830,10 +14636,10 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 ```json
 {
-  "id": "client-567",
+  "id": 567,
   "factFindRef": {
-    "id": "factfind-890",
-    "href": "/api/v2/factfinds/factfind-890",
+    "id": 890,
+    "href": "/api/v2/factfinds/890",
     "factFindNumber": "FF-2025-00456",
     "status": "INP"
   },
@@ -14869,8 +14675,8 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "directors": [
       {
         "personRef": {
-          "id": "client-568",
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-568",
+          "id": 568,
+          "href": "/api/v2/factfinds/{factfindId}/clients/568",
           "name": "Robert Johnson",
           "clientNumber": "C00005679"
         },
@@ -14881,8 +14687,8 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       },
       {
         "personRef": {
-          "id": "client-569",
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-569",
+          "id": 569,
+          "href": "/api/v2/factfinds/{factfindId}/clients/569",
           "name": "Amanda Chen",
           "clientNumber": "C00005680"
         },
@@ -14895,7 +14701,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "shareholders": [
       {
         "shareholderRef": {
-          "id": "client-568",
+          "id": 568,
           "name": "Robert Johnson",
           "type": "Person"
         },
@@ -14913,7 +14719,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       },
       {
         "shareholderRef": {
-          "id": "client-569",
+          "id": 569,
           "name": "Amanda Chen",
           "type": "Person"
         },
@@ -15017,7 +14823,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "expiryDate": "2028-03-20",
     "nextReviewDate": "2027-03-20",
     "verifiedBy": {
-      "id": "adviser-800",
+      "id": 800,
       "name": "Michael Brown"
     },
     "verificationMethod": "Electronic",
@@ -15058,7 +14864,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "adverseMediaCheckSource": "LexisNexis",
       "overallStatus": "Clear",
       "checkPerformedBy": {
-        "id": "adviser-800",
+        "id": 800,
         "name": "Michael Brown"
       }
     },
@@ -15278,37 +15084,35 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "lastReviewDate": "2026-02-18"
   },
   "adviserRef": {
-    "id": "adviser-800",
-    "href": "/api/v2/advisers/adviser-800",
+    "id": 800,
+    "href": "/api/v2/advisers/800",
     "name": "Michael Brown",
     "code": "ADV002"
   },
   "paraplannerRef": {
-    "id": "adviser-801",
-    "href": "/api/v2/advisers/adviser-801",
+    "id": 801,
+    "href": "/api/v2/advisers/801",
     "name": "Lisa Wong",
     "code": "PP002"
   },
   "officeRef": {
-    "id": "office-2",
+    "id": 2,
     "name": "Manchester Office",
     "code": "MAN"
   },
   "createdAt": "2015-03-20T09:00:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "createdBy": {
-    "id": "adviser-800",
+    "id": 800,
     "name": "Michael Brown"
   },
   "updatedBy": {
-    "id": "adviser-800",
+    "id": 800,
     "name": "Michael Brown"
   },
-  "_etag": "W/\"v2-20260216-143000\"",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/client-567" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-890" },
-    "adviser": { "href": "/api/v2/advisers/adviser-800" }
+  "_etag": "W/\"v2-20260216-143000\""/clients/567" },
+    "factfind": { "href": "/api/v2/factfinds/890" },
+    "adviser": { "href": "/api/v2/advisers/800" }
   }
 }
 ```
@@ -15321,10 +15125,10 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 ```json
 {
-  "id": "client-999",
+  "id": 999,
   "factFindRef": {
-    "id": "factfind-1111",
-    "href": "/api/v2/factfinds/factfind-1111",
+    "id": 1111,
+    "href": "/api/v2/factfinds/1111",
     "factFindNumber": "FF-2025-00789",
     "status": "INP"
   },
@@ -15345,8 +15149,8 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     },
     "settlor": {
       "personRef": {
-        "id": "client-1000",
-        "href": "/api/v2/factfinds/{factfindId}/clients/client-1000",
+        "id": 1000,
+        "href": "/api/v2/factfinds/{factfindId}/clients/1000",
         "name": "William Smith",
         "clientNumber": "C00010000"
       },
@@ -15364,8 +15168,8 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "trustees": [
       {
         "personRef": {
-          "id": "client-1001",
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-1001",
+          "id": 1001,
+          "href": "/api/v2/factfinds/{factfindId}/clients/1001",
           "name": "Margaret Smith",
           "clientNumber": "C00010001"
         },
@@ -15376,8 +15180,8 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       },
       {
         "personRef": {
-          "id": "client-1002",
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-1002",
+          "id": 1002,
+          "href": "/api/v2/factfinds/{factfindId}/clients/1002",
           "name": "James Harrison",
           "clientNumber": "C00010002"
         },
@@ -15391,7 +15195,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "beneficiaries": [
       {
         "personRef": {
-          "id": "client-1003",
+          "id": 1003,
           "name": "Alexander Smith",
           "type": "Person"
         },
@@ -15404,7 +15208,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       },
       {
         "personRef": {
-          "id": "client-1004",
+          "id": 1004,
           "name": "Emily Smith",
           "type": "Person"
         },
@@ -15417,7 +15221,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       },
       {
         "personRef": {
-          "id": "client-1005",
+          "id": 1005,
           "name": "Sophie Smith",
           "type": "Person"
         },
@@ -15504,7 +15308,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "distributions": [
       {
         "beneficiaryRef": {
-          "id": "client-1003",
+          "id": 1003,
           "name": "Alexander Smith"
         },
         "distributionDate": "2025-12-20",
@@ -15521,7 +15325,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       },
       {
         "beneficiaryRef": {
-          "id": "client-1004",
+          "id": 1004,
           "name": "Emily Smith"
         },
         "distributionDate": "2025-12-20",
@@ -15583,7 +15387,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "expiryDate": "2028-04-15",
     "nextReviewDate": "2027-04-15",
     "verifiedBy": {
-      "id": "adviser-810",
+      "id": 810,
       "name": "Patricia Davies"
     },
     "verificationMethod": "Documentary",
@@ -15624,7 +15428,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
       "adverseMediaCheckSource": "LexisNexis",
       "overallStatus": "Clear",
       "checkPerformedBy": {
-        "id": "adviser-810",
+        "id": 810,
         "name": "Patricia Davies"
       }
     },
@@ -15826,37 +15630,35 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "lastReviewDate": "2026-02-18"
   },
   "adviserRef": {
-    "id": "adviser-810",
-    "href": "/api/v2/advisers/adviser-810",
+    "id": 810,
+    "href": "/api/v2/advisers/810",
     "name": "Patricia Davies",
     "code": "ADV003"
   },
   "paraplannerRef": {
-    "id": "adviser-811",
-    "href": "/api/v2/advisers/adviser-811",
+    "id": 811,
+    "href": "/api/v2/advisers/811",
     "name": "Andrew Wilson",
     "code": "PP003"
   },
   "officeRef": {
-    "id": "office-1",
+    "id": 1,
     "name": "London Office",
     "code": "LON"
   },
   "createdAt": "2018-04-15T10:00:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "createdBy": {
-    "id": "adviser-810",
+    "id": 810,
     "name": "Patricia Davies"
   },
   "updatedBy": {
-    "id": "adviser-810",
+    "id": 810,
     "name": "Patricia Davies"
   },
-  "_etag": "W/\"v2-20260216-143000\"",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/clients/client-999" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-1111" },
-    "adviser": { "href": "/api/v2/advisers/adviser-810" }
+  "_etag": "W/\"v2-20260216-143000\""/clients/999" },
+    "factfind": { "href": "/api/v2/factfinds/1111" },
+    "adviser": { "href": "/api/v2/advisers/810" }
   }
 }
 ```
@@ -15867,7 +15669,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 
 | Field | Type | Required | Validation Rules | Notes |
 |-------|------|----------|------------------|-------|
-| `id` | string | Yes (read-only) | System-generated | Unique identifier |
+| `id` | string | Yes (read-only) | System-generated | Unique identifier (numeric) |
 | `clientNumber` | string | Yes | Unique, max 20 chars | Business key |
 | `clientType` | string | Yes | Enum: Person, Corporate, Trust | Discriminator field |
 | `personValue` | PersonValue | Conditional | Required if clientType=Person | Person-specific fields |
@@ -16686,7 +16488,7 @@ Content-Type: application/json
     "trustRegistrationNumber": "TRN12345678",
     "settlor": {
       "personRef": {
-        "id": "client-1000",
+        "id": 1000,
         "name": "William Smith"
       },
       "settlementAmount": {
@@ -16744,11 +16546,11 @@ See Section 10 for complete ATR API documentation and example payloads.
 **Example of embedded ATR in FactFind:**
 ```json
 {
-  "id": "factfind-123",
+  "id": 123,
   "client": {...},
   "status": "InProgress",
   "atrAssessment": {
-    "templateRef": { "id": "atr-template-v5", "version": "5.0", "name": "FCA Standard ATR 2025" },
+    "templateRef": { "id": 5407, "version": "5.0", "name": "FCA Standard ATR 2025" },
     "assessmentDate": "2026-02-18T10:30:00Z",
     "questions": [ /* 15 questions */ ],
     "supplementaryQuestions": [ /* 45 questions */ ],
@@ -16786,25 +16588,25 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 
 ```json
 {
-  "id": "factfind-456",
+  "id": 456,
   "factFindNumber": "FF001234",
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "jointClientRef": {
-    "id": "client-124",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-124",
+    "id": 124,
+    "href": "/api/v2/factfinds/{factfindId}/clients/124",
     "name": "Sarah Smith",
     "clientNumber": "C00001235",
     "type": "Person"
   },
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -17001,7 +16803,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 
   "atrAssessment": {
     "templateRef": {
-      "id": "atr-template-v5",
+      "id": 5407,
       "version": "5.0",
       "name": "FCA Standard ATR 2025"
     },
@@ -17054,7 +16856,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
         "agreed": true,
         "agreedAt": "2026-02-16T11:00:00Z",
         "adviserRef": {
-          "id": "adviser-789",
+          "id": 789,
           "name": "Jane Doe"
         }
       }
@@ -17074,14 +16876,12 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 
   "createdAt": "2026-02-16T14:30:00Z",
   "updatedAt": "2026-02-16T15:45:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/factfind-456" },
-    "complete": { "href": "/api/v2/factfinds/factfind-456/complete", "method": "POST" },
-    "summary": { "href": "/api/v2/factfinds/factfind-456/summary" },
-    "employment": { "href": "/api/v2/factfinds/factfind-456/employment" },
-    "income": { "href": "/api/v2/factfinds/factfind-456/income" },
-    "expenditure": { "href": "/api/v2/factfinds/factfind-456/expenditure" },
-    "affordability": { "href": "/api/v2/factfinds/factfind-456/affordability" }
+    "complete": { "href": "/api/v2/factfinds/456/complete", "method": "POST" },
+    "summary": { "href": "/api/v2/factfinds/456/summary" },
+    "employment": { "href": "/api/v2/factfinds/456/employment" },
+    "income": { "href": "/api/v2/factfinds/456/income" },
+    "expenditure": { "href": "/api/v2/factfinds/456/expenditure" },
+    "affordability": { "href": "/api/v2/factfinds/456/affordability" }
   }
 }
 ```
@@ -17113,9 +16913,9 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 **Creating a FactFind (POST /api/v2/factfinds):**
 ```json
 {
-  "clientRef": { "id": "client-123" },
-  "jointClientRef": { "id": "client-124" },
-  "adviserRef": { "id": "adviser-789" },
+  "clientRef": { "id": 123 },
+  "jointClientRef": { "id": 124 },
+  "adviserRef": { "id": 789 },
   "meetingDetails": {
     "meetingDate": "2026-02-16",
     "meetingType": "INIT",
@@ -17488,16 +17288,16 @@ The `Address` contract represents a client's address with additional metadata fo
 
 ```json
 {
-  "id": "address-789",
+  "id": 789,
   "factFindRef": {
-    "id": "factfind-456",
-    "href": "/api/v2/factfinds/factfind-456",
+    "id": 456,
+    "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -17545,23 +17345,23 @@ The `Income` contract represents an income source within a FactFind.
 
 ```json
 {
-  "id": "income-101",
+  "id": 101,
   "factFindRef": {
-    "id": "factfind-456",
-    "href": "/api/v2/factfinds/factfind-456",
+    "id": 456,
+    "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF001234",
     "status": "InProgress"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "employmentRef": {
-    "id": "employment-222",
-    "href": "/api/v2/employments/employment-222",
+    "id": 222,
+    "href": "/api/v2/employments/222",
     "employerName": "Tech Corp Ltd",
     "status": "Current"
   },
@@ -17921,10 +17721,10 @@ The `Arrangement` contract represents financial products (pensions, investments,
 
 ```json
 {
-  "id": "arrangement-555",
+  "id": 555,
   "factFindRef": {
-    "id": "factfind-456",
-    "href": "/api/v2/factfinds/factfind-456",
+    "id": 456,
+    "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
@@ -17933,23 +17733,23 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "pensionType": "PERSONAL_PENSION",
   "clientOwners": [
     {
-      "id": "client-123",
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+      "id": 123,
+      "href": "/api/v2/factfinds/{factfindId}/clients/123",
       "name": "John Smith",
       "clientNumber": "C00001234",
       "type": "Person"
     }
   ],
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
   "productName": "ABC SIPP",
   "providerRef": {
-    "id": "provider-456",
-    "href": "/api/v2/providers/provider-456",
+    "id": 456,
+    "href": "/api/v2/providers/456",
     "name": "ABC Pension Provider Ltd",
     "frnNumber": "123456"
   },
@@ -17996,11 +17796,9 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "isSalarySacrifice": false,
   "notes": "Consolidated from previous workplace pensions",
   "createdAt": "2015-01-01T10:00:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z",
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-555" },
-    "contributions": { "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-555/contributions" },
-    "valuations": { "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-555/valuations" }
+  "updatedAt": "2026-02-16T14:30:00Z"/arrangements/555" },
+    "contributions": { "href": "/api/v2/factfinds/{factfindId}/arrangements/555/contributions" },
+    "valuations": { "href": "/api/v2/factfinds/{factfindId}/arrangements/555/valuations" }
   }
 }
 ```
@@ -18029,16 +17827,16 @@ The `Goal` contract represents a client's financial goal.
 
 ```json
 {
-  "id": "goal-888",
+  "id": 888,
   "factFindRef": {
-    "id": "factfind-456",
-    "href": "/api/v2/factfinds/factfind-456",
+    "id": 456,
+    "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -18116,23 +17914,23 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 
 ```json
 {
-  "id": "riskprofile-999",
+  "id": 999,
   "factFindRef": {
-    "id": "factfind-456",
-    "href": "/api/v2/factfinds/factfind-456",
+    "id": 456,
+    "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -18192,17 +17990,17 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 
 ```json
 {
-  "id": "investment-789",
-  "arrangementId": "arrangement-456",
+  "id": 789,
+  "arrangementId": 456,
   "factFindRef": {
-    "id": "factfind-123",
-    "href": "/api/v2/factfinds/factfind-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -18754,8 +18552,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "isAdvised": true,
   "adviceType": "ONGOING",
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -18764,7 +18562,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "notes": "Client prefers sustainable investing, ESG funds where possible",
   "documents": [
     {
-      "documentId": "doc-001",
+      "documentId": 1,
       "type": "STATEMENT",
       "name": "ISA Annual Statement 2025",
       "date": "2025-12-31",
@@ -18774,26 +18572,24 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "createdAt": "2020-04-06T10:00:00Z",
   "updatedAt": "2026-02-16T16:30:00Z",
   "createdBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
   },
   "updatedBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
   },
-  "_links": {
-    "self": { "href": "/api/v2/investments/investment-789" },
-    "update": { "href": "/api/v2/investments/investment-789", "method": "PUT" },
-    "delete": { "href": "/api/v2/investments/investment-789", "method": "DELETE" },
-    "arrangement": { "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-456" },
-    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
-    "holdings": { "href": "/api/v2/investments/investment-789/holdings" },
-    "contributions": { "href": "/api/v2/investments/investment-789/contributions" },
-    "withdrawals": { "href": "/api/v2/investments/investment-789/withdrawals" },
-    "transactions": { "href": "/api/v2/investments/investment-789/transactions" },
-    "documents": { "href": "/api/v2/investments/investment-789/documents" },
-    "performance": { "href": "/api/v2/investments/investment-789/performance" }
+    "update": { "href": "/api/v2/investments/789", "method": "PUT" },
+    "delete": { "href": "/api/v2/investments/789", "method": "DELETE" },
+    "arrangement": { "href": "/api/v2/factfinds/{factfindId}/arrangements/456" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
+    "factfind": { "href": "/api/v2/factfinds/123" },
+    "holdings": { "href": "/api/v2/investments/789/holdings" },
+    "contributions": { "href": "/api/v2/investments/789/contributions" },
+    "withdrawals": { "href": "/api/v2/investments/789/withdrawals" },
+    "transactions": { "href": "/api/v2/investments/789/transactions" },
+    "documents": { "href": "/api/v2/investments/789/documents" },
+    "performance": { "href": "/api/v2/investments/789/performance" }
   }
 }
 ```
@@ -18875,9 +18671,9 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 **Creating an Investment ISA (POST /api/v2/investments):**
 ```json
 {
-  "arrangementId": "arrangement-456",
-  "factFindRef": { "id": "factfind-123" },
-  "clientRef": { "id": "client-123" },
+  "arrangementId": 456,
+  "factFindRef": { "id": 123 },
+  "clientRef": { "id": 123 },
   "arrangementCategory": "INVESTMENT",
   "provider": "VANGUARD",
   "policyNumber": "ISA-987654321",
@@ -18948,10 +18744,10 @@ The `Property` contract represents a property asset with valuation tracking, mor
 
 ```json
 {
-  "id": "property-456",
+  "id": 456,
   "factFindRef": {
-    "id": "factfind-123",
-    "href": "/api/v2/factfinds/factfind-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
@@ -19074,8 +18870,8 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "owners": [
     {
       "clientRef": {
-        "id": "client-123",
-        "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+        "id": 123,
+        "href": "/api/v2/factfinds/{factfindId}/clients/123",
         "name": "John Smith",
         "clientNumber": "C00001234",
         "type": "Person"
@@ -19131,8 +18927,8 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "mortgages": [
     {
       "mortgageRef": {
-        "id": "mortgage-789",
-        "href": "/api/v2/factfinds/{factfindId}/arrangements/mortgage-789",
+        "id": 789,
+        "href": "/api/v2/factfinds/{factfindId}/arrangements/789",
         "arrangementType": "Mortgage",
         "provider": "Nationwide Building Society",
         "policyNumber": "MTG-987654321"
@@ -19548,7 +19344,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "notes": "Well-maintained property in popular riverside development. Excellent rental demand in area.",
   "documents": [
     {
-      "documentId": "doc-prop-001",
+      "documentId": 1,
       "type": "VALUATION",
       "name": "Desktop Valuation February 2026",
       "date": "2026-02-10",
@@ -19558,24 +19354,22 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "createdAt": "2018-06-15T10:00:00Z",
   "updatedAt": "2026-02-16T14:30:00Z",
   "createdBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
   },
   "updatedBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
-  },
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456" },
-    "update": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456", "method": "PUT" },
-    "delete": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456", "method": "DELETE" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
-    "owners": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/owners" },
-    "mortgages": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/mortgages" },
-    "expenses": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/expenses" },
-    "rental": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/rental" },
-    "valuations": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/valuations" },
-    "documents": { "href": "/api/v2/factfinds/{factfindId}/assets/property-456/documents" }
+  }/assets/456" },
+    "update": { "href": "/api/v2/factfinds/{factfindId}/assets/456", "method": "PUT" },
+    "delete": { "href": "/api/v2/factfinds/{factfindId}/assets/456", "method": "DELETE" },
+    "factfind": { "href": "/api/v2/factfinds/123" },
+    "owners": { "href": "/api/v2/factfinds/{factfindId}/assets/456/owners" },
+    "mortgages": { "href": "/api/v2/factfinds/{factfindId}/assets/456/mortgages" },
+    "expenses": { "href": "/api/v2/factfinds/{factfindId}/assets/456/expenses" },
+    "rental": { "href": "/api/v2/factfinds/{factfindId}/assets/456/rental" },
+    "valuations": { "href": "/api/v2/factfinds/{factfindId}/assets/456/valuations" },
+    "documents": { "href": "/api/v2/factfinds/{factfindId}/assets/456/documents" }
   }
 }
 ```
@@ -19657,7 +19451,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
 **Creating a Buy-To-Let Property (POST /api/v2/factfinds/{factfindId}/assets):**
 ```json
 {
-  "factFindRef": { "id": "factfind-123" },
+  "factFindRef": { "id": 123 },
   "propertyType": "BTL",
   "address": {
     "line1": "Flat 12, Riverside Apartments",
@@ -19673,7 +19467,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "valuationType": "DESKTOP",
   "owners": [
     {
-      "clientRef": { "id": "client-123" },
+      "clientRef": { "id": 123 },
       "ownershipPercentage": 100.00,
       "isPrimaryOwner": true
     }
@@ -19685,7 +19479,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
 ```
 Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields. Returns complete contract.
 
-**Updating Property Valuation (PUT /api/v2/properties/property-456):**
+**Updating Property Valuation (PUT /api/v2/properties/456):**
 ```json
 {
   "currentValue": { "amount": 435000.00, "currency": { "code": "GBP" } },
@@ -19698,7 +19492,7 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields. 
 ```
 Server updates `updatedAt` and recalculates equity, LTV, capital growth. Returns complete contract.
 
-**Updating Rental Income (PATCH /api/v2/properties/property-456):**
+**Updating Rental Income (PATCH /api/v2/properties/456):**
 ```json
 {
   "rentalIncome": {
@@ -19734,16 +19528,16 @@ The `Equity` contract represents a direct stock holding with performance trackin
 
 ```json
 {
-  "id": "equity-321",
+  "id": 321,
   "factFindRef": {
-    "id": "factfind-123",
-    "href": "/api/v2/factfinds/factfind-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -20401,8 +20195,8 @@ The `Equity` contract represents a direct stock holding with performance trackin
   },
   "isAdvised": true,
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
@@ -20410,7 +20204,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
   "notes": "Core UK equity holding for dividend income. Monitor oil price exposure.",
   "documents": [
     {
-      "documentId": "doc-eq-001",
+      "documentId": 1,
       "type": "CONTRACT_NOTE",
       "name": "Purchase Contract Note - March 2021",
       "date": "2021-03-15",
@@ -20420,19 +20214,17 @@ The `Equity` contract represents a direct stock holding with performance trackin
   "createdAt": "2021-03-15T10:00:00Z",
   "updatedAt": "2026-02-16T16:30:00Z",
   "createdBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
   },
   "updatedBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
-  },
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321" },
+  }/assets/equity-321" },
     "update": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321", "method": "PUT" },
     "delete": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321", "method": "DELETE" },
-    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
+    "factfind": { "href": "/api/v2/factfinds/123" },
     "transactions": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321/transactions" },
     "dividends": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321/dividends" },
     "corporateActions": { "href": "/api/v2/factfinds/{factfindId}/assets/equity-321/corporate-actions" },
@@ -20486,8 +20278,8 @@ The `Equity` contract represents a direct stock holding with performance trackin
 **Creating an Equity Holding (POST /api/v2/factfinds/{factfindId}/assets):**
 ```json
 {
-  "factFindRef": { "id": "factfind-123" },
-  "clientRef": { "id": "client-123" },
+  "factFindRef": { "id": 123 },
+  "clientRef": { "id": 123 },
   "ticker": "BP.L",
   "isin": "GB0007980591",
   "sedol": "0798059",
@@ -20571,17 +20363,17 @@ The `IdentityVerification` contract represents identity verification status with
 
 ```json
 {
-  "id": "idverify-987",
+  "id": 987,
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "factFindRef": {
-    "id": "factfind-123",
-    "href": "/api/v2/factfinds/factfind-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
@@ -20594,7 +20386,7 @@ The `IdentityVerification` contract represents identity verification status with
   "daysUntilExpiry": 365,
   "documents": [
     {
-      "documentId": "doc-001",
+      "documentId": 1,
       "documentType": "PASSPORT",
       "documentNumber": "502135321",
       "issuingCountry": {
@@ -20611,7 +20403,7 @@ The `IdentityVerification` contract represents identity verification status with
       "isPrimary": true
     },
     {
-      "documentId": "doc-002",
+      "documentId": 2,
       "documentType": "UTILITY_BILL",
       "utilityType": "Electricity",
       "issueDate": "2026-01-15",
@@ -20798,7 +20590,7 @@ The `IdentityVerification` contract represents identity verification status with
   "nextReviewDate": "2027-02-10",
   "reviewFrequency": "ANNUAL",
   "verifiedBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe",
     "role": "Compliance Officer"
   },
@@ -20814,14 +20606,14 @@ The `IdentityVerification` contract represents identity verification status with
   "notes": "Enhanced verification completed successfully. All checks clear. High confidence biometric match. No adverse findings.",
   "documents": [
     {
-      "documentId": "doc-verify-001",
+      "documentId": 1,
       "type": "VERIFICATION_REPORT",
       "name": "Onfido Verification Report - Feb 2026",
       "date": "2026-02-10",
       "url": "/api/v2/documents/doc-verify-001"
     },
     {
-      "documentId": "doc-verify-002",
+      "documentId": 2,
       "type": "AML_REPORT",
       "name": "World-Check AML Report - Feb 2026",
       "date": "2026-02-10",
@@ -20831,19 +20623,17 @@ The `IdentityVerification` contract represents identity verification status with
   "createdAt": "2026-02-10T14:30:00Z",
   "updatedAt": "2026-02-10T15:00:00Z",
   "createdBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
   },
   "updatedBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
   },
-  "_links": {
-    "self": { "href": "/api/v2/identity-verification/idverify-987" },
     "update": { "href": "/api/v2/identity-verification/idverify-987", "method": "PUT" },
     "delete": { "href": "/api/v2/identity-verification/idverify-987", "method": "DELETE" },
-    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
+    "factfind": { "href": "/api/v2/factfinds/123" },
     "verificationReport": { "href": "/api/v2/documents/doc-verify-001" },
     "amlReport": { "href": "/api/v2/documents/doc-verify-002" },
     "history": { "href": "/api/v2/identity-verification/idverify-987/history" },
@@ -20899,8 +20689,8 @@ The `IdentityVerification` contract represents identity verification status with
 **Submitting Identity Verification (POST /api/v2/identity-verification):**
 ```json
 {
-  "clientRef": { "id": "client-123" },
-  "factFindRef": { "id": "factfind-123" },
+  "clientRef": { "id": 123 },
+  "factFindRef": { "id": 123 },
   "verificationType": "KYC_AML",
   "verificationLevel": "ENHANCED",
   "verificationStatus": "PENDING",
@@ -20920,7 +20710,7 @@ The `IdentityVerification` contract represents identity verification status with
   },
   "consentGiven": true,
   "consentDate": "2026-02-10T14:00:00Z",
-  "verifiedBy": { "id": "user-789" },
+  "verifiedBy": { "id": 789 },
   "verifiedAt": "2026-02-10T14:30:00Z"
 }
 ```
@@ -21000,17 +20790,17 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 
 ```json
 {
-  "id": "consent-555",
+  "id": 555,
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
   "factFindRef": {
-    "id": "factfind-123",
-    "href": "/api/v2/factfinds/factfind-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
@@ -21262,7 +21052,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   },
   "audit": {
     "consentRecordedBy": {
-      "id": "user-789",
+      "id": 789,
       "name": "Jane Doe",
       "role": "Financial Adviser"
     },
@@ -21307,14 +21097,14 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   "notes": "Initial consent obtained during client onboarding. Client fully informed of data processing activities and rights. Marketing consent given for email and post only.",
   "documents": [
     {
-      "documentId": "doc-consent-001",
+      "documentId": 1,
       "type": "CONSENT_FORM",
       "name": "Data Processing Consent Form - Signed",
       "date": "2026-02-10",
       "url": "/api/v2/documents/doc-consent-001"
     },
     {
-      "documentId": "doc-consent-002",
+      "documentId": 2,
       "type": "PRIVACY_NOTICE",
       "name": "Privacy Notice",
       "date": "2026-01-01",
@@ -21324,21 +21114,19 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
   "createdAt": "2026-02-10T14:00:00Z",
   "updatedAt": "2026-02-10T14:30:00Z",
   "createdBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
   },
   "updatedBy": {
-    "id": "user-789",
+    "id": 789,
     "name": "Jane Doe"
   },
-  "_links": {
-    "self": { "href": "/api/v2/consents/consent-555" },
     "update": { "href": "/api/v2/consents/consent-555", "method": "PUT" },
     "withdraw": { "href": "/api/v2/consents/consent-555/withdraw", "method": "POST" },
     "renew": { "href": "/api/v2/consents/consent-555/renew", "method": "POST" },
     "delete": { "href": "/api/v2/consents/consent-555", "method": "DELETE" },
-    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/client-123" },
-    "factfind": { "href": "/api/v2/factfinds/factfind-123" },
+    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
+    "factfind": { "href": "/api/v2/factfinds/123" },
     "consentForm": { "href": "/api/v2/documents/doc-consent-001" },
     "privacyNotice": { "href": "/api/v2/documents/doc-consent-002" },
     "evidence": { "href": "/api/v2/consent-evidence/consent-555" },
@@ -21395,8 +21183,8 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 **Recording Consent (POST /api/v2/consents):**
 ```json
 {
-  "clientRef": { "id": "client-123" },
-  "factFindRef": { "id": "factfind-123" },
+  "clientRef": { "id": 123 },
+  "factFindRef": { "id": 123 },
   "consentPurpose": "DATA_PROCESSING",
   "consentPurposeDescription": "Processing of personal and financial data for financial advice",
   "consentStatus": "GIVEN",
@@ -21426,7 +21214,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
     "rightsInformedDate": "2026-02-10T14:00:00Z"
   },
   "audit": {
-    "consentRecordedBy": { "id": "user-789" },
+    "consentRecordedBy": { "id": 789 },
     "consentRecordedAt": "2026-02-10T14:00:00Z",
     "ipAddress": "192.168.1.100"
   }
@@ -21498,9 +21286,7 @@ All list/collection endpoints use a standard wrapper contract:
     "totalPages": 5,
     "totalCount": 95,
     "hasMore": true
-  },
-  "_links": {
-    "first": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+  }/clients?page=1&pageSize=20" },
     "prev": null,
     "self": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
     "next": { "href": "/api/v2/factfinds/{factfindId}/clients?page=2&pageSize=20" },
@@ -22651,15 +22437,15 @@ Reference to a Client entity.
 **Minimal Contract (Required for Create/Update):**
 ```json
 {
-  "id": "client-123"
+  "id": 123
 }
 ```
 
 **Full Contract (Server Response):**
 ```json
 {
-  "id": "client-123",
-  "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+  "id": 123,
+  "href": "/api/v2/factfinds/{factfindId}/clients/123",
   "name": "John Michael Smith",
   "clientNumber": "C00001234",
   "type": "Person"
@@ -22670,7 +22456,7 @@ Reference to a Client entity.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique client identifier |
+| `id` | uuid | Yes | Unique client identifier (numeric) |
 | `href` | string | Yes (response) | URL to client resource |
 | `name` | string | Yes (response) | Full client name |
 | `clientNumber` | string | No | Business client number |
@@ -22680,8 +22466,8 @@ Reference to a Client entity.
 ```json
 {
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/{factfindId}/clients/client-123",
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
@@ -22696,8 +22482,8 @@ Reference to an Adviser entity.
 **Full Contract:**
 ```json
 {
-  "id": "adviser-789",
-  "href": "/api/v2/advisers/adviser-789",
+  "id": 789,
+  "href": "/api/v2/advisers/789",
   "name": "Sarah Johnson",
   "code": "ADV001"
 }
@@ -22707,7 +22493,7 @@ Reference to an Adviser entity.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique adviser identifier |
+| `id` | uuid | Yes | Unique adviser identifier (numeric) |
 | `href` | string | Yes (response) | URL to adviser resource |
 | `name` | string | Yes (response) | Adviser full name |
 | `code` | string | No | Adviser business code |
@@ -22716,8 +22502,8 @@ Reference to an Adviser entity.
 ```json
 {
   "adviserRef": {
-    "id": "adviser-789",
-    "href": "/api/v2/advisers/adviser-789",
+    "id": 789,
+    "href": "/api/v2/advisers/789",
     "name": "Sarah Johnson",
     "code": "ADV001"
   }
@@ -22731,8 +22517,8 @@ Reference to a financial product Provider entity.
 **Full Contract:**
 ```json
 {
-  "id": "provider-456",
-  "href": "/api/v2/providers/provider-456",
+  "id": 456,
+  "href": "/api/v2/providers/456",
   "name": "Aviva Life & Pensions UK Limited",
   "frnNumber": "185896"
 }
@@ -22742,7 +22528,7 @@ Reference to a financial product Provider entity.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique provider identifier |
+| `id` | uuid | Yes | Unique provider identifier (numeric) |
 | `href` | string | Yes (response) | URL to provider resource |
 | `name` | string | Yes (response) | Provider name |
 | `frnNumber` | string | No | FCA Firm Reference Number |
@@ -22751,8 +22537,8 @@ Reference to a financial product Provider entity.
 ```json
 {
   "providerRef": {
-    "id": "provider-456",
-    "href": "/api/v2/providers/provider-456",
+    "id": 456,
+    "href": "/api/v2/providers/456",
     "name": "Aviva",
     "frnNumber": "185896"
   }
@@ -22766,8 +22552,8 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 **Full Contract:**
 ```json
 {
-  "id": "arrangement-111",
-  "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-111",
+  "id": 111,
+  "href": "/api/v2/factfinds/{factfindId}/arrangements/111",
   "policyNumber": "POL123456",
   "productType": "Pension",
   "provider": "Aviva"
@@ -22778,7 +22564,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique arrangement identifier |
+| `id` | uuid | Yes | Unique arrangement identifier (numeric) |
 | `href` | string | Yes (response) | URL to arrangement resource |
 | `policyNumber` | string | No | Policy/plan number |
 | `productType` | string | Yes (response) | Product type (Pension, Investment, etc.) |
@@ -22788,8 +22574,8 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 ```json
 {
   "arrangementRef": {
-    "id": "arrangement-111",
-    "href": "/api/v2/factfinds/{factfindId}/arrangements/arrangement-111",
+    "id": 111,
+    "href": "/api/v2/factfinds/{factfindId}/arrangements/111",
     "policyNumber": "SIPP123456",
     "productType": "Pension",
     "provider": "Aviva"
@@ -22804,8 +22590,8 @@ Reference to an Employment entity.
 **Full Contract:**
 ```json
 {
-  "id": "employment-222",
-  "href": "/api/v2/employments/employment-222",
+  "id": 222,
+  "href": "/api/v2/employments/222",
   "employerName": "Acme Corporation Ltd",
   "status": "Current"
 }
@@ -22815,7 +22601,7 @@ Reference to an Employment entity.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique employment identifier |
+| `id` | uuid | Yes | Unique employment identifier (numeric) |
 | `href` | string | Yes (response) | URL to employment resource |
 | `employerName` | string | Yes (response) | Employer name |
 | `status` | enum | Yes (response) | Status: Current, Previous, Future |
@@ -22824,8 +22610,8 @@ Reference to an Employment entity.
 ```json
 {
   "employmentRef": {
-    "id": "employment-222",
-    "href": "/api/v2/employments/employment-222",
+    "id": 222,
+    "href": "/api/v2/employments/222",
     "employerName": "Acme Corp",
     "status": "Current"
   }
@@ -22839,8 +22625,8 @@ Reference to a Goal entity.
 **Full Contract:**
 ```json
 {
-  "id": "goal-333",
-  "href": "/api/v2/factfinds/{factfindId}/objectives/goal-333",
+  "id": 333,
+  "href": "/api/v2/factfinds/{factfindId}/objectives/333",
   "goalName": "Retirement at 65",
   "priority": "High"
 }
@@ -22850,7 +22636,7 @@ Reference to a Goal entity.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique goal identifier |
+| `id` | uuid | Yes | Unique goal identifier (numeric) |
 | `href` | string | Yes (response) | URL to goal resource |
 | `goalName` | string | Yes (response) | Goal name/description |
 | `priority` | enum | No | Priority: High, Medium, Low |
@@ -22859,8 +22645,8 @@ Reference to a Goal entity.
 ```json
 {
   "goalRef": {
-    "id": "goal-333",
-    "href": "/api/v2/factfinds/{factfindId}/objectives/goal-333",
+    "id": 333,
+    "href": "/api/v2/factfinds/{factfindId}/objectives/333",
     "goalName": "Retirement Planning",
     "priority": "High"
   }
@@ -22874,8 +22660,8 @@ Reference to a FactFind (ADVICE_CASE) entity.
 **Full Contract:**
 ```json
 {
-  "id": "factfind-444",
-  "href": "/api/v2/factfinds/factfind-444",
+  "id": 444,
+  "href": "/api/v2/factfinds/444",
   "factFindNumber": "FF001234",
   "status": "InProgress"
 }
@@ -22885,7 +22671,7 @@ Reference to a FactFind (ADVICE_CASE) entity.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | uuid | Yes | Unique fact find identifier |
+| `id` | uuid | Yes | Unique fact find identifier (numeric) |
 | `href` | string | Yes (response) | URL to fact find resource |
 | `factFindNumber` | string | No | Business fact find number |
 | `status` | enum | Yes (response) | Status: Draft, InProgress, Complete, Submitted |
@@ -22894,8 +22680,8 @@ Reference to a FactFind (ADVICE_CASE) entity.
 ```json
 {
   "factFindRef": {
-    "id": "factfind-444",
-    "href": "/api/v2/factfinds/factfind-444",
+    "id": 444,
+    "href": "/api/v2/factfinds/444",
     "factFindNumber": "FF001234",
     "status": "InProgress"
   }
@@ -22935,15 +22721,15 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
     "owners": [
       {
         "clientRef": {
-          "id": "client-123",
-          "href": "/api/v2/factfinds/679/clients/client-123"
+          "id": 123,
+          "href": "/api/v2/factfinds/679/clients/123"
         },
         "ownershipShare": 50.0
       },
       {
         "clientRef": {
-          "id": "client-124",
-          "href": "/api/v2/factfinds/679/clients/client-124"
+          "id": 124,
+          "href": "/api/v2/factfinds/679/clients/124"
         },
         "ownershipShare": 50.0
       }
@@ -22953,8 +22739,8 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
     "owners": [
       {
         "clientRef": {
-          "id": "client-123",
-          "href": "/api/v2/factfinds/679/clients/client-123"
+          "id": 123,
+          "href": "/api/v2/factfinds/679/clients/123"
         },
         "dividend": {
           "amount": 5000.00,
@@ -23123,8 +22909,8 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   },
   "owner": {
     "clientRef": {
-      "id": "client-123",
-      "href": "/api/v2/factfinds/679/clients/client-123",
+      "id": 123,
+      "href": "/api/v2/factfinds/679/clients/123",
       "name": "Bob Byblik"
     }
   },
@@ -23322,8 +23108,8 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   },
   "owner": {
     "clientRef": {
-      "id": "client-123",
-      "href": "/api/v2/factfinds/679/clients/client-123",
+      "id": 123,
+      "href": "/api/v2/factfinds/679/clients/123",
       "name": "Bob Byblik"
     }
   },
@@ -23383,8 +23169,8 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   },
   "owner": {
     "clientRef": {
-      "id": "client-123",
-      "href": "/api/v2/factfinds/679/clients/client-123",
+      "id": 123,
+      "href": "/api/v2/factfinds/679/clients/123",
       "name": "Bob Byblik"
     }
   },
@@ -23432,8 +23218,8 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   },
   "owner": {
     "clientRef": {
-      "id": "client-124",
-      "href": "/api/v2/factfinds/679/clients/client-124",
+      "id": 124,
+      "href": "/api/v2/factfinds/679/clients/124",
       "name": "Jane Byblik"
     }
   },
@@ -24070,8 +23856,8 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "category": "Housing",
   "amount": {
@@ -24126,8 +23912,8 @@ The `Expenditure` contract represents a client's actual expenditure aggregate, c
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "isDetailed": true,
   "totalMonthlyExpenditure": {
@@ -25040,12 +24826,12 @@ The `Notes` contract represents a note attached to a fact find entity using a un
   "isVisibleToClient": false,
   "isSystemGenerated": false,
   "createdBy": {
-    "id": "adviser-789",
+    "id": 789,
     "name": "Sarah Johnson"
   },
   "attachments": [
     {
-      "id": "att-111",
+      "id": 111,
       "filename": "valuation_report.pdf",
       "mimeType": "application/pdf",
       "sizeBytes": 524288,
@@ -25251,8 +25037,8 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "incomeRef": {
     "id": 890,
@@ -25370,8 +25156,8 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "expenseRef": {
     "id": 1001,
@@ -25476,14 +25262,14 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
   "clients": [
     {
       "clientRef": {
-        "id": "client-123",
-        "href": "/api/v2/factfinds/679/clients/client-123"
+        "id": 123,
+        "href": "/api/v2/factfinds/679/clients/123"
       }
     },
     {
       "clientRef": {
-        "id": "client-124",
-        "href": "/api/v2/factfinds/679/clients/client-124"
+        "id": 124,
+        "href": "/api/v2/factfinds/679/clients/124"
       }
     }
   ],
@@ -25683,14 +25469,14 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 ```json
 {
   "id": 2222,
-  "href": "/api/v2/factfinds/679/clients/client-123/contacts/2222",
+  "href": "/api/v2/factfinds/679/clients/123/contacts/2222",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "contactType": "EMAIL",
   "value": "john.smith@example.com",
@@ -25759,14 +25545,14 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 ```json
 {
   "id": 3333,
-  "href": "/api/v2/factfinds/679/clients/client-123/attitude-to-risk/3333",
+  "href": "/api/v2/factfinds/679/clients/123/attitude-to-risk/3333",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "assessmentDate": "2026-02-10",
   "assessmentMethod": "QUESTIONNAIRE",
@@ -25880,14 +25666,14 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 ```json
 {
   "id": 4444,
-  "href": "/api/v2/factfinds/679/clients/client-123/professional-contacts/4444",
+  "href": "/api/v2/factfinds/679/clients/123/professional-contacts/4444",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "professionalType": "SOLICITOR",
   "title": "Mr",
@@ -25950,14 +25736,14 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 ```json
 {
   "id": 5555,
-  "href": "/api/v2/factfinds/679/clients/client-123/vulnerabilities/5555",
+  "href": "/api/v2/factfinds/679/clients/123/vulnerabilities/5555",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "hasVulnerabilities": true,
   "identifiedDate": "2026-01-15",
@@ -26057,14 +25843,14 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 ```json
 {
   "id": 6666,
-  "href": "/api/v2/factfinds/679/clients/client-123/marketing-preferences/6666",
+  "href": "/api/v2/factfinds/679/clients/123/marketing-preferences/6666",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "lastUpdated": "2026-01-15",
   "overallConsent": true,
@@ -26142,14 +25928,14 @@ The `Will` contract represents a client's last will and testament details.
 ```json
 {
   "id": 7777,
-  "href": "/api/v2/factfinds/679/clients/client-123/estate-planning/wills/7777",
+  "href": "/api/v2/factfinds/679/clients/123/estate-planning/wills/7777",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "hasWill": true,
   "willDate": "2023-06-15",
@@ -26158,8 +25944,8 @@ The `Will` contract represents a client's last will and testament details.
   "willType": "MIRROR_WILL",
   "isMirrorWill": true,
   "mirrorWillClientRef": {
-    "id": "client-124",
-    "href": "/api/v2/factfinds/679/clients/client-124"
+    "id": 124,
+    "href": "/api/v2/factfinds/679/clients/124"
   },
   "executors": [
     {
@@ -26228,14 +26014,14 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 ```json
 {
   "id": 8888,
-  "href": "/api/v2/factfinds/679/clients/client-123/estate-planning/lpas/8888",
+  "href": "/api/v2/factfinds/679/clients/123/estate-planning/lpas/8888",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "hasLPA": true,
   "lpaType": "PROPERTY_FINANCIAL",
@@ -26320,14 +26106,14 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 ```json
 {
   "id": 9999,
-  "href": "/api/v2/factfinds/679/clients/client-123/estate-planning/gifts/9999",
+  "href": "/api/v2/factfinds/679/clients/123/estate-planning/gifts/9999",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "giftDate": "2024-12-25",
   "giftType": "POTENTIALLY_EXEMPT_TRANSFER",
@@ -26425,14 +26211,14 @@ The `Trust` contract represents trusts established by or benefiting the client.
 ```json
 {
   "id": 10001,
-  "href": "/api/v2/factfinds/679/clients/client-123/estate-planning/trusts/10001",
+  "href": "/api/v2/factfinds/679/clients/123/estate-planning/trusts/10001",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "trustName": "The Smith Family Discretionary Trust",
   "trustType": "DISCRETIONARY_TRUST",
@@ -26542,14 +26328,14 @@ The `IdentityVerification` contract represents identity verification checks and 
 ```json
 {
   "id": 11111,
-  "href": "/api/v2/factfinds/679/clients/client-123/identity-verification/11111",
+  "href": "/api/v2/factfinds/679/clients/123/identity-verification/11111",
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "verificationDate": "2026-01-05",
   "verificationMethod": "ELECTRONIC_VERIFICATION",
@@ -27310,12 +27096,12 @@ The `InvestmentArrangement` contract represents investment products including GI
   "productName": "Vanguard Investment Account",
   "providerName": "Vanguard",
   "providerRef": {
-    "id": "provider-456",
-    "href": "/api/v2/providers/provider-456"
+    "id": 456,
+    "href": "/api/v2/providers/456"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "accountNumber": "GIA-987654321",
   "startDate": "2020-03-15",
@@ -27413,7 +27199,7 @@ The `InvestmentArrangement` contract represents investment products including GI
     "targetRiskLevel": 6,
     "atrRef": {
       "id": 3333,
-      "href": "/api/v2/factfinds/679/clients/client-123/attitude-to-risk/3333"
+      "href": "/api/v2/factfinds/679/clients/123/attitude-to-risk/3333"
     }
   },
   "taxWrapper": "TAXABLE",
@@ -27484,12 +27270,12 @@ The `ProtectionArrangement` contract represents protection products including Li
   "productName": "Mortgage Protection Plan",
   "providerName": "Aviva",
   "providerRef": {
-    "id": "provider-789",
-    "href": "/api/v2/providers/provider-789"
+    "id": 789,
+    "href": "/api/v2/providers/789"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "policyNumber": "LA-12345678",
   "startDate": "2023-01-15",
@@ -27623,12 +27409,12 @@ The `PensionArrangement` contract represents pension products including Personal
   "productName": "Vanguard Personal Pension",
   "providerName": "Vanguard",
   "providerRef": {
-    "id": "provider-456",
-    "href": "/api/v2/providers/provider-456"
+    "id": 456,
+    "href": "/api/v2/providers/456"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "policyNumber": "PP-123456789",
   "startDate": "2010-04-06",
@@ -27869,12 +27655,12 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
   "productName": "Self-Invested Personal Pension",
   "providerName": "Hargreaves Lansdown",
   "providerRef": {
-    "id": "provider-789",
-    "href": "/api/v2/providers/provider-789"
+    "id": 789,
+    "href": "/api/v2/providers/789"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "policyNumber": "SIPP-987654321",
   "startDate": "2015-06-01",
@@ -28251,12 +28037,12 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
   "productName": "ABC Corporation Pension Scheme",
   "providerName": "ABC Corporation",
   "providerRef": {
-    "id": "provider-999",
-    "href": "/api/v2/providers/provider-999"
+    "id": 999,
+    "href": "/api/v2/providers/999"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "policyNumber": "DB-1234567",
   "membershipNumber": "MEM-987654",
@@ -28618,12 +28404,12 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
   "productName": "XYZ Corporation Group Money Purchase Scheme",
   "providerName": "Scottish Widows",
   "providerRef": {
-    "id": "provider-555",
-    "href": "/api/v2/providers/provider-555"
+    "id": 555,
+    "href": "/api/v2/providers/555"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "policyNumber": "DC-GRP-789456",
   "membershipNumber": "MEM-456789",
@@ -28976,8 +28762,8 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
   "productName": "UK State Pension",
   "providerName": "Department for Work and Pensions (DWP)",
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "nationalInsuranceNumber": "AB123456C",
   "statePensionType": "NEW_STATE_PENSION",
@@ -29304,12 +29090,12 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
   "productName": "Standard Life Stakeholder Pension",
   "providerName": "Standard Life",
   "providerRef": {
-    "id": "provider-333",
-    "href": "/api/v2/providers/provider-333"
+    "id": 333,
+    "href": "/api/v2/providers/333"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "policyNumber": "SHP-456789123",
   "startDate": "2016-09-01",
@@ -29581,12 +29367,12 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
   "productName": "Aviva Group Personal Pension",
   "providerName": "Aviva",
   "providerRef": {
-    "id": "provider-777",
-    "href": "/api/v2/providers/provider-777"
+    "id": 777,
+    "href": "/api/v2/providers/777"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "policyNumber": "GPP-789456123",
   "membershipNumber": "MEM-654321",
@@ -29958,12 +29744,12 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
   "productName": "Quilter Executive Pension Plan",
   "providerName": "Quilter",
   "providerRef": {
-    "id": "provider-888",
-    "href": "/api/v2/providers/provider-888"
+    "id": 888,
+    "href": "/api/v2/providers/888"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "policyNumber": "EPP-987654321",
   "membershipNumber": "EXEC-123456",
@@ -30439,12 +30225,12 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
   "productName": "Vanguard Stocks & Shares ISA",
   "providerName": "Vanguard",
   "providerRef": {
-    "id": "provider-456",
-    "href": "/api/v2/providers/provider-456"
+    "id": 456,
+    "href": "/api/v2/providers/456"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "accountNumber": "ISA-123456789",
   "startDate": "2015-04-06",
@@ -30710,7 +30496,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
     "targetRiskLevel": 6,
     "atrRef": {
       "id": 3333,
-      "href": "/api/v2/factfinds/679/clients/client-123/attitude-to-risk/3333"
+      "href": "/api/v2/factfinds/679/clients/123/attitude-to-risk/3333"
     }
   },
   "taxWrapper": "ISA",
@@ -30829,12 +30615,12 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
   "productName": "Premium Cash ISA",
   "providerName": "Nationwide Building Society",
   "providerRef": {
-    "id": "provider-111",
-    "href": "/api/v2/providers/provider-111"
+    "id": 111,
+    "href": "/api/v2/providers/111"
   },
   "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+    "id": 123,
+    "href": "/api/v2/factfinds/679/clients/123"
   },
   "accountNumber": "CISA-987654321",
   "startDate": "2024-04-06",
@@ -31074,12 +30860,12 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
   "productName": "Moneybox Lifetime ISA",
   "providerName": "Moneybox",
   "providerRef": {
-    "id": "provider-222",
-    "href": "/api/v2/providers/provider-222"
+    "id": 222,
+    "href": "/api/v2/providers/222"
   },
   "clientRef": {
-    "id": "client-456",
-    "href": "/api/v2/factfinds/679/clients/client-456"
+    "id": 456,
+    "href": "/api/v2/factfinds/679/clients/456"
   },
   "accountNumber": "LISA-456789123",
   "startDate": "2022-04-06",
@@ -31416,7 +31202,7 @@ The `OnshoreInvestmentBondArrangement` contract represents onshore investment bo
   "investmentType": "INVESTMENT_BOND_ONSHORE",
   "productName": "Prudential International Investment Bond",
   "providerName": "Prudential",
-  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "BOND-123456789",
   "startDate": "2018-03-15",
   "currentValue": {"amount": 285000.00, "currency": {"code": "GBP", "symbol": "£"}},
@@ -31512,7 +31298,7 @@ The `OffshoreInvestmentBondArrangement` contract represents offshore investment 
   "productName": "RL360 Quantum Reserve",
   "providerName": "RL360",
   "jurisdiction": "ISLE_OF_MAN",
-  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "OFF-BOND-987654",
   "startDate": "2015-06-01",
   "bondCurrency": "USD",
@@ -31590,7 +31376,7 @@ The `SavingsAccountArrangement` contract represents savings accounts, fixed-term
   "savingsAccountType": "FIXED_TERM_DEPOSIT",
   "productName": "2 Year Fixed Rate Bond",
   "providerName": "Coventry Building Society",
-  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "accountNumber": "SAV-445566778",
   "startDate": "2024-06-01",
   "maturityDate": "2026-06-01",
@@ -31666,7 +31452,7 @@ The `CriticalIllnessCoverArrangement` contract represents critical illness insur
   "policyType": "STANDALONE_CRITICAL_ILLNESS",
   "productName": "Vitality Serious Illness Cover",
   "providerName": "Vitality",
-  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "CIC-789456123",
   "startDate": "2023-01-15",
   "endDate": "2048-01-15",
@@ -31760,7 +31546,7 @@ The `IncomeProtectionArrangement` contract represents income protection insuranc
   "protectionType": "INCOME_PROTECTION",
   "productName": "Income Protection Plus",
   "providerName": "Legal & General",
-  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "IP-456789123",
   "startDate": "2023-06-01",
   "policyEndAge": 65,
@@ -31850,7 +31636,7 @@ The `BuildingsInsuranceArrangement` contract represents buildings insurance for 
   "protectionType": "BUILDINGS_INSURANCE",
   "productName": "Premier Home Insurance - Buildings",
   "providerName": "Aviva",
-  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "BLDG-123456789",
   "startDate": "2023-04-01",
   "renewalDate": "2026-04-01",
@@ -31926,7 +31712,7 @@ The `ContentsInsuranceArrangement` contract represents contents insurance for po
   "protectionType": "CONTENTS_INSURANCE",
   "productName": "Premier Home Insurance - Contents",
   "providerName": "Aviva",
-  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "CONT-987654321",
   "startDate": "2023-04-01",
   "renewalDate": "2026-04-01",
@@ -31986,7 +31772,7 @@ The `PrivateMedicalInsuranceArrangement` contract represents private medical ins
   "policyType": "CORPORATE_PMI",
   "productName": "Company Health Insurance",
   "providerName": "Bupa",
-  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "PMI-445566778",
   "startDate": "2023-01-01",
   "renewalDate": "2026-01-01",

@@ -117,7 +117,7 @@ Represents an individual person, company, or trust that receives financial advic
 | estatePlanning | Complex Data | Will, power of attorney, gifts, trusts, and inheritance tax planning | Complex object |
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | financialProfile | Complex Data | Summary of income, assets, liabilities, and net worth | Complex object |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | identityVerification | Complex Data | Identity verification, KYC, AML checks, and compliance status | Complex object |
 | isHeadOfFamilyGroup | Yes/No | Whether this client is the primary contact for the family group | Yes |
 | isJoint | Yes/No | Whether this client is part of a joint (couple) fact find | Yes |
@@ -141,14 +141,14 @@ Represents an individual person, company, or trust that receives financial advic
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | code | Text | Standard Occupational Classification (SOC) code | ADV001 |
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 **createdBy:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 **dataProtection:**
@@ -298,7 +298,7 @@ Represents an individual person, company, or trust that receives financial advic
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-456 |
+| id | Number | Unique system identifier for this record | 2405 |
 | status | Text | Current status of the goal | INP |
 
 **financialProfile:**
@@ -353,7 +353,7 @@ Represents an individual person, company, or trust that receives financial advic
 | adverseMediaChecked | Yes/No |  | Yes |
 | adverseMediaMatches | Number |  | 0 |
 | checkPerformedBy | Complex Data |  | Complex object |
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 | isPep | Yes/No |  | No |
 | lastCheckDate | Date |  | 2020-01-15 |
@@ -397,7 +397,7 @@ Represents an individual person, company, or trust that receives financial advic
 | verificationMethod | Text |  | Electronic |
 | verificationStatus | Text | Current status of the goal | Verified |
 | verifiedBy | Complex Data |  | Complex object |
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 **marketingPreferences:**
@@ -462,7 +462,7 @@ Represents an individual person, company, or trust that receives financial advic
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | code | Text | Standard Occupational Classification (SOC) code | LON |
-| id | Text | Unique system identifier for this record | office-1 |
+| id | Number | Unique system identifier for this record | 3797 |
 | name | Text | First name (given name) | London Office |
 
 **paraplannerRef:**
@@ -470,7 +470,7 @@ Represents an individual person, company, or trust that receives financial advic
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | code | Text | Standard Occupational Classification (SOC) code | PP001 |
-| id | Text | Unique system identifier for this record | adviser-790 |
+| id | Number | Unique system identifier for this record | 8082 |
 | name | Text | First name (given name) | Tom Johnson |
 
 **personValue:**
@@ -514,7 +514,7 @@ Represents an individual person, company, or trust that receives financial advic
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001235 |
-| id | Text | Unique system identifier for this record | client-124 |
+| id | Number | Unique system identifier for this record | 912 |
 | name | Text | First name (given name) | Sarah Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -548,7 +548,7 @@ Represents an individual person, company, or trust that receives financial advic
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 ---
@@ -613,7 +613,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 | customQuestions | List of Complex Data |  | List with 1 item(s) |
 | factFindNumber | Text |  | FF001234 |
 | financialSummary | Complex Data |  | Complex object |
-| id | Text | Unique system identifier for this record | factfind-456 |
+| id | Number | Unique system identifier for this record | 2405 |
 | investmentCapacity | Complex Data | City/town | Complex object |
 | jointClientRef | Reference Link |  | Complex object |
 | meetingDetails | Complex Data |  | Complex object |
@@ -627,7 +627,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | code | Text | Standard Occupational Classification (SOC) code | ADV001 |
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 **assetHoldings:**
@@ -685,7 +685,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 | generated | List of Complex Data |  | List with 3 item(s) |
 | supplementaryQuestions | List |  | Empty list |
 | templateRef | Complex Data |  | Complex object |
-| id | Text | Unique system identifier for this record | atr-template-v5 |
+| id | Number | Unique system identifier for this record | 483 |
 | name | Text | First name (given name) | FCA Standard ATR 2025 |
 | version | Text |  | 5.0 |
 
@@ -694,7 +694,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -783,7 +783,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001235 |
-| id | Text | Unique system identifier for this record | client-124 |
+| id | Number | Unique system identifier for this record | 912 |
 | name | Text | First name (given name) | Sarah Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -842,7 +842,7 @@ The `Address` contract represents a client's address with additional metadata fo
 | clientRef | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2020-01-15T10:30:00Z |
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Text | Unique system identifier for this record | address-789 |
+| id | Number | Unique system identifier for this record | 1392 |
 | isCorrespondenceAddress | Yes/No |  | Yes |
 | isOnElectoralRoll | Yes/No |  | Yes |
 | residencyPeriod | Complex Data | Unique system identifier for this record | Complex object |
@@ -867,7 +867,7 @@ The `Address` contract represents a client's address with additional metadata fo
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -876,7 +876,7 @@ The `Address` contract represents a client's address with additional metadata fo
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-456 |
+| id | Number | Unique system identifier for this record | 2405 |
 | status | Text | Current status of the goal | INP |
 
 **residencyPeriod:**
@@ -905,7 +905,7 @@ The `Income` contract represents an income source within a FactFind.
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | frequency | Selection | How often (Monthly, Annual, etc.) | Complex object |
 | grossAmount | Currency Amount | Amount spent | Complex object |
-| id | Text | Unique system identifier for this record | income-101 |
+| id | Number | Unique system identifier for this record | 5156 |
 | incomePeriod | Complex Data |  | Complex object |
 | incomeType | Text |  | Employment |
 | isTaxable | Yes/No | Is this income taxable? Some income like Child Benefit or ISA interest may be tax-free. | Yes |
@@ -926,7 +926,7 @@ The `Income` contract represents an income source within a FactFind.
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -935,7 +935,7 @@ The `Income` contract represents an income source within a FactFind.
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | employerName | Text | Name of the employer | Tech Corp Ltd |
-| id | Text | Unique system identifier for this record | employment-222 |
+| id | Number | Unique system identifier for this record | 8695 |
 | status | Text | Current status of the goal | Current |
 
 **factFindRef:**
@@ -943,7 +943,7 @@ The `Income` contract represents an income source within a FactFind.
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF001234 |
-| id | Text | Unique system identifier for this record | factfind-456 |
+| id | Number | Unique system identifier for this record | 2405 |
 | status | Text | Current status of the goal | InProgress |
 
 **frequency:**
@@ -1077,7 +1077,7 @@ Represents any financial product or arrangement including pensions, investments,
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | hasGuaranteedAnnuityRate | Yes/No |  | No |
 | hasProtectedTaxFreeAmount | Yes/No | Amount spent | No |
-| id | Text | Unique system identifier for this record | arrangement-555 |
+| id | Number | Unique system identifier for this record | 2348 |
 | isInDrawdown | Yes/No |  | No |
 | isSalarySacrifice | Yes/No | Annual salary | No |
 | notes | Text |  | Consolidated from previous workplace pensions |
@@ -1098,7 +1098,7 @@ Represents any financial product or arrangement including pensions, investments,
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | code | Text | Standard Occupational Classification (SOC) code | ADV001 |
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 **arrangementPeriod:**
@@ -1131,7 +1131,7 @@ Represents any financial product or arrangement including pensions, investments,
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-456 |
+| id | Number | Unique system identifier for this record | 2405 |
 | status | Text | Current status of the goal | INP |
 
 **projectedValueAtRetirement:**
@@ -1149,7 +1149,7 @@ Represents any financial product or arrangement including pensions, investments,
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | frnNumber | Text |  | 123456 |
-| id | Text | Unique system identifier for this record | provider-456 |
+| id | Number | Unique system identifier for this record | 577 |
 | name | Text | First name (given name) | ABC Pension Provider Ltd |
 
 **regularContribution:**
@@ -1214,7 +1214,7 @@ Represents a financial goal or objective that the client wants to achieve, such 
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | goalName | Text |  | Comfortable retirement at age 65 |
 | goalType | Text | Type of goal (Retirement, Education, Property Purchase, etc.) | Retirement |
-| id | Text | Unique system identifier for this record | goal-888 |
+| id | Number | Unique system identifier for this record | 9019 |
 | isAchievable | Yes/No |  | No |
 | monthlyContribution | Currency Amount |  | Complex object |
 | notes | Text |  | May need to increase contributions or adjust targe... |
@@ -1233,7 +1233,7 @@ Represents a financial goal or objective that the client wants to achieve, such 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -1252,7 +1252,7 @@ Represents a financial goal or objective that the client wants to achieve, such 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-456 |
+| id | Number | Unique system identifier for this record | 2405 |
 | status | Text | Current status of the goal | INP |
 
 **monthlyContribution:**
@@ -1327,7 +1327,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 | createdAt | Date | When this record was created in the system | 2026-02-16T14:30:00Z |
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | hasInvestedBefore | Yes/No |  | Yes |
-| id | Text | Unique system identifier for this record | riskprofile-999 |
+| id | Number | Unique system identifier for this record | riskprofile-999 |
 | investmentExperience | Text |  | Moderate |
 | isValid | Yes/No | Unique system identifier for this record | Yes |
 | notes | Text |  | Client understands market volatility but nervous a... |
@@ -1348,7 +1348,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | code | Text | Standard Occupational Classification (SOC) code | ADV001 |
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 **clientRef:**
@@ -1356,7 +1356,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -1365,7 +1365,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-456 |
+| id | Number | Unique system identifier for this record | 2405 |
 | status | Text | Current status of the goal | INP |
 
 ---
@@ -1400,7 +1400,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | geographicAllocation | Complex Data |  | Complex object |
 | holdings | List of Complex Data |  | List with 4 item(s) |
-| id | Text | Unique system identifier for this record | investment-789 |
+| id | Number | Unique system identifier for this record | 9140 |
 | inceptionDate | Date |  | 2020-04-06 |
 | investmentObjective | Text |  | Long-term capital growth with moderate risk exposu... |
 | investmentType | Text |  | STOCKS_SHARES_ISA |
@@ -1453,7 +1453,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | code | Text | Standard Occupational Classification (SOC) code | ADV001 |
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 **annualIsaAllowance:**
@@ -1516,7 +1516,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -1534,7 +1534,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 **currentValue:**
@@ -1552,7 +1552,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-123 |
+| id | Number | Unique system identifier for this record | 4066 |
 | status | Text | Current status of the goal | INP |
 
 **geographicAllocation:**
@@ -1739,7 +1739,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 ---
@@ -1783,7 +1783,7 @@ Represents a property owned or partially owned by the client, including resident
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | floorArea | Complex Data |  | Complex object |
 | groundRent | Currency Amount |  | Complex object |
-| id | Text | Unique system identifier for this record | property-456 |
+| id | Number | Unique system identifier for this record | 5754 |
 | improvements | List of Complex Data |  | List with 2 item(s) |
 | intendToRefinance | Yes/No |  | No |
 | intendToSell | Yes/No |  | No |
@@ -1876,7 +1876,7 @@ Represents a property owned or partially owned by the client, including resident
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 **currentValue:**
@@ -1913,7 +1913,7 @@ Represents a property owned or partially owned by the client, including resident
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-123 |
+| id | Number | Unique system identifier for this record | 4066 |
 | status | Text | Current status of the goal | INP |
 
 **floorArea:**
@@ -2162,7 +2162,7 @@ Represents a property owned or partially owned by the client, including resident
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 **valuationChange:**
@@ -2224,7 +2224,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | exchange | Selection |  | Complex object |
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | holdings | Complex Data |  | Complex object |
-| id | Text | Unique system identifier for this record | equity-321 |
+| id | Number | Unique system identifier for this record | equity-321 |
 | industry | Text |  | Integrated Oil & Gas |
 | investmentObjective | Text |  | Long-term income and capital growth from UK blue-c... |
 | isAdvised | Yes/No |  | Yes |
@@ -2248,7 +2248,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | code | Text | Standard Occupational Classification (SOC) code | ADV001 |
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
 **broker:**
@@ -2263,7 +2263,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -2279,7 +2279,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 **currency:**
@@ -2303,7 +2303,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-123 |
+| id | Number | Unique system identifier for this record | 4066 |
 | status | Text | Current status of the goal | INP |
 
 **holdings:**
@@ -2522,7 +2522,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 ---
@@ -2552,7 +2552,7 @@ The `IdentityVerification` contract represents identity verification status with
 | daysUntilExpiry | Number |  | 365 |
 | documents | List of Complex Data |  | List with 2 item(s) |
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Text | Unique system identifier for this record | idverify-987 |
+| id | Number | Unique system identifier for this record | idverify-987 |
 | identityProvider | Complex Data | Unique system identifier for this record | Complex object |
 | isExpired | Yes/No |  | No |
 | nextReviewDate | Date |  | 2027-02-10 |
@@ -2642,7 +2642,7 @@ The `IdentityVerification` contract represents identity verification status with
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -2650,7 +2650,7 @@ The `IdentityVerification` contract represents identity verification status with
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 **factFindRef:**
@@ -2658,7 +2658,7 @@ The `IdentityVerification` contract represents identity verification status with
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-123 |
+| id | Number | Unique system identifier for this record | 4066 |
 | status | Text | Current status of the goal | INP |
 
 **identityProvider:**
@@ -2715,14 +2715,14 @@ The `IdentityVerification` contract represents identity verification status with
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 **verifiedBy:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 | role | Text |  | Compliance Officer |
 
@@ -2760,7 +2760,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | documents | List of Complex Data |  | List with 2 item(s) |
 | dsarHistory | List of Complex Data |  | List with 1 item(s) |
 | factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Text | Unique system identifier for this record | consent-555 |
+| id | Number | Unique system identifier for this record | consent-555 |
 | isActive | Yes/No |  | Yes |
 | isExpired | Yes/No |  | No |
 | lawfulBasis | Text |  | CONSENT |
@@ -2788,7 +2788,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | witnessRequired | Yes/No |  | No |
 | consentRecordedAt | Date |  | 2026-02-10T14:00:00Z |
 | consentRecordedBy | Complex Data |  | Complex object |
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 | role | Text |  | Financial Adviser |
 | deviceType | Text |  | Desktop |
@@ -2804,7 +2804,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
@@ -2836,7 +2836,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 **dataProcessing:**
@@ -2893,7 +2893,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | factFindNumber | Text |  | FF-2025-00123 |
-| id | Text | Unique system identifier for this record | factfind-123 |
+| id | Number | Unique system identifier for this record | 4066 |
 | status | Text | Current status of the goal | INP |
 
 **marketingConsent:**
@@ -2953,7 +2953,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | user-789 |
+| id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
 ---
@@ -3151,7 +3151,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | clientRef | Reference Link |  | Complex object |
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | Bob Byblik |
 
 **paymentAmount:**
@@ -3535,7 +3535,7 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -3582,7 +3582,7 @@ Represents the client's regular spending and outgoings, used for budget planning
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -4193,7 +4193,7 @@ The `Notes` contract represents a note attached to a fact find entity using a un
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | adviser-789 |
+| id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Sarah Johnson |
 
 **entityRef:**
@@ -4366,7 +4366,7 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **currentAmount:**
 
@@ -4454,7 +4454,7 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **currentAmount:**
 
@@ -4714,7 +4714,7 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -4762,7 +4762,7 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -4851,7 +4851,7 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -4891,7 +4891,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **consumerDutyCompliance:**
 
@@ -4963,7 +4963,7 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -5016,7 +5016,7 @@ The `Will` contract represents a client's last will and testament details.
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -5028,7 +5028,7 @@ The `Will` contract represents a client's last will and testament details.
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-124 |
+| id | Number | Unique system identifier for this record | 912 |
 
 **willLocation:**
 
@@ -5083,7 +5083,7 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -5133,7 +5133,7 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -5216,7 +5216,7 @@ The `Trust` contract represents trusts established by or benefiting the client.
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **factfindRef:**
 
@@ -5308,7 +5308,7 @@ The `IdentityVerification` contract represents identity verification checks and 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **dataProtectionConsent:**
 
@@ -5719,7 +5719,7 @@ Represents a general investment account (GIA) or other investment wrapper.
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **currentValue:**
 
@@ -5750,7 +5750,7 @@ Represents a general investment account (GIA) or other investment wrapper.
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | provider-456 |
+| id | Number | Unique system identifier for this record | 577 |
 
 **regularContributions:**
 
@@ -5872,7 +5872,7 @@ Represents life assurance, critical illness cover, income protection, or other p
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **currentSumAssured:**
 
@@ -5918,7 +5918,7 @@ Represents life assurance, critical illness cover, income protection, or other p
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | provider-789 |
+| id | Number | Unique system identifier for this record | 3195 |
 
 **sumAssured:**
 
@@ -6057,7 +6057,7 @@ Represents a personal pension, workplace pension, SIPP, or other pension arrange
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| id | Number | Unique system identifier for this record | 8496 |
 
 **crystallisedAmount:**
 
@@ -6141,7 +6141,7 @@ Represents a personal pension, workplace pension, SIPP, or other pension arrange
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | provider-456 |
+| id | Number | Unique system identifier for this record | 577 |
 
 **regularContributions:**
 
@@ -6787,7 +6787,7 @@ Represents a link to another entity.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| id | Text | Unique identifier of the referenced entity |
+| id | Number | Unique identifier of the referenced entity |
 | href | Text | API URL to access the referenced entity |
 | name | Text | Display name of the referenced entity (optional) |
 
