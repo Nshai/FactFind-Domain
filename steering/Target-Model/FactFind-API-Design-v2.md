@@ -25693,6 +25693,4375 @@ The `PensionArrangement` contract represents pension products including Personal
 
 ---
 
+### 13.45 Arrangement - Pension Contract (SIPP - Self-Invested Personal Pension)
+
+The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which offer greater investment flexibility and control compared to standard personal pensions.
+
+**Reference Type:** SIPPArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Wider investment universe including direct equities, commercial property
+- Individual fund selection and asset allocation control
+- SIPP-specific charges (setup, annual administration, transaction fees)
+- May include commercial property holdings
+- Flexible contribution and withdrawal options
+- Death benefit nomination and trust arrangements
+
+#### Complete SIPP Arrangement Contract
+
+```json
+{
+  "id": 30002,
+  "href": "/api/v2/factfinds/679/arrangements/pensions/30002",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "PENSION",
+  "pensionType": "SIPP",
+  "productName": "Self-Invested Personal Pension",
+  "providerName": "Hargreaves Lansdown",
+  "providerRef": {
+    "id": "provider-789",
+    "href": "/api/v2/providers/provider-789"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "policyNumber": "SIPP-987654321",
+  "startDate": "2015-06-01",
+  "currentValue": {
+    "amount": 425000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalContributions": {
+    "amount": 280000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "growthToDate": {
+    "amount": 145000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 51.8
+  },
+  "regularContributions": {
+    "grossAmount": {
+      "amount": 1250.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "netAmount": {
+      "amount": 1000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "taxRelief": {
+      "amount": 250.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "frequency": "MONTHLY",
+    "startDate": "2015-06-01",
+    "isActive": true
+  },
+  "retirementAge": 67,
+  "selectedRetirementAge": 60,
+  "stateRetirementAge": 67,
+  "crystallisedAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "uncrystallisedAmount": {
+    "amount": 425000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "taxFreeCashAvailable": {
+    "amount": 106250.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 25
+  },
+  "assetAllocation": {
+    "equities": 55.0,
+    "bonds": 15.0,
+    "cash": 5.0,
+    "property": 20.0,
+    "alternatives": 5.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Vanguard FTSE All-World UCITS ETF",
+      "fundCode": "VWRL",
+      "units": 2500.00,
+      "currentValue": {
+        "amount": 195000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 45.9
+    },
+    {
+      "fundName": "iShares Core UK Gilts UCITS ETF",
+      "fundCode": "IGLT",
+      "units": 5000.00,
+      "currentValue": {
+        "amount": 63750.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 15.0
+    },
+    {
+      "fundName": "Commercial Property - 123 High Street",
+      "fundCode": "PROPERTY-001",
+      "currentValue": {
+        "amount": 145000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 34.1,
+      "assetType": "CommercialProperty",
+      "propertyDetails": {
+        "address": "123 High Street, Manchester M1 1AA",
+        "purchaseDate": "2018-03-15",
+        "purchasePrice": {
+          "amount": 120000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        },
+        "currentValuation": {
+          "amount": 145000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        },
+        "rentalIncome": {
+          "amount": 850.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          },
+          "frequency": "MONTHLY"
+        }
+      }
+    },
+    {
+      "fundName": "Cash Reserve",
+      "fundCode": "CASH",
+      "currentValue": {
+        "amount": 21250.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 5.0
+    }
+  ],
+  "sippSpecificFeatures": {
+    "allowsCommercialProperty": true,
+    "allowsDirectEquities": true,
+    "allowsOverseasInvestments": true,
+    "hasPropertyHolding": true,
+    "propertyHoldingsCount": 1,
+    "hasDirectEquityHoldings": false,
+    "directEquityHoldingsCount": 0
+  },
+  "projectedValueAtRetirement": {
+    "lowGrowth": {
+      "amount": 585000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "mediumGrowth": {
+      "amount": 720000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "highGrowth": {
+      "amount": 890000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "assumedRetirementAge": 60
+  },
+  "deathBenefits": {
+    "beforeRetirement": {
+      "type": "Full fund value",
+      "amount": {
+        "amount": 425000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "isInTrust": true,
+    "nominatedBeneficiaries": [
+      {
+        "name": "Sarah Smith",
+        "relationship": "Spouse",
+        "percentage": 60
+      },
+      {
+        "name": "Emily Smith",
+        "relationship": "Child",
+        "percentage": 20
+      },
+      {
+        "name": "Thomas Smith",
+        "relationship": "Child",
+        "percentage": 20
+      }
+    ]
+  },
+  "charges": {
+    "setupFee": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      },
+      "waived": true
+    },
+    "annualAdministrationFee": {
+      "amount": 400.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "percentageBasedFee": 0.45,
+    "cappedAt": {
+      "amount": 200.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      },
+      "period": "QUARTERLY"
+    },
+    "transactionFees": {
+      "equityDealingFee": {
+        "amount": 11.95,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "fundDealingFee": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "propertyRelatedFees": {
+      "annualPropertyFee": {
+        "amount": 900.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "conveyancingFees": "Client pays separately",
+      "valuationFees": "Client pays separately"
+    },
+    "totalAnnualCharge": 0.55
+  },
+  "adviserDetails": {
+    "adviserName": "Jane Financial Adviser",
+    "firmName": "XYZ Wealth Management",
+    "adviceDate": "2015-05-10",
+    "lastReviewDate": "2025-10-12"
+  },
+  "notes": "SIPP with commercial property investment and diversified portfolio. Regular contributions ongoing. Property generates rental income within SIPP wrapper. Consider rebalancing as retirement approaches.",
+  "createdAt": "2015-06-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**SIPP-Specific Fields:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `sippSpecificFeatures` | object | Required | Container for SIPP-specific investment features |
+| `sippSpecificFeatures.allowsCommercialProperty` | boolean | Required | Whether SIPP permits commercial property investment |
+| `sippSpecificFeatures.allowsDirectEquities` | boolean | Required | Whether SIPP permits direct equity holdings |
+| `sippSpecificFeatures.allowsOverseasInvestments` | boolean | Required | Whether SIPP permits overseas investments |
+| `sippSpecificFeatures.hasPropertyHolding` | boolean | Required | Whether SIPP currently holds commercial property |
+| `sippSpecificFeatures.propertyHoldingsCount` | integer | Optional | Number of commercial properties held |
+| `sippSpecificFeatures.hasDirectEquityHoldings` | boolean | Required | Whether SIPP currently holds direct equities |
+| `sippSpecificFeatures.directEquityHoldingsCount` | integer | Optional | Number of direct equity holdings |
+| `charges.setupFee` | MoneyValue | Optional | One-time setup fee (may be waived) |
+| `charges.annualAdministrationFee` | MoneyValue | Required | Fixed annual administration charge |
+| `charges.percentageBasedFee` | decimal | Optional | Percentage-based annual charge on fund value |
+| `charges.cappedAt` | object | Optional | Cap on percentage-based fees |
+| `charges.transactionFees` | object | Optional | Per-transaction dealing charges |
+| `charges.propertyRelatedFees` | object | Optional | Additional fees for holding property within SIPP |
+
+**Fund Holdings - Property Extension:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `fundHoldings[].assetType` | string | Optional | Type of asset (Fund, DirectEquity, CommercialProperty, Cash) |
+| `fundHoldings[].propertyDetails` | object | Conditional | Required if assetType = CommercialProperty |
+| `fundHoldings[].propertyDetails.address` | string | Required | Property address |
+| `fundHoldings[].propertyDetails.purchaseDate` | string (date) | Required | Date property purchased by SIPP |
+| `fundHoldings[].propertyDetails.purchasePrice` | MoneyValue | Required | Original purchase price |
+| `fundHoldings[].propertyDetails.currentValuation` | MoneyValue | Required | Current property valuation |
+| `fundHoldings[].propertyDetails.rentalIncome` | MoneyValue | Optional | Monthly rental income generated |
+
+#### Validation Rules
+
+**SIPP Property Investment Rules:**
+- If `hasPropertyHolding = true`, at least one fundHolding must have `assetType = "CommercialProperty"`
+- Commercial property must not exceed 60% of total SIPP value (best practice)
+- Property must be used for commercial purposes only (cannot be client's residence)
+- Rental income must be paid directly into SIPP
+
+**SIPP Contribution Limits:**
+- Annual allowance: £60,000 (2024/25) or 100% of earnings, whichever is lower
+- Carry forward rules apply for unused allowances from previous 3 tax years
+- Tapered annual allowance applies for high earners (adjusted income > £260,000)
+
+**SIPP Investment Restrictions:**
+- Cannot invest in residential property
+- Cannot invest in certain assets (e.g., fine wine, classic cars)
+- Investment must be at arm's length (no connected party transactions)
+
+---
+
+### 13.46 Arrangement - Pension Contract (Final Salary / Defined Benefit Pension)
+
+The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defined Benefit pensions, which provide a guaranteed income in retirement based on salary and years of service.
+
+**Reference Type:** DefinedBenefitPensionArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Guaranteed pension income calculation based on service and salary
+- Accrual rate and scheme-specific rules
+- Deferred vs active membership status
+- Revaluation rates and indexation
+- Transfer value (Cash Equivalent Transfer Value - CETV)
+- Spouse and dependant benefits
+- Early retirement reduction factors
+
+#### Complete Defined Benefit Pension Arrangement Contract
+
+```json
+{
+  "id": 30003,
+  "href": "/api/v2/factfinds/679/arrangements/pensions/30003",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "PENSION",
+  "pensionType": "FINAL_SALARY",
+  "schemeType": "DEFINED_BENEFIT",
+  "productName": "ABC Corporation Pension Scheme",
+  "providerName": "ABC Corporation",
+  "providerRef": {
+    "id": "provider-999",
+    "href": "/api/v2/providers/provider-999"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "policyNumber": "DB-1234567",
+  "membershipNumber": "MEM-987654",
+  "startDate": "2005-04-06",
+  "membershipStatus": "DEFERRED",
+  "dateLeftService": "2022-09-30",
+  "yearsOfService": {
+    "years": 17,
+    "months": 5,
+    "totalYears": 17.42
+  },
+  "normalRetirementAge": 65,
+  "selectedRetirementAge": 65,
+  "stateRetirementAge": 67,
+  "pensionableSalary": {
+    "finalSalary": {
+      "amount": 58000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "salaryDate": "2022-09-30",
+    "salaryType": "FINAL_SALARY",
+    "averagingPeriod": "Best 3 consecutive years in last 10 years"
+  },
+  "accrualDetails": {
+    "accrualRate": "1/60th",
+    "accrualRateDecimal": 0.01667,
+    "accrualType": "FINAL_SALARY",
+    "yearsAccrued": 17.42,
+    "additionalYears": 0.00,
+    "totalPensionableService": 17.42
+  },
+  "projectedPensionAtNRA": {
+    "annualAmount": {
+      "amount": 16837.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "monthlyAmount": {
+      "amount": 1403.08,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "calculation": "£58,000 × 17.42 ÷ 60 = £16,837 p.a.",
+    "revaluationMethod": "CPI",
+    "revaluedTo": "2026-04-06"
+  },
+  "currentDeferredPension": {
+    "annualAmount": {
+      "amount": 16100.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "monthlyAmount": {
+      "amount": 1341.67,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "asAtDate": "2022-09-30"
+  },
+  "revaluation": {
+    "revaluationMethod": "CPI_CAPPED",
+    "cappedAt": 2.5,
+    "revaluationRate": 2.5,
+    "lastRevaluationDate": "2025-04-06"
+  },
+  "indexation": {
+    "inPaymentIndexation": "CPI_CAPPED",
+    "cappedAt": 3.0,
+    "indexationAppliesTo": "Pension accrued from April 1997"
+  },
+  "earlyRetirementFactors": {
+    "availableFrom": 55,
+    "reductionFactors": [
+      {
+        "age": 55,
+        "annualReduction": 6.0,
+        "factor": 0.40
+      },
+      {
+        "age": 60,
+        "annualReduction": 4.0,
+        "factor": 0.80
+      },
+      {
+        "age": 62,
+        "annualReduction": 3.0,
+        "factor": 0.94
+      }
+    ],
+    "earlyRetirementPenaltyApplies": true
+  },
+  "lateRetirementFactors": {
+    "enhancementRate": 5.0,
+    "enhancementAppliesPerYear": true
+  },
+  "lumpSumOptions": {
+    "automaticLumpSum": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "commutationAvailable": true,
+    "commutationRate": "£12 lump sum per £1 of pension",
+    "maxCommutation": 25.0,
+    "maxTaxFreeLumpSum": {
+      "amount": 50509.25,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      },
+      "calculation": "£16,837 × 3 = £50,511 (25% of CETV £202,037)"
+    }
+  },
+  "transferValue": {
+    "cashEquivalentTransferValue": {
+      "amount": 415000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "cetvDate": "2026-01-15",
+    "cetvGuaranteePeriod": "3 months",
+    "cetvExpiryDate": "2026-04-15",
+    "transferValueMultiplier": 24.6,
+    "calculation": "£16,837 × 24.6 = £414,190",
+    "isProtectedTransferValue": false
+  },
+  "deathBenefits": {
+    "spousePension": {
+      "percentage": 50.0,
+      "annualAmount": {
+        "amount": 8418.50,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "payableFor": "Spouse's lifetime"
+    },
+    "childrensPension": {
+      "percentage": 25.0,
+      "annualAmountPerChild": {
+        "amount": 4209.25,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "payableUntil": "Age 18 (or 23 if in full-time education)"
+    },
+    "lumpSumOnDeathBeforeRetirement": {
+      "amount": 174000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      },
+      "calculation": "3 × Final Pensionable Salary"
+    },
+    "lumpSumOnDeathAfterRetirement": {
+      "guaranteePeriod": 5,
+      "guaranteePeriodUnit": "YEARS",
+      "calculation": "5 years' pension guaranteed, then spouse's pension"
+    }
+  },
+  "contributions": {
+    "memberContributionsRequired": false,
+    "employerContributionsRequired": false,
+    "historicMemberContributions": {
+      "amount": 18500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "averageContributionRate": 6.5
+  },
+  "schemeDetails": {
+    "schemeAdministrator": "ABC Pension Trustees Ltd",
+    "schemeFundingLevel": 105.2,
+    "lastValuationDate": "2023-03-31",
+    "schemeStatus": "ONGOING",
+    "isPensionProtectionFund": false,
+    "guaranteedMinimumPension": {
+      "amount": 2450.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "adviceConsiderations": {
+    "transferAdviceRequired": true,
+    "transferAdviceThreshold": {
+      "amount": 30000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "ftcaProtectionApplies": true,
+    "pensionWiseGuidanceRecommended": true,
+    "lastAdviceDate": "2025-11-20",
+    "adviserRecommendation": "Retain in scheme - valuable guaranteed benefits"
+  },
+  "notes": "Valuable DB scheme with good indexation. CETV multiple of 24.6× is below typical transfer multiples. Strong employer funding position. Death benefits include 50% spouse's pension. Recommend retaining in scheme unless compelling circumstances.",
+  "createdAt": "2022-10-01T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**Membership & Service:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `schemeType` | string (enum) | Required | DEFINED_BENEFIT, CAREER_AVERAGE, FINAL_SALARY |
+| `membershipStatus` | string (enum) | Required | ACTIVE, DEFERRED, PENSIONER |
+| `membershipNumber` | string | Optional | Scheme membership reference number |
+| `dateLeftService` | string (date) | Conditional | Date left employment (required if DEFERRED) |
+| `yearsOfService` | object | Required | Total pensionable service |
+| `yearsOfService.years` | integer | Required | Full years of service |
+| `yearsOfService.months` | integer | Required | Additional months of service |
+| `yearsOfService.totalYears` | decimal | Required | Total years in decimal format |
+
+**Pensionable Salary:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `pensionableSalary` | object | Required | Container for salary calculation details |
+| `pensionableSalary.finalSalary` | MoneyValue | Required | Final pensionable salary used for calculation |
+| `pensionableSalary.salaryDate` | string (date) | Required | Date salary was determined |
+| `pensionableSalary.salaryType` | string (enum) | Required | FINAL_SALARY, CAREER_AVERAGE, BEST_3_YEARS |
+| `pensionableSalary.averagingPeriod` | string | Optional | Description of averaging methodology |
+
+**Accrual Details:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `accrualDetails` | object | Required | Container for benefit accrual calculation |
+| `accrualDetails.accrualRate` | string | Required | Accrual rate (e.g., "1/60th", "1/80th") |
+| `accrualDetails.accrualRateDecimal` | decimal | Required | Decimal representation of accrual rate |
+| `accrualDetails.accrualType` | string (enum) | Required | FINAL_SALARY, CAREER_AVERAGE |
+| `accrualDetails.yearsAccrued` | decimal | Required | Total years of pension accrual |
+| `accrualDetails.additionalYears` | decimal | Optional | Additional years granted (e.g., redundancy enhancement) |
+| `accrualDetails.totalPensionableService` | decimal | Required | Total pensionable service including enhancements |
+
+**Projected & Current Pension:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `projectedPensionAtNRA` | object | Required | Projected pension at Normal Retirement Age |
+| `projectedPensionAtNRA.annualAmount` | MoneyValue | Required | Annual pension amount |
+| `projectedPensionAtNRA.monthlyAmount` | MoneyValue | Required | Monthly pension amount |
+| `projectedPensionAtNRA.calculation` | string | Optional | Calculation methodology explanation |
+| `projectedPensionAtNRA.revaluationMethod` | string (enum) | Required | CPI, RPI, FIXED, SALARY_INCREASE |
+| `projectedPensionAtNRA.revaluedTo` | string (date) | Required | Date revaluation calculated to |
+| `currentDeferredPension` | object | Conditional | Current deferred pension (required if DEFERRED status) |
+
+**Transfer Value (CETV):**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `transferValue` | object | Required | Cash Equivalent Transfer Value details |
+| `transferValue.cashEquivalentTransferValue` | MoneyValue | Required | Current CETV amount |
+| `transferValue.cetvDate` | string (date) | Required | Date CETV was calculated |
+| `transferValue.cetvGuaranteePeriod` | string | Required | How long CETV is guaranteed for |
+| `transferValue.cetvExpiryDate` | string (date) | Required | Date CETV guarantee expires |
+| `transferValue.transferValueMultiplier` | decimal | Required | CETV as multiple of annual pension (CETV ÷ annual pension) |
+| `transferValue.isProtectedTransferValue` | boolean | Optional | Whether CETV has protection certificate |
+
+**Death Benefits:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `deathBenefits.spousePension` | object | Required | Spouse's pension entitlement |
+| `deathBenefits.spousePension.percentage` | decimal | Required | Percentage of member's pension payable to spouse |
+| `deathBenefits.childrensPension` | object | Optional | Children's pension entitlement |
+| `deathBenefits.lumpSumOnDeathBeforeRetirement` | MoneyValue | Optional | Lump sum death benefit before retirement |
+| `deathBenefits.lumpSumOnDeathAfterRetirement` | object | Optional | Death benefit structure after retirement |
+
+**Advice Considerations:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `adviceConsiderations` | object | Required | Regulatory and advice requirements |
+| `adviceConsiderations.transferAdviceRequired` | boolean | Required | Whether FCA transfer advice is mandatory |
+| `adviceConsiderations.transferAdviceThreshold` | MoneyValue | Required | CETV threshold requiring advice (£30,000) |
+| `adviceConsiderations.ftcaProtectionApplies` | boolean | Required | Whether Financial Services Compensation Scheme applies |
+| `adviceConsiderations.pensionWiseGuidanceRecommended` | boolean | Required | Whether Pension Wise guidance recommended |
+| `adviceConsiderations.adviserRecommendation` | string | Optional | Summary of adviser's recommendation |
+
+#### Validation Rules
+
+**Transfer Advice Requirements (FCA Rules):**
+- If CETV ≥ £30,000: `transferAdviceRequired = true` (mandatory regulated advice)
+- Adviser must hold appropriate pension transfer qualifications
+- Pension Wise guidance must be offered to client aged 50+
+- Transfer must be in client's best interest (high bar to meet)
+
+**CETV Calculations:**
+- `transferValueMultiplier = CETV ÷ projectedPensionAtNRA.annualAmount`
+- Typical multiples: 20-30× (varies by scheme funding, age, market conditions)
+- Protected transfer values may have higher multiples
+
+**Accrual Rate Standards:**
+- Final Salary schemes: typically 1/60th or 1/80th
+- Career Average schemes: typically 1/60th or 1/80th of CARE salary each year
+- Public sector schemes: often 1/60th or better
+
+**Death Benefits Validation:**
+- Spouse's pension typically 50-66.67% of member's pension
+- Children's pension typically 25-33% per child
+- Lump sum death in service typically 2-4× final salary
+
+---
+
+### 13.47 Arrangement - Pension Contract (Money Purchase / Defined Contribution Pension)
+
+The `MoneyPurchasePensionArrangement` contract represents Defined Contribution pensions including workplace Money Purchase schemes, typically employer-sponsored with matched contributions.
+
+**Reference Type:** MoneyPurchasePensionArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Employer and employee contribution tracking
+- Contribution matching rules and eligibility
+- Auto-enrolment compliance details
+- Fund value accumulation (no guaranteed income)
+- Investment choice within scheme parameters
+- Salary sacrifice arrangements
+- Lifestyling and default fund management
+
+#### Complete Money Purchase Pension Arrangement Contract
+
+```json
+{
+  "id": 30004,
+  "href": "/api/v2/factfinds/679/arrangements/pensions/30004",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "PENSION",
+  "pensionType": "MONEY_PURCHASE",
+  "productName": "XYZ Corporation Group Money Purchase Scheme",
+  "providerName": "Scottish Widows",
+  "providerRef": {
+    "id": "provider-555",
+    "href": "/api/v2/providers/provider-555"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "policyNumber": "DC-GRP-789456",
+  "membershipNumber": "MEM-456789",
+  "startDate": "2019-01-01",
+  "employerDetails": {
+    "employerName": "XYZ Corporation Ltd",
+    "schemeJoinDate": "2019-01-01",
+    "isActiveEmployee": true,
+    "employmentRef": {
+      "id": 1001,
+      "href": "/api/v2/factfinds/679/employment/1001"
+    }
+  },
+  "currentValue": {
+    "amount": 48500.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalContributions": {
+    "memberContributions": {
+      "amount": 15800.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "employerContributions": {
+      "amount": 23700.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "totalContributed": {
+      "amount": 39500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "growthToDate": {
+    "amount": 9000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 22.8
+  },
+  "contributionStructure": {
+    "memberContribution": {
+      "type": "SALARY_PERCENTAGE",
+      "percentage": 5.0,
+      "grossAmount": {
+        "amount": 220.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netAmount": {
+        "amount": 176.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "taxRelief": {
+        "amount": 44.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        },
+        "method": "NET_PAY"
+      },
+      "frequency": "MONTHLY",
+      "isActive": true,
+      "isSalarySacrifice": false
+    },
+    "employerContribution": {
+      "type": "MATCHED_PERCENTAGE",
+      "percentage": 7.5,
+      "grossAmount": {
+        "amount": 330.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "frequency": "MONTHLY",
+      "matchingStructure": {
+        "baseContribution": 3.0,
+        "matchedContribution": 4.5,
+        "matchingRatio": "1.5:1",
+        "maxMatchedPercentage": 7.5,
+        "matchingTier": "Member contributes 5%, Employer matches 1.5× up to 7.5%"
+      },
+      "includesNationalInsuranceSaving": true,
+      "nationalInsuranceSaving": {
+        "amount": 45.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "totalMonthlyContribution": {
+      "amount": 550.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "autoEnrolmentDetails": {
+    "isAutoEnrolmentScheme": true,
+    "autoEnrolmentDate": "2019-01-01",
+    "isQualifyingScheme": true,
+    "minimumContributionsMet": true,
+    "currentMinimumMember": 5.0,
+    "currentMinimumEmployer": 3.0,
+    "currentMinimumTotal": 8.0,
+    "optOutDeadline": "2019-02-01",
+    "hasOptedOut": false,
+    "reEnrolmentDate": null
+  },
+  "salarySacrificeArrangement": {
+    "isSalarySacrifice": false,
+    "sacrificeAmount": null,
+    "employerNISaving": null,
+    "employeeNISaving": null,
+    "totalNISaving": null
+  },
+  "retirementAge": 67,
+  "selectedRetirementAge": 65,
+  "stateRetirementAge": 67,
+  "crystallisedAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "uncrystallisedAmount": {
+    "amount": 48500.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "taxFreeCashAvailable": {
+    "amount": 12125.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 25
+  },
+  "assetAllocation": {
+    "equities": 70.0,
+    "bonds": 20.0,
+    "cash": 5.0,
+    "alternatives": 5.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Scottish Widows Pension Portfolio Three",
+      "fundCode": "SWPP3",
+      "units": 4850.00,
+      "currentValue": {
+        "amount": 48500.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 100.0,
+      "isDefaultFund": true
+    }
+  ],
+  "lifestyling": {
+    "isLifestylingActive": true,
+    "lifestylingStrategy": "Automatic switching to lower-risk funds from age 55",
+    "lifestylingStartAge": 55,
+    "currentLifestylePhase": "Growth Phase",
+    "targetRetirementAge": 65,
+    "switchingRules": "Gradual switch to bonds and cash over 10 years before retirement"
+  },
+  "projectedValueAtRetirement": {
+    "lowGrowth": {
+      "amount": 92000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "mediumGrowth": {
+      "amount": 115000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "highGrowth": {
+      "amount": 145000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "assumedRetirementAge": 65,
+    "assumedContributionsIncrease": "In line with salary increases (assumed 2.5% p.a.)"
+  },
+  "deathBenefits": {
+    "beforeRetirement": {
+      "type": "Full fund value",
+      "amount": {
+        "amount": 48500.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "isInTrust": true,
+    "nominatedBeneficiaries": [
+      {
+        "name": "Sarah Smith",
+        "relationship": "Spouse",
+        "percentage": 100
+      }
+    ]
+  },
+  "charges": {
+    "annualManagementCharge": 0.75,
+    "transactionCosts": 0.08,
+    "totalAnnualCharge": 0.83,
+    "chargesCappedAt": null
+  },
+  "adviserDetails": {
+    "adviserName": "Corporate HR Team",
+    "firmName": "XYZ Corporation",
+    "adviceDate": "2018-12-15",
+    "lastReviewDate": "2025-08-10"
+  },
+  "notes": "Workplace money purchase scheme with generous 1.5:1 employer matching. Good growth phase allocation. Lifestyling will reduce risk from age 55. Consider increasing contributions if affordable. Review investment strategy every 3 years.",
+  "createdAt": "2019-01-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**Employer & Contribution Structure:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `employerDetails` | object | Required | Container for employer relationship details |
+| `employerDetails.employerName` | string | Required | Name of sponsoring employer |
+| `employerDetails.schemeJoinDate` | string (date) | Required | Date joined employer's scheme |
+| `employerDetails.isActiveEmployee` | boolean | Required | Whether member is currently employed |
+| `employerDetails.employmentRef` | object | Optional | Link to Employment record |
+| `contributionStructure` | object | Required | Container for contribution details |
+| `contributionStructure.memberContribution` | object | Required | Employee contribution structure |
+| `contributionStructure.memberContribution.type` | string (enum) | Required | SALARY_PERCENTAGE, FIXED_AMOUNT |
+| `contributionStructure.memberContribution.percentage` | decimal | Conditional | Contribution percentage (required if type = SALARY_PERCENTAGE) |
+| `contributionStructure.memberContribution.taxRelief.method` | string (enum) | Required | NET_PAY, RELIEF_AT_SOURCE |
+| `contributionStructure.memberContribution.isSalarySacrifice` | boolean | Required | Whether salary sacrifice arrangement applies |
+| `contributionStructure.employerContribution` | object | Required | Employer contribution structure |
+| `contributionStructure.employerContribution.type` | string (enum) | Required | MATCHED_PERCENTAGE, FIXED_PERCENTAGE, FIXED_AMOUNT |
+| `contributionStructure.employerContribution.matchingStructure` | object | Conditional | Matching rules (required if type = MATCHED_PERCENTAGE) |
+
+**Auto-Enrolment Compliance:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `autoEnrolmentDetails` | object | Required | Auto-enrolment compliance information |
+| `autoEnrolmentDetails.isAutoEnrolmentScheme` | boolean | Required | Whether scheme qualifies for auto-enrolment |
+| `autoEnrolmentDetails.autoEnrolmentDate` | string (date) | Conditional | Date auto-enrolled (required if applicable) |
+| `autoEnrolmentDetails.isQualifyingScheme` | boolean | Required | Whether scheme meets qualifying criteria |
+| `autoEnrolmentDetails.minimumContributionsMet` | boolean | Required | Whether minimum contribution levels met |
+| `autoEnrolmentDetails.currentMinimumMember` | decimal | Required | Current minimum member contribution % |
+| `autoEnrolmentDetails.currentMinimumEmployer` | decimal | Required | Current minimum employer contribution % |
+| `autoEnrolmentDetails.currentMinimumTotal` | decimal | Required | Current minimum total contribution % (8% from April 2019) |
+
+**Lifestyling:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `lifestyling` | object | Optional | Lifestyle investment strategy details |
+| `lifestyling.isLifestylingActive` | boolean | Required | Whether lifestyling strategy is active |
+| `lifestyling.lifestylingStrategy` | string | Optional | Description of lifestyling approach |
+| `lifestyling.lifestylingStartAge` | integer | Conditional | Age lifestyling begins (typically 10-15 years before retirement) |
+| `lifestyling.currentLifestylePhase` | string | Optional | Current phase (Growth, Consolidation, Protective) |
+| `lifestyling.targetRetirementAge` | integer | Required | Target retirement age for lifestyling calculations |
+
+#### Validation Rules
+
+**Auto-Enrolment Minimum Contributions (UK):**
+- Minimum member contribution: 5% of qualifying earnings
+- Minimum employer contribution: 3% of qualifying earnings
+- Minimum total contribution: 8% of qualifying earnings
+- Qualifying earnings band: £6,240 - £50,270 (2024/25)
+
+**Matching Structure Validation:**
+- If `employerContribution.type = MATCHED_PERCENTAGE`, `matchingStructure` is REQUIRED
+- `matchingStructure.baseContribution + matchingStructure.matchedContribution = employerContribution.percentage`
+- Matching ratio typically ranges from 1:1 to 2:1
+
+**Salary Sacrifice:**
+- If `isSalarySacrifice = true`, member contribution reduces gross salary for tax and NI purposes
+- Employer contribution typically includes NI saving passed to member
+- Total contribution usually higher than non-salary sacrifice equivalent
+
+**Net Pay vs Relief at Source:**
+- **Net Pay:** Tax relief at source (reduces taxable income) - used by most employer schemes
+- **Relief at Source:** Tax relief claimed back (20% automatically, higher rate via self-assessment)
+
+---
+
+### 13.48 Arrangement - Pension Contract (State Pension)
+
+The `StatePensionArrangement` contract represents State Pension entitlement, including forecast amounts and National Insurance contribution history.
+
+**Reference Type:** StatePensionArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- State Pension Age and entitlement tracking
+- National Insurance contributions record
+- New State Pension vs Basic State Pension
+- Contracted-out deductions
+- State Pension forecast amounts
+- Deferral options and increases
+
+#### Complete State Pension Arrangement Contract
+
+```json
+{
+  "id": 30005,
+  "href": "/api/v2/factfinds/679/arrangements/pensions/30005",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "PENSION",
+  "pensionType": "STATE_PENSION",
+  "productName": "UK State Pension",
+  "providerName": "Department for Work and Pensions (DWP)",
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "nationalInsuranceNumber": "AB123456C",
+  "statePensionType": "NEW_STATE_PENSION",
+  "stateRetirementAge": 67,
+  "statePensionDate": "2039-05-06",
+  "currentAge": 45,
+  "yearsToStatePension": 22,
+  "nationalInsuranceRecord": {
+    "qualifyingYears": 23,
+    "yearsRequired": 35,
+    "yearsToRequiredMinimum": 12,
+    "minimumYearsRequired": 10,
+    "hasMinimumYears": true,
+    "gapsInRecord": 2,
+    "yearsCredited": 1,
+    "yearsContributed": 22
+  },
+  "statePensionForecast": {
+    "currentWeeklyAmount": {
+      "amount": 140.35,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentAnnualAmount": {
+      "amount": 7298.20,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "forecastWeeklyAmount": {
+      "amount": 203.85,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "forecastAnnualAmount": {
+      "amount": 10600.20,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "maximumWeeklyAmount": {
+      "amount": 221.20,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "maximumAnnualAmount": {
+      "amount": 11502.40,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "forecastScenario": "Assuming you continue to contribute until State Pension Age",
+    "forecastDate": "2026-02-15",
+    "isMaximumPension": false
+  },
+  "contractedOut": {
+    "wasContractedOut": true,
+    "contractedOutPeriods": [
+      {
+        "startDate": "2005-04-06",
+        "endDate": "2016-04-05",
+        "yearsContractedOut": 11,
+        "scheme": "Employer Final Salary Scheme"
+      }
+    ],
+    "contractedOutDeduction": {
+      "weeklyAmount": {
+        "amount": 17.35,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "annualAmount": {
+        "amount": 902.20,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "affectsStatePension": true,
+    "explanation": "You were contracted out of the Additional State Pension (SERPS/S2P) from 2005-2016. Your State Pension is reduced but you have benefits in your employer's Final Salary scheme."
+  },
+  "voluntaryContributions": {
+    "canMakeVoluntaryContributions": true,
+    "gapsEligibleForFilling": 2,
+    "costToFillOneYear": {
+      "amount": 824.20,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "potentialIncrease": {
+      "weeklyAmount": {
+        "amount": 6.32,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "annualAmount": {
+        "amount": 328.64,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "perYearFilled": true
+    },
+    "deadlineToFillGaps": "2030-04-05",
+    "recommendation": "Consider filling gaps - payback period approximately 2.5 years"
+  },
+  "deferralOptions": {
+    "canDefer": true,
+    "deferralIncreaseRate": 5.8,
+    "deferralIncreaseType": "PERCENTAGE_PER_YEAR",
+    "deferredFor1Year": {
+      "weeklyIncrease": {
+        "amount": 12.83,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "newWeeklyAmount": {
+        "amount": 234.03,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "deferredFor5Years": {
+      "weeklyIncrease": {
+        "amount": 64.15,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "newWeeklyAmount": {
+        "amount": 285.35,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "lumpSumOption": false,
+    "explanation": "New State Pension can be deferred to increase weekly amount by 1% for every 9 weeks deferred (approximately 5.8% per year). Lump sum option not available for New State Pension."
+  },
+  "indexation": {
+    "indexationType": "TRIPLE_LOCK",
+    "indexationRule": "Increases by highest of: earnings growth, CPI inflation, or 2.5%",
+    "lastIncrease": {
+      "date": "2025-04-06",
+      "percentage": 8.5,
+      "increasedBy": {
+        "weeklyAmount": {
+          "amount": 17.30,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      }
+    }
+  },
+  "otherStateBenefits": {
+    "additionalStatePension": null,
+    "graduatedRetirementBenefit": {
+      "weeklyAmount": {
+        "amount": 2.45,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "statePensionCredit": {
+      "eligible": false
+    }
+  },
+  "notes": "State Pension forecast shows 23 qualifying years so far, with 2 gaps that could be filled. Contracted out for 11 years reduces entitlement but offset by Final Salary pension. On track for near-maximum State Pension if contributions continue. Consider filling gaps - good value. Deferral unlikely to be beneficial given other pension provisions.",
+  "createdAt": "2025-01-10T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**State Pension Basics:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `nationalInsuranceNumber` | string | Required | Client's National Insurance number |
+| `statePensionType` | string (enum) | Required | NEW_STATE_PENSION, BASIC_STATE_PENSION (pre-April 2016) |
+| `stateRetirementAge` | integer | Required | Client's State Pension Age |
+| `statePensionDate` | string (date) | Required | Date client reaches State Pension Age |
+| `currentAge` | integer | Required | Client's current age |
+| `yearsToStatePension` | integer | Required | Years until State Pension Age |
+
+**National Insurance Record:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `nationalInsuranceRecord` | object | Required | NI contributions history |
+| `nationalInsuranceRecord.qualifyingYears` | integer | Required | Total qualifying years accumulated |
+| `nationalInsuranceRecord.yearsRequired` | integer | Required | Years required for maximum State Pension (35 for New State Pension) |
+| `nationalInsuranceRecord.yearsToRequiredMinimum` | integer | Required | Additional years needed to reach minimum (10 years) |
+| `nationalInsuranceRecord.minimumYearsRequired` | integer | Required | Minimum years for any State Pension (10 years) |
+| `nationalInsuranceRecord.hasMinimumYears` | boolean | Required | Whether minimum qualifying years already achieved |
+| `nationalInsuranceRecord.gapsInRecord` | integer | Required | Number of years with gaps |
+| `nationalInsuranceRecord.yearsCredited` | integer | Optional | Years credited (e.g., caring responsibilities, unemployment) |
+| `nationalInsuranceRecord.yearsContributed` | integer | Required | Years with actual NI contributions |
+
+**State Pension Forecast:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `statePensionForecast` | object | Required | State Pension forecast amounts |
+| `statePensionForecast.currentWeeklyAmount` | MoneyValue | Required | Current entitlement based on record to date |
+| `statePensionForecast.currentAnnualAmount` | MoneyValue | Required | Current annual entitlement |
+| `statePensionForecast.forecastWeeklyAmount` | MoneyValue | Required | Forecast amount at State Pension Age |
+| `statePensionForecast.forecastAnnualAmount` | MoneyValue | Required | Forecast annual amount |
+| `statePensionForecast.maximumWeeklyAmount` | MoneyValue | Required | Maximum possible State Pension (35 qualifying years) |
+| `statePensionForecast.isMaximumPension` | boolean | Required | Whether forecast equals maximum |
+
+**Contracted Out:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `contractedOut` | object | Optional | Contracted-out history (pre-April 2016) |
+| `contractedOut.wasContractedOut` | boolean | Required | Whether ever contracted out of Additional State Pension |
+| `contractedOut.contractedOutPeriods` | array | Conditional | Periods contracted out (required if wasContractedOut = true) |
+| `contractedOut.contractedOutDeduction` | MoneyValue | Optional | Amount State Pension reduced by due to contracting out |
+| `contractedOut.affectsStatePension` | boolean | Required | Whether contracting out reduces State Pension |
+
+**Voluntary Contributions:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `voluntaryContributions` | object | Required | Voluntary NI contributions options |
+| `voluntaryContributions.canMakeVoluntaryContributions` | boolean | Required | Whether eligible to make voluntary contributions |
+| `voluntaryContributions.gapsEligibleForFilling` | integer | Required | Number of years with gaps that can be filled |
+| `voluntaryContributions.costToFillOneYear` | MoneyValue | Conditional | Cost to fill one year of NI contributions |
+| `voluntaryContributions.potentialIncrease` | MoneyValue | Conditional | State Pension increase per year filled |
+| `voluntaryContributions.deadlineToFillGaps` | string (date) | Conditional | Deadline to fill historic gaps |
+
+**Deferral Options:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `deferralOptions` | object | Required | State Pension deferral information |
+| `deferralOptions.canDefer` | boolean | Required | Whether State Pension can be deferred |
+| `deferralOptions.deferralIncreaseRate` | decimal | Required | Annual increase rate for deferral (5.8% for New State Pension) |
+| `deferralOptions.lumpSumOption` | boolean | Required | Whether lump sum option available (false for New State Pension) |
+
+#### Validation Rules
+
+**New State Pension (from 6 April 2016):**
+- Minimum qualifying years: 10 years
+- Full State Pension: 35 qualifying years
+- Current maximum (2024/25): £221.20 per week (£11,502.40 per year)
+- Calculation: £221.20 ÷ 35 × qualifying years = weekly entitlement
+- Triple lock: increases by highest of earnings growth, CPI, or 2.5%
+
+**State Pension Age:**
+- Currently: 66 (men and women)
+- Increasing to 67 between 2026-2028
+- Increasing to 68 between 2044-2046 (proposed)
+- Check gov.uk calculator for individual State Pension Age
+
+**Contracted Out Impact:**
+- Applies to those contracted out before 6 April 2016
+- Reduces State Pension but offset by contracted-out pension
+- Foundation amount calculation considers contracted-out periods
+
+**Voluntary Contributions:**
+- Can usually fill gaps from last 6 tax years
+- Extended deadline for pre-2016 gaps (until 5 April 2025 for many)
+- Cost: Class 3 NI contributions (£17.45 per week for 2024/25 = £907.40 per year)
+- Typical payback period: 2-3 years
+
+---
+
+### 13.49 Arrangement - Pension Contract (Stakeholder Pension)
+
+The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, which are low-cost, flexible personal pensions with capped charges and minimum contribution requirements.
+
+**Reference Type:** StakeholderPensionArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Charge cap of 1.5% (first 10 years) then 1%
+- Minimum contributions of £20
+- Portable between employers
+- Simple default investment fund
+- No penalties for stopping/restarting contributions
+- Used for employer auto-enrolment compliance
+
+#### Complete Stakeholder Pension Arrangement Contract
+
+```json
+{
+  "id": 30006,
+  "href": "/api/v2/factfinds/679/arrangements/pensions/30006",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "PENSION",
+  "pensionType": "STAKEHOLDER_PENSION",
+  "productName": "Standard Life Stakeholder Pension",
+  "providerName": "Standard Life",
+  "providerRef": {
+    "id": "provider-333",
+    "href": "/api/v2/providers/provider-333"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "policyNumber": "SHP-456789123",
+  "startDate": "2016-09-01",
+  "isPaid up": false,
+  "currentValue": {
+    "amount": 23400.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalContributions": {
+    "amount": 19800.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "growthToDate": {
+    "amount": 3600.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 18.2
+  },
+  "regularContributions": {
+    "grossAmount": {
+      "amount": 200.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "netAmount": {
+      "amount": 160.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "taxRelief": {
+      "amount": 40.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "frequency": "MONTHLY",
+    "startDate": "2016-09-01",
+    "isActive": true,
+    "paymentMethod": "DIRECT_DEBIT"
+  },
+  "stakeholderSpecificFeatures": {
+    "isAutoEnrolmentCompliant": true,
+    "meetsMinimumContribution": true,
+    "minimumContribution": {
+      "amount": 20.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "chargeCapCompliance": {
+      "withinChargeCap": true,
+      "chargeCap": 1.0,
+      "chargeCap First10Years": 1.5,
+      "currentYear": 10,
+      "appliedChargeCap": 1.0
+    },
+    "flexibility": {
+      "canStopContributions": true,
+      "penaltyForStopping": false,
+      "canRestartContributions": true,
+      "canChangeContributionAmount": true,
+      "minimumChangeAmount": {
+        "amount": 20.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "isPortable": true,
+    "acceptsTransferIn": true,
+    "transferOutRestrictions": "None"
+  },
+  "retirementAge": 67,
+  "selectedRetirementAge": 65,
+  "stateRetirementAge": 67,
+  "crystallisedAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "uncrystallisedAmount": {
+    "amount": 23400.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "taxFreeCashAvailable": {
+    "amount": 5850.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 25
+  },
+  "assetAllocation": {
+    "equities": 75.0,
+    "bonds": 20.0,
+    "cash": 5.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Standard Life Stakeholder Default Fund",
+      "fundCode": "SLSHDF",
+      "units": 2340.00,
+      "currentValue": {
+        "amount": 23400.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 100.0,
+      "isDefaultFund": true,
+      "lifestylingSwitching": "Automatic rebalancing 10 years before retirement"
+    }
+  ],
+  "projectedValueAtRetirement": {
+    "lowGrowth": {
+      "amount": 42000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "mediumGrowth": {
+      "amount": 52000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "highGrowth": {
+      "amount": 65000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "assumedRetirementAge": 65
+  },
+  "deathBenefits": {
+    "beforeRetirement": {
+      "type": "Full fund value",
+      "amount": {
+        "amount": 23400.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "isInTrust": true,
+    "nominatedBeneficiaries": [
+      {
+        "name": "Sarah Smith",
+        "relationship": "Spouse",
+        "percentage": 100
+      }
+    ]
+  },
+  "charges": {
+    "annualManagementCharge": 1.0,
+    "additionalFundCharges": 0.0,
+    "totalAnnualCharge": 1.0,
+    "isWithinStakeholderCap": true,
+    "noSetupFee": true,
+    "noExitFee": true,
+    "noTransferFee": true
+  },
+  "adviserDetails": {
+    "adviserName": "Jane Financial Adviser",
+    "firmName": "XYZ Wealth Management",
+    "adviceDate": "2016-08-15",
+    "lastReviewDate": "2025-07-22"
+  },
+  "notes": "Stakeholder pension with regular monthly contributions. Low charges at 1% annually. Default fund with lifestyling. No penalties for flexibility. Consider consolidating with other pensions for better management.",
+  "createdAt": "2016-09-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**Stakeholder-Specific Features:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `stakeholderSpecificFeatures` | object | Required | Container for stakeholder pension specific features |
+| `stakeholderSpecificFeatures.isAutoEnrolmentCompliant` | boolean | Required | Whether scheme qualifies for auto-enrolment |
+| `stakeholderSpecificFeatures.meetsMinimumContribution` | boolean | Required | Whether £20 minimum contribution met |
+| `stakeholderSpecificFeatures.minimumContribution` | MoneyValue | Required | Minimum contribution amount (£20) |
+| `stakeholderSpecificFeatures.chargeCapCompliance` | object | Required | Charge cap compliance details |
+| `stakeholderSpecificFeatures.chargeCapCompliance.withinChargeCap` | boolean | Required | Whether charges within stakeholder cap |
+| `stakeholderSpecificFeatures.chargeCapCompliance.chargeCap` | decimal | Required | Current charge cap (1% after 10 years) |
+| `stakeholderSpecificFeatures.chargeCapCompliance.chargeCapFirst10Years` | decimal | Required | Charge cap for first 10 years (1.5%) |
+| `stakeholderSpecificFeatures.flexibility` | object | Required | Flexibility features |
+| `stakeholderSpecificFeatures.flexibility.canStopContributions` | boolean | Required | Can stop without penalty |
+| `stakeholderSpecificFeatures.flexibility.penaltyForStopping` | boolean | Required | Whether penalty applies (must be false for stakeholder) |
+| `stakeholderSpecificFeatures.isPortable` | boolean | Required | Whether pension is portable between employers |
+
+#### Validation Rules
+
+**Stakeholder Pension Minimum Standards:**
+- Minimum contribution: £20
+- Maximum charge: 1.5% per year for first 10 years, then 1% per year
+- No penalties for stopping, changing, or restarting contributions
+- No minimum contribution period
+- Must offer default investment fund
+- Must accept transfers in
+- Lifestyling approach available
+
+**Charge Cap Enforcement:**
+- First 10 years: `annualManagementCharge ≤ 1.5%`
+- After 10 years: `annualManagementCharge ≤ 1.0%`
+- No additional charges permitted (setup, exit, transfer fees all £0)
+
+**Auto-Enrolment Compliance:**
+- Stakeholder pensions automatically qualify as auto-enrolment schemes
+- Must meet minimum contribution requirements (8% total from April 2019)
+- Can be used by employers without contract negotiation
+
+---
+
+### 13.50 Arrangement - Pension Contract (Group Personal Pension)
+
+The `GroupPersonalPensionArrangement` contract represents Group Personal Pensions (GPP), employer-sponsored arrangements where each member has individual personal pension with negotiated group terms.
+
+**Reference Type:** GroupPersonalPensionArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Employer-sponsored but individually owned policies
+- Group negotiated terms and charges
+- Employer and employee contributions
+- May include auto-enrolment features
+- Flexible investment choices
+- Portable when changing employment
+
+#### Complete Group Personal Pension Arrangement Contract
+
+```json
+{
+  "id": 30007,
+  "href": "/api/v2/factfinds/679/arrangements/pensions/30007",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "PENSION",
+  "pensionType": "GROUP_PERSONAL_PENSION",
+  "productName": "Aviva Group Personal Pension",
+  "providerName": "Aviva",
+  "providerRef": {
+    "id": "provider-777",
+    "href": "/api/v2/providers/provider-777"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "policyNumber": "GPP-789456123",
+  "membershipNumber": "MEM-654321",
+  "startDate": "2020-10-01",
+  "employerDetails": {
+    "employerName": "ABC Manufacturing Ltd",
+    "schemeJoinDate": "2020-10-01",
+    "isActiveEmployee": true,
+    "employmentRef": {
+      "id": 1002,
+      "href": "/api/v2/factfinds/679/employment/1002"
+    },
+    "employerSchemeStartDate": "2018-04-06",
+    "groupSchemeReference": "ABC-GPP-2018"
+  },
+  "groupSpecificFeatures": {
+    "isGroupScheme": true,
+    "individualPolicy": true,
+    "groupNegotiatedTerms": true,
+    "portableOnLeaving": true,
+    "canContinueContributionsAfterLeaving": true,
+    "groupDiscountApplied": true,
+    "groupChargeReduction": 0.25
+  },
+  "currentValue": {
+    "amount": 36800.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalContributions": {
+    "memberContributions": {
+      "amount": 12600.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "employerContributions": {
+      "amount": 18900.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "totalContributed": {
+      "amount": 31500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "growthToDate": {
+    "amount": 5300.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 16.8
+  },
+  "contributionStructure": {
+    "memberContribution": {
+      "type": "SALARY_PERCENTAGE",
+      "percentage": 5.0,
+      "grossAmount": {
+        "amount": 200.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netAmount": {
+        "amount": 160.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "taxRelief": {
+        "amount": 40.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        },
+        "method": "RELIEF_AT_SOURCE"
+      },
+      "frequency": "MONTHLY",
+      "isActive": true,
+      "isSalarySacrifice": false
+    },
+    "employerContribution": {
+      "type": "FIXED_PERCENTAGE",
+      "percentage": 7.5,
+      "grossAmount": {
+        "amount": 300.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "frequency": "MONTHLY"
+    },
+    "totalMonthlyContribution": {
+      "amount": 500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "autoEnrolmentDetails": {
+    "isAutoEnrolmentScheme": true,
+    "autoEnrolmentDate": "2020-10-01",
+    "isQualifyingScheme": true,
+    "minimumContributionsMet": true,
+    "currentMinimumMember": 5.0,
+    "currentMinimumEmployer": 3.0,
+    "currentMinimumTotal": 8.0
+  },
+  "retirementAge": 67,
+  "selectedRetirementAge": 65,
+  "stateRetirementAge": 67,
+  "crystallisedAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "uncrystallisedAmount": {
+    "amount": 36800.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "taxFreeCashAvailable": {
+    "amount": 9200.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 25
+  },
+  "investmentChoice": {
+    "hasInvestmentChoice": true,
+    "numberOfFundsAvailable": 45,
+    "selectedStrategy": "SELF_SELECTED",
+    "defaultFundAvailable": true,
+    "lifestylingAvailable": true,
+    "canSwitchFunds": true,
+    "fundSwitchingFee": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "assetAllocation": {
+    "equities": 80.0,
+    "bonds": 15.0,
+    "cash": 5.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Aviva My Future Growth Fund",
+      "fundCode": "AVMFG",
+      "units": 3200.00,
+      "currentValue": {
+        "amount": 29440.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 80.0,
+      "fundCharge": 0.18
+    },
+    {
+      "fundName": "Aviva Corporate Bond Fund",
+      "fundCode": "AVCB",
+      "units": 550.00,
+      "currentValue": {
+        "amount": 5520.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 15.0,
+      "fundCharge": 0.12
+    },
+    {
+      "fundName": "Aviva Cash Fund",
+      "fundCode": "AVCASH",
+      "currentValue": {
+        "amount": 1840.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 5.0,
+      "fundCharge": 0.05
+    }
+  },
+  "projectedValueAtRetirement": {
+    "lowGrowth": {
+      "amount": 78000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "mediumGrowth": {
+      "amount": 98000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "highGrowth": {
+      "amount": 124000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "assumedRetirementAge": 65
+  },
+  "deathBenefits": {
+    "beforeRetirement": {
+      "type": "Full fund value",
+      "amount": {
+        "amount": 36800.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "isInTrust": true,
+    "nominatedBeneficiaries": [
+      {
+        "name": "Sarah Smith",
+        "relationship": "Spouse",
+        "percentage": 100
+      }
+    ]
+  },
+  "charges": {
+    "annualManagementCharge": 0.50,
+    "groupDiscount": 0.25,
+    "effectiveAMC": 0.25,
+    "averageFundCharge": 0.15,
+    "totalAnnualCharge": 0.40,
+    "noSetupFee": true,
+    "noExitFee": true,
+    "fundSwitchingFee": 0.00
+  },
+  "portability": {
+    "isPortable": true,
+    "canContinueIfLeavingEmployer": true,
+    "contributionRestrictionsOnLeaving": "Can continue personal contributions; employer contributions cease",
+    "chargesOnLeaving": "Group discount may be lost; charges may increase to 0.75%"
+  },
+  "adviserDetails": {
+    "adviserName": "Corporate HR Team",
+    "firmName": "ABC Manufacturing Ltd",
+    "adviceDate": "2020-09-15",
+    "lastReviewDate": "2025-09-10"
+  },
+  "notes": "Group Personal Pension with good employer contributions (7.5%). Benefiting from group discount (0.25% reduction). Individual policy ownership means portable on leaving. Investment choice allows self-selection. Review allocation every 2-3 years. Death benefits written in trust.",
+  "createdAt": "2020-10-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**Group Scheme Features:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `groupSpecificFeatures` | object | Required | Container for GPP-specific features |
+| `groupSpecificFeatures.isGroupScheme` | boolean | Required | Whether this is a group scheme |
+| `groupSpecificFeatures.individualPolicy` | boolean | Required | Whether member owns individual policy (true for GPP) |
+| `groupSpecificFeatures.groupNegotiatedTerms` | boolean | Required | Whether terms negotiated at group level |
+| `groupSpecificFeatures.portableOnLeaving` | boolean | Required | Whether pension portable when leaving employer |
+| `groupSpecificFeatures.canContinueContributionsAfterLeaving` | boolean | Required | Whether can continue personal contributions after leaving |
+| `groupSpecificFeatures.groupDiscountApplied` | boolean | Required | Whether group discount on charges applies |
+| `groupSpecificFeatures.groupChargeReduction` | decimal | Optional | Percentage reduction in charges due to group terms |
+
+**Investment Choice:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `investmentChoice` | object | Required | Investment options and flexibility |
+| `investmentChoice.hasInvestmentChoice` | boolean | Required | Whether member can choose investments |
+| `investmentChoice.numberOfFundsAvailable` | integer | Optional | Number of funds available to choose from |
+| `investmentChoice.selectedStrategy` | string (enum) | Required | DEFAULT_FUND, LIFESTYLING, SELF_SELECTED |
+| `investmentChoice.defaultFundAvailable` | boolean | Required | Whether default fund option available |
+| `investmentChoice.lifestylingAvailable` | boolean | Required | Whether lifestyling option available |
+| `investmentChoice.canSwitchFunds` | boolean | Required | Whether can switch between funds |
+| `investmentChoice.fundSwitchingFee` | MoneyValue | Optional | Fee for switching funds (typically £0) |
+
+**Portability:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `portability` | object | Required | Portability details |
+| `portability.isPortable` | boolean | Required | Whether pension can be retained on leaving |
+| `portability.canContinueIfLeavingEmployer` | boolean | Required | Whether can keep pension active after leaving |
+| `portability.contributionRestrictionsOnLeaving` | string | Optional | Restrictions on contributions after leaving |
+| `portability.chargesOnLeaving` | string | Optional | How charges may change on leaving employment |
+
+#### Validation Rules
+
+**Group Personal Pension Characteristics:**
+- Individual policy ownership: member owns policy, not employer
+- Group negotiated terms: charges and terms negotiated at employer level
+- Portability: pension portable when leaving employer
+- Can continue contributions: member can continue personal contributions after leaving
+- Relief at source: tax relief typically claimed via relief at source method
+- Investment choice: typically offers wider investment choice than group schemes
+
+**Employer Contribution Validation:**
+- Employer contributions cease when leaving employment
+- Member can continue personal contributions
+- Group discount may be lost on leaving (charges may increase)
+
+**Auto-Enrolment Compliance:**
+- Can be used for auto-enrolment if meets qualifying scheme criteria
+- Minimum contribution requirements: 8% total (5% employee, 3% employer minimum)
+
+---
+
+### 13.51 Arrangement - Pension Contract (Executive Pension Plan)
+
+The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plans (EPP), typically high-value arrangements for company directors and senior executives with enhanced benefits.
+
+**Reference Type:** ExecutivePensionPlanArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- High contribution limits for directors/executives
+- Company-funded or co-funded arrangements
+- Enhanced death benefits (often 4× salary)
+- Flexible investment options including DFM services
+- May include Additional Voluntary Contributions (AVCs)
+- Often includes income protection or critical illness cover
+- Trustee structure or individual policy options
+
+#### Complete Executive Pension Plan Arrangement Contract
+
+```json
+{
+  "id": 30008,
+  "href": "/api/v2/factfinds/679/arrangements/pensions/30008",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "PENSION",
+  "pensionType": "EXECUTIVE_PENSION_PLAN",
+  "productName": "Quilter Executive Pension Plan",
+  "providerName": "Quilter",
+  "providerRef": {
+    "id": "provider-888",
+    "href": "/api/v2/providers/provider-888"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "policyNumber": "EPP-987654321",
+  "membershipNumber": "EXEC-123456",
+  "startDate": "2012-04-06",
+  "executiveDetails": {
+    "employerCompany": "XYZ Technology Ltd",
+    "memberRole": "Chief Financial Officer",
+    "memberDirector": true,
+    "schemeSetupDate": "2012-04-06",
+    "isCompanyDirector": true,
+    "employmentRef": {
+      "id": 1003,
+      "href": "/api/v2/factfinds/679/employment/1003"
+    }
+  },
+  "currentValue": {
+    "amount": 685000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalContributions": {
+    "memberContributions": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "employerContributions": {
+      "amount": 480000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "additionalVoluntaryContributions": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "totalContributed": {
+      "amount": 480000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "growthToDate": {
+    "amount": 205000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 42.7
+  },
+  "contributionStructure": {
+    "memberContribution": {
+      "type": "NONE",
+      "percentage": 0.0,
+      "grossAmount": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "isActive": false
+    },
+    "employerContribution": {
+      "type": "ANNUAL_LUMP_SUM",
+      "annualAmount": {
+        "amount": 40000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "frequency": "ANNUALLY",
+      "contributionMonth": "APRIL",
+      "isActive": true,
+      "contributionStrategy": "Maximum annual allowance utilization",
+      "carryForwardUsed": true
+    },
+    "additionalVoluntaryContributions": {
+      "avcAvailable": true,
+      "avcActive": false,
+      "avcAmount": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    }
+  },
+  "taxStrategy": {
+    "annualAllowanceUsed": {
+      "amount": 40000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "annualAllowanceRemaining": {
+      "amount": 20000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "carryForwardAvailable": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "taperedAnnualAllowance": {
+      "applies": false,
+      "adjustedIncome": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "reducedAllowance": {
+        "amount": 60000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    },
+    "moneyPurchaseAnnualAllowance": {
+      "applies": false
+    }
+  },
+  "retirementAge": 67,
+  "selectedRetirementAge": 60,
+  "stateRetirementAge": 67,
+  "crystallisedAmount": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "uncrystallisedAmount": {
+    "amount": 685000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "taxFreeCashAvailable": {
+    "amount": 171250.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 25
+  },
+  "investmentManagement": {
+    "investmentApproach": "DISCRETIONARY_FUND_MANAGEMENT",
+    "discretionaryFundManager": {
+      "name": "Quilter Cheviot",
+      "mandateType": "BALANCED_GROWTH",
+      "mandateStartDate": "2018-06-01",
+      "reviewFrequency": "QUARTERLY"
+    },
+    "hasInvestmentChoice": true,
+    "investmentRestrictions": "None - full discretion within mandate",
+    "modelPortfolio": "Quilter Cheviot Balanced Growth"
+  },
+  "assetAllocation": {
+    "equities": 55.0,
+    "bonds": 25.0,
+    "property": 10.0,
+    "alternatives": 7.0,
+    "cash": 3.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Quilter Investors Equity Fund",
+      "fundCode": "QIEF",
+      "units": 38000.00,
+      "currentValue": {
+        "amount": 376750.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 55.0
+    },
+    {
+      "fundName": "Quilter Investors Corporate Bond Fund",
+      "fundCode": "QICB",
+      "units": 17000.00,
+      "currentValue": {
+        "amount": 171250.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 25.0
+    },
+    {
+      "fundName": "Quilter Investors Property Fund",
+      "fundCode": "QIPF",
+      "units": 6800.00,
+      "currentValue": {
+        "amount": 68500.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 10.0
+    },
+    {
+      "fundName": "Quilter Investors Alternatives Fund",
+      "fundCode": "QIAF",
+      "units": 4800.00,
+      "currentValue": {
+        "amount": 47950.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 7.0
+    },
+    {
+      "fundName": "Cash Reserve",
+      "fundCode": "CASH",
+      "currentValue": {
+        "amount": 20550.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 3.0
+    }
+  ],
+  "projectedValueAtRetirement": {
+    "lowGrowth": {
+      "amount": 985000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "mediumGrowth": {
+      "amount": 1240000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "highGrowth": {
+      "amount": 1580000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+        }
+      }
+    },
+    "assumedRetirementAge": 60
+  },
+  "deathBenefits": {
+    "beforeRetirement": {
+      "type": "Enhanced death benefit",
+      "amount": {
+        "amount": 685000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "lumpSumLifeCover": {
+        "amount": 480000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        },
+        "calculation": "4 × Executive Salary (£120,000)"
+      },
+      "totalDeathBenefit": {
+        "amount": 1165000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        },
+        "explanation": "Fund value (£685,000) + Life cover (£480,000)"
+      }
+    },
+    "isInTrust": true,
+    "trustType": "DISCRETIONARY_TRUST",
+    "trustees": [
+      "Sarah Smith",
+      "Professional Trustee Ltd"
+    ],
+    "nominatedBeneficiaries": [
+      {
+        "name": "Sarah Smith",
+        "relationship": "Spouse",
+        "percentage": 60
+      },
+      {
+        "name": "Emily Smith",
+        "relationship": "Child",
+        "percentage": 20
+      },
+      {
+        "name": "Thomas Smith",
+        "relationship": "Child",
+        "percentage": 20
+      }
+    ]
+  },
+  "charges": {
+    "annualManagementCharge": 0.35,
+    "discretionaryFundManagementFee": 0.75,
+    "platformFee": 0.25,
+    "averageFundCharge": 0.15,
+    "totalAnnualCharge": 1.50,
+    "performanceFee": {
+      "applies": false
+    }
+  },
+  "additionalBenefits": {
+    "incomeProtectionIncluded": true,
+    "incomeProtectionDetails": {
+      "coverAmount": {
+        "amount": 6000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        },
+        "period": "MONTHLY"
+      },
+      "deferredPeriod": 13,
+      "deferredPeriodUnit": "WEEKS",
+      "coverUntilAge": 65
+    },
+    "criticalIllnessCoverIncluded": false
+  },
+  "adviserDetails": {
+    "adviserName": "Senior Wealth Adviser",
+    "firmName": "Elite Financial Planning Ltd",
+    "adviceDate": "2012-03-20",
+    "lastReviewDate": "2025-11-05",
+    "reviewFrequency": "ANNUALLY"
+  },
+  "notes": "High-value Executive Pension Plan for CFO. Company-funded with £40k annual contributions utilizing full annual allowance. Discretionary fund management via Quilter Cheviot with balanced growth mandate. Enhanced death benefits include 4× salary life cover (£480k) plus fund value. Income protection included (£6k/month after 13 weeks, to age 65). Death benefits written in discretionary trust. Quarterly investment reviews. Tax-efficient remuneration structure.",
+  "createdAt": "2012-04-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**Executive Arrangement Features:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `executiveDetails` | object | Required | Container for executive arrangement details |
+| `executiveDetails.employerCompany` | string | Required | Name of employer company |
+| `executiveDetails.memberRole` | string | Required | Member's role/position in company |
+| `executiveDetails.memberDirector` | boolean | Required | Whether member is company director |
+| `executiveDetails.isCompanyDirector` | boolean | Required | Whether member is registered company director |
+| `taxStrategy` | object | Required | Tax planning and annual allowance tracking |
+| `taxStrategy.annualAllowanceUsed` | MoneyValue | Required | Annual allowance used in current tax year |
+| `taxStrategy.annualAllowanceRemaining` | MoneyValue | Required | Annual allowance remaining |
+| `taxStrategy.carryForwardAvailable` | MoneyValue | Required | Unused allowance available from previous 3 years |
+| `taxStrategy.taperedAnnualAllowance` | object | Required | Tapered annual allowance details (high earners) |
+
+**Investment Management:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `investmentManagement` | object | Required | Investment management approach |
+| `investmentManagement.investmentApproach` | string (enum) | Required | SELF_DIRECTED, ADVISORY, DISCRETIONARY_FUND_MANAGEMENT |
+| `investmentManagement.discretionaryFundManager` | object | Conditional | DFM details (required if approach = DISCRETIONARY_FUND_MANAGEMENT) |
+| `investmentManagement.discretionaryFundManager.name` | string | Required | Name of discretionary fund manager |
+| `investmentManagement.discretionaryFundManager.mandateType` | string | Required | Investment mandate (e.g., BALANCED_GROWTH, INCOME, CAPITAL_PRESERVATION) |
+| `investmentManagement.discretionaryFundManager.reviewFrequency` | string (enum) | Required | MONTHLY, QUARTERLY, SEMI_ANNUALLY, ANNUALLY |
+
+**Enhanced Death Benefits:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `deathBenefits.beforeRetirement.lumpSumLifeCover` | MoneyValue | Optional | Additional life cover beyond fund value |
+| `deathBenefits.beforeRetirement.totalDeathBenefit` | MoneyValue | Required | Total death benefit (fund + life cover) |
+| `deathBenefits.trustType` | string (enum) | Conditional | DISCRETIONARY_TRUST, BARE_TRUST, FLEXIBLE_TRUST |
+| `deathBenefits.trustees` | array of strings | Conditional | Named trustees (required if trust established) |
+
+**Additional Benefits:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `additionalBenefits` | object | Optional | Additional benefits included in EPP |
+| `additionalBenefits.incomeProtectionIncluded` | boolean | Required | Whether income protection included |
+| `additionalBenefits.incomeProtectionDetails` | object | Conditional | IP details (required if included) |
+| `additionalBenefits.criticalIllnessCoverIncluded` | boolean | Required | Whether critical illness cover included |
+
+#### Validation Rules
+
+**Executive Pension Plan Characteristics:**
+- Typically high contribution levels (£30,000 - £60,000+ annually)
+- Company-funded or co-funded arrangements
+- Enhanced death benefits common (2-4× salary life cover)
+- Discretionary fund management often used
+- May include additional benefits (income protection, critical illness)
+- Death benefits typically in discretionary trust for IHT efficiency
+
+**Tax Planning Requirements:**
+- Annual allowance: £60,000 (2024/25) or 100% of earnings, whichever lower
+- Tapered annual allowance for high earners (adjusted income > £260,000)
+- Minimum tapered allowance: £10,000
+- Carry forward: unused allowances from previous 3 tax years
+- Money Purchase Annual Allowance (MPAA): £10,000 if flexibly accessed
+
+**Contribution Validation:**
+- If `taperedAnnualAllowance.applies = true`, validate contribution against reduced allowance
+- If `moneyPurchaseAnnualAllowance.applies = true`, maximum contribution £10,000
+- Total contributions across all pensions must not exceed annual allowance (+ carry forward)
+
+**Enhanced Death Benefits:**
+- Life cover typically 2-4× executive salary
+- Total death benefit = fund value + life cover
+- Life cover element typically written in trust
+- Life cover premiums paid by employer (benefit-in-kind tax implications)
+
+---
+
+### 13.52 Arrangement - Investment Contract (Stocks & Shares ISA)
+
+The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-efficient investment wrappers that shelter investment returns from income tax and capital gains tax.
+
+**Reference Type:** StocksSharesISAArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Annual subscription limit (£20,000 for 2024/25)
+- Tax-free growth and income
+- Flexible withdrawals without loss of allowance (from April 2024)
+- Wide investment choice (funds, ETFs, investment trusts, bonds, shares)
+- ISA transfer rules and history
+- No tax reporting required
+
+#### Complete Stocks & Shares ISA Arrangement Contract
+
+```json
+{
+  "id": 13002,
+  "href": "/api/v2/factfinds/679/arrangements/investments/13002",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "INVESTMENT",
+  "investmentType": "STOCKS_SHARES_ISA",
+  "productName": "Vanguard Stocks & Shares ISA",
+  "providerName": "Vanguard",
+  "providerRef": {
+    "id": "provider-456",
+    "href": "/api/v2/providers/provider-456"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "accountNumber": "ISA-123456789",
+  "startDate": "2015-04-06",
+  "currentValue": {
+    "amount": 142000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalContributions": {
+    "amount": 98000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "gainLoss": {
+    "amount": 44000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 44.9
+  },
+  "isaAllowanceTracking": {
+    "currentTaxYear": "2025/26",
+    "annualAllowance": {
+      "amount": 20000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "usedThisYear": {
+      "amount": 15000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "remainingThisYear": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "subscriptionHistory": [
+      {
+        "taxYear": "2025/26",
+        "subscribed": {
+          "amount": 15000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      },
+      {
+        "taxYear": "2024/25",
+        "subscribed": {
+          "amount": 20000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      },
+      {
+        "taxYear": "2023/24",
+        "subscribed": {
+          "amount": 20000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      }
+    ],
+    "totalHistoricSubscriptions": {
+      "amount": 98000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "regularContributions": {
+    "amount": {
+      "amount": 1250.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "frequency": "MONTHLY",
+    "startDate": "2015-04-06",
+    "isActive": true,
+    "paymentMethod": "DIRECT_DEBIT",
+    "annualEquivalent": {
+      "amount": 15000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "assetAllocation": {
+    "equities": 80.0,
+    "bonds": 15.0,
+    "cash": 5.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Vanguard LifeStrategy 80% Equity Fund",
+      "fundCode": "GB00B4PQW151",
+      "ISIN": "GB00B4PQW151",
+      "units": 6200.00,
+      "currentValue": {
+        "amount": 113600.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 80.0,
+      "fundCharge": 0.22
+    },
+    {
+      "fundName": "Vanguard UK Government Bond Index Fund",
+      "fundCode": "GB00B1S74Q32",
+      "ISIN": "GB00B1S74Q32",
+      "units": 2000.00,
+      "currentValue": {
+        "amount": 21300.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 15.0,
+      "fundCharge": 0.15
+    },
+    {
+      "fundName": "Cash Reserve",
+      "fundCode": "CASH",
+      "currentValue": {
+        "amount": 7100.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 5.0
+    }
+  ],
+  "withdrawals": {
+    "hasRegularWithdrawals": false,
+    "adhocWithdrawalsThisYear": [
+      {
+        "date": "2025-12-15",
+        "amount": {
+          "amount": 5000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        },
+        "purpose": "Christmas expenses",
+        "impactsAllowance": false
+      }
+    ],
+    "totalWithdrawnThisYear": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "flexibleISA": {
+    "isFlexibleISA": true,
+    "canReplaceWithdrawals": true,
+    "withdrawalsThisYear": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "replacementAllowanceAvailable": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "effectiveAllowanceRemaining": {
+      "amount": 10000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      },
+      "calculation": "Standard remaining (£5,000) + Withdrawal replacement (£5,000)"
+    }
+  },
+  "transferHistory": {
+    "transfersIn": [
+      {
+        "transferDate": "2018-06-15",
+        "fromProvider": "Hargreaves Lansdown",
+        "amount": {
+          "amount": 15000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        },
+        "taxYear": "2018/19"
+      }
+    ],
+    "totalTransferredIn": {
+      "amount": 15000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "charges": {
+    "platformFee": 0.15,
+    "fundCharges": 0.21,
+    "totalAnnualCharge": 0.36
+  },
+  "incomeGenerated": {
+    "dividendsReceivedThisYear": {
+      "amount": 3200.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "interestReceivedThisYear": {
+      "amount": 150.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "totalIncomeThisYear": {
+      "amount": 3350.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "incomeReinvested": true,
+    "taxTreatment": "TAX_FREE"
+  },
+  "riskProfile": {
+    "targetRiskLevel": 6,
+    "atrRef": {
+      "id": 3333,
+      "href": "/api/v2/factfinds/679/clients/client-123/attitude-to-risk/3333"
+    }
+  },
+  "taxWrapper": "ISA",
+  "investmentObjective": "Long-term capital growth, tax-efficiently. Build wealth for retirement and major life goals.",
+  "adviserDetails": {
+    "adviserName": "Jane Financial Adviser",
+    "firmName": "XYZ Wealth Management",
+    "adviceDate": "2015-03-20",
+    "lastReviewDate": "2025-11-10"
+  },
+  "notes": "Stocks & Shares ISA with consistent monthly contributions (£1,250). Utilizing annual ISA allowance effectively. Good growth (44.9% total return). Flexible ISA allows replacement of withdrawals. Tax-free income and growth. Review allocation annually. Consider maxing out ISA allowance if cash flow permits.",
+  "createdAt": "2015-04-10T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**ISA Allowance Tracking:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `isaAllowanceTracking` | object | Required | Container for ISA allowance tracking |
+| `isaAllowanceTracking.currentTaxYear` | string | Required | Current tax year (format: "YYYY/YY") |
+| `isaAllowanceTracking.annualAllowance` | MoneyValue | Required | Annual ISA allowance for current tax year (£20,000 for 2024/25) |
+| `isaAllowanceTracking.usedThisYear` | MoneyValue | Required | Amount of allowance used in current tax year |
+| `isaAllowanceTracking.remainingThisYear` | MoneyValue | Required | Remaining allowance for current tax year |
+| `isaAllowanceTracking.subscriptionHistory` | array | Optional | Historic ISA subscriptions by tax year |
+| `isaAllowanceTracking.totalHistoricSubscriptions` | MoneyValue | Required | Total subscriptions across all tax years |
+
+**Flexible ISA Features:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `flexibleISA` | object | Required | Flexible ISA withdrawal replacement tracking |
+| `flexibleISA.isFlexibleISA` | boolean | Required | Whether ISA is flexible (allows withdrawal replacement) |
+| `flexibleISA.canReplaceWithdrawals` | boolean | Required | Whether withdrawals can be replaced same tax year |
+| `flexibleISA.withdrawalsThisYear` | MoneyValue | Required | Total withdrawn in current tax year |
+| `flexibleISA.replacementAllowanceAvailable` | MoneyValue | Required | Additional allowance available from withdrawals |
+| `flexibleISA.effectiveAllowanceRemaining` | MoneyValue | Required | Total effective allowance (standard + replacement) |
+
+**Transfer History:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `transferHistory` | object | Optional | ISA transfer history |
+| `transferHistory.transfersIn` | array | Optional | List of ISA transfers received |
+| `transferHistory.transfersIn[].transferDate` | string (date) | Required | Date transfer completed |
+| `transferHistory.transfersIn[].fromProvider` | string | Required | Previous ISA provider |
+| `transferHistory.transfersIn[].amount` | MoneyValue | Required | Amount transferred |
+| `transferHistory.transfersIn[].taxYear` | string | Required | Tax year of transfer |
+
+**Income Generated:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `incomeGenerated` | object | Required | Income tracking within ISA |
+| `incomeGenerated.dividendsReceivedThisYear` | MoneyValue | Required | Dividends received in current tax year |
+| `incomeGenerated.interestReceivedThisYear` | MoneyValue | Required | Interest received in current tax year |
+| `incomeGenerated.totalIncomeThisYear` | MoneyValue | Required | Total income received |
+| `incomeGenerated.incomeReinvested` | boolean | Required | Whether income automatically reinvested |
+| `incomeGenerated.taxTreatment` | string | Required | Tax treatment of income (always "TAX_FREE" for ISA) |
+
+#### Validation Rules
+
+**ISA Allowance Rules (2024/25):**
+- Annual ISA allowance: £20,000
+- Can subscribe to one Stocks & Shares ISA per tax year
+- Can transfer previous years' ISAs without affecting current year allowance
+- Flexible ISA: withdrawals can be replaced in same tax year without using allowance
+
+**ISA Transfer Rules:**
+- Can transfer current year ISA subscriptions: must transfer all current year subscriptions
+- Can transfer previous years' ISA: can transfer partial or full amount
+- Transfers don't count towards annual allowance
+- Current year subscriptions to new ISA stop during transfer period
+
+**ISA Eligibility:**
+- UK resident (or Crown employee/spouse serving overseas)
+- Aged 18+ for Stocks & Shares ISA
+- One Stocks & Shares ISA per tax year
+
+**Flexible ISA Calculation:**
+```
+effectiveAllowanceRemaining = (annualAllowance - usedThisYear) + withdrawalsThisYear
+```
+
+---
+
+### 13.53 Arrangement - Investment Contract (Cash ISA)
+
+The `CashISAArrangement` contract represents Cash ISAs, tax-free savings accounts that shelter interest from income tax.
+
+**Reference Type:** CashISAArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Tax-free interest
+- Annual subscription limit (shares overall £20,000 ISA allowance)
+- Instant access or fixed-term options
+- Flexible ISA features
+- ISA transfer capabilities
+- No capital at risk
+
+#### Complete Cash ISA Arrangement Contract
+
+```json
+{
+  "id": 13003,
+  "href": "/api/v2/factfinds/679/arrangements/investments/13003",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "INVESTMENT",
+  "investmentType": "CASH_ISA",
+  "productName": "Premium Cash ISA",
+  "providerName": "Nationwide Building Society",
+  "providerRef": {
+    "id": "provider-111",
+    "href": "/api/v2/providers/provider-111"
+  },
+  "clientRef": {
+    "id": "client-123",
+    "href": "/api/v2/factfinds/679/clients/client-123"
+  },
+  "accountNumber": "CISA-987654321",
+  "startDate": "2024-04-06",
+  "cashISAType": "INSTANT_ACCESS",
+  "currentValue": {
+    "amount": 18500.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "totalDeposits": {
+    "amount": 18000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "totalInterestEarned": {
+    "amount": 500.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "isaAllowanceTracking": {
+    "currentTaxYear": "2025/26",
+    "annualAllowance": {
+      "amount": 20000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "usedThisYear": {
+      "amount": 4000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "remainingThisYear": {
+      "amount": 16000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "subscriptionHistory": [
+      {
+        "taxYear": "2025/26",
+        "subscribed": {
+          "amount": 4000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      },
+      {
+        "taxYear": "2024/25",
+        "subscribed": {
+          "amount": 14000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      }
+    ],
+    "totalHistoricSubscriptions": {
+      "amount": 18000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "interestRate": {
+    "grossAER": 4.25,
+    "rateType": "VARIABLE",
+    "lastRateChange": "2025-08-01",
+    "bonusRate": 0.50,
+    "bonusExpiry": "2026-04-05",
+    "baseRate": 3.75,
+    "rateGuaranteedUntil": null
+  },
+  "regularContributions": {
+    "amount": {
+      "amount": 500.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "frequency": "MONTHLY",
+    "startDate": "2024-04-06",
+    "isActive": true,
+    "paymentMethod": "STANDING_ORDER"
+  },
+  "accessTerms": {
+    "accessType": "INSTANT_ACCESS",
+    "withdrawalLimit": null,
+    "penaltyForWithdrawal": false,
+    "noticePeriod": 0,
+    "noticePeriodUnit": null
+  },
+  "flexibleISA": {
+    "isFlexibleISA": true,
+    "canReplaceWithdrawals": true,
+    "withdrawalsThisYear": {
+      "amount": 2000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "replacementAllowanceAvailable": {
+      "amount": 2000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "interestPayment": {
+    "interestEarnedThisYear": {
+      "amount": 780.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "interestPaymentFrequency": "MONTHLY",
+    "interestReinvested": true,
+    "taxTreatment": "TAX_FREE"
+  },
+  "taxWrapper": "ISA",
+  "investmentObjective": "Emergency fund and short-term savings with tax-free interest",
+  "notes": "Cash ISA for emergency fund. Instant access provides liquidity. Variable rate currently 4.25% AER including 0.50% bonus until April 2026. Flexible ISA allows replacement of withdrawals. Tax-free interest. Monitor rate after bonus expiry.",
+  "createdAt": "2024-04-10T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**Cash ISA Type:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `cashISAType` | string (enum) | Required | INSTANT_ACCESS, NOTICE_ACCOUNT, FIXED_TERM, REGULAR_SAVER |
+
+**Interest Rate:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `interestRate` | object | Required | Interest rate details |
+| `interestRate.grossAER` | decimal | Required | Gross Annual Equivalent Rate (%) |
+| `interestRate.rateType` | string (enum) | Required | VARIABLE, FIXED |
+| `interestRate.lastRateChange` | string (date) | Optional | Date rate last changed |
+| `interestRate.bonusRate` | decimal | Optional | Bonus rate component (%) |
+| `interestRate.bonusExpiry` | string (date) | Optional | Date bonus rate expires |
+| `interestRate.baseRate` | decimal | Optional | Base rate excluding bonus (%) |
+| `interestRate.rateGuaranteedUntil` | string (date) | Optional | Date rate guaranteed until (for fixed-term) |
+
+**Access Terms:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `accessTerms` | object | Required | Access and withdrawal terms |
+| `accessTerms.accessType` | string (enum) | Required | INSTANT_ACCESS, NOTICE_REQUIRED, FIXED_TERM |
+| `accessTerms.withdrawalLimit` | integer | Optional | Number of withdrawals allowed per year |
+| `accessTerms.penaltyForWithdrawal` | boolean | Required | Whether penalty applies for early withdrawal |
+| `accessTerms.noticePeriod` | integer | Optional | Notice period required for withdrawal |
+| `accessTerms.noticePeriodUnit` | string (enum) | Optional | DAYS, MONTHS |
+
+**Interest Payment:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `interestPayment` | object | Required | Interest payment details |
+| `interestPayment.interestEarnedThisYear` | MoneyValue | Required | Interest earned in current tax year |
+| `interestPayment.interestPaymentFrequency` | string (enum) | Required | MONTHLY, QUARTERLY, ANNUALLY |
+| `interestPayment.interestReinvested` | boolean | Required | Whether interest automatically reinvested |
+| `interestPayment.taxTreatment` | string | Required | Tax treatment (always "TAX_FREE" for Cash ISA) |
+
+#### Validation Rules
+
+**Cash ISA Allowance:**
+- Shares overall £20,000 ISA allowance with Stocks & Shares ISA
+- Can subscribe to one Cash ISA per tax year
+- Can split allowance between Cash ISA and Stocks & Shares ISA
+
+**Cash ISA Types:**
+- **Instant Access:** Withdraw anytime without penalty
+- **Notice Account:** Requires notice period (typically 30-120 days)
+- **Fixed-Term:** Fixed rate for set period; early withdrawal penalties apply
+- **Regular Saver:** Monthly contributions required; often higher rate
+
+**Interest Rate Rules:**
+- AER (Annual Equivalent Rate) accounts for compounding
+- Bonus rates typically expire after 12 months
+- Variable rates can change at provider's discretion
+- Fixed rates guaranteed for fixed term
+
+---
+
+### 13.54 Arrangement - Investment Contract (Lifetime ISA)
+
+The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed for first-time home buyers or retirement savings with 25% government bonus.
+
+**Reference Type:** LifetimeISAArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- 25% government bonus on contributions (up to £1,000/year)
+- Annual contribution limit £4,000
+- Age eligibility: 18-39 to open, contribute until age 50
+- Withdrawal purposes: first home purchase or age 60+
+- Early withdrawal penalty: 25% (loses bonus + some capital)
+- Cash or Stocks & Shares options
+
+#### Complete Lifetime ISA Arrangement Contract
+
+```json
+{
+  "id": 13004,
+  "href": "/api/v2/factfinds/679/arrangements/investments/13004",
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "INVESTMENT",
+  "investmentType": "LIFETIME_ISA",
+  "lisaType": "STOCKS_SHARES_LISA",
+  "productName": "Moneybox Lifetime ISA",
+  "providerName": "Moneybox",
+  "providerRef": {
+    "id": "provider-222",
+    "href": "/api/v2/providers/provider-222"
+  },
+  "clientRef": {
+    "id": "client-456",
+    "href": "/api/v2/factfinds/679/clients/client-456"
+  },
+  "accountNumber": "LISA-456789123",
+  "startDate": "2022-04-06",
+  "accountOpenedAge": 28,
+  "currentValue": {
+    "amount": 17200.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "valuationDate": "2026-02-18",
+  "memberContributions": {
+    "amount": 12000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "governmentBonus": {
+    "amount": 3000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "investmentGrowth": {
+    "amount": 2200.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    },
+    "percentage": 14.7
+  },
+  "lisaAllowanceTracking": {
+    "currentTaxYear": "2025/26",
+    "annualAllowance": {
+      "amount": 4000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "usedThisYear": {
+      "amount": 3000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "remainingThisYear": {
+      "amount": 1000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "governmentBonusThisYear": {
+      "amount": 750.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "subscriptionHistory": [
+      {
+        "taxYear": "2025/26",
+        "memberContribution": {
+          "amount": 3000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        },
+        "governmentBonus": {
+          "amount": 750.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      },
+      {
+        "taxYear": "2024/25",
+        "memberContribution": {
+          "amount": 4000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        },
+        "governmentBonus": {
+          "amount": 1000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        }
+      }
+    ]
+  },
+  "regularContributions": {
+    "amount": {
+      "amount": 250.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "frequency": "MONTHLY",
+    "startDate": "2022-04-06",
+    "isActive": true,
+    "annualEquivalent": {
+      "amount": 3000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "assetAllocation": {
+    "equities": 90.0,
+    "bonds": 5.0,
+    "cash": 5.0
+  },
+  "fundHoldings": [
+    {
+      "fundName": "Vanguard FTSE Global All Cap Index Fund",
+      "fundCode": "GB00BD3RZ582",
+      "units": 1450.00,
+      "currentValue": {
+        "amount": 15480.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 90.0
+    },
+    {
+      "fundName": "Cash Reserve",
+      "fundCode": "CASH",
+      "currentValue": {
+        "amount": 1720.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "percentage": 10.0
+    }
+  ],
+  "eligibilityAndWithdrawal": {
+    "ageAtOpening": 28,
+    "canContributeUntilAge": 50,
+    "yearsUntilContributionCutoff": 22,
+    "normalAccessAge": 60,
+    "yearsUntilNormalAccess": 32,
+    "qualifiedWithdrawalReasons": [
+      "FIRST_HOME_PURCHASE",
+      "AGE_60_OR_OVER",
+      "TERMINAL_ILLNESS"
+    ],
+    "earlyWithdrawalPenalty": 25.0,
+    "isFirstTimeBuyer": true,
+    "firstHomeEligibility": {
+      "maxPropertyPrice": {
+        "amount": 450000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "mustBeUKProperty": true,
+      "mustBeMainResidence": true,
+      "mustUseMortgage": true,
+      "minimumConveyancerHoldPeriod": "12 months"
+    }
+  },
+  "penaltyCalculation": {
+    "ifWithdrawnNow": {
+      "currentValue": {
+        "amount": 17200.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "penaltyPercentage": 25.0,
+      "penaltyAmount": {
+        "amount": 4300.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "netProceeds": {
+        "amount": 12900.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "bonusLost": {
+        "amount": 3000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "growthLost": {
+        "amount": 1300.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    }
+  },
+  "charges": {
+    "platformFee": 0.45,
+    "fundCharges": 0.23,
+    "totalAnnualCharge": 0.68
+  },
+  "purposeAndObjective": "Saving for first home purchase. Target property value: £350,000. Aiming to complete house purchase within 5-7 years.",
+  "taxWrapper": "LIFETIME_ISA",
+  "notes": "Lifetime ISA for first home purchase. Regular monthly contributions of £250. Government bonus of 25% received (£3,000 so far). Good investment growth (14.7%). Must use for first home purchase (under £450,000) or wait until age 60 to avoid 25% penalty. Monitor progress towards house deposit goal.",
+  "createdAt": "2022-04-10T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Field Definitions
+
+**LISA Type:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `lisaType` | string (enum) | Required | CASH_LISA, STOCKS_SHARES_LISA |
+
+**Government Bonus Tracking:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `memberContributions` | MoneyValue | Required | Total member contributions (excludes bonus) |
+| `governmentBonus` | MoneyValue | Required | Total government bonus received |
+| `investmentGrowth` | MoneyValue | Required | Investment growth/interest earned |
+| `lisaAllowanceTracking.governmentBonusThisYear` | MoneyValue | Required | Government bonus received in current tax year |
+| `lisaAllowanceTracking.subscriptionHistory[].governmentBonus` | MoneyValue | Required | Government bonus for each tax year |
+
+**Eligibility & Withdrawal:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `eligibilityAndWithdrawal` | object | Required | LISA eligibility and withdrawal rules |
+| `eligibilityAndWithdrawal.ageAtOpening` | integer | Required | Age when LISA opened (must be 18-39) |
+| `eligibilityAndWithdrawal.canContributeUntilAge` | integer | Required | Age contributions must stop (50) |
+| `eligibilityAndWithdrawal.normalAccessAge` | integer | Required | Age for penalty-free withdrawal (60) |
+| `eligibilityAndWithdrawal.qualifiedWithdrawalReasons` | array | Required | Reasons for penalty-free withdrawal |
+| `eligibilityAndWithdrawal.earlyWithdrawalPenalty` | decimal | Required | Early withdrawal penalty percentage (25%) |
+| `eligibilityAndWithdrawal.isFirstTimeBuyer` | boolean | Required | Whether member is first-time buyer |
+| `eligibilityAndWithdrawal.firstHomeEligibility` | object | Conditional | First home purchase criteria |
+
+**Penalty Calculation:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `penaltyCalculation` | object | Required | Early withdrawal penalty breakdown |
+| `penaltyCalculation.ifWithdrawnNow.penaltyPercentage` | decimal | Required | Penalty rate (25%) |
+| `penaltyCalculation.ifWithdrawnNow.penaltyAmount` | MoneyValue | Required | Calculated penalty amount |
+| `penaltyCalculation.ifWithdrawnNow.netProceeds` | MoneyValue | Required | Amount received after penalty |
+| `penaltyCalculation.ifWithdrawnNow.bonusLost` | MoneyValue | Required | Government bonus lost to penalty |
+
+#### Validation Rules
+
+**LISA Eligibility:**
+- Age at opening: 18-39
+- Can contribute from age 18 until day before 50th birthday
+- Maximum contribution: £4,000 per tax year
+- Government bonus: 25% on contributions (max £1,000/year)
+- Counts towards overall £20,000 ISA allowance
+
+**Qualified Withdrawals (No Penalty):**
+1. **First Home Purchase:**
+   - Property price ≤ £450,000
+   - Must be first-time buyer
+   - Property in UK
+   - Must be main residence
+   - Must use mortgage
+   - LISA open for at least 12 months
+
+2. **Age 60 or over:**
+   - Can withdraw penalty-free from age 60
+
+3. **Terminal Illness:**
+   - With less than 12 months to live
+
+**Early Withdrawal Penalty:**
+- 25% penalty on entire fund value
+- Loses all government bonus
+- May lose some original capital
+- Example: £10,000 fund → £2,500 penalty → £7,500 received
+
+**Government Bonus Calculation:**
+```
+governmentBonus = memberContribution × 0.25
+maxBonusPerYear = £1,000 (on £4,000 contributions)
+```
+
+---
+
+### 13.55 Arrangement - Investment Contract (Investment Bond - Onshore)
+
+The `OnshoreInvestmentBondArrangement` contract represents onshore investment bonds (life insurance wrappers) with tax-efficient growth and 5% annual withdrawal allowance.
+
+**Reference Type:** OnshoreInvestmentBondArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Life insurance wrapper with single/regular premium options
+- Tax-deferred growth (no CGT within bond, no income tax on gains)
+- 5% annual withdrawal allowance (cumulative if unused)
+- Top-slicing relief on chargeable gains
+- Segments for partial encashment
+- Succession planning benefits
+
+#### Complete Onshore Investment Bond Contract (Abbreviated)
+
+```json
+{
+  "id": 13005,
+  "href": "/api/v2/factfinds/679/arrangements/investments/13005",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "INVESTMENT",
+  "investmentType": "INVESTMENT_BOND_ONSHORE",
+  "productName": "Prudential International Investment Bond",
+  "providerName": "Prudential",
+  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "policyNumber": "BOND-123456789",
+  "startDate": "2018-03-15",
+  "currentValue": {"amount": 285000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "valuationDate": "2026-02-18",
+  "premiumStructure": {
+    "premiumType": "SINGLE_PREMIUM",
+    "initialPremium": {"amount": 200000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "additionalPremiums": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "totalInvested": {"amount": 250000.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "bondStructure": {
+    "numberOfSegments": 100,
+    "segmentValue": {"amount": 2850.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "segmentsRemaining": 100,
+    "segmentsSurrendered": 0
+  },
+  "withdrawalAllowance": {
+    "annualAllowancePercentage": 5.0,
+    "cumulativeAllowanceAvailable": {"amount": 100000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "withdrawalsTaken": {"amount": 0.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "allowanceRemaining": {"amount": 100000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "yearsElapsed": 8,
+    "calculation": "£250,000 × 5% × 8 years = £100,000 cumulative allowance"
+  },
+  "taxPosition": {
+    "bondType": "ONSHORE",
+    "taxTreatment": "TAX_DEFERRED",
+    "chargeableGain": {"amount": 35000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "topSlicingReliefAvailable": true,
+    "yearsHeld": 8,
+    "averageGainPerYear": {"amount": 4375.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "basicRateTaxCredit": 20.0
+  },
+  "assetAllocation": {"equities": 70.0, "bonds": 20.0, "property": 5.0, "cash": 5.0},
+  "charges": {"annualManagementCharge": 0.75, "fundCharges": 0.25, "totalAnnualCharge": 1.00},
+  "lifeAssured": [
+    {"name": "John Smith", "dateOfBirth": "1972-03-15", "smokerStatus": "NON_SMOKER"}
+  ],
+  "notes": "Onshore investment bond with 100 segments. 5% annual withdrawal allowance available. Tax-deferred growth with top-slicing relief. Consider partial encashments if higher rate taxpayer status changes.",
+  "createdAt": "2018-03-20T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Key Field Definitions
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `bondStructure.numberOfSegments` | integer | Total segments (typically 100 or 1000) for flexible partial encashment |
+| `withdrawalAllowance.annualAllowancePercentage` | decimal | Annual 5% withdrawal allowance |
+| `withdrawalAllowance.cumulativeAllowanceAvailable` | MoneyValue | Unused allowance accumulates over years |
+| `taxPosition.topSlicingReliefAvailable` | boolean | Whether top-slicing relief available on gains |
+| `taxPosition.basicRateTaxCredit` | decimal | 20% basic rate tax already paid within bond |
+
+#### Validation Rules
+
+**5% Withdrawal Allowance:**
+```
+cumulativeAllowance = totalInvested × 5% × yearsElapsed
+maxTaxDeferredWithdrawal = cumulativeAllowance - withdrawalsTaken
+```
+
+**Top-Slicing Relief:**
+- Gain divided by years held = average gain per year
+- Add average gain to income to determine tax rate
+- Can reduce higher rate tax liability
+
+---
+
+### 13.56 Arrangement - Investment Contract (Investment Bond - Offshore)
+
+The `OffshoreInvestmentBondArrangement` contract represents offshore investment bonds with gross roll-up and wider investment choice.
+
+**Reference Type:** OffshoreInvestmentBondArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Gross roll-up (no UK tax within bond)
+- Wider investment choice including alternative assets
+- 5% annual withdrawal allowance (same as onshore)
+- Currency options (GBP, USD, EUR)
+- Non-UK domiciled investor benefits
+- Chargeable event gain on full/partial surrender
+
+#### Complete Offshore Investment Bond Contract (Abbreviated)
+
+```json
+{
+  "id": 13006,
+  "href": "/api/v2/factfinds/679/arrangements/investments/13006",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "INVESTMENT",
+  "investmentType": "INVESTMENT_BOND_OFFSHORE",
+  "productName": "RL360 Quantum Reserve",
+  "providerName": "RL360",
+  "jurisdiction": "ISLE_OF_MAN",
+  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "policyNumber": "OFF-BOND-987654",
+  "startDate": "2015-06-01",
+  "bondCurrency": "USD",
+  "currentValue": {"amount": 420000.00, "currency": {"code": "USD", "symbol": "$"}},
+  "currentValueGBP": {"amount": 315000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "valuationDate": "2026-02-18",
+  "premiumStructure": {
+    "premiumType": "SINGLE_PREMIUM",
+    "initialPremium": {"amount": 300000.00, "currency": {"code": "USD", "symbol": "$"}},
+    "totalInvested": {"amount": 300000.00, "currency": {"code": "USD", "symbol": "$"}}
+  },
+  "bondStructure": {
+    "numberOfSegments": 1000,
+    "segmentValue": {"amount": 420.00, "currency": {"code": "USD", "symbol": "$"}},
+    "segmentsRemaining": 1000
+  },
+  "withdrawalAllowance": {
+    "annualAllowancePercentage": 5.0,
+    "cumulativeAllowanceAvailable": {"amount": 165000.00, "currency": {"code": "USD", "symbol": "$"}},
+    "allowanceRemaining": {"amount": 165000.00, "currency": {"code": "USD", "symbol": "$"}},
+    "yearsElapsed": 11
+  },
+  "taxPosition": {
+    "bondType": "OFFSHORE",
+    "taxTreatment": "GROSS_ROLLUP",
+    "chargeableGainOnSurrender": {"amount": 120000.00, "currency": {"code": "USD", "symbol": "$"}},
+    "topSlicingReliefAvailable": true,
+    "noUKTaxWithinBond": true,
+    "taxDeferredUntilEncashment": true
+  },
+  "assetAllocation": {"equities": 65.0, "bonds": 15.0, "property": 10.0, "alternatives": 5.0, "cash": 5.0},
+  "charges": {"annualManagementCharge": 1.00, "fundCharges": 0.35, "totalAnnualCharge": 1.35},
+  "notes": "Offshore investment bond in USD. Gross roll-up with no UK tax within bond. Wide investment choice. Consider currency risk and exchange rate timing on encashment.",
+  "createdAt": "2015-06-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Key Features - Offshore vs Onshore
+
+| Feature | Onshore Bond | Offshore Bond |
+|---------|--------------|---------------|
+| Tax within bond | 20% basic rate paid | Gross roll-up (0% UK tax) |
+| Tax on encashment | Higher/additional rate only | Full marginal rate on gain |
+| Investment choice | Standard funds | Wider choice (alternatives, property, etc.) |
+| Currency options | GBP only | Multiple currencies |
+| 5% allowance | Yes | Yes |
+| Top-slicing relief | Yes | Yes |
+
+---
+
+### 13.57 Arrangement - Investment Contract (Savings Account / Cash Deposit)
+
+The `SavingsAccountArrangement` contract represents savings accounts, fixed-term deposits, and instant access cash accounts.
+
+**Reference Type:** SavingsAccountArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- FSCS protection (£85,000 per institution)
+- Instant access, notice, or fixed-term options
+- Interest rates (gross and net)
+- Personal Savings Allowance tracking
+- Regular saver products
+- No capital risk
+
+#### Complete Savings Account Contract (Abbreviated)
+
+```json
+{
+  "id": 13007,
+  "href": "/api/v2/factfinds/679/arrangements/investments/13007",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "INVESTMENT",
+  "investmentType": "SAVINGS_ACCOUNT",
+  "savingsAccountType": "FIXED_TERM_DEPOSIT",
+  "productName": "2 Year Fixed Rate Bond",
+  "providerName": "Coventry Building Society",
+  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "accountNumber": "SAV-445566778",
+  "startDate": "2024-06-01",
+  "maturityDate": "2026-06-01",
+  "currentValue": {"amount": 51200.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "valuationDate": "2026-02-18",
+  "depositAmount": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "interestEarned": {"amount": 1200.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "interestRate": {
+    "grossAER": 5.10,
+    "netAER": 4.08,
+    "rateType": "FIXED",
+    "fixedUntil": "2026-06-01",
+    "taxDeductedAtSource": false
+  },
+  "accessTerms": {
+    "accessType": "FIXED_TERM",
+    "earlyAccessPenalty": "Interest forfeited for full term",
+    "withdrawalsAllowed": 0,
+    "maturityOptions": ["WITHDRAW_IN_FULL", "ROLLOVER_TO_NEW_TERM", "TRANSFER_TO_INSTANT_ACCESS"]
+  },
+  "fscsProtection": {
+    "protected": true,
+    "protectionLimit": {"amount": 85000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "balanceOverLimit": false
+  },
+  "personalSavingsAllowance": {
+    "applicableTaxYear": "2025/26",
+    "clientTaxBand": "HIGHER_RATE",
+    "allowance": {"amount": 500.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "interestEarnedThisYear": {"amount": 2550.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "taxableInterest": {"amount": 2050.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "estimatedTaxDue": {"amount": 820.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "notes": "Fixed term deposit for 2 years at 5.10% gross. FSCS protected. Interest taxable above £500 Personal Savings Allowance for higher rate taxpayer. Maturity June 2026 - review rates at maturity.",
+  "createdAt": "2024-06-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Personal Savings Allowance (PSA)
+
+| Tax Band | PSA | Tax on Excess |
+|----------|-----|---------------|
+| Basic rate (20%) | £1,000 | 20% |
+| Higher rate (40%) | £500 | 40% |
+| Additional rate (45%) | £0 | 45% |
+
+---
+
+### 13.58 Arrangement - Protection Contract (Critical Illness Cover)
+
+The `CriticalIllnessCoverArrangement` contract represents critical illness insurance providing lump sum on diagnosis of specified conditions.
+
+**Reference Type:** CriticalIllnessCoverArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Defined list of covered conditions (typically 40-50 conditions)
+- Full pay-out conditions vs partial pay-out conditions
+- Severity-based pay-outs (e.g., cancer staging)
+- Children's cover included
+- Additional payment cover
+- Total permanent disability (TPD) benefit
+
+#### Complete Critical Illness Cover Contract (Abbreviated)
+
+```json
+{
+  "id": 20002,
+  "href": "/api/v2/factfinds/679/arrangements/protection/20002",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "PROTECTION",
+  "protectionType": "CRITICAL_ILLNESS_COVER",
+  "policyType": "STANDALONE_CRITICAL_ILLNESS",
+  "productName": "Vitality Serious Illness Cover",
+  "providerName": "Vitality",
+  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "policyNumber": "CIC-789456123",
+  "startDate": "2023-01-15",
+  "endDate": "2048-01-15",
+  "termRemaining": {"years": 21, "months": 11},
+  "sumAssured": {"amount": 200000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "premium": {"amount": 95.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "premiumFrequency": "MONTHLY",
+  "premiumType": "REVIEWABLE",
+  "coverageDetails": {
+    "numberOfConditionsCovered": 47,
+    "fullPayOutConditions": 42,
+    "partialPayOutConditions": 5,
+    "childrensCoverIncluded": true,
+    "childrensCoverAmount": {"amount": 25000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "additionalPaymentCover": true,
+    "additionalPaymentAmount": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "totalPermanentDisabilityCover": true
+  },
+  "keyConditionsCovered": [
+    {"condition": "Cancer", "payOutType": "FULL_OR_PARTIAL_BASED_ON_SEVERITY"},
+    {"condition": "Heart Attack", "payOutType": "FULL"},
+    {"condition": "Stroke", "payOutType": "FULL"},
+    {"condition": "Multiple Sclerosis", "payOutType": "FULL"},
+    {"condition": "Coronary Artery Bypass", "payOutType": "FULL"},
+    {"condition": "Kidney Failure", "payOutType": "FULL"},
+    {"condition": "Major Organ Transplant", "payOutType": "FULL"},
+    {"condition": "Loss of Limbs", "payOutType": "FULL"},
+    {"condition": "Blindness", "payOutType": "FULL"},
+    {"condition": "Deafness", "payOutType": "FULL"}
+  ],
+  "underwriting": {
+    "underwritingType": "FULL_MEDICAL_UNDERWRITING",
+    "completedDate": "2023-01-10",
+    "exclusions": [],
+    "loadings": []
+  },
+  "indexation": {
+    "isIndexLinked": true,
+    "indexationType": "RPI",
+    "annualIncreasePercentage": 3.2
+  },
+  "linkedTo": {
+    "mortgageRef": {"id": 12001, "href": "/api/v2/factfinds/679/arrangements/mortgages/12001"}
+  },
+  "notes": "Standalone critical illness cover for mortgage protection. 47 conditions covered including partial pay-outs. Children's cover (£25k) and additional payment cover (£50k) included. Index-linked to maintain real value. Review annually.",
+  "createdAt": "2023-01-20T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Critical Illness - Full vs Partial Pay-Out
+
+**Full Pay-Out Conditions (100% of sum assured):**
+- Cancer (excluding less advanced cases)
+- Heart attack (of specified severity)
+- Stroke (with permanent symptoms)
+- Major organ transplant
+- Kidney failure (requiring dialysis)
+
+**Partial Pay-Out Conditions (typically 25% of sum assured):**
+- Early stage cancer
+- Less severe heart attack
+- Angioplasty
+- Loss of one limb
+- Less severe stroke
+
+---
+
+### 13.59 Arrangement - Protection Contract (Income Protection Insurance)
+
+The `IncomeProtectionArrangement` contract represents income protection insurance providing replacement income during illness or injury.
+
+**Reference Type:** IncomeProtectionArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Deferred period (4, 13, 26, 52 weeks)
+- Benefit percentage (typically 50-70% of income)
+- Payment period (to retirement age or fixed term)
+- Guaranteed vs reviewable premiums
+- Own occupation vs any occupation definition
+- Rehabilitation benefits
+
+#### Complete Income Protection Contract (Abbreviated)
+
+```json
+{
+  "id": 20003,
+  "href": "/api/v2/factfinds/679/arrangements/protection/20003",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "PROTECTION",
+  "protectionType": "INCOME_PROTECTION",
+  "productName": "Income Protection Plus",
+  "providerName": "Legal & General",
+  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "policyNumber": "IP-456789123",
+  "startDate": "2023-06-01",
+  "policyEndAge": 65,
+  "coverRemaining": {"years": 17, "months": 4},
+  "monthlyBenefit": {"amount": 3500.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "premium": {"amount": 87.50, "currency": {"code": "GBP", "symbol": "£"}},
+  "premiumFrequency": "MONTHLY",
+  "premiumType": "GUARANTEED",
+  "deferredPeriod": {
+    "weeks": 13,
+    "description": "13 weeks from onset of incapacity before benefit starts"
+  },
+  "benefitDetails": {
+    "monthlyBenefit": {"amount": 3500.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "annualBenefit": {"amount": 42000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "benefitPercentageOfIncome": 60.0,
+    "grossAnnualIncome": {"amount": 70000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "paymentPeriod": "TO_RETIREMENT_AGE",
+    "retirementAge": 65,
+    "maximumBenefitPeriod": "Until age 65"
+  },
+  "occupationDefinition": {
+    "definitionType": "OWN_OCCUPATION",
+    "occupation": "Software Engineer",
+    "occupationClass": "1",
+    "description": "Unable to perform own occupation due to illness or injury"
+  },
+  "additionalBenefits": {
+    "proportionateBenefit": true,
+    "rehabilitationBenefit": {"amount": 3500.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "hospitalCashBenefit": {"amount": 100.00, "currency": {"code": "GBP", "symbol": "£"}, "perDay": true},
+    "waiversOfPremium": true
+  },
+  "indexation": {
+    "isIndexLinked": true,
+    "indexationType": "RPI",
+    "cappedAt": 5.0
+  },
+  "underwriting": {
+    "underwritingType": "FULL_MEDICAL_UNDERWRITING",
+    "exclusions": ["Pre-existing back condition - 2 year exclusion"],
+    "loadings": []
+  },
+  "notes": "Income protection covering 60% of income (£3,500/month). 13 week deferred period. Own occupation definition. Guaranteed premiums. Index-linked with 5% cap. Rehabilitation support included. Critical for mortgage and family protection.",
+  "createdAt": "2023-06-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Income Protection Key Concepts
+
+**Deferred Period:** Time between onset of incapacity and benefit payment start
+- Longer deferred period = lower premium
+- Typical options: 4, 8, 13, 26, 52 weeks
+
+**Occupation Definition:**
+- **Own Occupation:** Can't perform your specific job
+- **Suited Occupation:** Can't perform any job you're suited to by training/experience
+- **Any Occupation:** Can't perform any paid work
+
+**Benefit Percentage:** Typically 50-70% of gross income (insurance companies limit to prevent over-insurance)
+
+---
+
+### 13.60 Arrangement - Protection Contract (Buildings Insurance)
+
+The `BuildingsInsuranceArrangement` contract represents buildings insurance for property structural protection.
+
+**Reference Type:** BuildingsInsuranceArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Rebuild cost basis (not market value)
+- Structural damage cover
+- Subsidence and landslip protection
+- Alternative accommodation
+- Public liability
+- Accidental damage extension
+
+#### Complete Buildings Insurance Contract (Abbreviated)
+
+```json
+{
+  "id": 20004,
+  "href": "/api/v2/factfinds/679/arrangements/protection/20004",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "PROTECTION",
+  "protectionType": "BUILDINGS_INSURANCE",
+  "productName": "Premier Home Insurance - Buildings",
+  "providerName": "Aviva",
+  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "policyNumber": "BLDG-123456789",
+  "startDate": "2023-04-01",
+  "renewalDate": "2026-04-01",
+  "sumInsured": {"amount": 450000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "valuationBasis": "REBUILD_COST",
+  "annualPremium": {"amount": 385.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "excess": {"amount": 250.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "subsidenceExcess": {"amount": 1000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "coverageDetails": {
+    "fireAndLightning": true,
+    "explosionAndEarthquake": true,
+    "floodAndWeather": true,
+    "theftAndVandalism": true,
+    "subsidenceAndHeave": true,
+    "impactDamage": true,
+    "accidentalDamage": true,
+    "alternativeAccommodation": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "publicLiability": {"amount": 2000000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "tracingAndAccessCover": {"amount": 5000.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "propertyDetails": {
+    "propertyType": "DETACHED_HOUSE",
+    "constructionType": "STANDARD_BRICK",
+    "yearBuilt": 1995,
+    "numberOfBedrooms": 4,
+    "roofType": "TILED",
+    "heatingType": "GAS_CENTRAL_HEATING"
+  },
+  "linkedProperty": {
+    "id": 12345,
+    "href": "/api/v2/factfinds/679/properties/12345"
+  },
+  "notes": "Buildings insurance based on rebuild cost (£450k). Accidental damage included. Subsidence cover with £1k excess. Alternative accommodation up to £50k. Review rebuild cost annually to ensure adequate cover.",
+  "createdAt": "2023-04-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Buildings vs Contents Insurance
+
+| Feature | Buildings Insurance | Contents Insurance |
+|---------|-------------------|-------------------|
+| Covers | Structure, fixtures, fittings | Possessions inside property |
+| Basis | Rebuild cost | Replacement cost |
+| Who needs it | Property owner (required if mortgage) | Owner or tenant |
+| Includes | Roof, walls, floors, built-in kitchen | Furniture, electronics, clothes, valuables |
+| Alternative accommodation | Usually included | May be included |
+
+---
+
+### 13.61 Arrangement - Protection Contract (Contents Insurance)
+
+The `ContentsInsuranceArrangement` contract represents contents insurance for possessions within property.
+
+**Reference Type:** ContentsInsuranceArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Replacement value basis
+- Specified high-value items
+- Accidental damage extension
+- All-risks cover for items outside home
+- New-for-old replacement
+- Personal liability
+
+#### Complete Contents Insurance Contract (Abbreviated)
+
+```json
+{
+  "id": 20005,
+  "href": "/api/v2/factfinds/679/arrangements/protection/20005",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "PROTECTION",
+  "protectionType": "CONTENTS_INSURANCE",
+  "productName": "Premier Home Insurance - Contents",
+  "providerName": "Aviva",
+  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "policyNumber": "CONT-987654321",
+  "startDate": "2023-04-01",
+  "renewalDate": "2026-04-01",
+  "sumInsured": {"amount": 75000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "valuationBasis": "NEW_FOR_OLD",
+  "annualPremium": {"amount": 185.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "excess": {"amount": 100.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "coverageDetails": {
+    "theft": true,
+    "fireAndSmoke": true,
+    "waterDamage": true,
+    "accidentalDamage": true,
+    "personalPossessionsAwayFromHome": true,
+    "allRisksCover": {"amount": 10000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "personalLiability": {"amount": 2000000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "legalExpenses": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "bicycleCover": {"amount": 2000.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "specifiedItems": [
+    {"itemDescription": "Rolex Watch", "value": {"amount": 8500.00, "currency": {"code": "GBP", "symbol": "£"}}},
+    {"itemDescription": "Diamond Engagement Ring", "value": {"amount": 6000.00, "currency": {"code": "GBP", "symbol": "£"}}},
+    {"itemDescription": "Artwork - Oil Painting", "value": {"amount": 4500.00, "currency": {"code": "GBP", "symbol": "£"}}}
+  ],
+  "totalSpecifiedItemsValue": {"amount": 19000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "singleItemLimit": {"amount": 2000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "notes": "Contents insurance covering £75k total. High-value items specified separately (£19k). Accidental damage included. All-risks cover for items outside home (£10k). Bicycle cover (£2k). Review annually and update valuations.",
+  "createdAt": "2023-04-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+---
+
+### 13.62 Arrangement - Protection Contract (Private Medical Insurance)
+
+The `PrivateMedicalInsuranceArrangement` contract represents private medical insurance (PMI) for healthcare treatment.
+
+**Reference Type:** PrivateMedicalInsuranceArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Hospital list (full or restricted)
+- Excess options (annual excess reduces premium)
+- Underwriting method (medical history disregarded or fully underwritten)
+- Out-patient cover
+- Mental health cover
+- Corporate vs individual policies
+
+#### Complete Private Medical Insurance Contract (Abbreviated)
+
+```json
+{
+  "id": 20006,
+  "href": "/api/v2/factfinds/679/arrangements/protection/20006",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "PROTECTION",
+  "protectionType": "PRIVATE_MEDICAL_INSURANCE",
+  "policyType": "CORPORATE_PMI",
+  "productName": "Company Health Insurance",
+  "providerName": "Bupa",
+  "clientRef": {"id": "client-123", "href": "/api/v2/factfinds/679/clients/client-123"},
+  "policyNumber": "PMI-445566778",
+  "startDate": "2023-01-01",
+  "renewalDate": "2026-01-01",
+  "annualPremium": {"amount": 0.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "paidByEmployer": true,
+  "benefitInKindValue": {"amount": 1850.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "excess": {"amount": 0.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "hospitalList": "FULL_LIST",
+  "underwritingMethod": "MEDICAL_HISTORY_DISREGARDED",
+  "coverageDetails": {
+    "inPatientTreatment": true,
+    "outPatientTreatment": true,
+    "dayPatientTreatment": true,
+    "diagnosticTests": true,
+    "cancerCover": true,
+    "mentalHealthCover": {"amount": 5000.00, "currency": {"code": "GBP", "symbol": "£"}, "perYear": true},
+    "dentalAccidentCover": true,
+    "therapies": true,
+    "prescriptionDrugs": true
+  },
+  "limits": {
+    "annualLimit": "UNLIMITED",
+    "outPatientLimit": {"amount": 1500.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "therapiesLimit": {"amount": 1000.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "notes": "Corporate PMI provided by employer. Full hospital list access. Medical history disregarded underwriting. Unlimited in-patient cover. Out-patient limited to £1,500 p.a. Mental health cover £5k p.a. Benefit-in-kind £1,850.",
+  "createdAt": "2023-01-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+---
+
+### 13.63 Arrangement - Mortgage Contract (Lifetime Mortgage - Equity Release)
+
+The `LifetimeMortgageArrangement` contract represents lifetime mortgages (equity release) for over-55s with no monthly repayments.
+
+**Reference Type:** LifetimeMortgageArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- No monthly repayments (interest rolls up)
+- No negative equity guarantee (Equity Release Council standard)
+- Fixed or capped interest rate
+- Voluntary interest payment option
+- Drawdown facility or lump sum
+- Inheritance protection
+
+#### Complete Lifetime Mortgage Contract (Abbreviated)
+
+```json
+{
+  "id": 5002,
+  "href": "/api/v2/factfinds/679/arrangements/mortgages/5002",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "MORTGAGE",
+  "productType": "LifetimeMortgage",
+  "lenderName": "Aviva Equity Release",
+  "productName": "Lifetime Mortgage - Lump Sum",
+  "policyNumber": "LTM-123456",
+  "startDate": "2024-06-01",
+  "borrowerDetails": [
+    {"name": "John Smith", "dateOfBirth": "1955-03-15", "ageAtAdvance": 69},
+    {"name": "Mary Smith", "dateOfBirth": "1957-08-22", "ageAtAdvance": 66}
+  ],
+  "youngestBorrowerAge": 66,
+  "loanDetails": {
+    "initialAdvance": {"amount": 85000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "currentBalance": {"amount": 87650.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "propertyValue": {"amount": 380000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "loanToValue": 23.0,
+    "maxLoanToValue": 30.0
+  },
+  "interestDetails": {
+    "interestRate": 5.95,
+    "rateType": "FIXED_FOR_LIFE",
+    "rollUpMethod": "COMPOUND_INTEREST",
+    "noPaymentRequired": true,
+    "voluntaryPaymentOption": true,
+    "voluntaryPaymentMaxPerYear": {"amount": 10000.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "projectedBalance": {
+    "after5Years": {"amount": 114500.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "after10Years": {"amount": 149700.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "after15Years": {"amount": 195700.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "after20Years": {"amount": 255800.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "equityReleaseCouncilStandards": {
+    "memberOfERC": true,
+    "noNegativeEquityGuarantee": true,
+    "guaranteedRightToRemain": true,
+    "portabilityOption": true,
+    "fixedInterestRate": true,
+    "regulatedByFCA": true
+  },
+  "inheritanceProtection": {
+    "protectionAmount": {"amount": 76000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "protectionPercentage": 20.0,
+    "description": "20% of property value protected for inheritance"
+  },
+  "drawdownFacility": {
+    "hasDrawdownFacility": false
+  },
+  "notes": "Lifetime mortgage releasing £85k equity. Fixed 5.95% for life with interest rolling up. No monthly payments required. No negative equity guarantee. 20% inheritance protection (£76k). Projected balance after 20 years: £256k. Review annually to monitor equity position.",
+  "createdAt": "2024-06-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Lifetime Mortgage Key Features
+
+**No Negative Equity Guarantee:** Balance owed will never exceed property sale proceeds
+
+**Interest Roll-Up Calculation:**
+```
+year1Balance = initialLoan × (1 + rate)
+year2Balance = year1Balance × (1 + rate)
+yearNBalance = initialLoan × (1 + rate)^N
+```
+
+Example: £85,000 at 5.95% for 20 years = £255,800
+
+**Equity Release Council Standards:**
+- Member lenders must offer no negative equity guarantee
+- Clients have right to remain in property for life
+- Fixed interest rates standard
+- Portability to new property (subject to lender criteria)
+
+---
+
+### 13.64 Arrangement - Mortgage Contract (Buy-to-Let Mortgage)
+
+The `BuyToLetMortgageArrangement` contract represents buy-to-let mortgages for investment properties with rental income assessment.
+
+**Reference Type:** BuyToLetMortgageArrangement is a reference type with identity (has `id` field).
+
+**Key Features:**
+- Rental income assessment (125-145% ICR)
+- Higher interest rates than residential mortgages
+- Limited company vs personal ownership
+- Portfolio landlord considerations
+- Section 24 tax implications
+- HMO or standard tenancy
+
+#### Complete Buy-to-Let Mortgage Contract (Abbreviated)
+
+```json
+{
+  "id": 5003,
+  "href": "/api/v2/factfinds/679/arrangements/mortgages/5003",
+  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "arrangementCategory": "MORTGAGE",
+  "productType": "BuyToLetMortgage",
+  "lenderName": "Paragon Bank",
+  "productName": "Buy-to-Let Fixed Rate Mortgage",
+  "policyNumber": "BTL-789456",
+  "startDate": "2023-09-01",
+  "loanDetails": {
+    "originalLoanAmount": {"amount": 180000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "currentBalance": {"amount": 175000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "propertyValue": {"amount": 300000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "loanToValue": 58.3
+  },
+  "interestDetails": {
+    "interestRate": 4.75,
+    "rateType": "FIXED",
+    "fixedUntil": "2028-09-01",
+    "reversionRate": 5.99,
+    "monthlyPayment": {"amount": 976.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "rentalIncome": {
+    "monthlyRental": {"amount": 1450.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "annualRental": {"amount": 17400.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "voidPeriodsAssumed": 1.0,
+    "netAnnualRental": {"amount": 16530.00, "currency": {"code": "GBP", "symbol": "£"}}
+  },
+  "interestCoverageRatio": {
+    "requiredICR": 125.0,
+    "actualICR": 145.0,
+    "calculation": "(£17,400 / £11,713 annual interest) × 100 = 148.5% (passes 125% requirement)",
+    "assessmentRate": 5.5,
+    "meetsRequirement": true
+  },
+  "ownershipStructure": {
+    "ownershipType": "PERSONAL",
+    "section24TaxApplies": true,
+    "section24Impact": "Mortgage interest relief restricted to basic rate (20%) from 2020/21"
+  },
+  "landlordProfile": {
+    "isPortfolioLandlord": false,
+    "numberOfBTLProperties": 1,
+    "experiencedLandlord": false,
+    "yearsExperience": 2
+  },
+  "tenancyDetails": {
+    "tenancyType": "ASSURED_SHORTHOLD_TENANCY",
+    "isHMO": false,
+    "currentlyLet": true,
+    "tenancyStartDate": "2023-10-01"
+  },
+  "notes": "Buy-to-let mortgage on investment property. Rental income £1,450/month. ICR 145% (passes 125% requirement). Personal ownership subject to Section 24 tax restrictions. Fixed rate until Sept 2028. Monitor rental market and consider limited company structure for tax efficiency.",
+  "createdAt": "2023-09-05T10:00:00Z",
+  "updatedAt": "2026-02-18T14:00:00Z"
+}
+```
+
+#### Buy-to-Let Key Concepts
+
+**Interest Coverage Ratio (ICR):**
+```
+ICR = (Annual Rental Income / Annual Mortgage Interest) × 100
+Required ICR typically: 125% (standard), 145% (higher rate taxpayers)
+Assessment rate: Typically 5.5% (stress test rate)
+```
+
+**Section 24 Tax Changes:**
+- Pre-2017: Full mortgage interest tax relief at marginal rate (20%/40%/45%)
+- From 2020/21: Interest relief restricted to basic rate (20%) only
+- Higher rate landlords significantly impacted
+- Many landlords switching to limited company ownership for tax efficiency
+
+**Portfolio Landlord:** Typically 4+ mortgaged BTL properties
+
 
 ---
 

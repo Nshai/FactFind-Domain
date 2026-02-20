@@ -5660,6 +5660,501 @@ This contract connects to:
 
 ---
 
+## 13.45 Arrangement - Pension Contract (SIPP)
+
+### Business Purpose
+
+Represents a Self-Invested Personal Pension with wider investment choices including property and direct equities.
+
+### Key Features
+
+- Commercial property investment within pension wrapper
+- Direct equity holdings allowed
+- Greater investment flexibility than standard pensions
+- Higher charges for additional services
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | PENSION |
+| pensionType | Text | Specific pension type | SIPP |
+| currentValue | Currency Amount | Current total fund value | £425,000 |
+| sippSpecificFeatures | Complex Data | SIPP-specific investment features | Complex object |
+| allowsCommercialProperty | Yes/No | Whether can invest in commercial property | Yes |
+| hasPropertyHolding | Yes/No | Currently holds commercial property | Yes |
+| propertyHoldingsCount | Number | Number of properties held | 1 |
+| charges | Complex Data | SIPP fee structure | Complex object |
+| setupFee | Currency Amount | One-time setup fee | £0 (waived) |
+| annualAdministrationFee | Currency Amount | Annual admin charge | £400 |
+| propertyRelatedFees | Complex Data | Additional property fees | Complex object |
+
+### Business Validation Rules
+
+- Commercial property must be for business use only (not residential)
+- Property should not exceed 60% of total SIPP value
+- Annual contributions subject to £60,000 limit
+- SIPP provider must be FCA regulated
+
+---
+
+## 13.46 Arrangement - Pension Contract (Final Salary/Defined Benefit)
+
+### Business Purpose
+
+Represents a Final Salary or Defined Benefit pension providing guaranteed income based on salary and service.
+
+### Key Features
+
+- Guaranteed pension income for life
+- Based on years of service and final/career average salary
+- Spouse and dependant pensions
+- Cash Equivalent Transfer Value (CETV) for transfer options
+- Early/late retirement factors
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | PENSION |
+| pensionType | Text | Specific pension type | FINAL_SALARY |
+| membershipStatus | Text | Current membership status | DEFERRED |
+| yearsOfService | Complex Data | Service years breakdown | 17 years, 5 months |
+| accrualRate | Text | Benefit accrual rate | 1/60th |
+| projectedPensionAtNRA | Currency Amount | Projected annual pension | £16,837 per year |
+| transferValue | Complex Data | CETV details | Complex object |
+| cashEquivalentTransferValue | Currency Amount | Current transfer value | £415,000 |
+| cetvDate | Date | Date CETV calculated | 2026-01-15 |
+| transferValueMultiplier | Number | CETV as multiple of pension | 24.6 |
+| deathBenefits | Complex Data | Death benefit structure | Complex object |
+| spousePension | Complex Data | Spouse's pension entitlement | 50% of member pension |
+
+### Business Validation Rules
+
+- Transfer advice mandatory if CETV ≥ £30,000 (FCA requirement)
+- Pension Wise guidance must be offered to members aged 50+
+- Transfer value expires after guarantee period (typically 3 months)
+- Accrual rate typically 1/60th or 1/80th for UK schemes
+
+---
+
+## 13.47 Arrangement - Pension Contract (Money Purchase/Defined Contribution)
+
+### Business Purpose
+
+Represents a workplace Defined Contribution pension with employer matching contributions.
+
+### Key Features
+
+- Employer contribution matching
+- Auto-enrolment compliance
+- Lifestyling investment strategy
+- Member and employer contribution tracking
+- Salary sacrifice options available
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | PENSION |
+| pensionType | Text | Specific pension type | MONEY_PURCHASE |
+| currentValue | Currency Amount | Current fund value | £48,500 |
+| contributionStructure | Complex Data | Contribution breakdown | Complex object |
+| memberContribution | Complex Data | Employee contribution | 5% of salary |
+| employerContribution | Complex Data | Employer contribution | 7.5% of salary |
+| matchingStructure | Complex Data | Matching rules | 1.5:1 ratio |
+| autoEnrolmentDetails | Complex Data | Auto-enrolment compliance | Complex object |
+| minimumContributionsMet | Yes/No | Meets minimum 8% total | Yes |
+| lifestyling | Complex Data | Lifestyling strategy | Complex object |
+| lifestylingStartAge | Number | Age lifestyling begins | 55 |
+
+### Business Validation Rules
+
+- Minimum total contributions: 8% (3% employer + 5% employee from April 2019)
+- Qualifying earnings: £6,240 to £50,270 (2024/25)
+- Auto-enrolment age: 22 to State Pension Age
+- Re-enrolment every 3 years for opt-outs
+
+---
+
+## 13.48 Arrangement - Pension Contract (State Pension)
+
+### Business Purpose
+
+Represents UK State Pension entitlement based on National Insurance contributions.
+
+### Key Features
+
+- National Insurance contributions record tracking
+- State Pension forecast calculations
+- Voluntary contributions options
+- Deferral benefits
+- Contracted-out impact assessment
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | PENSION |
+| pensionType | Text | Specific pension type | STATE_PENSION |
+| statePensionType | Text | New or Basic State Pension | NEW_STATE_PENSION |
+| nationalInsuranceNumber | Text | NI number | AB123456C |
+| stateRetirementAge | Number | State Pension Age | 67 |
+| nationalInsuranceRecord | Complex Data | NI contributions history | Complex object |
+| qualifyingYears | Number | Years with full NI credits | 23 |
+| yearsRequired | Number | Years needed for full pension | 35 |
+| statePensionForecast | Complex Data | Forecast amounts | Complex object |
+| forecastWeeklyAmount | Currency Amount | Forecast weekly pension | £203.85 per week |
+| forecastAnnualAmount | Currency Amount | Forecast annual pension | £10,600 per year |
+| voluntaryContributions | Complex Data | Options to fill gaps | Complex object |
+| costToFillOneYear | Currency Amount | Cost per year of gaps | £824.20 |
+
+### Business Validation Rules
+
+- Minimum 10 qualifying years needed for any State Pension
+- Full State Pension requires 35 qualifying years
+- Maximum State Pension 2024/25: £221.20 per week
+- Voluntary contributions deadline: typically within 6 years
+
+---
+
+## 13.49 Arrangement - Investment Contract (Stocks & Shares ISA)
+
+### Business Purpose
+
+Represents a tax-efficient investment wrapper providing tax-free growth and income on investments.
+
+### Key Features
+
+- Annual subscription limit (£20,000 for 2024/25)
+- Tax-free dividends and capital gains
+- Flexible ISA withdrawal replacement
+- Wide investment choice
+- ISA transfer capabilities
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | INVESTMENT |
+| investmentType | Text | Specific investment type | STOCKS_SHARES_ISA |
+| currentValue | Currency Amount | Current ISA value | £142,000 |
+| isaAllowanceTracking | Complex Data | ISA allowance details | Complex object |
+| annualAllowance | Currency Amount | Current year allowance | £20,000 |
+| usedThisYear | Currency Amount | Allowance used this year | £15,000 |
+| remainingThisYear | Currency Amount | Allowance remaining | £5,000 |
+| flexibleISA | Complex Data | Flexible ISA features | Complex object |
+| isFlexibleISA | Yes/No | Allows withdrawal replacement | Yes |
+| withdrawalsThisYear | Currency Amount | Amount withdrawn this year | £5,000 |
+| replacementAllowanceAvailable | Currency Amount | Extra allowance from withdrawals | £5,000 |
+| incomeGenerated | Complex Data | Tax-free income tracking | Complex object |
+| dividendsReceivedThisYear | Currency Amount | Dividends received | £3,200 |
+| taxTreatment | Text | Tax status | TAX_FREE |
+
+### Business Validation Rules
+
+- One Stocks & Shares ISA per tax year
+- Age 18+ required
+- UK resident (or Crown employee/spouse serving overseas)
+- Transfers don't count towards annual allowance
+
+---
+
+## 13.50 Arrangement - Investment Contract (Lifetime ISA)
+
+### Business Purpose
+
+Represents a Lifetime ISA for first-time home buyers or retirement savings with government bonus.
+
+### Key Features
+
+- 25% government bonus on contributions (max £1,000/year)
+- £4,000 annual contribution limit
+- Use for first home (≤£450k) or age 60+ withdrawal
+- 25% penalty on early withdrawal
+- Counts towards £20,000 ISA allowance
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | INVESTMENT |
+| investmentType | Text | Specific investment type | LIFETIME_ISA |
+| lisaType | Text | Cash or Stocks & Shares | STOCKS_SHARES_LISA |
+| currentValue | Currency Amount | Total fund value | £17,200 |
+| memberContributions | Currency Amount | Client contributions (excl bonus) | £12,000 |
+| governmentBonus | Currency Amount | Total bonus received | £3,000 |
+| eligibilityAndWithdrawal | Complex Data | Eligibility rules | Complex object |
+| ageAtOpening | Number | Age when opened | 28 |
+| earlyWithdrawalPenalty | Number | Penalty percentage | 25% |
+| firstHomeEligibility | Complex Data | First home purchase rules | Complex object |
+| maxPropertyPrice | Currency Amount | Maximum property value | £450,000 |
+| penaltyCalculation | Complex Data | Penalty breakdown | Complex object |
+| penaltyAmount | Currency Amount | Calculated penalty | £4,300 |
+| bonusLost | Currency Amount | Bonus lost to penalty | £3,000 |
+
+### Business Validation Rules
+
+- Age 18-39 to open
+- Contribute until day before 50th birthday
+- Maximum £4,000 per tax year
+- Government bonus: 25% (max £1,000/year)
+- First home: UK property, ≤£450k, main residence, use mortgage
+
+---
+
+## 13.51 Arrangement - Investment Contract (Investment Bond - Onshore)
+
+### Business Purpose
+
+Represents an onshore investment bond (life insurance wrapper) with tax-deferred growth.
+
+### Key Features
+
+- Life insurance wrapper with tax benefits
+- 5% annual withdrawal allowance (cumulative)
+- Top-slicing relief on chargeable gains
+- Segment structure for partial encashment
+- 20% basic rate tax paid within bond
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | INVESTMENT |
+| investmentType | Text | Specific investment type | INVESTMENT_BOND_ONSHORE |
+| currentValue | Currency Amount | Current bond value | £285,000 |
+| bondStructure | Complex Data | Segment structure | Complex object |
+| numberOfSegments | Number | Total segments | 100 |
+| segmentValue | Currency Amount | Value per segment | £2,850 |
+| withdrawalAllowance | Complex Data | 5% allowance tracking | Complex object |
+| annualAllowancePercentage | Number | Annual allowance | 5% |
+| cumulativeAllowanceAvailable | Currency Amount | Total unused allowance | £100,000 |
+| taxPosition | Complex Data | Tax treatment | Complex object |
+| bondType | Text | Onshore or offshore | ONSHORE |
+| topSlicingReliefAvailable | Yes/No | Tax relief available | Yes |
+| basicRateTaxCredit | Number | Tax already paid | 20% |
+
+### Business Validation Rules
+
+- 5% annual withdrawal allowance accumulates if unused
+- Calculation: Total invested × 5% × years elapsed
+- Top-slicing relief: Gain ÷ years held = average gain
+- Chargeable gain on full or partial surrender
+
+---
+
+## 13.52 Arrangement - Protection Contract (Critical Illness Cover)
+
+### Business Purpose
+
+Represents critical illness insurance paying lump sum on diagnosis of specified conditions.
+
+### Key Features
+
+- Defined list of covered conditions (typically 40-50)
+- Full and partial pay-out conditions
+- Severity-based benefits
+- Children's cover included
+- Additional payment cover options
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | PROTECTION |
+| protectionType | Text | Specific protection type | CRITICAL_ILLNESS_COVER |
+| policyType | Text | Standalone or combined | STANDALONE_CRITICAL_ILLNESS |
+| sumAssured | Currency Amount | Lump sum benefit | £200,000 |
+| premium | Currency Amount | Monthly premium | £95 |
+| coverageDetails | Complex Data | Coverage specifics | Complex object |
+| numberOfConditionsCovered | Number | Total conditions covered | 47 |
+| fullPayOutConditions | Number | Full benefit conditions | 42 |
+| partialPayOutConditions | Number | Partial benefit conditions | 5 |
+| childrensCoverIncluded | Yes/No | Children's cover | Yes |
+| childrensCoverAmount | Currency Amount | Children's benefit | £25,000 |
+| additionalPaymentCover | Yes/No | Extra payment option | Yes |
+
+### Business Validation Rules
+
+- Full pay-out: 100% of sum assured for major conditions
+- Partial pay-out: typically 25% for less severe conditions
+- Examples: Cancer, heart attack, stroke, major organ transplant
+- Children's cover: typically £10k-£50k per child
+
+---
+
+## 13.53 Arrangement - Protection Contract (Income Protection)
+
+### Business Purpose
+
+Represents income protection insurance providing replacement income during illness or injury.
+
+### Key Features
+
+- Deferred period before benefit starts
+- Benefit percentage (typically 50-70% of income)
+- Payment until retirement age or fixed term
+- Own occupation vs any occupation definition
+- Rehabilitation support
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | PROTECTION |
+| protectionType | Text | Specific protection type | INCOME_PROTECTION |
+| monthlyBenefit | Currency Amount | Monthly income benefit | £3,500 |
+| premium | Currency Amount | Monthly premium | £87.50 |
+| deferredPeriod | Complex Data | Waiting period | Complex object |
+| weeks | Number | Weeks before benefit starts | 13 |
+| benefitDetails | Complex Data | Benefit structure | Complex object |
+| benefitPercentageOfIncome | Number | Percentage of income covered | 60% |
+| paymentPeriod | Text | How long benefits paid | TO_RETIREMENT_AGE |
+| occupationDefinition | Complex Data | Definition of incapacity | Complex object |
+| definitionType | Text | Type of definition | OWN_OCCUPATION |
+| rehabilitationBenefit | Currency Amount | Support for return to work | £3,500 |
+
+### Business Validation Rules
+
+- Deferred period: typically 4, 8, 13, 26, or 52 weeks
+- Benefit percentage: usually 50-70% of gross income (prevents over-insurance)
+- Own occupation: can't perform your specific job
+- Payment period: typically to age 60, 65, or 70
+
+---
+
+## 13.54 Arrangement - Protection Contract (Buildings Insurance)
+
+### Business Purpose
+
+Represents buildings insurance providing structural protection for property.
+
+### Key Features
+
+- Based on rebuild cost (not market value)
+- Structural damage cover
+- Subsidence and landslip protection
+- Alternative accommodation provision
+- Public liability included
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | PROTECTION |
+| protectionType | Text | Specific protection type | BUILDINGS_INSURANCE |
+| sumInsured | Currency Amount | Rebuild cost estimate | £450,000 |
+| valuationBasis | Text | How sum insured determined | REBUILD_COST |
+| annualPremium | Currency Amount | Annual premium | £385 |
+| excess | Currency Amount | Standard excess | £250 |
+| subsidenceExcess | Currency Amount | Subsidence-specific excess | £1,000 |
+| coverageDetails | Complex Data | What's covered | Complex object |
+| subsidenceAndHeave | Yes/No | Subsidence cover included | Yes |
+| alternativeAccommodation | Currency Amount | Max alternative accommodation | £50,000 |
+| publicLiability | Currency Amount | Public liability cover | £2,000,000 |
+
+### Business Validation Rules
+
+- Sum insured should equal rebuild cost (not market value)
+- Rebuild cost typically lower than market value
+- Review annually to account for building cost inflation
+- Subsidence excess typically £1,000
+
+---
+
+## 13.55 Arrangement - Mortgage Contract (Lifetime Mortgage)
+
+### Business Purpose
+
+Represents a lifetime mortgage (equity release) for homeowners aged 55+ with no monthly repayments.
+
+### Key Features
+
+- No monthly repayments (interest rolls up)
+- No negative equity guarantee
+- Fixed or capped interest rate for life
+- Voluntary payment options
+- Inheritance protection available
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | MORTGAGE |
+| productType | Text | Specific mortgage type | LifetimeMortgage |
+| lenderName | Text | Equity release provider | Aviva Equity Release |
+| youngestBorrowerAge | Number | Age of youngest borrower | 66 |
+| loanDetails | Complex Data | Loan structure | Complex object |
+| initialAdvance | Currency Amount | Lump sum released | £85,000 |
+| currentBalance | Currency Amount | Current amount owed | £87,650 |
+| loanToValue | Number | LTV percentage | 23% |
+| interestDetails | Complex Data | Interest terms | Complex object |
+| interestRate | Number | Annual interest rate | 5.95% |
+| rollUpMethod | Text | How interest compounds | COMPOUND_INTEREST |
+| noPaymentRequired | Yes/No | No monthly payments | Yes |
+| equityReleaseCouncilStandards | Complex Data | ERC compliance | Complex object |
+| noNegativeEquityGuarantee | Yes/No | Balance never exceeds value | Yes |
+| inheritanceProtection | Complex Data | Protected amount | Complex object |
+| protectionPercentage | Number | Percentage protected | 20% |
+
+### Business Validation Rules
+
+- Minimum age: typically 55 (youngest borrower)
+- No negative equity guarantee: balance never exceeds property value
+- Interest rolls up: £85k at 5.95% for 20 years = £256k
+- Equity Release Council membership recommended
+- Lifetime occupancy guarantee
+
+---
+
+## 13.56 Arrangement - Mortgage Contract (Buy-to-Let Mortgage)
+
+### Business Purpose
+
+Represents a buy-to-let mortgage for investment properties assessed on rental income.
+
+### Key Features
+
+- Rental income assessment (125-145% ICR requirement)
+- Higher interest rates than residential
+- Interest coverage ratio stress testing
+- Section 24 tax implications (for personal ownership)
+- Portfolio landlord considerations
+
+### Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| arrangementCategory | Text | Type of arrangement | MORTGAGE |
+| productType | Text | Specific mortgage type | BuyToLetMortgage |
+| lenderName | Text | BTL mortgage lender | Paragon Bank |
+| loanDetails | Complex Data | Loan structure | Complex object |
+| currentBalance | Currency Amount | Amount owed | £175,000 |
+| loanToValue | Number | LTV percentage | 58.3% |
+| interestDetails | Complex Data | Interest terms | Complex object |
+| interestRate | Number | Annual interest rate | 4.75% |
+| monthlyPayment | Currency Amount | Monthly interest payment | £976 |
+| rentalIncome | Complex Data | Rental income details | Complex object |
+| monthlyRental | Currency Amount | Monthly rent | £1,450 |
+| annualRental | Currency Amount | Annual rent | £17,400 |
+| interestCoverageRatio | Complex Data | ICR calculation | Complex object |
+| requiredICR | Number | Minimum ICR required | 125% |
+| actualICR | Number | Actual ICR achieved | 145% |
+| ownershipStructure | Complex Data | Tax structure | Complex object |
+| ownershipType | Text | Personal or limited company | PERSONAL |
+| section24TaxApplies | Yes/No | Section 24 restrictions | Yes |
+
+### Business Validation Rules
+
+- Interest Coverage Ratio: (Annual Rent ÷ Annual Interest) × 100
+- Required ICR: 125% standard, 145% for higher rate taxpayers
+- Assessment rate: typically 5.5% (stress test)
+- Section 24: Interest relief restricted to 20% for personal ownership
+- Portfolio landlord: typically 4+ mortgaged BTL properties
+
+---
+
 # Appendices
 
 ## Appendix A: Common Value Types
