@@ -5726,21 +5726,21 @@ Use: Demonstrate suitability in file review
 ### 6.1 Overview
 
 **Base Paths:**
-- Employment: `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
 - Income: `/api/v2/factfinds/{factfindId}/clients/{clientId}/income`
 - Income Changes: `/api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes`
 - Expenditure: `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
 - Expenditure Changes: `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
 
-**Purpose:** Track client's actual income sources, employment history, expenditure, and expected changes to their financial circumstances.
+**Purpose:** Track client's actual income sources, expenditure, and expected changes to their financial circumstances.
 
 **Scope:**
-- Employment history (current and past employment records)
 - Income sources (salaries, rental income, dividends, pensions in payment, benefits)
 - Expected income changes (promotions, bonuses, retirement, benefit changes)
 - Living expenses (mortgage/rent, utilities, food, transport, insurance)
 - Debt payments (loans, credit cards)
 - Expected expenditure changes (mortgage payoff, retirement lifestyle changes)
+
+**Note:** Employment history and details are managed separately in Section 7 (Employment API).
 
 **Aggregate Root:** Client (each client has their own circumstances, nested under FactFind)
 
@@ -5757,16 +5757,6 @@ Use: Demonstrate suitability in file review
 - Mortgage Credit Directive (Affordability Assessment)
 
 ### 6.2 Operations Summary
-
-**Employment Operations:**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | List employment records | `circumstances:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | Create employment record | `circumstances:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Get employment details | `circumstances:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Update employment record | `circumstances:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{id}` | Delete employment record | `circumstances:write` |
 
 **Income Operations:**
 
@@ -5810,170 +5800,9 @@ Use: Demonstrate suitability in file review
 
 ### 6.3 Key Endpoints
 
-### 6.3 Key Endpoints
+**Note:** Employment operations have been moved to Section 7 (Employment API). See Section 7.3 for employment endpoint documentation.
 
-#### 6.3.1 List Employment Records
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
-
-**Description:** Retrieve all employment records for a client, including current and historical employment.
-
-**Query Parameters:**
-- `status` - Filter by employment status (Current, Previous, NotEmployed)
-- `includeEnded` - Include employment records with end dates (default: true)
-
-**Response:**
-```json
-{
-  "clientId": "client-123",
-  "clientName": "John Smith",
-  "totalRecords": 2,
-  "employment": [
-    {
-      "id": "emp-456",
-      "employmentType": "Employed",
-      "employerName": "ABC Technology Ltd",
-      "jobTitle": "Software Engineer",
-      "occupation": "2136",
-      "startDate": "2020-03-01",
-      "endDate": null,
-      "status": "Current",
-      "annualSalary": {
-        "amount": 65000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "payFrequency": "Monthly",
-      "bonusAmount": {
-        "amount": 5000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "benefitsInKind": {
-        "amount": 2000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "_links": {
-        "self": {
-          "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-456"
-        }
-      }
-    }
-  ],
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment"
-    },
-    "create": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment",
-      "method": "POST"
-    }
-  }
-}
-```
-
-#### 6.3.2 Create Employment Record
-
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
-
-**Description:** Create a new employment record for a client.
-
-**Request Body:**
-```json
-{
-  "employmentType": "Employed",
-  "employerName": "XYZ Corporation",
-  "jobTitle": "Financial Analyst",
-  "occupation": "3537",
-  "startDate": "2021-06-01",
-  "endDate": null,
-  "status": "Current",
-  "annualSalary": {
-    "amount": 45000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "payFrequency": "Monthly",
-  "bonusAmount": {
-    "amount": 3000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  }
-}
-```
-
-**Response:**
-```http
-HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-789
-
-{
-  "id": "emp-789",
-  "employmentType": "Employed",
-  "employerName": "XYZ Corporation",
-  "jobTitle": "Financial Analyst",
-  "occupation": "3537",
-  "startDate": "2021-06-01",
-  "endDate": null,
-  "status": "Current",
-  "annualSalary": {
-    "amount": 45000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "payFrequency": "Monthly",
-  "bonusAmount": {
-    "amount": 3000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "createdAt": "2026-02-18T10:00:00Z",
-  "updatedAt": "2026-02-18T10:00:00Z",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-789"
-    },
-    "update": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-789",
-      "method": "PATCH"
-    },
-    "client": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/client-123"
-    }
-  }
-}
-```
-
-**Employment Types:**
-- `Employed` - Salaried employment
-- `SelfEmployed` - Self-employed/sole trader
-- `Director` - Company director
-- `Retired` - Retired from employment
-- `NotEmployed` - Unemployed or not in workforce
-
-#### 6.3.3 List Income Sources
+#### 6.3.1 List Income Sources
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/income`
 
@@ -6055,7 +5884,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/employment/emp-789
 }
 ```
 
-#### 6.3.4 Create Income Source
+#### 6.3.2 Create Income Source
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/income`
 
@@ -6130,7 +5959,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income/inc-333
 **Frequency Values:**
 - `Weekly`, `Fortnightly`, `Monthly`, `Quarterly`, `Annual`
 
-#### 6.3.5 Create Income Change
+#### 6.3.3 Create Income Change
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/income-changes`
 
@@ -6188,7 +6017,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
 - `Stop` - Income will cease
 - `Start` - New income will commence
 
-#### 6.3.6 List Expenditure Items
+#### 6.3.4 List Expenditure Items
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
 
@@ -6269,7 +6098,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/income-changes/inc-c
 }
 ```
 
-#### 6.3.7 Create Expenditure Item
+#### 6.3.5 Create Expenditure Item
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
 
@@ -6344,7 +6173,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/client-123/expenditure/exp-777
 - `Discretionary` - Entertainment, holidays, hobbies
 - `Other` - Other expenses
 
-#### 6.3.8 Create Expenditure Change
+#### 6.3.6 Create Expenditure Change
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure-changes`
 
@@ -7434,54 +7263,918 @@ Impact:
 
 ---
 
-## 7. Employment API (Part of Circumstances Context)
+## 7. Employment API (Circumstances Context)
 
 ### 7.1 Overview
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments`
 
-**Purpose:** Track client's employment history and current employment status.
+**Purpose:** Track comprehensive employment history, employment status, self-employed income, and employment-related information for affordability assessments and mortgage applications.
 
 **Scope:**
-- Current employment records
-- Historical employment (employment timeline)
-- Self-employment and directorship tracking
-- Employment income and benefits
-- Occupation and industry information
-- Employment status changes over time
+- Current and historical employment records
+- Employment status tracking (employed, self-employed, director, retired, etc.)
+- Self-employed income with 3 years of accounts
+- Employer details and business information
+- Probation period tracking
+- Industry and occupation classification
+- Intended retirement age
+- Tax rate capture for affordability
+- Continuous employment duration
+- Connection to income sources
 
 **Aggregate Root:** Client (employment is nested under each client)
 
 **Key Characteristics:**
-- **Nested under clients** - Each client has their own employment records
-- **Supports current and historical** - Track employment timeline including past roles
-- **Multiple employment types** - Employed, self-employed, director, retired, not employed
-- **Income connection** - Employment records link to income sources
+- **Comprehensive employment tracking** - Full employment history with start/end dates
+- **Self-employed income support** - Track 3 years of accounts for mortgage applications
+- **Business type classification** - Sole trader, limited company, partnership, LLP
+- **Affordability integration** - Employment data feeds into affordability calculations
+- **Income linking** - HATEOAS links to related income records
+- **Mortgage application ready** - Captures all data needed for UK mortgage lending
 
 **Regulatory Compliance:**
 - FCA COBS (Know Your Customer - Employment Status)
 - Mortgage Credit Directive (Employment verification for affordability)
+- MCOB (Mortgage Conduct of Business) - Income verification requirements
 - Consumer Duty (Understanding client circumstances)
+- FCA Handbook - Responsible lending employment checks
 
 ### 7.2 Operations Summary
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | List employment history | `employment:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | Add employment record | `employment:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Get employment details | `employment:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Update employment | `employment:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Delete employment | `employment:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments` | List employment history | `employment:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments` | Create employment record | `employment:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Get employment details | `employment:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Update employment | `employment:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Delete employment | `employment:write` |
+
+**Total Endpoints:** 5
 
 ### 7.3 Key Endpoints
 
-Employment operations are documented in Section 6.3 (Income & Expenditure API) as part of the Circumstances Context.
+#### 7.3.1 List Employment Records
 
-See Section 6.3.1 and 6.3.2 for detailed employment endpoint documentation including:
-- List Employment Records (Section 6.3.1)
-- Create Employment Record (Section 6.3.2)
-- Update Employment Record
-- Employment Types and Contract Types
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/employments`
+
+**Description:** Retrieve all employment records for a client, including current and historical employment with self-employed income details.
+
+**Query Parameters:**
+- `employmentStatus` - Filter by status (Employed, SelfEmployed, CompanyDirector, Retired, etc.)
+- `isCurrentEmployment` - Filter by current employment (true/false)
+- `includeEnded` - Include employment with end dates (default: true)
+
+**Response:**
+```json
+{
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 456,
+    "href": "/api/v2/factfinds/679/clients/456",
+    "name": "John Smith"
+  },
+  "employments": [
+    {
+      "id": 12345,
+      "href": "/api/v2/factfinds/679/clients/456/employments/12345",
+      "employmentStatus": "SelfEmployed",
+      "employmentBusinessType": "PrivateLimitedCompany",
+      "occupation": "Software Consultant / Company Director",
+      "employer": "Smith Tech Solutions Ltd",
+      "startsOn": "2018-04-01",
+      "endsOn": null,
+      "isCurrentEmployment": true,
+      "continuousEmploymentMonths": 70,
+      "intendedRetirementAge": 65,
+      "industryType": "Information Technology"
+    },
+    {
+      "id": 12344,
+      "href": "/api/v2/factfinds/679/clients/456/employments/12344",
+      "employmentStatus": "Employed",
+      "employmentBusinessType": null,
+      "occupation": "Senior Developer",
+      "employer": "Previous Tech Corp",
+      "startsOn": "2015-01-15",
+      "endsOn": "2018-03-31",
+      "isCurrentEmployment": false,
+      "continuousEmploymentMonths": 38,
+      "intendedRetirementAge": null,
+      "industryType": "Information Technology"
+    }
+  ],
+  "totalCount": 2,
+  "_links": {
+    "self": {
+      "href": "/api/v2/factfinds/679/clients/456/employments"
+    },
+    "create": {
+      "href": "/api/v2/factfinds/679/clients/456/employments",
+      "method": "POST"
+    }
+  }
+}
+```
+
+#### 7.3.2 Get Employment Details (Self-Employed Example)
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}`
+
+**Description:** Get detailed employment information including self-employed income with 3 years of accounts.
+
+**Response:**
+```json
+{
+  "id": 12345,
+  "href": "/api/v2/factfinds/679/clients/456/employments/12345",
+
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 456,
+    "href": "/api/v2/factfinds/679/clients/456"
+  },
+
+  "employmentStatus": "SelfEmployed",
+  "employmentBusinessType": "PrivateLimitedCompany",
+  "employmentStatusDescription": "Managing Director of software consultancy company",
+  "occupation": "Software Consultant / Company Director",
+  "employer": "Smith Tech Solutions Ltd",
+  "intendedRetirementAge": 65,
+  "startsOn": "2018-04-01",
+  "endsOn": null,
+  "inProbation": false,
+  "probationPeriodInMonths": null,
+  "industryType": "Information Technology",
+  "continuousEmploymentMonths": 70,
+  "isCurrentEmployment": true,
+  "highestTaxRate": "40",
+
+  "address": {
+    "line1": "Tech Hub Building",
+    "line2": "45 Innovation Drive",
+    "line3": null,
+    "line4": null,
+    "locality": "London",
+    "postalCode": "EC2A 4BX",
+    "county": {
+      "code": "GB-LND",
+      "name": "Greater London"
+    },
+    "country": {
+      "isoCode": "GB",
+      "name": "United Kingdom"
+    }
+  },
+
+  "selfEmployedIncome": {
+    "mostRecentAnnualAccounts": {
+      "grossProfit": {
+        "amount": 180000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netProfit": {
+        "amount": 150000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "shareOfCompanyProfit": {
+        "amount": 180000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossDividend": {
+        "amount": 60000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 54000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossSalary": {
+        "amount": 25000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netSalary": {
+        "amount": 20000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "yearEnd": "2024-03-31",
+      "includeInAffordability": true
+    },
+    "yearTwoAnnualAccounts": {
+      "grossProfit": {
+        "amount": 165000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netProfit": {
+        "amount": 135000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "shareOfCompanyProfit": {
+        "amount": 165000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossDividend": {
+        "amount": 55000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 49500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossSalary": {
+        "amount": 24000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netSalary": {
+        "amount": 19200.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "yearEnd": "2023-03-31",
+      "includeInAffordability": false
+    },
+    "yearThreeAnnualAccounts": {
+      "grossProfit": {
+        "amount": 150000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netProfit": {
+        "amount": 120000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "shareOfCompanyProfit": {
+        "amount": 150000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossDividend": {
+        "amount": 50000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netDividend": {
+        "amount": 45000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "grossSalary": {
+        "amount": 22000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "netSalary": {
+        "amount": 17600.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "yearEnd": "2022-03-31",
+      "includeInAffordability": false
+    },
+    "recentGrossPreTaxProfit": {
+      "amount": 180000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+
+  "incomesHref": "/api/v2/factfinds/679/clients/456/incomes?filter=employment.id eq 12345",
+
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+#### 7.3.3 Get Employment Details (Employed Example)
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}`
+
+**Description:** Get employment details for standard employed status (no self-employed income).
+
+**Response:**
+```json
+{
+  "id": 12346,
+  "href": "/api/v2/factfinds/679/clients/457/employments/12346",
+
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 457,
+    "href": "/api/v2/factfinds/679/clients/457"
+  },
+
+  "employmentStatus": "Employed",
+  "employmentBusinessType": null,
+  "employmentStatusDescription": "Full-time permanent employee",
+  "occupation": "Senior Software Engineer",
+  "employer": "Acme Corporation Ltd",
+  "intendedRetirementAge": 67,
+  "startsOn": "2015-03-01",
+  "endsOn": null,
+  "inProbation": false,
+  "probationPeriodInMonths": null,
+  "industryType": "Information Technology",
+  "continuousEmploymentMonths": 132,
+  "isCurrentEmployment": true,
+  "highestTaxRate": "40",
+
+  "address": {
+    "line1": "Tech Park Building 5",
+    "line2": "Silicon Way",
+    "line3": null,
+    "line4": null,
+    "locality": "London",
+    "postalCode": "EC1A 1BB",
+    "county": {
+      "code": "GB-LND",
+      "name": "Greater London"
+    },
+    "country": {
+      "isoCode": "GB",
+      "name": "United Kingdom"
+    }
+  },
+
+  "selfEmployedIncome": null,
+
+  "incomesHref": "/api/v2/factfinds/679/clients/457/incomes?filter=employment.id eq 12346",
+
+  "createdAt": "2026-01-10T09:00:00Z",
+  "updatedAt": "2026-02-10T11:15:00Z"
+}
+```
+
+#### 7.3.4 Create Employment Record (Self-Employed)
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/employments`
+
+**Description:** Create a new self-employed employment record with 3 years of accounts.
+
+**Request Body:**
+```json
+{
+  "employmentStatus": "SelfEmployed",
+  "employmentBusinessType": "PrivateLimitedCompany",
+  "employmentStatusDescription": "Managing Director of software consultancy company",
+  "occupation": "Software Consultant / Company Director",
+  "employer": "Smith Tech Solutions Ltd",
+  "intendedRetirementAge": 65,
+  "startsOn": "2018-04-01",
+  "endsOn": null,
+  "industryType": "Information Technology",
+  "highestTaxRate": "40",
+  "address": {
+    "line1": "Tech Hub Building",
+    "line2": "45 Innovation Drive",
+    "locality": "London",
+    "postalCode": "EC2A 4BX",
+    "country": {
+      "isoCode": "GB"
+    }
+  },
+  "selfEmployedIncome": {
+    "mostRecentAnnualAccounts": {
+      "grossProfit": { "amount": 180000.00, "currency": { "code": "GBP" } },
+      "netProfit": { "amount": 150000.00, "currency": { "code": "GBP" } },
+      "shareOfCompanyProfit": { "amount": 180000.00, "currency": { "code": "GBP" } },
+      "grossDividend": { "amount": 60000.00, "currency": { "code": "GBP" } },
+      "netDividend": { "amount": 54000.00, "currency": { "code": "GBP" } },
+      "grossSalary": { "amount": 25000.00, "currency": { "code": "GBP" } },
+      "netSalary": { "amount": 20000.00, "currency": { "code": "GBP" } },
+      "yearEnd": "2024-03-31",
+      "includeInAffordability": true
+    },
+    "yearTwoAnnualAccounts": {
+      "grossProfit": { "amount": 165000.00, "currency": { "code": "GBP" } },
+      "netProfit": { "amount": 135000.00, "currency": { "code": "GBP" } },
+      "yearEnd": "2023-03-31",
+      "includeInAffordability": false
+    }
+  }
+}
+```
+
+**Response:** 201 Created with complete employment entity (see 7.3.2 for response structure)
+
+#### 7.3.5 Create Employment Record (Employed)
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/employments`
+
+**Description:** Create a standard employed employment record.
+
+**Request Body:**
+```json
+{
+  "employmentStatus": "Employed",
+  "employmentStatusDescription": "Full-time permanent employee",
+  "occupation": "Senior Software Engineer",
+  "employer": "Acme Corporation Ltd",
+  "intendedRetirementAge": 67,
+  "startsOn": "2015-03-01",
+  "inProbation": false,
+  "industryType": "Information Technology",
+  "highestTaxRate": "40",
+  "address": {
+    "line1": "Tech Park Building 5",
+    "line2": "Silicon Way",
+    "locality": "London",
+    "postalCode": "EC1A 1BB",
+    "country": {
+      "isoCode": "GB"
+    }
+  }
+}
+```
+
+**Response:** 201 Created with complete employment entity
+
+#### 7.3.6 Update Employment Record
+
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}`
+
+**Description:** Update employment details, add new year's accounts for self-employed, or mark employment as ended.
+
+**Request Body (End Employment):**
+```json
+{
+  "endsOn": "2026-06-30"
+}
+```
+
+**Request Body (Add New Year's Accounts):**
+```json
+{
+  "selfEmployedIncome": {
+    "mostRecentAnnualAccounts": {
+      "grossProfit": { "amount": 195000.00, "currency": { "code": "GBP" } },
+      "netProfit": { "amount": 165000.00, "currency": { "code": "GBP" } },
+      "yearEnd": "2025-03-31",
+      "includeInAffordability": true
+    },
+    "yearTwoAnnualAccounts": {
+      "grossProfit": { "amount": 180000.00, "currency": { "code": "GBP" } },
+      "netProfit": { "amount": 150000.00, "currency": { "code": "GBP" } },
+      "yearEnd": "2024-03-31",
+      "includeInAffordability": false
+    },
+    "yearThreeAnnualAccounts": {
+      "grossProfit": { "amount": 165000.00, "currency": { "code": "GBP" } },
+      "netProfit": { "amount": 135000.00, "currency": { "code": "GBP" } },
+      "yearEnd": "2023-03-31",
+      "includeInAffordability": false
+    }
+  }
+}
+```
+
+**Response:** 200 OK with updated employment entity
+
+#### 7.3.7 Delete Employment Record
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}`
+
+**Description:** Delete an employment record (soft delete for audit trail).
+
+**Response:** 204 No Content
+
+**Business Rules:**
+- Soft delete (retained for compliance)
+- Cannot delete if referenced in active income records
+- Cannot delete if used in affordability calculations
+- Deletion logged for audit trail
+
+---
+
+### 7.4 Employment Status Types
+
+**Complete Enum List:**
+
+| Code | Display | Description | Common Use Cases |
+|------|---------|-------------|-----------------|
+| `Employed` | Employed | Standard PAYE employment | Full-time and part-time employees |
+| `SelfEmployed` | Self-Employed | Self-employed/sole trader | Freelancers, contractors, sole traders |
+| `CompanyDirector` | Company Director | Director of limited company | Business owners, company directors |
+| `Retired` | Retired | Retired from employment | Pensioners, early retirees |
+| `Unemployed` | Unemployed | Currently unemployed | Job seekers, between employment |
+| `Houseperson` | Houseperson | Home maker | Stay-at-home parents, carers |
+| `Student` | Student | Full-time student | University students, apprentices |
+| `MaternityLeave` | Maternity Leave | On maternity/paternity leave | Temporary leave from employment |
+| `LongTermIllness` | Long Term Illness | Unable to work due to illness | Long-term sick leave |
+| `ContractWorker` | Contract Worker | Fixed-term contract | Agency workers, fixed-term contracts |
+| `CarerOfaChildUnder16` | Carer of Child Under 16 | Full-time carer | Child carer |
+| `CarerOfaPersonOver16` | Carer of Person Over 16 | Full-time carer | Adult carer |
+| `Other` | Other | Other employment status | Non-standard situations |
+| `Unknown` | Unknown | Status not yet determined | Initial fact-find state |
+
+### 7.5 Employment Business Type (Self-Employed)
+
+**Enum Values (only applicable when employmentStatus = "SelfEmployed"):**
+
+| Code | Display | Description | Tax Structure |
+|------|---------|-------------|---------------|
+| `SoleTrader` | Sole Trader | Individual trading under own name or trading name | Self-assessment, personal tax |
+| `PrivateLimitedCompany` | Private Limited Company | Limited company (Ltd) with shareholders | Corporation tax, dividends, salary |
+| `Partnership` | Partnership | Business partnership (not LLP) | Self-assessment, shared profits |
+| `LimitedLiabilityPartnership` | Limited Liability Partnership | LLP structure | Self-assessment, LLP tax rules |
+
+**Notes:**
+- employmentBusinessType is NULL for all non-self-employed statuses
+- Required when employmentStatus = "SelfEmployed"
+- Determines income assessment method for mortgage applications
+- Affects affordability calculations and evidence requirements
+
+### 7.6 Field Definitions
+
+**Identification Fields:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `id` | integer | read-only | System-assigned employment identifier |
+| `href` | string | read-only | Canonical URI for this employment record |
+| `factfindRef.id` | integer | read-only | Reference to parent fact find |
+| `factfindRef.href` | string | read-only | URI to parent fact find |
+| `client.id` | integer | read-only | Reference to client |
+| `client.href` | string | read-only | URI to client |
+
+**Employment Details:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `employmentStatus` | enum | required-on-create | Employment status (see Section 7.4) |
+| `employmentBusinessType` | enum | conditional | Business type for self-employed (see Section 7.5), null for employed |
+| `employmentStatusDescription` | string | optional | Additional status details (max 1000 chars) |
+| `occupation` | string | optional | Job title or occupation (max 512 chars) |
+| `employer` | string | optional | Employer or business name (max 512 chars) |
+| `industryType` | string | optional | Industry or sector (max 100 chars) |
+| `highestTaxRate` | string | optional | Highest marginal tax rate (e.g., "20", "40", "45") |
+
+**Employment Period:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `startsOn` | date | required-on-create | Employment start date (YYYY-MM-DD) |
+| `endsOn` | date | optional | Employment end date (YYYY-MM-DD), null if current |
+| `isCurrentEmployment` | boolean | read-only | Computed: true if endsOn is null |
+| `continuousEmploymentMonths` | integer | read-only | Calculated months from startsOn to endsOn or today |
+| `inProbation` | boolean | optional | Currently in probation period |
+| `probationPeriodInMonths` | integer | optional | Length of probation period (1-99 months) |
+| `intendedRetirementAge` | integer | optional | Planned retirement age (0-99 years) |
+
+**Employment Location:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `address.line1` | string | optional | Address line 1 (max 100 chars) |
+| `address.line2` | string | optional | Address line 2 (max 100 chars) |
+| `address.line3` | string | optional | Address line 3 (max 100 chars) |
+| `address.line4` | string | optional | Address line 4 (max 100 chars) |
+| `address.locality` | string | optional | City/town (max 100 chars) |
+| `address.postalCode` | string | optional | Postal/ZIP code (max 20 chars) |
+| `address.county.code` | string | optional | County code (ISO-3166-2, max 6 chars) |
+| `address.county.name` | string | read-only | County name (derived from code) |
+| `address.country.isoCode` | string | required | Country ISO code (ISO-3166-1 alpha-2) |
+| `address.country.name` | string | read-only | Country name (derived from ISO code) |
+
+**Self-Employed Income (3 Years of Accounts):**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `selfEmployedIncome` | object | conditional | Self-employed accounts (null if not self-employed) |
+| `selfEmployedIncome.mostRecentAnnualAccounts` | object | required-if-se | Most recent year accounts |
+| `selfEmployedIncome.yearTwoAnnualAccounts` | object | optional | Previous year accounts |
+| `selfEmployedIncome.yearThreeAnnualAccounts` | object | optional | Third year accounts |
+| `selfEmployedIncome.recentGrossPreTaxProfit` | MoneyValue | read-only | Most recent gross profit (computed) |
+
+**Annual Accounts Fields (for each year):**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `grossProfit` | MoneyValue | optional | Gross profit for the year |
+| `netProfit` | MoneyValue | optional | Net profit after expenses |
+| `shareOfCompanyProfit` | MoneyValue | optional | Individual's share of company profit |
+| `grossDividend` | MoneyValue | optional | Gross dividend received |
+| `netDividend` | MoneyValue | optional | Net dividend after tax |
+| `grossSalary` | MoneyValue | optional | Gross salary/director's salary |
+| `netSalary` | MoneyValue | optional | Net salary after tax and NI |
+| `yearEnd` | date | required | Year end date (YYYY-MM-DD) |
+| `includeInAffordability` | boolean | required | Include this year in affordability calculations |
+
+**Related Resources:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `incomesHref` | string | read-only | HATEOAS link to related income records filtered by this employment |
+
+**Audit Trail:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+
+### 7.7 Validation Rules
+
+**Required Fields:**
+- `employmentStatus` - Must be one of the valid enum values
+- `startsOn` - Must be a valid date, cannot be in future
+- `address.country.isoCode` - Must be valid ISO 3166-1 alpha-2 code
+
+**Conditional Requirements:**
+- If `employmentStatus` = "SelfEmployed":
+  - `employmentBusinessType` is required
+  - `selfEmployedIncome` must be provided
+  - `selfEmployedIncome.mostRecentAnnualAccounts` must be complete
+- If `inProbation` = true:
+  - `probationPeriodInMonths` should be provided
+
+**Date Validations:**
+- `endsOn` must be after `startsOn` if provided
+- `yearEnd` dates must be in chronological order (most recent first)
+- All dates cannot be in the future
+
+**Self-Employed Income Validations:**
+- Must have at least `mostRecentAnnualAccounts`
+- `yearEnd` must be in the past
+- At least one financial field must be populated per year
+- `includeInAffordability` = true only for most recent year (typically)
+
+**Business Logic:**
+- `continuousEmploymentMonths` automatically calculated from dates
+- `isCurrentEmployment` automatically computed (endsOn == null)
+- `recentGrossPreTaxProfit` derived from mostRecentAnnualAccounts.grossProfit
+
+### 7.8 Business Rules
+
+**Self-Employed Income Assessment:**
+
+**Mortgage Lenders Typically:**
+- Require 2-3 years of accounts for self-employed applicants
+- Use average of 2 years net profit for affordability
+- May stress-test using lower of 2 years
+- Some lenders accept 1 year for established businesses (3+ years trading)
+- Directors of limited companies: salary + dividends + retained profits
+
+**Income Averaging Formula:**
+```
+Average Annual Income = (Year 1 Net Profit + Year 2 Net Profit) / 2
+
+For Limited Companies:
+Total Income = Net Salary + Net Dividends + Share of Retained Profits
+```
+
+**Accountant Certification Requirements:**
+- Certified accounts required for self-employed mortgage applications
+- SA302 forms (HMRC Self-Assessment) required as evidence
+- Tax year overview from HMRC
+- Some lenders accept management accounts for most recent year
+
+**Probation Period Impact on Lending:**
+- Most lenders require probation period to be completed
+- Some specialist lenders accept "out of probation" letters
+- Contract of employment must be permanent
+- Probation period typically 3-6 months
+
+**Continuous Employment Calculations:**
+- Calculated from `startsOn` to `endsOn` or current date
+- Used for mortgage affordability (longer employment = lower risk)
+- Gaps in employment may require explanation
+- Typical mortgage requirement: 12+ months continuous employment
+
+**Retirement Age Considerations:**
+- Most lenders require mortgage term to end before retirement age
+- State pension age is currently 66-67 in UK
+- Private pension access from age 55 (increasing to 57 in 2028)
+- Intended retirement age affects maximum mortgage term
+
+**Tax Rate Capture:**
+- Used for net income calculations in affordability
+- UK tax rates: 20% (basic), 40% (higher), 45% (additional)
+- Scottish tax rates differ slightly
+- Affects net disposable income calculations
+
+**Industry Type:**
+- Some industries considered higher risk by lenders
+- Construction, hospitality may require larger deposits
+- Professional occupations (IT, finance) typically preferred
+- Used for insurance underwriting and occupation classification
+
+### 7.9 Use Cases
+
+**Use Case 1: Self-Employed Mortgage Application**
+
+**Scenario:** Self-employed client applying for £300,000 mortgage, need to provide 2 years accounts.
+
+**API Flow:**
+```
+1. Create self-employed employment record:
+   POST /api/v2/factfinds/679/clients/456/employments
+   {
+     "employmentStatus": "SelfEmployed",
+     "employmentBusinessType": "PrivateLimitedCompany",
+     "employer": "Smith Tech Solutions Ltd",
+     "startsOn": "2018-04-01",
+     "selfEmployedIncome": {
+       "mostRecentAnnualAccounts": {
+         "netProfit": { "amount": 150000.00 },
+         "yearEnd": "2024-03-31"
+       },
+       "yearTwoAnnualAccounts": {
+         "netProfit": { "amount": 135000.00 },
+         "yearEnd": "2023-03-31"
+       }
+     }
+   }
+
+2. Lender calculates affordability:
+   Average Net Profit = (£150,000 + £135,000) / 2 = £142,500
+   Max Mortgage = £142,500 × 4.5 = £641,250
+
+3. Decision: £300,000 mortgage comfortably affordable
+```
+
+**Use Case 2: Standard Employed Worker**
+
+**Scenario:** PAYE employee with stable 10-year employment history.
+
+**API Flow:**
+```
+1. Create employment record:
+   POST /api/v2/factfinds/679/clients/457/employments
+   {
+     "employmentStatus": "Employed",
+     "employer": "Acme Corporation Ltd",
+     "occupation": "Senior Software Engineer",
+     "startsOn": "2015-03-01",
+     "continuousEmploymentMonths": 132
+   }
+
+2. Link to income record:
+   POST /api/v2/factfinds/679/clients/457/incomes
+   {
+     "description": "Salary from Acme Corporation",
+     "amount": { "amount": 65000.00 },
+     "employmentRef": { "id": 12346 }
+   }
+
+3. Affordability calculation uses stable employment (10+ years) as positive factor
+```
+
+**Use Case 3: Update Employment - New Year's Accounts**
+
+**Scenario:** Add new year's accounts to existing self-employed record.
+
+**API Flow:**
+```
+1. Fetch current employment:
+   GET /api/v2/factfinds/679/clients/456/employments/12345
+   Current: 2 years of accounts (2024, 2023)
+
+2. Update with new year's accounts:
+   PATCH /api/v2/factfinds/679/clients/456/employments/12345
+   {
+     "selfEmployedIncome": {
+       "mostRecentAnnualAccounts": {
+         "grossProfit": { "amount": 195000.00 },
+         "netProfit": { "amount": 165000.00 },
+         "yearEnd": "2025-03-31",
+         "includeInAffordability": true
+       },
+       "yearTwoAnnualAccounts": {
+         "grossProfit": { "amount": 180000.00 },
+         "netProfit": { "amount": 150000.00 },
+         "yearEnd": "2024-03-31",
+         "includeInAffordability": false
+       },
+       "yearThreeAnnualAccounts": {
+         "grossProfit": { "amount": 165000.00 },
+         "netProfit": { "amount": 135000.00 },
+         "yearEnd": "2023-03-31",
+         "includeInAffordability": false
+       }
+     }
+   }
+
+3. New average for mortgage: (£165,000 + £150,000) / 2 = £157,500
+4. Improved affordability due to income growth trend
+```
+
+**Use Case 4: Employment in Probation Period**
+
+**Scenario:** Client just started new job, still in probation.
+
+**API Flow:**
+```
+1. Create employment with probation flag:
+   POST /api/v2/factfinds/679/clients/458/employments
+   {
+     "employmentStatus": "Employed",
+     "employer": "New Employer Ltd",
+     "startsOn": "2026-01-15",
+     "inProbation": true,
+     "probationPeriodInMonths": 6
+   }
+
+2. Mortgage application impact:
+   - Most lenders will decline until probation completed
+   - Expected completion: July 2026
+   - Recommend waiting until probation cleared
+   - Some specialist lenders may consider with premium rates
+
+3. Follow-up after probation:
+   PATCH /api/v2/factfinds/679/clients/458/employments/12347
+   {
+     "inProbation": false
+   }
+```
 
 ---
 
@@ -21797,19 +22490,27 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 
 ### 13.19 Employment Contract
 
-The `Employment` contract represents a client's employment history with employer details, employment status, self-employed income tracking, and affordability calculations.
+The `Employment` contract represents a client's comprehensive employment record including employment history, status, self-employed income with 3 years of accounts, and all information required for UK mortgage applications and affordability assessments.
 
 **Reference Type:** Employment is a reference type with identity (has `id` field).
 
+**Purpose:**
+- Track employment history for affordability and mortgage applications
+- Capture self-employed income with 3 years of accounts
+- Support UK mortgage lending requirements
+- Enable income verification and affordability calculations
+- Record employment timeline and continuous employment
+
 **Key Features:**
-- Supports multiple employment statuses (Employed, Self-Employed, Company Director, Retired, etc.)
-- Business type classification for self-employed clients
-- Three years of accounts for self-employed income tracking
-- Employer details and address tracking
-- Probation period tracking
-- Tax rate capture for affordability
-- Continuous employment duration
-- Income linking via HATEOAS
+- **Comprehensive Employment Tracking** - Full employment details including dates, status, and occupation
+- **Self-Employed Income Support** - 3 years of accounts (gross/net profit, dividends, salary)
+- **Business Type Classification** - Sole trader, limited company, partnership, LLP
+- **Mortgage Application Ready** - All fields required for UK mortgage lending
+- **Affordability Integration** - Direct link to affordability calculations
+- **Income Linking** - HATEOAS links to related income records
+- **Probation Tracking** - Track probation periods affecting lending decisions
+- **Tax Rate Capture** - Marginal tax rate for net income calculations
+- **Continuous Employment** - Calculated duration for lending assessments
 
 #### Complete Employment Contract (Employed Example)
 
@@ -21817,6 +22518,16 @@ The `Employment` contract represents a client's employment history with employer
 {
   "id": 567,
   "href": "/api/v2/factfinds/679/clients/346/employments/567",
+
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 346,
+    "href": "/api/v2/factfinds/679/clients/346"
+  },
+
   "employmentStatus": "Employed",
   "employmentBusinessType": null,
   "employmentStatusDescription": "Full-time permanent employee",
@@ -21830,7 +22541,8 @@ The `Employment` contract represents a client's employment history with employer
   "industryType": "Information Technology",
   "continuousEmploymentMonths": 132,
   "isCurrentEmployment": true,
-  "highestTaxRate": "40%",
+  "highestTaxRate": "40",
+
   "address": {
     "line1": "Tech Park Building 5",
     "line2": "Silicon Way",
@@ -21840,18 +22552,20 @@ The `Employment` contract represents a client's employment history with employer
     "postalCode": "EC1A 1BB",
     "county": {
       "code": "GB-LND",
-      "name": "London"
+      "name": "Greater London"
     },
     "country": {
       "isoCode": "GB",
       "name": "United Kingdom"
     }
   },
-  "client": {
-    "id": 346
-  },
+
   "selfEmployedIncome": null,
-  "incomesHref": "/api/v2/factfinds/679/clients/346/incomes?filter=employment.id eq 567"
+
+  "incomesHref": "/api/v2/factfinds/679/clients/346/incomes?filter=employment.id eq 567",
+
+  "createdAt": "2026-01-10T09:00:00Z",
+  "updatedAt": "2026-02-10T11:15:00Z"
 }
 ```
 
@@ -21861,6 +22575,16 @@ The `Employment` contract represents a client's employment history with employer
 {
   "id": 568,
   "href": "/api/v2/factfinds/679/clients/347/employments/568",
+
+  "factfindRef": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 347,
+    "href": "/api/v2/factfinds/679/clients/347"
+  },
+
   "employmentStatus": "SelfEmployed",
   "employmentBusinessType": "PrivateLimitedCompany",
   "employmentStatusDescription": "Director and majority shareholder of limited company",
@@ -21869,12 +22593,13 @@ The `Employment` contract represents a client's employment history with employer
   "intendedRetirementAge": 65,
   "startsOn": "2018-04-01",
   "endsOn": null,
-  "inProbation": null,
+  "inProbation": false,
   "probationPeriodInMonths": null,
   "industryType": "Professional Services - IT Consulting",
   "continuousEmploymentMonths": 94,
   "isCurrentEmployment": true,
-  "highestTaxRate": "45%",
+  "highestTaxRate": "45",
+
   "address": {
     "line1": "Business Centre",
     "line2": "123 High Street",
@@ -21890,9 +22615,6 @@ The `Employment` contract represents a client's employment history with employer
       "isoCode": "GB",
       "name": "United Kingdom"
     }
-  },
-  "client": {
-    "id": 347
   },
   "selfEmployedIncome": {
     "mostRecentAnnualAccounts": {
@@ -22062,48 +22784,88 @@ The `Employment` contract represents a client's employment history with employer
       }
     }
   },
-  "incomesHref": "/api/v2/factfinds/679/clients/347/incomes?filter=employment.id eq 568"
+
+  "incomesHref": "/api/v2/factfinds/679/clients/347/incomes?filter=employment.id eq 568",
+
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
 }
 ```
 
 #### Field Definitions
 
+**Identification:**
+
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned employment identifier |
-| `href` | string | read-only | Canonical URI for this employment |
-| `employmentStatus` | enum string | required-on-create | Employment status (see codes below) |
-| `employmentBusinessType` | enum string | optional | Business type for self-employed (null for employed) |
+| `href` | string | read-only | Canonical URI for this employment record |
+| `factfindRef.id` | integer | read-only | Reference to parent fact find |
+| `factfindRef.href` | string | read-only | URI to parent fact find |
+| `client.id` | integer | read-only | Reference to client |
+| `client.href` | string | read-only | URI to client |
+
+**Employment Details:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `employmentStatus` | enum string | required-on-create | Employment status (see Section 7.4 for complete list) |
+| `employmentBusinessType` | enum string | conditional | Business type for self-employed (null for employed, see Section 7.5) |
 | `employmentStatusDescription` | string | optional | Additional employment status details (max 1000 chars) |
 | `occupation` | string | optional | Job title or occupation (max 512 chars) |
 | `employer` | string | optional | Employer or business name (max 512 chars) |
-| `intendedRetirementAge` | integer | optional | Planned retirement age (0-99) |
-| `startsOn` | date | optional | Employment start date (YYYY-MM-DD) |
+| `industryType` | string | optional | Industry or sector (max 100 chars) |
+| `highestTaxRate` | string | optional | Highest marginal tax rate (e.g., "20", "40", "45") |
+
+**Employment Period:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `startsOn` | date | required-on-create | Employment start date (YYYY-MM-DD) |
 | `endsOn` | date | optional | Employment end date (YYYY-MM-DD), null if current |
+| `isCurrentEmployment` | boolean | read-only | Computed: true if endsOn is null |
+| `continuousEmploymentMonths` | integer | read-only | Calculated months from startsOn to endsOn or today |
 | `inProbation` | boolean | optional | Currently in probation period |
 | `probationPeriodInMonths` | integer | optional | Length of probation period (1-99 months) |
-| `industryType` | string | optional | Industry or sector (max 100 chars) |
-| `continuousEmploymentMonths` | integer | optional | Months of continuous employment |
-| `isCurrentEmployment` | boolean | read-only | Computed from start and end dates |
-| `highestTaxRate` | string | optional | Highest marginal tax rate (e.g., "40%", "45%") |
-| `address` | AddressValue | optional | Employer/business address |
-| `address.line1` | string | optional | Address line 1 |
-| `address.line2` | string | optional | Address line 2 |
-| `address.line3` | string | optional | Address line 3 |
-| `address.line4` | string | optional | Address line 4 |
-| `address.locality` | string | optional | City/town |
-| `address.postalCode` | string | optional | Postal/ZIP code |
+| `intendedRetirementAge` | integer | optional | Planned retirement age (0-99 years) |
+
+**Employment Location:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `address.line1` | string | optional | Address line 1 (max 100 chars) |
+| `address.line2` | string | optional | Address line 2 (max 100 chars) |
+| `address.line3` | string | optional | Address line 3 (max 100 chars) |
+| `address.line4` | string | optional | Address line 4 (max 100 chars) |
+| `address.locality` | string | optional | City/town (max 100 chars) |
+| `address.postalCode` | string | optional | Postal/ZIP code (max 20 chars) |
 | `address.county.code` | string | optional | County code (ISO-3166-2, max 6 chars) |
-| `address.county.name` | string | read-only | County name |
+| `address.county.name` | string | read-only | County name (derived from code) |
 | `address.country.isoCode` | string | required | Country ISO code (ISO-3166-1 alpha-2) |
-| `address.country.name` | string | read-only | Country name |
-| `client.id` | integer | read-only | Reference to client |
-| `selfEmployedIncome` | SelfEmployedIncomeValue | optional | Self-employed accounts (null if not self-employed) |
-| `selfEmployedIncome.mostRecentAnnualAccounts` | AnnualAccountsValue | optional | Most recent year accounts |
-| `selfEmployedIncome.yearTwoAnnualAccounts` | AnnualAccountsValue | optional | Previous year accounts |
-| `selfEmployedIncome.yearThreeAnnualAccounts` | AnnualAccountsValue | optional | Third year accounts |
-| `selfEmployedIncome.recentGrossPreTaxProfit` | MoneyValue | read-only | Most recent gross profit |
-| `incomesHref` | string | read-only | HATEOAS link to related incomes |
+| `address.country.name` | string | read-only | Country name (derived from ISO code) |
+
+**Self-Employed Income (3 Years of Accounts):**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `selfEmployedIncome` | object | conditional | Self-employed accounts (null if not self-employed) |
+| `selfEmployedIncome.mostRecentAnnualAccounts` | object | required-if-se | Most recent year accounts |
+| `selfEmployedIncome.yearTwoAnnualAccounts` | object | optional | Previous year accounts |
+| `selfEmployedIncome.yearThreeAnnualAccounts` | object | optional | Third year accounts |
+| `selfEmployedIncome.recentGrossPreTaxProfit` | MoneyValue | read-only | Most recent gross profit (computed) |
+
+**Related Resources:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `incomesHref` | string | read-only | HATEOAS link to related income records filtered by this employment |
+
+**Audit Trail:**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
 
 #### Annual Accounts Fields (for Self-Employed Income)
 
@@ -22140,12 +22902,144 @@ The `Employment` contract represents a client's employment history with employer
 
 #### Employment Business Type Codes (for Self-Employed)
 
-| Code | Description |
-|------|-------------|
-| `SoleTrader` | Sole Trader |
-| `PrivateLimitedCompany` | Private Limited Company |
-| `Partnership` | Partnership |
-| `LimitedLiabilityPartnership` | Limited Liability Partnership |
+| Code | Description | Tax Structure |
+|------|-------------|---------------|
+| `SoleTrader` | Sole Trader | Self-assessment, personal tax |
+| `PrivateLimitedCompany` | Private Limited Company | Corporation tax, dividends, salary |
+| `Partnership` | Partnership | Self-assessment, shared profits |
+| `LimitedLiabilityPartnership` | Limited Liability Partnership | Self-assessment, LLP tax rules |
+
+**Notes:**
+- employmentBusinessType is NULL for all non-self-employed statuses
+- Required when employmentStatus = "SelfEmployed"
+- Determines income assessment method for mortgage applications
+- Affects affordability calculations and evidence requirements
+
+#### Validation Rules
+
+**Required Fields:**
+- `employmentStatus` - Must be one of the valid enum values
+- `startsOn` - Must be a valid date, cannot be in future
+- `address.country.isoCode` - Must be valid ISO 3166-1 alpha-2 code (if address provided)
+
+**Conditional Requirements:**
+- If `employmentStatus` = "SelfEmployed":
+  - `employmentBusinessType` is required
+  - `selfEmployedIncome` must be provided
+  - `selfEmployedIncome.mostRecentAnnualAccounts` must be complete
+- If `inProbation` = true:
+  - `probationPeriodInMonths` should be provided
+
+**Date Validations:**
+- `endsOn` must be after `startsOn` if provided
+- `yearEnd` dates must be in chronological order (most recent first)
+- All dates cannot be in the future
+- `startsOn` must be a reasonable date (not more than 60 years in past)
+
+**Self-Employed Income Validations:**
+- Must have at least `mostRecentAnnualAccounts`
+- `yearEnd` must be in the past
+- At least one financial field must be populated per year
+- `includeInAffordability` = true only for most recent year (typically)
+- Year end dates must be unique (no duplicate years)
+
+**Numeric Validations:**
+- `intendedRetirementAge` - Must be between 50 and 99
+- `probationPeriodInMonths` - Must be between 1 and 99
+- `continuousEmploymentMonths` - Auto-calculated, must be >= 0
+- All money amounts must be >= 0
+
+**Business Logic:**
+- `continuousEmploymentMonths` automatically calculated from dates
+- `isCurrentEmployment` automatically computed (endsOn == null)
+- `recentGrossPreTaxProfit` derived from mostRecentAnnualAccounts.grossProfit
+
+#### Business Rules
+
+**Self-Employed Income Assessment for Mortgage Applications:**
+
+**UK Mortgage Lenders Typically:**
+- Require 2-3 years of accounts for self-employed applicants
+- Use average of 2 years net profit for affordability calculations
+- May stress-test using lower of 2 years if declining income
+- Some lenders accept 1 year accounts for established businesses (3+ years trading)
+- Directors of limited companies: salary + dividends + retained profits considered
+- Partnership income: share of partnership profits used
+
+**Income Averaging Formula:**
+```
+Standard Employed:
+  Annual Income = Gross Salary + Regular Bonuses
+
+Self-Employed (Sole Trader):
+  Average Annual Income = (Year 1 Net Profit + Year 2 Net Profit) / 2
+
+Limited Company Director:
+  Total Income = Net Salary + Net Dividends + (Share of Retained Profits × percentage)
+  Average = (Year 1 Total + Year 2 Total) / 2
+
+Partnership:
+  Average Income = (Year 1 Share of Profit + Year 2 Share of Profit) / 2
+```
+
+**Accountant Certification Requirements:**
+- Certified accounts required for self-employed mortgage applications
+- SA302 forms (HMRC Self-Assessment tax calculation) required as evidence
+- Tax year overview from HMRC (matching SA302)
+- Some lenders accept management accounts for most recent year
+- Accounts must be prepared by qualified accountant (ACCA, ACA, FCCA, FCA)
+
+**Probation Period Impact on Lending:**
+- Most UK lenders require probation period to be completed before mortgage offer
+- Some specialist lenders accept "passed probation" confirmation letters
+- Contract of employment must be permanent (not fixed-term)
+- Probation period typically 3-6 months for standard roles
+- Senior/professional roles may have 6-12 month probation
+- During probation: Higher deposit may be required or application declined
+
+**Continuous Employment Calculations:**
+- Calculated from `startsOn` to `endsOn` or current date
+- Used for mortgage affordability (longer employment = lower risk)
+- Gaps in employment history may require written explanation
+- Typical mortgage requirement: 12+ months continuous employment
+- Some lenders require 3+ years employment history
+- Career changes may require explanation and impact assessment
+
+**Retirement Age Considerations:**
+- Most lenders require mortgage term to end before retirement age
+- State pension age currently 66-67 in UK (may increase)
+- Private pension access from age 55 (increasing to 57 in 2028)
+- Intended retirement age affects maximum mortgage term calculation
+- Some lenders use state pension age if intended retirement age not provided
+- Early retirement plans may reduce maximum borrowing
+
+**Tax Rate Capture:**
+- Used for net income calculations in affordability assessments
+- UK tax rates 2024/25: 20% (basic), 40% (higher), 45% (additional)
+- Scottish tax rates differ: 19%, 20%, 21%, 42%, 47%
+- Affects net disposable income calculations
+- Higher rate taxpayers may have better affordability due to higher gross income
+- Used to verify net income figures
+
+**Industry Type Classification:**
+- Some industries considered higher risk by mortgage lenders
+- Construction, hospitality, arts may require larger deposits
+- Professional occupations (IT, finance, healthcare, legal) typically preferred
+- Key workers (NHS, teachers, emergency services) may get preferential rates
+- Industry affects insurance underwriting and occupation classification
+- Contractor/agency workers may face additional scrutiny
+
+**Employment Status Impact on Mortgage Applications:**
+
+| Employment Status | Mortgage Impact | Typical Requirements |
+|-------------------|-----------------|---------------------|
+| Employed (Permanent) | Standard assessment | 3 months payslips, employment letter |
+| Self-Employed | More scrutiny | 2-3 years accounts, SA302s, tax overview |
+| Company Director | Complex assessment | Accounts, dividend vouchers, shareholding proof |
+| Contract Worker | Specialist lenders | Contract history, day rate evidence |
+| Retired | Age-restricted | Pension income evidence, guaranteed for life |
+| Unemployed | Generally declined | Must show alternative income |
+| Maternity Leave | Depends on return date | Employment contract showing return date |
 
 ---
 
@@ -22359,15 +23253,29 @@ The `Expense` contract represents a single expense line item within an expenditu
 
 ### 13.23 Credit History Contract
 
-The `CreditHistory` contract represents a client's credit history items including credit scores, payment history, and adverse credit events.
+The `CreditHistory` contract represents a comprehensive record of a client's credit history, including credit scores, adverse credit events, payment history, and mortgage lending suitability assessments. This contract is essential for affordability assessments and mortgage lending decisions, ensuring compliance with FCA regulations and responsible lending requirements.
 
 **Reference Type:** CreditHistory is a reference type with identity (has `id` field).
 
+**Purpose:**
+- Track client credit history for affordability and lending decisions
+- Record credit scores from major Credit Reference Agencies (CRAs)
+- Document adverse credit events and their impact on lending eligibility
+- Assess mortgage suitability based on credit profile
+- Support regulatory compliance for mortgage affordability assessments
+
 **Key Features:**
-- Credit score tracking
-- Adverse credit event recording
-- Payment history
-- Mortgage suitability assessment
+- Credit score tracking from major providers (Experian, Equifax, TransUnion)
+- Detailed adverse credit event recording with financial impact tracking
+- Payment history analysis (12-month and 6-year views)
+- Automated mortgage suitability assessment
+- Regulatory compliance support for FCA mortgage lending rules
+
+**Regulatory Context:**
+- FCA Mortgage Conduct of Business (MCOB) rules require thorough credit assessment
+- Affordability assessments must consider credit history and repayment capacity
+- Adverse credit events impact lending decisions and interest rates
+- Credit Reference Agency data forms basis of responsible lending decisions
 
 #### Complete Credit History Contract
 
@@ -22375,14 +23283,16 @@ The `CreditHistory` contract represents a client's credit history items includin
 {
   "id": 334,
   "href": "/api/v2/factfinds/679/clients/346/credit-history/334",
+
   "factfindRef": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
-    "id": "client-123",
-    "href": "/api/v2/factfinds/679/clients/client-123"
+  "client": {
+    "id": 1234,
+    "href": "/api/v2/factfinds/679/clients/1234"
   },
+
   "creditScore": {
     "score": 780,
     "maxScore": 999,
@@ -22390,16 +23300,59 @@ The `CreditHistory` contract represents a client's credit history items includin
     "provider": "Experian",
     "checkedDate": "2026-01-15"
   },
+
   "hasAdverseCredit": false,
-  "adverseCreditEvents": [],
-  "ccjCount": 0,
-  "defaultCount": 0,
-  "bankruptcyHistory": false,
+  "hasCCJ": false,
+  "hasBeenRefusedCredit": false,
   "ivaHistory": false,
+  "hasDefault": false,
+  "hasBankruptcyHistory": false,
+  "hasArrears": false,
+
+  "adverseCreditEvents": [{
+    "type": "Default",
+    "registeredOn": "2020-06-15T00:00:00Z",
+    "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
+    "reposessedOn": "2022-08-10T00:00:00Z",
+    "dischargedOn": "2023-12-20T00:00:00Z",
+    "amountRegistered": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "amountOutstanding": {
+      "amount": 3500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "isDebtOutstanding": true,
+    "numberOfPaymentsMissed": 2,
+    "consecutivePaymentsMissed": 2,
+    "numberOfPaymentsInArrears": 1,
+    "isArrearsClearedUponCompletion": true,
+    "yearsMaintained": 5,
+    "lender": "High Street Bank",
+    "liability": {
+      "id": 1001,
+      "href": "/api/v2/clients/456/liabilities/1001",
+      "description": "Credit Card Debt"
+    },
+    "concurrencyId": 12,
+    "createdAt": "2026-01-15T10:30:00Z",
+    "lastUpdatedAt": "2026-01-29T14:45:00Z"
+  }],
+
   "missedPayments": {
     "last12Months": 0,
     "last6Years": 0
   },
+
   "mortgageSuitability": {
     "isEligible": true,
     "factors": [
@@ -22408,7 +23361,9 @@ The `CreditHistory` contract represents a client's credit history items includin
       "No missed payments"
     ]
   },
+
   "notes": "Excellent credit history - eligible for best mortgage rates",
+
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-01-15T10:00:00Z"
 }
@@ -22416,30 +23371,221 @@ The `CreditHistory` contract represents a client's credit history items includin
 
 #### Field Definitions
 
+**Identification Fields**
+
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
-| `id` | integer | read-only | System-assigned credit history identifier |
-| `href` | string | read-only | Canonical URI for this credit history |
+| `id` | integer | read-only | System-assigned credit history record identifier |
+| `href` | string | read-only | Canonical URI for this credit history record |
 | `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to client |
-| `creditScore.score` | integer | optional | Credit score value |
-| `creditScore.maxScore` | integer | optional | Maximum possible score |
-| `creditScore.rating` | string | optional | Rating category (Excellent, Good, Fair, Poor) |
-| `creditScore.provider` | string | optional | Credit reference agency |
-| `creditScore.checkedDate` | date | optional | Date score was checked |
-| `hasAdverseCredit` | boolean | optional | Has adverse credit events (default: false) |
-| `adverseCreditEvents[]` | array | optional | List of adverse credit events |
-| `ccjCount` | integer | optional | County Court Judgment count |
-| `defaultCount` | integer | optional | Default count |
-| `bankruptcyHistory` | boolean | optional | Has bankruptcy history (default: false) |
-| `ivaHistory` | boolean | optional | Has IVA history (default: false) |
-| `missedPayments.last12Months` | integer | optional | Missed payments in last 12 months |
-| `missedPayments.last6Years` | integer | optional | Missed payments in last 6 years |
-| `mortgageSuitability.isEligible` | boolean | read-only | Eligible for standard mortgages |
-| `mortgageSuitability.factors[]` | array | read-only | Factors affecting suitability |
-| `notes` | string | optional | Additional notes (max 2000 chars) |
-| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
-| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
+| `client` | ClientRef | read-only | Reference to the client this credit history belongs to |
+
+**Credit Score Assessment**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `creditScore` | object | optional | Complete credit score assessment from Credit Reference Agency |
+| `creditScore.score` | integer | optional | Credit score value (typically 0-999 for Experian, 0-700 for Equifax, 0-710 for TransUnion) |
+| `creditScore.maxScore` | integer | optional | Maximum possible score for this provider's scoring system |
+| `creditScore.rating` | string | optional | Rating category: "Excellent" (961-999), "Good" (881-960), "Fair" (721-880), "Poor" (561-720), "Very Poor" (0-560) |
+| `creditScore.provider` | string | optional | Credit Reference Agency: "Experian", "Equifax", "TransUnion" |
+| `creditScore.checkedDate` | date | optional | Date the credit score was obtained (ISO 8601 format: YYYY-MM-DD) |
+
+**Adverse Credit Indicators (Summary Flags)**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `hasAdverseCredit` | boolean | optional | Indicates if client has any adverse credit events (default: false) |
+| `hasCCJ` | boolean | optional | Has County Court Judgment(s) registered (default: false) |
+| `hasBeenRefusedCredit` | boolean | optional | Has been refused credit in the past (default: false) |
+| `ivaHistory` | boolean | optional | Has Individual Voluntary Arrangement (IVA) history (default: false) |
+| `hasDefault` | boolean | optional | Has default(s) registered on credit file (default: false) |
+| `hasBankruptcyHistory` | boolean | optional | Has bankruptcy history on record (default: false) |
+| `hasArrears` | boolean | optional | Currently has or had payment arrears (default: false) |
+
+**Adverse Credit Events (Detailed Records)**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `adverseCreditEvents[]` | array | optional | Detailed list of adverse credit events with full financial and timeline information |
+| `adverseCreditEvents[].type` | string | required | Type of adverse event: "CCJ" (County Court Judgment), "Default", "IVA" (Individual Voluntary Arrangement), "Bankruptcy", "Arrears", "Repossession", "Debt Relief Order" |
+| `adverseCreditEvents[].registeredOn` | datetime | optional | Date event was registered with Credit Reference Agencies (ISO 8601) |
+| `adverseCreditEvents[].satisfiedOrClearedOn` | datetime | optional | Date the debt was satisfied or cleared (ISO 8601) |
+| `adverseCreditEvents[].reposessedOn` | datetime | optional | Date of property repossession if applicable (ISO 8601) |
+| `adverseCreditEvents[].dischargedOn` | datetime | optional | Date bankruptcy or IVA was discharged (ISO 8601) |
+| `adverseCreditEvents[].amountRegistered` | MoneyValue | optional | Original amount registered when event occurred |
+| `adverseCreditEvents[].amountOutstanding` | MoneyValue | optional | Current outstanding amount (if any) |
+| `adverseCreditEvents[].isDebtOutstanding` | boolean | optional | Whether debt is still outstanding (true) or fully paid (false) |
+| `adverseCreditEvents[].numberOfPaymentsMissed` | integer | optional | Total number of payments missed for this event |
+| `adverseCreditEvents[].consecutivePaymentsMissed` | integer | optional | Number of consecutive payments missed (maximum consecutive period) |
+| `adverseCreditEvents[].numberOfPaymentsInArrears` | integer | optional | Number of payments currently in arrears |
+| `adverseCreditEvents[].isArrearsClearedUponCompletion` | boolean | optional | Whether arrears were cleared when arrangement completed |
+| `adverseCreditEvents[].yearsMaintained` | integer | optional | Number of years successfully maintained after event (for IVA/payment plans) |
+| `adverseCreditEvents[].lender` | string | optional | Name of lender or creditor involved in the adverse event |
+| `adverseCreditEvents[].liability` | LiabilityRef | optional | Reference to related liability record if applicable |
+| `adverseCreditEvents[].concurrencyId` | integer | read-only | Concurrency control identifier for optimistic locking |
+| `adverseCreditEvents[].createdAt` | datetime | read-only | ISO 8601 timestamp when event record was created |
+| `adverseCreditEvents[].lastUpdatedAt` | datetime | read-only | ISO 8601 timestamp when event record was last updated |
+
+**Missed Payments Summary**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `missedPayments` | object | optional | Summary of missed payment history across different time periods |
+| `missedPayments.last12Months` | integer | optional | Count of missed payments in the last 12 months (0 = clean record) |
+| `missedPayments.last6Years` | integer | optional | Count of missed payments in the last 6 years (used for mortgage affordability) |
+
+**Mortgage Suitability Assessment**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `mortgageSuitability` | object | read-only | Automated assessment of mortgage lending eligibility based on credit profile |
+| `mortgageSuitability.isEligible` | boolean | read-only | Whether client is eligible for standard mortgage products (calculated field) |
+| `mortgageSuitability.factors[]` | array[string] | read-only | List of factors affecting mortgage suitability (positive or negative) |
+
+**Additional Information**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `notes` | string | optional | Free-text notes about credit history, mitigating circumstances, or additional context (max 2000 chars) |
+
+**Audit Trail**
+
+| Field | Type | Behavior | Description |
+|-------|------|----------|-------------|
+| `createdAt` | datetime | read-only | ISO 8601 timestamp when credit history record was created |
+| `updatedAt` | datetime | read-only | ISO 8601 timestamp when credit history record was last updated |
+
+#### Validation Rules
+
+**Credit Score Validations:**
+- `creditScore.score` must be between 0 and `creditScore.maxScore`
+- Experian scores: 0-999 (max: 999)
+- Equifax scores: 0-700 (max: 700)
+- TransUnion scores: 0-710 (max: 710)
+- `creditScore.checkedDate` cannot be in the future
+- `creditScore.provider` must be one of: "Experian", "Equifax", "TransUnion"
+
+**Adverse Credit Business Logic:**
+- If `hasAdverseCredit` = true, then `adverseCreditEvents[]` array must not be empty
+- If `adverseCreditEvents[]` contains any items, then `hasAdverseCredit` must be true
+- Specific type flags (`hasCCJ`, `hasDefault`, etc.) should align with `adverseCreditEvents[].type` values
+- If `hasCCJ` = true, there should be at least one event with `type` = "CCJ"
+- If `hasDefault` = true, there should be at least one event with `type` = "Default"
+
+**Adverse Credit Event Validations:**
+- `adverseCreditEvents[].type` is required when event is present
+- `adverseCreditEvents[].registeredOn` cannot be in the future
+- If `satisfiedOrClearedOn` is provided, it must be after `registeredOn`
+- If `dischargedOn` is provided, it must be after `registeredOn`
+- `amountOutstanding` cannot exceed `amountRegistered`
+- If `isDebtOutstanding` = false, `amountOutstanding.amount` should be 0
+- `numberOfPaymentsMissed` must be >= 0
+- `consecutivePaymentsMissed` must be <= `numberOfPaymentsMissed`
+- `yearsMaintained` must be >= 0
+
+**Date Validations:**
+- All dates must be valid ISO 8601 format
+- `creditScore.checkedDate`: YYYY-MM-DD format
+- Event dates: ISO 8601 datetime with timezone (YYYY-MM-DDTHH:mm:ssZ)
+- Historical dates should not be in the future
+
+**Mortgage Suitability Calculation:**
+- `mortgageSuitability.isEligible` is calculated based on:
+  - Credit score (typically 650+ for standard mortgages)
+  - Adverse credit recency (CCJs older than 3 years, defaults satisfied for 3+ years)
+  - Missed payments in last 12 months (ideally 0)
+  - Outstanding adverse credit debt amounts
+- `mortgageSuitability.factors[]` is auto-generated list of assessment criteria
+
+#### Business Rules and Context
+
+**Credit Reference Agencies (CRAs):**
+The UK has three main Credit Reference Agencies that financial advisers and lenders use:
+
+1. **Experian** - Most widely used, score range 0-999
+   - Excellent: 961-999
+   - Good: 881-960
+   - Fair: 721-880
+   - Poor: 561-720
+   - Very Poor: 0-560
+
+2. **Equifax** - Score range 0-700
+   - Excellent: 466-700
+   - Good: 420-465
+   - Fair: 380-419
+   - Poor: 280-379
+   - Very Poor: 0-279
+
+3. **TransUnion (formerly Callcredit)** - Score range 0-710
+   - Excellent: 628-710
+   - Good: 604-627
+   - Fair: 566-603
+   - Poor: 551-565
+   - Very Poor: 0-550
+
+**Adverse Credit Event Types:**
+
+1. **CCJ (County Court Judgment)** - Court order requiring debt repayment
+   - Stays on credit file for 6 years
+   - Can be marked as "satisfied" when paid
+   - Significant impact on mortgage applications
+   - CCJs over £500 within 3 years typically exclude standard mortgages
+
+2. **Default** - Creditor has written off debt (typically 3-6 months of missed payments)
+   - Stays on credit file for 6 years from default date
+   - Even if paid, remains on file
+   - Impact reduces over time
+   - Multiple defaults severely impact lending options
+
+3. **IVA (Individual Voluntary Arrangement)** - Formal agreement to pay reduced debt over time
+   - Typically 5-6 year payment plan
+   - Stays on credit file for 6 years from approval date
+   - Can apply for mortgages after 3 years with good payment record
+   - Must disclose to lenders
+
+4. **Bankruptcy** - Legal process to write off unaffordable debts
+   - Typically discharged after 12 months
+   - Stays on credit file for 6 years
+   - Severe impact on mortgage applications
+   - May need specialist lender
+
+5. **Arrears** - Behind on contractual payments
+   - Current arrears severely impact lending decisions
+   - Historical arrears (cleared) have reducing impact
+   - 2+ months arrears trigger lender concerns
+   - Pattern of arrears more serious than one-off issues
+
+6. **Repossession** - Property taken back by lender
+   - Extremely serious adverse event
+   - Stays on file for 6 years
+   - Very difficult to obtain new mortgage
+   - Specialist lenders only, high interest rates
+
+**Mortgage Lending Impact:**
+
+The credit history directly affects:
+- **Loan-to-Value (LTV)** - Clean credit may access 95% LTV; adverse credit often limited to 75-85% LTV
+- **Interest Rates** - Adverse credit attracts higher rates (typically 1-3% higher)
+- **Lender Options** - Mainstream vs. specialist adverse credit lenders
+- **Affordability Assessment** - Pattern of missed payments suggests future risk
+
+**FCA Regulatory Requirements:**
+
+Under FCA MCOB (Mortgage Conduct of Business) rules:
+- Lenders must assess creditworthiness comprehensively
+- Credit Reference Agency searches are mandatory
+- Adverse credit must be factored into affordability assessments
+- Advisers must explain impact of credit history on mortgage options
+- Consumers must be made aware of their credit profile
+
+**Best Practices:**
+- Check credit score 3-6 months before mortgage application
+- Address errors on credit files immediately
+- Allow time for adverse events to age (3+ years is better)
+- Build positive credit history after adverse events
+- Consider specialist lenders for recent adverse credit
+- Document mitigating circumstances for adverse events
 
 ---
 

@@ -3132,66 +3132,151 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 
 ### Business Purpose
 
-Represents current or historical employment for a client, including salary, benefits, and workplace pension details.
+Represents comprehensive employment records for clients, including current and historical employment, self-employed income with 3 years of accounts, and all information required for UK mortgage applications and affordability assessments.
+
+**Why This Matters:**
+- Critical for mortgage applications (employment verification)
+- Self-employed income tracking for affordability calculations
+- Continuous employment history affects lending decisions
+- Probation periods impact mortgage offers
+- Retirement age affects maximum mortgage term
 
 ### Key Features
 
-- Tracks employment dates and status
-- Records salary, bonus, and commission
-- Links to workplace pension schemes
-- Supports multiple employments (current and historical)
+- **Comprehensive Employment Tracking** - Full employment history with dates, status, occupation
+- **Self-Employed Income Support** - Track 3 years of accounts for mortgage applications
+- **Business Type Classification** - Sole trader, limited company, partnership, LLP
+- **Mortgage Application Ready** - Captures all data UK lenders require
+- **Affordability Integration** - Employment feeds directly into affordability assessments
+- **Probation Period Tracking** - Critical for lending decisions
+- **Tax Rate Capture** - For net income calculations
+- **Continuous Employment** - Auto-calculated for lending assessments
+
+### When to Use This Contract
+
+**Standard Employment (PAYE):**
+- Recording current permanent employment
+- Historical employment records for timeline
+- Part-time or contract employment
+
+**Self-Employed:**
+- Sole trader business with 3 years accounts
+- Limited company director with salary + dividends
+- Partnership income
+- LLP member income
+
+**Other Situations:**
+- Retired clients (for pension income tracking)
+- Clients on maternity/paternity leave
+- Unemployed (for mortgage application context)
+- Contract workers with irregular income
+
+### Employment Status Types
+
+| Status | Description | Mortgage Impact |
+|--------|-------------|-----------------|
+| **Employed** | Standard PAYE employment | Best - standard assessment, 3 months payslips required |
+| **SelfEmployed** | Self-employed/sole trader | More scrutiny - 2-3 years accounts + SA302s required |
+| **CompanyDirector** | Director of limited company | Complex - accounts + dividend vouchers + shareholding proof |
+| **ContractWorker** | Fixed-term contracts | Specialist lenders - contract history required |
+| **Retired** | Retired from employment | Age-restricted - pension income must be guaranteed |
+| **Unemployed** | Currently unemployed | Generally declined unless alternative income shown |
+| **Houseperson** | Home maker | No income - joint application typically required |
+| **Student** | Full-time student | Not suitable for standard mortgages |
+| **MaternityLeave** | On maternity/paternity | Depends on return date - contract showing return required |
+| **LongTermIllness** | Unable to work | Depends on income protection/benefits |
+
+### Self-Employed Business Types
+
+**Only applicable when Employment Status = "SelfEmployed":**
+
+| Business Type | Description | Income Assessment Method |
+|---------------|-------------|------------------------|
+| **Sole Trader** | Individual trading | Net profit from SA302 forms, average of 2 years |
+| **Private Limited Company** | Ltd company (director/shareholder) | Salary + dividends + retained profits, average of 2 years |
+| **Partnership** | Business partnership | Share of partnership profits from SA302, average of 2 years |
+| **Limited Liability Partnership** | LLP structure | Share of LLP profits from SA302, average of 2 years |
 
 ### Fields
 
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| address | Complex Data | List of all addresses for this client (current and historical) | Complex object |
-| client | Complex Data | Client reference number assigned by your organization | Complex object |
-| continuousEmploymentMonths | Number |  | 132 |
-| employer | Text | Name of the employer | Acme Corporation Ltd |
-| employmentBusinessType | Text |  | None |
-| employmentStatus | Text | Current employment status | Employed |
-| employmentStatusDescription | Text | Current employment status | Full-time permanent employee |
-| endsOn | Text |  | None |
-| highestTaxRate | Text |  | 40% |
-| id | Number | Unique system identifier for this record | 567 |
-| inProbation | Yes/No |  | No |
-| incomesHref | Text |  | /api/v2/factfinds/679/clients/346/incomes?filter=e... |
-| industryType | Text |  | Information Technology |
-| intendedRetirementAge | Number | Current age (calculated from date of birth) | 67 |
-| isCurrentEmployment | Yes/No |  | Yes |
-| occupation | Text | Current occupation/job title | Senior Software Engineer |
-| probationPeriodInMonths | Text |  | None |
-| selfEmployedIncome | Text |  | None |
-| startsOn | Date |  | 2015-03-01 |
-
-#### Nested Field Groups
-
-**address:**
+#### Identification
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| country | Complex Data | Country | Complex object |
-| isoCode | Text |  | GB |
-| name | Text | First name (given name) | United Kingdom |
-| county | Complex Data | County/region | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GB-LND |
-| name | Text | First name (given name) | London |
-| line1 | Text | Address line 1 | Tech Park Building 5 |
-| line2 | Text | Address line 2 | Silicon Way |
-| line3 | Text | Address line 3 | None |
-| line4 | Text | Address line 4 | None |
-| locality | Text |  | London |
-| postalCode | Text |  | EC1A 1BB |
+|------------|------|-------------|---------------|
+| **id** | Number | System-assigned employment record ID | 567 |
+| **factfindRef** | Reference | Reference to parent fact find | FactFind #679 |
+| **client** | Reference | Reference to the client | Client #346 |
 
-**client:**
+#### Employment Details
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 346 |
+|------------|------|-------------|---------------|
+| **employmentStatus** | Status | Current employment status (see types above) | Employed |
+| **employmentBusinessType** | Status | Business type (only for self-employed) | Private Limited Company |
+| **employmentStatusDescription** | Text | Additional employment details | "Managing Director of software company" |
+| **occupation** | Text | Job title or occupation | Software Consultant / Director |
+| **employer** | Text | Employer or business name | Smith Tech Solutions Ltd |
+| **industryType** | Text | Industry or sector | Information Technology |
+| **highestTaxRate** | Text | Marginal tax rate (20, 40, 45) | 40 |
+
+#### Employment Period
+
+| Field Name | Type | Description | Example Value |
+|------------|------|-------------|---------------|
+| **startsOn** | Date | Employment start date | 2018-04-01 |
+| **endsOn** | Date | Employment end date (blank if current) | (blank - current employment) |
+| **isCurrentEmployment** | Yes/No | Is this current employment? (auto-calculated) | Yes |
+| **continuousEmploymentMonths** | Number | Months of continuous employment (auto-calculated) | 70 months |
+| **inProbation** | Yes/No | Currently in probation period? | No |
+| **probationPeriodInMonths** | Number | Length of probation period | 6 months |
+| **intendedRetirementAge** | Number | Planned retirement age | 65 |
+
+#### Employer Address
+
+| Field Name | Type | Description | Example Value |
+|------------|------|-------------|---------------|
+| **address.line1** | Text | Address line 1 | Tech Hub Building |
+| **address.line2** | Text | Address line 2 | 45 Innovation Drive |
+| **address.locality** | Text | City/town | London |
+| **address.postalCode** | Text | Postal code | EC2A 4BX |
+| **address.county** | Text | County | Greater London |
+| **address.country** | Text | Country | United Kingdom |
+
+#### Self-Employed Income (3 Years of Accounts)
+
+**Only populated for self-employed clients. Used for mortgage affordability calculations.**
+
+**Most Recent Year:**
+
+| Field Name | Type | Description | Example Value |
+|------------|------|-------------|---------------|
+| **grossProfit** | Money | Gross profit for the year | £180,000.00 |
+| **netProfit** | Money | Net profit after expenses | £150,000.00 |
+| **shareOfCompanyProfit** | Money | Individual's share of profit | £180,000.00 |
+| **grossDividend** | Money | Gross dividend received | £60,000.00 |
+| **netDividend** | Money | Net dividend after tax | £54,000.00 |
+| **grossSalary** | Money | Gross salary/director's salary | £25,000.00 |
+| **netSalary** | Money | Net salary after tax | £20,000.00 |
+| **yearEnd** | Date | Accounting year end | 2024-03-31 |
+| **includeInAffordability** | Yes/No | Use in affordability calculations | Yes |
+
+**Year 2 and Year 3:** Same fields as above for previous years' accounts.
+
+**Computed Field:**
+- **recentGrossPreTaxProfit** - Most recent gross profit (auto-calculated from most recent year)
+
+#### Related Resources
+
+| Field Name | Type | Description | Example Value |
+|------------|------|-------------|---------------|
+| **incomesHref** | Link | Link to related income records | /api/v2/factfinds/679/clients/456/incomes?filter=... |
+
+#### Audit Trail
+
+| Field Name | Type | Description | Example Value |
+|------------|------|-------------|---------------|
+| **createdAt** | DateTime | When this record was created | 2026-01-15T10:00:00Z |
+| **updatedAt** | DateTime | When this record was last updated | 2026-02-18T14:30:00Z |
 
 ---
 
@@ -3199,16 +3284,176 @@ Represents current or historical employment for a client, including salary, bene
 
 This contract connects to:
 
-- Belongs to a Client
-- Belongs to a FactFind
-- May link to workplace Pension arrangements
+- **Belongs to:** Client - Each employment belongs to one client
+- **Belongs to:** FactFind - Employment is part of the overall fact find
+- **Links to:** Income records - Employment generates income records
+- **Used by:** Affordability assessments - Employment income feeds affordability calculations
+- **Referenced in:** Mortgage applications - Lenders verify employment details
+
+---
+
+### Self-Employed Income Explained
+
+**Why 3 Years of Accounts?**
+
+UK mortgage lenders require 2-3 years of accounts for self-employed applicants to:
+- Verify sustainable income levels
+- Identify income trends (increasing/decreasing)
+- Calculate average income for affordability
+- Assess business stability and viability
+- Comply with FCA responsible lending rules
+
+**How Lenders Calculate Affordability:**
+
+**Sole Traders:**
+```
+Average Net Profit = (Year 1 Net Profit + Year 2 Net Profit) / 2
+Annual Income = Average Net Profit
+```
+
+**Limited Company Directors:**
+```
+Year 1 Total = Net Salary + Net Dividends + Share of Retained Profits
+Year 2 Total = Net Salary + Net Dividends + Share of Retained Profits
+Average Income = (Year 1 Total + Year 2 Total) / 2
+```
+
+**Example:**
+- Year 1 Net Profit: £150,000
+- Year 2 Net Profit: £135,000
+- **Average: £142,500** (used for mortgage affordability)
+- Maximum mortgage at 4.5x income: £641,250
+
+**Evidence Required:**
+- Certified accounts (prepared by qualified accountant)
+- SA302 tax calculations from HMRC
+- Tax year overview from HMRC
+- Business bank statements
+- Proof of business ownership
+
+---
 
 ### Business Validation Rules
 
-- salary must be >= 0
-- startDate is required
-- endDate must be after startDate (if provided)
-- Current employment must have endDate=null
+**Required Fields:**
+- Employment Status must be selected
+- Employment Start Date is required
+- Country is required (if address provided)
+
+**Conditional Requirements:**
+- **If Self-Employed:** Business Type must be selected
+- **If Self-Employed:** Most Recent Year accounts must be complete
+- **If In Probation:** Probation period length should be provided
+
+**Date Rules:**
+- Start date cannot be in the future
+- End date must be after start date (if provided)
+- Year end dates must be in the past
+- Account years must be in chronological order (most recent first)
+
+**Self-Employed Income Rules:**
+- Must have at least Most Recent Year accounts
+- Cannot have duplicate year end dates
+- At least one financial figure per year
+- Typically only most recent year included in affordability
+
+**Numeric Rules:**
+- Retirement age must be between 50-99 years
+- Probation period must be 1-99 months
+- Continuous employment auto-calculated (must be >= 0)
+- All money amounts must be >= 0
+
+**Business Logic:**
+- Current employment: End date must be blank
+- Historical employment: End date must be provided
+- Continuous employment months: Auto-calculated from dates
+- Recent gross profit: Auto-calculated from most recent year
+
+---
+
+### Mortgage Application Requirements by Employment Status
+
+#### Employed (PAYE)
+
+**Typical Requirements:**
+- 3 months' recent payslips
+- Employment contract or confirmation letter
+- 12+ months continuous employment preferred
+- Out of probation (or probation end date confirmed)
+- Permanent contract (not fixed-term)
+
+**Affordability Calculation:**
+- Basic salary used
+- Regular bonuses/commission averaged (if 2+ years history)
+- Overtime averaged (if regular and sustainable)
+
+#### Self-Employed
+
+**Typical Requirements:**
+- 2-3 years certified accounts
+- SA302 tax calculations from HMRC
+- Tax year overview from HMRC
+- Business bank statements (3-6 months)
+- Proof of business ownership/trading
+
+**Affordability Calculation:**
+- Average of 2 years net profit
+- Some lenders use lower of 2 years if declining
+- Accountant certification essential
+
+**Probation Period Rules:**
+- Most lenders: Must be out of probation
+- Some lenders: Accept if probation ends within 3 months
+- Require written confirmation of probation completion
+- May require higher deposit during probation
+
+**Retirement Age Impact:**
+- Mortgage term cannot extend past retirement age
+- State pension age: 66-67 (may increase)
+- Early retirement reduces maximum term
+- Lenders may use state pension age if intended age not provided
+
+**Continuous Employment:**
+- Longer employment = lower lending risk
+- Gaps require explanation
+- 12+ months continuous preferred
+- 3+ years history ideal
+- Career changes may need justification
+
+---
+
+### Common Business Scenarios
+
+**Scenario 1: Standard Employed Mortgage Application**
+- Status: Employed (PAYE)
+- Employment: 11 years continuous
+- Salary: £65,000
+- Result: Standard assessment, best rates available
+
+**Scenario 2: Self-Employed Limited Company Director**
+- Status: Self-Employed
+- Business Type: Private Limited Company
+- Year 1: £150k net profit, Year 2: £135k net profit
+- Average: £142,500
+- Result: 2 years accounts required, SA302s needed, max mortgage ~£640k at 4.5x
+
+**Scenario 3: Probation Period**
+- Status: Employed
+- Started: 2 months ago
+- In Probation: Yes (6 month probation)
+- Result: Most lenders decline, recommend waiting 4 months until probation cleared
+
+**Scenario 4: Recently Self-Employed**
+- Status: Self-Employed
+- Trading: 8 months
+- Accounts: Only 1 year available
+- Result: Need 2 years accounts, recommend waiting 16 months or specialist lender
+
+**Scenario 5: Contract Worker**
+- Status: Contract Worker
+- Contract Length: 12 months rolling
+- Day Rate: £500
+- Result: Specialist lender needed, contract history required, may need 2+ years contracts
 
 ---
 
@@ -3382,68 +3627,339 @@ The `Expense` contract represents a single expense line item within an expenditu
 ---
 
 ## 13.23 Credit History Contract
+
 ### Overview
-The `CreditHistory` contract represents a client's credit history items including credit scores, payment history, and adverse credit events.
+The `CreditHistory` contract represents a comprehensive record of a client's credit history, including credit scores from Credit Reference Agencies (CRAs), adverse credit events, payment history, and mortgage lending suitability assessments. This information is essential for affordability assessments and mortgage lending decisions, ensuring compliance with FCA regulations.
+
+**Business Purpose:**
+- Record credit scores from major providers (Experian, Equifax, TransUnion)
+- Track adverse credit events (CCJs, defaults, IVA, bankruptcy, arrears)
+- Assess mortgage suitability based on credit profile
+- Support FCA-compliant affordability assessments for mortgage lending
+- Document payment history and creditworthiness
 
 ### Fields
 
-#### Main Fields
+#### Identification
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| adverseCreditEvents | List |  | Empty list |
-| bankruptcyHistory | Yes/No |  | No |
-| ccjCount | Number |  | 0 |
-| clientRef | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2026-01-15T10:00:00Z |
-| creditScore | Complex Data |  | Complex object |
-| defaultCount | Number |  | 0 |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| hasAdverseCredit | Yes/No |  | No |
-| id | Number | Unique system identifier for this record | 334 |
-| ivaHistory | Yes/No |  | No |
-| missedPayments | Complex Data |  | Complex object |
-| mortgageSuitability | Complex Data | Current age (calculated from date of birth) | Complex object |
-| notes | Text |  | Excellent credit history - eligible for best mortg... |
-| updatedAt | Date | When this record was last modified | 2026-01-15T10:00:00Z |
+| id | Number | Unique system identifier for this credit history record | 334 |
+| href | Text | Web link to access this credit history record | /api/v2/factfinds/679/clients/346/credit-history/334 |
+| factfindRef | Reference Link | Link to the FactFind this credit history belongs to | See factfindRef below |
+| client | Reference Link | Link to the client this credit history belongs to | See client below |
 
-#### Nested Field Groups
-
-**clientRef:**
+#### Credit Score Assessment
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Text | Unique system identifier for this record | client-123 |
+| creditScore | Complex Data | Credit score information from Credit Reference Agency | See creditScore below |
 
 **creditScore:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| checkedDate | Date |  | 2026-01-15 |
-| maxScore | Number |  | 999 |
-| provider | Text | Financial institution or provider | Experian |
-| rating | Text |  | Excellent |
-| score | Number |  | 780 |
+| score | Number | Credit score value (0-999 for Experian, 0-700 for Equifax, 0-710 for TransUnion) | 780 |
+| maxScore | Number | Maximum possible score for this provider | 999 |
+| rating | Selection | Credit rating category: Excellent, Good, Fair, Poor, Very Poor | Excellent |
+| provider | Selection | Credit Reference Agency: Experian, Equifax, TransUnion | Experian |
+| checkedDate | Date | Date when credit score was obtained | 2026-01-15 |
 
-**factfindRef:**
+#### Adverse Credit Indicators (Summary)
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
+| hasAdverseCredit | Yes/No | Does the client have any adverse credit events on their record? | No |
+| hasCCJ | Yes/No | Does the client have any County Court Judgments? | No |
+| hasBeenRefusedCredit | Yes/No | Has the client been refused credit in the past? | No |
+| ivaHistory | Yes/No | Does the client have an Individual Voluntary Arrangement (IVA) history? | No |
+| hasDefault | Yes/No | Does the client have any defaults registered on their credit file? | No |
+| hasBankruptcyHistory | Yes/No | Does the client have bankruptcy history? | No |
+| hasArrears | Yes/No | Does the client currently have or have had payment arrears? | No |
+
+#### Adverse Credit Events (Detailed Records)
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| adverseCreditEvents | List of Events | Detailed list of adverse credit events with financial and timeline information | See adverseCreditEvents below |
+
+**Each Adverse Credit Event contains:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| type | Selection | Type of adverse event: CCJ, Default, IVA, Bankruptcy, Arrears, Repossession, Debt Relief Order | Default |
+| registeredOn | Date/Time | Date and time when event was registered with Credit Reference Agencies | 2020-06-15T00:00:00Z |
+| satisfiedOrClearedOn | Date/Time | Date and time when the debt was satisfied or cleared | 2023-12-20T00:00:00Z |
+| reposessedOn | Date/Time | Date of property repossession (if applicable) | 2022-08-10T00:00:00Z |
+| dischargedOn | Date/Time | Date when bankruptcy or IVA was discharged | 2023-12-20T00:00:00Z |
+| amountRegistered | Currency Amount | Original amount registered when event occurred | £5,000.00 |
+| amountOutstanding | Currency Amount | Current outstanding amount (if any) | £3,500.00 |
+| isDebtOutstanding | Yes/No | Is the debt still outstanding or has it been fully paid? | Yes |
+| numberOfPaymentsMissed | Number | Total number of payments missed for this event | 2 |
+| consecutivePaymentsMissed | Number | Maximum number of consecutive payments missed | 2 |
+| numberOfPaymentsInArrears | Number | Number of payments currently in arrears | 1 |
+| isArrearsClearedUponCompletion | Yes/No | Were arrears cleared when arrangement completed? | Yes |
+| yearsMaintained | Number | Number of years successfully maintained after event (for IVA/payment plans) | 5 |
+| lender | Text | Name of lender or creditor involved in the adverse event | High Street Bank |
+| liability | Reference Link | Link to related liability record (if applicable) | /api/v2/clients/456/liabilities/1001 |
+| concurrencyId | Number | System version control number (automatic) | 12 |
+| createdAt | Date/Time | When this event record was created in the system | 2026-01-15T10:30:00Z |
+| lastUpdatedAt | Date/Time | When this event record was last modified | 2026-01-29T14:45:00Z |
+
+#### Missed Payments Summary
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| missedPayments | Complex Data | Summary of missed payment history | See missedPayments below |
 
 **missedPayments:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| last12Months | Number |  | 0 |
-| last6Years | Number |  | 0 |
+| last12Months | Number | Count of missed payments in the last 12 months (0 = clean record) | 0 |
+| last6Years | Number | Count of missed payments in the last 6 years (used for mortgage affordability) | 0 |
+
+#### Mortgage Suitability Assessment
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| mortgageSuitability | Complex Data | Automated assessment of mortgage lending eligibility | See mortgageSuitability below |
 
 **mortgageSuitability:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| factors | List of str |  | List with 3 item(s) |
-| isEligible | Yes/No |  | Yes |
+| isEligible | Yes/No | Is the client eligible for standard mortgage products? (automatically calculated) | Yes |
+| factors | List of Text | List of factors affecting mortgage suitability (positive or negative) | ["Good credit score (780)", "No adverse credit", "No missed payments"] |
+
+#### Additional Information
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| notes | Text | Free-text notes about credit history, mitigating circumstances, or additional context (max 2000 characters) | Excellent credit history - eligible for best mortgage rates |
+
+#### System Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| createdAt | Date/Time | When this credit history record was created in the system | 2026-01-15T10:00:00Z |
+| updatedAt | Date/Time | When this credit history record was last modified | 2026-01-15T10:00:00Z |
+
+#### Reference Link Structures
+
+**factfindRef:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique identifier for the FactFind | 679 |
+| href | Text | Web link to the FactFind | /api/v2/factfinds/679 |
+
+**client:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique identifier for the client | 1234 |
+| href | Text | Web link to the client record | /api/v2/factfinds/679/clients/1234 |
+
+### Business Validation Rules
+
+#### Credit Score Validations
+- Credit score must be between 0 and the maximum score for the provider
+- Experian: 0-999 (max: 999)
+- Equifax: 0-700 (max: 700)
+- TransUnion: 0-710 (max: 710)
+- Credit score check date cannot be in the future
+
+#### Adverse Credit Logic
+- If "Has Adverse Credit" is Yes, there must be at least one adverse credit event recorded
+- If there are adverse credit events recorded, "Has Adverse Credit" must be Yes
+- Specific indicators (Has CCJ, Has Default, etc.) should match the types of events recorded
+- If "Has CCJ" is Yes, there should be at least one event of type "CCJ"
+- If "Has Default" is Yes, there should be at least one event of type "Default"
+
+#### Adverse Credit Event Rules
+- Event type is required for every adverse credit event
+- Registration date cannot be in the future
+- If debt is satisfied/cleared, the satisfied date must be after the registration date
+- Outstanding amount cannot be more than the originally registered amount
+- If debt is not outstanding, the outstanding amount should be £0
+- Number of consecutive payments missed cannot exceed total payments missed
+- Years maintained must be zero or positive
+
+#### Date and Time Rules
+- All dates use standard format (YYYY-MM-DD for dates, YYYY-MM-DDTHH:mm:ssZ for date/times)
+- Historical dates should not be in the future
+- Satisfaction/discharge dates should be after registration dates
+
+### Understanding Adverse Credit Events
+
+#### CCJ (County Court Judgment)
+**What it is:** A court order requiring you to repay a debt to a creditor.
+
+**Impact on Lending:**
+- Stays on credit file for 6 years from judgment date
+- Can be marked as "satisfied" when paid, which looks better but still shows on file
+- CCJs over £500 within the last 3 years typically exclude standard mortgage applications
+- May need specialist lender if CCJ is recent or large
+
+**Mortgage Implications:**
+- CCJs older than 3 years: Many mainstream lenders will consider
+- CCJs under 3 years old: Likely need specialist lender
+- Multiple CCJs: Significantly reduced lender options
+- Satisfied CCJs: Better than unsatisfied, but still visible
+
+#### Default
+**What it is:** Creditor has officially written off the debt after typically 3-6 months of missed payments.
+
+**Impact on Lending:**
+- Stays on credit file for 6 years from default date
+- Even if paid in full, it remains on the file
+- Indicates serious payment difficulties
+- Multiple defaults severely restrict lending options
+
+**Mortgage Implications:**
+- Recent defaults (under 2 years): Very difficult, specialist lenders only
+- Defaults 2-3 years old: Some specialist lenders available
+- Defaults 3+ years old: More mainstream options become available
+- Satisfied defaults: Better than unsatisfied, shows responsibility
+
+#### IVA (Individual Voluntary Arrangement)
+**What it is:** Formal agreement with creditors to pay reduced debt over time (typically 5-6 years).
+
+**Impact on Lending:**
+- Stays on credit file for 6 years from approval date
+- Alternative to bankruptcy
+- Shows formal debt management
+- Must be disclosed to lenders
+
+**Mortgage Implications:**
+- During IVA: Usually no mortgage applications possible
+- After 3 years with good payment record: Some specialist lenders
+- After IVA completion: Gradually more options
+- Rebuilding credit after IVA essential
+
+#### Bankruptcy
+**What it is:** Legal process to write off unaffordable debts.
+
+**Impact on Lending:**
+- Typically discharged after 12 months
+- Stays on credit file for 6 years from bankruptcy order date
+- Most severe form of insolvency
+- Public record
+
+**Mortgage Implications:**
+- Discharged less than 3 years: Extremely difficult, very limited specialist lenders
+- Discharged 3-6 years: Some specialist lenders with higher rates
+- After 6 years: Returns to normal consideration
+- May always need to disclose to certain lenders
+
+#### Arrears
+**What it is:** Being behind on contractual payments (mortgage, loans, credit cards).
+
+**Impact on Lending:**
+- Current arrears: Major red flag for lenders
+- Historical arrears (cleared): Impact reduces over time
+- 2+ months in arrears triggers serious lender concerns
+- Pattern of arrears worse than one-off issues
+
+**Mortgage Implications:**
+- Current arrears: Extremely difficult to get new mortgage
+- Recent arrears (within 12 months): Specialist lenders only
+- Arrears cleared for 12+ months: More options available
+- Demonstrated ability to maintain payments essential
+
+#### Repossession
+**What it is:** Property has been taken back by the lender due to non-payment.
+
+**Impact on Lending:**
+- Stays on file for 6 years
+- Extremely serious adverse event
+- Shows total payment breakdown
+- Very difficult to explain to lenders
+
+**Mortgage Implications:**
+- Within 3 years: Almost impossible to obtain mortgage
+- 3-6 years: Very limited specialist lenders, very high rates
+- Often requires large deposit (25%+ equity)
+- May never access best rates
+
+### Credit Score Rating Guide
+
+#### Experian (0-999)
+- **Excellent (961-999):** Best mortgage rates and terms available
+- **Good (881-960):** Access to most standard mortgage products
+- **Fair (721-880):** May face some restrictions or higher rates
+- **Poor (561-720):** Limited to specialist lenders
+- **Very Poor (0-560):** Very difficult to obtain mortgage
+
+#### Equifax (0-700)
+- **Excellent (466-700):** Best mortgage rates and terms available
+- **Good (420-465):** Access to most standard mortgage products
+- **Fair (380-419):** May face some restrictions or higher rates
+- **Poor (280-379):** Limited to specialist lenders
+- **Very Poor (0-279):** Very difficult to obtain mortgage
+
+#### TransUnion (0-710)
+- **Excellent (628-710):** Best mortgage rates and terms available
+- **Good (604-627):** Access to most standard mortgage products
+- **Fair (566-603):** May face some restrictions or higher rates
+- **Poor (551-565):** Limited to specialist lenders
+- **Very Poor (0-550):** Very difficult to obtain mortgage
+
+### Mortgage Suitability Factors
+
+The mortgage suitability assessment considers:
+
+1. **Credit Score Level**
+   - 650+: Generally eligible for standard mortgages
+   - 550-649: May need specialist lender
+   - Below 550: Very limited options
+
+2. **Adverse Credit Recency**
+   - CCJs older than 3 years: Better prospects
+   - Defaults satisfied for 3+ years: Improving situation
+   - Recent adverse events (under 2 years): Significant restrictions
+
+3. **Payment History**
+   - No missed payments in 12 months: Ideal
+   - 1-2 missed payments in 12 months: Some lenders may accept
+   - 3+ missed payments in 12 months: Specialist lenders only
+
+4. **Outstanding Adverse Debt**
+   - No outstanding adverse debt: Positive factor
+   - Outstanding adverse debt: May need settlement before mortgage
+
+5. **Bankruptcy/IVA Status**
+   - Discharged 3+ years: Some options available
+   - Discharged less than 3 years: Very limited options
+   - Currently in IVA/bankruptcy: Generally no mortgage available
+
+### Regulatory Context (FCA Requirements)
+
+Under FCA MCOB (Mortgage Conduct of Business) rules:
+
+- **Creditworthiness Assessment Required:** Lenders must assess creditworthiness comprehensively before lending
+- **Credit Reference Agency Checks Mandatory:** All mortgage applications require CRA searches
+- **Adverse Credit Must Be Considered:** Impact on affordability must be assessed
+- **Consumer Awareness:** Advisers must explain how credit history affects mortgage options
+- **Responsible Lending:** Lenders cannot ignore adverse credit or poor payment history
+
+**Affordability Assessment Requirements:**
+- Credit history is key component of affordability assessment
+- Pattern of payments indicates future payment reliability
+- Adverse credit suggests higher lending risk
+- Consumer must demonstrate ability to maintain payments despite past issues
+
+### Best Practices for Advisers
+
+1. **Check Credit Early:** Obtain credit report 3-6 months before mortgage application to identify and address issues
+2. **Correct Errors:** Challenge any incorrect information on credit files immediately
+3. **Allow Time:** Adverse events have less impact as they age (3+ years is significantly better)
+4. **Build Positive History:** Encourage clients to build positive payment history after adverse events
+5. **Set Expectations:** Manage client expectations about lender options and likely interest rates
+6. **Document Circumstances:** Record mitigating circumstances for adverse events in notes
+7. **Consider Specialists:** Don't assume adverse credit means no mortgage - specialist lenders exist
+8. **Review All Three CRAs:** Credit scores can vary between agencies - check all three
 
 ---
 
