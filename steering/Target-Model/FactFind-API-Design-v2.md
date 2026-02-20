@@ -255,6 +255,7 @@ The FactFind API provides comprehensive digital capabilities for:
       - [10.4.5 Final Salary (Defined Benefit)](#1045-final-salary-defined-benefit)
       - [10.4.6 Pension Drawdown](#1046-pension-drawdown)
       - [10.4.7 Annuity](#1047-annuity)
+      - [10.4.8 Money Purchase](#1048-money-purchase)
     - [10.5 Mortgage Arrangements](#105-mortgage-arrangements)
     - [10.6 Protection Arrangements](#106-protection-arrangements)
       - [10.6.1 Personal Protection (Life, CI, IP)](#1061-personal-protection-life-ci-ip)
@@ -8419,8 +8420,8 @@ The Arrangements API provides comprehensive management of client financial produ
 **Aggregate Root:** FactFind (arrangements are part of the fact-find lifecycle)
 
 **Arrangement Categories:**
-- **Investment Arrangements:** GIA, ISA, Investment Bonds, Investment Trusts, Platform Accounts, Offshore Bonds
-- **Pension Arrangements:** Personal Pension, State Pension, Workplace Pension, SIPP, Final Salary, Drawdown, Annuity
+- **Investment Arrangements:** GIA, ISA, Investment Bonds, Investment Trusts, Platform Accounts, Offshore Bonds, Cash Accounts
+- **Pension Arrangements:** Personal Pension, State Pension, Workplace Pension, SIPP, Final Salary, Money Purchase, Drawdown, Annuity
 - **Mortgage Arrangements:** Residential, Buy-to-Let, Second Charge
 - **Protection Arrangements:** Personal Protection (Life, Critical Illness, Income Protection), General Insurance
 
@@ -9391,7 +9392,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 **Base Path:** `/api/v1/factfinds/{factfindId}/arrangements/pensions`
 
-**Purpose:** Manage all pension arrangements including workplace, personal, SIPPs, defined benefit schemes, drawdown, and annuities.
+**Purpose:** Manage all pension arrangements including workplace, personal, SIPPs, money purchase, defined benefit schemes, drawdown, and annuities.
 
 **Common Pension Fields:**
 
@@ -10472,6 +10473,568 @@ The Arrangements API provides comprehensive management of client financial produ
     },
     "purchaseDate": "2025-03-15",
     "annuityRate": 4.72
+  }
+}
+```
+
+#### 10.4.8 Money Purchase
+
+**Operations:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase` | Create Money Purchase | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase` | List Money Purchase Pensions | `arrangements:read` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Get Money Purchase | `arrangements:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Update Money Purchase | `arrangements:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/pensions/money-purchase/{arrangementId}` | Delete Money Purchase | `arrangements:write` |
+
+**Create Money Purchase Request:**
+
+```json
+{
+  "arrangementType": "MONEY_PURCHASE",
+  "provider": {
+    "name": "Scottish Widows",
+    "reference": "SW-001"
+  },
+  "employer": "ABC Corporation Ltd",
+  "sellingAdviser": {
+    "id": "adviser-789",
+    "name": "Michael Smith",
+    "firmName": "XYZ Wealth Management"
+  },
+  "agencyStatus": "NotUnderAgency",
+  "agencyStatusDate": "2023-01-15",
+  "contractType": "MoneyPurchaseContracted",
+  "productName": "Executive Pension Plan",
+  "policyNumber": "EPP-123456",
+  "currency": {
+    "code": "GBP",
+    "symbol": "£"
+  },
+  "owners": [
+    {
+      "clientRef": { "id": "client-123" },
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "status": {
+    "code": "ACTIVE",
+    "display": "Active - Contributing"
+  },
+  "dateSchemeJoined": "2018-03-15",
+  "retirementAge": 65,
+  "taxWrapper": "RegisteredPension",
+  "isIndexed": true,
+  "isPreserved": false,
+  "hasLifestylingStrategy": true,
+  "currentValue": {
+    "amount": 125000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "valuationDate": "2026-02-18",
+  "regularContributions": {
+    "memberContribution": {
+      "amount": 400.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "employerContribution": {
+      "amount": 800.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "frequency": "Monthly"
+  },
+  "lumpSumContributions": {
+    "amount": 5000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "employerMatchingDetails": "Employer matches up to 5% of salary. Additional 1% discretionary contribution if company performance targets met.",
+  "gmpAmount": {
+    "amount": 850.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "enhancedTaxFreeCash": {
+    "amount": 45000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "guaranteedAnnuityRate": "4.5% at age 65 for single life annuity",
+  "applicablePenalties": "Early exit penalty of 5% if withdrawn within 5 years of policy start date",
+  "erfLoyaltyBonusTerminalBonus": "Terminal bonus of 0.5% added at retirement if policy held for 10+ years",
+  "guaranteedGrowthRates": "Guaranteed 3% p.a. for first 5 years, then standard fund growth",
+  "deathInServiceSpousalBenefits": "4x salary lump sum plus fund value payable to nominated beneficiaries",
+  "deathBenefits": "Fund value payable to nominated beneficiaries tax-free before age 75. Subject to 45% tax after age 75.",
+  "lifetimeAllowanceUsed": 45.5,
+  "lifestylingStrategyDetails": "Automatic switch from equity funds to bonds and cash starting at age 60, completing by age 65",
+  "optionsAtRetirement": "Full drawdown, phased drawdown, annuity purchase, or UFPLS (Uncrystallised Funds Pension Lump Sum) available. No obligation to purchase annuity.",
+  "otherBenefitsOrMaterialFeatures": "Access to discounted fund platform with 0.2% p.a. rebate. Annual review included. Free switching between funds. Waiver of premium in event of critical illness.",
+  "additionalNotes": "Policy includes protected tax-free cash rights from A-Day (6 April 2006) giving enhanced 30% tax-free entitlement instead of standard 25%."
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "id": "arr-mp-001",
+  "href": "/api/v1/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001",
+  "arrangementType": "MONEY_PURCHASE",
+  "arrangementCategory": "PENSION",
+  "provider": {
+    "name": "Scottish Widows",
+    "reference": "SW-001",
+    "href": "/api/v1/providers/SW-001"
+  },
+  "employer": "ABC Corporation Ltd",
+  "sellingAdviser": {
+    "id": "adviser-789",
+    "name": "Michael Smith",
+    "firmName": "XYZ Wealth Management",
+    "href": "/api/v1/advisers/adviser-789"
+  },
+  "agencyStatus": "NotUnderAgency",
+  "agencyStatusDate": "2023-01-15",
+  "contractType": "MoneyPurchaseContracted",
+  "productName": "Executive Pension Plan",
+  "policyNumber": "EPP-123456",
+  "currency": {
+    "code": "GBP",
+    "symbol": "£",
+    "display": "British Pound"
+  },
+  "owners": [
+    {
+      "clientRef": {
+        "id": "client-123",
+        "fullName": "John Smith",
+        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+      },
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "status": {
+    "code": "ACTIVE",
+    "display": "Active - Contributing"
+  },
+  "dateSchemeJoined": "2018-03-15",
+  "retirementAge": 65,
+  "taxWrapper": "RegisteredPension",
+  "isIndexed": true,
+  "isPreserved": false,
+  "hasLifestylingStrategy": true,
+  "currentValue": {
+    "amount": 125000.00,
+    "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
+  },
+  "valuationDate": "2026-02-18",
+  "valuationType": {
+    "code": "STATEMENT",
+    "display": "Provider Statement Value"
+  },
+  "regularContributions": {
+    "memberContribution": {
+      "amount": 400.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "employerContribution": {
+      "amount": 800.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "totalMonthlyContribution": {
+      "amount": 1200.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "annualisedContribution": {
+      "amount": 14400.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "frequency": "Monthly"
+  },
+  "lumpSumContributions": {
+    "amount": 5000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "employerMatchingDetails": "Employer matches up to 5% of salary. Additional 1% discretionary contribution if company performance targets met.",
+  "gmpAmount": {
+    "amount": 850.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "enhancedTaxFreeCash": {
+    "amount": 45000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "guaranteedAnnuityRate": "4.5% at age 65 for single life annuity",
+  "applicablePenalties": "Early exit penalty of 5% if withdrawn within 5 years of policy start date",
+  "erfLoyaltyBonusTerminalBonus": "Terminal bonus of 0.5% added at retirement if policy held for 10+ years",
+  "guaranteedGrowthRates": "Guaranteed 3% p.a. for first 5 years, then standard fund growth",
+  "deathInServiceSpousalBenefits": "4x salary lump sum plus fund value payable to nominated beneficiaries",
+  "deathBenefits": "Fund value payable to nominated beneficiaries tax-free before age 75. Subject to 45% tax after age 75.",
+  "lifetimeAllowanceUsed": 45.5,
+  "lifestylingStrategyDetails": "Automatic switch from equity funds to bonds and cash starting at age 60, completing by age 65",
+  "optionsAtRetirement": "Full drawdown, phased drawdown, annuity purchase, or UFPLS (Uncrystallised Funds Pension Lump Sum) available. No obligation to purchase annuity.",
+  "otherBenefitsOrMaterialFeatures": "Access to discounted fund platform with 0.2% p.a. rebate. Annual review included. Free switching between funds. Waiver of premium in event of critical illness.",
+  "additionalNotes": "Policy includes protected tax-free cash rights from A-Day (6 April 2006) giving enhanced 30% tax-free entitlement instead of standard 25%.",
+  "projections": {
+    "assumedGrowthRate": 5.0,
+    "projectedValueAtRetirement": {
+      "amount": 285000.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "yearsToRetirement": 17.2
+  },
+  "annualAllowanceTracking": {
+    "currentTaxYear": {
+      "year": "2025/26",
+      "contributionsToDate": {
+        "amount": 19400.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "availableAllowance": {
+        "amount": 40000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "carryForwardAvailable": {
+        "amount": 15000.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      }
+    }
+  },
+  "concurrencyId": "k3g7h9i2-9j12-5k8l-6m4n-8o9p1q2r3s4t",
+  "createdAt": "2026-02-18T14:30:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" },
+    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "provider": { "href": "/api/v1/providers/SW-001" },
+    "sellingAdviser": { "href": "/api/v1/advisers/adviser-789" },
+    "beneficiaries": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-mp-001/beneficiaries" },
+    "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-mp-001/valuations" },
+    "contributions": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-mp-001/contributions" }
+  }
+}
+```
+
+**Enum Tables:**
+
+**Contract Type Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `AppropriatePersonalPension` | Appropriate Personal Pension |
+| `AVS` | AVS |
+| `CIMP` | CIMP |
+| `COMP` | COMP |
+| `EPABS` | EPABS |
+| `ExecutivePensionPlan` | Executive Pension Plan |
+| `FlexibleBenefits` | Flexible Benefits |
+| `FUIBBS` | FUIBBS |
+| `GroupCIMP` | Group CIMP |
+| `GroupCOMP` | Group COMP |
+| `GroupDependantsPension` | Group Dependants Pension |
+| `GroupOffshorePensionScheme` | Group Offshore Pension Scheme |
+| `GroupPersonalPension` | Group Personal Pension |
+| `GroupS32BuyoutBond` | Group S32 Buyout Bond |
+| `GroupSIPP` | Group SIPP |
+| `GroupStakeholderPension` | Group Stakeholder Pension |
+| `MasterTrustPension` | Master Trust Pension |
+| `MoneyPurchaseContracted` | Money Purchase Contracted |
+| `OMUPS` | OMUPS |
+| `ORDPS` | ORDPS |
+| `ROFPS` | ROFPS |
+| `SSAS` | SSAS |
+| `TrusteeInvestmentPlan` | Trustee Investment Plan |
+| `TUMBS` | TUMBS |
+| `WorkplacePensionScheme` | Workplace Pension Scheme |
+
+**Agency Status Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `NotUnderAgency` | Not Under Agency |
+| `UnderAgencyInformationOnly` | Under Agency - Information Only |
+| `UnderAgencyServicingAgent` | Under Agency - Servicing Agent |
+
+**Contribution Frequency Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `Monthly` | Monthly |
+| `Quarterly` | Quarterly |
+| `HalfYearly` | Half-Yearly |
+| `Annually` | Annually |
+| `Single` | Single Premium |
+| `Irregular` | Irregular |
+
+**Tax Wrapper Codes:**
+
+| Code | Display Name | Description |
+|------|-------------|-------------|
+| `RegisteredPension` | Registered Pension | Standard UK registered pension scheme |
+| `SIPP` | SIPP | Self-Invested Personal Pension |
+| `SSAS` | SSAS | Small Self-Administered Scheme |
+| `QualifyingRecognisedOverseasPensionScheme` | QROPS | Qualifying Recognised Overseas Pension Scheme |
+| `Section32BuyOut` | Section 32 Buy-Out | Section 32 buy-out policy |
+| `StakeholderPension` | Stakeholder Pension | Stakeholder pension scheme |
+
+**Status Codes:**
+
+| Code | Display Name | Description |
+|------|-------------|-------------|
+| `ACTIVE` | Active - Contributing | Member actively contributing to scheme |
+| `ACTIVE_NON_CONTRIBUTING` | Active - Non-Contributing | Member still employed but not contributing |
+| `PRESERVED` | Preserved | Member left scheme, benefits preserved |
+| `PAID_UP` | Paid-Up | No further contributions, fund remains invested |
+| `IN_DRAWDOWN` | In Drawdown | Member taking income via drawdown |
+| `CRYSTALLISED` | Crystallised | Benefits accessed but not fully withdrawn |
+| `CLOSED` | Closed | Policy closed or transferred out |
+
+**Validation Rules:**
+
+- `arrangementType` - Required, must be "MONEY_PURCHASE"
+- `provider.name` - Required
+- `productName` - Required
+- `policyNumber` - Required
+- `contractType` - Required, must be valid Contract Type Code
+- `owners` - Required, at least one owner with sum of ownershipPercentage = 100
+- `dateSchemeJoined` - Required, must be a past date
+- `retirementAge` - Required, must be between 55 and 75
+- `currency` - Required
+- `currentValue` - Required if policy has accumulated value
+- `valuationDate` - Required if currentValue provided, must be within last 12 months
+- `taxWrapper` - Required
+- `isIndexed` - Required boolean
+- `isPreserved` - Required boolean
+- `hasLifestylingStrategy` - Required boolean
+- `regularContributions` - At least one of memberContribution or employerContribution required if status is ACTIVE
+- `regularContributions.frequency` - Required if regularContributions provided
+- `lifestylingStrategyDetails` - Recommended if hasLifestylingStrategy = true
+- `lifetimeAllowanceUsed` - If provided, must be between 0 and 100 (percentage)
+- `gmpAmount` - Required only if member has contracted-out rights pre-April 2016
+- `enhancedTaxFreeCash` - Optional, only if member has protected rights from pre-A-Day
+- `agencyStatus` - Optional, but if provided must be valid Agency Status Code
+- `agencyStatusDate` - Required if agencyStatus provided
+
+**Business Rules:**
+
+**Employer Matching:**
+- Employer matching details should clearly state the matching formula
+- Total employer contribution may include base contribution plus matching
+- Some schemes have tiered matching (e.g., 100% match up to 3%, then 50% match from 3-5%)
+- `employerMatchingDetails` should capture all matching tiers and conditions
+
+**Annual Allowance:**
+- Standard annual allowance is £60,000 (2025/26 tax year)
+- Tapered annual allowance may apply for high earners (adjusted income > £260,000)
+- Money Purchase Annual Allowance (MPAA) of £10,000 applies if member has triggered it
+- Unused allowance can be carried forward from previous 3 tax years
+- Total contributions (member + employer + third party) count toward annual allowance
+- Tax relief applies automatically for pension contributions up to 100% of earnings
+
+**Lifetime Allowance:**
+- Lifetime Allowance was abolished from 6 April 2024
+- `lifetimeAllowanceUsed` percentage is relevant only for historical tracking
+- Protected rights (LTA protections) still apply: Fixed Protection, Individual Protection, etc.
+- Enhanced tax-free cash rights from protections should be noted in `enhancedTaxFreeCash`
+
+**GMP (Guaranteed Minimum Pension):**
+- Applies to members who contracted out of SERPS/S2P between 1978-1997
+- Must be paid at State Pension Age at minimum GMP rate
+- Different indexation rules: none for pre-1988 GMP, 3% for post-1988 GMP
+- Include in `gmpAmount` as annual pension amount
+
+**Enhanced Tax-Free Cash:**
+- Standard tax-free cash is 25% of fund value
+- Protected rights may allow higher percentage (e.g., 30% or fixed amount)
+- Primary Protection (before A-Day 2006) may give enhanced entitlement
+- Record protected amount in `enhancedTaxFreeCash` field
+
+**Guaranteed Annuity Rates (GAR):**
+- Valuable benefit if guaranteed rate significantly exceeds current market rates
+- Example: "4.5% at age 65" means £4,500 p.a. income per £100,000 fund value
+- Should be highlighted in adviser notes if GAR is materially valuable
+- Consider impact on transfer value and retirement options
+
+**Penalties:**
+- Early exit penalties typically apply within first 5-10 years
+- Market Value Reduction (MVR) may apply to with-profits funds
+- Surrender penalties may be tiered (e.g., 5% year 1, reducing to 0% by year 5)
+- Record all penalty structures in `applicablePenalties`
+
+**ERF/Loyalty/Terminal Bonuses:**
+- Enhancement Reserve Fund (ERF) payments may apply at retirement
+- Loyalty bonuses reward long-term policy holding
+- Terminal bonuses added at retirement for with-profits policies
+- Include details and conditions in `erfLoyaltyBonusTerminalBonus`
+
+**Guaranteed Growth Rates:**
+- Some older policies guarantee minimum growth rates (e.g., 3% p.a.)
+- Time-limited guarantees should specify duration
+- Very valuable in low interest rate environment
+- Include exact terms in `guaranteedGrowthRates`
+
+**Death Benefits:**
+- Pre-age 75: Fund value typically payable tax-free to beneficiaries
+- Post-age 75: Fund value subject to beneficiary's marginal income tax rate (or 45% lump sum tax)
+- Death in service benefits may include multiple of salary
+- Spousal benefits may include ongoing pension or lump sum
+- Record both death in service and standard death benefits separately
+
+**Lifestyling Strategy:**
+- Automatic de-risking approach as retirement approaches
+- Typically switches from equities to bonds/cash over 5-10 years before retirement
+- Should specify trigger age, completion age, and asset allocation glide path
+- Member should review suitability, especially if not purchasing annuity
+- If `hasLifestylingStrategy` = true, provide details in `lifestylingStrategyDetails`
+
+**Options at Retirement:**
+- Since pension freedoms (2015), members have full flexibility:
+  - Full drawdown: Leave invested, take income as needed
+  - Phased drawdown: Crystallise fund in stages
+  - Annuity purchase: Buy guaranteed income for life
+  - UFPLS: Take ad-hoc lump sums (25% tax-free, 75% taxable)
+  - Full encashment: Take entire fund (25% tax-free, 75% taxable)
+- No obligation to purchase annuity unless GAR is valuable
+- Record available options in `optionsAtRetirement`
+
+**Contribution Calculations:**
+- `totalMonthlyContribution` = memberContribution + employerContribution
+- `annualisedContribution` = totalMonthlyContribution × 12 (if monthly)
+- Adjust for frequency: Quarterly × 4, Annually × 1, etc.
+- Include net contribution (after tax relief) or gross equivalent consistently
+
+**Provider vs Employer:**
+- `provider` = Pension provider/administrator (e.g., "Scottish Widows", "Aviva")
+- `employer` = Actual employer organization sponsoring the scheme
+- Group schemes: provider administers, employer sponsors
+- Personal pensions: provider manages, employer may contribute but doesn't sponsor
+
+**Projected Values:**
+- Projections should use FCA standardized growth rates (currently 5% real growth)
+- Account for ongoing charges (e.g., AMC of 0.5-1.5% p.a.)
+- Projection accuracy decreases with time horizon
+- Update projections annually or when contributions change significantly
+
+**Example: Preserved Personal Pension (Paid-Up Policy)**
+
+```json
+{
+  "id": "arr-mp-002",
+  "href": "/api/v1/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002",
+  "arrangementType": "MONEY_PURCHASE",
+  "arrangementCategory": "PENSION",
+  "provider": {
+    "name": "Standard Life",
+    "reference": "SL-002",
+    "href": "/api/v1/providers/SL-002"
+  },
+  "employer": null,
+  "sellingAdviser": {
+    "id": "adviser-234",
+    "name": "David Brown",
+    "firmName": "Legacy Financial Advisers",
+    "href": "/api/v1/advisers/adviser-234"
+  },
+  "agencyStatus": null,
+  "agencyStatusDate": null,
+  "contractType": "AppropriatePersonalPension",
+  "productName": "Personal Pension Plan",
+  "policyNumber": "SL-APP-778899",
+  "currency": {
+    "code": "GBP",
+    "symbol": "£",
+    "display": "British Pound"
+  },
+  "owners": [
+    {
+      "clientRef": {
+        "id": "client-456",
+        "fullName": "Emma Wilson",
+        "href": "/api/v1/factfinds/ff-789/clients/client-456"
+      },
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "status": {
+    "code": "PAID_UP",
+    "display": "Paid-Up - No Further Contributions"
+  },
+  "dateSchemeJoined": "2008-06-01",
+  "dateContributionsStopped": "2015-12-31",
+  "retirementAge": 65,
+  "taxWrapper": "RegisteredPension",
+  "isIndexed": false,
+  "isPreserved": true,
+  "hasLifestylingStrategy": false,
+  "currentValue": {
+    "amount": 42500.00,
+    "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
+  },
+  "valuationDate": "2026-01-31",
+  "valuationType": {
+    "code": "STATEMENT",
+    "display": "Provider Statement Value"
+  },
+  "regularContributions": null,
+  "lumpSumContributions": null,
+  "employerMatchingDetails": null,
+  "gmpAmount": null,
+  "enhancedTaxFreeCash": null,
+  "guaranteedAnnuityRate": null,
+  "applicablePenalties": "No penalties apply - policy held for 10+ years",
+  "erfLoyaltyBonusTerminalBonus": null,
+  "guaranteedGrowthRates": null,
+  "deathInServiceSpousalBenefits": null,
+  "deathBenefits": "Fund value payable to nominated beneficiaries. Tax treatment depends on age at death: tax-free if under 75, taxable if over 75.",
+  "lifetimeAllowanceUsed": 15.2,
+  "lifestylingStrategyDetails": null,
+  "optionsAtRetirement": "All pension freedoms options available: drawdown, annuity purchase, UFPLS, or full encashment. No GAR or protected benefits restricting options.",
+  "otherBenefitsOrMaterialFeatures": "With-profits fund with potential for terminal bonus at retirement. Smoothing reduces volatility.",
+  "additionalNotes": "Policy was originally established with regular contributions of £200/month until 2015. Now paid-up with fund remaining invested in Standard Life Pension With-Profits Fund. Annual management charge 1.0% p.a.",
+  "historicalContributions": {
+    "totalContributionsMade": {
+      "amount": 22400.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "yearsContributing": 7.5
+  },
+  "projections": {
+    "assumedGrowthRate": 4.0,
+    "projectedValueAtRetirement": {
+      "amount": 78500.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "yearsToRetirement": 14.8
+  },
+  "fundComposition": [
+    {
+      "fundName": "Standard Life Pension With-Profits Fund",
+      "value": {
+        "amount": 42500.00,
+        "currency": { "code": "GBP", "symbol": "£" }
+      },
+      "percentage": 100.0
+    }
+  ],
+  "charges": {
+    "annualManagementCharge": 1.0,
+    "policyFee": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "symbol": "£" }
+    },
+    "totalExpenseRatio": 1.0
+  },
+  "concurrencyId": "m5n8p2q4-3r7s-9t1u-4v6w-8x9y1z2a3b4c",
+  "createdAt": "2026-02-18T15:00:00Z",
+  "updatedAt": "2026-02-18T15:00:00Z",
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002" },
+    "factfind": { "href": "/api/v1/factfinds/ff-789" },
+    "owner": { "href": "/api/v1/factfinds/ff-789/clients/client-456" },
+    "provider": { "href": "/api/v1/providers/SL-002" },
+    "sellingAdviser": { "href": "/api/v1/advisers/adviser-234" },
+    "beneficiaries": { "href": "/api/v1/factfinds/ff-789/arrangements/arr-mp-002/beneficiaries" },
+    "valuations": { "href": "/api/v1/factfinds/ff-789/arrangements/arr-mp-002/valuations" }
   }
 }
 ```
@@ -11839,13 +12402,13 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ## Total Endpoints Summary
 
-**Investment Arrangements:** 30 endpoints (6 types × 5 operations)
-**Pension Arrangements:** 35 endpoints (7 types × 5 operations)
+**Investment Arrangements:** 35 endpoints (7 types × 5 operations)
+**Pension Arrangements:** 40 endpoints (8 types × 5 operations)
 **Mortgage Arrangements:** 5 endpoints
 **Protection Arrangements:** 10 endpoints (2 types × 5 operations)
 **Sub-Resources:** 20 endpoints (4 resources × 5 operations)
 
-**Total Arrangement Endpoints:** 100
+**Total Arrangement Endpoints:** 110
 
 ---
 ## 11. Risk Profile API
@@ -26333,6 +26896,7 @@ The `PensionArrangement` contract represents pension products including Personal
 | `WORKPLACE_PENSION` | Workplace Pension |
 | `GROUP_PERSONAL_PENSION` | Group Personal Pension |
 | `STAKEHOLDER_PENSION` | Stakeholder Pension |
+| `MONEY_PURCHASE` | Money Purchase |
 | `FINAL_SALARY` | Final Salary / Defined Benefit |
 | `STATE_PENSION` | State Pension |
 | `DRAWDOWN` | Pension Drawdown |
