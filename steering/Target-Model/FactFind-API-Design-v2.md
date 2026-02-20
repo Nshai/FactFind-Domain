@@ -164,11 +164,9 @@ The FactFind API provides comprehensive digital capabilities for:
       - [6.3.5 Create Expenditure Item](#635-create-expenditure-item)
       - [6.3.6 Create Expenditure Change](#636-create-expenditure-change)
    - [6.4 Affordability](#64-affordability)
-      - [6.4.1 Operations Summary](#641-operations-summary)
-      - [6.4.2 Calculate Affordability](#642-calculate-affordability)
-      - [6.4.3 List Affordability Calculations](#643-list-affordability-calculations)
-      - [6.4.4 Update Affordability Calculation](#644-update-affordability-calculation)
-      - [6.4.5 Delete Affordability Calculation](#645-delete-affordability-calculation)
+      - [6.4.1 Overview](#641-overview)
+      - [6.4.2 Operations Summary](#642-operations-summary)
+      - [6.4.3 Key Endpoints](#643-key-endpoints)
 7. [Employment API (Circumstances Context)](#7-employment-api-circumstances-context)
    - [7.1 Overview](#71-overview)
    - [7.2 Operations Summary](#72-operations-summary)
@@ -333,12 +331,11 @@ The FactFind API provides comprehensive digital capabilities for:
    - [14.21 Expenditure Contract](#1421-expenditure-contract)
    - [14.22 Credit History Contract](#1422-credit-history-contract)
    - [14.23 Property Detail Contract](#1423-property-detail-contract)
-   - [14.24 Business Asset Contract](#1424-business-asset-contract)
    - [14.25 Notes Contract](#1425-notes-contract)
    - [14.26 Dependant Contract](#1426-dependant-contract)
    - [14.27 Income Changes Contract](#1427-income-changes-contract)
    - [14.28 Expenditure Changes Contract](#1428-expenditure-changes-contract)
-   - [14.29 Affordability Assessment Contract](#1429-affordability-assessment-contract)
+   - [14.29 Affordability](#1429-affordability)
    - [14.30 Contact Contract](#1430-contact-contract)
    - [14.31 Attitude to Risk (ATR) Contract](#1431-attitude-to-risk-atr-contract)
    - [14.32 Professional Contact Contract](#1432-professional-contact-contract)
@@ -548,8 +545,7 @@ Resources are organized into **business contexts** that reflect the domain model
 |---------|-----------|-----------|
 | **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Consent, Vulnerabilities, ID Verification, Professional Contacts | `/api/v2/factfinds/{id}/clients/{id}/*` |
 | **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v2/factfinds/{id}/clients/{id}/*` |
-| **Assets & Liabilities** | Assets, Business Assets, Property Details, Credit History, Valuations | `/api/v2/factfinds/{id}/assets` |
-| **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v2/factfinds/{id}/arrangements/{type}` |
+| **Assets & Liabilities** | **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v2/factfinds/{id}/arrangements/{type}` |
 | **Goals & Objectives** | Objectives (investment, pension, protection, mortgages, budget, estate-planning), Needs | `/api/v2/factfinds/{id}/objectives/{type}` |
 | **Risk Profiling** | ATR (client ATR), Supplementary Questions | `/api/v2/factfinds/{id}/attitude-to-risk` |
 | **Estate Planning** | Gifts, Trusts (nested under clients) | `/api/v2/factfinds/{id}/clients/{id}/estate-planning` |
@@ -656,7 +652,7 @@ Response: 200 OK
 Some entities may need to reference entities in other fact-finds (e.g., comparing historical risk profiles). These should be:
 - **Read-only** - No modifications across aggregates
 - **Eventually consistent** - Denormalized data may be slightly stale
-- **Explicitly marked** - Use `factfindRef` to indicate cross-aggregate references
+- **Explicitly marked** - Use `factfind` to indicate cross-aggregate references
 
 **Reference Data Exception**
 
@@ -965,7 +961,7 @@ Reference types represent entities that have **independent identity** and can ex
 - **Cross-References:** Can be referenced from multiple other entities
 - **Naming Convention:**
   - Entity type: Singular noun (e.g., `Client`, `Adviser`, `Provider`)
-  - Reference field: Entity name + "Ref" suffix (e.g., `clientRef`, `adviserRef`)
+  - Reference field: Entity name + "Ref" suffix (e.g., `client`, `adviser`)
 
 **Reference Object Pattern:**
 
@@ -973,7 +969,7 @@ When one entity references another, use an expanded reference object containing:
 
 ```json
 {
-  "clientRef": {
+  "client": {
     "id": 123,                    // Required: Unique identifier (numeric)
     "href": "/api/v2/factfinds/{factfindId}/clients/123-123",  // Required: URL to resource
     "name": "John Smith",                // Required: Human-readable display name
@@ -1010,7 +1006,7 @@ When one entity references another, use an expanded reference object containing:
 {
   "id": 456,                   // FactFind entity has identity
   "factFindNumber": "FF001234",
-  "clientRef": {                          // ClientRef - reference to Client entity
+  "client": {                          // ClientRef - reference to Client entity
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -1024,7 +1020,7 @@ When one entity references another, use an expanded reference object containing:
     "clientNumber": "C00001235",
     "type": "Person"
   },
-  "adviserRef": {                         // AdviserRef - reference to Adviser entity
+  "adviser": {                         // AdviserRef - reference to Adviser entity
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Sarah Johnson",
@@ -1099,7 +1095,7 @@ GET /api/v2/factfinds/456
 ```json
 {
   "id": 456,
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -1110,13 +1106,13 @@ GET /api/v2/factfinds/456
 
 **Expanded Response:**
 ```http
-GET /api/v2/factfinds/456?expand=clientRef,adviserRef
+GET /api/v2/factfinds/456?expand=client,adviser
 ```
 
 ```json
 {
   "id": 456,
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -1146,8 +1142,8 @@ GET /api/v2/factfinds/456?expand=clientRef,adviserRef
 
 **Expansion Rules:**
 - Use `?expand=fieldName` query parameter
-- Multiple fields: `?expand=clientRef,adviserRef,providerRef`
-- Nested expansion: `?expand=clientRef.employmentRef`
+- Multiple fields: `?expand=client,adviser,provider`
+- Nested expansion: `?expand=client.employment`
 - Only reference types can be expanded
 - Value types are always fully embedded
 
@@ -1161,10 +1157,10 @@ When creating an entity that references others, provide only the reference `id`:
 POST /api/v2/factfinds
 
 {
-  "clientRef": {
+  "client": {
     "id": 123              // Only id required on create
   },
-  "adviserRef": {
+  "adviser": {
     "id": 789
   },
   "sessionDate": "2026-02-15",
@@ -1181,13 +1177,13 @@ POST /api/v2/factfinds
 Response:
 {
   "id": 456,
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",           // Server populates display fields
     "clientNumber": "C00001234"
   },
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Sarah Johnson",
@@ -1215,7 +1211,7 @@ To change a reference, provide the new reference `id`:
 PATCH /api/v2/factfinds/456
 
 {
-  "adviserRef": {
+  "adviser": {
     "id": 999             // Change to different adviser
   }
 }
@@ -1223,7 +1219,7 @@ PATCH /api/v2/factfinds/456
 Response:
 {
   "id": 456,
-  "adviserRef": {
+  "adviser": {
     "id": 999,
     "href": "/api/v2/advisers/999",
     "name": "Michael Brown",        // Server updates display fields
@@ -1725,7 +1721,7 @@ GET /api/v2/factfinds/{factfindId}/clients/123?exclude=notes,medicalConditions
 
 **Embed Related Resources:**
 
-Reference types (entities with identity) can be expanded to include their full entity data inline. This applies to fields ending with "Ref" (e.g., `clientRef`, `adviserRef`). Value types are always fully embedded by default.
+Reference types (entities with identity) can be expanded to include their full entity data inline. This applies to fields ending with "Ref" (e.g., `client`, `adviser`). Value types are always fully embedded by default.
 
 **Default response (minimal references):**
 ```http
@@ -1735,14 +1731,14 @@ GET /api/v2/factfinds/123
 {
   "id": 123,
   "factFindNumber": "FF001234",
-  "clientRef": {
+  "client": {
     "id": 456,
     "href": "/api/v2/factfinds/{factfindId}/clients/456",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
@@ -1761,13 +1757,13 @@ GET /api/v2/factfinds/123
 
 **Expanded response (full referenced entities):**
 ```http
-GET /api/v2/factfinds/123?expand=clientRef,adviserRef
+GET /api/v2/factfinds/123?expand=client,adviser
 ```
 ```json
 {
   "id": 123,
   "factFindNumber": "FF001234",
-  "clientRef": {
+  "client": {
     "id": 456,
     "href": "/api/v2/factfinds/{factfindId}/clients/456",
     "name": "John Smith",
@@ -1793,7 +1789,7 @@ GET /api/v2/factfinds/123?expand=clientRef,adviserRef
       "country": "GB"
     }
   },
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
@@ -1815,9 +1811,9 @@ GET /api/v2/factfinds/123?expand=clientRef,adviserRef
 
 **Expansion Rules:**
 - Use `?expand=fieldName` query parameter
-- Multiple fields: `?expand=clientRef,adviserRef,providerRef`
-- Nested expansion: `?expand=clientRef.employmentRef` (expand client, then employment within client)
-- Only reference types (with "Ref" suffix) can be expanded
+- Multiple fields: `?expand=client,adviser,provider`
+- Nested expansion: `?expand=client.employment` (expand client, then employment within client)
+- Only reference types can be expanded
 - Value types (MoneyValue, AddressValue, etc.) are always fully embedded
 - Maximum expansion depth: 2 levels to prevent excessive response sizes
 
@@ -2159,7 +2155,7 @@ Client contract with required-on-create fields. Read-only and computed fields ar
   "hasWill": true,
   "isWillUpToDate": true,
   "isPowerOfAttorneyGranted": false,
-  "adviserRef": {
+  "adviser": {
     "id": 789
   }
 }
@@ -2521,7 +2517,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/addresses/456
 
 {
   "id": 456,
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -2584,7 +2580,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/addresses/456
 ```json
 {
   "id": 789,
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -2974,679 +2970,7 @@ The financial health score is calculated on a 0-100 scale with five components:
 | GET | `/api/v2/factfinds/{id}/expenditure-changes` | List expected expenditure changes | `factfind:read` |
 | POST | `/api/v2/factfinds/{id}/expenditure-changes` | Add expenditure change | `factfind:write` |
 | GET | `/api/v2/factfinds/{id}/affordability` | Calculate affordability | `factfind:read` |
-| GET | `/api/v2/factfinds/{id}/complete` | Get complete aggregate | `factfind:read` |
-
-### 5.3 Key Endpoints
-
-#### 5.3.1 Create FactFind
-
-**Endpoint:** `POST /api/v2/factfinds`
-
-**Description:** Create a new fact find session for a client or joint clients.
-
-**Contract:** Uses the unified `FactFind` contract (see Section 12.2). Request includes required-on-create fields; response includes complete contract with server-generated fields.
-
-**Request Body:**
-FactFind contract with required-on-create fields. Read-only and computed fields are ignored.
-
-
-```json
-{
-  "client": {
-    "id": 123
-  },
-  "jointClient": {
-    "id": 124
-  },
-  "dateOfMeeting": "2026-02-16",
-  "typeOfMeeting": "InitialConsultation",
-  "scopeOfAdvice": [
-    "RetirementPlanning",
-    "InvestmentAdvice",
-    "ProtectionReview"
-  ],
-  "primaryAdviser": {
-    "id": 789
-  },
-  "anybodyElsePresent": false,
-  "customQuestions": [
-    {
-      "question": "What are your main financial concerns?",
-      "answer": "Ensuring sufficient retirement income and protecting family"
-    }
-  ]
-}
-```
-
-**Response:**
-Complete `FactFind` contract with all fields populated.
-
-```http
-HTTP/1.1 201 Created
-Location: /api/v2/factfinds/456
-ETag: "a1b2c3d4e5f6"
-
-{
-  "id": 456,
-  "client": {
-    "id": 123,
-    "fullName": "John Smith",
-    "href": "/api/v2/factfinds/{factfindId}/clients/123"
-  },
-  "jointClient": {
-    "id": 124,
-    "fullName": "Sarah Smith",
-    "href": "/api/v2/factfinds/{factfindId}/clients/124"
-  },
-  "dateOfMeeting": "2026-02-16",
-  "typeOfMeeting": "InitialConsultation",
-  "scopeOfAdvice": [
-    "RetirementPlanning",
-    "InvestmentAdvice",
-    "ProtectionReview"
-  ],
-  "primaryAdviser": {
-    "id": 789,
-    "fullName": "Jane Doe",
-    "href": "/api/v2/advisers/789"
-  },
-  "isComplete": false,
-  "dateFactFindCompleted": null,
-  "anybodyElsePresent": false,
-  "status": "INPROG",
-  "createdAt": "2026-02-16T14:30:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z",
-    "complete": { "href": "/api/v2/factfinds/456/complete", "method": "POST" },
-    "employment": { "href": "/api/v2/factfinds/456/employment" },
-    "income": { "href": "/api/v2/factfinds/456/income" },
-    "expenditure": { "href": "/api/v2/factfinds/456/expenditure" },
-    "summary": { "href": "/api/v2/factfinds/456/summary" }
-  }
-}
-```
-
-**Validation Rules:**
-- `client` - Required, must be existing client
-- `dateOfMeeting` - Required, must not be in future
-- `typeOfMeeting` - Required, one of: InitialConsultation, Review, AdHoc, Annual, SixMonth
-- `scopeOfAdvice` - Required, array, min 1 item
-
-**Business Rules:**
-- Joint fact find requires jointClient reference
-- Single client fact find has null jointClient
-- Primary adviser must be active adviser
-- Scope of advice determines required sections
-
-#### 5.3.2 Add Income
-
-**Endpoint:** `POST /api/v2/factfinds/{id}/income`
-
-**Description:** Add an income source to the fact find.
-
-**Contract:** Uses the unified `Income` contract (see Section 12.4). The same contract is used for request and response.
-
-**Request Body:**
-Income contract with required-on-create fields.
-
-
-```json
-{
-  "owner": "Client1",
-  "category": "EmployedIncome",
-  "description": "Primary employment salary",
-  "employment": {
-    "id": 789
-  },
-  "basicIncomeGross": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "basicIncomeNet": {
-    "amount": 52500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "frequencyGross": {
-    "code": "A",
-    "display": "Annual",
-    "periodsPerYear": 1
-  },
-  "frequencyNet": {
-    "code": "A",
-    "display": "Annual",
-    "periodsPerYear": 1
-  },
-  "hasOvertimeIncome": true,
-  "guaranteedOvertimeGross": {
-    "amount": 5000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "hasBonusIncome": true,
-  "regularBonusGross": {
-    "amount": 10000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "includeInAffordability": true,
-  "includeBasicIncomeInAffordability": true,
-  "includeGuaranteedOvertimeInAffordability": true,
-  "includeRegularBonusInAffordability": true,
-  "startDate": "2020-01-15",
-  "endDate": null
-}
-```
-
-**Response:**
-```json
-{
-  "id": 999,
-  "factfindId": 456,
-  "owner": "Client1",
-  "category": "EmployedIncome",
-  "description": "Primary employment salary",
-  "employment": {
-    "id": 789,
-    "employer": "ACME Corporation Ltd",
-    "occupation": "Senior Software Engineer",
-    "href": "/api/v2/factfinds/456/employment/789"
-  },
-  "basicIncomeGross": {
-    "amount": 75000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "basicIncomeNet": {
-    "amount": 52500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "frequencyGross": {
-    "code": "A",
-    "display": "Annual",
-    "periodsPerYear": 1
-  },
-  "frequencyNet": {
-    "code": "A",
-    "display": "Annual",
-    "periodsPerYear": 1
-  },
-  "hasOvertimeIncome": true,
-  "guaranteedOvertimeGross": {
-    "amount": 5000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "guaranteedOvertimeNet": {
-    "amount": 3500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "hasBonusIncome": true,
-  "regularBonusGross": {
-    "amount": 10000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "regularBonusNet": {
-    "amount": 7000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "totalGrossAnnualEarnings": {
-    "amount": 90000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "netMonthlyIncome": {
-    "amount": 5250.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "includeInAffordability": true,
-  "includeBasicIncomeInAffordability": true,
-  "includeGuaranteedOvertimeInAffordability": true,
-  "includeRegularBonusInAffordability": true,
-  "startDate": "2020-01-15",
-  "endDate": null,
-  "createdAt": "2026-02-16T14:35:00Z",
-    "factfind": { "href": "/api/v2/factfinds/456" },
-    "employment": { "href": "/api/v2/factfinds/456/employment/789" }
-  }
-}
-```
-
-**Income Categories:**
-- `EmployedIncome` - Salary from employment
-- `SelfEmployedIncome` - Self-employment profits
-- `DividendIncome` - Company dividends
-- `RentalIncome` - Property rental income
-- `PensionIncome` - Pension payments
-- `InvestmentIncome` - Investment returns
-- `StateBedefits` - State benefits
-- `MaintenanceIncome` - Maintenance payments
-- `OtherIncome` - Other income sources
-
-**Validation Rules:**
-- `owner` - Required, one of: Client1, Client2, Joint
-- `category` - Required, see categories above
-- `basicIncomeGross` - Required, amount > 0
-- `frequencyGross` - Required, one of: Annual, Monthly, Weekly, Quarterly
-- Income amounts must be positive
-- Net income must be less than gross income
-- Employment link required for EmployedIncome category
-
-#### 5.3.3 Add Expenditure
-
-**Endpoint:** `POST /api/v2/factfinds/{id}/expenditure`
-
-**Description:** Add an expenditure item (essential or discretionary).
-
-**Request Body:**
-```json
-{
-  "owner": "Joint",
-  "category": "Mortgage",
-  "description": "Primary residence mortgage payment",
-  "netAmount": {
-    "amount": 1500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "discretionaryAmount": {
-    "amount": 0.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "frequency": {
-    "code": "M",
-    "display": "Monthly",
-    "periodsPerYear": 12
-  },
-  "liability": {
-    "id": 555
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "id": 888,
-  "factfindId": 456,
-  "owner": "Joint",
-  "category": "Mortgage",
-  "description": "Primary residence mortgage payment",
-  "netAmount": {
-    "amount": 1500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "discretionaryAmount": {
-    "amount": 0.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "essentialAmount": {
-    "amount": 1500.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "frequency": {
-    "code": "M",
-    "display": "Monthly",
-    "periodsPerYear": 12
-  },
-  "annualAmount": {
-    "amount": 18000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "liability": {
-    "id": 555,
-    "type": "Mortgage",
-    "provider": "UK Building Society",
-    "href": "/api/v2/factfinds/{factfindId}/arrangements/555"
-  },
-  "createdAt": "2026-02-16T14:40:00Z",
-    "factfind": { "href": "/api/v2/factfinds/456" },
-    "liability": { "href": "/api/v2/factfinds/{factfindId}/arrangements/555" }
-  }
-}
-```
-
-**Expenditure Categories:**
-- `Mortgage` - Mortgage payments
-- `Rent` - Rental payments
-- `UtilitiesGas` - Gas bills
-- `UtilitiesElectric` - Electricity bills
-- `UtilitiesWater` - Water bills
-- `CouncilTax` - Council tax
-- `Groceries` - Food and household shopping
-- `Transport` - Car, fuel, public transport
-- `Insurance` - General insurance premiums
-- `ChildcareCosts` - Childcare and education
-- `Entertainment` - Leisure and entertainment
-- `HolidaysTravel` - Holidays and travel
-- `ClothingFootwear` - Clothing and footwear
-- `CommunicationsPhone` - Phone and internet
-- `LoanRepayments` - Loan and credit repayments
-- `Other` - Other expenditure
-
-**Business Rules:**
-- Essential expenditure: discretionaryAmount = 0
-- Discretionary expenditure: discretionaryAmount > 0
-- Total expenditure = netAmount = essentialAmount + discretionaryAmount
-- Frequency determines annualization factor
-- Linked liabilities affect affordability calculations
-
-#### 5.3.4 Get FactFind Summary
-
-**Endpoint:** `GET /api/v2/factfinds/{id}/summary`
-
-**Description:** Get comprehensive financial summary with calculated totals.
-
-**Response:**
-```json
-{
-  "factfindId": 456,
-  "client": {
-    "id": 123,
-    "fullName": "John Smith"
-  },
-  "jointClient": {
-    "id": 124,
-    "fullName": "Sarah Smith"
-  },
-  "incomeSummary": {
-    "totalEarnedAnnualIncomeGross": {
-      "amount": 120000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "totalNetMonthlyIncome": {
-      "amount": 7500.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "client1Income": {
-      "amount": 90000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "client2Income": {
-      "amount": 30000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "incomeCount": 4,
-    "incomeForAffordability": {
-      "amount": 110000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    }
-  },
-  "expenditureSummary": {
-    "totalMonthlyExpenditure": {
-      "amount": 4500.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "totalEssentialExpenditure": {
-      "amount": 3800.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "totalDiscretionaryExpenditure": {
-      "amount": 700.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "client1Expenditure": {
-      "amount": 500.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "client2Expenditure": {
-      "amount": 300.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "jointExpenditure": {
-      "amount": 3700.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "expenditureCount": 18
-  },
-  "disposableIncome": {
-    "totalMonthlyDisposableIncome": {
-      "amount": 3000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "netDisposableIncome": {
-      "amount": 2300.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "discretionaryIncome": {
-      "amount": 700.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    }
-  },
-  "emergencyFund": {
-    "requiredAmount": {
-      "amount": 11400.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "committedAmount": {
-      "amount": 15000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "shortfall": {
-      "amount": 0.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "monthsCovered": 3.3
-  },
-  "affordability": {
-    "grossAnnualIncomeForAffordability": {
-      "amount": 110000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "netMonthlyIncomeAvailable": {
-      "amount": 7000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "monthlyDisposableIncome": {
-      "amount": 2300.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    },
-    "affordabilityRatio": 0.31,
-    "stressTestedAffordability": {
-      "amount": 2000.00,
-      "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
-  }
-    }
-  },
-  "calculatedAt": "2026-02-16T14:45:00Z",
-    "income": { "href": "/api/v2/factfinds/456/income" },
-    "expenditure": { "href": "/api/v2/factfinds/456/expenditure" },
-    "affordability": { "href": "/api/v2/factfinds/456/affordability" }
-  }
-}
-```
-
-**Calculation Rules:**
-- All amounts normalized to monthly for comparison
-- Essential expenditure = netAmount - discretionaryAmount
-- Disposable income = total income - total expenditure
-- Emergency fund recommended = 3-6 months essential expenditure
-- Affordability ratio = housing costs / gross income
-- Stress test applies +3% interest rate increase
-
----
-
-### 5.4 Estate Planning
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
-
-**Purpose:** Manage client-specific estate planning information including wills, powers of attorney, trusts, and gift planning for inheritance tax (IHT) mitigation.
-
-**Scope:**
-- Estate planning overview (wills, lasting power of attorney, inheritance wishes)
-- Gift recording and tracking (cash gifts, property gifts, business asset gifts)
-- Potentially Exempt Transfer (PET) tracking and 7-year rule monitoring
-- Gift trust management and beneficiary tracking
-- Inheritance Tax (IHT) calculations and liability assessment
-- Estate value monitoring and IHT planning strategies
-
-**Key Features:**
-- **Client-Level Resource** - Estate planning is specific to each individual client
-- **Gift History** - Complete audit trail of all gifts made by the client
-- **PET Tracking** - Automatic 7-year countdown for potentially exempt transfers
-- **IHT Calculations** - Real-time IHT exposure based on estate value and gifts
-- **Trust Management** - Link gifts to trusts with beneficiary tracking
-
-**Aggregate Root:** Client (estate planning nested under client)
-
-**Regulatory Compliance:**
-- FCA Handbook - Understanding client estate planning needs
-- HMRC Inheritance Tax regulations
-- Inheritance Tax Act 1984 - 7-year rule, exemptions, reliefs
-- Data Protection Act 2018 - Sensitive estate planning data
-- Money Laundering Regulations 2017 - Source of wealth for large gifts
-
-#### 5.4.1 Operations Summary
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| GET | `/api/v2/factfinds/{id}/complete` | Get complete aggregate | `factfind:read` |--------|----------|-------------|---------------|
 | **Estate Planning Overview** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
 | PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
@@ -3661,503 +2985,7 @@ Income contract with required-on-create fields.
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | List client's trusts | `estate:read` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Get trust details | `estate:read` |
 | PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Update trust | `estate:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |
-
-**Total Endpoints:** 12
-
-#### 5.4.2 Get Estate Planning Overview
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
-
-**Description:** Retrieve comprehensive estate planning information for a client including wills, powers of attorney, total gifts made, and IHT exposure.
-
-**Response:**
-
-```json
-{
-  "clientRef": {
-    "id": 123,
-    "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-456/clients/123"
-  },
-  "estatePlanning": {
-    "hasWill": true,
-    "willLastUpdated": "2023-06-15",
-    "willLocation": "With solicitor - Smith & Partners LLP",
-    "hasLastingPowerOfAttorney": true,
-    "lpaTypes": ["Property and Financial Affairs", "Health and Welfare"],
-    "lpaRegistered": true,
-    "lpaRegistrationDate": "2023-07-01",
-    "executors": [
-      {
-        "name": "Sarah Smith",
-        "relationshipToClient": "Spouse",
-        "contactRef": { "id": 124 }
-      },
-      {
-        "name": "David Smith",
-        "relationshipToClient": "Brother",
-        "contactRef": { "id": 789 }
-      }
-    ],
-    "inheritanceWishes": "Estate split equally between children. Family home to spouse.",
-    "concernsOrPriorities": "Minimize IHT burden, protect family home"
-  },
-  "giftsSummary": {
-    "totalGifts": 8,
-    "totalValueGifted": {
-      "amount": 125000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "activePETs": 3,
-    "giftsTaxFree": 5,
-    "totalIHTExposure": {
-      "amount": 42000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    }
-  },
-  "trustsSummary": {
-    "totalTrusts": 2,
-    "totalValueInTrust": {
-      "amount": 200000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "beneficiaryCount": 4
-  },
-  "ihtCalculation": {
-    "estimatedEstateValue": {
-      "amount": 850000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "ihtThreshold": {
-      "amount": 325000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "residenceNilRateBand": {
-      "amount": 175000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "totalAllowance": {
-      "amount": 500000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "taxableEstate": {
-      "amount": 350000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "estimatedIHT": {
-      "amount": 140000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "effectiveRate": 16.47
-  },
-  "lastReviewed": "2026-01-15",
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" },
-    "gifts": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning/gifts" },
-    "trusts": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning/trusts" }
-  }
-}
-```
-
-#### 5.4.3 Update Estate Planning Details
-
-**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
-
-**Description:** Update estate planning information such as will status, powers of attorney, and inheritance wishes.
-
-**Request Body:**
-
-```json
-{
-  "hasWill": true,
-  "willLastUpdated": "2026-02-15",
-  "willLocation": "With solicitor - Smith & Partners LLP",
-  "hasLastingPowerOfAttorney": true,
-  "lpaTypes": ["Property and Financial Affairs", "Health and Welfare"],
-  "lpaRegistered": true,
-  "lpaRegistrationDate": "2026-02-10",
-  "inheritanceWishes": "Estate to be split equally between three children after spouse passes. Family home to spouse with life interest.",
-  "concernsOrPriorities": "Minimize IHT, protect family home, provide for grandchildren's education"
-}
-```
-
-**Response:** 200 OK with updated estate planning overview.
-
-#### 5.4.4 Record Gift
-
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
-
-**Description:** Record a gift made by the client for IHT planning and PET tracking.
-
-**Request Body:**
-
-```json
-{
-  "giftDate": "2026-01-15",
-  "giftType": "CASH",
-  "recipientName": "Emma Smith",
-  "recipientRelationship": "CHILD",
-  "recipientRef": {
-    "id": 789
-  },
-  "giftValue": {
-    "amount": 15000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "giftPurpose": "University tuition assistance",
-  "isPotentiallyExemptTransfer": true,
-  "exemptionType": "NONE",
-  "notes": "First of three annual payments for university costs"
-}
-```
-
-**Response:**
-
-```json
-{
-  "id": 123,
-  "clientRef": {
-    "id": 123,
-    "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-456/clients/123"
-  },
-  "giftDate": "2026-01-15",
-  "giftType": "CASH",
-  "recipientName": "Emma Smith",
-  "recipientRelationship": "CHILD",
-  "recipientRef": {
-    "id": 789,
-    "href": "/api/v2/factfinds/ff-456/clients/123/dependents/dependent-789"
-  },
-  "giftValue": {
-    "amount": 15000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "giftPurpose": "University tuition assistance",
-  "isPotentiallyExemptTransfer": true,
-  "exemptionType": "NONE",
-  "petExpiryDate": "2033-01-15",
-  "yearsRemaining": 6.92,
-  "petStatus": "ACTIVE",
-  "ihtLiability": {
-    "amount": 6000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "notes": "First of three annual payments for university costs",
-  "createdAt": "2026-02-18T10:30:00Z",
-  "updatedAt": "2026-02-18T10:30:00Z",
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" },
-    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning" }
-  }
-}
-```
-
-**Validation Rules:**
-- `giftDate` - Required, cannot be in future
-- `giftType` - Required, one of: Cash, Property, Business Asset, Investment, Other
-- `giftValue` - Required, must be positive
-- `recipientName` - Required
-
-**Business Rules:**
-- PET expiry date automatically calculated as gift date + 7 years
-- IHT liability calculated based on current IHT rate (40%) and exemptions
-- Years remaining updated automatically each day
-- PET status changes to "Exempt" once 7 years elapsed
-- Annual exemption (£3,000) applied automatically if available
-
-#### 5.4.5 List Gifts
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
-
-**Description:** Retrieve all gifts made by the client, with optional filtering by status and date range.
-
-**Query Parameters:**
-- `petStatus` - Filter by PET status (active, exempt, expired)
-- `fromDate` - Filter gifts from this date onwards
-- `toDate` - Filter gifts up to this date
-- `giftType` - Filter by gift type (cash, property, business_asset, etc.)
-- `minValue` - Minimum gift value
-- `includeExempt` - Include tax-exempt gifts (default: true)
-
-**Response:**
-
-```json
-{
-  "clientRef": {
-    "id": 123,
-    "fullName": "John Smith"
-  },
-  "gifts": [
-    {
-      "id": 123,
-      "giftDate": "2026-01-15",
-      "giftType": "CASH",
-      "recipientName": "Emma Smith",
-      "recipientRelationship": "CHILD",
-      "giftValue": {
-        "amount": 15000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      },
-      "isPotentiallyExemptTransfer": true,
-      "petExpiryDate": "2033-01-15",
-      "yearsRemaining": 6.92,
-      "petStatus": "ACTIVE",
-      "ihtLiability": {
-        "amount": 6000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      }
-      }
-    },
-    {
-      "id": 124,
-      "giftDate": "2025-12-25",
-      "giftType": "CASH",
-      "recipientName": "Michael Smith",
-      "recipientRelationship": "CHILD",
-      "giftValue": {
-        "amount": 10000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      },
-      "isPotentiallyExemptTransfer": true,
-      "petExpiryDate": "2032-12-25",
-      "yearsRemaining": 6.86,
-      "petStatus": "ACTIVE",
-      "ihtLiability": {
-        "amount": 4000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      }
-      }
-    },
-    {
-      "id": 125,
-      "giftDate": "2019-03-10",
-      "giftType": "PROPERTY",
-      "recipientName": "Sarah Smith",
-      "recipientRelationship": "SPOUSE",
-      "giftValue": {
-        "amount": 200000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      },
-      "isPotentiallyExemptTransfer": false,
-      "exemptionType": "SPOUSE",
-      "petExpiryDate": null,
-      "yearsRemaining": 0,
-      "petStatus": "EXEMPT",
-      "ihtLiability": {
-        "amount": 0.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      }
-      }
-    }
-  ],
-  "totalGifts": 3,
-  "totalValueGifted": {
-    "amount": 225000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-  "activePETs": 2,
-  "totalIHTExposure": {
-    "amount": 10000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning" }
-  }
-}
-```
-
-#### 5.4.6 Create Gift Trust
-
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts`
-
-**Description:** Create a gift trust for estate planning and IHT mitigation.
-
-**Request Body:**
-
-```json
-{
-  "trustName": "Smith Family Education Trust",
-  "trustType": "BARE_TRUST",
-  "establishedDate": "2026-02-01",
-  "trustValue": {
-    "amount": 100000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "trustPurpose": "Provide for grandchildren's education expenses",
-  "trustees": [
-    {
-      "name": "John Smith",
-      "relationshipToClient": "Self",
-      "contactRef": { "id": 123 }
-    },
-    {
-      "name": "Sarah Smith",
-      "relationshipToClient": "Spouse",
-      "contactRef": { "id": 124 }
-    }
-  ],
-  "beneficiaries": [
-    {
-      "name": "Oliver Smith",
-      "relationshipToClient": "Grandchild",
-      "dateOfBirth": "2015-08-22",
-      "benefitShare": 50.0
-    },
-    {
-      "name": "Sophie Smith",
-      "relationshipToClient": "Grandchild",
-      "dateOfBirth": "2018-03-15",
-      "benefitShare": 50.0
-    }
-  ],
-  "linkedGifts": [
-    { "giftRef": { "id": 126 } }
-  ]
-}
-```
-
-**Response:**
-
-```json
-{
-  "id": 456,
-  "clientRef": {
-    "id": 123,
-    "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-456/clients/123"
-  },
-  "trustName": "Smith Family Education Trust",
-  "trustType": "BARE_TRUST",
-  "establishedDate": "2026-02-01",
-  "trustValue": {
-    "amount": 100000.00,
-    "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
-    }
-  },
-  "trustPurpose": "Provide for grandchildren's education expenses",
-  "trustees": [
-    {
-      "name": "John Smith",
-      "relationshipToClient": "Self",
-      "contactRef": { "id": 123, "href": "/api/v2/factfinds/ff-456/clients/123" }
-    },
-    {
-      "name": "Sarah Smith",
-      "relationshipToClient": "Spouse",
-      "contactRef": { "id": 124, "href": "/api/v2/factfinds/ff-456/clients/124" }
-    }
-  ],
-  "beneficiaries": [
-    {
-      "name": "Oliver Smith",
-      "relationshipToClient": "Grandchild",
-      "dateOfBirth": "2015-08-22",
-      "age": 10,
-      "benefitShare": 50.0
-    },
-    {
-      "name": "Sophie Smith",
-      "relationshipToClient": "Grandchild",
-      "dateOfBirth": "2018-03-15",
-      "age": 7,
-      "benefitShare": 50.0
-    }
-  ],
-  "linkedGifts": [
-    {
-      "giftRef": { "id": 126, "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning/gifts/gift-126" },
-      "giftDate": "2026-02-01",
-      "giftValue": { "amount": 100000.00, "currency": { "code": "GBP" } }
-    }
-  ],
-  "totalGiftsInTrust": {
-    "amount": 100000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-  "ihtTreatment": "Immediately chargeable transfer - periodic charges apply",
-  "nextPeriodicCharge": "2036-02-01",
-  "createdAt": "2026-02-18T11:00:00Z",
-  "updatedAt": "2026-02-18T11:00:00Z",
-    "client": { "href": "/api/v2/factfinds/ff-456/clients/123" },
-    "estate-planning": { "href": "/api/v2/factfinds/ff-456/clients/123/estate-planning" }
-  }
-}
-```
-
-**Trust Types:**
-- **Bare Trust** - Beneficiary has immediate absolute entitlement
-- **Discretionary Trust** - Trustees have discretion over distributions
-- **Interest in Possession Trust** - Beneficiary has right to income
-- **Life Interest Trust** - Beneficiary has interest for life
-- **Disabled Person's Trust** - Special tax treatment for disabled beneficiaries
-
-**Validation Rules:**
-- `trustName` - Required, max 200 characters
-- `trustType` - Required
-- `establishedDate` - Required, cannot be in future
-- `trustValue` - Required, must be positive
-- `beneficiaries` - At least one beneficiary required
-- `benefitShare` - Must sum to 100% across all beneficiaries
-
-**Business Rules:**
-- Trust creation automatically creates linked gift if value > 0
-- IHT treatment determined by trust type
-- Periodic charges calculated for relevant property trusts (every 10 years)
-- Trust value tracked separately from personal estate
-
----
-
-### 5.5 Dependants
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants`
-
-**Purpose:** Manage client's dependants including children, elderly parents, and other financially dependent individuals for protection planning and financial forecasting.
-
-**Scope:**
-- Dependant demographic information (name, date of birth, relationship)
-- Living arrangements tracking (living with client or separate)
-- Financial dependency status and duration
-- Age-based dependency calculations
-- Dependency end date projections
-- Multiple client associations (e.g., child dependant of both joint clients)
-
-**Key Features:**
-- **Automatic Age Calculation** - Age calculated from date of birth and updated daily
-- **Dependency Period Tracking** - Track when financial dependency ends (age-based or date-based)
-- **Custom Age Thresholds** - Override standard dependency age (e.g., dependency until age 25 for university)
-- **Multiple Parent Support** - Dependant can be associated with multiple clients (joint families)
-- **Protection Planning** - Critical for calculating protection needs and life insurance requirements
-
-**Aggregate Root:** Client (dependants nested under client)
-
-**Regulatory Compliance:**
-- FCA Handbook - Understanding dependant needs for protection advice
-- COBS 9.2 - Assessing suitability for protection planning
-- Consumer Duty - Ensuring adequate protection for dependants
-- Data Protection Act 2018 - Sensitive data about minors
-
-#### 5.5.1 Operations Summary
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |--------|----------|-------------|---------------|
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List all client's dependants | `clients:read` |
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add new dependant | `clients:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | `clients:read` |
@@ -4183,7 +3011,7 @@ Income contract with required-on-create fields.
 
 ```json
 {
-  "clientRef": {
+  "client": {
     "id": 123,
     "fullName": "John Smith",
     "href": "/api/v2/factfinds/ff-456/clients/123"
@@ -4370,11 +3198,19 @@ Income contract with required-on-create fields.
   "protectionNeeds": {
     "estimatedAnnualCost": {
       "amount": 12000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "totalCapitalRequired": {
       "amount": 132000.00,
-      "currency": { "code": "GBP", "symbol": "£" },
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
       "calculation": "11 years × £12,000"
     }
   },
@@ -4642,7 +3478,7 @@ Where:
 
 ```json
 {
-  "clientRef": {
+  "client": {
     "id": 456,
     "fullName": "John Smith",
     "href": "/api/v2/factfinds/ff-423/clients/456"
@@ -4702,7 +3538,7 @@ Where:
 {
   "id": 792,
   "href": "/api/v2/factfinds/ff-423/clients/456/notes/note-792",
-  "clientRef": {
+  "client": {
     "id": 456,
     "fullName": "John Smith",
     "href": "/api/v2/factfinds/ff-423/clients/456"
@@ -5915,7 +4751,7 @@ Use: Demonstrate suitability in file review
       "startDate": "2020-03-01",
       "endDate": null,
       "isTaxable": true,
-      "assetRef": null/clients/123/income/inc-111"
+      "asset": null/clients/123/income/inc-111"
         }
       }
     },
@@ -5935,7 +4771,7 @@ Use: Demonstrate suitability in file review
       "startDate": "2019-01-01",
       "endDate": null,
       "isTaxable": true,
-      "assetRef": {
+      "asset": {
         "id": 5001,
         "href": "/api/v2/factfinds/{factfindId}/assets/5001",
         "assetType": "Property",
@@ -5977,7 +4813,7 @@ Use: Demonstrate suitability in file review
   "startDate": "2027-01-01",
   "endDate": null,
   "isTaxable": true,
-  "assetRef": null
+  "asset": null
 }
 ```
 
@@ -6002,7 +4838,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income/inc-333
   "startDate": "2027-01-01",
   "endDate": null,
   "isTaxable": true,
-  "assetRef": null,
+  "asset": null,
   "createdAt": "2026-02-18T10:15:00Z",
   "updatedAt": "2026-02-18T10:15:00Z"/clients/123/income/inc-333"
     },
@@ -6037,7 +4873,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income/inc-333
 **Request Body:**
 ```json
 {
-  "incomeRef": {
+  "income": {
     "id": 111,
     "description": "Salary from ABC Technology"
   },
@@ -6055,7 +4891,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
 
 {
   "id": 444,
-  "incomeRef": {
+  "income": {
     "id": 111,
     "description": "Salary from ABC Technology",
     "href": "/api/v2/factfinds/{factfindId}/clients/123/income/inc-111"
@@ -6114,7 +4950,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
     {
       "id": 1001,
       "href": "/api/v2/factfinds/234/clients/456/expenditures/1001",
-      "factfindRef": {
+      "factfind": {
         "id": 234,
         "href": "/api/v2/factfinds/234"
       },
@@ -6143,7 +4979,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
     {
       "id": 1002,
       "href": "/api/v2/factfinds/234/clients/456/expenditures/1002",
-      "factfindRef": {
+      "factfind": {
         "id": 234,
         "href": "/api/v2/factfinds/234"
       },
@@ -6168,7 +5004,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
     {
       "id": 1004,
       "href": "/api/v2/factfinds/234/clients/456/expenditures/1004",
-      "factfindRef": {
+      "factfind": {
         "id": 234,
         "href": "/api/v2/factfinds/234"
       },
@@ -6190,11 +5026,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
       "liability": null,
       "notes": "Family of 4 - approximately £120/week"
     }
-  ],
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/234/clients/456/expenditures"
-    },
+  ]
     "create": {
       "href": "/api/v2/factfinds/234/clients/456/expenditures",
       "method": "POST"
@@ -6240,7 +5072,7 @@ Location: /api/v2/factfinds/234/clients/456/expenditures/1005
   "id": 1005,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1005",
 
-  "factfindRef": {
+  "factfind": {
     "id": 234,
     "href": "/api/v2/factfinds/234"
   },
@@ -6268,11 +5100,7 @@ Location: /api/v2/factfinds/234/clients/456/expenditures/1005
   "liability": null,
   "notes": "3-year lease agreement",
   "createdAt": "2026-02-18T11:00:00Z",
-  "updatedAt": "2026-02-18T11:00:00Z",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/234/clients/456/expenditures/1005"
-    },
+  "updatedAt": "2026-02-18T11:00:00Z"
     "update": {
       "href": "/api/v2/factfinds/234/clients/456/expenditures/1005",
       "method": "PATCH"
@@ -6312,7 +5140,7 @@ See Section 14.21 for the complete list of expenditure types organized by catego
 **Request Body:**
 ```json
 {
-  "expenditureRef": {
+  "expenditure": {
     "id": 555,
     "description": "Mortgage payment - main residence"
   },
@@ -6330,7 +5158,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/expenditure-changes/exp-cha
 
 {
   "id": 888,
-  "expenditureRef": {
+  "expenditure": {
     "id": 555,
     "description": "Mortgage payment - main residence",
     "href": "/api/v2/factfinds/{factfindId}/clients/123/expenditure/exp-555"
@@ -6358,8 +5186,7 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/expenditure-changes/exp-cha
 - `Stop` - Expenditure will cease
 - `Start` - New expenditure will commence
 
-### 6.4 Affordability Assessment
-
+### 6.4 Affordability
 **Base Path:** `/api/v2/factfinds/{factfindId}/affordability`
 
 **Purpose:** Provides comprehensive affordability assessments for both monthly cashflow analysis and lumpsum investment planning. Supports mortgage applications, protection planning, investment advice, debt consolidation scenarios, and retirement planning through sophisticated scenario modelling and calculation capabilities.
@@ -6401,33 +5228,27 @@ Affordability Assessment is a critical component of the fact-find process that e
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/affordability` | List all affordability assessments | Yes |
-| POST | `/api/v2/factfinds/{factfindId}/affordability` | Create new affordability assessment | Yes |
-| GET | `/api/v2/factfinds/{factfindId}/affordability/{affordabilityId}` | Get specific assessment | Yes |
-| PATCH | `/api/v2/factfinds/{factfindId}/affordability/{affordabilityId}` | Update assessment parameters | Yes |
-| POST | `/api/v2/factfinds/{factfindId}/affordability/{affordabilityId}/recalculate` | Trigger recalculation | Yes |
-| DELETE | `/api/v2/factfinds/{factfindId}/affordability/{affordabilityId}` | Delete assessment | Yes |
+| GET | `/api/v2/factfinds/{factfindId}/affordability` | Get the affordability assessment | Yes |
+| PUT | `/api/v2/factfinds/{factfindId}/affordability` | Update affordability assessment | Yes |
 
-**Total Endpoints:** 6
+**Total Endpoints:** 2
 
 **Key Design Decisions:**
-- Affordability assessments are factfind-level resources (not nested under client)
-- Support for multiple clients within a single assessment (joint scenarios)
-- Automatic calculation on create/update
-- Explicit recalculate endpoint for manual refresh
-- Soft delete for audit trail preservation
+- Affordability is a singleton resource per factfind (one assessment per factfind)
+- No id field required as it's uniquely identified by factfind
+- Support for multiple clients within the assessment (joint scenarios)
+- Automatic calculation on update
+- Cannot be deleted independently (deleted when factfind is deleted)
 
 #### 6.4.3 Key Endpoints
 
-##### 6.4.3.1 Get Affordability Assessment
+##### 6.4.3.1 Get Affordability
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/affordability`
 
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/affordability/{affordabilityId}`
-
-**Description:** Retrieve a specific affordability assessment with all calculated values.
+**Description:** Retrieve the affordability assessment for this factfind with all calculated values.
 
 **Path Parameters:**
 - `factfindId` (string, required) - The fact-find identifier
-- `affordabilityId` (integer, required) - The affordability assessment identifier
 
 **Response:** `200 OK`
 
@@ -6435,8 +5256,7 @@ Affordability Assessment is a critical component of the fact-find process that e
 
 ```json
 {
-  "id": 1001,
-  "href": "/api/v2/factfinds/456/affordability/1001",
+  "href": "/api/v2/factfinds/456/affordability",
 
   "factfind": {
     "id": 456,
@@ -6638,8 +5458,7 @@ Affordability Assessment is a critical component of the fact-find process that e
 
 ---
 
-##### 6.4.3.2 Create Affordability Assessment
-
+##### 6.4.3.2 Create Affordability
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/affordability`
 
 **Description:** Create a new affordability assessment with initial parameters. All calculated fields are automatically computed.
@@ -6690,7 +5509,9 @@ Affordability Assessment is a critical component of the fact-find process that e
     "agreedMonthlyBudget": {
       "amount": 1500.00,
       "currency": {
-        "code": "GBP"
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
       }
     },
     "notes": "Client has variable income from bonus"
@@ -6700,13 +5521,17 @@ Affordability Assessment is a critical component of the fact-find process that e
     "totalLumpSumAvailable": {
       "amount": 50000.00,
       "currency": {
-        "code": "GBP"
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
       }
     },
     "agreedInvestmentAmount": {
       "amount": 30000.00,
       "currency": {
-        "code": "GBP"
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
       }
     },
     "sourceOfInvestment": "PropertySale",
@@ -6718,13 +5543,17 @@ Affordability Assessment is a critical component of the fact-find process that e
     "committedAmount": {
       "amount": 5000.00,
       "currency": {
-        "code": "GBP"
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
       }
     },
     "requiredAmount": {
       "amount": 8000.00,
       "currency": {
-        "code": "GBP"
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
       }
     }
   }
@@ -6735,13 +5564,8 @@ Affordability Assessment is a critical component of the fact-find process that e
 
 **Response Body:** Full affordability assessment entity (same structure as GET response)
 
-**Response Headers:**
-```
-Location: /api/v2/factfinds/456/affordability/1001
-```
-
 **Status Codes:**
-- `201 Created` - Assessment created successfully
+- `200 OK` - Assessment updated successfully
 - `400 Bad Request` - Invalid request data or validation failure
 - `404 Not Found` - Referenced clients, incomes, or expenditures not found
 - `401 Unauthorized` - Missing or invalid authentication
@@ -6766,15 +5590,13 @@ Location: /api/v2/factfinds/456/affordability/1001
 
 ---
 
-##### 6.4.3.3 Update Affordability Assessment
-
-**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/affordability/{affordabilityId}`
+##### 6.4.3.2 Update Affordability
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/affordability`
 
 **Description:** Update scenario options, budget amounts, or change which incomes/expenditures are included. All calculated fields automatically recalculate.
 
 **Path Parameters:**
 - `factfindId` (string, required) - The fact-find identifier
-- `affordabilityId` (integer, required) - The affordability assessment identifier
 
 **Request Body:**
 
@@ -6788,7 +5610,9 @@ Location: /api/v2/factfinds/456/affordability/1001
     "agreedMonthlyBudget": {
       "amount": 1800.00,
       "currency": {
-        "code": "GBP"
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
       }
     },
     "notes": "Updated scenario: client willing to reduce non-essentials"
@@ -6798,7 +5622,9 @@ Location: /api/v2/factfinds/456/affordability/1001
     "agreedInvestmentAmount": {
       "amount": 35000.00,
       "currency": {
-        "code": "GBP"
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
       }
     }
   }
@@ -6872,8 +5698,7 @@ Location: /api/v2/factfinds/456/affordability/1001
 
 | Field | Type | Required | Read-Only | Description |
 |-------|------|----------|-----------|-------------|
-| `id` | integer | - | Yes | Unique identifier for the assessment (auto-generated) |
-| `href` | string | - | Yes | Canonical URI for this assessment |
+| `href` | string | - | Yes | Canonical URI for this affordability assessment |
 | `factfind.id` | integer | On create | Yes | Reference to parent fact-find |
 | `factfind.href` | string | - | Yes | URI to parent fact-find |
 | `clients` | array | On create | No | Array of client references included in this assessment (minimum 1) |
@@ -7243,7 +6068,11 @@ Where months typically:
     },
     "agreedMonthlyBudget": {
       "amount": 1850.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "notes": "Conservative assessment - not including expected bonus income. Excluding current mortgage (will be repaid) and credit cards (will be consolidated)."
   },
@@ -7251,11 +6080,19 @@ Where months typically:
   "emergencyFund": {
     "committedAmount": {
       "amount": 10000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "requiredAmount": {
       "amount": 12000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   }
 }
@@ -7265,8 +6102,7 @@ Where months typically:
 
 ```json
 {
-  "id": 2001,
-  "href": "/api/v2/factfinds/456/affordability/2001",
+  "href": "/api/v2/factfinds/456/affordability",
 
   "factfind": {
     "id": 456,
@@ -7419,7 +6255,11 @@ Where months typically:
     },
     "agreedMonthlyBudget": {
       "amount": 800.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "notes": "Client wants to invest £800/month regularly for retirement"
   },
@@ -7427,11 +6267,19 @@ Where months typically:
   "lumpsumAffordability": {
     "totalLumpSumAvailable": {
       "amount": 80000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "agreedInvestmentAmount": {
       "amount": 70000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "sourceOfInvestment": "PropertySale",
     "isInvestmentAvailableWithoutPenalty": "Yes",
@@ -7441,11 +6289,19 @@ Where months typically:
   "emergencyFund": {
     "committedAmount": {
       "amount": 15000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "requiredAmount": {
       "amount": 12000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   }
 }
@@ -7455,8 +6311,7 @@ Where months typically:
 
 ```json
 {
-  "id": 3001,
-  "href": "/api/v2/factfinds/789/affordability/3001",
+  "href": "/api/v2/factfinds/789/affordability",
 
   "factfind": {
     "id": 789,
@@ -7629,7 +6484,11 @@ Where months typically:
     },
     "agreedMonthlyBudget": {
       "amount": 0.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "notes": "Retirement sustainability check. State pension increases incorporated."
   },
@@ -7637,11 +6496,19 @@ Where months typically:
   "lumpsumAffordability": {
     "totalLumpSumAvailable": {
       "amount": 45000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "agreedInvestmentAmount": {
       "amount": 12000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "sourceOfInvestment": "Savings",
     "isInvestmentAvailableWithoutPenalty": "Yes",
@@ -7651,11 +6518,19 @@ Where months typically:
   "emergencyFund": {
     "committedAmount": {
       "amount": 20000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "requiredAmount": {
       "amount": 15000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   }
 }
@@ -7665,8 +6540,7 @@ Where months typically:
 
 ```json
 {
-  "id": 4001,
-  "href": "/api/v2/factfinds/555/affordability/4001",
+  "href": "/api/v2/factfinds/555/affordability",
 
   "factfind": {
     "id": 555,
@@ -7868,7 +6742,7 @@ Where months typically:
 **Response:**
 ```json
 {
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -7928,7 +6802,7 @@ Where months typically:
   "id": 12345,
   "href": "/api/v2/factfinds/679/clients/456/employments/12345",
 
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -8179,7 +7053,7 @@ Where months typically:
   "id": 12346,
   "href": "/api/v2/factfinds/679/clients/457/employments/12346",
 
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -8259,19 +7133,55 @@ Where months typically:
   },
   "selfEmployedIncome": {
     "mostRecentAnnualAccounts": {
-      "grossProfit": { "amount": 180000.00, "currency": { "code": "GBP" } },
-      "netProfit": { "amount": 150000.00, "currency": { "code": "GBP" } },
-      "shareOfCompanyProfit": { "amount": 180000.00, "currency": { "code": "GBP" } },
-      "grossDividend": { "amount": 60000.00, "currency": { "code": "GBP" } },
-      "netDividend": { "amount": 54000.00, "currency": { "code": "GBP" } },
-      "grossSalary": { "amount": 25000.00, "currency": { "code": "GBP" } },
-      "netSalary": { "amount": 20000.00, "currency": { "code": "GBP" } },
+      "grossProfit": { "amount": 180000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "netProfit": { "amount": 150000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "shareOfCompanyProfit": { "amount": 180000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "grossDividend": { "amount": 60000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "netDividend": { "amount": 54000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "grossSalary": { "amount": 25000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "netSalary": { "amount": 20000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
       "yearEnd": "2024-03-31",
       "includeInAffordability": true
     },
     "yearTwoAnnualAccounts": {
-      "grossProfit": { "amount": 165000.00, "currency": { "code": "GBP" } },
-      "netProfit": { "amount": 135000.00, "currency": { "code": "GBP" } },
+      "grossProfit": { "amount": 165000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "netProfit": { "amount": 135000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
       "yearEnd": "2023-03-31",
       "includeInAffordability": false
     }
@@ -8331,20 +7241,44 @@ Where months typically:
 {
   "selfEmployedIncome": {
     "mostRecentAnnualAccounts": {
-      "grossProfit": { "amount": 195000.00, "currency": { "code": "GBP" } },
-      "netProfit": { "amount": 165000.00, "currency": { "code": "GBP" } },
+      "grossProfit": { "amount": 195000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "netProfit": { "amount": 165000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
       "yearEnd": "2025-03-31",
       "includeInAffordability": true
     },
     "yearTwoAnnualAccounts": {
-      "grossProfit": { "amount": 180000.00, "currency": { "code": "GBP" } },
-      "netProfit": { "amount": 150000.00, "currency": { "code": "GBP" } },
+      "grossProfit": { "amount": 180000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "netProfit": { "amount": 150000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
       "yearEnd": "2024-03-31",
       "includeInAffordability": false
     },
     "yearThreeAnnualAccounts": {
-      "grossProfit": { "amount": 165000.00, "currency": { "code": "GBP" } },
-      "netProfit": { "amount": 135000.00, "currency": { "code": "GBP" } },
+      "grossProfit": { "amount": 165000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "netProfit": { "amount": 135000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
       "yearEnd": "2023-03-31",
       "includeInAffordability": false
     }
@@ -8416,8 +7350,8 @@ Where months typically:
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned employment identifier |
 | `href` | string | read-only | Canonical URI for this employment record |
-| `factfindRef.id` | integer | read-only | Reference to parent fact find |
-| `factfindRef.href` | string | read-only | URI to parent fact find |
+| `factfind.id` | integer | read-only | Reference to parent fact find |
+| `factfind.href` | string | read-only | URI to parent fact find |
 | `client.id` | integer | read-only | Reference to client |
 | `client.href` | string | read-only | URI to client |
 
@@ -8638,7 +7572,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
    {
      "description": "Salary from Acme Corporation",
      "amount": { "amount": 65000.00 },
-     "employmentRef": { "id": 12346 }
+     "employment": { "id": 12346 }
    }
 
 3. Affordability calculation uses stable employment (10+ years) as positive factor
@@ -8791,7 +7725,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
   "id": 334,
   "href": "/api/v2/factfinds/679/clients/346/credit-history/334",
 
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -8947,7 +7881,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
   "id": 334,
   "href": "/api/v2/factfinds/679/clients/346/credit-history/334",
 
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -9163,7 +8097,7 @@ Total Income = Net Salary + Net Dividends + Share of Retained Profits
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned credit history record identifier |
 | `href` | string | read-only | Canonical URI for this credit history record |
-| `factfindRef` | FactfindRef | read-only | Reference to parent factfind |
+| `factfind` | FactfindRef | read-only | Reference to parent factfind |
 | `client` | ClientRef | read-only | Reference to the client this credit history belongs to |
 
 **Summary Object (Aggregate Fields)**
@@ -9425,11 +8359,19 @@ POST /api/v2/factfinds/679/clients/346/credit-history
     "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
     "amountRegistered": {
       "amount": 5000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "amountOutstanding": {
       "amount": 0.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "isDebtOutstanding": false,
     "numberOfPaymentsMissed": 2,
@@ -9468,11 +8410,19 @@ POST /api/v2/factfinds/679/clients/346/credit-history
     "registeredOn": "2022-03-01T00:00:00Z",
     "amountRegistered": {
       "amount": 45000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "amountOutstanding": {
       "amount": 15000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "isDebtOutstanding": true,
     "yearsMaintained": 2,
@@ -9515,11 +8465,19 @@ POST /api/v2/factfinds/679/clients/346/credit-history
       "satisfiedOrClearedOn": "2022-12-15T00:00:00Z",
       "amountRegistered": {
         "amount": 2500.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "amountOutstanding": {
         "amount": 0.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "isDebtOutstanding": false,
       "lender": "Council Tax Authority"
@@ -9530,11 +8488,19 @@ POST /api/v2/factfinds/679/clients/346/credit-history
       "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
       "amountRegistered": {
         "amount": 5000.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "amountOutstanding": {
         "amount": 0.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "isDebtOutstanding": false,
       "numberOfPaymentsMissed": 3,
@@ -9581,11 +8547,19 @@ PATCH /api/v2/factfinds/679/clients/346/credit-history/334
     "satisfiedOrClearedOn": "2026-02-18T00:00:00Z",
     "amountRegistered": {
       "amount": 5000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "amountOutstanding": {
       "amount": 0.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "isDebtOutstanding": false,
     "numberOfPaymentsMissed": 2,
@@ -9688,154 +8662,7 @@ Mortgage impact:
 | POST | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs` | Add need | `objectives:write` |
 | GET | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Get need details | `objectives:read` |
 | PATCH | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Update need | `objectives:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Delete need | `objectives:write` |
-
-**Total Endpoints:** 31 (26 objective operations + 5 needs operations)
-
-### 9.3 Objective Types and Contracts
-
-Each objective type has specific fields relevant to that goal category. All objectives share common fields (id, factfindRef, clientRef, description, priority, targetDate, status) plus type-specific fields.
-
-#### 10.3.1 Investment Objectives
-
-**Purpose:** Track investment goals and savings targets.
-
-**Type-Specific Fields:**
-- `investmentPurpose` - Purpose of the investment (Wealth accumulation, House deposit, Education, etc.)
-- `timeHorizon` - Investment time horizon in years
-- `riskProfile` - Target risk profile for investments
-- `lumpSumRequired` - Target lump sum amount
-- `currentInvestments` - Current investment value
-- `shortfallAmount` - Gap to target
-
-For detailed request/response examples, see API Endpoints Catalog Section 6.3.1.
-
-#### 10.3.2 Pension Objectives
-
-**Purpose:** Track retirement planning goals.
-
-**Type-Specific Fields:**
-- `retirementAge` - Target retirement age
-- `annualIncomeRequired` - Annual retirement income target
-- `lumpSumRequired` - Lump sum required at retirement
-- `incomeDrawdownStrategy` - Strategy for drawing income
-- `statePensionForecast` - Expected state pension amount
-
-For detailed request/response examples, see API Endpoints Catalog Section 6.3.2.
-
-#### 10.3.3 Protection Objectives
-
-**Purpose:** Track protection needs (life, critical illness, income protection).
-
-**Type-Specific Fields:**
-- `protectionType` - Type of protection (Life, Critical Illness, Income Protection)
-- `coverRequired` - Amount of cover required
-- `coverTerm` - Term of cover in years
-- `dependants` - Number of dependants
-- `currentCover` - Existing cover amount
-- `shortfallAmount` - Gap in protection
-
-For detailed request/response examples, see API Endpoints Catalog Section 6.3.3.
-
-#### 10.3.4 Mortgage Objectives
-
-**Purpose:** Track mortgage and property purchase goals.
-
-**Type-Specific Fields:**
-- `propertyValue` - Target property value
-- `depositAmount` - Available deposit
-- `loanRequired` - Mortgage amount required
-- `propertyAddress` - Target property address (if known)
-- `isFirstTimeBuyer` - First-time buyer status
-- `affordabilityAssessment` - Affordability assessment result
-
-For detailed request/response examples, see API Endpoints Catalog Section 6.3.4.
-
-#### 10.3.5 Budget Objectives
-
-**Purpose:** Track budget and spending goals.
-
-**Type-Specific Fields:**
-- `budgetType` - Type of budget goal (Debt Reduction, Emergency Fund, Spending Control, Savings)
-- `monthlyTarget` - Monthly budget target
-- `currentSpend` - Current monthly spending
-- `savingsTarget` - Target monthly savings
-
-For detailed request/response examples, see API Endpoints Catalog Section 6.3.5.
-
-#### 10.3.6 Estate Planning Objectives
-
-**Purpose:** Track estate planning and inheritance goals.
-
-**Type-Specific Fields:**
-- `estateValue` - Current estate value
-- `inheritanceTaxLiability` - Estimated IHT liability
-- `beneficiaryCount` - Number of beneficiaries
-- `trustsRequired` - Whether trusts are needed
-- `willInPlace` - Whether will is in place
-- `powerOfAttorneyInPlace` - Whether POA is in place
-
-For detailed request/response examples, see API Endpoints Catalog Section 6.3.6.
-
-### 9.4 Needs Sub-Resources
-
-**Purpose:** Capture detailed needs and questions under each objective.
-
-**Endpoint Pattern:** `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs`
-
-**Need Contract:**
-- `id` - Unique identifier (numeric)
-- `questionId` - Question identifier
-- `question` - The question text
-- `answer` - Client's answer
-- `answeredAt` - Timestamp
-- `priority` - Priority level (High, Medium, Low)
-
-For detailed request/response examples, see API Endpoints Catalog Section 6.4.
-
----
-
-## 10. Assets & Liabilities API
-
-### 10.1 Overview
-
-**Base Path:** `/api/v2/factfinds/{id}/assets`
-
-**Purpose:** Manage factfind-level assets and liabilities with comprehensive tracking, valuations, and financial calculations.
-
-**Scope:**
-- Asset management (property, business, investments, cash, other)
-- Liability tracking (mortgages, loans, credit cards, other debts)
-- Property details with valuations, LTV, rental yield, and CGT calculations
-- Business asset details with valuations and dividend tracking
-- Aggregated views for financial summary and net worth calculations
-- Joint ownership tracking across multiple clients with ownership shares
-- Tax relief and inheritance tax planning fields
-
-**Key Features:**
-- **Property Reference** - Property-specific data via propertyRef linking
-- **Business Dividends** - Dividend tracking per owner with withdrawal types and frequency
-- **Valuation Basis** - Record valuation methods (Market Valuation, Comparable Sales, Net Asset Value, etc.)
-- **Tax Planning Fields** - Business Asset Disposal Relief, Inheritance Tax exemptions, RNRB eligibility, Business Relief
-- **Financial Calculations** - Automated LTV, rental yield, CGT, net worth calculations
-- **Joint Ownership** - Assets can be jointly owned by multiple clients with percentage shares
-- **Client Visibility** - Control which assets are visible to clients
-- **Rental Expenses** - Track expenses for rental properties
-- **Holding Status** - Mark assets as holdings for portfolio management
-
-**Aggregate Root:** FactFind (assets and liabilities are factfind-level resources)
-
-**Regulatory Compliance:**
-- FCA Handbook - Understanding client assets for suitability
-- MLR 2017 - Source of wealth verification
-- HMRC Capital Gains Tax regulations
-- HMRC Stamp Duty Land Tax requirements
-- Data Protection Act 2018 - Asset data retention
-
-### 10.2 Operations Summary
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| DELETE | `/api/v2/factfinds/{factfindId}/objectives/{objectiveId}/needs/{needId}` | Delete need | `objectives:write` |--------|----------|-------------|---------------|
 | **Assets** | | | |
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/assets` | List all assets | `assets:read` |
 | POST | `/api/v2/factfinds/{id}/clients/{clientId}/assets` | Add asset | `assets:write` |
@@ -9856,11 +8683,6 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 | GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/ltv` | Calculate LTV | `assets:read` |
 | GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/rental-yield` | Calculate rental yield | `assets:read` |
 | GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/capital-gains` | Calculate CGT | `assets:read` |
-| **Business Asset Details** | | | |
-| GET | `/api/v2/factfinds/{id}/business-assets/{businessAssetId}` | Get business asset detail | `assets:read` |
-| PUT | `/api/v2/factfinds/{id}/business-assets/{businessAssetId}` | Update business asset | `assets:write` |
-| GET | `/api/v2/factfinds/{id}/business-assets/{businessAssetId}/valuations` | Get valuation history | `assets:read` |
-| POST | `/api/v2/factfinds/{id}/business-assets/{businessAssetId}/valuations` | Add business valuation | `assets:write` |
 | **Aggregated Views** | | | |
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/assets/summary` | Get client assets summary | `assets:read` |
 | GET | `/api/v2/factfinds/{id}/liabilities/summary` | Get liabilities summary | `liabilities:read` |
@@ -9890,31 +8712,39 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     {
       "id": 1234,
       "href": "/api/v2/factfinds/679/clients/346/assets/1234",
-      "factfindRef": { "id": 679, "href": "/api/v2/factfinds/679" },
+      "factfind": { "id": 679, "href": "/api/v2/factfinds/679" },
       "assetType": "PROPERTY",
       "description": "Primary Residence - 123 Main Street",
       "ownership": {
         "ownershipType": "JOINT",
         "owners": [
           {
-            "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
+            "client": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
             "ownershipShare": 50.0
           },
           {
-            "clientRef": { "id": 124, "href": "/api/v2/factfinds/679/clients/124" },
+            "client": { "id": 124, "href": "/api/v2/factfinds/679/clients/124" },
             "ownershipShare": 50.0
           }
         ]
       },
       "currentValue": {
         "amount": 450000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "valuedOn": "2026-01-15",
       "valuationBasis": "Comparable Sales",
       "originalValue": {
         "amount": 450000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "purchasedOn": "2024-05-10",
       "rentalExpenses": { "amount": 1200.00, "currency": "GBP" },
@@ -9924,9 +8754,9 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "rnrbEligibility": "Not Eligible",
       "isBusinessReliefQualifying": false,
       "isHolding": false,
-      "propertyRef": { "id": 1234, "href": "/api/v2/factfinds/679/property-details/1234" },
-      "arrangementRef": { "id": 1234, "href": "/api/v2/factfinds/679/clients/4436/arrangements/1234" },
-      "incomeRef": { "id": 1234, "href": "/api/v2/factfinds/679/clients/4436/income/1234" },
+      "property": { "id": 1234, "href": "/api/v2/factfinds/679/property-details/1234" },
+      "arrangement": { "id": 1234, "href": "/api/v2/factfinds/679/clients/4436/arrangements/1234" },
+      "income": { "id": 1234, "href": "/api/v2/factfinds/679/clients/4436/income/1234" },
       "notes": "Rental property - managed by external agent",
       "createdAt": "2026-02-01T10:00:00Z",
       "updatedAt": "2026-02-15T14:30:00Z"
@@ -9934,14 +8764,14 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     {
       "id": 1235,
       "href": "/api/v2/factfinds/679/clients/346/assets/1235",
-      "factfindRef": { "id": 679, "href": "/api/v2/factfinds/679" },
+      "factfind": { "id": 679, "href": "/api/v2/factfinds/679" },
       "assetType": "OWN_BUSINESS",
       "description": "Smith & Co Limited - Software Consulting",
       "ownership": {
         "ownershipType": "SOLE_CLIENT1",
         "owners": [
           {
-            "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
+            "client": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
             "ownershipShare": 100.0
           }
         ]
@@ -9949,7 +8779,7 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "dividends": {
         "owners": [
           {
-            "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
+            "client": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
             "dividend": { "amount": 5000.00, "currency": "GBP" },
             "withdrawalType": "Regular",
             "frequency": "Monthly"
@@ -9958,13 +8788,21 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       },
       "currentValue": {
         "amount": 250000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "valuedOn": "2026-01-15",
       "valuationBasis": "Net Asset Value",
       "originalValue": {
         "amount": 100000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "purchasedOn": "2018-03-20",
       "isVisibleToClient": true,
@@ -9980,7 +8818,11 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "totalCount": 2,
   "totalValue": {
     "amount": 700000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   }
 }
 ```
@@ -10001,20 +8843,28 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
     "ownershipType": "SOLE_CLIENT1",
     "owners": [
       {
-        "clientRef": { "id": 123 },
+        "client": { "id": 123 },
         "ownershipShare": 100.0
       }
     ]
   },
   "currentValue": {
     "amount": 275000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuedOn": "2026-02-01",
   "valuationBasis": "Market Valuation",
   "originalValue": {
     "amount": 220000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "purchasedOn": "2020-03-15",
   "rentalExpenses": { "amount": 800.00, "currency": "GBP" },
@@ -10024,13 +8874,13 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "rnrbEligibility": "Eligible",
   "isBusinessReliefQualifying": false,
   "isHolding": false,
-  "propertyRef": { "id": 5001 },
-  "incomeRef": { "id": 3456 },
+  "property": { "id": 5001 },
+  "income": { "id": 3456 },
   "notes": "Rental property generating monthly income"
 }
 ```
 
-**Response:** 201 Created with complete asset entity including server-generated fields (`id`, `href`, `factfindRef`, `createdAt`, `updatedAt`).
+**Response:** 201 Created with complete asset entity including server-generated fields (`id`, `href`, `factfind`, `createdAt`, `updatedAt`).
 
 **Example Response:**
 
@@ -10038,27 +8888,35 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 {
   "id": 1236,
   "href": "/api/v2/factfinds/679/clients/346/assets/1236",
-  "factfindRef": { "id": 679, "href": "/api/v2/factfinds/679" },
+  "factfind": { "id": 679, "href": "/api/v2/factfinds/679" },
   "assetType": "PROPERTY",
   "description": "Buy-to-Let Property - 45 Oak Avenue",
   "ownership": {
     "ownershipType": "SOLE_CLIENT1",
     "owners": [
       {
-        "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
+        "client": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
         "ownershipShare": 100.0
       }
     ]
   },
   "currentValue": {
     "amount": 275000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuedOn": "2026-02-01",
   "valuationBasis": "Market Valuation",
   "originalValue": {
     "amount": 220000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "purchasedOn": "2020-03-15",
   "rentalExpenses": { "amount": 800.00, "currency": "GBP" },
@@ -10068,8 +8926,8 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "rnrbEligibility": "Eligible",
   "isBusinessReliefQualifying": false,
   "isHolding": false,
-  "propertyRef": { "id": 5001, "href": "/api/v2/factfinds/679/property-details/5001" },
-  "incomeRef": { "id": 3456, "href": "/api/v2/factfinds/679/clients/346/income/3456" },
+  "property": { "id": 5001, "href": "/api/v2/factfinds/679/property-details/5001" },
+  "income": { "id": 3456, "href": "/api/v2/factfinds/679/clients/346/income/3456" },
   "notes": "Rental property generating monthly income",
   "createdAt": "2026-02-19T10:15:00Z",
   "updatedAt": "2026-02-19T10:15:00Z"
@@ -10137,26 +8995,42 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ```json
 {
-  "assetRef": { "id": 123 },
+  "asset": { "id": 123 },
   "currentValue": {
     "amount": 450000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "totalMortgageBalance": {
     "amount": 180000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "ltvRatio": 40.0,
   "equity": {
     "amount": 270000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "linkedMortgages": [
     {
-      "liabilityRef": { "id": 789 },
+      "liability": { "id": 789 },
       "outstandingBalance": {
         "amount": 180000.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     }
   ],
@@ -10174,18 +9048,30 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ```json
 {
-  "assetRef": { "id": 123 },
+  "asset": { "id": 123 },
   "propertyValue": {
     "amount": 275000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "annualRentalIncome": {
     "amount": 21600.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "annualExpenses": {
     "amount": 4200.00,
-    "currency": { "code": "GBP" },
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "breakdown": {
       "maintenance": { "amount": 1200.00 },
       "insurance": { "amount": 800.00 },
@@ -10215,17 +9101,25 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "liabilities": [
     {
       "id": 789,
-      "factfindRef": { "id": 456 },
+      "factfind": { "id": 456 },
       "liabilityType": "MORTGAGE",
       "lender": "First National Bank",
       "accountNumber": "****1234",
       "outstandingBalance": {
         "amount": 180000.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "monthlyPayment": {
         "amount": 1200.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "interestRate": 3.5,
       "remainingTerm": {
@@ -10233,16 +9127,16 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
         "months": 6
       },
       "linkedAsset": {
-        "assetRef": { "id": 123, "href": "/api/v2/factfinds/ff-456/assets/123" },
+        "asset": { "id": 123, "href": "/api/v2/factfinds/ff-456/assets/123" },
         "description": "Primary Residence"
       },
       "responsibleClients": [
         {
-          "clientRef": { "id": 123 },
+          "client": { "id": 123 },
           "responsibilityShare": 50.0
         },
         {
-          "clientRef": { "id": 124 },
+          "client": { "id": 124 },
           "responsibilityShare": 50.0
         }
       ],
@@ -10253,7 +9147,11 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
   "totalCount": 1,
   "totalOutstanding": {
     "amount": 180000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   }
 }
 ```
@@ -10268,10 +9166,14 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ```json
 {
-  "factfindRef": { "id": 679 },
+  "factfind": { "id": 679 },
   "totalAssets": {
     "amount": 700000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "assetsByType": [
     {
@@ -10279,7 +9181,11 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "count": 1,
       "totalValue": {
         "amount": 450000.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 64.29
     },
@@ -10288,25 +9194,37 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
       "count": 1,
       "totalValue": {
         "amount": 250000.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 35.71
     }
   ],
   "assetsByClient": [
     {
-      "clientRef": { "id": 123, "name": "John Smith" },
+      "client": { "id": 123, "name": "John Smith" },
       "totalValue": {
         "amount": 500000.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 68.97
     },
     {
-      "clientRef": { "id": 124, "name": "Jane Smith" },
+      "client": { "id": 124, "name": "Jane Smith" },
       "totalValue": {
         "amount": 225000.00,
-        "currency": { "code": "GBP" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 31.03
     }
@@ -10325,33 +9243,417 @@ For detailed request/response examples, see API Endpoints Catalog Section 6.4.
 
 ```json
 {
-  "factfindRef": { "id": 679 },
-  "clientRef": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
+  "factfind": { "id": 679 },
+  "client": { "id": 123, "href": "/api/v2/factfinds/679/clients/123" },
   "totalAssets": {
     "amount": 700000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "totalLiabilities": {
     "amount": 180000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "netWorth": {
     "amount": 520000.00,
-    "currency": { "code": "GBP" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "assetBreakdown": [
     {
       "assetType": "PROPERTY",
-      "value": { "amount": 450000.00, "currency": { "code": "GBP" } }
+      "value": { "amount": 450000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } }
     },
     {
       "assetType": "OWN_BUSINESS",
-      "value": { "amount": 250000.00, "currency": { "code": "GBP" } }
+      "value": { "amount": 250000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } }
     }
   ],
   "calculatedAt": "2026-02-18T10:30:00Z"
 }
 ```
+
+
+#### 10.3.9 List Net Worth Calculations
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/networth`
+
+**Description:** List all net worth calculations for a factfind, showing historical snapshots of client wealth over time.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| clientId | integer | Filter by specific client |
+| fromDate | date | Filter calculations from this date |
+| toDate | date | Filter calculations to this date |
+| page | integer | Page number (default: 1) |
+| pageSize | integer | Results per page (default: 20, max: 100) |
+
+**Response:**
+
+```json
+{
+  "items": [
+    {
+      "id": 9001,
+      "href": "/api/v2/factfinds/456/networth/9001",
+      "factfind": {
+        "id": 456,
+        "href": "/api/v2/factfinds/456"
+      },
+      "clients": [
+        {
+          "id": 456,
+          "href": "/api/v2/factfinds/456/clients/456"
+        }
+      ],
+      "netWorth": {
+        "amount": 761500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-18T14:30:00Z",
+      "notes": "Net worth calculation as of property revaluation"
+    },
+    {
+      "id": 9000,
+      "href": "/api/v2/factfinds/456/networth/9000",
+      "factfind": {
+        "id": 456,
+        "href": "/api/v2/factfinds/456"
+      },
+      "clients": [
+        {
+          "id": 456,
+          "href": "/api/v2/factfinds/456/clients/456"
+        }
+      ],
+      "netWorth": {
+        "amount": 745000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-01-15T10:00:00Z",
+      "notes": "Initial net worth assessment"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalItems": 2,
+    "totalPages": 1
+  }
+}
+```
+
+#### 10.3.10 Create Net Worth Calculation
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/networth`
+
+**Description:** Create a new net worth calculation snapshot for tracking client wealth over time.
+
+**Request Body:**
+
+```json
+{
+  "clients": [
+    {
+      "id": 456,
+      "href": "/api/v2/factfinds/456/clients/456"
+    }
+  ],
+  "calculatedOn": "2026-02-18T14:30:00Z",
+  "assets": {
+    "property": {
+      "amount": 450000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "pensions": {
+      "amount": 325000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "investments": {
+      "amount": 185000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "cash": {
+      "amount": 45000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "other": {
+      "amount": 25000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "liabilities": {
+    "mortgages": {
+      "amount": 240000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "loans": {
+      "amount": 15000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "creditCards": {
+      "amount": 8500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "other": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "notes": "Net worth calculation as of property revaluation"
+}
+```
+
+**Response:** `201 Created`
+
+Returns the complete Net Worth object with system-calculated fields (see Section 14.31 for full contract).
+
+**Validation:**
+
+- All clients must exist and belong to the specified factfind
+- calculatedOn cannot be in the future
+- All currency codes must be consistent
+- System automatically calculates totalAssets, totalLiabilities, and netWorth
+- All amounts must be non-negative except netWorth which can be negative
+
+#### 10.3.11 Get Net Worth Calculation
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/networth/{networthId}`
+
+**Description:** Retrieve a specific net worth calculation by ID.
+
+**Response:**
+
+```json
+{
+  "id": 9001,
+  "href": "/api/v2/factfinds/456/networth/9001",
+  "factfind": {
+    "id": 456,
+    "href": "/api/v2/factfinds/456"
+  },
+  "clients": [
+    {
+      "id": 456,
+      "href": "/api/v2/factfinds/456/clients/456"
+    }
+  ],
+  "calculatedOn": "2026-02-18T14:30:00Z",
+  "assets": {
+    "property": {
+      "amount": 450000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "pensions": {
+      "amount": 325000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "investments": {
+      "amount": 185000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "cash": {
+      "amount": 45000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "other": {
+      "amount": 25000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalAssets": {
+      "amount": 1030000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "liabilities": {
+    "mortgages": {
+      "amount": 240000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "loans": {
+      "amount": 15000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "creditCards": {
+      "amount": 8500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "other": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalLiabilities": {
+      "amount": 268500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "netWorth": {
+    "amount": 761500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "notes": "Net worth calculation as of property revaluation",
+  "createdAt": "2026-02-18T14:30:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+See Section 14.31 for complete field definitions.
+
+#### 10.3.12 Update Net Worth Calculation
+
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/networth/{networthId}`
+
+**Description:** Update an existing net worth calculation. Typically used to correct data or add notes.
+
+**Request Body:**
+
+Partial Net Worth object with fields to update:
+
+```json
+{
+  "notes": "Updated: Net worth calculation as of property revaluation and mortgage refinance",
+  "assets": {
+    "property": {
+      "amount": 460000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  }
+}
+```
+
+**Response:** `200 OK`
+
+Returns the updated complete Net Worth object with recalculated totals.
+
+**Note:** Updating any asset or liability amounts will trigger automatic recalculation of totalAssets, totalLiabilities, and netWorth.
+
+#### 10.3.13 Delete Net Worth Calculation
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/networth/{networthId}`
+
+**Description:** Delete a net worth calculation. Used to remove incorrect or duplicate calculations.
+
+**Response:** `204 No Content`
+
+**Note:** This operation is permanent and cannot be undone. Consider whether the calculation should be archived rather than deleted.
+
+
 
 ---
 ## 11. Arrangements API (Type-Based Routing)
@@ -10449,7 +9751,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationDate": "date",
   "owners": [
     {
-      "clientRef": "Reference",
+      "client": "Reference",
       "ownershipPercentage": "number"
     }
   ],
@@ -10534,12 +9836,16 @@ The Arrangements API provides comprehensive management of client financial produ
   "startDate": "2020-03-15",
   "currentValue": {
     "amount": 45000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": { "id": 123 },
+      "client": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -10561,18 +9867,30 @@ The Arrangements API provides comprehensive management of client financial produ
   "taxPosition": {
     "capitalGainsUsed": {
       "amount": 3000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "dividendTaxPaid": {
       "amount": 450.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "taxYear": "2025/26"
   },
   "regularContribution": {
     "amount": {
       "amount": 500.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "MONTHLY",
     "startDate": "2020-04-01",
@@ -10607,7 +9925,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "fullName": "John Smith",
         "href": "/api/v2/factfinds/ff-456/clients/123"
@@ -10639,18 +9957,30 @@ The Arrangements API provides comprehensive management of client financial produ
   "taxPosition": {
     "capitalGainsUsed": {
       "amount": 3000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "dividendTaxPaid": {
       "amount": 450.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "taxYear": "2025/26"
   },
   "regularContribution": {
     "amount": {
       "amount": 500.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "MONTHLY",
     "startDate": "2020-04-01",
@@ -10715,12 +10045,16 @@ The Arrangements API provides comprehensive management of client financial produ
   "startDate": "2018-04-06",
   "currentValue": {
     "amount": 75000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": { "id": 123 },
+      "client": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -10743,15 +10077,27 @@ The Arrangements API provides comprehensive management of client financial produ
     "taxYear": "2025/26",
     "annualAllowance": {
       "amount": 20000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "usedThisYear": {
       "amount": 15000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "remainingAllowance": {
       "amount": 5000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "previousYearTransfers": [
@@ -10760,14 +10106,22 @@ The Arrangements API provides comprehensive management of client financial produ
       "transferDate": "2023-09-15",
       "transferValue": {
         "amount": 45000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     }
   ],
   "regularContribution": {
     "amount": {
       "amount": 1250.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "MONTHLY",
     "startDate": "2025-04-06",
@@ -10803,7 +10157,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "fullName": "John Smith",
         "href": "/api/v2/factfinds/ff-456/clients/123"
@@ -10836,19 +10190,35 @@ The Arrangements API provides comprehensive management of client financial produ
     "taxYear": "2025/26",
     "annualAllowance": {
       "amount": 20000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "usedThisYear": {
       "amount": 15000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "remainingAllowance": {
       "amount": 5000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "projectedYearEnd": {
       "amount": 20000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "previousYearTransfers": [
@@ -10857,14 +10227,22 @@ The Arrangements API provides comprehensive management of client financial produ
       "transferDate": "2023-09-15",
       "transferValue": {
         "amount": 45000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     }
   ],
   "regularContribution": {
     "amount": {
       "amount": 1250.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "MONTHLY",
     "startDate": "2025-04-06",
@@ -10873,11 +10251,19 @@ The Arrangements API provides comprehensive management of client financial produ
   "taxBenefits": {
     "taxSavedPerYear": {
       "amount": 1200.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "lifetimeTaxSaved": {
       "amount": 9600.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "concurrencyId": "f8c4d2b1-3g56-5f9c-0e4d-2b3c4d5e6f7g",
@@ -10933,28 +10319,52 @@ The Arrangements API provides comprehensive management of client financial produ
     "years": 8,
     "annualGain": {
       "amount": 1875.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "surrenderValue": {
     "amount": 85000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "initialInvestment": {
     "amount": 75000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "cumulativeWithdrawals": {
     "amount": 4500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "annualWithdrawalAllowance": {
     "amount": 3750.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "unused5PercentAllowance": {
     "amount": 18750.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   }
 }
 ```
@@ -10988,11 +10398,19 @@ The Arrangements API provides comprehensive management of client financial produ
   "shares": 5000,
   "averagePurchasePrice": {
     "amount": 8.50,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "currentSharePrice": {
     "amount": 9.25,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "premiumDiscount": -2.3,
   "yieldPercent": 0.8,
@@ -11044,7 +10462,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "segments": 0,
   "foreignTaxCredit": {
     "amount": 0.00,
-    "currency": { "code": "EUR", "symbol": "€" }
+    "currency": {
+        "code": "EUR",
+        "display": "Euro",
+        "symbol": "€"
+      }
   },
   "currencyHedging": true,
   "reportableForUKTax": true,
@@ -11087,7 +10509,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "purpose": "EmergencyFund",
   "owners": [
     {
-      "clientRef": { "id": 123 },
+      "client": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -11100,7 +10522,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "agencyStatusDate": "2023-01-15",
   "currentBalance": {
     "amount": 15000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "interestRate": 4.50,
   "interestRateType": "Variable",
@@ -11154,7 +10580,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "purpose": "EmergencyFund",
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "fullName": "John Smith",
         "href": "/api/v2/factfinds/ff-456/clients/123"
@@ -11362,61 +10788,105 @@ The Arrangements API provides comprehensive management of client financial produ
   "startDate": "2015-06-01",
   "currentValue": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": { "id": 123 },
+      "client": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
   "status": "ACTIVE",
   "uncrystallisedAmount": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "crystallisedAmount": {
     "amount": 0.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "regularContribution": {
     "grossAmount": {
       "amount": 625.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "netAmount": {
       "amount": 500.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "taxRelief": {
       "amount": 125.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "MONTHLY"
   },
   "employeeContribution": {
     "amount": 500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "normalRetirementAge": 67,
   "selectedRetirementAge": 60,
   "projectedFund": {
     "atAge55": {
       "amount": 142000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "atAge60": {
       "amount": 175000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "atAge65": {
       "amount": 215000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "atAge67": {
       "amount": 235000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "investmentStrategy": {
@@ -11452,7 +10922,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "fullName": "John Smith",
         "href": "/api/v2/factfinds/ff-456/clients/123"
@@ -11463,38 +10933,70 @@ The Arrangements API provides comprehensive management of client financial produ
   "status": "ACTIVE",
   "uncrystallisedAmount": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "crystallisedAmount": {
     "amount": 0.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxFreeCashAvailable": {
     "amount": 31250.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "regularContribution": {
     "grossAmount": {
       "amount": 625.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "netAmount": {
       "amount": 500.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "taxRelief": {
       "amount": 125.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "MONTHLY"
   },
   "employeeContribution": {
     "amount": 500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "annualContribution": {
     "amount": 7500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "normalRetirementAge": 67,
   "selectedRetirementAge": 60,
@@ -11502,19 +11004,35 @@ The Arrangements API provides comprehensive management of client financial produ
   "projectedFund": {
     "atAge55": {
       "amount": 142000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "atAge60": {
       "amount": 175000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "atAge65": {
       "amount": 215000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "atAge67": {
       "amount": 235000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "investmentStrategy": {
@@ -11526,15 +11044,27 @@ The Arrangements API provides comprehensive management of client financial produ
     "taxYear": "2025/26",
     "standardAllowance": {
       "amount": 60000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "usedThisYear": {
       "amount": 7500.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "remaining": {
       "amount": 52500.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "concurrencyId": "g9d5e3c2-4h67-6g0d-1f5e-3c4d5e6f7g8h",
@@ -11581,15 +11111,27 @@ The Arrangements API provides comprehensive management of client financial produ
   "statePensionAge": 67,
   "forecastAnnualAmount": {
     "amount": 11502.40,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "forecastWeeklyAmount": {
     "amount": 221.20,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "maxStatePension": {
     "amount": 11502.40,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "contracted Out": false,
   "deferralOptions": {
@@ -11621,19 +11163,31 @@ The Arrangements API provides comprehensive management of client financial produ
     "percentage": 5.0,
     "amount": {
       "amount": 250.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "employeeContribution": {
     "percentage": 5.0,
     "amount": {
       "amount": 250.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "salaryForPension": {
     "amount": 60000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "salaryExchangeApplied": true,
   "autoEnrollmentDate": "2020-01-15",
@@ -11664,15 +11218,27 @@ The Arrangements API provides comprehensive management of client financial produ
   "sippCharges": {
     "setupFee": {
       "amount": 0.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "annualFee": {
       "amount": 300.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "dealingCharges": {
       "amount": 9.95,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "investmentFlexibility": "HIGH"
@@ -11711,12 +11277,13 @@ The Arrangements API provides comprehensive management of client financial produ
   "productName": "NHS Pension Scheme (1995 Section)",
   "policyNumber": "NHS-DB-987654",
   "currency": {
-    "code": "GBP",
-    "symbol": "£"
-  },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
   "owners": [
     {
-      "clientRef": { "id": 123 },
+      "client": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -11733,39 +11300,71 @@ The Arrangements API provides comprehensive management of client financial produ
   "projectedServiceAtRetirement": 35.0,
   "pensionableSalary": {
     "amount": 65000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "finalSalary": {
     "amount": 65000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "projectedFinalSalary": {
     "amount": 72000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "isIndexed": true,
   "isPreserved": false,
   "prospectivePensionNoLumpSum": {
     "amount": 28875.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "prospectivePensionWithLumpSum": {
     "amount": 23100.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "prospectiveLumpSum": {
     "amount": 69300.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "gmpAmount": {
     "amount": 1250.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "spousePension": {
     "percentage": 50.0,
     "amount": {
       "amount": 11550.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "escalationRate": "CPI",
@@ -11773,7 +11372,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "revaluationMethod": "CAREER_AVERAGE",
   "cashEquivalentTransferValue": {
     "amount": 950000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "cetvDate": "2026-01-15",
   "transferValueExpiryDate": "2026-04-15",
@@ -11825,7 +11428,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationType": "CETV",
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "fullName": "John Smith",
         "href": "/api/v2/factfinds/ff-456/clients/123"
@@ -11847,51 +11450,91 @@ The Arrangements API provides comprehensive management of client financial produ
   "yearsToNormalRetirement": 6.5,
   "pensionableSalary": {
     "amount": 65000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "finalSalary": {
     "amount": 65000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "projectedFinalSalary": {
     "amount": 72000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "isIndexed": true,
   "isPreserved": false,
   "prospectivePensionNoLumpSum": {
     "amount": 28875.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "prospectivePensionWithLumpSum": {
     "amount": 23100.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "prospectiveLumpSum": {
     "amount": 69300.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "gmpAmount": {
     "amount": 1250.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "spousePension": {
     "percentage": 50.0,
     "amount": {
       "amount": 11550.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "escalationRate": "CPI",
   "escalationPercentage": 2.5,
   "lifetimeValue": {
     "amount": 462000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "revaluationMethod": "CAREER_AVERAGE",
   "cashEquivalentTransferValue": {
     "amount": 950000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "cetvDate": "2026-01-15",
   "transferValueExpiryDate": "2026-04-15",
@@ -11899,7 +11542,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "transferAdviceRequired": true,
   "adviceThreshold": {
     "amount": 30000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "deathInServiceSpousalBenefits": "Spouse receives 50% of prospective pension plus return of contributions",
   "dependantBenefits": "Children's pensions available until age 23 if in full-time education",
@@ -12100,7 +11747,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 125,
         "fullName": "Sarah Jones",
         "href": "/api/v2/factfinds/ff-456/clients/125"
@@ -12123,39 +11770,71 @@ The Arrangements API provides comprehensive management of client financial produ
   "yearsToNormalRetirement": 18.5,
   "pensionableSalary": {
     "amount": 42000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "finalSalary": {
     "amount": 42000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "projectedFinalSalary": {
     "amount": 42000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "isIndexed": true,
   "isPreserved": true,
   "prospectivePensionNoLumpSum": {
     "amount": 9380.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "prospectivePensionWithLumpSum": {
     "amount": 7035.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "prospectiveLumpSum": {
     "amount": 21105.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "gmpAmount": {
     "amount": 650.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "spousePension": {
     "percentage": 50.0,
     "amount": {
       "amount": 3517.50,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "escalationRate": "LPI",
@@ -12163,7 +11842,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "revaluationMethod": "FINAL_SALARY",
   "cashEquivalentTransferValue": {
     "amount": 185000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "cetvDate": "2026-01-20",
   "transferValueExpiryDate": "2026-04-20",
@@ -12210,20 +11893,36 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "crystallisedAmount": {
     "amount": 180000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedAmount": {
     "amount": 0.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxFreeCashTaken": {
     "amount": 60000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "drawdownIncome": {
     "annualAmount": {
       "amount": 12000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "MONTHLY",
     "nextReviewDate": "2026-06-01"
@@ -12237,7 +11936,11 @@ The Arrangements API provides comprehensive management of client financial produ
     "triggered": true,
     "allowance": {
       "amount": 10000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   }
 }
@@ -12262,7 +11965,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "annuityType": "LIFETIME",
   "guaranteedAnnualIncome": {
     "amount": 8500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "paymentFrequency": "MONTHLY",
   "escalation": {
@@ -12278,7 +11985,11 @@ The Arrangements API provides comprehensive management of client financial produ
     "percentage": 66.67,
     "amount": {
       "amount": 5666.95,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "overlayBenefits": {
@@ -12288,7 +11999,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "purchaseDetails": {
     "fundUsed": {
       "amount": 180000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "purchaseDate": "2025-03-15",
     "annuityRate": 4.72
@@ -12329,12 +12044,13 @@ The Arrangements API provides comprehensive management of client financial produ
   "productName": "Executive Pension Plan",
   "policyNumber": "EPP-123456",
   "currency": {
-    "code": "GBP",
-    "symbol": "£"
-  },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
   "owners": [
     {
-      "clientRef": { "id": 123 },
+      "client": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -12347,32 +12063,56 @@ The Arrangements API provides comprehensive management of client financial produ
   "hasLifestylingStrategy": true,
   "currentValue": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "regularContributions": {
     "memberContribution": {
       "amount": 400.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "employerContribution": {
       "amount": 800.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "Monthly"
   },
   "lumpSumContributions": {
     "amount": 5000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "employerMatchingDetails": "Employer matches up to 5% of salary. Additional 1% discretionary contribution if company performance targets met.",
   "gmpAmount": {
     "amount": 850.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "enhancedTaxFreeCash": {
     "amount": 45000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "guaranteedAnnuityRate": "4.5% at age 65 for single life annuity",
   "applicablePenalties": "Early exit penalty of 5% if withdrawn within 5 years of policy start date",
@@ -12420,7 +12160,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "fullName": "John Smith",
         "href": "/api/v2/factfinds/ff-456/clients/123"
@@ -12444,34 +12184,62 @@ The Arrangements API provides comprehensive management of client financial produ
   "regularContributions": {
     "memberContribution": {
       "amount": 400.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "employerContribution": {
       "amount": 800.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "totalMonthlyContribution": {
       "amount": 1200.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "annualisedContribution": {
       "amount": 14400.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "frequency": "Monthly"
   },
   "lumpSumContributions": {
     "amount": 5000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "employerMatchingDetails": "Employer matches up to 5% of salary. Additional 1% discretionary contribution if company performance targets met.",
   "gmpAmount": {
     "amount": 850.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "enhancedTaxFreeCash": {
     "amount": 45000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "guaranteedAnnuityRate": "4.5% at age 65 for single life annuity",
   "applicablePenalties": "Early exit penalty of 5% if withdrawn within 5 years of policy start date",
@@ -12488,7 +12256,11 @@ The Arrangements API provides comprehensive management of client financial produ
     "assumedGrowthRate": 5.0,
     "projectedValueAtRetirement": {
       "amount": 285000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "yearsToRetirement": 17.2
   },
@@ -12497,15 +12269,27 @@ The Arrangements API provides comprehensive management of client financial produ
       "year": "2025/26",
       "contributionsToDate": {
         "amount": 19400.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "availableAllowance": {
         "amount": 40000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "carryForwardAvailable": {
         "amount": 15000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     }
   },
@@ -12755,7 +12539,7 @@ The Arrangements API provides comprehensive management of client financial produ
   },
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 456,
         "fullName": "Emma Wilson",
         "href": "/api/v2/factfinds/ff-789/clients/456"
@@ -12796,7 +12580,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "historicalContributions": {
     "totalContributionsMade": {
       "amount": 22400.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "yearsContributing": 7.5
   },
@@ -12804,7 +12592,11 @@ The Arrangements API provides comprehensive management of client financial produ
     "assumedGrowthRate": 4.0,
     "projectedValueAtRetirement": {
       "amount": 78500.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "yearsToRetirement": 14.8
   },
@@ -12813,7 +12605,11 @@ The Arrangements API provides comprehensive management of client financial produ
       "fundName": "Standard Life Pension With-Profits Fund",
       "value": {
         "amount": 42500.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 100.0
     }
@@ -12822,7 +12618,11 @@ The Arrangements API provides comprehensive management of client financial produ
     "annualManagementCharge": 1.0,
     "policyFee": {
       "amount": 0.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "totalExpenseRatio": 1.0
   },
@@ -12880,25 +12680,84 @@ The Arrangements API provides comprehensive management of client financial produ
   "loanAmounts": {
     "originalLoanAmount": {
       "amount": 300000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "currentBalance": {
       "amount": 245000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "depositAmount": {
       "amount": 100000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "originalPropertyValuation": {
       "amount": 400000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "currentPropertyValuation": {
       "amount": 425000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
-    "loanToValueRatio": 57.65
+    "loanToValue": {
+      "percentage": 75.0,
+      "propertyValue": {
+        "amount": 400000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "loanAmount": {
+        "amount": 300000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2018-06-15"
+    },
+    "currentLTV": {
+      "percentage": 57.65,
+      "outstandingBalance": {
+        "amount": 245000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "currentPropertyValue": {
+        "amount": 425000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-18"
+    }
   },
   "interestTerms": {
     "interestRate": 4.25,
@@ -12918,7 +12777,11 @@ The Arrangements API provides comprehensive management of client financial produ
     "repaymentMethod": "CapitalAndInterest",
     "capitalRepaymentAmount": {
       "amount": 300000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "capitalTermYears": 25,
     "capitalTermMonths": 0,
@@ -12934,7 +12797,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "feesAndCharges": {
     "lenderFees": {
       "amount": 999.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "ongoingContributions": null
   },
@@ -12960,12 +12827,20 @@ The Arrangements API provides comprehensive management of client financial produ
     "earlyRepaymentChargeEndsOn": "2028-06-30",
     "earlyRepaymentCharge": {
       "amount": 9800.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "earlyRepaymentChargeSecondCharge": null,
     "netProceedsOnRedemption": {
       "amount": 235200.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "specialFeatures": {
@@ -12996,7 +12871,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 5,
   "href": "/api/v2/factfinds/ff-456/arrangements/mortgages/arr-secl-005",
-  "factfindRef": {
+  "factfind": {
     "id": 456,
     "href": "/api/v2/factfinds/ff-456"
   },
@@ -13028,26 +12903,85 @@ The Arrangements API provides comprehensive management of client financial produ
   "loanAmounts": {
     "originalLoanAmount": {
       "amount": 300000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "currentBalance": {
       "amount": 245000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "depositAmount": {
       "amount": 100000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "equityReleased": null,
     "originalPropertyValuation": {
       "amount": 400000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "currentPropertyValuation": {
       "amount": 425000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
-    "loanToValueRatio": 57.65
+    "loanToValue": {
+      "percentage": 75.0,
+      "propertyValue": {
+        "amount": 400000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "loanAmount": {
+        "amount": 300000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2018-06-15"
+    },
+    "currentLTV": {
+      "percentage": 57.65,
+      "outstandingBalance": {
+        "amount": 245000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "currentPropertyValue": {
+        "amount": 425000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-18"
+    }
   },
   "interestTerms": {
     "interestRate": 4.25,
@@ -13067,7 +13001,11 @@ The Arrangements API provides comprehensive management of client financial produ
     "repaymentMethod": "CapitalAndInterest",
     "capitalRepaymentAmount": {
       "amount": 300000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "capitalTermYears": 25,
     "capitalTermMonths": 0,
@@ -13083,7 +13021,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "feesAndCharges": {
     "lenderFees": {
       "amount": 999.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "ongoingContributions": null
   },
@@ -13109,12 +13051,20 @@ The Arrangements API provides comprehensive management of client financial produ
     "earlyRepaymentChargeEndsOn": "2028-06-30",
     "earlyRepaymentCharge": {
       "amount": 9800.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "earlyRepaymentChargeSecondCharge": null,
     "netProceedsOnRedemption": {
       "amount": 235200.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "specialFeatures": {
@@ -13214,7 +13164,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "maturityDate": "2050-04-01",
   "owners": [
     {
-      "clientRef": { "id": 123 },
+      "client": { "id": 123 },
       "ownershipPercentage": 100.0
     }
   ],
@@ -13222,7 +13172,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "coverDetails": {
     "coverAmount": {
       "amount": 500000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "coverType": "LEVEL_TERM",
     "coverPeriod": {
@@ -13233,11 +13187,19 @@ The Arrangements API provides comprehensive management of client financial produ
   "premiumDetails": {
     "monthlyPremium": {
       "amount": 35.50,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "annualPremium": {
       "amount": 426.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "paymentFrequency": "MONTHLY",
     "reviewable": false,
@@ -13294,7 +13256,7 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationDate": "2026-02-18",
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "fullName": "John Smith",
         "href": "/api/v2/factfinds/ff-456/clients/123"
@@ -13306,7 +13268,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "coverDetails": {
     "coverAmount": {
       "amount": 500000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "coverType": "LEVEL_TERM",
     "coverPeriod": {
@@ -13318,16 +13284,28 @@ The Arrangements API provides comprehensive management of client financial produ
   "premiumDetails": {
     "monthlyPremium": {
       "amount": 35.50,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "annualPremium": {
       "amount": 426.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "paymentFrequency": "MONTHLY",
     "totalPremiumsPaid": {
       "amount": 2982.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "reviewable": false,
     "guaranteed": true,
@@ -13363,11 +13341,19 @@ The Arrangements API provides comprehensive management of client financial produ
   "adequacyCheck": {
     "recommendedCover": {
       "amount": 650000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "shortfall": {
       "amount": 150000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "adequacyPercentage": 76.92
   },
@@ -13402,7 +13388,11 @@ The Arrangements API provides comprehensive management of client financial produ
   "coverDetails": {
     "monthlyBenefit": {
       "amount": 3000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "deferredPeriod": {
       "weeks": 13
@@ -13446,15 +13436,27 @@ The Arrangements API provides comprehensive management of client financial produ
   "policyNumber": "BLDG-456789",
   "coverAmount": {
     "amount": 425000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "annualPremium": {
     "amount": 285.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "excess": {
     "amount": 250.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "renewalDate": "2026-06-15",
   "linkedAssetRef": {
@@ -13491,19 +13493,35 @@ The Arrangements API provides comprehensive management of client financial produ
   "contributionType": "REGULAR",
   "grossAmount": {
     "amount": 625.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "netAmount": {
     "amount": 500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxRelief": {
     "amount": 125.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "employerContribution": {
     "amount": 250.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "source": "SALARY",
   "notes": "Standard monthly contribution"
@@ -13516,7 +13534,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001",
-  "arrangementRef": {
+  "arrangement": {
     "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
@@ -13524,29 +13542,53 @@ The Arrangements API provides comprehensive management of client financial produ
   "contributionType": "REGULAR",
   "grossAmount": {
     "amount": 625.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "netAmount": {
     "amount": 500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxRelief": {
     "amount": 125.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "employerContribution": {
     "amount": 250.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "totalContribution": {
     "amount": 875.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "source": "SALARY",
   "taxYear": "2025/26",
   "annualAllowanceUsed": {
     "amount": 875.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "notes": "Standard monthly contribution",
   "createdAt": "2026-02-18T11:00:00Z",
@@ -13561,7 +13603,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementRef": {
+  "arrangement": {
     "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
@@ -13571,7 +13613,11 @@ The Arrangements API provides comprehensive management of client financial produ
       "contributionDate": "2026-02-15",
       "grossAmount": {
         "amount": 625.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "contributionType": "REGULAR"
       }
@@ -13581,7 +13627,11 @@ The Arrangements API provides comprehensive management of client financial produ
       "contributionDate": "2026-01-15",
       "grossAmount": {
         "amount": 625.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "contributionType": "REGULAR"
       }
@@ -13591,15 +13641,27 @@ The Arrangements API provides comprehensive management of client financial produ
     "totalContributions": 24,
     "totalAmount": {
       "amount": 21000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "thisYearContributions": {
       "amount": 1750.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "annualAllowanceUsed": {
       "amount": 1750.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "totalCount": 24,
@@ -13638,24 +13700,44 @@ The Arrangements API provides comprehensive management of client financial produ
   "withdrawalType": "INCOME",
   "grossAmount": {
     "amount": 1000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxDeducted": {
     "amount": 200.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "netAmount": {
     "amount": 800.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxCode": "1257L",
   "crystallisedFund": {
     "amount": 1000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedFund": {
     "amount": 0.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "reason": "REGULAR_INCOME",
   "notes": "Monthly drawdown payment"
@@ -13668,7 +13750,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/arr-dd-007/withdrawals/withdraw-001",
-  "arrangementRef": {
+  "arrangement": {
     "id": 7,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007"
   },
@@ -13676,25 +13758,45 @@ The Arrangements API provides comprehensive management of client financial produ
   "withdrawalType": "INCOME",
   "grossAmount": {
     "amount": 1000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxDeducted": {
     "amount": 200.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "netAmount": {
     "amount": 800.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxCode": "1257L",
   "effectiveTaxRate": 20.0,
   "crystallisedFund": {
     "amount": 1000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedFund": {
     "amount": 0.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxYear": "2025/26",
   "reason": "REGULAR_INCOME",
@@ -13715,19 +13817,35 @@ The Arrangements API provides comprehensive management of client financial produ
   "withdrawalType": "TAX_DEFERRED",
   "grossAmount": {
     "amount": 3750.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "netAmount": {
     "amount": 3750.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "fivePercentAllowanceUsed": {
     "amount": 3750.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "cumulativeAllowanceRemaining": {
     "amount": 15000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxYear": "2025/26",
   "reason": "INCOME_REQUIREMENT"
@@ -13778,7 +13896,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 2,
   "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002",
-  "arrangementRef": {
+  "arrangement": {
     "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
@@ -13811,7 +13929,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementRef": {
+  "arrangement": {
     "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
@@ -13870,18 +13988,30 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationType": "STATEMENT",
   "value": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "source": "PROVIDER",
   "crystallisedValue": {
     "amount": 0.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedValue": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
-  "documentRef": "statement-2026-02.pdf",
+  "document": "statement-2026-02.pdf",
   "notes": "Q4 2025/26 statement"
 }
 ```
@@ -13892,7 +14022,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001",
-  "arrangementRef": {
+  "arrangement": {
     "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
@@ -13900,23 +14030,39 @@ The Arrangements API provides comprehensive management of client financial produ
   "valuationType": "STATEMENT",
   "value": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "source": "PROVIDER",
   "crystallisedValue": {
     "amount": 0.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedValue": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "changeFromPrevious": {
     "amount": 5000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "percentageChange": 4.17,
-  "documentRef": "statement-2026-02.pdf",
+  "document": "statement-2026-02.pdf",
   "notes": "Q4 2025/26 statement",
   "createdAt": "2026-02-18T11:15:00Z",
   "updatedAt": "2026-02-18T11:15:00Z",
@@ -13930,7 +14076,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementRef": {
+  "arrangement": {
     "id": 3,
     "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
   },
@@ -13940,7 +14086,11 @@ The Arrangements API provides comprehensive management of client financial produ
       "valuationDate": "2026-02-18",
       "value": {
         "amount": 125000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "valuationType": "STATEMENT",
       "percentageChange": 4.17
@@ -13951,7 +14101,11 @@ The Arrangements API provides comprehensive management of client financial produ
       "valuationDate": "2025-11-18",
       "value": {
         "amount": 120000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "valuationType": "STATEMENT",
       "percentageChange": 3.45
@@ -13962,15 +14116,27 @@ The Arrangements API provides comprehensive management of client financial produ
     "totalValuations": 8,
     "latestValue": {
       "amount": 125000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "earliestValue": {
       "amount": 95000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "totalGrowth": {
       "amount": 30000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "totalGrowthPercentage": 31.58,
     "annualizedReturn": 6.2
@@ -14972,7 +15138,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 ```json
 {
   "id": 123,
-  "factFindRef": {
+  "factfind": {
     "id": 456,
     "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
@@ -15663,7 +15829,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "calculatedAt": "2026-02-18T10:30:00Z",
     "lastReviewDate": "2026-02-18"
   },
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
@@ -15707,7 +15873,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 ```json
 {
   "id": 567,
-  "factFindRef": {
+  "factfind": {
     "id": 890,
     "href": "/api/v2/factfinds/890",
     "factFindNumber": "FF-2025-00456",
@@ -16153,7 +16319,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "calculatedAt": "2026-02-18T10:30:00Z",
     "lastReviewDate": "2026-02-18"
   },
-  "adviserRef": {
+  "adviser": {
     "id": 800,
     "href": "/api/v2/advisers/800",
     "name": "Michael Brown",
@@ -16196,7 +16362,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
 ```json
 {
   "id": 999,
-  "factFindRef": {
+  "factfind": {
     "id": 1111,
     "href": "/api/v2/factfinds/1111",
     "factFindNumber": "FF-2025-00789",
@@ -16211,7 +16377,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "trustRegistrationNumber": "TRN12345678",
     "taxReference": "1234567890",
     "trustDeed": {
-      "documentRef": "DEED-2018-04-15-SMITH",
+      "document": "DEED-2018-04-15-SMITH",
       "documentUrl": "https://docs.example.com/trusts/deed-smith-2018.pdf",
       "executionDate": "2018-04-15",
       "storedWith": "Harrison & Partners Solicitors",
@@ -16699,7 +16865,7 @@ The `Client` contract represents a client entity (Person, Corporate, or Trust) w
     "calculatedAt": "2026-02-18T10:30:00Z",
     "lastReviewDate": "2026-02-18"
   },
-  "adviserRef": {
+  "adviser": {
     "id": 810,
     "href": "/api/v2/advisers/810",
     "name": "Patricia Davies",
@@ -17204,23 +17370,43 @@ Embedded value type representing client financial snapshot and computed wealth m
     },
     "householdIncome": {
       "amount": 120000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "netWorth": {
       "amount": 450000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "householdNetWorth": {
       "amount": 650000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "totalAssets": {
       "amount": 500000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "totalJointAssets": {
       "amount": 200000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "calculatedAt": "2026-02-18T10:30:00Z",
     "lastReviewDate": "2026-02-18"
@@ -17482,11 +17668,19 @@ Content-Type: application/json
   "financialProfile": {
     "grossAnnualIncome": {
       "amount": 75000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "netWorth": {
       "amount": 450000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "lastReviewDate": "2026-02-18"
   }
@@ -17531,11 +17725,19 @@ Content-Type: application/json
   "financialProfile": {
     "grossAnnualIncome": {
       "amount": 3500000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "netWorth": {
       "amount": 1250000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "lastReviewDate": "2026-02-18"
   }
@@ -17589,7 +17791,11 @@ Content-Type: application/json
   "financialProfile": {
     "netWorth": {
       "amount": 650000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "lastReviewDate": "2026-02-18"
   }
@@ -17660,7 +17866,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 {
   "id": 456,
   "factFindNumber": "FF001234",
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -17674,7 +17880,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
     "clientNumber": "C00001235",
     "type": "Person"
   },
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
@@ -17925,7 +18131,7 @@ This grouping improves clarity, aligns with industry standards, and makes the co
       "adviserDeclaration": {
         "agreed": true,
         "agreedAt": "2026-02-16T11:00:00Z",
-        "adviserRef": {
+        "adviser": {
           "id": 789,
           "name": "Jane Doe"
         }
@@ -17962,9 +18168,9 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 |-------|------|--------|--------|----------|-------|
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
 | `factFindNumber` | string | optional | ignored | included | write-once, business identifier |
-| `clientRef` | ClientRef | required | ignored | included | write-once, reference to Client |
+| `client` | ClientRef | required | ignored | included | write-once, reference to Client |
 | `jointClientRef` | ClientRef | optional | ignored | included | write-once, reference to Client |
-| `adviserRef` | AdviserRef | required | updatable | included | Reference type: Primary adviser |
+| `adviser` | AdviserRef | required | updatable | included | Reference type: Primary adviser |
 | **`meetingDetails`** | **MeetingDetailsValue** | **required** | **updatable** | **included** | **Value type group (Section 12.2.1)** |
 | **`financialSummary`** | **FinancialSummaryValue** | **ignored** | **ignored** | **included** | **read-only, computed value type (Section 12.2.2)** |
 | **`assetHoldings`** | **AssetHoldingsValue** | **ignored** | **partial** | **included** | **Mostly computed, credit fields updatable (Section 12.2.3)** |
@@ -17976,16 +18182,15 @@ This grouping improves clarity, aligns with industry standards, and makes the co
 | `customQuestions` | array | optional | updatable | included | - |
 | `createdAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
 
 **Usage Examples:**
 
 **Creating a FactFind (POST /api/v2/factfinds):**
 ```json
 {
-  "clientRef": { "id": 123 },
+  "client": { "id": 123 },
   "jointClientRef": { "id": 124 },
-  "adviserRef": { "id": 789 },
+  "adviser": { "id": 789 },
   "meetingDetails": {
     "meetingDate": "2026-02-16",
     "meetingType": "INIT",
@@ -18093,31 +18298,55 @@ The `FinancialSummaryValue` provides a read-only snapshot of the client's financ
     },
     "monthlyNet": {
       "amount": 7500.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "netRelevantEarnings": {
       "amount": 110000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "expenditure": {
     "monthlyTotal": {
       "amount": 4500.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "monthlyDisposable": {
       "amount": 3000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "liquidity": {
     "totalFundsAvailable": {
       "amount": 85000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "availableForAdvice": {
       "amount": 70000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
   "taxation": {
@@ -18236,29 +18465,49 @@ The `InvestmentCapacityValue` captures the client's capacity and budget for new 
   "emergencyFund": {
     "required": {
       "amount": 11400.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "committed": {
       "amount": 15000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "shortfall": {
       "amount": 0.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "status": "Adequate"
   },
   "regularContributions": {
     "agreedMonthlyBudget": {
       "amount": 1000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "sustainabilityRating": "High"
   },
   "lumpSumInvestment": {
     "agreedAmount": {
       "amount": 50000.00,
-      "currency": { "code": "GBP" }
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "sourceOfFunds": "Savings from employment"
   },
@@ -18359,13 +18608,13 @@ The `Address` contract represents a client's address with additional metadata fo
 ```json
 {
   "id": 789,
-  "factFindRef": {
+  "factfind": {
     "id": 456,
     "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -18395,8 +18644,8 @@ The `Address` contract represents a client's address with additional metadata fo
 
 **Key Field Behaviors:**
 - `id` - read-only, server-generated (uuid)
-- `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
-- `clientRef` - write-once, reference to Client
+- `factfind` - required-on-create, write-once, reference to FactFind (owning aggregate)
+- `client` - write-once, reference to Client
 - `addressType` - required-on-create, updatable
 - `address` - required-on-create, updatable (AddressValue embedded)
 - `isCorrespondenceAddress` - optional, updatable (boolean)
@@ -18416,20 +18665,20 @@ The `Income` contract represents an income source within a FactFind.
 ```json
 {
   "id": 101,
-  "factFindRef": {
+  "factfind": {
     "id": 456,
     "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF001234",
     "status": "InProgress"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
-  "employmentRef": {
+  "employment": {
     "id": 222,
     "href": "/api/v2/employments/222",
     "employerName": "Tech Corp Ltd",
@@ -18438,7 +18687,7 @@ The `Income` contract represents an income source within a FactFind.
   "incomeType": "Employment",
   "description": "Salary from Tech Corp Ltd",
   "isTaxable": true,
-  "assetRef": null,
+  "asset": null,
   "grossAmount": {
     "amount": 75000.00,
     "currency": {
@@ -18491,13 +18740,13 @@ The `Income` contract represents an income source within a FactFind.
 
 **Key Field Behaviors:**
 - `id` - read-only, server-generated (uuid)
-- `factFindRef` - write-once, reference to FactFind (set from URL path parameter)
-- `clientRef` - required-on-create, write-once, reference to Client
-- `employmentRef` - optional, updatable, reference to Employment
+- `factfind` - write-once, reference to FactFind (set from URL path parameter)
+- `client` - required-on-create, write-once, reference to Client
+- `employment` - optional, updatable, reference to Employment
 - `incomeType` - required-on-create, updatable
 - `description` - optional, updatable
 - `isTaxable` - optional, updatable (boolean, defaults to true)
-- `assetRef` - optional, updatable, reference to Asset/Arrangement
+- `asset` - optional, updatable, reference to Asset/Arrangement
 - `grossAmount` - required-on-create, updatable (MoneyValue)
 - `netAmount` - optional, updatable (MoneyValue)
 - `frequency` - required-on-create, updatable
@@ -18511,7 +18760,7 @@ The `Income` contract represents an income source within a FactFind.
 | Field | Type | Behavior | Description |
 |-------|------|----------|-------------|
 | `isTaxable` | boolean | optional, updatable | Indicates whether the income is subject to taxation. Defaults to `true` if not specified. Set to `false` for tax-free income such as certain benefits, ISA income, or other non-taxable sources. Required for accurate affordability assessments and tax calculations. |
-| `assetRef` | AssetReference | optional, updatable | Reference to the asset that generates this income. Required for rental income (links to property), dividend income (links to investment), interest income (links to savings), or business profit (links to business). Includes `id`, `href`, `assetType`, and `description`. Enables traceability between income and underlying assets. |
+| `asset` | AssetReference | optional, updatable | Reference to the asset that generates this income. Required for rental income (links to property), dividend income (links to investment), interest income (links to savings), or business profit (links to business). Includes `id`, `href`, `assetType`, and `description`. Enables traceability between income and underlying assets. |
 
 **AssetReference Structure:**
 
@@ -18533,13 +18782,13 @@ The `Income` contract represents an income source within a FactFind.
 - Taxable income examples: Employment income, self-employment profit, rental income, dividends (above allowance), interest (above allowance), pension income
 
 **Asset Reference Validation:**
-- `assetRef` is required when `incomeType` is one of: "Rental", "Dividend", "Interest", "BusinessProfit"
-- `assetRef.id` must reference an existing asset or arrangement in the factfind
-- `assetRef.assetType` must match the income type:
+- `asset` is required when `incomeType` is one of: "Rental", "Dividend", "Interest", "BusinessProfit"
+- `asset.id` must reference an existing asset or arrangement in the factfind
+- `asset.assetType` must match the income type:
   - "Rental" income → "Property" asset
   - "Dividend" or "Interest" income → "Investment" asset
   - "BusinessProfit" income → "Business" asset
-- `assetRef` should be `null` for income types that don't originate from assets (Employment, Pension, Benefits, etc.)
+- `asset` should be `null` for income types that don't originate from assets (Employment, Pension, Benefits, etc.)
 
 **Business Rules:**
 
@@ -18549,7 +18798,7 @@ The `Income` contract represents an income source within a FactFind.
 - Mortgage affordability assessments may treat taxable and non-taxable income differently
 
 **Asset Linkage:**
-- When `assetRef` is provided, the income is directly associated with the generating asset
+- When `asset` is provided, the income is directly associated with the generating asset
 - Enables impact analysis: if asset is sold, associated income ceases
 - Supports portfolio analysis: total return from an asset = capital growth + income generated
 - Required for regulatory reporting of asset-generated income
@@ -18575,8 +18824,7 @@ Income types that typically have asset references:
 | **Rental Income** | Property Asset | Residential or commercial property generating rental income |
 | **Dividend Income** | Investment/Share Portfolio | Stocks, shares, or investment accounts paying dividends |
 | **Interest Income** | Savings Account or Investment | Bank accounts, bonds, or other interest-bearing investments |
-| **Business Profit** | Business Asset | Self-employed business or company generating profit distributions |
-| **Capital Growth/Gains** | Any Investment or Property | Realized or unrealized gains from asset appreciation |
+| **Business Profit** | **Capital Growth/Gains** | Any Investment or Property | Realized or unrealized gains from asset appreciation |
 
 Income types that typically do NOT have asset references:
 - Employment income (salary, wages, bonuses)
@@ -18586,27 +18834,27 @@ Income types that typically do NOT have asset references:
 
 **Example Scenarios:**
 
-**Example 1: Rental Income (with assetRef, taxable)**
+**Example 1: Rental Income (with asset, taxable)**
 ```json
 {
   "id": 2001,
   "href": "/api/v2/factfinds/679/clients/456/incomes/2001",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 456,
     "href": "/api/v2/factfinds/679/clients/456",
     "name": "John Smith",
     "clientNumber": "C00123",
     "type": "Person"
   },
-  "employmentRef": null,
+  "employment": null,
   "incomeType": "Rental",
   "description": "Rental income from investment property",
   "isTaxable": true,
-  "assetRef": {
+  "asset": {
     "id": 5001,
     "href": "/api/v2/factfinds/679/assets/5001",
     "assetType": "Property",
@@ -18655,27 +18903,27 @@ Income types that typically do NOT have asset references:
 }
 ```
 
-**Example 2: Child Benefit (no assetRef, non-taxable under threshold)**
+**Example 2: Child Benefit (no asset, non-taxable under threshold)**
 ```json
 {
   "id": 2002,
   "href": "/api/v2/factfinds/679/clients/456/incomes/2002",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 456,
     "href": "/api/v2/factfinds/679/clients/456",
     "name": "John Smith",
     "clientNumber": "C00123",
     "type": "Person"
   },
-  "employmentRef": null,
+  "employment": null,
   "incomeType": "Benefit",
   "description": "Child Benefit - 2 children",
   "isTaxable": false,
-  "assetRef": null,
+  "asset": null,
   "grossAmount": {
     "amount": 2074.80,
     "currency": {
@@ -18712,27 +18960,27 @@ Income types that typically do NOT have asset references:
 }
 ```
 
-**Example 3: Dividend Income (with assetRef, taxable)**
+**Example 3: Dividend Income (with asset, taxable)**
 ```json
 {
   "id": 2003,
   "href": "/api/v2/factfinds/679/clients/456/incomes/2003",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 456,
     "href": "/api/v2/factfinds/679/clients/456",
     "name": "John Smith",
     "clientNumber": "C00123",
     "type": "Person"
   },
-  "employmentRef": null,
+  "employment": null,
   "incomeType": "Dividend",
   "description": "Dividends from share portfolio",
   "isTaxable": true,
-  "assetRef": {
+  "asset": {
     "id": 13001,
     "href": "/api/v2/factfinds/679/arrangements/investments/13001",
     "assetType": "Investment",
@@ -18792,7 +19040,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
 ```json
 {
   "id": 555,
-  "factFindRef": {
+  "factfind": {
     "id": 456,
     "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
@@ -18810,14 +19058,14 @@ The `Arrangement` contract represents financial products (pensions, investments,
       "type": "Person"
     }
   ],
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
     "code": "ADV001"
   },
   "productName": "ABC SIPP",
-  "providerRef": {
+  "provider": {
     "id": 456,
     "href": "/api/v2/providers/456",
     "name": "ABC Pension Provider Ltd",
@@ -18875,7 +19123,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
 
 **Key Field Behaviors:**
 - `id` - read-only, server-generated
-- `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
+- `factfind` - required-on-create, write-once, reference to FactFind (owning aggregate)
 - `arrangementCategory` - required-on-create, write-once (discriminator)
 - `pensionType`, `investmentType`, `protectionType`, `mortgageType` - required-on-create (type-specific), write-once
 - `clientId` - required-on-create, write-once
@@ -18898,13 +19146,13 @@ The `Goal` contract represents a client's financial goal.
 ```json
 {
   "id": 888,
-  "factFindRef": {
+  "factfind": {
     "id": 456,
     "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -18959,8 +19207,8 @@ The `Goal` contract represents a client's financial goal.
 
 **Key Field Behaviors:**
 - `id` - read-only, server-generated (uuid)
-- `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
-- `clientRef` - write-once, reference to Client
+- `factfind` - required-on-create, write-once, reference to FactFind (owning aggregate)
+- `client` - write-once, reference to Client
 - `goalType` - required-on-create, updatable
 - `goalName` - required-on-create, updatable
 - `description` - optional, updatable
@@ -18985,20 +19233,20 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 ```json
 {
   "id": 999,
-  "factFindRef": {
+  "factfind": {
     "id": 456,
     "href": "/api/v2/factfinds/456",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
@@ -19036,7 +19284,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 
 **Key Field Behaviors:**
 - `id` - read-only, server-generated
-- `factFindRef` - required-on-create, write-once, reference to FactFind (owning aggregate)
+- `factfind` - required-on-create, write-once, reference to FactFind (owning aggregate)
 - `clientId` - write-once, set from URL or required-on-create
 - `assessmentDate` - required-on-create, updatable
 - `assessmentType` - required-on-create, write-once
@@ -19062,13 +19310,13 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 {
   "id": 789,
   "arrangementId": 456,
-  "factFindRef": {
+  "factfind": {
     "id": 123,
     "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -19621,7 +19869,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "nextRebalancingDate": "2026-04-15",
   "isAdvised": true,
   "adviceType": "ONGOING",
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
@@ -19670,8 +19918,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 |-------|------|--------|--------|----------|-------|
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
 | `arrangementId` | uuid | required | ignored | included | write-once, link to parent Arrangement |
-| `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
-| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `factfind` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
+| `client` | ClientRef | required | ignored | included | Reference to client, write-once |
 | `arrangementCategory` | string | required | ignored | included | write-once, discriminator field (INVESTMENT) |
 | `investmentType` | string (enum) | required | ignored | included | write-once, specific type (GIA/ISA/Bond/etc) |
 | `provider` | ProviderValue | required | updatable | included | Provider details with FRN |
@@ -19725,7 +19973,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | `nextRebalancingDate` | date | optional | updatable | included | Next scheduled rebalance |
 | `isAdvised` | boolean | optional | updatable | included | Whether investment is advised |
 | `adviceType` | string | optional | updatable | included | Ongoing/One-off advice |
-| `adviserRef` | AdviserRef | optional | updatable | included | Reference to adviser |
+| `adviser` | AdviserRef | optional | updatable | included | Reference to adviser |
 | `lastReviewDate` | date | optional | updatable | included | Last review date |
 | `nextReviewDate` | date | optional | updatable | included | Next scheduled review |
 | `notes` | string | optional | updatable | included | Additional notes |
@@ -19734,7 +19982,6 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `createdBy` | object | ignored | ignored | included | read-only, audit trail |
 | `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
 
 **Usage Examples:**
 
@@ -19742,8 +19989,8 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 ```json
 {
   "arrangementId": 456,
-  "factFindRef": { "id": 123 },
-  "clientRef": { "id": 123 },
+  "factfind": { "id": 123 },
+  "client": { "id": 123 },
   "arrangementCategory": "INVESTMENT",
   "provider": "VANGUARD",
   "policyNumber": "ISA-987654321",
@@ -19752,9 +19999,17 @@ The `Investment` contract extends the Arrangement contract with investment-speci
   "investmentType": "STOCKS_SHARES_ISA",
   "isaType": "STOCKS_SHARES",
   "taxYear": "2025/2026",
-  "currentValue": { "amount": 185000.00, "currency": { "code": "GBP" } },
+  "currentValue": { "amount": 185000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
   "valuationDate": "2026-02-16",
-  "costBasis": { "amount": 150000.00, "currency": { "code": "GBP" } }
+  "costBasis": { "amount": 150000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } }
 }
 ```
 Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields like `unrealizedGain`, `totalReturn`, etc. Returns complete contract.
@@ -19762,13 +20017,33 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields l
 **Updating Asset Allocation (PUT /api/v2/investments/investment-789):**
 ```json
 {
-  "currentValue": { "amount": 190000.00, "currency": { "code": "GBP" } },
+  "currentValue": { "amount": 190000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
   "valuationDate": "2026-02-18",
   "assetAllocation": {
-    "equities": { "percentage": 70.00, "value": { "amount": 133000.00, "currency": { "code": "GBP" } } },
-    "bonds": { "percentage": 20.00, "value": { "amount": 38000.00, "currency": { "code": "GBP" } } },
-    "cash": { "percentage": 5.00, "value": { "amount": 9500.00, "currency": { "code": "GBP" } } },
-    "alternatives": { "percentage": 5.00, "value": { "amount": 9500.00, "currency": { "code": "GBP" } } }
+    "equities": { "percentage": 70.00, "value": { "amount": 133000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } } },
+    "bonds": { "percentage": 20.00, "value": { "amount": 38000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } } },
+    "cash": { "percentage": 5.00, "value": { "amount": 9500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } } },
+    "alternatives": { "percentage": 5.00, "value": { "amount": 9500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } } }
   }
 }
 ```
@@ -19782,9 +20057,21 @@ Server updates `updatedAt` and recalculates computed fields. Returns complete co
       "isin": "GB00B3X7QG63",
       "fundName": "Vanguard FTSE Global All Cap Index Fund",
       "units": 15000.00,
-      "unitPrice": { "amount": 6.25, "currency": { "code": "GBP" } },
-      "currentValue": { "amount": 93750.00, "currency": { "code": "GBP" } },
-      "costBasis": { "amount": 75000.00, "currency": { "code": "GBP" } }
+      "unitPrice": { "amount": 6.25, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "currentValue": { "amount": 93750.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "costBasis": { "amount": 75000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } }
     }
   ]
 }
@@ -19793,8 +20080,8 @@ Only specified fields are updated. Returns complete contract with new holding ad
 
 **Validation Rules:**
 
-1. **Required Fields on Create:** `arrangementId`, `factFindRef`, `clientRef`, `arrangementCategory`, `investmentType`, `provider`, `policyNumber`, `startDate`, `inceptionDate`, `currentValue`, `valuationDate`
-2. **Write-Once Fields:** Cannot be changed after creation: `arrangementId`, `factFindRef`, `clientRef`, `arrangementCategory`, `investmentType`, `policyNumber`, `startDate`, `inceptionDate`
+1. **Required Fields on Create:** `arrangementId`, `factfind`, `client`, `arrangementCategory`, `investmentType`, `provider`, `policyNumber`, `startDate`, `inceptionDate`, `currentValue`, `valuationDate`
+2. **Write-Once Fields:** Cannot be changed after creation: `arrangementId`, `factfind`, `client`, `arrangementCategory`, `investmentType`, `policyNumber`, `startDate`, `inceptionDate`
 3. **ISA Validation:** If `productType` is ISA, `isaType` must be provided (Stocks/Cash/Innovative/Lifetime)
 4. **ISA Allowance:** `isaAllowanceUsed` cannot exceed `annualIsaAllowance` (£20,000 for 2025/26)
 5. **Asset Allocation:** Sum of percentages in `assetAllocation` must equal 100%
@@ -19802,7 +20089,7 @@ Only specified fields are updated. Returns complete contract with new holding ad
 7. **Holdings Validation:** Each holding must have `isin` or `sedol`, `fundName`, and `currentValue`
 8. **Date Logic:** `startDate` must be <= `valuationDate`, `maturityDate` (if provided) must be > `startDate`
 9. **Contribution Limits:** For ISAs, total contributions in a tax year cannot exceed annual allowance
-10. **Reference Integrity:** `arrangementId`, `clientRef.id`, `factFindRef.id`, `adviserRef.id` must reference existing entities
+10. **Reference Integrity:** `arrangementId`, `client.id`, `factfind.id`, `adviserRef.id` must reference existing entities
 
 ---
 
@@ -19815,7 +20102,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
 ```json
 {
   "id": 456,
-  "factFindRef": {
+  "factfind": {
     "id": 123,
     "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
@@ -19939,7 +20226,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
   },
   "owners": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "href": "/api/v2/factfinds/{factfindId}/clients/123",
         "name": "John Smith",
@@ -19996,7 +20283,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
   "annualizedGrowth": 3.94,
   "mortgages": [
     {
-      "mortgageRef": {
+      "mortgage": {
         "id": 789,
         "href": "/api/v2/factfinds/{factfindId}/arrangements/789",
         "arrangementType": "Mortgage",
@@ -20039,8 +20326,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "symbol": "£"
     }
   },
-  "equityPercentage": 43.53,
-  "loanToValue": 56.47,
+  "equityPercentage": 43.53
   "isPrimaryResidence": false,
   "isRented": true,
   "isBuyToLet": true,
@@ -20449,7 +20735,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
 | Field | Type | Create | Update | Response | Notes |
 |-------|------|--------|--------|----------|-------|
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
-| `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
+| `factfind` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
 | `propertyType` | string | required | ignored | included | write-once, PrimaryResidence/BuyToLet/SecondHome/Commercial |
 | `propertySubType` | string | optional | updatable | included | Detached/SemiDetached/Terraced/Apartment/Bungalow |
 | `ownershipType` | string | optional | updatable | included | Freehold/Leasehold/Shared Ownership |
@@ -20487,7 +20773,6 @@ The `Property` contract represents a property asset with valuation tracking, mor
 | `totalMortgageBalance` | MoneyValue | ignored | ignored | included | read-only, sum of mortgage balances |
 | `equityAmount` | MoneyValue | ignored | ignored | included | read-only, currentValue - totalMortgageBalance |
 | `equityPercentage` | decimal | ignored | ignored | included | read-only, equity as % of value |
-| `loanToValue` | decimal | ignored | ignored | included | read-only, LTV percentage |
 | `isPrimaryResidence` | boolean | optional | updatable | included | Whether this is primary residence |
 | `isRented` | boolean | optional | updatable | included | Whether property is rented |
 | `isBuyToLet` | boolean | optional | updatable | included | Whether this is a BTL property |
@@ -20514,14 +20799,13 @@ The `Property` contract represents a property asset with valuation tracking, mor
 | `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `createdBy` | object | ignored | ignored | included | read-only, audit trail |
 | `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
 
 **Usage Examples:**
 
 **Creating a Buy-To-Let Property (POST /api/v2/factfinds/{factfindId}/assets):**
 ```json
 {
-  "factFindRef": { "id": 123 },
+  "factfind": { "id": 123 },
   "propertyType": "BTL",
   "address": {
     "line1": "Flat 12, Riverside Apartments",
@@ -20531,13 +20815,21 @@ The `Property` contract represents a property asset with valuation tracking, mor
     "country": { "code": "GB" }
   },
   "purchaseDate": "2018-06-15",
-  "purchasePrice": { "amount": 325000.00, "currency": { "code": "GBP" } },
-  "currentValue": { "amount": 425000.00, "currency": { "code": "GBP" } },
+  "purchasePrice": { "amount": 325000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+  "currentValue": { "amount": 425000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
   "valuationDate": "2026-02-10",
   "valuationType": "DESKTOP",
   "owners": [
     {
-      "clientRef": { "id": 123 },
+      "client": { "id": 123 },
       "ownershipPercentage": 100.00,
       "isPrimaryOwner": true
     }
@@ -20552,11 +20844,19 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes read-only fields. 
 **Updating Property Valuation (PUT /api/v2/properties/456):**
 ```json
 {
-  "currentValue": { "amount": 435000.00, "currency": { "code": "GBP" } },
+  "currentValue": { "amount": 435000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
   "valuationDate": "2026-06-15",
   "valuationType": "SURVEYOR",
   "valuationProvider": "Knight Frank",
-  "previousValuation": { "amount": 425000.00, "currency": { "code": "GBP" } },
+  "previousValuation": { "amount": 425000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
   "previousValuationDate": "2026-02-10"
 }
 ```
@@ -20566,7 +20866,11 @@ Server updates `updatedAt` and recalculates equity, LTV, capital growth. Returns
 ```json
 {
   "rentalIncome": {
-    "monthlyRent": { "amount": 1750.00, "currency": { "code": "GBP" } },
+    "monthlyRent": { "amount": 1750.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
     "tenancyStartDate": "2026-08-01",
     "tenancyEndDate": "2027-07-31",
     "tenantName": "Michael Brown"
@@ -20577,8 +20881,8 @@ Only specified fields are updated. Server recalculates rental yield and net inco
 
 **Validation Rules:**
 
-1. **Required Fields on Create:** `factFindRef`, `propertyType`, `address`, `purchaseDate`, `purchasePrice`, `currentValue`, `valuationDate`, `valuationType`, `owners`, `ownershipStructure`
-2. **Write-Once Fields:** Cannot be changed after creation: `factFindRef`, `propertyType`, `purchaseDate`, `purchasePrice`
+1. **Required Fields on Create:** `factfind`, `propertyType`, `address`, `purchaseDate`, `purchasePrice`, `currentValue`, `valuationDate`, `valuationType`, `owners`, `ownershipStructure`
+2. **Write-Once Fields:** Cannot be changed after creation: `factfind`, `propertyType`, `purchaseDate`, `purchasePrice`
 3. **Ownership Validation:** Sum of `owners[].ownershipPercentage` must equal 100%
 4. **Date Logic:** `purchaseDate` must be <= `valuationDate`, `tenancyEndDate` must be > `tenancyStartDate`
 5. **Rental Validation:** If `isRented` is true, `rentalIncome` must be provided
@@ -20586,7 +20890,7 @@ Only specified fields are updated. Server recalculates rental yield and net inco
 7. **Leasehold Validation:** If `tenure` is "Leasehold", `leaseRemaining` should be provided
 8. **Mortgage Linking:** `mortgages[].mortgageRef.id` must reference valid Arrangement entities
 9. **Valuation Requirements:** `currentValue` must be > 0, `valuationDate` must not be in future
-10. **Reference Integrity:** `factFindRef.id`, `owners[].clientRef.id` must reference existing entities
+10. **Reference Integrity:** `factfind.id`, `owners[].client.id` must reference existing entities
 
 ---
 
@@ -20599,13 +20903,13 @@ The `Equity` contract represents a direct stock holding with performance trackin
 ```json
 {
   "id": 321,
-  "factFindRef": {
+  "factfind": {
     "id": 123,
     "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
     "status": "INP"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -21264,7 +21568,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
     "accountNumber": "HL-12345678"
   },
   "isAdvised": true,
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Jane Doe",
@@ -21309,8 +21613,8 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | Field | Type | Create | Update | Response | Notes |
 |-------|------|--------|--------|----------|-------|
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
-| `factFindRef` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
-| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `factfind` | FactFindRef | required | ignored | included | Reference to owning FactFind, write-once |
+| `client` | ClientRef | required | ignored | included | Reference to client, write-once |
 | `ticker` | string | required | ignored | included | write-once, stock ticker symbol |
 | `isin` | string | required | ignored | included | write-once, International Securities ID |
 | `sedol` | string | optional | ignored | included | write-once, Stock Exchange Daily Official List |
@@ -21333,7 +21637,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | `accountType` | string | optional | updatable | included | ISA/GIA/SIPP account type |
 | `broker` | object | optional | updatable | included | Broker details and account number |
 | `isAdvised` | boolean | optional | updatable | included | Whether holding is advised |
-| `adviserRef` | AdviserRef | optional | updatable | included | Reference to adviser |
+| `adviser` | AdviserRef | optional | updatable | included | Reference to adviser |
 | `investmentObjective` | string | optional | updatable | included | Investment objective for this holding |
 | `notes` | string | optional | updatable | included | Additional notes |
 | `documents` | array | optional | updatable | included | Array of document references |
@@ -21341,27 +21645,46 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `createdBy` | object | ignored | ignored | included | read-only, audit trail |
 | `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
 
 **Usage Examples:**
 
 **Creating an Equity Holding (POST /api/v2/factfinds/{factfindId}/assets):**
 ```json
 {
-  "factFindRef": { "id": 123 },
-  "clientRef": { "id": 123 },
+  "factfind": { "id": 123 },
+  "client": { "id": 123 },
   "ticker": "BP.L",
   "isin": "GB0007980591",
   "sedol": "0798059",
   "companyName": "BP plc",
   "exchange": "LSE",
-  "currency": { "code": "GBP" },
+  "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
   "holdings": {
     "quantity": 3000,
-    "averagePurchasePrice": { "amount": 4.00, "currency": { "code": "GBP" } },
-    "totalCostBasis": { "amount": 12000.00, "currency": { "code": "GBP" } },
-    "currentPrice": { "amount": 5.15, "currency": { "code": "GBP" } },
-    "currentValue": { "amount": 15450.00, "currency": { "code": "GBP" } }
+    "averagePurchasePrice": { "amount": 4.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+    "totalCostBasis": { "amount": 12000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+    "currentPrice": { "amount": 5.15, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+    "currentValue": { "amount": 15450.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } }
   },
   "accountType": "GIA"
 }
@@ -21376,16 +21699,40 @@ Server generates `id`, `createdAt`, `updatedAt`, and computes performance metric
       "date": "2026-02-18",
       "transactionType": "BUY",
       "quantity": 1000,
-      "price": { "amount": 5.20, "currency": { "code": "GBP" } },
-      "grossAmount": { "amount": 5200.00, "currency": { "code": "GBP" } },
-      "commission": { "amount": 10.00, "currency": { "code": "GBP" } },
-      "stampDuty": { "amount": 26.00, "currency": { "code": "GBP" } },
-      "totalCost": { "amount": 5236.00, "currency": { "code": "GBP" } }
+      "price": { "amount": 5.20, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "grossAmount": { "amount": 5200.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "commission": { "amount": 10.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "stampDuty": { "amount": 26.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "totalCost": { "amount": 5236.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } }
     }
   ],
   "holdings": {
     "quantity": 6000,
-    "totalCostBasis": { "amount": 26486.00, "currency": { "code": "GBP" } }
+    "totalCostBasis": { "amount": 26486.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } }
   }
 }
 ```
@@ -21399,10 +21746,22 @@ Server updates `updatedAt`, recalculates performance and Section 104 pool. Retur
       "exDividendDate": "2026-02-14",
       "paymentDate": "2026-03-28",
       "dividendType": "ORDINARY",
-      "amountPerShare": { "amount": 0.0650, "currency": { "code": "GBP" } },
+      "amountPerShare": { "amount": 0.0650, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
       "quantityHeld": 5000,
-      "grossDividend": { "amount": 325.00, "currency": { "code": "GBP" } },
-      "netDividend": { "amount": 325.00, "currency": { "code": "GBP" } },
+      "grossDividend": { "amount": 325.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
+      "netDividend": { "amount": 325.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      } },
       "reinvested": false
     }
   ]
@@ -21412,8 +21771,8 @@ Only specified fields are updated. Server recalculates total dividends and yield
 
 **Validation Rules:**
 
-1. **Required Fields on Create:** `factFindRef`, `clientRef`, `ticker`, `isin`, `companyName`, `exchange`, `currency`, `holdings`
-2. **Write-Once Fields:** Cannot be changed after creation: `factFindRef`, `clientRef`, `ticker`, `isin`, `sedol`, `cusip`
+1. **Required Fields on Create:** `factfind`, `client`, `ticker`, `isin`, `companyName`, `exchange`, `currency`, `holdings`
+2. **Write-Once Fields:** Cannot be changed after creation: `factfind`, `client`, `ticker`, `isin`, `sedol`, `cusip`
 3. **Holdings Validation:** `holdings.quantity` must be > 0, `currentValue` must equal `quantity * currentPrice`
 4. **Transaction Validation:** Each purchase/sale must have `date`, `quantity`, `price`, `totalCost`/`netProceeds`
 5. **Dividend Validation:** Each dividend must have `exDividendDate`, `paymentDate`, `amountPerShare`, `quantityHeld`
@@ -21421,7 +21780,7 @@ Only specified fields are updated. Server recalculates total dividends and yield
 7. **Corporate Actions:** Stock splits must maintain cost basis (quantity doubles, cost per share halves)
 8. **Date Logic:** `exDividendDate` must be before `paymentDate`, transaction dates must be in past
 9. **Market Data:** `marketData.lastUpdated` must not be in future
-10. **Reference Integrity:** `factFindRef.id`, `clientRef.id`, `adviserRef.id` must reference existing entities
+10. **Reference Integrity:** `factfind.id`, `client.id`, `adviserRef.id` must reference existing entities
 
 ---
 
@@ -21434,14 +21793,14 @@ The `IdentityVerification` contract represents identity verification status with
 ```json
 {
   "id": 987,
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
-  "factFindRef": {
+  "factfind": {
     "id": 123,
     "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
@@ -21717,8 +22076,8 @@ The `IdentityVerification` contract represents identity verification status with
 | Field | Type | Create | Update | Response | Notes |
 |-------|------|--------|--------|----------|-------|
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
-| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
-| `factFindRef` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
+| `client` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `factfind` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
 | `verificationType` | string | required | ignored | included | write-once, KYC/AML/EnhancedDueDiligence |
 | `verificationLevel` | string | optional | updatable | included | Standard/Enhanced/Simplified |
 | `verificationStatus` | string | required | updatable | included | Pending/InProgress/Verified/Failed/Expired |
@@ -21752,15 +22111,14 @@ The `IdentityVerification` contract represents identity verification status with
 | `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `createdBy` | object | ignored | ignored | included | read-only, audit trail |
 | `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
 
 **Usage Examples:**
 
 **Submitting Identity Verification (POST /api/v2/identity-verification):**
 ```json
 {
-  "clientRef": { "id": 123 },
-  "factFindRef": { "id": 123 },
+  "client": { "id": 123 },
+  "factfind": { "id": 123 },
   "verificationType": "KYC_AML",
   "verificationLevel": "ENHANCED",
   "verificationStatus": "PENDING",
@@ -21839,8 +22197,8 @@ Only specified fields are updated. Returns complete contract.
 
 **Validation Rules:**
 
-1. **Required Fields on Create:** `clientRef`, `verificationType`, `verificationStatus`, `verificationDate`, `documents`, `amlChecks`, `consentGiven`, `verifiedBy`, `verifiedAt`
-2. **Write-Once Fields:** Cannot be changed after creation: `clientRef`, `factFindRef`, `verificationType`
+1. **Required Fields on Create:** `client`, `verificationType`, `verificationStatus`, `verificationDate`, `documents`, `amlChecks`, `consentGiven`, `verifiedBy`, `verifiedAt`
+2. **Write-Once Fields:** Cannot be changed after creation: `client`, `factfind`, `verificationType`
 3. **Consent Validation:** `consentGiven` must be true before verification can be performed
 4. **Document Validation:** At least one primary identity document (Passport/DrivingLicense) must be provided
 5. **Document Expiry:** Identity documents must not be expired (expiryDate must be in future)
@@ -21848,7 +22206,7 @@ Only specified fields are updated. Returns complete contract.
 7. **Biometric Validation:** If biometric verification is used, confidence scores must be > 90%
 8. **Address Match:** For address verification, `addressMatchScore` should be > 80%
 9. **Date Logic:** `verificationDate` must not be in future, `verificationExpiryDate` must be > `verificationDate`
-10. **Reference Integrity:** `clientRef.id`, `factFindRef.id` must reference existing entities
+10. **Reference Integrity:** `client.id`, `factfind.id` must reference existing entities
 
 ---
 
@@ -21861,14 +22219,14 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 ```json
 {
   "id": 555,
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
-  "factFindRef": {
+  "factfind": {
     "id": 123,
     "href": "/api/v2/factfinds/123",
     "factFindNumber": "FF-2025-00123",
@@ -22211,8 +22569,8 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | Field | Type | Create | Update | Response | Notes |
 |-------|------|--------|--------|----------|-------|
 | `id` | uuid | ignored | ignored | included | read-only, server-generated |
-| `clientRef` | ClientRef | required | ignored | included | Reference to client, write-once |
-| `factFindRef` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
+| `client` | ClientRef | required | ignored | included | Reference to client, write-once |
+| `factfind` | FactFindRef | optional | ignored | included | Reference to owning FactFind, write-once |
 | `consentPurpose` | string | required | ignored | included | write-once, DataProcessing/Marketing/Profiling/ThirdPartySharing |
 | `consentPurposeDescription` | string | optional | updatable | included | Detailed description of purpose |
 | `consentStatus` | string | required | updatable | included | Given/Withdrawn/Expired |
@@ -22246,15 +22604,14 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | `updatedAt` | timestamp | ignored | ignored | included | read-only, server-generated |
 | `createdBy` | object | ignored | ignored | included | read-only, audit trail |
 | `updatedBy` | object | ignored | ignored | included | read-only, audit trail |
-| `_links` | object | ignored | ignored | included | read-only, HATEOAS links |
 
 **Usage Examples:**
 
 **Recording Consent (POST /api/v2/consents):**
 ```json
 {
-  "clientRef": { "id": 123 },
-  "factFindRef": { "id": 123 },
+  "client": { "id": 123 },
+  "factfind": { "id": 123 },
   "consentPurpose": "DATA_PROCESSING",
   "consentPurposeDescription": "Processing of personal and financial data for financial advice",
   "consentStatus": "GIVEN",
@@ -22327,8 +22684,8 @@ Server updates status and withdrawal date. Returns complete contract.
 
 **Validation Rules:**
 
-1. **Required Fields on Create:** `clientRef`, `consentPurpose`, `consentStatus`, `consentGivenDate`, `consentMethod`, `consentChannel`, `lawfulBasis`, `dataProcessing`, `privacyPolicy`, `dataSubjectRights`, `audit`
-2. **Write-Once Fields:** Cannot be changed after creation: `clientRef`, `factFindRef`, `consentPurpose`
+1. **Required Fields on Create:** `client`, `consentPurpose`, `consentStatus`, `consentGivenDate`, `consentMethod`, `consentChannel`, `lawfulBasis`, `dataProcessing`, `privacyPolicy`, `dataSubjectRights`, `audit`
+2. **Write-Once Fields:** Cannot be changed after creation: `client`, `factfind`, `consentPurpose`
 3. **Status Validation:** If `consentStatus` is "GIVEN", `consentGivenDate` must be provided. If "WITHDRAWN", `consentWithdrawnDate` must be provided
 4. **Date Logic:** `consentGivenDate` must not be in future, `consentWithdrawnDate` must be > `consentGivenDate`
 5. **Lawful Basis:** For `lawfulBasis` = "CONSENT", consent must be freely given, specific, informed, and unambiguous
@@ -22336,7 +22693,7 @@ Server updates status and withdrawal date. Returns complete contract.
 7. **Retention Period:** `dataProcessing.dataRetentionPeriod` must be specified and justified
 8. **Privacy Policy:** `privacyPolicy.privacyPolicyAcceptedDate` must be provided and not in future
 9. **Marketing Consent:** If marketing consent is given, at least one marketing channel must have `isConsented` = true
-10. **Reference Integrity:** `clientRef.id`, `factFindRef.id` must reference existing entities
+10. **Reference Integrity:** `client.id`, `factfind.id` must reference existing entities
 
 ---
 
@@ -23498,7 +23855,7 @@ Represents a person's health status for insurance purposes as a simple string en
 
 ### 14.16 Standard Reference Types
 
-Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `clientRef`, `adviserRef`).
+Reference types represent entities with independent identity. They are referenced from other entities using an expanded reference object containing `id`, `href`, and display fields. Reference fields are named with a "Ref" suffix (e.g., `client`, `adviser`).
 
 #### 14.16.1 ClientRef
 
@@ -23535,7 +23892,7 @@ Reference to a Client entity.
 **Usage Example:**
 ```json
 {
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
     "name": "John Smith",
@@ -23571,7 +23928,7 @@ Reference to an Adviser entity.
 **Usage Example:**
 ```json
 {
-  "adviserRef": {
+  "adviser": {
     "id": 789,
     "href": "/api/v2/advisers/789",
     "name": "Sarah Johnson",
@@ -23606,7 +23963,7 @@ Reference to a financial product Provider entity.
 **Usage Example:**
 ```json
 {
-  "providerRef": {
+  "provider": {
     "id": 456,
     "href": "/api/v2/providers/456",
     "name": "Aviva",
@@ -23643,7 +24000,7 @@ Reference to an Arrangement entity (pension, investment, protection, mortgage).
 **Usage Example:**
 ```json
 {
-  "arrangementRef": {
+  "arrangement": {
     "id": 111,
     "href": "/api/v2/factfinds/{factfindId}/arrangements/111",
     "policyNumber": "SIPP123456",
@@ -23679,7 +24036,7 @@ Reference to an Employment entity.
 **Usage Example:**
 ```json
 {
-  "employmentRef": {
+  "employment": {
     "id": 222,
     "href": "/api/v2/employments/222",
     "employerName": "Acme Corp",
@@ -23714,7 +24071,7 @@ Reference to a Goal entity.
 **Usage Example:**
 ```json
 {
-  "goalRef": {
+  "goal": {
     "id": 333,
     "href": "/api/v2/factfinds/{factfindId}/objectives/333",
     "goalName": "Retirement Planning",
@@ -23744,146 +24101,20 @@ Reference to a FactFind (ADVICE_CASE) entity.
 | `id` | uuid | Yes | Unique fact find identifier (numeric) |
 | `href` | string | Yes (response) | URL to fact find resource |
 | `factFindNumber` | string | No | Business fact find number |
-| `status` | enum | Yes (response) | Status: Draft, InProgress, Complete, Submitted |
-
-**Usage Example:**
-```json
-{
-  "factFindRef": {
-    "id": 444,
-    "href": "/api/v2/factfinds/444",
-    "factFindNumber": "FF001234",
-    "status": "InProgress"
-  }
-}
-```
-
-### 14.17 Asset Contract
-
-The `Asset` contract represents a client's asset (property, business, cash, investments, etc.) with ownership, valuation, and tax planning information.
-
-**Reference Type:** Asset is a reference type with identity (has `id` field).
-
-**Key Features:**
-- Supports 16 asset type categories (Property, Own Business, Cash, Investments, etc.)
-- Complex ownership model with multiple owners and percentage shares
-- Dividend tracking for business assets
-- Valuation basis recording
-- Tax relief fields (BADR, IHT, RNRB, Business Relief)
-- Links to property details, arrangements, and income
-- Rental expense tracking
-- Client visibility control
-
-#### Complete Asset Contract
-
-```json
-{
-  "id": 1234,
-  "href": "/api/v2/factfinds/679/clients/346/assets/1234",
-  "factfindRef": {
-    "id": 679,
-    "href": "/api/v2/factfinds/679"
-  },
-  "assetType": "PROPERTY",
-  "description": "Primary Residence - 123 Main Street",
-  "ownership": {
-    "ownershipType": "JOINT",
-    "owners": [
-      {
-        "clientRef": {
-          "id": 123,
-          "href": "/api/v2/factfinds/679/clients/123"
-        },
-        "ownershipShare": 50.0
-      },
-      {
-        "clientRef": {
-          "id": 124,
-          "href": "/api/v2/factfinds/679/clients/124"
-        },
-        "ownershipShare": 50.0
-      }
-    ]
-  },
-  "dividends": {
-    "owners": [
-      {
-        "clientRef": {
-          "id": 123,
-          "href": "/api/v2/factfinds/679/clients/123"
-        },
-        "dividend": {
-          "amount": 5000.00,
-          "currency": "GBP"
-        },
-        "withdrawalType": "Regular",
-        "frequency": "Monthly"
-      }
-    ]
-  },
-  "currentValue": {
-    "amount": 450000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "valuedOn": "2026-01-15",
-  "valuationBasis": "Comparable Sales",
-  "originalValue": {
-    "amount": 350000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "purchasedOn": "2024-05-10",
-  "rentalExpenses": {
-    "amount": 1200.00,
-    "currency": "GBP"
-  },
-  "isVisibleToClient": true,
-  "isBusinessAssetDisposalRelief": false,
-  "isFreeFromInheritanceTax": false,
-  "rnrbEligibility": "Not Eligible",
-  "isBusinessReliefQualifying": false,
-  "isHolding": false,
-  "propertyRef": {
-    "id": 1234,
-    "href": "/api/v2/factfinds/679/property-details/1234"
-  },
-  "arrangementRef": {
-    "id": 1234,
-    "href": "/api/v2/factfinds/679/clients/346/arrangements/1234"
-  },
-  "incomeRef": {
-    "id": 1234,
-    "href": "/api/v2/factfinds/679/clients/346/income/1234"
-  },
-  "notes": "Rental property - managed by external agent",
-  "createdAt": "2026-02-01T10:00:00Z",
-  "updatedAt": "2026-02-15T14:30:00Z"
-}
-```
-
-#### Field Definitions
-
-| Field | Type | Behavior | Description |
-|-------|------|----------|-------------|
+| `status` | enum | Yes (response) | Status: Draft, InProgress, Complete, Submitted |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned asset identifier |
 | `href` | string | read-only | Canonical URI for this asset |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
 | `assetType.code` | enum | required-on-create | Asset type code (PROPERTY, OWN_BUSINESS, CASH, etc.) |
 | `assetType.display` | string | read-only | Human-readable asset type label |
 | `description` | string | required-on-create | Asset description (max 500 chars) |
 | `ownership.ownershipType.code` | enum | required-on-create | SOLE_CLIENT1, SOLE_CLIENT2, JOINT |
 | `ownership.ownershipType.display` | string | read-only | Human-readable ownership type |
 | `ownership.owners[]` | array | required-on-create | Array of owners with shares |
-| `ownership.owners[].clientRef` | ClientRef | required-on-create | Reference to owning client |
+| `ownership.owners[].client` | ClientRef | required-on-create | Reference to owning client |
 | `ownership.owners[].ownershipShare` | decimal | required-on-create | Percentage ownership (0-100) |
-| `dividends` | DividendsValue | optional | Dividend information for business assets |
-| `dividends.owners[]` | array | optional | Array of dividend recipients |
-| `dividends.owners[].clientRef` | ClientRef | required | Dividend recipient client |
+| `dividends` | DividendsValue | optional | `dividends.owners[]` | array | optional | Array of dividend recipients |
+| `dividends.owners[].client` | ClientRef | required | Dividend recipient client |
 | `dividends.owners[].dividend` | MoneyValue | required | Dividend amount |
 | `dividends.owners[].withdrawalType` | enum | required | Regular or Lumpsum |
 | `dividends.owners[].frequency` | enum | required | Payment frequency (Monthly, Quarterly, etc.) |
@@ -23899,9 +24130,9 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 | `rnrbEligibility` | string | optional | Residence Nil Rate Band eligibility |
 | `isBusinessReliefQualifying` | boolean | optional | Business Relief for IHT (default: false) |
 | `isHolding` | boolean | optional | Asset is a holding (default: false) |
-| `propertyRef` | PropertyRef | optional | Link to property details |
-| `arrangementRef` | ArrangementRef | optional | Link to related arrangement (mortgage) |
-| `incomeRef` | IncomeRef | optional | Link to income generated by asset |
+| `property` | PropertyRef | optional | Link to property details |
+| `arrangement` | ArrangementRef | optional | Link to related arrangement (mortgage) |
+| `income` | IncomeRef | optional | Link to income generated by asset |
 | `notes` | string | optional | Additional notes (max 2000 chars) |
 | `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
 | `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
@@ -23926,134 +24157,11 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 | `OVERSEAS_PROPERTY` | Overseas Property |
 | `OWN_BUSINESS` | Own Business |
 | `PROPERTY` | Property |
-| `RENTAL_PROPERTY_OTHER_PROPERTY` | Rental Property / Other Property |
-
-#### Validation Rules
-
-1. **Ownership Validation:**
-   - Sum of all `ownershipShare` values must equal 100.0
-   - For `JOINT` ownership, must have 2+ owners
-   - For `SOLE_CLIENT1` or `SOLE_CLIENT2`, should have 1 owner with 100% share
-
-2. **Dividends Validation:**
-   - `dividends` field only applicable for `OWN_BUSINESS` asset type
-   - Each dividend owner must have `dividend`, `withdrawalType`, and `frequency`
-
-3. **Property Assets:**
-   - Property asset types should have `propertyRef` linking to property detail
-   - If generating rental income, should have `incomeRef`
-   - If mortgaged, should have `arrangementRef`
-
-4. **Tax Relief Validation:**
-   - `isBusinessAssetDisposalRelief` only applicable for business assets
-   - `rnrbEligibility` only applicable for residential properties
-   - `isBusinessReliefQualifying` only applicable for business assets
-
----
-
-### 14.18 Liability Contract
-
-The `Liability` contract represents a client's debt obligation (mortgage, loan, credit card, maintenance/alimony, etc.) with repayment details and protection coverage tracking.
-
-**Reference Type:** Liability is a reference type with identity (has `id` field).
-
-**Key Features:**
-- Supports 11 liability categories (Main Residence, Credit/Store Cards, Personal Loans, etc.)
-- Interest rate tracking with 9 rate types (Fixed, Variable, Tracker, LIBOR, etc.)
-- Repayment vs. Interest Only tracking
-- 8 protection type options (Life Only, CIC Only, ASU Only, combinations)
-- Property/asset linking for secured loans
-- Early redemption charge tracking
-- Consolidation planning support
-- Guarantor mortgage flag
-
-#### Complete Liability Contract
-
-```json
-{
-  "id": 789,
-  "href": "/api/v2/factfinds/679/clients/346/liabilities/789",
-  "factfindRef": {
-    "id": 679,
-    "href": "/api/v2/factfinds/679"
-  },
-  "owner": {
-    "clientRef": {
-      "id": 123,
-      "href": "/api/v2/factfinds/679/clients/123",
-      "name": "Bob Byblik"
-    }
-  },
-  "liabilityAccountNumber": "MTG-123456",
-  "liabilityCategory": "MAIN_RESIDENCE",
-  "description": "Primary Residence Mortgage - 123 Main Street",
-  "originalLoanAmount": {
-    "amount": 250000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "repaymentOrInterestOnly": "REPAYMENT",
-  "rateType": "FIXED",
-  "amountOutstanding": {
-    "amount": 180000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "creditLimit": {
-    "amount": 0.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "interestRate": 3.5,
-  "paymentAmount": {
-    "amount": 1200.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "lender": "Nationwide Building Society",
-  "loanTermYears": 25,
-  "endDate": "2040-06-01",
-  "protected": "LIFE_AND_CIC",
-  "earlyRedemptionCharge": {
-    "amount": 5000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "consolidate": false,
-  "isToBeRepaid": false,
-  "howWillLiabilityBeRepaid": null,
-  "isGuarantorMortgage": false,
-  "linkedAssetRef": {
-    "id": 1234,
-    "href": "/api/v2/factfinds/679/clients/346/assets/1234"
-  },
-  "protectionArrangementRef": {
-    "id": 555,
-    "href": "/api/v2/factfinds/679/arrangements/555"
-  },
-  "createdAt": "2026-01-15T09:00:00Z",
-  "updatedAt": "2026-02-10T11:30:00Z"
-}
-```
-
-#### Field Definitions
-
-| Field | Type | Behavior | Description |
-|-------|------|----------|-------------|
+| `RENTAL_PROPERTY_OTHER_PROPERTY` | Rental Property / Other Property |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned liability identifier |
 | `href` | string | read-only | Canonical URI for this liability |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `owner.clientRef` | ClientRef | required-on-create | Owner of the liability |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
+| `owner.client` | ClientRef | required-on-create | Owner of the liability |
 | `liabilityAccountNumber` | string | optional | Account/reference number (max 100 chars) |
 | `liabilityCategory.code` | enum | required-on-create | Liability category code |
 | `liabilityCategory.display` | string | read-only | Human-readable liability category |
@@ -24135,7 +24243,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 #### Validation Rules
 
 1. **Owner Validation:**
-   - `owner.clientRef` is required - at least one owner must be specified
+   - `owner.client` is required - at least one owner must be specified
    - Owner must be a valid client within the fact find
 
 2. **Category-Specific Fields:**
@@ -24172,12 +24280,12 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 {
   "id": 790,
   "href": "/api/v2/factfinds/679/clients/346/liabilities/790",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "owner": {
-    "clientRef": {
+    "client": {
       "id": 123,
       "href": "/api/v2/factfinds/679/clients/123",
       "name": "Bob Byblik"
@@ -24192,24 +24300,27 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "amountOutstanding": {
     "amount": 3500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "creditLimit": {
     "amount": 10000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "interestRate": 19.9,
   "paymentAmount": {
     "amount": 250.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "lender": "HSBC",
   "loanTermYears": null,
@@ -24233,12 +24344,12 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 {
   "id": 791,
   "href": "/api/v2/factfinds/679/clients/346/liabilities/791",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "owner": {
-    "clientRef": {
+    "client": {
       "id": 123,
       "href": "/api/v2/factfinds/679/clients/123",
       "name": "Bob Byblik"
@@ -24256,9 +24367,10 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "paymentAmount": {
     "amount": 800.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "lender": null,
   "loanTermYears": null,
@@ -24282,12 +24394,12 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 {
   "id": 792,
   "href": "/api/v2/factfinds/679/clients/346/liabilities/792",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "owner": {
-    "clientRef": {
+    "client": {
       "id": 124,
       "href": "/api/v2/factfinds/679/clients/124",
       "name": "Jane Byblik"
@@ -24299,27 +24411,30 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "originalLoanAmount": {
     "amount": 15000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "repaymentOrInterestOnly": "REPAYMENT",
   "rateType": "FIXED",
   "amountOutstanding": {
     "amount": 12500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "creditLimit": null,
   "interestRate": 5.9,
   "paymentAmount": {
     "amount": 300.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "lender": "Santander",
   "loanTermYears": 5,
@@ -24328,9 +24443,10 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
   "earlyRedemptionCharge": {
     "amount": 500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "consolidate": false,
   "isToBeRepaid": false,
@@ -24379,7 +24495,7 @@ The `Employment` contract represents a client's comprehensive employment record 
   "id": 567,
   "href": "/api/v2/factfinds/679/clients/346/employments/567",
 
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -24436,7 +24552,7 @@ The `Employment` contract represents a client's comprehensive employment record 
   "id": 568,
   "href": "/api/v2/factfinds/679/clients/347/employments/568",
 
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -24481,51 +24597,58 @@ The `Employment` contract represents a client's comprehensive employment record 
       "grossProfit": {
         "amount": 180000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netProfit": {
         "amount": 150000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "shareOfCompanyProfit": {
         "amount": 180000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "grossDividend": {
         "amount": 60000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netDividend": {
         "amount": 54000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "grossSalary": {
         "amount": 25000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netSalary": {
         "amount": 20000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "yearEnd": "2024-03-31",
       "includeInAffordability": true
@@ -24534,51 +24657,58 @@ The `Employment` contract represents a client's comprehensive employment record 
       "grossProfit": {
         "amount": 165000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netProfit": {
         "amount": 135000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "shareOfCompanyProfit": {
         "amount": 165000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "grossDividend": {
         "amount": 55000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netDividend": {
         "amount": 49500.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "grossSalary": {
         "amount": 24000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netSalary": {
         "amount": 19200.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "yearEnd": "2023-03-31",
       "includeInAffordability": false
@@ -24587,51 +24717,58 @@ The `Employment` contract represents a client's comprehensive employment record 
       "grossProfit": {
         "amount": 150000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netProfit": {
         "amount": 120000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "shareOfCompanyProfit": {
         "amount": 150000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "grossDividend": {
         "amount": 50000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netDividend": {
         "amount": 45000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "grossSalary": {
         "amount": 22000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netSalary": {
         "amount": 17600.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "yearEnd": "2022-03-31",
       "includeInAffordability": false
@@ -24640,6 +24777,7 @@ The `Employment` contract represents a client's comprehensive employment record 
       "amount": 180000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -24660,8 +24798,8 @@ The `Employment` contract represents a client's comprehensive employment record 
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned employment identifier |
 | `href` | string | read-only | Canonical URI for this employment record |
-| `factfindRef.id` | integer | read-only | Reference to parent fact find |
-| `factfindRef.href` | string | read-only | URI to parent fact find |
+| `factfind.id` | integer | read-only | Reference to parent fact find |
+| `factfind.href` | string | read-only | URI to parent fact find |
 | `client.id` | integer | read-only | Reference to client |
 | `client.href` | string | read-only | URI to client |
 
@@ -24921,11 +25059,11 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 {
   "id": 445,
   "href": "/api/v2/factfinds/679/clients/346/budget/445",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -24933,9 +25071,10 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
   "amount": {
     "amount": 1500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "notes": "Monthly mortgage payment and council tax",
   "createdAt": "2026-01-10T09:00:00Z",
@@ -24949,8 +25088,8 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned budget identifier |
 | `href` | string | read-only | Canonical URI for this budget item |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to client |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
+| `client` | ClientRef | read-only | Reference to client |
 | `category` | string | required-on-create | Budget category name (max 100 chars) |
 | `amount` | MoneyValue | required-on-create | Budgeted monthly amount |
 | `notes` | string | optional | Budget notes and assumptions (max 2000 chars) |
@@ -24973,7 +25112,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 - Period tracking with start and end dates
 
 **Key Structure Changes (v2.2):**
-- **RESTORED:** `factfindRef` field for consistent navigation patterns
+- **RESTORED:** `factfind` field for consistent navigation patterns
 - **REMOVED:** `grossAmount` field (now only `netAmount`)
 - **CHANGED:** `netAmount` structure upgraded to full MoneyValue with currency object including code, display, and symbol
 - **ADDED:** `isConsolidated` flag for debt consolidation scenarios
@@ -24989,7 +25128,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "id": 1001,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1001",
 
-  "factfindRef": {
+  "factfind": {
     "id": 234,
     "href": "/api/v2/factfinds/234"
   },
@@ -25035,7 +25174,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "id": 1002,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1002",
 
-  "factfindRef": {
+  "factfind": {
     "id": 234,
     "href": "/api/v2/factfinds/234"
   },
@@ -25077,7 +25216,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "id": 1003,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1003",
 
-  "factfindRef": {
+  "factfind": {
     "id": 234,
     "href": "/api/v2/factfinds/234"
   },
@@ -25123,7 +25262,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "id": 1004,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1004",
 
-  "factfindRef": {
+  "factfind": {
     "id": 234,
     "href": "/api/v2/factfinds/234"
   },
@@ -25166,7 +25305,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned expenditure identifier |
 | `href` | string | read-only | Canonical URI for this expenditure |
-| `factfindRef` | FactFindReference | required-on-create, write-once | Reference to the owning FactFind |
+| `factfind` | FactFindReference | required-on-create, write-once | Reference to the owning FactFind |
 | `client` | ClientReference | required-on-create | Reference to the client who has this expenditure |
 
 **Expenditure Details**
@@ -25241,7 +25380,7 @@ Expenditure types are organized into three categories based on their importance 
 #### Validation Rules
 
 - `id` is read-only, auto-generated by the system
-- `factfindRef` is required on create and write-once (cannot be changed after creation)
+- `factfind` is required on create and write-once (cannot be changed after creation)
 - `client` is required on create
 - `expenditureType` is required, must be one of the enum values from the table above
 - `netAmount` is required, must be positive (> 0)
@@ -25375,7 +25514,7 @@ The `CreditHistory` contract represents a comprehensive record of a client's cre
   "id": 334,
   "href": "/api/v2/factfinds/679/clients/346/credit-history/334",
 
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -25465,7 +25604,7 @@ The `CreditHistory` contract represents a comprehensive record of a client's cre
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned credit history record identifier |
 | `href` | string | read-only | Canonical URI for this credit history record |
-| `factfindRef` | FactfindRef | read-only | Reference to parent factfind |
+| `factfind` | FactfindRef | read-only | Reference to parent factfind |
 | `client` | ClientRef | read-only | Reference to the client this credit history belongs to |
 
 **Summary Object (Aggregate Calculated Fields)**
@@ -25940,147 +26079,6 @@ Returns: `204 No Content`
 
 ---
 
-### 14.25 Business Asset Contract
-
-The `BusinessAsset` contract represents detailed business asset information including valuation basis, dividend tracking, and tax relief eligibility.
-
-**Reference Type:** BusinessAsset is a reference type with identity (has `id` field).
-
-**Key Features:**
-- Business valuation tracking
-- Dividend distribution management
-- Business Asset Disposal Relief tracking
-- Business Relief for IHT
-- Multiple valuation methods
-
-#### Complete Business Asset Contract
-
-```json
-{
-  "id": 555,
-  "href": "/api/v2/factfinds/679/business-assets/555",
-  "assetRef": {
-    "id": 1235,
-    "href": "/api/v2/factfinds/679/clients/346/assets/1235"
-  },
-  "businessName": "Smith & Co Limited",
-  "companyNumber": "12345678",
-  "incorporationDate": "2018-03-20",
-  "businessType": "LIMITED_COMPANY",
-  "industry": "SOFTWARE",
-  "ownershipStructure": {
-    "totalShares": 100,
-    "ownedShares": 100,
-    "ownershipPercentage": 100.0,
-    "shareClass": "Ordinary"
-  },
-  "valuationBasis": "NET_ASSET_VALUE",
-  "valuations": [
-    {
-      "date": "2026-01-15",
-      "value": {
-        "amount": 250000.00,
-        "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
-      },
-      "method": "Net Asset Value",
-      "valuedBy": "Company Accountant"
-    }
-  ],
-  "dividendPolicy": {
-    "paymentSchedule": "MONTHLY",
-    "annualDividend": {
-      "amount": 60000.00,
-      "currency": {
-        "code": "GBP",
-        "symbol": "£"
-      }
-    },
-    "monthlyDividend": {
-      "amount": 5000.00,
-      "currency": {
-        "code": "GBP",
-        "symbol": "£"
-      }
-    }
-  },
-  "taxReliefs": {
-    "businessAssetDisposalRelief": true,
-    "businessReliefQualifying": true,
-    "ihtReliefPercentage": 100,
-    "notes": "Qualifying trading company - 100% IHT relief after 2 years"
-  },
-  "financials": {
-    "annualTurnover": {
-      "amount": 500000.00,
-      "currency": {
-        "code": "GBP",
-        "symbol": "£"
-      }
-    },
-    "annualProfit": {
-      "amount": 150000.00,
-      "currency": {
-        "code": "GBP",
-        "symbol": "£"
-      }
-    },
-    "netAssets": {
-      "amount": 250000.00,
-      "currency": {
-        "code": "GBP",
-        "symbol": "£"
-      }
-    },
-    "financialYearEnd": "2025-12-31"
-  },
-  "exitStrategy": {
-    "plannedExitDate": "2035-03-20",
-    "exitMethod": "Sale to Management Team",
-    "expectedSaleValue": {
-      "amount": 500000.00,
-      "currency": {
-        "code": "GBP",
-        "symbol": "£"
-      }
-    }
-  },
-  "notes": "Profitable software consultancy - considering expansion in 2027",
-  "createdAt": "2026-01-10T09:00:00Z",
-  "updatedAt": "2026-02-01T11:00:00Z"
-}
-```
-
-#### Field Definitions
-
-| Field | Type | Behavior | Description |
-|-------|------|----------|-------------|
-| `id` | integer | read-only | System-assigned business asset identifier |
-| `href` | string | read-only | Canonical URI for this business asset |
-| `assetRef` | AssetRef | read-only | Reference to parent asset |
-| `businessName` | string | required-on-create | Business name (max 200 chars) |
-| `companyNumber` | string | optional | Companies House registration number |
-| `incorporationDate` | date | optional | Date business was incorporated |
-| `businessType.code` | enum | required-on-create | Business structure code |
-| `businessType.display` | string | read-only | Business structure display |
-| `industry.code` | enum | optional | Industry sector code |
-| `industry.display` | string | read-only | Industry sector display |
-| `ownershipStructure` | OwnershipValue | optional | Shareholding details |
-| `valuationBasis.code` | enum | required-on-create | Valuation method code |
-| `valuationBasis.display` | string | read-only | Valuation method display |
-| `valuations[]` | array | read-only | Historical valuations |
-| `dividendPolicy` | DividendPolicyValue | optional | Dividend distribution details |
-| `taxReliefs` | TaxReliefsValue | optional | Tax relief eligibility |
-| `financials` | FinancialsValue | optional | Financial performance |
-| `exitStrategy` | ExitStrategyValue | optional | Exit planning details |
-| `notes` | string | optional | Additional notes (max 2000 chars) |
-| `createdAt` | datetime | read-only | ISO 8601 timestamp of creation |
-| `updatedAt` | datetime | read-only | ISO 8601 timestamp of last update |
-
----
-
 ### 14.26 Notes Contract
 
 The `Notes` contract represents a note attached to a fact find entity using a unified discriminator pattern.
@@ -26100,12 +26098,12 @@ The `Notes` contract represents a note attached to a fact find entity using a un
 {
   "id": 888,
   "href": "/api/v2/factfinds/679/notes/888",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
   "noteDiscriminator": "ASSET_NOTES",
-  "entityRef": {
+  "entity": {
     "type": "Asset",
     "id": 1234,
     "href": "/api/v2/factfinds/679/clients/346/assets/1234"
@@ -26139,7 +26137,7 @@ The `Notes` contract represents a note attached to a fact find entity using a un
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned note identifier |
 | `href` | string | read-only | Canonical URI for this note |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
 | `noteDiscriminator.code` | enum | required-on-create | Note type discriminator code |
 | `noteDiscriminator.display` | string | read-only | Note type display |
 | `entityRef` | EntityRef | optional | Reference to related entity |
@@ -26190,7 +26188,7 @@ The `Dependant` contract represents a dependent family member of one or more cli
 {
   "id": 999,
   "href": "/api/v2/factfinds/679/dependants/999",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -26220,6 +26218,7 @@ The `Dependant` contract represents a dependent family member of one or more cli
       "amount": 800.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26227,6 +26226,7 @@ The `Dependant` contract represents a dependent family member of one or more cli
       "amount": 9600.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -26239,6 +26239,7 @@ The `Dependant` contract represents a dependent family member of one or more cli
       "amount": 50000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -26264,7 +26265,7 @@ The `Dependant` contract represents a dependent family member of one or more cli
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned dependant identifier |
 | `href` | string | read-only | Canonical URI for this dependant |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
 | `clients[]` | array | required-on-create | Array of client references (min 1, supports multiple parents) |
 | `clients[].id` | integer | required | Client identifier |
 | `clients[].href` | string | read-only | Client URI |
@@ -26322,15 +26323,15 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 {
   "id": 345,
   "href": "/api/v2/factfinds/679/clients/346/income-changes/345",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
-  "incomeRef": {
+  "income": {
     "id": 890,
     "href": "/api/v2/factfinds/679/clients/346/income/890"
   },
@@ -26339,23 +26340,26 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
   "currentAmount": {
     "amount": 75000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "newAmount": {
     "amount": 85000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "changeAmount": {
     "amount": 10000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "changePercentage": 13.33,
   "effectiveDate": "2026-04-01",
@@ -26366,6 +26370,7 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
       "amount": 625.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26383,9 +26388,9 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned income change identifier |
 | `href` | string | read-only | Canonical URI for this income change |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to client |
-| `incomeRef` | IncomeRef | optional | Reference to existing income source |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
+| `client` | ClientRef | read-only | Reference to client |
+| `income` | IncomeRef | optional | Reference to existing income source |
 | `changeType.code` | enum | required-on-create | Change type code (INCREASE, DECREASE, NEW, CEASE) |
 | `changeType.display` | string | read-only | Human-readable change type |
 | `description` | string | required-on-create | Description of income change (max 500 chars) |
@@ -26441,11 +26446,11 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 {
   "id": 456,
   "href": "/api/v2/factfinds/679/clients/346/expenditure-changes/456",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -26458,23 +26463,26 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
   "currentAmount": {
     "amount": 1200.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "newAmount": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "changeAmount": {
     "amount": -1200.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "changePercentage": -100.0,
   "effectiveDate": "2027-06-01",
@@ -26485,6 +26493,7 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
       "amount": 1200.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26502,8 +26511,8 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned expenditure change identifier |
 | `href` | string | read-only | Canonical URI for this expenditure change |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to client |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
+| `client` | ClientRef | read-only | Reference to client |
 | `expenseRef` | ExpenseRef | optional | Reference to existing expense |
 | `changeType.code` | enum | required-on-create | Change type code (INCREASE, DECREASE, NEW, CEASE) |
 | `changeType.display` | string | read-only | Human-readable change type |
@@ -26523,7 +26532,7 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 
 ---
 
-### 14.30 Affordability Assessment Contract
+### 14.30 Affordability
 
 The `AffordabilityAssessment` contract represents a mortgage affordability calculation with stress testing and regulatory compliance checks.
 
@@ -26537,13 +26546,13 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
 - Multiple scenario modeling
 - Surplus income calculations
 
-#### Complete Affordability Assessment Contract
+#### Complete Affordability Contract
 
 ```json
 {
   "id": 1111,
   "href": "/api/v2/factfinds/679/affordability-assessments/1111",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -26551,13 +26560,13 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
   "assessmentType": "MORTGAGE_AFFORDABILITY",
   "clients": [
     {
-      "clientRef": {
+      "client": {
         "id": 123,
         "href": "/api/v2/factfinds/679/clients/123"
       }
     },
     {
-      "clientRef": {
+      "client": {
         "id": 124,
         "href": "/api/v2/factfinds/679/clients/124"
       }
@@ -26568,6 +26577,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 95000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26575,6 +26585,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 68000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26582,6 +26593,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 7916.67,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26589,6 +26601,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 5666.67,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26599,9 +26612,10 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
         "amount": {
           "amount": 75000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       },
       {
@@ -26610,9 +26624,10 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
         "amount": {
           "amount": 20000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       }
     ]
@@ -26622,6 +26637,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 3250.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26629,6 +26645,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 2800.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26636,6 +26653,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 450.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26643,6 +26661,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -26652,6 +26671,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 350000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26661,6 +26681,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 1945.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26671,6 +26692,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 1471.67,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26685,6 +26707,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 2475.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26692,6 +26715,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 941.67,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26708,6 +26732,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
       "amount": 375000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -26724,7 +26749,7 @@ The `AffordabilityAssessment` contract represents a mortgage affordability calcu
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned assessment identifier |
 | `href` | string | read-only | Canonical URI for this assessment |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
 | `assessmentDate` | date | required-on-create | Date of assessment |
 | `assessmentType.code` | enum | required-on-create | Assessment type code |
 | `assessmentType.display` | string | read-only | Human-readable assessment type |
@@ -26760,11 +26785,11 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 {
   "id": 2222,
   "href": "/api/v2/factfinds/679/clients/123/contacts/2222",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -26788,8 +26813,8 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned contact identifier |
 | `href` | string | read-only | Canonical URI for this contact |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to client |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
+| `client` | ClientRef | read-only | Reference to client |
 | `contactType.code` | enum | required-on-create | Contact type code |
 | `contactType.display` | string | read-only | Human-readable contact type |
 | `value` | string | required-on-create | Contact value (email, phone number, URL) |
@@ -26836,11 +26861,11 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 {
   "id": 3333,
   "href": "/api/v2/factfinds/679/clients/123/attitude-to-risk/3333",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -26891,8 +26916,8 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned ATR identifier |
 | `href` | string | read-only | Canonical URI for this ATR |
-| `factfindRef` | FactfindRef | read-only | Reference to parent fact find |
-| `clientRef` | ClientRef | read-only | Reference to client |
+| `factfind` | FactfindRef | read-only | Reference to parent fact find |
+| `client` | ClientRef | read-only | Reference to client |
 | `assessmentDate` | date | required-on-create | Date assessment was completed |
 | `assessmentMethod.code` | enum | required-on-create | Assessment method code |
 | `assessmentMethod.display` | string | read-only | Human-readable assessment method |
@@ -26957,11 +26982,11 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 {
   "id": 4444,
   "href": "/api/v2/factfinds/679/clients/123/professional-contacts/4444",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -27027,11 +27052,11 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 {
   "id": 5555,
   "href": "/api/v2/factfinds/679/clients/123/vulnerabilities/5555",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -27134,11 +27159,11 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 {
   "id": 6666,
   "href": "/api/v2/factfinds/679/clients/123/marketing-preferences/6666",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -27219,11 +27244,11 @@ The `Will` contract represents a client's last will and testament details.
 {
   "id": 7777,
   "href": "/api/v2/factfinds/679/clients/123/estate-planning/wills/7777",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -27305,11 +27330,11 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 {
   "id": 8888,
   "href": "/api/v2/factfinds/679/clients/123/estate-planning/lpas/8888",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -27397,11 +27422,11 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 {
   "id": 9999,
   "href": "/api/v2/factfinds/679/clients/123/estate-planning/gifts/9999",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -27415,9 +27440,10 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
   "giftValue": {
     "amount": 25000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "giftDescription": "Cash gift to help with house deposit",
   "isRegularGift": false,
@@ -27428,9 +27454,10 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
       "exemptionAmount": {
         "amount": 3000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "taxYear": "2024/25"
     }
@@ -27450,6 +27477,7 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
       "amount": 22000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -27502,11 +27530,11 @@ The `Trust` contract represents trusts established by or benefiting the client.
 {
   "id": 10001,
   "href": "/api/v2/factfinds/679/clients/123/estate-planning/trusts/10001",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -27548,6 +27576,7 @@ The `Trust` contract represents trusts established by or benefiting the client.
       "amount": 150000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27619,11 +27648,11 @@ The `IdentityVerification` contract represents identity verification checks and 
 {
   "id": 11111,
   "href": "/api/v2/factfinds/679/clients/123/identity-verification/11111",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -27766,7 +27795,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
 {
   "id": 5001,
   "href": "/api/v2/factfinds/679/arrangements/mortgages/5001",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -27802,6 +27831,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 250000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27809,6 +27839,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 235000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27816,6 +27847,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 132000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27823,6 +27855,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27830,6 +27863,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 382000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27837,6 +27871,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 385000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27864,6 +27899,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 200000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27873,6 +27909,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 50000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27885,6 +27922,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 5000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27896,6 +27934,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 995.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27927,6 +27966,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 7500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27934,6 +27974,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27941,6 +27982,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 227500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -27970,6 +28012,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -27979,6 +28022,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -28377,7 +28421,7 @@ The `InvestmentArrangement` contract represents investment products including GI
 {
   "id": 13001,
   "href": "/api/v2/factfinds/679/arrangements/investments/13001",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -28385,11 +28429,11 @@ The `InvestmentArrangement` contract represents investment products including GI
   "investmentType": "GENERAL_INVESTMENT_ACCOUNT",
   "productName": "Vanguard Investment Account",
   "providerName": "Vanguard",
-  "providerRef": {
+  "provider": {
     "id": 456,
     "href": "/api/v2/providers/456"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -28398,24 +28442,27 @@ The `InvestmentArrangement` contract represents investment products including GI
   "currentValue": {
     "amount": 75000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalContributions": {
     "amount": 60000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "gainLoss": {
     "amount": 15000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 25.0
   },
   "assetAllocation": {
@@ -28432,9 +28479,10 @@ The `InvestmentArrangement` contract represents investment products including GI
       "currentValue": {
         "amount": 45000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 60.0
     },
@@ -28445,9 +28493,10 @@ The `InvestmentArrangement` contract represents investment products including GI
       "currentValue": {
         "amount": 25000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 33.3
     },
@@ -28458,9 +28507,10 @@ The `InvestmentArrangement` contract represents investment products including GI
       "currentValue": {
         "amount": 5000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 6.7
     }
@@ -28470,6 +28520,7 @@ The `InvestmentArrangement` contract represents investment products including GI
       "amount": 500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28550,7 +28601,7 @@ The `ProtectionArrangement` contract represents protection products including Li
 {
   "id": 20001,
   "href": "/api/v2/factfinds/679/arrangements/protection/20001",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -28559,11 +28610,11 @@ The `ProtectionArrangement` contract represents protection products including Li
   "policyType": "DECREASING_TERM",
   "productName": "Mortgage Protection Plan",
   "providerName": "Aviva",
-  "providerRef": {
+  "provider": {
     "id": 789,
     "href": "/api/v2/providers/789"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -28577,24 +28628,27 @@ The `ProtectionArrangement` contract represents protection products including Li
   "sumAssured": {
     "amount": 350000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "currentSumAssured": {
     "amount": 325000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "note": "Decreasing with mortgage balance"
   },
   "premium": {
     "amount": 45.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "premiumFrequency": "MONTHLY",
   "premiumType": "GUARANTEED",
@@ -28617,11 +28671,11 @@ The `ProtectionArrangement` contract represents protection products including Li
     }
   ],
   "linkedTo": {
-    "mortgageRef": {
+    "mortgage": {
       "id": 12001,
       "href": "/api/v2/factfinds/679/arrangements/mortgages/12001"
     },
-    "liabilityRef": {
+    "liability": {
       "id": 5678,
       "href": "/api/v2/factfinds/679/clients/346/liabilities/5678"
     }
@@ -28690,7 +28744,7 @@ The `PensionArrangement` contract represents pension products including Personal
 {
   "id": 30001,
   "href": "/api/v2/factfinds/679/arrangements/pensions/30001",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -28698,11 +28752,11 @@ The `PensionArrangement` contract represents pension products including Personal
   "pensionType": "PERSONAL_PENSION",
   "productName": "Vanguard Personal Pension",
   "providerName": "Vanguard",
-  "providerRef": {
+  "provider": {
     "id": 456,
     "href": "/api/v2/providers/456"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -28711,24 +28765,27 @@ The `PensionArrangement` contract represents pension products including Personal
   "currentValue": {
     "amount": 185000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalContributions": {
     "amount": 120000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "growthToDate": {
     "amount": 65000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 54.2
   },
   "regularContributions": {
@@ -28736,6 +28793,7 @@ The `PensionArrangement` contract represents pension products including Personal
       "amount": 800.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28743,6 +28801,7 @@ The `PensionArrangement` contract represents pension products including Personal
       "amount": 640.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28750,6 +28809,7 @@ The `PensionArrangement` contract represents pension products including Personal
       "amount": 160.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28763,31 +28823,35 @@ The `PensionArrangement` contract represents pension products including Personal
   "crystallisedAmount": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedAmount": {
     "amount": 185000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxFreeCashAvailable": {
     "amount": 46250.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 25
   },
   "lifetimeAllowanceUsed": {
     "amount": 185000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 16.4,
     "note": "Lifetime Allowance abolished from April 2024"
   },
@@ -28805,9 +28869,10 @@ The `PensionArrangement` contract represents pension products including Personal
       "currentValue": {
         "amount": 148000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 80.0
     },
@@ -28818,9 +28883,10 @@ The `PensionArrangement` contract represents pension products including Personal
       "currentValue": {
         "amount": 27750.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 15.0
     },
@@ -28830,9 +28896,10 @@ The `PensionArrangement` contract represents pension products including Personal
       "currentValue": {
         "amount": 9250.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 5.0
     }
@@ -28842,6 +28909,7 @@ The `PensionArrangement` contract represents pension products including Personal
       "amount": 285000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28849,6 +28917,7 @@ The `PensionArrangement` contract represents pension products including Personal
       "amount": 340000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28856,6 +28925,7 @@ The `PensionArrangement` contract represents pension products including Personal
       "amount": 410000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28867,9 +28937,10 @@ The `PensionArrangement` contract represents pension products including Personal
       "amount": {
         "amount": 185000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "isInTrust": true,
@@ -28936,7 +29007,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
 {
   "id": 30002,
   "href": "/api/v2/factfinds/679/arrangements/pensions/30002",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -28944,11 +29015,11 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
   "pensionType": "SIPP",
   "productName": "Self-Invested Personal Pension",
   "providerName": "Hargreaves Lansdown",
-  "providerRef": {
+  "provider": {
     "id": 789,
     "href": "/api/v2/providers/789"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -28957,24 +29028,27 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
   "currentValue": {
     "amount": 425000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalContributions": {
     "amount": 280000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "growthToDate": {
     "amount": 145000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 51.8
   },
   "regularContributions": {
@@ -28982,6 +29056,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 1250.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28989,6 +29064,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 1000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -28996,6 +29072,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 250.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29009,23 +29086,26 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
   "crystallisedAmount": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedAmount": {
     "amount": 425000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxFreeCashAvailable": {
     "amount": 106250.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 25
   },
   "assetAllocation": {
@@ -29043,9 +29123,10 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "currentValue": {
         "amount": 195000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 45.9
     },
@@ -29056,9 +29137,10 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "currentValue": {
         "amount": 63750.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 15.0
     },
@@ -29068,9 +29150,10 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "currentValue": {
         "amount": 145000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 34.1,
       "assetType": "CommercialProperty",
@@ -29080,23 +29163,26 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
         "purchasePrice": {
           "amount": 120000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         },
         "currentValuation": {
           "amount": 145000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         },
         "rentalIncome": {
           "amount": 850.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
           "frequency": "MONTHLY"
         }
       }
@@ -29107,9 +29193,10 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "currentValue": {
         "amount": 21250.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 5.0
     }
@@ -29128,6 +29215,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 585000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29135,6 +29223,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 720000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29142,6 +29231,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 890000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29153,9 +29243,10 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": {
         "amount": 425000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "isInTrust": true,
@@ -29182,6 +29273,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       },
       "waived": true
@@ -29190,6 +29282,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 400.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29198,6 +29291,7 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "amount": 200.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       },
       "period": "QUARTERLY"
@@ -29206,25 +29300,28 @@ The `SIPPArrangement` contract represents Self-Invested Personal Pensions, which
       "equityDealingFee": {
         "amount": 11.95,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "fundDealingFee": {
         "amount": 0.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "propertyRelatedFees": {
       "annualPropertyFee": {
         "amount": 900.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "conveyancingFees": "Client pays separately",
       "valuationFees": "Client pays separately"
@@ -29317,7 +29414,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
 {
   "id": 30003,
   "href": "/api/v2/factfinds/679/arrangements/pensions/30003",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -29326,11 +29423,11 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
   "schemeType": "DEFINED_BENEFIT",
   "productName": "ABC Corporation Pension Scheme",
   "providerName": "ABC Corporation",
-  "providerRef": {
+  "provider": {
     "id": 999,
     "href": "/api/v2/providers/999"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -29352,6 +29449,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 58000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29372,6 +29470,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 16837.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29379,6 +29478,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 1403.08,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29391,6 +29491,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 16100.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29398,6 +29499,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 1341.67,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29444,6 +29546,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29454,6 +29557,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 50509.25,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       },
       "calculation": "£16,837 × 3 = £50,511 (25% of CETV £202,037)"
@@ -29464,6 +29568,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 415000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29480,9 +29585,10 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "annualAmount": {
         "amount": 8418.50,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "payableFor": "Spouse's lifetime"
     },
@@ -29491,9 +29597,10 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "annualAmountPerChild": {
         "amount": 4209.25,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "payableUntil": "Age 18 (or 23 if in full-time education)"
     },
@@ -29501,6 +29608,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 174000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       },
       "calculation": "3 × Final Pensionable Salary"
@@ -29518,6 +29626,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 18500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29533,6 +29642,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 2450.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -29543,6 +29653,7 @@ The `DefinedBenefitPensionArrangement` contract represents Final Salary and Defi
       "amount": 30000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29685,7 +29796,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
 {
   "id": 30004,
   "href": "/api/v2/factfinds/679/arrangements/pensions/30004",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -29693,11 +29804,11 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
   "pensionType": "MONEY_PURCHASE",
   "productName": "XYZ Corporation Group Money Purchase Scheme",
   "providerName": "Scottish Widows",
-  "providerRef": {
+  "provider": {
     "id": 555,
     "href": "/api/v2/providers/555"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -29708,7 +29819,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
     "employerName": "XYZ Corporation Ltd",
     "schemeJoinDate": "2019-01-01",
     "isActiveEmployee": true,
-    "employmentRef": {
+    "employment": {
       "id": 1001,
       "href": "/api/v2/factfinds/679/employment/1001"
     }
@@ -29716,9 +29827,10 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
   "currentValue": {
     "amount": 48500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalContributions": {
@@ -29726,6 +29838,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "amount": 15800.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29733,6 +29846,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "amount": 23700.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29740,6 +29854,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "amount": 39500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -29747,9 +29862,10 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
   "growthToDate": {
     "amount": 9000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 22.8
   },
   "contributionStructure": {
@@ -29759,23 +29875,26 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "grossAmount": {
         "amount": 220.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netAmount": {
         "amount": 176.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "taxRelief": {
         "amount": 44.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
         "method": "NET_PAY"
       },
       "frequency": "MONTHLY",
@@ -29788,9 +29907,10 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "grossAmount": {
         "amount": 330.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "frequency": "MONTHLY",
       "matchingStructure": {
@@ -29804,15 +29924,17 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "nationalInsuranceSaving": {
         "amount": 45.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "totalMonthlyContribution": {
       "amount": 550.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -29842,23 +29964,26 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
   "crystallisedAmount": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedAmount": {
     "amount": 48500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxFreeCashAvailable": {
     "amount": 12125.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 25
   },
   "assetAllocation": {
@@ -29875,9 +30000,10 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "currentValue": {
         "amount": 48500.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 100.0,
       "isDefaultFund": true
@@ -29896,6 +30022,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "amount": 92000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29903,6 +30030,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "amount": 115000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29910,6 +30038,7 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "amount": 145000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -29922,9 +30051,10 @@ The `MoneyPurchasePensionArrangement` contract represents Defined Contribution p
       "amount": {
         "amount": 48500.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "isInTrust": true,
@@ -30043,7 +30173,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
 {
   "id": 30005,
   "href": "/api/v2/factfinds/679/arrangements/pensions/30005",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -30051,7 +30181,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
   "pensionType": "STATE_PENSION",
   "productName": "UK State Pension",
   "providerName": "Department for Work and Pensions (DWP)",
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -30076,6 +30206,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "amount": 140.35,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30083,6 +30214,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "amount": 7298.20,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30090,6 +30222,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "amount": 203.85,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30097,6 +30230,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "amount": 10600.20,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30104,6 +30238,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "amount": 221.20,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30111,6 +30246,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "amount": 11502.40,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30132,16 +30268,18 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "weeklyAmount": {
         "amount": 17.35,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "annualAmount": {
         "amount": 902.20,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "affectsStatePension": true,
@@ -30154,6 +30292,7 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "amount": 824.20,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30161,16 +30300,18 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "weeklyAmount": {
         "amount": 6.32,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "annualAmount": {
         "amount": 328.64,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "perYearFilled": true
     },
@@ -30185,32 +30326,36 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "weeklyIncrease": {
         "amount": 12.83,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "newWeeklyAmount": {
         "amount": 234.03,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "deferredFor5Years": {
       "weeklyIncrease": {
         "amount": 64.15,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "newWeeklyAmount": {
         "amount": 285.35,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "lumpSumOption": false,
@@ -30226,9 +30371,10 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
         "weeklyAmount": {
           "amount": 17.30,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       }
     }
@@ -30239,9 +30385,10 @@ The `StatePensionArrangement` contract represents State Pension entitlement, inc
       "weeklyAmount": {
         "amount": 2.45,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "statePensionCredit": {
@@ -30371,7 +30518,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
 {
   "id": 30006,
   "href": "/api/v2/factfinds/679/arrangements/pensions/30006",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -30379,11 +30526,11 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
   "pensionType": "STAKEHOLDER_PENSION",
   "productName": "Standard Life Stakeholder Pension",
   "providerName": "Standard Life",
-  "providerRef": {
+  "provider": {
     "id": 333,
     "href": "/api/v2/providers/333"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -30393,24 +30540,27 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
   "currentValue": {
     "amount": 23400.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalContributions": {
     "amount": 19800.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "growthToDate": {
     "amount": 3600.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 18.2
   },
   "regularContributions": {
@@ -30418,6 +30568,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "amount": 200.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30425,6 +30576,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "amount": 160.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30432,6 +30584,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "amount": 40.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30447,6 +30600,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "amount": 20.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30465,9 +30619,10 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "minimumChangeAmount": {
         "amount": 20.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "isPortable": true,
@@ -30480,23 +30635,26 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
   "crystallisedAmount": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedAmount": {
     "amount": 23400.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxFreeCashAvailable": {
     "amount": 5850.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 25
   },
   "assetAllocation": {
@@ -30512,9 +30670,10 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "currentValue": {
         "amount": 23400.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 100.0,
       "isDefaultFund": true,
@@ -30526,6 +30685,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "amount": 42000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30533,6 +30693,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "amount": 52000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30540,6 +30701,7 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "amount": 65000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30551,9 +30713,10 @@ The `StakeholderPensionArrangement` contract represents Stakeholder Pensions, wh
       "amount": {
         "amount": 23400.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "isInTrust": true,
@@ -30648,7 +30811,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
 {
   "id": 30007,
   "href": "/api/v2/factfinds/679/arrangements/pensions/30007",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -30656,11 +30819,11 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
   "pensionType": "GROUP_PERSONAL_PENSION",
   "productName": "Aviva Group Personal Pension",
   "providerName": "Aviva",
-  "providerRef": {
+  "provider": {
     "id": 777,
     "href": "/api/v2/providers/777"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -30671,7 +30834,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
     "employerName": "ABC Manufacturing Ltd",
     "schemeJoinDate": "2020-10-01",
     "isActiveEmployee": true,
-    "employmentRef": {
+    "employment": {
       "id": 1002,
       "href": "/api/v2/factfinds/679/employment/1002"
     },
@@ -30690,9 +30853,10 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
   "currentValue": {
     "amount": 36800.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalContributions": {
@@ -30700,6 +30864,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": 12600.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30707,6 +30872,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": 18900.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30714,6 +30880,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": 31500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -30721,9 +30888,10 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
   "growthToDate": {
     "amount": 5300.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 16.8
   },
   "contributionStructure": {
@@ -30733,23 +30901,26 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "grossAmount": {
         "amount": 200.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netAmount": {
         "amount": 160.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "taxRelief": {
         "amount": 40.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
         "method": "RELIEF_AT_SOURCE"
       },
       "frequency": "MONTHLY",
@@ -30762,9 +30933,10 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "grossAmount": {
         "amount": 300.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "frequency": "MONTHLY"
     },
@@ -30772,6 +30944,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": 500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -30791,23 +30964,26 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
   "crystallisedAmount": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedAmount": {
     "amount": 36800.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxFreeCashAvailable": {
     "amount": 9200.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 25
   },
   "investmentChoice": {
@@ -30821,6 +30997,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -30838,9 +31015,10 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "currentValue": {
         "amount": 29440.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 80.0,
       "fundCharge": 0.18
@@ -30852,9 +31030,10 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "currentValue": {
         "amount": 5520.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 15.0,
       "fundCharge": 0.12
@@ -30865,9 +31044,10 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "currentValue": {
         "amount": 1840.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 5.0,
       "fundCharge": 0.05
@@ -30878,6 +31058,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": 78000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30885,6 +31066,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": 98000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30892,6 +31074,7 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": 124000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -30903,9 +31086,10 @@ The `GroupPersonalPensionArrangement` contract represents Group Personal Pension
       "amount": {
         "amount": 36800.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "isInTrust": true,
@@ -31025,7 +31209,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
 {
   "id": 30008,
   "href": "/api/v2/factfinds/679/arrangements/pensions/30008",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -31033,11 +31217,11 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
   "pensionType": "EXECUTIVE_PENSION_PLAN",
   "productName": "Quilter Executive Pension Plan",
   "providerName": "Quilter",
-  "providerRef": {
+  "provider": {
     "id": 888,
     "href": "/api/v2/providers/888"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -31050,7 +31234,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
     "memberDirector": true,
     "schemeSetupDate": "2012-04-06",
     "isCompanyDirector": true,
-    "employmentRef": {
+    "employment": {
       "id": 1003,
       "href": "/api/v2/factfinds/679/employment/1003"
     }
@@ -31058,9 +31242,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
   "currentValue": {
     "amount": 685000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalContributions": {
@@ -31068,6 +31253,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31075,6 +31261,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 480000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31082,6 +31269,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31089,6 +31277,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 480000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -31096,9 +31285,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
   "growthToDate": {
     "amount": 205000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 42.7
   },
   "contributionStructure": {
@@ -31108,9 +31298,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "grossAmount": {
         "amount": 0.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "isActive": false
     },
@@ -31119,9 +31310,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "annualAmount": {
         "amount": 40000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "frequency": "ANNUALLY",
       "contributionMonth": "APRIL",
@@ -31135,9 +31327,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "avcAmount": {
         "amount": 0.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     }
   },
@@ -31146,6 +31339,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 40000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31153,6 +31347,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 20000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31160,6 +31355,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 0.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31168,16 +31364,18 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "adjustedIncome": {
         "amount": 0.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "reducedAllowance": {
         "amount": 60000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     },
     "moneyPurchaseAnnualAllowance": {
@@ -31190,23 +31388,26 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
   "crystallisedAmount": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "uncrystallisedAmount": {
     "amount": 685000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "taxFreeCashAvailable": {
     "amount": 171250.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 25
   },
   "investmentManagement": {
@@ -31236,9 +31437,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "currentValue": {
         "amount": 376750.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 55.0
     },
@@ -31249,9 +31451,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "currentValue": {
         "amount": 171250.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 25.0
     },
@@ -31262,9 +31465,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "currentValue": {
         "amount": 68500.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 10.0
     },
@@ -31275,9 +31479,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "currentValue": {
         "amount": 47950.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 7.0
     },
@@ -31287,9 +31492,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "currentValue": {
         "amount": 20550.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 3.0
     }
@@ -31299,6 +31505,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 985000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31306,6 +31513,7 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 1240000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31313,8 +31521,9 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": 1580000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
-        }
+      }
       }
     },
     "assumedRetirementAge": 60
@@ -31325,24 +31534,27 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "amount": {
         "amount": 685000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "lumpSumLifeCover": {
         "amount": 480000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
         "calculation": "4 × Executive Salary (£120,000)"
       },
       "totalDeathBenefit": {
         "amount": 1165000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
         "explanation": "Fund value (£685,000) + Life cover (£480,000)"
       }
     },
@@ -31386,9 +31598,10 @@ The `ExecutivePensionPlanArrangement` contract represents Executive Pension Plan
       "coverAmount": {
         "amount": 6000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
         "period": "MONTHLY"
       },
       "deferredPeriod": 13,
@@ -31506,7 +31719,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
 {
   "id": 13002,
   "href": "/api/v2/factfinds/679/arrangements/investments/13002",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -31514,11 +31727,11 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
   "investmentType": "STOCKS_SHARES_ISA",
   "productName": "Vanguard Stocks & Shares ISA",
   "providerName": "Vanguard",
-  "providerRef": {
+  "provider": {
     "id": 456,
     "href": "/api/v2/providers/456"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -31527,24 +31740,27 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
   "currentValue": {
     "amount": 142000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalContributions": {
     "amount": 98000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "gainLoss": {
     "amount": 44000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 44.9
   },
   "isaAllowanceTracking": {
@@ -31553,6 +31769,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 20000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31560,6 +31777,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 15000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31567,6 +31785,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 5000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31576,9 +31795,10 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
         "subscribed": {
           "amount": 15000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       },
       {
@@ -31586,9 +31806,10 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
         "subscribed": {
           "amount": 20000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       },
       {
@@ -31596,9 +31817,10 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
         "subscribed": {
           "amount": 20000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       }
     ],
@@ -31606,6 +31828,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 98000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -31615,6 +31838,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 1250.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31626,6 +31850,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 15000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -31644,9 +31869,10 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "currentValue": {
         "amount": 113600.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 80.0,
       "fundCharge": 0.22
@@ -31659,9 +31885,10 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "currentValue": {
         "amount": 21300.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 15.0,
       "fundCharge": 0.15
@@ -31672,9 +31899,10 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "currentValue": {
         "amount": 7100.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 5.0
     }
@@ -31687,9 +31915,10 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
         "amount": {
           "amount": 5000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         },
         "purpose": "Christmas expenses",
         "impactsAllowance": false
@@ -31699,6 +31928,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 5000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -31710,6 +31940,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 5000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31717,6 +31948,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 5000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31724,6 +31956,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 10000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       },
       "calculation": "Standard remaining (£5,000) + Withdrawal replacement (£5,000)"
@@ -31737,9 +31970,10 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
         "amount": {
           "amount": 15000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         },
         "taxYear": "2018/19"
       }
@@ -31748,6 +31982,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 15000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -31762,6 +31997,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 3200.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31769,6 +32005,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 150.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31776,6 +32013,7 @@ The `StocksSharesISAArrangement` contract represents Stocks & Shares ISAs, tax-e
       "amount": 3350.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31896,7 +32134,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
 {
   "id": 13003,
   "href": "/api/v2/factfinds/679/arrangements/investments/13003",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -31904,11 +32142,11 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
   "investmentType": "CASH_ISA",
   "productName": "Premium Cash ISA",
   "providerName": "Nationwide Building Society",
-  "providerRef": {
+  "provider": {
     "id": 111,
     "href": "/api/v2/providers/111"
   },
-  "clientRef": {
+  "client": {
     "id": 123,
     "href": "/api/v2/factfinds/679/clients/123"
   },
@@ -31918,24 +32156,27 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
   "currentValue": {
     "amount": 18500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "totalDeposits": {
     "amount": 18000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "totalInterestEarned": {
     "amount": 500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "isaAllowanceTracking": {
     "currentTaxYear": "2025/26",
@@ -31943,6 +32184,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
       "amount": 20000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31950,6 +32192,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
       "amount": 4000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31957,6 +32200,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
       "amount": 16000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -31966,9 +32210,10 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
         "subscribed": {
           "amount": 4000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       },
       {
@@ -31976,9 +32221,10 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
         "subscribed": {
           "amount": 14000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       }
     ],
@@ -31986,6 +32232,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
       "amount": 18000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -32004,6 +32251,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
       "amount": 500.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -32026,6 +32274,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
       "amount": 2000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -32033,6 +32282,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
       "amount": 2000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -32042,6 +32292,7 @@ The `CashISAArrangement` contract represents Cash ISAs, tax-free savings account
       "amount": 780.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -32140,7 +32391,7 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
 {
   "id": 13004,
   "href": "/api/v2/factfinds/679/arrangements/investments/13004",
-  "factfindRef": {
+  "factfind": {
     "id": 679,
     "href": "/api/v2/factfinds/679"
   },
@@ -32149,11 +32400,11 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
   "lisaType": "STOCKS_SHARES_LISA",
   "productName": "Moneybox Lifetime ISA",
   "providerName": "Moneybox",
-  "providerRef": {
+  "provider": {
     "id": 222,
     "href": "/api/v2/providers/222"
   },
-  "clientRef": {
+  "client": {
     "id": 456,
     "href": "/api/v2/factfinds/679/clients/456"
   },
@@ -32163,31 +32414,35 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
   "currentValue": {
     "amount": 17200.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "valuationDate": "2026-02-18",
   "memberContributions": {
     "amount": 12000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "governmentBonus": {
     "amount": 3000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
   },
   "investmentGrowth": {
     "amount": 2200.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    },
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      },
     "percentage": 14.7
   },
   "lisaAllowanceTracking": {
@@ -32196,6 +32451,7 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "amount": 4000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -32203,6 +32459,7 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "amount": 3000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -32210,6 +32467,7 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "amount": 1000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -32217,6 +32475,7 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "amount": 750.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -32226,16 +32485,18 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
         "memberContribution": {
           "amount": 3000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         },
         "governmentBonus": {
           "amount": 750.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       },
       {
@@ -32243,16 +32504,18 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
         "memberContribution": {
           "amount": 4000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         },
         "governmentBonus": {
           "amount": 1000.00,
           "currency": {
-            "code": "GBP",
-            "symbol": "£"
-          }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
         }
       }
     ]
@@ -32262,6 +32525,7 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "amount": 250.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     },
@@ -32272,6 +32536,7 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "amount": 3000.00,
       "currency": {
         "code": "GBP",
+        "display": "British Pound",
         "symbol": "£"
       }
     }
@@ -32289,9 +32554,10 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "currentValue": {
         "amount": 15480.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 90.0
     },
@@ -32301,9 +32567,10 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "currentValue": {
         "amount": 1720.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "percentage": 10.0
     }
@@ -32325,9 +32592,10 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "maxPropertyPrice": {
         "amount": 450000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "mustBeUKProperty": true,
       "mustBeMainResidence": true,
@@ -32340,38 +32608,43 @@ The `LifetimeISAArrangement` contract represents Lifetime ISAs (LISA), designed 
       "currentValue": {
         "amount": 17200.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "penaltyPercentage": 25.0,
       "penaltyAmount": {
         "amount": 4300.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "netProceeds": {
         "amount": 12900.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "bonusLost": {
         "amount": 3000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       },
       "growthLost": {
         "amount": 1300.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
-        }
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
       }
     }
   },
@@ -32487,43 +32760,83 @@ The `OnshoreInvestmentBondArrangement` contract represents onshore investment bo
 {
   "id": 13005,
   "href": "/api/v2/factfinds/679/arrangements/investments/13005",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "INVESTMENT",
   "investmentType": "INVESTMENT_BOND_ONSHORE",
   "productName": "Prudential International Investment Bond",
   "providerName": "Prudential",
-  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
+  "client": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "BOND-123456789",
   "startDate": "2018-03-15",
-  "currentValue": {"amount": 285000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "currentValue": {"amount": 285000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "valuationDate": "2026-02-18",
   "premiumStructure": {
     "premiumType": "SINGLE_PREMIUM",
-    "initialPremium": {"amount": 200000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "additionalPremiums": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "totalInvested": {"amount": 250000.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "initialPremium": {"amount": 200000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "additionalPremiums": {"amount": 50000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "totalInvested": {"amount": 250000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "bondStructure": {
     "numberOfSegments": 100,
-    "segmentValue": {"amount": 2850.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "segmentValue": {"amount": 2850.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "segmentsRemaining": 100,
     "segmentsSurrendered": 0
   },
   "withdrawalAllowance": {
     "annualAllowancePercentage": 5.0,
-    "cumulativeAllowanceAvailable": {"amount": 100000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "withdrawalsTaken": {"amount": 0.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "allowanceRemaining": {"amount": 100000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "cumulativeAllowanceAvailable": {"amount": 100000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "withdrawalsTaken": {"amount": 0.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "allowanceRemaining": {"amount": 100000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "yearsElapsed": 8,
     "calculation": "£250,000 × 5% × 8 years = £100,000 cumulative allowance"
   },
   "taxPosition": {
     "bondType": "ONSHORE",
     "taxTreatment": "TAX_DEFERRED",
-    "chargeableGain": {"amount": 35000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "chargeableGain": {"amount": 35000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "topSlicingReliefAvailable": true,
     "yearsHeld": 8,
-    "averageGainPerYear": {"amount": 4375.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "averageGainPerYear": {"amount": 4375.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "basicRateTaxCredit": 20.0
   },
   "assetAllocation": {"equities": 70.0, "bonds": 20.0, "property": 5.0, "cash": 5.0},
@@ -32582,39 +32895,71 @@ The `OffshoreInvestmentBondArrangement` contract represents offshore investment 
 {
   "id": 13006,
   "href": "/api/v2/factfinds/679/arrangements/investments/13006",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "INVESTMENT",
   "investmentType": "INVESTMENT_BOND_OFFSHORE",
   "productName": "RL360 Quantum Reserve",
   "providerName": "RL360",
   "jurisdiction": "ISLE_OF_MAN",
-  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
+  "client": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "OFF-BOND-987654",
   "startDate": "2015-06-01",
   "bondCurrency": "USD",
-  "currentValue": {"amount": 420000.00, "currency": {"code": "USD", "symbol": "$"}},
-  "currentValueGBP": {"amount": 315000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "currentValue": {"amount": 420000.00, "currency": {
+        "code": "USD",
+        "display": "US Dollar",
+        "symbol": "$"
+      }},
+  "currentValueGBP": {"amount": 315000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "valuationDate": "2026-02-18",
   "premiumStructure": {
     "premiumType": "SINGLE_PREMIUM",
-    "initialPremium": {"amount": 300000.00, "currency": {"code": "USD", "symbol": "$"}},
-    "totalInvested": {"amount": 300000.00, "currency": {"code": "USD", "symbol": "$"}}
+    "initialPremium": {"amount": 300000.00, "currency": {
+        "code": "USD",
+        "display": "US Dollar",
+        "symbol": "$"
+      }},
+    "totalInvested": {"amount": 300000.00, "currency": {
+        "code": "USD",
+        "display": "US Dollar",
+        "symbol": "$"
+      }}
   },
   "bondStructure": {
     "numberOfSegments": 1000,
-    "segmentValue": {"amount": 420.00, "currency": {"code": "USD", "symbol": "$"}},
+    "segmentValue": {"amount": 420.00, "currency": {
+        "code": "USD",
+        "display": "US Dollar",
+        "symbol": "$"
+      }},
     "segmentsRemaining": 1000
   },
   "withdrawalAllowance": {
     "annualAllowancePercentage": 5.0,
-    "cumulativeAllowanceAvailable": {"amount": 165000.00, "currency": {"code": "USD", "symbol": "$"}},
-    "allowanceRemaining": {"amount": 165000.00, "currency": {"code": "USD", "symbol": "$"}},
+    "cumulativeAllowanceAvailable": {"amount": 165000.00, "currency": {
+        "code": "USD",
+        "display": "US Dollar",
+        "symbol": "$"
+      }},
+    "allowanceRemaining": {"amount": 165000.00, "currency": {
+        "code": "USD",
+        "display": "US Dollar",
+        "symbol": "$"
+      }},
     "yearsElapsed": 11
   },
   "taxPosition": {
     "bondType": "OFFSHORE",
     "taxTreatment": "GROSS_ROLLUP",
-    "chargeableGainOnSurrender": {"amount": 120000.00, "currency": {"code": "USD", "symbol": "$"}},
+    "chargeableGainOnSurrender": {"amount": 120000.00, "currency": {
+        "code": "USD",
+        "display": "US Dollar",
+        "symbol": "$"
+      }},
     "topSlicingReliefAvailable": true,
     "noUKTaxWithinBond": true,
     "taxDeferredUntilEncashment": true
@@ -32660,20 +33005,32 @@ The `SavingsAccountArrangement` contract represents savings accounts, fixed-term
 {
   "id": 13007,
   "href": "/api/v2/factfinds/679/arrangements/investments/13007",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "INVESTMENT",
   "investmentType": "SAVINGS_ACCOUNT",
   "savingsAccountType": "FIXED_TERM_DEPOSIT",
   "productName": "2 Year Fixed Rate Bond",
   "providerName": "Coventry Building Society",
-  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
+  "client": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "accountNumber": "SAV-445566778",
   "startDate": "2024-06-01",
   "maturityDate": "2026-06-01",
-  "currentValue": {"amount": 51200.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "currentValue": {"amount": 51200.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "valuationDate": "2026-02-18",
-  "depositAmount": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
-  "interestEarned": {"amount": 1200.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "depositAmount": {"amount": 50000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+  "interestEarned": {"amount": 1200.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "interestRate": {
     "grossAER": 5.10,
     "netAER": 4.08,
@@ -32689,16 +33046,36 @@ The `SavingsAccountArrangement` contract represents savings accounts, fixed-term
   },
   "fscsProtection": {
     "protected": true,
-    "protectionLimit": {"amount": 85000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "protectionLimit": {"amount": 85000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "balanceOverLimit": false
   },
   "personalSavingsAllowance": {
     "applicableTaxYear": "2025/26",
     "clientTaxBand": "HIGHER_RATE",
-    "allowance": {"amount": 500.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "interestEarnedThisYear": {"amount": 2550.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "taxableInterest": {"amount": 2050.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "estimatedTaxDue": {"amount": 820.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "allowance": {"amount": 500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "interestEarnedThisYear": {"amount": 2550.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "taxableInterest": {"amount": 2050.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "estimatedTaxDue": {"amount": 820.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "notes": "Fixed term deposit for 2 years at 5.10% gross. FSCS protected. Interest taxable above £500 Personal Savings Allowance for higher rate taxpayer. Maturity June 2026 - review rates at maturity.",
   "createdAt": "2024-06-05T10:00:00Z",
@@ -32736,19 +33113,27 @@ The `CriticalIllnessCoverArrangement` contract represents critical illness insur
 {
   "id": 20002,
   "href": "/api/v2/factfinds/679/arrangements/protection/20002",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "PROTECTION",
   "protectionType": "CRITICAL_ILLNESS_COVER",
   "policyType": "STANDALONE_CRITICAL_ILLNESS",
   "productName": "Vitality Serious Illness Cover",
   "providerName": "Vitality",
-  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
+  "client": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "CIC-789456123",
   "startDate": "2023-01-15",
   "endDate": "2048-01-15",
   "termRemaining": {"years": 21, "months": 11},
-  "sumAssured": {"amount": 200000.00, "currency": {"code": "GBP", "symbol": "£"}},
-  "premium": {"amount": 95.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "sumAssured": {"amount": 200000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+  "premium": {"amount": 95.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "premiumFrequency": "MONTHLY",
   "premiumType": "REVIEWABLE",
   "coverageDetails": {
@@ -32756,9 +33141,17 @@ The `CriticalIllnessCoverArrangement` contract represents critical illness insur
     "fullPayOutConditions": 42,
     "partialPayOutConditions": 5,
     "childrensCoverIncluded": true,
-    "childrensCoverAmount": {"amount": 25000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "childrensCoverAmount": {"amount": 25000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "additionalPaymentCover": true,
-    "additionalPaymentAmount": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "additionalPaymentAmount": {"amount": 50000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "totalPermanentDisabilityCover": true
   },
   "keyConditionsCovered": [
@@ -32785,7 +33178,7 @@ The `CriticalIllnessCoverArrangement` contract represents critical illness insur
     "annualIncreasePercentage": 3.2
   },
   "linkedTo": {
-    "mortgageRef": {"id": 12001, "href": "/api/v2/factfinds/679/arrangements/mortgages/12001"}
+    "mortgage": {"id": 12001, "href": "/api/v2/factfinds/679/arrangements/mortgages/12001"}
   },
   "notes": "Standalone critical illness cover for mortgage protection. 47 conditions covered including partial pay-outs. Children's cover (£25k) and additional payment cover (£50k) included. Index-linked to maintain real value. Review annually.",
   "createdAt": "2023-01-20T10:00:00Z",
@@ -32831,18 +33224,26 @@ The `IncomeProtectionArrangement` contract represents income protection insuranc
 {
   "id": 20003,
   "href": "/api/v2/factfinds/679/arrangements/protection/20003",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "PROTECTION",
   "protectionType": "INCOME_PROTECTION",
   "productName": "Income Protection Plus",
   "providerName": "Legal & General",
-  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
+  "client": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "IP-456789123",
   "startDate": "2023-06-01",
   "policyEndAge": 65,
   "coverRemaining": {"years": 17, "months": 4},
-  "monthlyBenefit": {"amount": 3500.00, "currency": {"code": "GBP", "symbol": "£"}},
-  "premium": {"amount": 87.50, "currency": {"code": "GBP", "symbol": "£"}},
+  "monthlyBenefit": {"amount": 3500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+  "premium": {"amount": 87.50, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "premiumFrequency": "MONTHLY",
   "premiumType": "GUARANTEED",
   "deferredPeriod": {
@@ -32850,10 +33251,22 @@ The `IncomeProtectionArrangement` contract represents income protection insuranc
     "description": "13 weeks from onset of incapacity before benefit starts"
   },
   "benefitDetails": {
-    "monthlyBenefit": {"amount": 3500.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "annualBenefit": {"amount": 42000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "monthlyBenefit": {"amount": 3500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "annualBenefit": {"amount": 42000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "benefitPercentageOfIncome": 60.0,
-    "grossAnnualIncome": {"amount": 70000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "grossAnnualIncome": {"amount": 70000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "paymentPeriod": "TO_RETIREMENT_AGE",
     "retirementAge": 65,
     "maximumBenefitPeriod": "Until age 65"
@@ -32866,8 +33279,16 @@ The `IncomeProtectionArrangement` contract represents income protection insuranc
   },
   "additionalBenefits": {
     "proportionateBenefit": true,
-    "rehabilitationBenefit": {"amount": 3500.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "hospitalCashBenefit": {"amount": 100.00, "currency": {"code": "GBP", "symbol": "£"}, "perDay": true},
+    "rehabilitationBenefit": {"amount": 3500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "hospitalCashBenefit": {"amount": 100.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }, "perDay": true},
     "waiversOfPremium": true
   },
   "indexation": {
@@ -32921,20 +33342,36 @@ The `BuildingsInsuranceArrangement` contract represents buildings insurance for 
 {
   "id": 20004,
   "href": "/api/v2/factfinds/679/arrangements/protection/20004",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "PROTECTION",
   "protectionType": "BUILDINGS_INSURANCE",
   "productName": "Premier Home Insurance - Buildings",
   "providerName": "Aviva",
-  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
+  "client": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "BLDG-123456789",
   "startDate": "2023-04-01",
   "renewalDate": "2026-04-01",
-  "sumInsured": {"amount": 450000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "sumInsured": {"amount": 450000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "valuationBasis": "REBUILD_COST",
-  "annualPremium": {"amount": 385.00, "currency": {"code": "GBP", "symbol": "£"}},
-  "excess": {"amount": 250.00, "currency": {"code": "GBP", "symbol": "£"}},
-  "subsidenceExcess": {"amount": 1000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "annualPremium": {"amount": 385.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+  "excess": {"amount": 250.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+  "subsidenceExcess": {"amount": 1000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "coverageDetails": {
     "fireAndLightning": true,
     "explosionAndEarthquake": true,
@@ -32943,9 +33380,21 @@ The `BuildingsInsuranceArrangement` contract represents buildings insurance for 
     "subsidenceAndHeave": true,
     "impactDamage": true,
     "accidentalDamage": true,
-    "alternativeAccommodation": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "publicLiability": {"amount": 2000000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "tracingAndAccessCover": {"amount": 5000.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "alternativeAccommodation": {"amount": 50000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "publicLiability": {"amount": 2000000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "tracingAndAccessCover": {"amount": 5000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "propertyDetails": {
     "propertyType": "DETACHED_HOUSE",
@@ -32997,37 +33446,85 @@ The `ContentsInsuranceArrangement` contract represents contents insurance for po
 {
   "id": 20005,
   "href": "/api/v2/factfinds/679/arrangements/protection/20005",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "PROTECTION",
   "protectionType": "CONTENTS_INSURANCE",
   "productName": "Premier Home Insurance - Contents",
   "providerName": "Aviva",
-  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
+  "client": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "CONT-987654321",
   "startDate": "2023-04-01",
   "renewalDate": "2026-04-01",
-  "sumInsured": {"amount": 75000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "sumInsured": {"amount": 75000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "valuationBasis": "NEW_FOR_OLD",
-  "annualPremium": {"amount": 185.00, "currency": {"code": "GBP", "symbol": "£"}},
-  "excess": {"amount": 100.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "annualPremium": {"amount": 185.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+  "excess": {"amount": 100.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "coverageDetails": {
     "theft": true,
     "fireAndSmoke": true,
     "waterDamage": true,
     "accidentalDamage": true,
     "personalPossessionsAwayFromHome": true,
-    "allRisksCover": {"amount": 10000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "personalLiability": {"amount": 2000000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "legalExpenses": {"amount": 50000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "bicycleCover": {"amount": 2000.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "allRisksCover": {"amount": 10000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "personalLiability": {"amount": 2000000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "legalExpenses": {"amount": 50000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "bicycleCover": {"amount": 2000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "specifiedItems": [
-    {"itemDescription": "Rolex Watch", "value": {"amount": 8500.00, "currency": {"code": "GBP", "symbol": "£"}}},
-    {"itemDescription": "Diamond Engagement Ring", "value": {"amount": 6000.00, "currency": {"code": "GBP", "symbol": "£"}}},
-    {"itemDescription": "Artwork - Oil Painting", "value": {"amount": 4500.00, "currency": {"code": "GBP", "symbol": "£"}}}
+    {"itemDescription": "Rolex Watch", "value": {"amount": 8500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}},
+    {"itemDescription": "Diamond Engagement Ring", "value": {"amount": 6000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}},
+    {"itemDescription": "Artwork - Oil Painting", "value": {"amount": 4500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}}
   ],
-  "totalSpecifiedItemsValue": {"amount": 19000.00, "currency": {"code": "GBP", "symbol": "£"}},
-  "singleItemLimit": {"amount": 2000.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "totalSpecifiedItemsValue": {"amount": 19000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+  "singleItemLimit": {"amount": 2000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "notes": "Contents insurance covering £75k total. High-value items specified separately (£19k). Accidental damage included. All-risks cover for items outside home (£10k). Bicycle cover (£2k). Review annually and update valuations.",
   "createdAt": "2023-04-05T10:00:00Z",
   "updatedAt": "2026-02-18T14:00:00Z"
@@ -33056,20 +33553,32 @@ The `PrivateMedicalInsuranceArrangement` contract represents private medical ins
 {
   "id": 20006,
   "href": "/api/v2/factfinds/679/arrangements/protection/20006",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "PROTECTION",
   "protectionType": "PRIVATE_MEDICAL_INSURANCE",
   "policyType": "CORPORATE_PMI",
   "productName": "Company Health Insurance",
   "providerName": "Bupa",
-  "clientRef": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
+  "client": {"id": 123, "href": "/api/v2/factfinds/679/clients/123"},
   "policyNumber": "PMI-445566778",
   "startDate": "2023-01-01",
   "renewalDate": "2026-01-01",
-  "annualPremium": {"amount": 0.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "annualPremium": {"amount": 0.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "paidByEmployer": true,
-  "benefitInKindValue": {"amount": 1850.00, "currency": {"code": "GBP", "symbol": "£"}},
-  "excess": {"amount": 0.00, "currency": {"code": "GBP", "symbol": "£"}},
+  "benefitInKindValue": {"amount": 1850.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+  "excess": {"amount": 0.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
   "hospitalList": "FULL_LIST",
   "underwritingMethod": "MEDICAL_HISTORY_DISREGARDED",
   "coverageDetails": {
@@ -33078,15 +33587,27 @@ The `PrivateMedicalInsuranceArrangement` contract represents private medical ins
     "dayPatientTreatment": true,
     "diagnosticTests": true,
     "cancerCover": true,
-    "mentalHealthCover": {"amount": 5000.00, "currency": {"code": "GBP", "symbol": "£"}, "perYear": true},
+    "mentalHealthCover": {"amount": 5000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }, "perYear": true},
     "dentalAccidentCover": true,
     "therapies": true,
     "prescriptionDrugs": true
   },
   "limits": {
     "annualLimit": "UNLIMITED",
-    "outPatientLimit": {"amount": 1500.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "therapiesLimit": {"amount": 1000.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "outPatientLimit": {"amount": 1500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "therapiesLimit": {"amount": 1000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "notes": "Corporate PMI provided by employer. Full hospital list access. Medical history disregarded underwriting. Unlimited in-patient cover. Out-patient limited to £1,500 p.a. Mental health cover £5k p.a. Benefit-in-kind £1,850.",
   "createdAt": "2023-01-05T10:00:00Z",
@@ -33116,7 +33637,7 @@ The `LifetimeMortgageArrangement` contract represents lifetime mortgages (equity
 {
   "id": 5002,
   "href": "/api/v2/factfinds/679/arrangements/mortgages/5002",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "MORTGAGE",
   "productType": "LifetimeMortgage",
   "lenderName": "Aviva Equity Release",
@@ -33129,10 +33650,21 @@ The `LifetimeMortgageArrangement` contract represents lifetime mortgages (equity
   ],
   "youngestBorrowerAge": 66,
   "loanDetails": {
-    "initialAdvance": {"amount": 85000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "currentBalance": {"amount": 87650.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "propertyValue": {"amount": 380000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "loanToValue": 23.0,
+    "initialAdvance": {"amount": 85000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "currentBalance": {"amount": 87650.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "propertyValue": {"amount": 380000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
     "maxLoanToValue": 30.0
   },
   "interestDetails": {
@@ -33141,13 +33673,33 @@ The `LifetimeMortgageArrangement` contract represents lifetime mortgages (equity
     "rollUpMethod": "COMPOUND_INTEREST",
     "noPaymentRequired": true,
     "voluntaryPaymentOption": true,
-    "voluntaryPaymentMaxPerYear": {"amount": 10000.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "voluntaryPaymentMaxPerYear": {"amount": 10000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "projectedBalance": {
-    "after5Years": {"amount": 114500.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "after10Years": {"amount": 149700.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "after15Years": {"amount": 195700.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "after20Years": {"amount": 255800.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "after5Years": {"amount": 114500.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "after10Years": {"amount": 149700.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "after15Years": {"amount": 195700.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "after20Years": {"amount": 255800.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "equityReleaseCouncilStandards": {
     "memberOfERC": true,
@@ -33158,7 +33710,11 @@ The `LifetimeMortgageArrangement` contract represents lifetime mortgages (equity
     "regulatedByFCA": true
   },
   "inheritanceProtection": {
-    "protectionAmount": {"amount": 76000.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "protectionAmount": {"amount": 76000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "protectionPercentage": 20.0,
     "description": "20% of property value protected for inheritance"
   },
@@ -33212,7 +33768,7 @@ The `BuyToLetMortgageArrangement` contract represents buy-to-let mortgages for i
 {
   "id": 5003,
   "href": "/api/v2/factfinds/679/arrangements/mortgages/5003",
-  "factfindRef": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
   "arrangementCategory": "MORTGAGE",
   "productType": "BuyToLetMortgage",
   "lenderName": "Paragon Bank",
@@ -33220,23 +33776,50 @@ The `BuyToLetMortgageArrangement` contract represents buy-to-let mortgages for i
   "policyNumber": "BTL-789456",
   "startDate": "2023-09-01",
   "loanDetails": {
-    "originalLoanAmount": {"amount": 180000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "currentBalance": {"amount": 175000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "propertyValue": {"amount": 300000.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "loanToValue": 58.3
+    "originalLoanAmount": {"amount": 180000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "currentBalance": {"amount": 175000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "propertyValue": {"amount": 300000.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "interestDetails": {
     "interestRate": 4.75,
     "rateType": "FIXED",
     "fixedUntil": "2028-09-01",
     "reversionRate": 5.99,
-    "monthlyPayment": {"amount": 976.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "monthlyPayment": {"amount": 976.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "rentalIncome": {
-    "monthlyRental": {"amount": 1450.00, "currency": {"code": "GBP", "symbol": "£"}},
-    "annualRental": {"amount": 17400.00, "currency": {"code": "GBP", "symbol": "£"}},
+    "monthlyRental": {"amount": 1450.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
+    "annualRental": {"amount": 17400.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }},
     "voidPeriodsAssumed": 1.0,
-    "netAnnualRental": {"amount": 16530.00, "currency": {"code": "GBP", "symbol": "£"}}
+    "netAnnualRental": {"amount": 16530.00, "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }}
   },
   "interestCoverageRatio": {
     "requiredICR": 125.0,
@@ -33313,7 +33896,6 @@ Assessment rate: Typically 5.5% (stress test rate)
 
 **Assets & Liabilities Context:**
 - ASSET → `/api/v2/factfinds/{factfindId}/assets`
-- BUSINESS_ASSET → `/api/v2/factfinds/{factfindId}/assets/{id}` (embedded in ASSET)
 - PROPERTY_DETAIL → `/api/v2/factfinds/{factfindId}/assets/{id}` (embedded in ASSET)
 - CREDIT_HISTORY → `/api/v2/factfinds/{factfindId}/clients/{id}/credit-history`
 - VALUATION → `/api/v2/factfinds/{factfindId}/arrangements/{id}/valuations`
@@ -33520,7 +34102,183 @@ Assessment rate: Typically 5.5% (stress test rate)
 
 ---
 
+
+
+### 14.31 Net Worth
+
+**Purpose:** Calculate and track client net worth based on total assets and liabilities.
+
+**Structure:**
+```json
+{
+  "id": 9001,
+  "href": "/api/v2/factfinds/456/networth/9001",
+
+  "factfind": {
+    "id": 456,
+    "href": "/api/v2/factfinds/456"
+  },
+
+  "clients": [
+    {
+      "id": 456,
+      "href": "/api/v2/factfinds/456/clients/456"
+    }
+  ],
+
+  "calculatedOn": "2026-02-18T14:30:00Z",
+
+  "assets": {
+    "property": {
+      "amount": 450000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "pensions": {
+      "amount": 325000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "investments": {
+      "amount": 185000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "cash": {
+      "amount": 45000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "other": {
+      "amount": 25000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalAssets": {
+      "amount": 1030000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+
+  "liabilities": {
+    "mortgages": {
+      "amount": 240000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "loans": {
+      "amount": 15000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "creditCards": {
+      "amount": 8500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "other": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "totalLiabilities": {
+      "amount": 268500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+
+  "netWorth": {
+    "amount": 761500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+
+  "notes": "Net worth calculation as of property revaluation",
+
+  "createdAt": "2026-02-18T14:30:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+**Field Definitions:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| id | integer | Yes | Unique identifier |
+| href | string | Yes | Resource URI |
+| factfind | Reference | Yes | Parent factfind reference |
+| clients | Array[Reference] | Yes | Client references |
+| calculatedOn | datetime | Yes | Calculation date |
+| assets | Object | Yes | Asset breakdown |
+| assets.property | MoneyValue | Yes | Property assets total |
+| assets.pensions | MoneyValue | Yes | Pension assets total |
+| assets.investments | MoneyValue | Yes | Investment assets total |
+| assets.cash | MoneyValue | Yes | Cash assets total |
+| assets.other | MoneyValue | Yes | Other assets total |
+| assets.totalAssets | MoneyValue | Yes | Total assets |
+| liabilities | Object | Yes | Liability breakdown |
+| liabilities.mortgages | MoneyValue | Yes | Mortgage liabilities total |
+| liabilities.loans | MoneyValue | Yes | Loan liabilities total |
+| liabilities.creditCards | MoneyValue | Yes | Credit card liabilities total |
+| liabilities.other | MoneyValue | Yes | Other liabilities total |
+| liabilities.totalLiabilities | MoneyValue | Yes | Total liabilities |
+| netWorth | MoneyValue | Yes | Net worth (assets - liabilities) |
+| notes | string | No | Additional notes |
+| createdAt | datetime | Yes | Creation timestamp |
+| updatedAt | datetime | Yes | Last update timestamp |
+
+**Validation Rules:**
+- All clients must be associated with the factfind
+- Calculations must be mathematically correct:
+  - totalAssets = sum of all asset categories
+  - totalLiabilities = sum of all liability categories
+  - netWorth = totalAssets - totalLiabilities
+- All money values must have consistent currency
+- calculatedOn cannot be in the future
+- Net worth can be negative (more liabilities than assets)
+
+
 **END OF SPECIFICATION**
 
 This comprehensive API design provides production-ready specifications for implementing the complete FactFind system. All endpoints follow RESTful principles, industry standards, and regulatory requirements for wealth management platforms.
+
+
 

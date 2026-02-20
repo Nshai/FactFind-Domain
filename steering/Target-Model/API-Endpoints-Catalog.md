@@ -303,16 +303,7 @@
 | POST | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/valuations` | Add property valuation | ⭐ New valuation |
 | GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/ltv` | Calculate LTV | ⭐ Loan-to-value |
 | GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/rental-yield` | Calculate rental yield | ⭐ Rental income |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/capital-gains` | Calculate CGT | ⭐ Tax calculation |
-
-### Business Asset Details (Embedded in Assets)
-
-| Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/business-asset` | Get business asset detail | ⭐ For asset_type=business |
-| PATCH | `/api/v1/factfinds/{id}/assets/{assetId}/business-asset` | Update business asset | ⭐ Embedded detail |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/business-asset/valuations` | Get valuation history | ⭐ Business valuations |
-| POST | `/api/v1/factfinds/{id}/assets/{assetId}/business-asset/valuations` | Add business valuation | ⭐ New valuation |
+| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/capital-gains` | Calculate CGT | ⭐ Tax calculation |--------|----------|-------------|-------|
 
 ### Aggregated Views
 
@@ -638,6 +629,20 @@
 | **7. ATR** | 22 | 22 ⭐ |
 | **8. Reference Data** | 24 | 7 ⭐ |
 | **TOTAL** | **343** | **315** |
+
+
+### Net Worth
+
+Calculate and track client net worth.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/v2/factfinds/{factfindId}/networth | List all net worth calculations |
+| POST | /api/v2/factfinds/{factfindId}/networth | Create net worth calculation |
+| GET | /api/v2/factfinds/{factfindId}/networth/{networthId} | Get specific net worth |
+| PATCH | /api/v2/factfinds/{factfindId}/networth/{networthId} | Update net worth |
+| DELETE | /api/v2/factfinds/{factfindId}/networth/{networthId} | Delete net worth |
+
 
 ### HTTP Methods Distribution
 

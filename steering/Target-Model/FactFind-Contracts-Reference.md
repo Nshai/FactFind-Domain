@@ -51,13 +51,13 @@ Each contract section includes:
 - [13.22 Expense Contract - DEPRECATED](#1322-expense-contract)
 - [13.23 Credit History Contract](#1323-credit-history-contract)
 - [13.24 Property Detail Contract](#1324-property-detail-contract)
-- [13.25 Business Asset Contract](#1325-business-asset-contract)
 - [13.26 Notes Contract](#1326-notes-contract)
 - [13.27 Dependant Contract](#1327-dependant-contract)
 - [13.28 Income Changes Contract](#1328-income-changes-contract)
 - [13.29 Expenditure Changes Contract](#1329-expenditure-changes-contract)
-- [13.30 Affordability Assessment Contract](#1330-affordability-assessment-contract)
-- [13.31 Contact Contract](#1331-contact-contract)
+- [13.30 Affordability Contract](#1330-affordability-contract)
+- [13.31 Net Worth Contract](#1331-net-worth-contract)
+- [13.32 Contact Contract](#1332-contact-contract)
 - [13.32 Attitude to Risk (ATR) Contract](#1332-attitude-to-risk-atr-contract)
 - [13.33 Professional Contact Contract](#1333-professional-contact-contract)
 - [13.34 Vulnerability Contract](#1334-vulnerability-contract)
@@ -103,7 +103,7 @@ Represents an individual person, company, or trust that receives financial advic
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | addresses | List of Complex Data | List of all addresses for this client (current and historical) | List with 2 item(s) |
-| adviserRef | Reference Link | The adviser responsible for this client | Complex object |
+| adviser | Reference Link | The adviser responsible for this client | Complex object |
 | clientCategory | Text | Client category (e.g., HighNetWorth, Mass Market) | HighNetWorth |
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
 | clientSegment | Text | Client segment classification (A, B, C, D for prioritization) | A |
@@ -115,7 +115,7 @@ Represents an individual person, company, or trust that receives financial advic
 | dataProtection | Complex Data | GDPR consent, data protection, and privacy management | Complex object |
 | dependants | List of Complex Data | List of financially dependent children and relatives | List with 2 item(s) |
 | estatePlanning | Complex Data | Will, power of attorney, gifts, trusts, and inheritance tax planning | Complex object |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | financialProfile | Complex Data | Summary of income, assets, liabilities, and net worth | Complex object |
 | id | Number | Unique system identifier for this record | 8496 |
 | identityVerification | Complex Data | Identity verification, KYC, AML checks, and compliance status | Complex object |
@@ -136,7 +136,7 @@ Represents an individual person, company, or trust that receives financial advic
 
 #### Nested Field Groups
 
-**adviserRef:**
+**adviser:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -293,7 +293,7 @@ Represents an individual person, company, or trust that receives financial advic
 | willStoredWith | Text |  | Smith & Co Solicitors |
 | willType | Text |  | Simple Will |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -604,10 +604,10 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | additionalNotes | Text |  | None |
-| adviserRef | Reference Link | The adviser responsible for this client | Complex object |
+| adviser | Reference Link | The adviser responsible for this client | Complex object |
 | assetHoldings | Complex Data |  | Complex object |
 | atrAssessment | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | completionStatus | Complex Data | Current status of the goal | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-02-16T14:30:00Z |
 | customQuestions | List of Complex Data |  | List with 1 item(s) |
@@ -622,7 +622,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 
 #### Nested Field Groups
 
-**adviserRef:**
+**adviser:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -668,7 +668,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 | completedAt | Date |  | 2026-02-16T11:10:00Z |
 | declarations | Complex Data |  | Complex object |
 | adviserDeclaration | Complex Data |  | Complex object |
-| adviserRef | Complex Data | The adviser responsible for this client | Complex object |
+| adviser | Complex Data | The adviser responsible for this client | Complex object |
 | agreed | Yes/No |  | Yes |
 | agreedAt | Date |  | 2026-02-16T11:00:00Z |
 | clientDeclaration | Complex Data |  | Complex object |
@@ -689,7 +689,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 | name | Text | First name (given name) | FCA Standard ATR 2025 |
 | version | Text |  | 5.0 |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -839,9 +839,9 @@ The `Address` contract represents a client's address with additional metadata fo
 |---|---|---|---|
 | address | Complex Data | List of all addresses for this client (current and historical) | Complex object |
 | addressType | Text | Type of address (Residential, Previous, Business, etc.) | Residential |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2020-01-15T10:30:00Z |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 1392 |
 | isCorrespondenceAddress | Yes/No |  | Yes |
 | isOnElectoralRoll | Yes/No |  | Yes |
@@ -862,7 +862,7 @@ The `Address` contract represents a client's address with additional metadata fo
 | line2 | Text | Address line 2 | Apartment 4B |
 | postcode | Text | Postcode/ZIP code | SW1A 1AA |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -871,7 +871,7 @@ The `Address` contract represents a client's address with additional metadata fo
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -898,18 +898,18 @@ The `Income` contract represents an income source within a FactFind.
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-02-16T14:30:00Z |
 | description | Text | Description of the goal | Salary from Tech Corp Ltd |
-| employmentRef | Reference Link |  | Complex object |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| employment | Reference Link |  | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | frequency | Selection | How often (Monthly, Annual, etc.) | Complex object |
 | grossAmount | Currency Amount | Amount spent | Complex object |
 | id | Number | Unique system identifier for this record | 5156 |
 | incomePeriod | Complex Data |  | Complex object |
 | incomeType | Text |  | Employment |
 | isTaxable | Yes/No | Is this income taxable? Some income like Child Benefit or ISA interest may be tax-free. | Yes |
-| assetRef | Link to Asset | Link to the asset (property, investment, business) that generates this income. For example, rental income links to the rental property. | Property #5001 - Rental Property on High Street |
+| asset | Link to Asset | Link to the asset (property, investment, business) that generates this income. For example, rental income links to the rental property. | Property #5001 - Rental Property on High Street |
 | isGuaranteed | Yes/No |  | Yes |
 | isOngoing | Yes/No |  | Yes |
 | isPrimary | Yes/No | Whether this is the primary/main address | Yes |
@@ -921,7 +921,7 @@ The `Income` contract represents an income source within a FactFind.
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -930,7 +930,7 @@ The `Income` contract represents an income source within a FactFind.
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
-**employmentRef:**
+**employment:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -938,7 +938,7 @@ The `Income` contract represents an income source within a FactFind.
 | id | Number | Unique system identifier for this record | 8695 |
 | status | Text | Current status of the goal | Current |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1001,42 +1001,14 @@ The `Income` contract represents an income source within a FactFind.
 | display | Text |  | British Pound |
 | symbol | Text |  | £ |
 
-**assetRef:**
+**asset:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique identifier for the asset that generates this income | 5001 |
 | href | Text | Link to the asset resource | /api/v2/factfinds/679/assets/5001 |
 | assetType | Text | Type of asset (Property, Investment, Business, Other) | Property |
-| description | Text | Description of the asset | Rental Property - 45 High Street, Manchester |
-
-### Business Validation Rules
-
-**Tax Status:**
-- `isTaxable` should be set to "Yes" for most income types (employment, rental, dividends above allowances, interest above allowances, pension income)
-- `isTaxable` should be set to "No" for tax-free income such as:
-  - Child Benefit (if household income is under £50,000)
-  - ISA interest and dividends
-  - Premium Bonds prizes
-  - Certain disability benefits (PIP, DLA)
-  - Guardian's Allowance
-
-**Asset Reference Requirements:**
-- `assetRef` is required when the income type is:
-  - **Rental Income** → Must link to a Property asset
-  - **Dividend Income** → Must link to an Investment asset
-  - **Interest Income** → Must link to a Savings or Investment asset
-  - **Business Profit** → Must link to a Business asset
-- `assetRef` should be blank (null) for income types that don't originate from assets:
-  - Employment income (salary, wages, bonuses)
-  - Pension income (state pension, private pension in payment)
-  - Benefits (state benefits, welfare payments)
-  - Other income sources not tied to specific assets
-
-**Income-Asset Relationship Examples:**
-
-| Income Type | Asset Type | Description |
-|-------------|-----------|-------------|
+| description | Text | Description of the asset | Rental Property - 45 High Street, Manchester |-------------|-----------|-------------|
 | Rental Income | Property | Links to residential or commercial property generating rental income |
 | Dividend Income | Investment | Links to stocks, shares, or investment accounts paying dividends |
 | Interest Income | Savings/Investment | Links to bank accounts, bonds, or other interest-bearing investments |
@@ -1065,7 +1037,7 @@ Represents any financial product or arrangement including pensions, investments,
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| adviserRef | Reference Link | The adviser responsible for this client | Complex object |
+| adviser | Reference Link | The adviser responsible for this client | Complex object |
 | arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | PENSION |
 | arrangementNumber | Text |  | ARR123456 |
 | arrangementPeriod | Complex Data |  | Complex object |
@@ -1074,7 +1046,7 @@ Represents any financial product or arrangement including pensions, investments,
 | createdAt | Date | When this record was created in the system | 2015-01-01T10:00:00Z |
 | currentValue | Currency Amount | Current value of the arrangement | Complex object |
 | expectedRetirementAge | Number | Current age (calculated from date of birth) | 67 |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | hasGuaranteedAnnuityRate | Yes/No |  | No |
 | hasProtectedTaxFreeAmount | Yes/No | Amount spent | No |
 | id | Number | Unique system identifier for this record | 2348 |
@@ -1085,7 +1057,7 @@ Represents any financial product or arrangement including pensions, investments,
 | policyNumber | Text | Policy or account number | POL123456 |
 | productName | Text | Name of the financial product | ABC SIPP |
 | projectedValueAtRetirement | Currency Amount | The contact value (email address, phone number, etc.) | Complex object |
-| providerRef | Reference Link | Unique system identifier for this record | Complex object |
+| provider | Reference Link | Unique system identifier for this record | Complex object |
 | regularContribution | Currency Amount |  | Complex object |
 | status | Text | Current status of the goal | ACT |
 | updatedAt | Date | When this record was last modified | 2026-02-16T14:30:00Z |
@@ -1093,7 +1065,7 @@ Represents any financial product or arrangement including pensions, investments,
 
 #### Nested Field Groups
 
-**adviserRef:**
+**adviser:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1126,7 +1098,7 @@ Represents any financial product or arrangement including pensions, investments,
 | display | Text |  | British Pound |
 | symbol | Text |  | £ |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1144,7 +1116,7 @@ Represents any financial product or arrangement including pensions, investments,
 | display | Text |  | British Pound |
 | symbol | Text |  | £ |
 
-**providerRef:**
+**provider:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1207,11 +1179,11 @@ Represents a financial goal or objective that the client wants to achieve, such 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-02-16T14:30:00Z |
 | currentSavings | Currency Amount |  | Complex object |
 | description | Text | Description of the goal | Build sufficient pension pot to support £40k annua... |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | goalName | Text |  | Comfortable retirement at age 65 |
 | goalType | Text | Type of goal (Retirement, Education, Property Purchase, etc.) | Retirement |
 | id | Number | Unique system identifier for this record | 9019 |
@@ -1228,7 +1200,7 @@ Represents a financial goal or objective that the client wants to achieve, such 
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1247,7 +1219,7 @@ Represents a financial goal or objective that the client wants to achieve, such 
 | display | Text |  | British Pound |
 | symbol | Text |  | £ |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1315,17 +1287,17 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| adviserRef | Reference Link | The adviser responsible for this client | Complex object |
+| adviser | Reference Link | The adviser responsible for this client | Complex object |
 | assessmentDate | Date |  | 2026-02-16 |
 | assessmentType | Text |  | ATR |
 | attitudeToRiskRating | Text |  | Balanced |
 | attitudeToRiskScore | Number |  | 6 |
 | capacityForLossRating | Text | City/town | Medium |
 | capacityForLossScore | Number | City/town | 7 |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | comfortableWithVolatility | Yes/No |  | Yes |
 | createdAt | Date | When this record was created in the system | 2026-02-16T14:30:00Z |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | hasInvestedBefore | Yes/No |  | Yes |
 | id | Number | Unique system identifier for this record | riskprofile-999 |
 | investmentExperience | Text |  | Moderate |
@@ -1343,7 +1315,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 
 #### Nested Field Groups
 
-**adviserRef:**
+**adviser:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1351,7 +1323,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 | id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1360,7 +1332,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 | name | Text | First name (given name) | John Smith |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1382,7 +1354,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 |---|---|---|---|
 | accountNumber | Text |  | ACC-12345678 |
 | adviceType | Text |  | ONGOING |
-| adviserRef | Reference Link | The adviser responsible for this client | Complex object |
+| adviser | Reference Link | The adviser responsible for this client | Complex object |
 | annualIsaAllowance | Currency Amount |  | Complex object |
 | annualizedReturn | Number |  | 5.87 |
 | arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | INVESTMENT |
@@ -1390,14 +1362,14 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | assetAllocation | Complex Data |  | Complex object |
 | benchmarkIndex | Text |  | FTSE All-World Index |
 | charges | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | contributions | List of Complex Data | Regular contributions being made | List with 2 item(s) |
 | costBasis | Currency Amount |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2020-04-06T10:00:00Z |
 | createdBy | Complex Data | User who created this record | Complex object |
 | currentValue | Currency Amount | Current value of the arrangement | Complex object |
 | documents | List of Complex Data |  | List with 1 item(s) |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | geographicAllocation | Complex Data |  | Complex object |
 | holdings | List of Complex Data |  | List with 4 item(s) |
 | id | Number | Unique system identifier for this record | 9140 |
@@ -1448,7 +1420,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 
 #### Nested Field Groups
 
-**adviserRef:**
+**adviser:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1511,7 +1483,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | display | Text |  | British Pound |
 | symbol | Text |  | £ |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1547,7 +1519,7 @@ The `Investment` contract extends the Arrangement contract with investment-speci
 | display | Text |  | British Pound |
 | symbol | Text |  | £ |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -1780,7 +1752,7 @@ Represents a property owned or partially owned by the client, including resident
 | equityPercentage | Number | Current age (calculated from date of birth) | 43.53 |
 | estimatedSalePrice | Text |  | None |
 | expenses | List of Complex Data |  | List with 7 item(s) |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | floorArea | Complex Data |  | Complex object |
 | groundRent | Currency Amount |  | Complex object |
 | id | Number | Unique system identifier for this record | 5754 |
@@ -1793,7 +1765,6 @@ Represents a property owned or partially owned by the client, including resident
 | isRented | Yes/No |  | Yes |
 | jointOwnershipType | Text | Who owns this arrangement | None |
 | leaseRemaining | Number |  | 95 |
-| loanToValue | Number | The contact value (email address, phone number, etc.) | 56.47 |
 | mortgages | List of Complex Data | Current age (calculated from date of birth) | List with 1 item(s) |
 | netAnnualIncome | Currency Amount |  | Complex object |
 | netMonthlyIncome | Currency Amount |  | Complex object |
@@ -1908,7 +1879,7 @@ Represents a property owned or partially owned by the client, including resident
 | display | Text |  | British Pound |
 | symbol | Text |  | £ |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -2208,9 +2179,9 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | accountType | Text |  | GIA |
-| adviserRef | Reference Link | The adviser responsible for this client | Complex object |
+| adviser | Reference Link | The adviser responsible for this client | Complex object |
 | broker | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | companyDescription | Text | Description of the goal | British multinational oil and gas company |
 | companyName | Text | Official registered company name | BP plc |
 | corporateActions | List of Complex Data |  | List with 2 item(s) |
@@ -2222,7 +2193,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | dividends | List of Complex Data | Unique system identifier for this record | List with 3 item(s) |
 | documents | List of Complex Data |  | List with 1 item(s) |
 | exchange | Selection |  | Complex object |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | holdings | Complex Data |  | Complex object |
 | id | Number | Unique system identifier for this record | equity-321 |
 | industry | Text |  | Integrated Oil & Gas |
@@ -2243,7 +2214,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 
 #### Nested Field Groups
 
-**adviserRef:**
+**adviser:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -2258,7 +2229,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | accountNumber | Text |  | HL-12345678 |
 | name | Text | First name (given name) | Hargreaves Lansdown |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -2298,7 +2269,7 @@ The `Equity` contract represents a direct stock holding with performance trackin
 | display | Text |  | London Stock Exchange |
 | mic | Text | Whether the client is UK domiciled | XLON |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -2540,7 +2511,7 @@ The `IdentityVerification` contract represents identity verification status with
 | addressVerification | Complex Data |  | Complex object |
 | amlChecks | Complex Data |  | Complex object |
 | biometricVerification | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | consentDate | Date |  | 2026-02-10T14:00:00Z |
 | consentGiven | Yes/No |  | Yes |
 | consentReference | Text |  | consent-123 |
@@ -2551,7 +2522,7 @@ The `IdentityVerification` contract represents identity verification status with
 | dataProtectionNoticeVersion | Text | GDPR consent, data protection, and privacy management | 2.1 |
 | daysUntilExpiry | Number |  | 365 |
 | documents | List of Complex Data |  | List with 2 item(s) |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | idverify-987 |
 | identityProvider | Complex Data | Unique system identifier for this record | Complex object |
 | isExpired | Yes/No |  | No |
@@ -2637,7 +2608,7 @@ The `IdentityVerification` contract represents identity verification status with
 | confidence | Number | Unique system identifier for this record | 98.2 |
 | status | Text | Current status of the goal | PASSED |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -2653,7 +2624,7 @@ The `IdentityVerification` contract represents identity verification status with
 | id | Number | Unique system identifier for this record | user-789 |
 | name | Text | First name (given name) | Jane Doe |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -2739,7 +2710,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | audit | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | complianceChecks | Complex Data |  | Complex object |
 | consentChannel | Text |  | WEB |
 | consentExpiryDate | Date |  | 2028-02-10 |
@@ -2759,7 +2730,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | daysUntilExpiry | Number |  | 730 |
 | documents | List of Complex Data |  | List with 2 item(s) |
 | dsarHistory | List of Complex Data |  | List with 1 item(s) |
-| factFindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | consent-555 |
 | isActive | Yes/No |  | Yes |
 | isExpired | Yes/No |  | No |
@@ -2799,7 +2770,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | userAgent | Text | Current age (calculated from date of birth) | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb... |
 | verificationMethod | Text |  | EMAIL_VERIFIED |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -2888,7 +2859,7 @@ The `Consent` contract represents GDPR consent tracking with purpose-specific co
 | rightsInformed | Yes/No |  | Yes |
 | rightsInformedDate | Date |  | 2026-02-10T14:00:00Z |
 
-**factFindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -2968,15 +2939,15 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| arrangementRef | Reference Link |  | Complex object |
+| arrangement | Reference Link |  | Complex object |
 | assetType | Text |  | PROPERTY |
 | createdAt | Date | When this record was created in the system | 2026-02-01T10:00:00Z |
 | currentValue | Currency Amount | Current value of the arrangement | Complex object |
 | description | Text | Description of the goal | Primary Residence - 123 Main Street |
 | dividends | Complex Data | Unique system identifier for this record | Complex object |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 1234 |
-| incomeRef | Reference Link |  | Complex object |
+| income | Reference Link |  | Complex object |
 | isBusinessAssetDisposalRelief | Yes/No |  | No |
 | isBusinessReliefQualifying | Yes/No |  | No |
 | isFreeFromInheritanceTax | Yes/No |  | No |
@@ -2985,7 +2956,7 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 | notes | Text |  | Rental property - managed by external agent |
 | originalValue | Currency Amount | The contact value (email address, phone number, etc.) | Complex object |
 | ownership | Complex Data | Who owns this arrangement | Complex object |
-| propertyRef | Reference Link |  | Complex object |
+| property | Reference Link |  | Complex object |
 | purchasedOn | Date |  | 2024-05-10 |
 | rentalExpenses | Currency Amount |  | Complex object |
 | rnrbEligibility | Text |  | Not Eligible |
@@ -2995,7 +2966,7 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 
 #### Nested Field Groups
 
-**arrangementRef:**
+**arrangement:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -3016,13 +2987,13 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 |---|---|---|---|
 | owners | List of Complex Data | Who owns this arrangement | List with 1 item(s) |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 679 |
 
-**incomeRef:**
+**income:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -3044,7 +3015,7 @@ The `Asset` contract represents a client's asset (property, business, cash, inve
 | owners | List of Complex Data | Who owns this arrangement | List with 2 item(s) |
 | ownershipType | Text | Who owns this arrangement | JOINT |
 
-**propertyRef:**
+**property:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -3076,7 +3047,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 | description | Text | Description of the goal | Primary Residence Mortgage - 123 Main Street |
 | earlyRedemptionCharge | Currency Amount |  | Complex object |
 | endDate | Date | Employment end date (null if current) | 2040-06-01 |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | howWillLiabilityBeRepaid | Text | Unique system identifier for this record | None |
 | id | Number | Unique system identifier for this record | 789 |
 | interestRate | Number |  | 3.5 |
@@ -3125,7 +3096,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -3150,7 +3121,7 @@ The `Liability` contract represents a client's debt obligation (mortgage, loan, 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | id | Number | Unique system identifier for this record | 8496 |
 | name | Text | First name (given name) | Bob Byblik |
 
@@ -3513,9 +3484,9 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 |---|---|---|---|
 | amount | Currency Amount | Amount spent | Complex object |
 | category | Text | Expenditure category (Housing, Transport, Food, etc.) | Housing |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-01-10T09:00:00Z |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 445 |
 | notes | Text |  | Monthly mortgage payment and council tax |
 | updatedAt | Date | When this record was last modified | 2026-02-05T10:15:00Z |
@@ -3531,13 +3502,13 @@ The `Budget` contract represents a client's budgeted/planned monthly expenditure
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -3567,7 +3538,7 @@ Represents a single expenditure item (outgoing payment) for a client, used for b
 |-----------|------|-------------|---------------|
 | id | Number | Unique identifier for the expenditure | 1001 |
 | href | Text | Link to this expenditure resource | /api/v2/factfinds/234/clients/456/expenditures/1001 |
-| factfindRef | Link to FactFind | The fact-find that this expenditure belongs to | FactFind #234 |
+| factfind | Link to FactFind | The fact-find that this expenditure belongs to | FactFind #234 |
 | client | Link to Client | The client who has this expenditure | Client #456 |
 | description | Text | Description of the expenditure | Monthly mortgage payment |
 | expenditureType | Selection | Type/category of expenditure | Mortgage, Rent, Council Tax, etc. |
@@ -3584,7 +3555,7 @@ Represents a single expenditure item (outgoing payment) for a client, used for b
 
 #### Nested Field Groups
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
@@ -3719,7 +3690,7 @@ In v2.2, the separate Expense entity has been removed. Individual expenditure it
 
 **Migration Note:**
 - Old `Expense` records should be migrated to `Expenditure` entities
-- The `expenditureRef` parent relationship is no longer needed
+- The `expenditure` parent relationship is no longer needed
 - Each expense becomes a standalone expenditure item with direct client reference
 
 See **Section 13.21 Expenditure Contract** for the current structure.
@@ -3746,7 +3717,7 @@ The `CreditHistory` contract represents a comprehensive record of a client's cre
 |---|---|---|---|
 | id | Number | Unique system identifier for this credit history record | 334 |
 | href | Text | Web link to access this credit history record | /api/v2/factfinds/679/clients/346/credit-history/334 |
-| factfindRef | Reference Link | Link to the FactFind this credit history belongs to | See factfindRef below |
+| factfind | Reference Link | Link to the FactFind this credit history belongs to | See factfindRef below |
 | client | Reference Link | Link to the client this credit history belongs to | See client below |
 
 #### Credit Score Assessment
@@ -3847,7 +3818,7 @@ The `CreditHistory` contract represents a comprehensive record of a client's cre
 
 #### Reference Link Structures
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4111,21 +4082,8 @@ The `PropertyDetail` contract represents detailed property information including
 | line3 | Text | Address line 3 | None |
 | line4 | Text | Address line 4 | None |
 | locality | Text |  | Cotswolds Village |
-| postalCode | Text |  | GL54 2AB |
-
----
-
-## 13.25 Business Asset Contract
-### Overview
-The `BusinessAsset` contract represents detailed business asset information including valuation basis, dividend tracking, and tax relief eligibility.
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| assetRef | Reference Link |  | Complex object |
+| postalCode | Text |  | GL54 2AB |---|---|---|---|
+| asset | Reference Link |  | Complex object |
 | businessName | Text |  | Smith & Co Limited |
 | businessType | Text |  | LIMITED_COMPANY |
 | companyNumber | Text |  | 12345678 |
@@ -4145,7 +4103,7 @@ The `BusinessAsset` contract represents detailed business asset information incl
 
 #### Nested Field Groups
 
-**assetRef:**
+**asset:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4235,8 +4193,8 @@ The `Notes` contract represents a note attached to a fact find entity using a un
 | contentType | Text |  | text/plain |
 | createdAt | Date | When this record was created in the system | 2026-02-10T14:00:00Z |
 | createdBy | Complex Data | User who created this record | Complex object |
-| entityRef | Reference Link |  | Complex object |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| entity | Reference Link |  | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 888 |
 | isSystemGenerated | Yes/No |  | No |
 | isVisibleToClient | Yes/No |  | No |
@@ -4253,14 +4211,14 @@ The `Notes` contract represents a note attached to a fact find entity using a un
 | id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Sarah Johnson |
 
-**entityRef:**
+**entity:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 1234 |
 | type | Text | Type of client: Person (individual), Corporate (company), or Trust | Asset |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4294,7 +4252,7 @@ Represents a person who is financially dependent on the client, such as children
 | dateOfBirth | Date | Date of birth | 2015-08-20 |
 | dependencyDetails | Complex Data |  | Complex object |
 | educationDetails | Complex Data |  | Complex object |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | firstName | Text | First name (given name) | Emily |
 | fullName | Text | Complete formatted name including title | Emily Rose Smith |
 | gender | Text | Gender (M=Male, F=Female, O=Other, X=Prefer not to say) | F |
@@ -4340,7 +4298,7 @@ Represents a person who is financially dependent on the client, such as children
 | isInPrivateEducation | Yes/No |  | No |
 | plannedHigherEducation | Yes/No |  | Yes |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4393,16 +4351,16 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 | changeAmount | Currency Amount | Amount spent | Complex object |
 | changePercentage | Number | Current age (calculated from date of birth) | 13.33 |
 | changeType | Text |  | INCREASE |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | confidenceLevel | Text | Unique system identifier for this record | HIGH |
 | createdAt | Date | When this record was created in the system | 2026-02-15T10:00:00Z |
 | currentAmount | Currency Amount | Amount spent | Complex object |
 | description | Text | Description of the goal | Salary increase following promotion to Senior Engi... |
 | effectiveDate | Date |  | 2026-04-01 |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 345 |
 | impactOnAffordability | Complex Data |  | Complex object |
-| incomeRef | Reference Link |  | Complex object |
+| income | Reference Link |  | Complex object |
 | isConfirmed | Yes/No |  | Yes |
 | newAmount | Currency Amount | Amount spent | Complex object |
 | notes | Text |  | Promotion confirmed by employer - effective from A... |
@@ -4419,7 +4377,7 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4434,7 +4392,7 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4451,7 +4409,7 @@ The `IncomeChanges` contract represents anticipated changes to a client's income
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**incomeRef:**
+**income:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4481,14 +4439,14 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 | changeAmount | Currency Amount | Amount spent | Complex object |
 | changePercentage | Number | Current age (calculated from date of birth) | -100.0 |
 | changeType | Text |  | CEASE |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | confidenceLevel | Text | Unique system identifier for this record | HIGH |
 | createdAt | Date | When this record was created in the system | 2026-02-18T11:00:00Z |
 | currentAmount | Currency Amount | Amount spent | Complex object |
 | description | Text | Description of the goal | Mortgage will be paid off |
 | effectiveDate | Date |  | 2027-06-01 |
 | expenseRef | Reference Link |  | Complex object |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 456 |
 | impactOnAffordability | Complex Data |  | Complex object |
 | isConfirmed | Yes/No |  | Yes |
@@ -4507,7 +4465,7 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4528,7 +4486,7 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 1001 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -4556,11 +4514,11 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 
 ---
 
-## 13.30 Affordability Assessment Contract
+## 13.30 Affordability Contract
 
 ### Business Purpose
 
-The Affordability Assessment evaluates a client's financial capacity to take on new commitments or make investment decisions. It provides comprehensive analysis of both monthly cashflow sustainability and lumpsum capital availability, supporting mortgage applications, investment advice, protection planning, debt consolidation, and retirement planning.
+The Affordability Contract evaluates a client's financial capacity to take on new commitments or make investment decisions. It provides comprehensive analysis of both monthly cashflow sustainability and lumpsum capital availability, supporting mortgage applications, investment advice, protection planning, debt consolidation, and retirement planning.
 
 ### Key Features
 
@@ -4604,8 +4562,7 @@ The Affordability Assessment evaluates a client's financial capacity to take on 
 
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
-| id | Number | Unique identifier | 1001 |
-| href | Link | Web address for this assessment | /api/v2/factfinds/456/affordability/1001 |
+| href | Link | Web address for this assessment | /api/v2/factfinds/456/affordability |
 | factfind | Link to FactFind | The fact-find this assessment belongs to | FactFind #456 |
 | clients | List of Client Links | Clients included in this assessment (minimum 1) | Client #456, Client #457 |
 | incomes | List of Income Links | Income sources to include in calculation (minimum 1) | 3 income sources |
@@ -4965,7 +4922,102 @@ This contract connects to:
 
 ---
 
-## 13.31 Contact Contract
+## 13.31 Net Worth Contract
+
+### Business Purpose
+
+The Net Worth Contract provides a snapshot calculation of a client's total financial position by aggregating all assets and liabilities at a specific point in time. This enables wealth tracking, financial planning benchmarking, and regulatory reporting.
+
+### Key Features
+
+- **Snapshot Calculation** - Captures net worth at a specific point in time
+- **Asset Categorization** - Groups assets by type (property, pensions, investments, cash, other)
+- **Liability Categorization** - Groups liabilities by type (mortgages, loans, credit cards, other)
+- **Multi-Client Support** - Can calculate net worth for individuals or joint clients
+- **Historical Tracking** - Multiple snapshots enable wealth progression analysis
+- **Automated Totals** - System automatically calculates subtotals and net worth
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| id | Number | Unique identifier | 9001 |
+| href | Link | Web address for this net worth record | /api/v2/factfinds/456/networth/9001 |
+| factfind | Link to FactFind | The fact-find this belongs to | FactFind #456 |
+| clients | List of Client Links | Clients included in this calculation | Client #456, Client #457 |
+| calculatedOn | Date/Time | When this net worth was calculated | 2026-02-18T14:30:00Z |
+| notes | Text | Context for this calculation | "Net worth calculation as of property revaluation" |
+| createdAt | Date/Time | When this record was created | 2026-02-18T14:30:00Z |
+| updatedAt | Date/Time | When this record was last modified | 2026-02-18T14:30:00Z |
+
+#### Asset Breakdown
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| property | Currency Amount | Total property asset value | £450,000.00 |
+| pensions | Currency Amount | Total pension asset value | £325,000.00 |
+| investments | Currency Amount | Total investment asset value | £185,000.00 |
+| cash | Currency Amount | Total cash and savings | £45,000.00 |
+| other | Currency Amount | Other assets (business, collectibles, etc.) | £25,000.00 |
+| totalAssets | Currency Amount | Sum of all asset categories (calculated) | £1,030,000.00 |
+
+#### Liability Breakdown
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| mortgages | Currency Amount | Total outstanding mortgages | £240,000.00 |
+| loans | Currency Amount | Total loans (personal, secured, unsecured) | £15,000.00 |
+| creditCards | Currency Amount | Total credit card balances | £8,500.00 |
+| other | Currency Amount | Other liabilities | £5,000.00 |
+| totalLiabilities | Currency Amount | Sum of all liability categories (calculated) | £268,500.00 |
+
+#### Net Worth
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| netWorth | Currency Amount | Total assets minus total liabilities (calculated) | £761,500.00 |
+
+### Relationships
+
+This contract connects to:
+
+- Belongs to a FactFind
+- References one or more Clients
+- Derives from Asset and Liability records
+
+### Business Validation Rules
+
+- At least 1 client is required
+- calculatedOn is required
+- totalAssets = sum of all asset categories
+- totalLiabilities = sum of all liability categories
+- netWorth = totalAssets - totalLiabilities
+- All currency amounts must use the same currency code
+- All amounts must be non-negative (except netWorth can be negative)
+
+### Common Use Cases
+
+**Wealth Planning:**
+- Track client wealth progression over time
+- Identify wealth-building opportunities
+- Monitor impact of financial decisions
+
+**Regulatory Reporting:**
+- Demonstrate client financial capacity
+- Support suitability assessments
+- Evidence affordability for large commitments
+
+**Life Event Tracking:**
+- Property purchase impact on net worth
+- Inheritance or windfall received
+- Retirement milestone tracking
+- Divorce settlement calculations
+
+---
+
+## 13.32 Contact Contract
 ### Overview
 The `Contact` contract represents a contact method (email, phone, mobile, work phone, website) for a client.
 
@@ -4975,10 +5027,10 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | contactType | Text | Type of contact (Email, Phone, Mobile, etc.) | EMAIL |
 | createdAt | Date | When this record was created in the system | 2026-01-05T10:00:00Z |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 2222 |
 | isPreferred | Yes/No |  | Yes |
 | isPrimary | Yes/No | Whether this is the primary/main address | Yes |
@@ -4992,13 +5044,13 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5019,9 +5071,9 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 | assessmentDate | Date |  | 2026-02-10 |
 | assessmentMethod | Text |  | QUESTIONNAIRE |
 | capacityForLoss | Text | City/town | MEDIUM |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-02-10T11:00:00Z |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 3333 |
 | investmentObjective | Text |  | GROWTH |
 | isValid | Yes/No | Unique system identifier for this record | Yes |
@@ -5040,13 +5092,13 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5098,10 +5150,10 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 |---|---|---|---|
 | address | Complex Data | List of all addresses for this client (current and historical) | Complex object |
 | canContactDirectly | Yes/No |  | Yes |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-01-10T09:00:00Z |
 | email | Text |  | david.williams@wandassoc.co.uk |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | firmName | Text |  | Williams & Associates Solicitors |
 | firstName | Text | First name (given name) | David |
 | fullName | Text | Complete formatted name including title | Mr David Williams |
@@ -5129,13 +5181,13 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 | line2 | Text | Address line 2 | Suite 300 |
 | postcode | Text | Postcode/ZIP code | EC4A 1BR |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5153,10 +5205,10 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | consumerDutyCompliance | Complex Data |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-01-15T10:00:00Z |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | hasVulnerabilities | Yes/No | Consumer Duty vulnerabilities and required adjustments | Yes |
 | id | Number | Unique system identifier for this record | 5555 |
 | identifiedDate | Date | Unique system identifier for this record | 2026-01-15 |
@@ -5169,7 +5221,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5184,7 +5236,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 | needsIdentified | Yes/No | Unique system identifier for this record | Yes |
 | ongoingMonitoring | Yes/No |  | Yes |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5203,10 +5255,10 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | channelPreferences | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-01-15T10:00:00Z |
 | dataRetentionConsent | Yes/No |  | Yes |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 6666 |
 | lastUpdated | Date |  | 2026-01-15 |
 | notes | Text |  | Client prefers email contact for newsletters and u... |
@@ -5241,13 +5293,13 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 | consentMethod | Text |  | None |
 | optIn | Yes/No |  | No |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5272,10 +5324,10 @@ The `Will` contract represents a client's last will and testament details.
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-01-10T10:00:00Z |
 | executors | List of Complex Data |  | List with 2 item(s) |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | hasResidenceNilRateBand | Yes/No | Unique system identifier for this record | Yes |
 | hasWill | Yes/No |  | Yes |
 | id | Number | Unique system identifier for this record | 7777 |
@@ -5294,13 +5346,13 @@ The `Will` contract represents a client's last will and testament details.
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5334,9 +5386,9 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 |---|---|---|---|
 | attorneys | List of Complex Data |  | List with 2 item(s) |
 | certificateProvider | Complex Data | Unique system identifier for this record | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2023-09-25T10:00:00Z |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | guidance | Text | Unique system identifier for this record | Preference to remain at home as long as possible |
 | hasLPA | Yes/No |  | Yes |
 | id | Number | Unique system identifier for this record | 8888 |
@@ -5361,13 +5413,13 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 | name | Text | First name (given name) | Dr. Michael Brown |
 | relationship | Text |  | GP |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5392,10 +5444,10 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2024-12-26T10:00:00Z |
 | exemptionsClaimed | List of Complex Data |  | List with 1 item(s) |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | giftDate | Date |  | 2024-12-25 |
 | giftDescription | Text | Description of the goal | Cash gift to help with house deposit |
 | giftType | Text |  | POTENTIALLY_EXEMPT_TRANSFER |
@@ -5411,13 +5463,13 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5475,11 +5527,11 @@ The `Trust` contract represents trusts established by or benefiting the client.
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | beneficiaries | List of Complex Data | List of trust beneficiaries | List with 2 item(s) |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | clientRole | Text |  | SETTLOR |
 | createdAt | Date | When this record was created in the system | 2020-03-20T10:00:00Z |
 | establishedDate | Date | Date the trust was established | 2020-03-15 |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 10001 |
 | lastReviewDate | Date | When these figures were last reviewed | 2025-06-15 |
 | nextReviewDate | Date |  | 2026-06-15 |
@@ -5494,13 +5546,13 @@ The `Trust` contract represents trusts established by or benefiting the client.
 
 #### Nested Field Groups
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5548,10 +5600,10 @@ The `IdentityVerification` contract represents identity verification checks and 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | amlChecks | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2026-01-05T10:00:00Z |
 | dataProtectionConsent | Complex Data | GDPR consent, data protection, and privacy management | Complex object |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | gdprRights | Complex Data |  | Complex object |
 | id | Number | Unique system identifier for this record | 11111 |
 | identityDocuments | List of Complex Data | Unique system identifier for this record | List with 2 item(s) |
@@ -5586,7 +5638,7 @@ The `IdentityVerification` contract represents identity verification checks and 
 | provider | Text | Financial institution or provider | World-Check |
 | result | Text |  | Clear |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5608,7 +5660,7 @@ The `IdentityVerification` contract represents identity verification checks and 
 | consentGiven | Yes/No |  | Yes |
 | disclosureReasons | List of str |  | List with 3 item(s) |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5662,7 +5714,7 @@ Represents a mortgage loan secured against a property, including terms, repaymen
 | asset | Reference Link | Total value of all assets | Complex object |
 | createdAt | Date | When this record was created in the system | 2023-01-15T10:00:00Z |
 | description | Text | Description of the goal | Main residence mortgage - 25 year fixed |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | feesAndCharges | Complex Data |  | Complex object |
 | id | Number | Unique system identifier for this record | 5001 |
 | illustrationReference | Text |  | IOB-REF-123456 |
@@ -5694,7 +5746,7 @@ Represents a mortgage loan secured against a property, including terms, repaymen
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 67890 |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -5771,7 +5823,8 @@ Represents a mortgage loan secured against a property, including terms, repaymen
 | currency | Complex Data |  | Complex object |
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
-| loanToValueRatio | Number | The contact value (email address, phone number, etc.) | 65.5 |
+| loanToValue | Complex Data | Loan-to-Value at origination | Complex object |
+| currentLTV | Complex Data | Current Loan-to-Value | Complex object |
 | originalLoanAmount | Currency Amount | Amount spent | Complex object |
 | amount | Number | Amount spent | 250000.0 |
 | currency | Complex Data |  | Complex object |
@@ -5782,6 +5835,40 @@ Represents a mortgage loan secured against a property, including terms, repaymen
 | currency | Complex Data |  | Complex object |
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
+
+**loanToValue:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| percentage | Number | LTV percentage at origination | 75.0 |
+| propertyValue | Currency Amount | Property value at origination | Complex object |
+| amount | Number | Amount | 400000.0 |
+| currency | Complex Data | Currency details | Complex object |
+| code | Text | Currency code | GBP |
+| symbol | Text | Currency symbol | £ |
+| loanAmount | Currency Amount | Loan amount at origination | Complex object |
+| amount | Number | Amount | 300000.0 |
+| currency | Complex Data | Currency details | Complex object |
+| code | Text | Currency code | GBP |
+| symbol | Text | Currency symbol | £ |
+| calculatedOn | Date | Date of LTV calculation | 2018-06-15 |
+
+**currentLTV:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| percentage | Number | Current LTV percentage | 57.65 |
+| outstandingBalance | Currency Amount | Current outstanding balance | Complex object |
+| amount | Number | Amount | 245000.0 |
+| currency | Complex Data | Currency details | Complex object |
+| code | Text | Currency code | GBP |
+| symbol | Text | Currency symbol | £ |
+| currentPropertyValue | Currency Amount | Current property value | Complex object |
+| amount | Number | Amount | 425000.0 |
+| currency | Complex Data | Currency details | Complex object |
+| code | Text | Currency code | GBP |
+| symbol | Text | Currency symbol | £ |
+| calculatedOn | Date | Date of current LTV calculation | 2026-02-18 |
 
 **offsetFeatures:**
 
@@ -5947,10 +6034,10 @@ Represents a general investment account (GIA) or other investment wrapper.
 | arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | INVESTMENT |
 | assetAllocation | Complex Data |  | Complex object |
 | charges | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2020-03-20T10:00:00Z |
 | currentValue | Currency Amount | Current value of the arrangement | Complex object |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | fundHoldings | List of Complex Data |  | List with 3 item(s) |
 | gainLoss | Currency Amount |  | Complex object |
 | id | Number | Unique system identifier for this record | 13001 |
@@ -5959,7 +6046,7 @@ Represents a general investment account (GIA) or other investment wrapper.
 | notes | Text |  | General Investment Account with monthly contributi... |
 | productName | Text | Name of the financial product | Vanguard Investment Account |
 | providerName | Text | Unique system identifier for this record | Vanguard |
-| providerRef | Reference Link | Unique system identifier for this record | Complex object |
+| provider | Reference Link | Unique system identifier for this record | Complex object |
 | regularContributions | Complex Data | Regular contributions being made | Complex object |
 | riskProfile | Complex Data |  | Complex object |
 | startDate | Date | Employment start date | 2020-03-15 |
@@ -5997,7 +6084,7 @@ Represents a general investment account (GIA) or other investment wrapper.
 | platformFee | Number |  | 0.25 |
 | totalAnnualCharge | Number |  | 0.47 |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6012,7 +6099,7 @@ Represents a general investment account (GIA) or other investment wrapper.
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6028,7 +6115,7 @@ Represents a general investment account (GIA) or other investment wrapper.
 | symbol | Text |  | £ |
 | percentage | Number | Current age (calculated from date of birth) | 25.0 |
 
-**providerRef:**
+**provider:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6113,11 +6200,11 @@ Represents life assurance, critical illness cover, income protection, or other p
 | adviserDetails | Complex Data |  | Complex object |
 | arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | PROTECTION |
 | beneficiaries | List of Complex Data | List of trust beneficiaries | List with 1 item(s) |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2023-01-20T10:00:00Z |
 | currentSumAssured | Currency Amount |  | Complex object |
 | endDate | Date | Employment end date (null if current) | 2048-01-15 |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | id | Number | Unique system identifier for this record | 20001 |
 | indexation | Complex Data |  | Complex object |
 | isInTrust | Yes/No |  | Yes |
@@ -6131,7 +6218,7 @@ Represents life assurance, critical illness cover, income protection, or other p
 | productName | Text | Name of the financial product | Mortgage Protection Plan |
 | protectionType | Text |  | LIFE_ASSURANCE |
 | providerName | Text | Unique system identifier for this record | Aviva |
-| providerRef | Reference Link | Unique system identifier for this record | Complex object |
+| provider | Reference Link | Unique system identifier for this record | Complex object |
 | reviewDate | Date | When these figures were last reviewed | 2027-01-15 |
 | startDate | Date | Employment start date | 2023-01-15 |
 | sumAssured | Currency Amount |  | Complex object |
@@ -6150,7 +6237,7 @@ Represents life assurance, critical illness cover, income protection, or other p
 | adviserName | Text |  | John Adviser |
 | firmName | Text |  | ABC Protection Services |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6166,7 +6253,7 @@ Represents life assurance, critical illness cover, income protection, or other p
 | symbol | Text |  | £ |
 | note | Text |  | Decreasing with mortgage balance |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6182,9 +6269,9 @@ Represents life assurance, critical illness cover, income protection, or other p
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| liabilityRef | Reference Link |  | Complex object |
+| liability | Reference Link |  | Complex object |
 | id | Number | Unique system identifier for this record | 5678 |
-| mortgageRef | Reference Link | Current age (calculated from date of birth) | Complex object |
+| mortgage | Reference Link | Current age (calculated from date of birth) | Complex object |
 | id | Number | Unique system identifier for this record | 12001 |
 
 **premium:**
@@ -6196,7 +6283,7 @@ Represents life assurance, critical illness cover, income protection, or other p
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**providerRef:**
+**provider:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6279,12 +6366,12 @@ Represents a personal pension, workplace pension, SIPP, or other pension arrange
 | arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | PENSION |
 | assetAllocation | Complex Data |  | Complex object |
 | charges | Complex Data |  | Complex object |
-| clientRef | Reference Link |  | Complex object |
+| client | Reference Link |  | Complex object |
 | createdAt | Date | When this record was created in the system | 2010-04-10T10:00:00Z |
 | crystallisedAmount | Currency Amount | Amount spent | Complex object |
 | currentValue | Currency Amount | Current value of the arrangement | Complex object |
 | deathBenefits | Complex Data |  | Complex object |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
+| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | fundHoldings | List of Complex Data |  | List with 3 item(s) |
 | growthToDate | Currency Amount | Date moved from this address (null if current) | Complex object |
 | id | Number | Unique system identifier for this record | 30001 |
@@ -6295,7 +6382,7 @@ Represents a personal pension, workplace pension, SIPP, or other pension arrange
 | productName | Text | Name of the financial product | Vanguard Personal Pension |
 | projectedValueAtRetirement | Complex Data | The contact value (email address, phone number, etc.) | Complex object |
 | providerName | Text | Unique system identifier for this record | Vanguard |
-| providerRef | Reference Link | Unique system identifier for this record | Complex object |
+| provider | Reference Link | Unique system identifier for this record | Complex object |
 | regularContributions | Complex Data | Regular contributions being made | Complex object |
 | retirementAge | Number | Current age (calculated from date of birth) | 67 |
 | selectedRetirementAge | Number | Current age (calculated from date of birth) | 65 |
@@ -6335,7 +6422,7 @@ Represents a personal pension, workplace pension, SIPP, or other pension arrange
 | platformFee | Number |  | 0.15 |
 | totalAnnualCharge | Number |  | 0.37 |
 
-**clientRef:**
+**client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6371,7 +6458,7 @@ Represents a personal pension, workplace pension, SIPP, or other pension arrange
 | isInTrust | Yes/No |  | Yes |
 | nominatedBeneficiaries | List of Complex Data | List of trust beneficiaries | List with 1 item(s) |
 
-**factfindRef:**
+**factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6419,7 +6506,7 @@ Represents a personal pension, workplace pension, SIPP, or other pension arrange
 | code | Text | Standard Occupational Classification (SOC) code | GBP |
 | symbol | Text |  | £ |
 
-**providerRef:**
+**provider:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
@@ -6929,7 +7016,6 @@ Represents a lifetime mortgage (equity release) for homeowners aged 55+ with no 
 | loanDetails | Complex Data | Loan structure | Complex object |
 | initialAdvance | Currency Amount | Lump sum released | £85,000 |
 | currentBalance | Currency Amount | Current amount owed | £87,650 |
-| loanToValue | Number | LTV percentage | 23% |
 | interestDetails | Complex Data | Interest terms | Complex object |
 | interestRate | Number | Annual interest rate | 5.95% |
 | rollUpMethod | Text | How interest compounds | COMPOUND_INTEREST |
@@ -6972,7 +7058,6 @@ Represents a buy-to-let mortgage for investment properties assessed on rental in
 | lenderName | Text | BTL mortgage lender | Paragon Bank |
 | loanDetails | Complex Data | Loan structure | Complex object |
 | currentBalance | Currency Amount | Amount owed | £175,000 |
-| loanToValue | Number | LTV percentage | 58.3% |
 | interestDetails | Complex Data | Interest terms | Complex object |
 | interestRate | Number | Annual interest rate | 4.75% |
 | monthlyPayment | Currency Amount | Monthly interest payment | £976 |
@@ -7222,4 +7307,117 @@ These are predefined selection lists used throughout the system.
 - **Half-Yearly**: Half-yearly (every 6 months)
 - **Annual**: Annual (yearly)
 - **One-off**: One-off (single payment)
+
+
+## 13.31 Net Worth
+
+### Business Purpose
+
+The Net Worth contract calculates and tracks a client's overall financial position by aggregating all assets and liabilities into a single net worth figure. This provides a snapshot of the client's total wealth at a specific point in time.
+
+### Key Features
+
+- **Comprehensive Asset Tracking** - Aggregates property, pensions, investments, cash, and other assets
+- **Complete Liability Overview** - Tracks mortgages, loans, credit cards, and other debts
+- **Automated Calculations** - System automatically calculates totals and net worth
+- **Historical Tracking** - Maintains history of net worth over time
+- **Multi-Client Support** - Handles joint net worth calculations for couples
+- **Wealth Reporting** - Provides clear breakdown for client presentations
+
+### Common Scenarios
+
+**Wealth Management Planning:**
+- Track client wealth progression over time
+- Compare current net worth to retirement goals
+- Identify wealth accumulation trends
+- Support annual review meetings
+
+**Investment Advice:**
+- Assess investable assets vs total wealth
+- Determine appropriate asset allocation
+- Evaluate liquidity needs vs net worth
+- Support investment suitability assessments
+
+**Protection Planning:**
+- Calculate life cover requirements based on net worth
+- Assess estate planning needs
+- Evaluate wealth protection strategies
+- Support inheritance tax planning
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| id | Number | Unique identifier | 9001 |
+| href | Link | Web address for this net worth calculation | /api/v2/factfinds/456/networth/9001 |
+| factfind | Link to FactFind | The fact-find this belongs to | FactFind #456 |
+| clients | List of Client Links | Clients included in this calculation | Client #456, Client #457 |
+| calculatedOn | Date/Time | When this net worth was calculated | 2026-02-18T14:30:00Z |
+| notes | Text | Additional context or notes | "Net worth as of property revaluation" |
+| createdAt | Date/Time | When this record was created | 2026-02-18T14:30:00Z |
+| updatedAt | Date/Time | When this record was last changed | 2026-02-18T14:30:00Z |
+
+#### Asset Breakdown
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| assets.property | Currency Amount | Total value of all property assets | £450,000.00 |
+| assets.pensions | Currency Amount | Total value of all pension assets | £325,000.00 |
+| assets.investments | Currency Amount | Total value of all investment assets | £185,000.00 |
+| assets.cash | Currency Amount | Total value of all cash assets | £45,000.00 |
+| assets.other | Currency Amount | Total value of other assets | £25,000.00 |
+| assets.totalAssets | Currency Amount | Sum of all assets (calculated) | £1,030,000.00 |
+
+#### Liability Breakdown
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| liabilities.mortgages | Currency Amount | Total of all mortgage balances | £240,000.00 |
+| liabilities.loans | Currency Amount | Total of all loan balances | £15,000.00 |
+| liabilities.creditCards | Currency Amount | Total of all credit card balances | £8,500.00 |
+| liabilities.other | Currency Amount | Total of other liabilities | £5,000.00 |
+| liabilities.totalLiabilities | Currency Amount | Sum of all liabilities (calculated) | £268,500.00 |
+
+#### Net Worth Calculation
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| netWorth | Currency Amount | Total net worth (assets - liabilities) | £761,500.00 |
+
+**How it's calculated:**
+- **totalAssets** = sum of all asset categories
+- **totalLiabilities** = sum of all liability categories
+- **netWorth** = totalAssets minus totalLiabilities
+
+**Important:** Net worth can be negative if liabilities exceed assets.
+
+### Validation Rules
+
+- All clients must be associated with the parent factfind
+- calculatedOn cannot be in the future
+- All money values must have consistent currency
+- Calculations must be mathematically correct:
+  - totalAssets = sum of all asset categories
+  - totalLiabilities = sum of all liability categories
+  - netWorth = totalAssets - totalLiabilities
+- All amounts must be non-negative except netWorth which can be negative
+
+### Relationships
+
+**Referenced By:**
+- FactFind - Parent fact-find
+- Clients - Clients included in calculation
+
+**References:**
+- Assets - Aggregated from asset records
+- Liabilities - Aggregated from liability records
+
+**Business Rules:**
+- Net worth should be recalculated when assets or liabilities change significantly
+- Historical net worth records should be preserved for tracking
+- System should automatically pull latest asset and liability values
+- All currency values must match the factfind base currency
+
 
