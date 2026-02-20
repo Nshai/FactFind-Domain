@@ -246,6 +246,7 @@ The FactFind API provides comprehensive digital capabilities for:
       - [10.3.4 Investment Trusts](#1034-investment-trusts)
       - [10.3.5 Platform Accounts](#1035-platform-accounts)
       - [10.3.6 Offshore Bonds](#1036-offshore-bonds)
+      - [10.3.7 Cash Accounts](#1037-cash-accounts)
     - [10.4 Pension Arrangements](#104-pension-arrangements)
       - [10.4.1 Personal Pension](#1041-personal-pension)
       - [10.4.2 State Pension](#1042-state-pension)
@@ -9152,6 +9153,239 @@ The Arrangements API provides comprehensive management of client financial produ
   "topSlicingAvailable": true
 }
 ```
+
+#### 10.3.7 Cash Accounts
+
+**Operations:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash` | Create Cash Account | `arrangements:write` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash` | List Cash Accounts | `arrangements:read` |
+| GET | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Get Cash Account details | `arrangements:read` |
+| PATCH | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Update Cash Account | `arrangements:write` |
+| DELETE | `/api/v1/factfinds/{factfindId}/arrangements/investments/Cash/{arrangementId}` | Delete Cash Account | `arrangements:write` |
+
+**Create Cash Account Request:**
+
+```json
+{
+  "arrangementType": "Cash",
+  "arrangementCategory": "INVESTMENT",
+  "provider": {
+    "name": "HSBC UK",
+    "reference": "HSBC-UK-001",
+    "contactDetails": {
+      "phone": "0800 678 3456",
+      "email": "customer.service@hsbc.co.uk",
+      "website": "https://www.hsbc.co.uk"
+    }
+  },
+  "accountType": "SavingsAccount",
+  "accountNumber": "12345678",
+  "sortCode": "40-47-84",
+  "productName": "Advance Savings Account",
+  "policyNumber": "POL-CASH-001",
+  "purpose": "EmergencyFund",
+  "owners": [
+    {
+      "clientRef": { "id": "client-123" },
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "sellingAdviser": {
+    "id": "adviser-456",
+    "name": "Jane Adviser",
+    "firmName": "ABC Financial Services"
+  },
+  "agencyStatus": "NotUnderAgency",
+  "agencyStatusDate": "2023-01-15",
+  "currentBalance": {
+    "amount": 15000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "interestRate": 4.50,
+  "interestRateType": "Variable",
+  "startDate": "2023-01-15",
+  "endDate": null,
+  "maturityDate": null,
+  "lastUpdatedDate": "2026-02-18",
+  "valuationDate": "2026-02-18",
+  "taxWrapper": "Taxable",
+  "status": "ACTIVE",
+  "features": {
+    "hasInstantAccess": true,
+    "hasNoticeRequired": false,
+    "noticePeriodDays": 0,
+    "hasWithdrawalLimit": false,
+    "monthlyWithdrawalLimit": null,
+    "isFixedTerm": false,
+    "termMonths": null
+  },
+  "interestPayment": {
+    "frequency": "Monthly",
+    "method": "PaidToAccount",
+    "lastPaymentDate": "2026-02-01",
+    "nextPaymentDate": "2026-03-01"
+  }
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "id": "arr-cash-001",
+  "href": "/api/v1/factfinds/ff-456/arrangements/investments/Cash/arr-cash-001",
+  "arrangementType": "Cash",
+  "arrangementCategory": "INVESTMENT",
+  "provider": {
+    "name": "HSBC UK",
+    "reference": "HSBC-UK-001",
+    "contactDetails": {
+      "phone": "0800 678 3456",
+      "email": "customer.service@hsbc.co.uk",
+      "website": "https://www.hsbc.co.uk"
+    }
+  },
+  "accountType": "SavingsAccount",
+  "accountNumber": "12345678",
+  "sortCode": "40-47-84",
+  "productName": "Advance Savings Account",
+  "policyNumber": "POL-CASH-001",
+  "purpose": "EmergencyFund",
+  "owners": [
+    {
+      "clientRef": {
+        "id": "client-123",
+        "fullName": "John Smith",
+        "href": "/api/v1/factfinds/ff-456/clients/client-123"
+      },
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "sellingAdviser": {
+    "id": "adviser-456",
+    "name": "Jane Adviser",
+    "firmName": "ABC Financial Services",
+    "href": "/api/v1/advisers/adviser-456"
+  },
+  "agencyStatus": "NotUnderAgency",
+  "agencyStatusDate": "2023-01-15",
+  "currentBalance": {
+    "amount": 15000.00,
+    "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
+  },
+  "interestRate": 4.50,
+  "interestRateType": "Variable",
+  "startDate": "2023-01-15",
+  "endDate": null,
+  "maturityDate": null,
+  "lastUpdatedDate": "2026-02-18",
+  "valuationDate": "2026-02-18",
+  "taxWrapper": "Taxable",
+  "status": "ACTIVE",
+  "features": {
+    "hasInstantAccess": true,
+    "hasNoticeRequired": false,
+    "noticePeriodDays": 0,
+    "hasWithdrawalLimit": false,
+    "monthlyWithdrawalLimit": null,
+    "isFixedTerm": false,
+    "termMonths": null
+  },
+  "interestPayment": {
+    "frequency": "Monthly",
+    "method": "PaidToAccount",
+    "lastPaymentDate": "2026-02-01",
+    "nextPaymentDate": "2026-03-01"
+  },
+  "createdAt": "2023-01-15T10:00:00Z",
+  "updatedAt": "2026-02-18T14:30:00Z"
+}
+```
+
+**Cash Account-Specific Fields:**
+
+```json
+{
+  "accountType": "SavingsAccount",
+  "sortCode": "40-47-84",
+  "interestRate": 4.50,
+  "interestRateType": "Variable",
+  "taxWrapper": "Taxable",
+  "features": {
+    "hasInstantAccess": true,
+    "hasNoticeRequired": false,
+    "noticePeriodDays": 0,
+    "hasWithdrawalLimit": false,
+    "monthlyWithdrawalLimit": null,
+    "isFixedTerm": false,
+    "termMonths": null
+  },
+  "interestPayment": {
+    "frequency": "Monthly",
+    "method": "PaidToAccount",
+    "lastPaymentDate": "2026-02-01",
+    "nextPaymentDate": "2026-03-01"
+  }
+}
+```
+
+**Account Type Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `CashAccount` | Cash Account |
+| `CashDeposit` | Cash Deposit |
+| `CurrentAccount` | Current Account |
+| `SavingsAccount` | Savings Account |
+
+**Purpose Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `EmergencyFund` | Emergency Fund |
+| `Savings` | General Savings |
+| `SpecificGoal` | Specific Goal |
+| `IncomeReserve` | Income Reserve |
+| `BusinessReserve` | Business Reserve |
+
+**Agency Status Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `NotUnderAgency` | Not Under Agency |
+| `UnderAgencyInformationOnly` | Under Agency - Information Only |
+| `UnderAgencyServicingAgent` | Under Agency - Servicing Agent |
+
+**Interest Rate Type Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `Fixed` | Fixed Rate |
+| `Variable` | Variable Rate |
+| `TrackerRate` | Tracker Rate |
+| `TieredRate` | Tiered Rate |
+
+**Interest Payment Frequency Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `Monthly` | Monthly |
+| `Quarterly` | Quarterly |
+| `Annually` | Annually |
+| `OnMaturity` | On Maturity |
+
+**Interest Payment Method Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `PaidToAccount` | Paid to Account |
+| `Reinvested` | Reinvested |
+| `PaidToExternalAccount` | Paid to External Account |
+
+---
 
 ### 10.4 Pension Arrangements
 
@@ -25219,7 +25453,7 @@ initialRatePeriodEndsOn ≤ earlyRepaymentChargeEndsOn
 
 ### 13.42 Arrangement - Investment Contract (General Investment Account)
 
-The `InvestmentArrangement` contract represents investment products including GIAs, ISAs, Investment Bonds, and Platform Accounts.
+The `InvestmentArrangement` contract represents investment products including GIAs, ISAs, Investment Bonds, Platform Accounts, and Cash Accounts (savings, current accounts, cash deposits).
 
 **Reference Type:** InvestmentArrangement is a reference type with identity (has `id` field).
 
@@ -25392,6 +25626,10 @@ The `InvestmentArrangement` contract represents investment products including GI
 | `ETFS` | ETFs (Exchange-Traded Funds) |
 | `DIRECT_EQUITIES` | Direct Equities |
 | `PLATFORM_ACCOUNT` | Platform Account |
+| `CASH_ACCOUNT` | Cash Account |
+| `CASH_DEPOSIT` | Cash Deposit |
+| `CURRENT_ACCOUNT` | Current Account |
+| `SAVINGS_ACCOUNT` | Savings Account |
 
 ---
 
