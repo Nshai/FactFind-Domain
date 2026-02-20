@@ -9825,8 +9825,20 @@ The Arrangements API provides comprehensive management of client financial produ
     "name": "NHS Pension Scheme",
     "reference": "NHS-PS-001"
   },
+  "employer": "Royal London Hospital Trust",
+  "sellingAdviser": {
+    "id": "adviser-456",
+    "name": "Jane Adviser",
+    "firmName": "ABC Financial Services"
+  },
+  "agencyStatus": "NotUnderAgency",
+  "agencyStatusDate": "2023-01-15",
+  "productName": "NHS Pension Scheme (1995 Section)",
   "policyNumber": "NHS-DB-987654",
-  "startDate": "1995-09-01",
+  "currency": {
+    "code": "GBP",
+    "symbol": "£"
+  },
   "owners": [
     {
       "clientRef": { "id": "client-123" },
@@ -9837,72 +9849,79 @@ The Arrangements API provides comprehensive management of client financial produ
     "code": "ACTIVE",
     "display": "Active - In Service"
   },
-  "schemeDetails": {
-    "schemeName": "NHS Pension Scheme (1995 Section)",
-    "schemeType": {
-      "code": "PUBLIC_SECTOR",
-      "display": "Public Sector DB"
-    },
-    "accrualRate": "1/80th",
-    "normalRetirementAge": 60,
-    "earlyRetirementAge": 55,
-    "employerName": "Royal London Hospital Trust"
+  "normalRetirementAge": 60,
+  "earlyRetirementAge": 55,
+  "accrualRate": "1/80th",
+  "schemeType": {
+    "code": "PUBLIC_SECTOR",
+    "display": "Public Sector DB"
   },
-  "serviceDetails": {
-    "totalService": 28.5,
-    "pensionableService": 28.5,
-    "additionalPurchasedYears": 0,
-    "projectedServiceAtRetirement": 35.0
+  "dateSchemeJoined": "1995-09-01",
+  "expectedYearsOfService": 35.0,
+  "totalService": 28.5,
+  "pensionableService": 28.5,
+  "additionalPurchasedYears": 0,
+  "projectedServiceAtRetirement": 35.0,
+  "pensionableSalary": {
+    "amount": 65000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
   },
-  "salaryDetails": {
-    "currentPensionableSalary": {
-      "amount": 65000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "finalSalary": {
-      "amount": 65000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "projectedFinalSalary": {
-      "amount": 72000.00,
+  "finalSalary": {
+    "amount": 65000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "projectedFinalSalary": {
+    "amount": 72000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "isIndexed": true,
+  "isPreserved": false,
+  "prospectivePensionNoLumpSum": {
+    "amount": 28875.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "prospectivePensionWithLumpSum": {
+    "amount": 23100.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "prospectiveLumpSum": {
+    "amount": 69300.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "gmpAmount": {
+    "amount": 1250.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "spousePension": {
+    "percentage": 50.0,
+    "amount": {
+      "amount": 11550.00,
       "currency": { "code": "GBP", "symbol": "£" }
     }
   },
-  "benefitDetails": {
-    "guaranteedAnnualPension": {
-      "amount": 23100.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "taxFreeLumpSum": {
-      "amount": 69300.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "spousePension": {
-      "percentage": 50.0,
-      "amount": {
-        "amount": 11550.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      }
-    },
-    "escalationRate": {
-      "code": "CPI",
-      "display": "CPI (Consumer Price Index)"
-    },
-    "escalationPercentage": 2.5
+  "escalationRate": {
+    "code": "CPI",
+    "display": "CPI (Consumer Price Index)"
   },
+  "escalationPercentage": 2.5,
   "revaluationMethod": {
     "code": "CAREER_AVERAGE",
     "display": "Career Average Revalued Earnings (CARE)"
   },
-  "transferValue": {
-    "cetv": {
-      "amount": 950000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "cetvDate": "2026-01-15",
-    "cetvExpiry": "2026-04-15",
-    "transferAdviceRequired": true
-  }
+  "cashEquivalentTransferValue": {
+    "amount": 950000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "cetvDate": "2026-01-15",
+  "transferValueExpiryDate": "2026-04-15",
+  "transferAdviceRequired": true,
+  "deathInServiceSpousalBenefits": "Spouse receives 50% of prospective pension plus return of contributions",
+  "dependantBenefits": "Children's pensions available until age 23 if in full-time education",
+  "earlyRetirementFactorConsiderations": "3% reduction per year before age 60. No early retirement permitted before age 55.",
+  "canPurchaseAddedYears": true,
+  "hasAffinityDCScheme": false,
+  "indexationNotes": "CPI linked annual increases, capped at 5% p.a. Applied from scheme retirement date.",
+  "additionalNotes": "Protected rights from pre-1997 contracting out included. Member has option to transfer to 2015 CARE scheme."
 }
 ```
 
@@ -9916,10 +9935,25 @@ The Arrangements API provides comprehensive management of client financial produ
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "NHS Pension Scheme",
-    "reference": "NHS-PS-001"
+    "reference": "NHS-PS-001",
+    "href": "/api/v1/providers/NHS-PS-001"
   },
+  "employer": "Royal London Hospital Trust",
+  "sellingAdviser": {
+    "id": "adviser-456",
+    "name": "Jane Adviser",
+    "firmName": "ABC Financial Services",
+    "href": "/api/v1/advisers/adviser-456"
+  },
+  "agencyStatus": "NotUnderAgency",
+  "agencyStatusDate": "2023-01-15",
+  "productName": "NHS Pension Scheme (1995 Section)",
   "policyNumber": "NHS-DB-987654",
-  "startDate": "1995-09-01",
+  "currency": {
+    "code": "GBP",
+    "symbol": "£",
+    "display": "British Pound"
+  },
   "currentValue": {
     "amount": 950000.00,
     "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
@@ -9943,82 +9977,89 @@ The Arrangements API provides comprehensive management of client financial produ
     "code": "ACTIVE",
     "display": "Active - In Service"
   },
-  "schemeDetails": {
-    "schemeName": "NHS Pension Scheme (1995 Section)",
-    "schemeType": {
-      "code": "PUBLIC_SECTOR",
-      "display": "Public Sector DB"
-    },
-    "accrualRate": "1/80th",
-    "normalRetirementAge": 60,
-    "earlyRetirementAge": 55,
-    "employerName": "Royal London Hospital Trust"
+  "normalRetirementAge": 60,
+  "earlyRetirementAge": 55,
+  "accrualRate": "1/80th",
+  "schemeType": {
+    "code": "PUBLIC_SECTOR",
+    "display": "Public Sector DB"
   },
-  "serviceDetails": {
-    "totalService": 28.5,
-    "pensionableService": 28.5,
-    "additionalPurchasedYears": 0,
-    "projectedServiceAtRetirement": 35.0,
-    "yearsToNormalRetirement": 6.5
+  "dateSchemeJoined": "1995-09-01",
+  "expectedYearsOfService": 35.0,
+  "totalService": 28.5,
+  "pensionableService": 28.5,
+  "additionalPurchasedYears": 0,
+  "projectedServiceAtRetirement": 35.0,
+  "yearsToNormalRetirement": 6.5,
+  "pensionableSalary": {
+    "amount": 65000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
   },
-  "salaryDetails": {
-    "currentPensionableSalary": {
-      "amount": 65000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "finalSalary": {
-      "amount": 65000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "projectedFinalSalary": {
-      "amount": 72000.00,
+  "finalSalary": {
+    "amount": 65000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "projectedFinalSalary": {
+    "amount": 72000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "isIndexed": true,
+  "isPreserved": false,
+  "prospectivePensionNoLumpSum": {
+    "amount": 28875.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "prospectivePensionWithLumpSum": {
+    "amount": 23100.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "prospectiveLumpSum": {
+    "amount": 69300.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "gmpAmount": {
+    "amount": 1250.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "spousePension": {
+    "percentage": 50.0,
+    "amount": {
+      "amount": 11550.00,
       "currency": { "code": "GBP", "symbol": "£" }
     }
   },
-  "benefitDetails": {
-    "guaranteedAnnualPension": {
-      "amount": 23100.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "taxFreeLumpSum": {
-      "amount": 69300.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "spousePension": {
-      "percentage": 50.0,
-      "amount": {
-        "amount": 11550.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      }
-    },
-    "escalationRate": {
-      "code": "CPI",
-      "display": "CPI (Consumer Price Index)"
-    },
-    "escalationPercentage": 2.5,
-    "lifetimeValue": {
-      "amount": 462000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    }
+  "escalationRate": {
+    "code": "CPI",
+    "display": "CPI (Consumer Price Index)"
+  },
+  "escalationPercentage": 2.5,
+  "lifetimeValue": {
+    "amount": 462000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
   },
   "revaluationMethod": {
     "code": "CAREER_AVERAGE",
     "display": "Career Average Revalued Earnings (CARE)"
   },
-  "transferValue": {
-    "cetv": {
-      "amount": 950000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "cetvDate": "2026-01-15",
-    "cetvExpiry": "2026-04-15",
-    "cetvMultiple": 41.1,
-    "transferAdviceRequired": true,
-    "adviceThreshold": {
-      "amount": 30000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    }
+  "cashEquivalentTransferValue": {
+    "amount": 950000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
   },
+  "cetvDate": "2026-01-15",
+  "transferValueExpiryDate": "2026-04-15",
+  "cetvMultiple": 41.1,
+  "transferAdviceRequired": true,
+  "adviceThreshold": {
+    "amount": 30000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "deathInServiceSpousalBenefits": "Spouse receives 50% of prospective pension plus return of contributions",
+  "dependantBenefits": "Children's pensions available until age 23 if in full-time education",
+  "earlyRetirementFactorConsiderations": "3% reduction per year before age 60. No early retirement permitted before age 55.",
+  "canPurchaseAddedYears": true,
+  "hasAffinityDCScheme": false,
+  "indexationNotes": "CPI linked annual increases, capped at 5% p.a. Applied from scheme retirement date.",
+  "additionalNotes": "Protected rights from pre-1997 contracting out included. Member has option to transfer to 2015 CARE scheme.",
   "riskWarnings": [
     "Transfer value exceeds £30,000 - FCA regulated advice mandatory",
     "Loss of guaranteed income for life",
@@ -10033,27 +10074,291 @@ The Arrangements API provides comprehensive management of client financial produ
     "self": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004" },
     "factfind": { "href": "/api/v1/factfinds/ff-456" },
     "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-123" },
+    "provider": { "href": "/api/v1/providers/NHS-PS-001" },
+    "sellingAdviser": { "href": "/api/v1/advisers/adviser-456" },
     "beneficiaries": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-db-004/beneficiaries" },
     "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-db-004/valuations" }
   }
 }
 ```
 
+**Enum Tables:**
+
+**Agency Status Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `NotUnderAgency` | Not Under Agency |
+| `UnderAgencyInformationOnly` | Under Agency - Information Only |
+| `UnderAgencyServicingAgent` | Under Agency - Servicing Agent |
+
+**Scheme Type Codes:**
+
+| Code | Display Name | Description |
+|------|-------------|-------------|
+| `PUBLIC_SECTOR` | Public Sector DB | NHS, Teachers, Civil Service, Police, Fire |
+| `PRIVATE_SECTOR` | Private Sector DB | Corporate final salary schemes |
+| `FUNDED` | Funded DB | Scheme backed by separate fund |
+| `UNFUNDED` | Unfunded DB | Pay-as-you-go, typically public sector |
+| `CARE` | Career Average (CARE) | Career Average Revalued Earnings |
+| `HYBRID` | Hybrid DB/DC | Mixed benefit structure |
+
+**Escalation Rate Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `CPI` | CPI (Consumer Price Index) |
+| `RPI` | RPI (Retail Price Index) |
+| `LPI` | LPI (Limited Price Indexation) |
+| `FIXED` | Fixed Rate Escalation |
+| `NONE` | No Escalation |
+| `SECTION_148` | Section 148 Orders |
+
+**Revaluation Method Codes:**
+
+| Code | Display Name |
+|------|-------------|
+| `FINAL_SALARY` | Final Salary |
+| `CAREER_AVERAGE` | Career Average Revalued Earnings (CARE) |
+| `AVERAGE_SALARY` | Average Salary |
+| `BEST_CONSECUTIVE` | Best Consecutive Years |
+
+**Preservation Status Codes:**
+
+| Code | Display Name | Description |
+|------|-------------|-------------|
+| `ACTIVE` | Active - In Service | Member actively accruing benefits |
+| `DEFERRED` | Deferred / Preserved | Member left scheme, benefits preserved |
+| `PENSIONER` | Pensioner | Member retired, receiving pension |
+| `EARLY_LEAVER` | Early Leaver - Transferred Out | Benefits transferred to another scheme |
+
 **Validation Rules:**
-- `arrangementType.code` - Required, must be "FINAL_SALARY"
-- `schemeDetails.schemeName` - Required
-- `guaranteedAnnualPension` - Required
+- `arrangementType` - Required, must be "FINAL_SALARY"
+- `provider.name` - Required
+- `productName` - Required (scheme name)
+- `policyNumber` - Required
+- `owners` - Required, at least one owner with sum of ownershipPercentage = 100
+- `normalRetirementAge` - Required, must be between 55 and 75
+- `accrualRate` - Required (e.g., "1/60th", "1/80th", "1/120th")
+- `dateSchemeJoined` - Required, must be a past date
+- `pensionableSalary` - Required if status is ACTIVE
+- At least one prospective pension field required (NoLumpSum or WithLumpSum)
+- `cashEquivalentTransferValue` - Required if transfer being considered
+- `transferValueExpiryDate` - Required if CETV provided (typically 3 months from CETV date)
 - Transfer advice mandatory if CETV > £30,000 (FCA requirement)
-- Spouse's pension typically 50% of member's pension
-- Escalation rate required (CPI, RPI, Fixed, None)
+- `isIndexed` - Required boolean
+- `isPreserved` - Required boolean
+- `spousePension.percentage` - Typically 50% or 66.67%
+- `escalationRate` - Required if `isIndexed` = true
+- `gmpAmount` - Required if member has guaranteed minimum pension rights
+- `canPurchaseAddedYears` - Required boolean
+- `hasAffinityDCScheme` - Required boolean
 
 **Business Rules:**
-- CETV multiple calculated as CETV / Annual Pension
+- CETV multiple calculated as CETV / Annual Pension (prospectivePensionWithLumpSum)
 - Typical DB multipliers: 20-25x for good schemes, 30-40x+ for transfer incentives
 - Transfer advice required by FCA if CETV exceeds £30,000
 - Early retirement reductions typically 3-5% per year before NRA
-- Protected rights tracking for pre-1997 contracting out
+- Protected rights tracking for pre-1997 contracting out (include in additionalNotes)
 - Pension input amount tracking for annual allowance purposes
+- `yearsToNormalRetirement` - Calculated field: normalRetirementAge - member's current age
+- `lifetimeValue` - Calculated: prospectivePensionWithLumpSum × expected years in retirement
+- Provider vs Employer distinction:
+  - `provider` = Pension scheme administrator (e.g., "NHS Pension Scheme")
+  - `employer` = Actual employer organization (e.g., "Royal London Hospital Trust")
+- Prospective pension calculations:
+  - `prospectivePensionNoLumpSum` = Maximum annual pension if no lump sum taken
+  - `prospectivePensionWithLumpSum` = Reduced annual pension if maximum lump sum taken
+  - `prospectiveLumpSum` = Maximum tax-free lump sum available (typically 3x reduced pension)
+- GMP (Guaranteed Minimum Pension):
+  - Applies to members who contracted out of SERPS/S2P before April 2016
+  - Must be paid at least at GMP rate from State Pension Age
+  - Different escalation rules apply (fixed for pre-1988, capped at 3% for post-1988)
+- Indexation:
+  - Public sector schemes typically CPI-linked, often capped at 2.5% or 5%
+  - Private sector schemes may have LPI (Limited Price Indexation) capped at 2.5%, 3%, or 5%
+  - Escalation applies from retirement, not during deferment (unless CARE scheme)
+- Added Years:
+  - Some schemes allow purchase of additional years of service
+  - Cost typically calculated by scheme actuary based on age and service
+  - `canPurchaseAddedYears` indicates if this option is available
+- Affinity DC Scheme:
+  - Some DB schemes offer additional voluntary contributions (AVCs) via DC arrangement
+  - `hasAffinityDCScheme` indicates if this option is available
+  - If true, consider creating separate Personal Pension arrangement for AVC pot
+
+**Field Mapping (Legacy to New):**
+
+| Legacy Field Name | New Field Name | Notes |
+|-------------------|----------------|-------|
+| `startDate` | `dateSchemeJoined` | Clarifies this is scheme join date, not policy start |
+| `schemeDetails.schemeName` | `productName` | Flattened, consistent with investment pattern |
+| `schemeDetails.schemeType` | `schemeType` | Flattened |
+| `schemeDetails.accrualRate` | `accrualRate` | Flattened |
+| `schemeDetails.normalRetirementAge` | `normalRetirementAge` | Flattened |
+| `schemeDetails.earlyRetirementAge` | `earlyRetirementAge` | Flattened |
+| `schemeDetails.employerName` | `employer` | Flattened, renamed for consistency |
+| `serviceDetails.totalService` | `totalService` | Flattened |
+| `serviceDetails.pensionableService` | `pensionableService` | Flattened |
+| `serviceDetails.additionalPurchasedYears` | `additionalPurchasedYears` | Flattened |
+| `serviceDetails.projectedServiceAtRetirement` | `projectedServiceAtRetirement` | Flattened |
+| `salaryDetails.currentPensionableSalary` | `pensionableSalary` | Flattened, renamed to match screenshot |
+| `salaryDetails.finalSalary` | `finalSalary` | Flattened |
+| `salaryDetails.projectedFinalSalary` | `projectedFinalSalary` | Flattened |
+| `benefitDetails.guaranteedAnnualPension` | `prospectivePensionWithLumpSum` | Renamed to match screenshot label |
+| `benefitDetails.taxFreeLumpSum` | `prospectiveLumpSum` | Renamed to match screenshot label |
+| `benefitDetails.spousePension` | `spousePension` | Flattened |
+| `benefitDetails.escalationRate` | `escalationRate` | Flattened |
+| `benefitDetails.escalationPercentage` | `escalationPercentage` | Flattened |
+| `transferValue.cetv` | `cashEquivalentTransferValue` | Flattened, full name for clarity |
+| `transferValue.cetvDate` | `cetvDate` | Flattened |
+| `transferValue.cetvExpiry` | `transferValueExpiryDate` | Flattened, renamed to match screenshot |
+| N/A (new) | `prospectivePensionNoLumpSum` | New field from screenshot |
+| N/A (new) | `gmpAmount` | New field from screenshot |
+| N/A (new) | `isIndexed` | New boolean from screenshot |
+| N/A (new) | `isPreserved` | New boolean from screenshot |
+| N/A (new) | `deathInServiceSpousalBenefits` | New text field from screenshot |
+| N/A (new) | `earlyRetirementFactorConsiderations` | New textarea from screenshot |
+| N/A (new) | `dependantBenefits` | New text field from screenshot |
+| N/A (new) | `canPurchaseAddedYears` | New boolean from screenshot |
+| N/A (new) | `hasAffinityDCScheme` | New boolean from screenshot |
+| N/A (new) | `indexationNotes` | New textarea from screenshot |
+| N/A (new) | `additionalNotes` | New textarea from screenshot |
+| N/A (new) | `sellingAdviser` | New object - matches investment pattern |
+| N/A (new) | `agencyStatus` | New field - matches investment pattern |
+| N/A (new) | `agencyStatusDate` | New field - matches investment pattern |
+| N/A (new) | `employer` | New field - separate from provider |
+| N/A (new) | `expectedYearsOfService` | New field from screenshot |
+
+**Example: Preserved Final Salary Pension (Deferred Member)**
+
+```json
+{
+  "id": "arr-db-005",
+  "href": "/api/v1/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005",
+  "arrangementType": "FINAL_SALARY",
+  "arrangementCategory": "PENSION",
+  "provider": {
+    "name": "Aviva Master Trust",
+    "reference": "AVIVA-DB-001"
+  },
+  "employer": "Former Employer Ltd (scheme closed)",
+  "sellingAdviser": null,
+  "agencyStatus": null,
+  "productName": "Company Pension Scheme",
+  "policyNumber": "AVIVA-DB-445566",
+  "currency": {
+    "code": "GBP",
+    "symbol": "£",
+    "display": "British Pound"
+  },
+  "owners": [
+    {
+      "clientRef": {
+        "id": "client-125",
+        "fullName": "Sarah Jones",
+        "href": "/api/v1/factfinds/ff-456/clients/client-125"
+      },
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "status": {
+    "code": "DEFERRED",
+    "display": "Deferred - Preserved Benefits"
+  },
+  "normalRetirementAge": 65,
+  "earlyRetirementAge": 55,
+  "accrualRate": "1/60th",
+  "schemeType": {
+    "code": "PRIVATE_SECTOR",
+    "display": "Private Sector DB"
+  },
+  "dateSchemeJoined": "2005-04-01",
+  "dateLeft": "2018-08-31",
+  "expectedYearsOfService": 13.4,
+  "totalService": 13.4,
+  "pensionableService": 13.4,
+  "additionalPurchasedYears": 0,
+  "projectedServiceAtRetirement": 13.4,
+  "yearsToNormalRetirement": 18.5,
+  "pensionableSalary": {
+    "amount": 42000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "finalSalary": {
+    "amount": 42000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "projectedFinalSalary": {
+    "amount": 42000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "isIndexed": true,
+  "isPreserved": true,
+  "prospectivePensionNoLumpSum": {
+    "amount": 9380.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "prospectivePensionWithLumpSum": {
+    "amount": 7035.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "prospectiveLumpSum": {
+    "amount": 21105.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "gmpAmount": {
+    "amount": 650.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "spousePension": {
+    "percentage": 50.0,
+    "amount": {
+      "amount": 3517.50,
+      "currency": { "code": "GBP", "symbol": "£" }
+    }
+  },
+  "escalationRate": {
+    "code": "LPI",
+    "display": "LPI (Limited Price Indexation)"
+  },
+  "escalationPercentage": 2.5,
+  "revaluationMethod": {
+    "code": "FINAL_SALARY",
+    "display": "Final Salary"
+  },
+  "cashEquivalentTransferValue": {
+    "amount": 185000.00,
+    "currency": { "code": "GBP", "symbol": "£" }
+  },
+  "cetvDate": "2026-01-20",
+  "transferValueExpiryDate": "2026-04-20",
+  "cetvMultiple": 26.3,
+  "transferAdviceRequired": true,
+  "deathInServiceSpousalBenefits": "N/A - member no longer in service",
+  "dependantBenefits": "Spouse receives 50% pension. No children's pensions.",
+  "earlyRetirementFactorConsiderations": "5% reduction per year before age 65 (actuarially reduced). Scheme consent required for retirement before 60.",
+  "canPurchaseAddedYears": false,
+  "hasAffinityDCScheme": false,
+  "indexationNotes": "LPI (CPI capped at 2.5% p.a.) on pension in payment. Deferred revaluation at Section 148 orders (currently CPI capped at 5%).",
+  "additionalNotes": "Scheme closed to future accrual in 2015. All deferred members. GMP element from pre-1997 service.",
+  "riskWarnings": [
+    "Transfer value exceeds £30,000 - FCA regulated advice mandatory",
+    "Loss of guaranteed income for life",
+    "Loss of spouse's pension benefits",
+    "Private sector scheme - potential employer covenant risk",
+    "Scheme closed - may have higher transfer values to encourage transfers"
+  ],
+  "_links": {
+    "self": { "href": "/api/v1/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005" },
+    "factfind": { "href": "/api/v1/factfinds/ff-456" },
+    "owner": { "href": "/api/v1/factfinds/ff-456/clients/client-125" },
+    "provider": { "href": "/api/v1/providers/AVIVA-DB-001" },
+    "beneficiaries": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-db-005/beneficiaries" },
+    "valuations": { "href": "/api/v1/factfinds/ff-456/arrangements/arr-db-005/valuations" }
+  }
+}
+```
 
 #### 10.4.6 Pension Drawdown
 
