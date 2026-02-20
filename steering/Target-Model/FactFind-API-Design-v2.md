@@ -6103,18 +6103,30 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
     "fullName": "John Smith"
   },
   "totalMonthlyExpenditure": {
-    "currencyCode": "GBP",
-    "amount": 3855.00
+    "amount": 3855.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
   },
   "expenditures": [
     {
       "id": 1001,
       "href": "/api/v2/factfinds/234/clients/456/expenditures/1001",
+      "factfindRef": {
+        "id": 234,
+        "href": "/api/v2/factfinds/234"
+      },
       "description": "Monthly mortgage payment - main residence",
       "expenditureType": "Mortgage",
       "netAmount": {
-        "currencyCode": "GBP",
-        "amount": 1500.00
+        "amount": 1500.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
       },
       "frequency": "Monthly",
       "startsOn": "2020-06-01",
@@ -6131,11 +6143,19 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
     {
       "id": 1002,
       "href": "/api/v2/factfinds/234/clients/456/expenditures/1002",
+      "factfindRef": {
+        "id": 234,
+        "href": "/api/v2/factfinds/234"
+      },
       "description": "Council tax - Band D property",
       "expenditureType": "Council Tax",
       "netAmount": {
-        "currencyCode": "GBP",
-        "amount": 185.00
+        "amount": 185.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
       },
       "frequency": "Monthly",
       "startsOn": "2025-04-01",
@@ -6148,19 +6168,27 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
     {
       "id": 1004,
       "href": "/api/v2/factfinds/234/clients/456/expenditures/1004",
+      "factfindRef": {
+        "id": 234,
+        "href": "/api/v2/factfinds/234"
+      },
       "description": "Weekly food shopping and personal care items",
       "expenditureType": "Food & Personal Care",
       "netAmount": {
-        "currencyCode": "GBP",
-        "amount": 120.00
+        "amount": 520.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
       },
-      "frequency": "Weekly",
+      "frequency": "Monthly",
       "startsOn": "2025-01-01",
       "endsOn": null,
       "isConsolidated": false,
       "isLiabilityToBeRepaid": false,
       "liability": null,
-      "notes": "Family of 4"
+      "notes": "Family of 4 - approximately £120/week"
     }
   ],
   "_links": {
@@ -6187,8 +6215,12 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/income-changes/inc-change-4
   "description": "Car lease payment",
   "expenditureType": "Car/Travelling Expenses",
   "netAmount": {
-    "currencyCode": "GBP",
-    "amount": 300.00
+    "amount": 300.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
   },
   "frequency": "Monthly",
   "startsOn": "2024-01-01",
@@ -6207,15 +6239,26 @@ Location: /api/v2/factfinds/234/clients/456/expenditures/1005
 {
   "id": 1005,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1005",
+
+  "factfindRef": {
+    "id": 234,
+    "href": "/api/v2/factfinds/234"
+  },
+
   "client": {
     "id": 456,
     "href": "/api/v2/factfinds/234/clients/456"
   },
+
   "description": "Car lease payment",
   "expenditureType": "Car/Travelling Expenses",
   "netAmount": {
-    "currencyCode": "GBP",
-    "amount": 300.00
+    "amount": 300.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
   },
   "frequency": "Monthly",
   "startsOn": "2024-01-01",
@@ -24083,9 +24126,9 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 - Period tracking with start and end dates
 
 **Key Structure Changes (v2.2):**
-- **REMOVED:** `factfindRef` field (client reference provides context)
+- **RESTORED:** `factfindRef` field for consistent navigation patterns
 - **REMOVED:** `grossAmount` field (now only `netAmount`)
-- **CHANGED:** `netAmount` structure simplified to `{"currencyCode": "GBP", "amount": 1500.00}`
+- **CHANGED:** `netAmount` structure upgraded to full MoneyValue with currency object including code, display, and symbol
 - **ADDED:** `isConsolidated` flag for debt consolidation scenarios
 - **ADDED:** `isLiabilityToBeRepaid` flag to indicate debt repayment
 - **ADDED:** `liability` reference to link to the liability being repaid
@@ -24098,6 +24141,12 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 {
   "id": 1001,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1001",
+
+  "factfindRef": {
+    "id": 234,
+    "href": "/api/v2/factfinds/234"
+  },
+
   "client": {
     "id": 456,
     "href": "/api/v2/factfinds/234/clients/456"
@@ -24106,8 +24155,12 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "description": "Monthly mortgage payment - main residence",
   "expenditureType": "Mortgage",
   "netAmount": {
-    "currencyCode": "GBP",
-    "amount": 1500.00
+    "amount": 1500.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
   },
   "frequency": "Monthly",
   "startsOn": "2020-06-01",
@@ -24134,6 +24187,12 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 {
   "id": 1002,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1002",
+
+  "factfindRef": {
+    "id": 234,
+    "href": "/api/v2/factfinds/234"
+  },
+
   "client": {
     "id": 456,
     "href": "/api/v2/factfinds/234/clients/456"
@@ -24142,8 +24201,12 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "description": "Council tax - Band D property",
   "expenditureType": "Council Tax",
   "netAmount": {
-    "currencyCode": "GBP",
-    "amount": 185.00
+    "amount": 185.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
   },
   "frequency": "Monthly",
   "startsOn": "2025-04-01",
@@ -24166,6 +24229,12 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 {
   "id": 1003,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1003",
+
+  "factfindRef": {
+    "id": 234,
+    "href": "/api/v2/factfinds/234"
+  },
+
   "client": {
     "id": 456,
     "href": "/api/v2/factfinds/234/clients/456"
@@ -24174,8 +24243,12 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "description": "Credit card minimum payment",
   "expenditureType": "Credit Card",
   "netAmount": {
-    "currencyCode": "GBP",
-    "amount": 150.00
+    "amount": 150.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
   },
   "frequency": "Monthly",
   "startsOn": "2024-01-01",
@@ -24202,6 +24275,12 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 {
   "id": 1004,
   "href": "/api/v2/factfinds/234/clients/456/expenditures/1004",
+
+  "factfindRef": {
+    "id": 234,
+    "href": "/api/v2/factfinds/234"
+  },
+
   "client": {
     "id": 456,
     "href": "/api/v2/factfinds/234/clients/456"
@@ -24210,10 +24289,14 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "description": "Weekly food shopping and personal care items",
   "expenditureType": "Food & Personal Care",
   "netAmount": {
-    "currencyCode": "GBP",
-    "amount": 120.00
+    "amount": 520.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
   },
-  "frequency": "Weekly",
+  "frequency": "Monthly",
   "startsOn": "2025-01-01",
   "endsOn": null,
 
@@ -24221,7 +24304,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
   "isLiabilityToBeRepaid": false,
   "liability": null,
 
-  "notes": "Family of 4",
+  "notes": "Family of 4 - approximately £120/week",
 
   "createdAt": "2026-01-15T10:00:00Z",
   "updatedAt": "2026-02-18T14:30:00Z"
@@ -24236,6 +24319,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 |-------|------|----------|-------------|
 | `id` | integer | read-only | System-assigned expenditure identifier |
 | `href` | string | read-only | Canonical URI for this expenditure |
+| `factfindRef` | FactFindReference | required-on-create, write-once | Reference to the owning FactFind |
 | `client` | ClientReference | required-on-create | Reference to the client who has this expenditure |
 
 **Expenditure Details**
@@ -24244,7 +24328,7 @@ The `Expenditure` contract represents a single expenditure item (outgoing paymen
 |-------|------|----------|-------------|
 | `description` | string | optional | Description of the expenditure (max 500 chars) |
 | `expenditureType` | enum | required-on-create | Type/category of expenditure (see Expenditure Types below) |
-| `netAmount` | MoneyValue | required-on-create | Amount paid after tax (if applicable) - simplified structure with `currencyCode` and `amount` |
+| `netAmount` | MoneyValue | required-on-create | Amount paid after tax (if applicable) - full MoneyValue structure with `amount` and nested `currency` object containing `code`, `display`, and `symbol` |
 | `frequency` | enum | required-on-create | Payment frequency: Daily, Weekly, Fortnightly, Monthly, Quarterly, Annually |
 
 **Period**
@@ -24310,10 +24394,14 @@ Expenditure types are organized into three categories based on their importance 
 #### Validation Rules
 
 - `id` is read-only, auto-generated by the system
+- `factfindRef` is required on create and write-once (cannot be changed after creation)
 - `client` is required on create
 - `expenditureType` is required, must be one of the enum values from the table above
 - `netAmount` is required, must be positive (> 0)
-- `netAmount.currencyCode` must be valid ISO 4217 currency code (e.g., GBP, EUR, USD)
+- `netAmount.amount` must be positive (> 0)
+- `netAmount.currency.code` must be valid ISO 4217 currency code (e.g., GBP, EUR, USD)
+- `netAmount.currency.display` must be provided (full currency name)
+- `netAmount.currency.symbol` must be provided (currency symbol)
 - `frequency` is required, must be one of: Daily, Weekly, Fortnightly, Monthly, Quarterly, Annually
 - `endsOn` must be after `startsOn` if both provided
 - If `startsOn` is provided, it cannot be in the future (cannot start payments that haven't begun)

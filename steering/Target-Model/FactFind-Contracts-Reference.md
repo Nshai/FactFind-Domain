@@ -3567,10 +3567,11 @@ Represents a single expenditure item (outgoing payment) for a client, used for b
 |-----------|------|-------------|---------------|
 | id | Number | Unique identifier for the expenditure | 1001 |
 | href | Text | Link to this expenditure resource | /api/v2/factfinds/234/clients/456/expenditures/1001 |
+| factfindRef | Link to FactFind | The fact-find that this expenditure belongs to | FactFind #234 |
 | client | Link to Client | The client who has this expenditure | Client #456 |
 | description | Text | Description of the expenditure | Monthly mortgage payment |
 | expenditureType | Selection | Type/category of expenditure | Mortgage, Rent, Council Tax, etc. |
-| netAmount | Currency Amount | Amount paid (after tax if applicable) | £1,500.00 |
+| netAmount | Currency Amount | Amount paid (after tax if applicable) - includes currency code, name, and symbol | £1,500.00 (GBP - British Pound) |
 | frequency | Selection | How often the payment is made | Monthly, Weekly, Annually |
 | startsOn | Date | When the expenditure started | 2025-01-01 |
 | endsOn | Date | When the expenditure ends (if known) | null (ongoing) |
@@ -3583,6 +3584,13 @@ Represents a single expenditure item (outgoing payment) for a client, used for b
 
 #### Nested Field Groups
 
+**factfindRef:**
+
+| Field Name | Type | Description | Example Value |
+|-----------|------|-------------|---------------|
+| id | Number | FactFind identifier | 234 |
+| href | Text | Link to the fact-find | /api/v2/factfinds/234 |
+
 **client:**
 
 | Field Name | Type | Description | Example Value |
@@ -3594,8 +3602,10 @@ Represents a single expenditure item (outgoing payment) for a client, used for b
 
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
-| currencyCode | Text | Currency code (ISO 4217) | GBP |
-| amount | Number | Amount paid | 1500.00 |
+| amount | Number | The monetary amount | 1500.00 |
+| currency.code | Text | ISO 4217 currency code | GBP |
+| currency.display | Text | Full currency name | British Pound |
+| currency.symbol | Text | Currency symbol | £ |
 
 **liability (optional):**
 
