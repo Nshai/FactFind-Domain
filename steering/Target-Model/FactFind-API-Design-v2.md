@@ -6358,601 +6358,1448 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/expenditure-changes/exp-cha
 - `Stop` - Expenditure will cease
 - `Start` - New expenditure will commence
 
-### 6.4 Affordability
+### 6.4 Affordability Assessment
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability`
+**Base Path:** `/api/v2/factfinds/{factfindId}/affordability`
 
-**Purpose:** Calculate comprehensive affordability assessments for clients based on their income and expenditure, supporting mortgage applications, protection planning, investment planning, and debt consolidation scenarios.
+**Purpose:** Provides comprehensive affordability assessments for both monthly cashflow analysis and lumpsum investment planning. Supports mortgage applications, protection planning, investment advice, debt consolidation scenarios, and retirement planning through sophisticated scenario modelling and calculation capabilities.
 
-**Scope:**
-- Monthly disposable income calculations
-- Revised income/expenditure with expected changes
-- Consolidated and repaid liability adjustments
-- Protection premium impact analysis
-- Emergency fund assessment
-- Lump sum availability analysis
-- Multiple scenario modeling (forgo non-essentials, exclude liabilities, rebroker protection)
-- Budget agreement and tracking
+#### 6.4.1 Overview
+
+Affordability Assessment is a critical component of the fact-find process that evaluates a client's financial capacity to take on new commitments or make investment decisions. This API enables advisers to:
 
 **Key Features:**
-- **Dynamic Calculations** - Real-time affordability based on selected income and expenditure items
-- **Scenario Modeling** - Toggle various options to see impact on disposable income
-- **Expected Changes** - Include or exclude future income/expenditure changes
-- **Liability Consolidation** - Model impact of debt consolidation
-- **Protection Analysis** - Calculate protection premium impact
-- **Emergency Fund** - Track committed vs required emergency fund
-- **Lump Sum Planning** - Model available capital for investment or debt reduction
+- **Monthly Cashflow Analysis** - Calculate disposable income based on current income and expenditure
+- **Scenario Modelling** - Test multiple "what-if" scenarios with configurable options:
+  * Incorporate planned income/expenditure changes
+  * Model forgoing non-essential expenditure
+  * Exclude consolidated debts
+  * Exclude debts being repaid
+  * Include new protection premium costs
+- **Lumpsum Investment Assessment** - Evaluate available capital for investment or debt reduction
+- **Emergency Fund Planning** - Calculate required emergency reserves and track shortfalls
+- **Multi-Client Support** - Assess affordability for individual clients or joint scenarios
+- **Dynamic Recalculation** - All calculated fields update automatically when inputs change
+- **Regulatory Compliance** - Built-in validation for FCA affordability requirements
 
-**Aggregate Root:** Client (affordability nested under client)
+**Use Cases:**
+1. **Mortgage Applications** - Demonstrate affordability for mortgage lending criteria
+2. **Investment Advice** - Determine sustainable monthly investment capacity
+3. **Retirement Planning** - Assess sustainability of retirement income vs expenditure
+4. **Debt Consolidation** - Model impact of consolidating multiple debts
+5. **Protection Planning** - Calculate impact of new protection premiums on cashflow
+6. **Emergency Fund Planning** - Establish appropriate emergency reserves
 
 **Regulatory Compliance:**
-- MCOB (Mortgage Conduct of Business) - Affordability assessments
-- FCA Handbook - Responsible lending requirements
-- Consumer Duty - Understanding customer financial position
-- COBS 9.2 - Assessing suitability for investments and protection
-- CCA (Consumer Credit Act) - Creditworthiness assessments
+- MCOB (Mortgage Conduct of Business) - Mortgage affordability assessments
+- FCA Handbook COBS 9.2 - Suitability for investments and protection
+- Consumer Duty - Understanding customer financial position and vulnerability
+- FCA Responsible Lending - Creditworthiness assessments
+- CCA (Consumer Credit Act) - Pre-contractual credit assessments
 
-#### 6.4.1 Operations Summary
+#### 6.4.2 Operations Summary
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability` | Calculate affordability | `affordability:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability` | List all affordability calculations | `affordability:read` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Get specific calculation | `affordability:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Update calculation parameters | `affordability:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}` | Delete calculation | `affordability:write` |
+| GET | `/api/v2/factfinds/{factfindId}/affordability` | List all affordability assessments | Yes |
+| POST | `/api/v2/factfinds/{factfindId}/affordability` | Create new affordability assessment | Yes |
+| GET | `/api/v2/factfinds/{factfindId}/affordability/{affordabilityId}` | Get specific assessment | Yes |
+| PATCH | `/api/v2/factfinds/{factfindId}/affordability/{affordabilityId}` | Update assessment parameters | Yes |
+| POST | `/api/v2/factfinds/{factfindId}/affordability/{affordabilityId}/recalculate` | Trigger recalculation | Yes |
+| DELETE | `/api/v2/factfinds/{factfindId}/affordability/{affordabilityId}` | Delete assessment | Yes |
 
-**Total Endpoints:** 5
+**Total Endpoints:** 6
 
-#### 6.4.2 Calculate Affordability
+**Key Design Decisions:**
+- Affordability assessments are factfind-level resources (not nested under client)
+- Support for multiple clients within a single assessment (joint scenarios)
+- Automatic calculation on create/update
+- Explicit recalculate endpoint for manual refresh
+- Soft delete for audit trail preservation
 
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/affordability`
+#### 6.4.3 Key Endpoints
 
-**Description:** Perform a comprehensive affordability calculation based on selected income and expenditure items, with configurable scenario options.
+##### 6.4.3.1 Get Affordability Assessment
 
-**Request Body:**
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/affordability/{affordabilityId}`
 
-```json
-{
-  "incomes": [
-    { "id": 1 },
-    { "id": 2 }
-  ],
-  "expenditures": [
-    { "id": 1 },
-    { "id": 2 },
-    { "id": 3 }
-  ],
-  "options": {
-    "isIncludeExpectedIncomeChanges": true,
-    "isIncludeExpectedExpenditureChanges": false,
-    "isForgoNonEssentialExpenditure": false,
-    "isExcludeConsolidatedLiabilities": false,
-    "isExcludeRepaidLiabilities": false,
-    "isRebrokerProtection": false
-  },
-  "emergencyFund": {
-    "committedAmount": {
-      "amount": 5000.00,
-      "currencyCode": "GBP"
-    },
-    "requiredAmount": {
-      "amount": 8000.00,
-      "currencyCode": "GBP"
-    }
-  },
-  "lumpSum": {
-    "availableAmount": {
-      "amount": 50000.00,
-      "currencyCode": "GBP"
-    },
-    "agreedInvestmentAmount": {
-      "amount": 30000.00,
-      "currencyCode": "GBP"
-    },
-    "fundSource": "PropertySale",
-    "isAvailableWithoutPenalty": true,
-    "totalFundsAvailable": {
-      "amount": 55000.00,
-      "currencyCode": "GBP"
-    },
-    "notes": "From property sale completion expected March 2026"
-  },
-  "agreedBudget": {
-    "amount": 1500.00,
-    "currencyCode": "GBP"
-  },
-  "notes": "Client has variable income from bonus"
-}
-```
+**Description:** Retrieve a specific affordability assessment with all calculated values.
 
-**Response:**
+**Path Parameters:**
+- `factfindId` (string, required) - The fact-find identifier
+- `affordabilityId` (integer, required) - The affordability assessment identifier
+
+**Response:** `200 OK`
+
+**Response Body:**
 
 ```json
 {
   "id": 1001,
-  "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1001",
-  "clientRef": {
+  "href": "/api/v2/factfinds/456/affordability/1001",
+
+  "factfind": {
     "id": 456,
-    "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-234/clients/456"
+    "href": "/api/v2/factfinds/456"
   },
+
+  "clients": [
+    {
+      "id": 456,
+      "href": "/api/v2/factfinds/456/clients/456"
+    }
+  ],
+
   "incomes": [
     {
-      "id": 1,
-      "description": "Primary employment salary",
-      "netMonthlyAmount": {
-        "amount": 3500.00,
-        "currencyCode": "GBP"
-      },
-      "href": "/api/v2/factfinds/ff-234/clients/456/income/001"
-    },
-    {
-      "id": 2,
-      "description": "Rental income from BTL property",
-      "netMonthlyAmount": {
-        "amount": 1000.00,
-        "currencyCode": "GBP"
-      },
-      "href": "/api/v2/factfinds/ff-234/clients/456/income/002"
+      "id": 2001,
+      "href": "/api/v2/factfinds/456/clients/456/incomes/2001"
     }
   ],
+
   "expenditures": [
     {
-      "id": 1,
-      "description": "Mortgage payment",
-      "monthlyAmount": {
-        "amount": 1500.00,
-        "currencyCode": "GBP"
-      },
-      "isEssential": true,
-      "href": "/api/v2/factfinds/ff-234/clients/456/expenditure/exp-001"
-    },
-    {
-      "id": 2,
-      "description": "Living expenses",
-      "monthlyAmount": {
-        "amount": 1000.00,
-        "currencyCode": "GBP"
-      },
-      "isEssential": true,
-      "href": "/api/v2/factfinds/ff-234/clients/456/expenditure/exp-002"
-    },
-    {
-      "id": 3,
-      "description": "Gym membership and leisure",
-      "monthlyAmount": {
-        "amount": 300.00,
-        "currencyCode": "GBP"
-      },
-      "isEssential": false,
-      "href": "/api/v2/factfinds/ff-234/clients/456/expenditure/exp-003"
+      "id": 1001,
+      "href": "/api/v2/factfinds/456/clients/456/expenditures/1001"
     }
   ],
-  "monthly": {
+
+  "monthlyCashFlow": {
     "totalNetIncome": {
       "amount": 4500.00,
-      "currencyCode": "GBP"
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "totalExpenditure": {
       "amount": 2800.00,
-      "currencyCode": "GBP"
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "disposableIncome": {
       "amount": 1700.00,
-      "currencyCode": "GBP"
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+
+  "monthlyModelling": {
+    "options": {
+      "incorporateIncomeChanges": "Yes",
+      "incorporateExpenditureChanges": "Yes",
+      "forgoNonEssentialExpenditure": "No",
+      "excludeConsolidatedExpenditure": "Yes",
+      "excludeRepaidExpenditure": "Yes",
+      "hasRebrokerProtection": "No"
     },
-    "revisedIncome": {
-      "amount": 4700.00,
-      "currencyCode": "GBP"
-    },
-    "revisedExpenditure": {
-      "amount": 2900.00,
-      "currencyCode": "GBP"
-    },
-    "consolidatedExpenditure": {
-      "amount": 500.00,
-      "currencyCode": "GBP"
-    },
-    "repaidExpenditure": {
-      "amount": 300.00,
-      "currencyCode": "GBP"
-    },
-    "protectionPremiums": {
-      "amount": 150.00,
-      "currencyCode": "GBP"
-    },
-    "finalDisposableIncome": {
-      "amount": 1250.00,
-      "currencyCode": "GBP"
-    },
-    "isIncludeExpectedIncomeChanges": true,
-    "isIncludeExpectedExpenditureChanges": false,
-    "isForgoNonEssentialExpenditure": false,
-    "isExcludeConsolidatedLiabilities": false,
-    "isExcludeRepaidLiabilities": false,
-    "isRebrokerProtection": false,
-    "agreedBudget": {
+    "agreedMonthlyBudget": {
       "amount": 1500.00,
-      "currencyCode": "GBP"
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "notes": "Client has variable income from bonus"
   },
-  "emergencyFund": {
-    "committedAmount": {
-      "amount": 5000.00,
-      "currencyCode": "GBP"
+
+  "monthlyAffordability": {
+    "revisedIncome": {
+      "amount": 4700.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
-    "requiredAmount": {
-      "amount": 8000.00,
-      "currencyCode": "GBP"
+    "revisedExpenditure": {
+      "amount": 2900.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
-    "shortfall": {
-      "amount": 3000.00,
-      "currencyCode": "GBP"
+    "consolidatedExpenditurePayments": {
+      "amount": 500.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "expenditurePaymentsTobeRepaid": {
+      "amount": 300.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "protectionPremiums": {
+      "amount": 150.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "finalDisposableIncome": {
+      "amount": 1250.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     }
   },
-  "lumpSum": {
-    "availableAmount": {
+
+  "lumpsumAffordability": {
+    "totalLumpSumAvailable": {
       "amount": 50000.00,
-      "currencyCode": "GBP"
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
     "agreedInvestmentAmount": {
       "amount": 30000.00,
-      "currencyCode": "GBP"
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
-    "fundSource": "PropertySale",
-    "isAvailableWithoutPenalty": true,
+    "sourceOfInvestment": "PropertySale",
+    "isInvestmentAvailableWithoutPenalty": "Yes",
+    "notes": "From property sale completion expected March 2026",
     "totalFundsAvailable": {
       "amount": 55000.00,
-      "currencyCode": "GBP"
-    },
-    "notes": "From property sale completion expected March 2026"
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
   },
+
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "requiredAmount": {
+      "amount": 8000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "shortfall": {
+      "amount": 3000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+
   "createdAt": "2026-01-15T10:30:00Z",
-  "updatedAt": "2026-01-29T14:45:00Z",
-  "concurrencyId": 5,
-    "client": {
-      "href": "/api/v2/factfinds/ff-234/clients/456"
-    },
-    "update": {
-      "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1001",
-      "method": "PATCH"
-    },
-    "delete": {
-      "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1001",
-      "method": "DELETE"
-    }
-  }
+  "lastUpdatedAt": "2026-01-29T14:45:00Z"
 }
 ```
 
-**Calculation Logic:**
+**Status Codes:**
+- `200 OK` - Assessment retrieved successfully
+- `404 Not Found` - Assessment or fact-find not found
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
 
-**1. Base Calculation:**
-```
-disposableIncome = totalNetIncome - totalExpenditure
-```
+**Business Logic:**
+- All calculated fields are read-only and computed server-side
+- MonthlyC ashFlow calculations aggregate data from referenced incomes and expenditures
+- MonthlyAffordability applies scenario options to produce adjusted figures
+- LumpsumAffordability evaluates available capital for investment
 
-**2. Revised Income (with expected changes):**
-```
-revisedIncome = totalNetIncome + expectedIncomeIncreases - expectedIncomeDecreases
-```
+---
 
-**3. Revised Expenditure (with expected changes):**
-```
-revisedExpenditure = totalExpenditure + expectedExpenditureIncreases - expectedExpenditureDecreases
-```
+##### 6.4.3.2 Create Affordability Assessment
 
-**4. Consolidated Expenditure Adjustment:**
-```
-If isExcludeConsolidatedLiabilities = true:
-  adjustedExpenditure = revisedExpenditure - consolidatedExpenditure
-```
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/affordability`
 
-**5. Repaid Expenditure Adjustment:**
-```
-If isExcludeRepaidLiabilities = true:
-  adjustedExpenditure = adjustedExpenditure - repaidExpenditure
-```
+**Description:** Create a new affordability assessment with initial parameters. All calculated fields are automatically computed.
 
-**6. Non-Essential Forgo:**
-```
-If isForgoNonEssentialExpenditure = true:
-  adjustedExpenditure = essentialExpenditureOnly
-```
-
-**7. Protection Premium Adjustment:**
-```
-If isRebrokerProtection = true:
-  adjustedExpenditure = adjustedExpenditure - currentProtectionPremiums + rebrokenProtectionPremiums
-```
-
-**8. Final Disposable Income:**
-```
-finalDisposableIncome = revisedIncome - adjustedExpenditure
-```
-
-**Validation Rules:**
-- `incomes` - At least one income required
-- `expenditures` - At least one expenditure required
-- All income/expenditure IDs must exist and belong to client
-- Emergency fund amounts must be non-negative
-- Lump sum amounts must be non-negative
-- agreedInvestmentAmount cannot exceed availableAmount
-
-**Business Rules:**
-- All amounts normalized to monthly frequency
-- Income changes only included if isIncludeExpectedIncomeChanges = true
-- Expenditure changes only included if isIncludeExpectedExpenditureChanges = true
-- Emergency fund shortfall calculated as requiredAmount - committedAmount
-- Emergency fund recommendation: 3-6 months essential expenditure
-- Final disposable income used for mortgage affordability, investment capacity
-
-#### 6.4.3 List Affordability Calculations
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/affordability`
-
-**Description:** Retrieve all affordability calculations for a client.
-
-**Query Parameters:**
-- `sort` - Sort by createdAt, updatedAt (default: createdAt desc)
-- `limit` - Maximum results (default: 20, max: 100)
-- `offset` - Pagination offset
-
-**Response:**
-
-```json
-{
-  "clientRef": {
-    "id": 456,
-    "fullName": "John Smith",
-    "href": "/api/v2/factfinds/ff-234/clients/456"
-  },
-  "calculations": [
-    {
-      "id": 1001,
-      "createdAt": "2026-01-29T14:45:00Z",
-      "monthly": {
-        "totalNetIncome": {
-          "amount": 4500.00,
-          "currencyCode": "GBP"
-        },
-        "finalDisposableIncome": {
-          "amount": 1250.00,
-          "currencyCode": "GBP"
-        }
-      },
-      "notes": "Client has variable income from bonus",
-      "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1001"
-    },
-    {
-      "id": 1000,
-      "createdAt": "2026-01-15T10:30:00Z",
-      "monthly": {
-        "totalNetIncome": {
-          "amount": 4200.00,
-          "currencyCode": "GBP"
-        },
-        "finalDisposableIncome": {
-          "amount": 1100.00,
-          "currencyCode": "GBP"
-        }
-      },
-      "notes": "Initial assessment",
-      "href": "/api/v2/factfinds/ff-234/clients/456/affordability/1000"
-    }
-  ],
-  "totalCount": 2,
-    "client": {
-      "href": "/api/v2/factfinds/ff-234/clients/456"
-    }
-  }
-}
-```
-
-#### 6.4.4 Update Affordability Calculation
-
-**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}`
-
-**Description:** Update scenario options or add/remove income/expenditure items, triggering recalculation.
+**Path Parameters:**
+- `factfindId` (string, required) - The fact-find identifier
 
 **Request Body:**
 
 ```json
 {
-  "options": {
-    "isForgoNonEssentialExpenditure": true,
-    "isExcludeConsolidatedLiabilities": true
+  "clients": [
+    {
+      "id": 456
+    }
+  ],
+
+  "incomes": [
+    {
+      "id": 2001
+    },
+    {
+      "id": 2002
+    }
+  ],
+
+  "expenditures": [
+    {
+      "id": 1001
+    },
+    {
+      "id": 1002
+    },
+    {
+      "id": 1003
+    }
+  ],
+
+  "monthlyModelling": {
+    "options": {
+      "incorporateIncomeChanges": "Yes",
+      "incorporateExpenditureChanges": "Yes",
+      "forgoNonEssentialExpenditure": "No",
+      "excludeConsolidatedExpenditure": "Yes",
+      "excludeRepaidExpenditure": "Yes",
+      "hasRebrokerProtection": "No"
+    },
+    "agreedMonthlyBudget": {
+      "amount": 1500.00,
+      "currency": {
+        "code": "GBP"
+      }
+    },
+    "notes": "Client has variable income from bonus"
   },
-  "agreedBudget": {
-    "amount": 1800.00,
-    "currencyCode": "GBP"
+
+  "lumpsumAffordability": {
+    "totalLumpSumAvailable": {
+      "amount": 50000.00,
+      "currency": {
+        "code": "GBP"
+      }
+    },
+    "agreedInvestmentAmount": {
+      "amount": 30000.00,
+      "currency": {
+        "code": "GBP"
+      }
+    },
+    "sourceOfInvestment": "PropertySale",
+    "isInvestmentAvailableWithoutPenalty": "Yes",
+    "notes": "From property sale completion expected March 2026"
   },
-  "notes": "Updated scenario: client willing to forgo non-essentials"
+
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 5000.00,
+      "currency": {
+        "code": "GBP"
+      }
+    },
+    "requiredAmount": {
+      "amount": 8000.00,
+      "currency": {
+        "code": "GBP"
+      }
+    }
+  }
 }
 ```
 
-**Response:** 200 OK with recalculated affordability entity.
+**Response:** `201 Created`
+
+**Response Body:** Full affordability assessment entity (same structure as GET response)
+
+**Response Headers:**
+```
+Location: /api/v2/factfinds/456/affordability/1001
+```
+
+**Status Codes:**
+- `201 Created` - Assessment created successfully
+- `400 Bad Request` - Invalid request data or validation failure
+- `404 Not Found` - Referenced clients, incomes, or expenditures not found
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+
+**Validation Rules:**
+- At least 1 client required
+- At least 1 income required
+- Expenditures can be empty array (clients with no recorded expenditure)
+- All referenced IDs must exist and belong to the fact-find
+- All MoneyValue amounts must be non-negative
+- `agreedMonthlyBudget` cannot exceed calculated `finalDisposableIncome`
+- `agreedInvestmentAmount` cannot exceed `totalLumpSumAvailable`
+- Yes/No fields must be exactly "Yes" or "No" (case-sensitive)
+
+**Business Logic:**
+- Server automatically calculates all fields in monthlyCashFlow
+- Server applies monthlyModelling options to calculate monthlyAffordability
+- Server calculates emergencyFund.shortfall
+- Server calculates lumpsumAffordability.totalFundsAvailable
+- Currency codes must be consistent across all money values in the assessment
+
+---
+
+##### 6.4.3.3 Update Affordability Assessment
+
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/affordability/{affordabilityId}`
+
+**Description:** Update scenario options, budget amounts, or change which incomes/expenditures are included. All calculated fields automatically recalculate.
+
+**Path Parameters:**
+- `factfindId` (string, required) - The fact-find identifier
+- `affordabilityId` (integer, required) - The affordability assessment identifier
+
+**Request Body:**
+
+```json
+{
+  "monthlyModelling": {
+    "options": {
+      "forgoNonEssentialExpenditure": "Yes",
+      "excludeConsolidatedExpenditure": "Yes"
+    },
+    "agreedMonthlyBudget": {
+      "amount": 1800.00,
+      "currency": {
+        "code": "GBP"
+      }
+    },
+    "notes": "Updated scenario: client willing to reduce non-essentials"
+  },
+
+  "lumpsumAffordability": {
+    "agreedInvestmentAmount": {
+      "amount": 35000.00,
+      "currency": {
+        "code": "GBP"
+      }
+    }
+  }
+}
+```
+
+**Response:** `200 OK`
+
+**Response Body:** Full affordability assessment entity with recalculated values
+
+**Status Codes:**
+- `200 OK` - Assessment updated successfully
+- `400 Bad Request` - Invalid request data or validation failure
+- `404 Not Found` - Assessment or fact-find not found
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
 
 **Automatic Recalculations:**
-- All monthly figures recalculated
-- Revised income/expenditure updated
-- Final disposable income recalculated
-- Updated timestamp incremented
-- concurrencyId incremented
+- All monthlyCashFlow values recalculated if incomes/expenditures changed
+- All monthlyAffordability values recalculated based on new options
+- emergencyFund.shortfall recalculated if amounts changed
+- lastUpdatedAt timestamp updated
 
-#### 6.4.5 Delete Affordability Calculation
-
-**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/{affordabilityId}`
-
-**Description:** Delete an affordability calculation.
-
-**Response:** 204 No Content
-
-**Business Rules:**
-- Soft delete (retained for audit)
-- Does not affect related income/expenditure records
-- Cannot delete if referenced in active mortgage application
+**Partial Update Support:**
+- Only provided fields are updated
+- Nested objects are merged (not replaced entirely)
+- To unset optional fields, explicitly set to null
 
 ---
 
-**Scenario Options Explained:**
+##### 6.4.3.4 Recalculate Affordability
 
-| Option | Description | Impact |
-|--------|-------------|--------|
-| **isIncludeExpectedIncomeChanges** | Include future income increases/decreases | Increases revisedIncome if positive changes expected |
-| **isIncludeExpectedExpenditureChanges** | Include future expenditure increases/decreases | May increase/decrease revisedExpenditure |
-| **isForgoNonEssentialExpenditure** | Client willing to cut non-essential spending | Reduces expenditure to essentials only |
-| **isExcludeConsolidatedLiabilities** | Model debt consolidation scenario | Reduces expenditure by consolidated debt payments |
-| **isExcludeRepaidLiabilities** | Exclude debts being paid off | Reduces expenditure by repaid debt amounts |
-| **isRebrokerProtection** | Model rebrokering protection policies | Adjusts expenditure based on new protection premiums |
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/affordability/{affordabilityId}/recalculate`
 
----
+**Description:** Manually trigger recalculation of all derived fields. Useful when underlying income or expenditure records have been updated outside of this assessment.
 
-**Emergency Fund Calculation:**
+**Path Parameters:**
+- `factfindId` (string, required) - The fact-find identifier
+- `affordabilityId` (integer, required) - The affordability assessment identifier
 
-**Required Amount Recommendation:**
-- **Conservative:** 6 months essential expenditure
-- **Moderate:** 4 months essential expenditure
-- **Aggressive:** 3 months essential expenditure
+**Request Body:** Empty (or optional notes)
 
-**Formula:**
-```
-requiredAmount = essentialMonthlyExpenditure × months (3-6)
-shortfall = requiredAmount - committedAmount
+```json
+{
+  "notes": "Recalculated after updating client employment income"
+}
 ```
 
-**Example:**
-- Essential monthly expenditure: £2,500
-- Months coverage: 4
-- Required amount: £10,000
-- Committed amount: £6,000
-- **Shortfall: £4,000**
+**Response:** `200 OK`
 
----
+**Response Body:** Full affordability assessment entity with recalculated values
 
-**Lump Sum Sources:**
-
-| Code | Display | Description |
-|------|---------|-------------|
-| PROPERTY_SALE | PropertySale | Proceeds from property sale |
-| INHERITANCE | Inheritance | Inherited funds |
-| BONUS | Bonus | Employment bonus |
-| INVESTMENT_MATURITY | InvestmentMaturity | Maturing investment |
-| SAVINGS | Savings | Accumulated savings |
-| GIFT | Gift | Gift from family |
-| PENSION_LUMP_SUM | PensionLumpSum | Tax-free pension lump sum |
-| REDUNDANCY | Redundancy | Redundancy payment |
-| OTHER | Other | Other lump sum source |
-
----
+**Status Codes:**
+- `200 OK` - Recalculation completed successfully
+- `404 Not Found` - Assessment or fact-find not found
+- `422 Unprocessable Entity` - Referenced incomes/expenditures no longer exist
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
 
 **Use Cases:**
+- Client income records have been updated
+- Expenditure records have been modified
+- Referenced records have been deleted (will return 422)
+- Periodic refresh to ensure data consistency
 
-### Use Case 1: Mortgage Affordability Assessment
+---
 
-**Scenario:** Client applying for £250,000 mortgage
+#### 6.4.4 Field Definitions
 
-**API Flow:**
+##### Identification Fields
+
+| Field | Type | Required | Read-Only | Description |
+|-------|------|----------|-----------|-------------|
+| `id` | integer | - | Yes | Unique identifier for the assessment (auto-generated) |
+| `href` | string | - | Yes | Canonical URI for this assessment |
+| `factfind.id` | integer | On create | Yes | Reference to parent fact-find |
+| `factfind.href` | string | - | Yes | URI to parent fact-find |
+| `clients` | array | On create | No | Array of client references included in this assessment (minimum 1) |
+| `clients[].id` | integer | Yes | No | Client identifier |
+| `clients[].href` | string | - | Yes | URI to client resource |
+| `incomes` | array | On create | No | Array of income references to include (minimum 1) |
+| `incomes[].id` | integer | Yes | No | Income identifier |
+| `incomes[].href` | string | - | Yes | URI to income resource |
+| `expenditures` | array | On create | No | Array of expenditure references to include (can be empty) |
+| `expenditures[].id` | integer | Yes | No | Expenditure identifier |
+| `expenditures[].href` | string | - | Yes | URI to expenditure resource |
+
+##### Monthly Cash Flow (Read-Only Calculated)
+
+All fields in this section are calculated server-side based on the referenced incomes and expenditures.
+
+| Field | Type | Required | Read-Only | Description |
+|-------|------|----------|-----------|-------------|
+| `monthlyCashFlow.totalNetIncome` | MoneyValue | - | Yes | Sum of all net annual income from incomes array ÷ 12 |
+| `monthlyCashFlow.totalExpenditure` | MoneyValue | - | Yes | Sum of all expenditures converted to monthly equivalent |
+| `monthlyCashFlow.disposableIncome` | MoneyValue | - | Yes | totalNetIncome - totalExpenditure |
+
+**Calculation Logic:**
 ```
-1. POST /clients/456/affordability
-   Request: {
-     incomes: [salary, rental income],
-     expenditures: [all current expenditures],
-     options: {
-       isIncludeExpectedIncomeChanges: false,  // Conservative
-       isIncludeExpectedExpenditureChanges: true,
-       isForgoNonEssentialExpenditure: false
-     }
-   }
-
-2. Response shows:
-   - finalDisposableIncome: £1,250/month
-   - Maximum affordable mortgage payment: ~£1,000/month (80% of disposable)
-   - Affordable loan amount: ~£220,000 (at 4% over 25 years)
-
-3. Decision: £250,000 mortgage marginally affordable
-   - Requires: Reduce non-essentials OR increase income OR longer term
-```
-
-### Use Case 2: Debt Consolidation Planning
-
-**Scenario:** Client has 3 credit cards totaling £15,000, paying £500/month
-
-**API Flow:**
-```
-1. Create affordability scenario with consolidation:
-   POST /clients/456/affordability
-   Request: {
-     options: {
-       isExcludeConsolidatedLiabilities: true
-     },
-     consolidatedExpenditure: { amount: 500.00 }
-   }
-
-2. Response shows:
-   - Current disposable income: £800/month
-   - With consolidation (£250/month loan): £1,050/month
-   - Monthly saving: £250
-
-3. Decision: Consolidate at 8% APR over 5 years
-   - New payment: £250/month
-   - Frees up: £250/month
-   - Total interest saved: £3,000+
+totalNetIncome = Σ(incomes[].netAnnualAmount) / 12
+totalExpenditure = Σ(expenditures[].monthlyEquivalent)
+disposableIncome = totalNetIncome - totalExpenditure
 ```
 
-### Use Case 3: Investment Capacity Assessment
+##### Monthly Modelling Options
 
-**Scenario:** Client wants to start regular investment
+Controls which scenario adjustments are applied to calculate revised affordability.
 
-**API Flow:**
+| Field | Type | Required | Read-Only | Description | Values |
+|-------|------|----------|-----------|-------------|--------|
+| `monthlyModelling.options.incorporateIncomeChanges` | string | No | No | Include expected future income changes | "Yes" or "No" |
+| `monthlyModelling.options.incorporateExpenditureChanges` | string | No | No | Include expected future expenditure changes | "Yes" or "No" |
+| `monthlyModelling.options.forgoNonEssentialExpenditure` | string | No | No | Exclude all non-essential expenditure | "Yes" or "No" |
+| `monthlyModelling.options.excludeConsolidatedExpenditure` | string | No | No | Exclude expenditures marked for consolidation | "Yes" or "No" |
+| `monthlyModelling.options.excludeRepaidExpenditure` | string | No | No | Exclude expenditures marked to be repaid | "Yes" or "No" |
+| `monthlyModelling.options.hasRebrokerProtection` | string | No | No | Include cost of new/rebrokered protection | "Yes" or "No" |
+| `monthlyModelling.agreedMonthlyBudget` | MoneyValue | No | No | Monthly amount client commits to for new commitment |  |
+| `monthlyModelling.notes` | string | No | No | Free-text notes about modelling assumptions | Max 1000 chars |
+
+**Default Values (if not provided):**
+- All options default to "No"
+- agreedMonthlyBudget defaults to null
+- notes defaults to empty string
+
+##### Monthly Affordability (Read-Only Calculated)
+
+All fields in this section are calculated by applying monthlyModelling options to the base cashflow.
+
+| Field | Type | Required | Read-Only | Description |
+|-------|------|----------|-----------|-------------|
+| `monthlyAffordability.revisedIncome` | MoneyValue | - | Yes | Income adjusted for expected changes (if incorporateIncomeChanges = "Yes") |
+| `monthlyAffordability.revisedExpenditure` | MoneyValue | - | Yes | Expenditure adjusted for expected changes (if incorporateExpenditureChanges = "Yes") |
+| `monthlyAffordability.consolidatedExpenditurePayments` | MoneyValue | - | Yes | Sum of expenditure payments flagged as consolidated |
+| `monthlyAffordability.expenditurePaymentsTobeRepaid` | MoneyValue | - | Yes | Sum of expenditure payments flagged to be repaid |
+| `monthlyAffordability.protectionPremiums` | MoneyValue | - | Yes | Sum of protection arrangement premiums (if hasRebrokerProtection = "Yes") |
+| `monthlyAffordability.finalDisposableIncome` | MoneyValue | - | Yes | Final monthly surplus after all adjustments |
+
+**Calculation Logic (detailed in section 6.4.5)**
+
+##### Lumpsum Affordability
+
+Assesses available capital for investment, purchase, or debt reduction.
+
+| Field | Type | Required | Read-Only | Description |
+|-------|------|----------|-----------|-------------|
+| `lumpsumAffordability.totalLumpSumAvailable` | MoneyValue | No | No | Total cash available for investment/commitment |
+| `lumpsumAffordability.agreedInvestmentAmount` | MoneyValue | No | No | Amount client agrees to invest/commit |
+| `lumpsumAffordability.sourceOfInvestment` | string | No | No | Where the funds come from (free text or enum) |
+| `lumpsumAffordability.isInvestmentAvailableWithoutPenalty` | string | No | No | Can funds be accessed without penalties? | "Yes" or "No" |
+| `lumpsumAffordability.notes` | string | No | No | Additional context about lumpsum availability | Max 1000 chars |
+| `lumpsumAffordability.totalFundsAvailable` | MoneyValue | - | Yes | Total funds available (calculated, may include other sources) |
+
+**Validation:**
+- agreedInvestmentAmount cannot exceed totalLumpSumAvailable
+- sourceOfInvestment typically one of: PropertySale, Inheritance, Bonus, InvestmentMaturity, Savings, Gift, PensionLumpSum, Redundancy, Other
+
+##### Emergency Fund
+
+Tracks emergency fund adequacy and shortfall.
+
+| Field | Type | Required | Read-Only | Description |
+|-------|------|----------|-----------|-------------|
+| `emergencyFund.committedAmount` | MoneyValue | No | No | Amount client has set aside for emergencies |
+| `emergencyFund.requiredAmount` | MoneyValue | No | No | Recommended emergency fund (typically 3-6 months essential expenditure) |
+| `emergencyFund.shortfall` | MoneyValue | - | Yes | Gap to close (requiredAmount - committedAmount, minimum 0) |
+
+**Calculation Logic:**
 ```
-1. Calculate current affordability:
-   GET /clients/456/affordability (latest)
-   - finalDisposableIncome: £1,250/month
-   - agreedBudget: £1,500/month (client's target)
-
-2. Available for investment:
-   - Current disposable: £1,250
-   - Recommended emergency fund top-up: £100/month
-   - Available for regular investment: £1,150/month
-
-3. Recommendation:
-   - Regular investment: £800/month
-   - Emergency fund: £100/month
-   - Buffer: £350/month
-
-4. Create investment plan referencing affordability calculation
+shortfall = MAX(0, requiredAmount - committedAmount)
 ```
 
-### Use Case 4: Forgo Non-Essentials Scenario
+**Business Rule:**
+- requiredAmount typically = essentialMonthlyExpenditure × months (3-6)
 
-**Scenario:** Client struggling with affordability, model cutting non-essentials
+##### Audit Trail
 
-**API Flow:**
+| Field | Type | Required | Read-Only | Description |
+|-------|------|----------|-----------|-------------|
+| `createdAt` | timestamp | - | Yes | When assessment was created (ISO 8601 format) |
+| `lastUpdatedAt` | timestamp | - | Yes | When assessment was last modified (ISO 8601 format) |
+
+---
+
+#### 6.4.5 Calculation Rules
+
+This section documents the precise formulas used to calculate derived fields.
+
+##### Monthly Cash Flow Calculations
+
+**1. Total Net Income (Monthly)**
 ```
-1. Current position:
-   - Disposable income: £600/month
-   - Non-essential expenditure: £400/month
-   - Essential only: £200/month
+totalNetIncome = Σ(incomes[i].netAnnualAmount) / 12
 
-2. Model scenario:
-   PATCH /clients/456/affordability/1001
-   Request: {
-     options: { isForgoNonEssentialExpenditure: true }
-   }
-
-3. Response shows:
-   - Original disposable income: £600/month
-   - With forgo non-essentials: £1,000/month
-   - Improvement: £400/month
-
-4. Discussion with client:
-   - Identify which non-essentials can be reduced
-   - Gym, entertainment, dining out
-   - Create sustainable budget
+Where:
+  - netAnnualAmount is the after-tax annual income for each income source
+  - Result is normalized to monthly frequency
 ```
+
+**2. Total Expenditure (Monthly)**
+```
+totalExpenditure = Σ(expenditures[i].monthlyEquivalent)
+
+Where:
+  - monthlyEquivalent converts all expenditures to monthly frequency
+  - Annual expenditure ÷ 12
+  - Quarterly expenditure ÷ 3
+  - Weekly expenditure × 52 ÷ 12
+```
+
+**3. Disposable Income**
+```
+disposableIncome = totalNetIncome - totalExpenditure
+```
+
+##### Monthly Affordability Calculations
+
+**4. Revised Income**
+```
+IF incorporateIncomeChanges = "Yes":
+  revisedIncome = totalNetIncome + Σ(expectedIncomeIncreases) - Σ(expectedIncomeDecreases)
+ELSE:
+  revisedIncome = totalNetIncome
+
+Where:
+  - expectedIncomeIncreases/Decreases come from income records with futureChange flags
+  - All normalized to monthly frequency
+```
+
+**5. Revised Expenditure (Base)**
+```
+IF incorporateExpenditureChanges = "Yes":
+  revisedExpenditure = totalExpenditure + Σ(expectedExpenditureIncreases) - Σ(expectedExpenditureDecreases)
+ELSE:
+  revisedExpenditure = totalExpenditure
+```
+
+**6. Apply Forgo Non-Essentials Option**
+```
+IF forgoNonEssentialExpenditure = "Yes":
+  revisedExpenditure = Σ(expenditures WHERE isEssential = true)
+
+This overrides step 5 - only essential expenditures are counted
+```
+
+**7. Consolidated Expenditure Adjustment**
+```
+consolidatedExpenditurePayments = Σ(expenditures WHERE isConsolidated = true)
+
+IF excludeConsolidatedExpenditure = "Yes":
+  revisedExpenditure = revisedExpenditure - consolidatedExpenditurePayments
+```
+
+**8. Repaid Expenditure Adjustment**
+```
+expenditurePaymentsTobeRepaid = Σ(expenditures WHERE isLiabilityToBeRepaid = true)
+
+IF excludeRepaidExpenditure = "Yes":
+  revisedExpenditure = revisedExpenditure - expenditurePaymentsTobeRepaid
+```
+
+**9. Protection Premium Adjustment**
+```
+IF hasRebrokerProtection = "Yes":
+  protectionPremiums = Σ(newProtectionArrangements.monthlyPremium)
+  revisedExpenditure = revisedExpenditure + protectionPremiums
+ELSE:
+  protectionPremiums = 0
+```
+
+**10. Final Disposable Income**
+```
+finalDisposableIncome = revisedIncome - revisedExpenditure
+```
+
+##### Lumpsum Affordability Calculations
+
+**11. Total Funds Available**
+```
+totalFundsAvailable = totalLumpSumAvailable + Σ(additionalAvailableFunds)
+
+Where:
+  - additionalAvailableFunds might include accessible savings, maturing investments, etc.
+  - For basic scenarios: totalFundsAvailable = totalLumpSumAvailable
+```
+
+##### Emergency Fund Calculations
+
+**12. Shortfall**
+```
+shortfall = MAX(0, requiredAmount - committedAmount)
+
+If committedAmount >= requiredAmount, shortfall = 0
+```
+
+**Recommended Required Amount:**
+```
+requiredAmount = essentialMonthlyExpenditure × months
+
+Where months typically:
+  - Conservative approach: 6 months
+  - Moderate approach: 4 months
+  - Minimum recommendation: 3 months
+```
+
+---
+
+#### 6.4.6 Validation Rules
+
+**Required Fields (on create):**
+- `factfind` reference is required
+- `clients` array must contain at least 1 client
+- `incomes` array must contain at least 1 income
+- `expenditures` array can be empty (representing client with no recorded expenditure)
+
+**Reference Validation:**
+- All client IDs must exist in the fact-find
+- All income IDs must exist and belong to one of the specified clients
+- All expenditure IDs must exist and belong to one of the specified clients
+- Cross-fact-find references are not permitted
+
+**Money Value Validation:**
+- All MoneyValue amounts must be >= 0 (non-negative)
+- All MoneyValue currency codes must be valid ISO 4217 codes
+- All money values within a single assessment should use consistent currency
+- Mixing currencies within one assessment is not recommended (may cause calculation errors)
+
+**Option Field Validation:**
+- All Yes/No fields must be exactly "Yes" or "No" (case-sensitive)
+- Invalid values like "yes", "YES", "true", "1" will be rejected
+
+**Budget Validation:**
+- `agreedMonthlyBudget` cannot exceed `finalDisposableIncome`
+- `agreedInvestmentAmount` cannot exceed `totalLumpSumAvailable`
+- Both can be equal to their respective maximums
+
+**Emergency Fund Validation:**
+- `committedAmount` must be >= 0
+- `requiredAmount` must be >= 0
+- `committedAmount` can exceed `requiredAmount` (shortfall will be 0)
+
+**Text Field Length Limits:**
+- `monthlyModelling.notes`: 1000 characters
+- `lumpsumAffordability.notes`: 1000 characters
+- `lumpsumAffordability.sourceOfInvestment`: 100 characters
+
+---
+
+#### 6.4.7 Business Rules
+
+**Emergency Fund Guidelines:**
+- Standard recommendation: 3-6 months of essential expenditure
+- Essential expenditure = Σ(expenditures WHERE isEssential = true)
+- Higher-risk situations (self-employed, single income): 6 months
+- Lower-risk situations (dual income, stable employment): 3-4 months
+- Emergency fund should be held in accessible, low-risk accounts
+
+**Mortgage Affordability Standards:**
+- Lenders typically stress-test at higher interest rates (+2-3% above current rate)
+- Affordable mortgage payment typically <= 40-45% of gross income
+- finalDisposableIncome should comfortably cover proposed mortgage payment
+- Conservative approach: mortgage payment <= 35% of net income
+- Must account for future life changes (children, retirement, etc.)
+
+**Investment Capacity Assessment:**
+- Never invest emergency fund reserves
+- Regular contributions should not compromise essential expenditure
+- Lumpsum investments should maintain adequate liquidity buffer
+- Consider penalty-free access requirements (especially for shorter time horizons)
+
+**Debt Consolidation Scenarios:**
+- Model excludes consolidated debt payments to show improved cashflow
+- Consolidation only beneficial if lower total interest cost
+- Must ensure client can afford consolidated payment sustainably
+- Warning: extending term may increase total interest paid despite lower monthly payment
+
+**Protection Planning:**
+- New protection premiums should be affordable from sustainable income
+- Rebrokering may increase/decrease premiums
+- hasRebrokerProtection option models the cost impact
+- Protection premiums should not exceed 5-10% of net income typically
+
+**Non-Essential Expenditure:**
+- forgoNonEssentialExpenditure models worst-case scenario
+- Used for conservative mortgage affordability assessments
+- Helps identify sustainable cutbacks if income reduced
+- Not a long-term recommendation (quality of life considerations)
+
+**Currency Consistency:**
+- All money values should use the same currency within one assessment
+- Mixed currencies require manual conversion before assessment
+- Exchange rates should be documented if conversions performed
+
+**Regulatory Compliance:**
+- FCA MCOB rules require comprehensive affordability assessment for mortgages
+- Must consider foreseeable future changes (retirement, children, etc.)
+- Consumer Duty requires understanding of customer vulnerability
+- Documentation should support suitability of recommendations
+
+---
+
+#### 6.4.8 Comprehensive Examples
+
+##### Example 1: Mortgage Application Scenario
+
+**Context:**
+- Joint clients applying for £350,000 mortgage
+- Combined income: £75,000/year (£6,250/month after tax)
+- Existing mortgage: £1,200/month (will be replaced)
+- Want to consolidate two credit card debts: £300/month total
+- Proposed new mortgage payment: £1,850/month
+
+**POST /api/v2/factfinds/456/affordability**
+
+```json
+{
+  "clients": [
+    { "id": 101 },
+    { "id": 102 }
+  ],
+
+  "incomes": [
+    { "id": 501 },
+    { "id": 502 }
+  ],
+
+  "expenditures": [
+    { "id": 801 },
+    { "id": 802 },
+    { "id": 803 },
+    { "id": 804 },
+    { "id": 805 }
+  ],
+
+  "monthlyModelling": {
+    "options": {
+      "incorporateIncomeChanges": "No",
+      "incorporateExpenditureChanges": "Yes",
+      "forgoNonEssentialExpenditure": "No",
+      "excludeConsolidatedExpenditure": "Yes",
+      "excludeRepaidExpenditure": "Yes",
+      "hasRebrokerProtection": "No"
+    },
+    "agreedMonthlyBudget": {
+      "amount": 1850.00,
+      "currency": { "code": "GBP" }
+    },
+    "notes": "Conservative assessment - not including expected bonus income. Excluding current mortgage (will be repaid) and credit cards (will be consolidated)."
+  },
+
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 10000.00,
+      "currency": { "code": "GBP" }
+    },
+    "requiredAmount": {
+      "amount": 12000.00,
+      "currency": { "code": "GBP" }
+    }
+  }
+}
+```
+
+**Response: 201 Created**
+
+```json
+{
+  "id": 2001,
+  "href": "/api/v2/factfinds/456/affordability/2001",
+
+  "factfind": {
+    "id": 456,
+    "href": "/api/v2/factfinds/456"
+  },
+
+  "clients": [
+    { "id": 101, "href": "/api/v2/factfinds/456/clients/101" },
+    { "id": 102, "href": "/api/v2/factfinds/456/clients/102" }
+  ],
+
+  "incomes": [
+    { "id": 501, "href": "/api/v2/factfinds/456/clients/101/incomes/501" },
+    { "id": 502, "href": "/api/v2/factfinds/456/clients/102/incomes/502" }
+  ],
+
+  "expenditures": [
+    { "id": 801, "href": "/api/v2/factfinds/456/clients/101/expenditures/801" },
+    { "id": 802, "href": "/api/v2/factfinds/456/clients/101/expenditures/802" },
+    { "id": 803, "href": "/api/v2/factfinds/456/clients/101/expenditures/803" },
+    { "id": 804, "href": "/api/v2/factfinds/456/clients/102/expenditures/804" },
+    { "id": 805, "href": "/api/v2/factfinds/456/clients/102/expenditures/805" }
+  ],
+
+  "monthlyCashFlow": {
+    "totalNetIncome": {
+      "amount": 6250.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "totalExpenditure": {
+      "amount": 4350.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "disposableIncome": {
+      "amount": 1900.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "monthlyModelling": {
+    "options": {
+      "incorporateIncomeChanges": "No",
+      "incorporateExpenditureChanges": "Yes",
+      "forgoNonEssentialExpenditure": "No",
+      "excludeConsolidatedExpenditure": "Yes",
+      "excludeRepaidExpenditure": "Yes",
+      "hasRebrokerProtection": "No"
+    },
+    "agreedMonthlyBudget": {
+      "amount": 1850.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "notes": "Conservative assessment - not including expected bonus income. Excluding current mortgage (will be repaid) and credit cards (will be consolidated)."
+  },
+
+  "monthlyAffordability": {
+    "revisedIncome": {
+      "amount": 6250.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "revisedExpenditure": {
+      "amount": 2850.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "consolidatedExpenditurePayments": {
+      "amount": 300.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "expenditurePaymentsTobeRepaid": {
+      "amount": 1200.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "protectionPremiums": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "finalDisposableIncome": {
+      "amount": 3400.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "lumpsumAffordability": null,
+
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 10000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "requiredAmount": {
+      "amount": 12000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "shortfall": {
+      "amount": 2000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "createdAt": "2026-02-20T10:30:00Z",
+  "lastUpdatedAt": "2026-02-20T10:30:00Z"
+}
+```
+
+**Interpretation:**
+- **Before remortgage:** Disposable income = £1,900/month
+- **After remortgage:** Final disposable income = £3,400/month
+- **Impact:** Remortgage increases disposable income by £1,500/month
+- **Proposed payment:** £1,850/month fits comfortably within £3,400 available
+- **Affordability verdict:** AFFORDABLE ✓
+- **Recommendation:** Proceed with application, build emergency fund from improved cashflow
+
+---
+
+##### Example 2: Investment Advice Scenario
+
+**Context:**
+- Single client, age 45
+- Just sold buy-to-let property: £80,000 proceeds
+- Wants to invest for retirement (20 years)
+- Regular income sustainable for monthly contributions
+- Already has adequate emergency fund
+
+**POST /api/v2/factfinds/789/affordability**
+
+```json
+{
+  "clients": [
+    { "id": 201 }
+  ],
+
+  "incomes": [
+    { "id": 601 }
+  ],
+
+  "expenditures": [
+    { "id": 901 },
+    { "id": 902 },
+    { "id": 903 }
+  ],
+
+  "monthlyModelling": {
+    "options": {
+      "incorporateIncomeChanges": "No",
+      "incorporateExpenditureChanges": "No",
+      "forgoNonEssentialExpenditure": "No",
+      "excludeConsolidatedExpenditure": "No",
+      "excludeRepaidExpenditure": "No",
+      "hasRebrokerProtection": "No"
+    },
+    "agreedMonthlyBudget": {
+      "amount": 800.00,
+      "currency": { "code": "GBP" }
+    },
+    "notes": "Client wants to invest £800/month regularly for retirement"
+  },
+
+  "lumpsumAffordability": {
+    "totalLumpSumAvailable": {
+      "amount": 80000.00,
+      "currency": { "code": "GBP" }
+    },
+    "agreedInvestmentAmount": {
+      "amount": 70000.00,
+      "currency": { "code": "GBP" }
+    },
+    "sourceOfInvestment": "PropertySale",
+    "isInvestmentAvailableWithoutPenalty": "Yes",
+    "notes": "BTL property sale completed January 2026. Retaining £10,000 for potential home improvements."
+  },
+
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 15000.00,
+      "currency": { "code": "GBP" }
+    },
+    "requiredAmount": {
+      "amount": 12000.00,
+      "currency": { "code": "GBP" }
+    }
+  }
+}
+```
+
+**Response: 201 Created**
+
+```json
+{
+  "id": 3001,
+  "href": "/api/v2/factfinds/789/affordability/3001",
+
+  "factfind": {
+    "id": 789,
+    "href": "/api/v2/factfinds/789"
+  },
+
+  "clients": [
+    { "id": 201, "href": "/api/v2/factfinds/789/clients/201" }
+  ],
+
+  "incomes": [
+    { "id": 601, "href": "/api/v2/factfinds/789/clients/201/incomes/601" }
+  ],
+
+  "expenditures": [
+    { "id": 901, "href": "/api/v2/factfinds/789/clients/201/expenditures/901" },
+    { "id": 902, "href": "/api/v2/factfinds/789/clients/201/expenditures/902" },
+    { "id": 903, "href": "/api/v2/factfinds/789/clients/201/expenditures/903" }
+  ],
+
+  "monthlyCashFlow": {
+    "totalNetIncome": {
+      "amount": 3800.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "totalExpenditure": {
+      "amount": 2600.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "disposableIncome": {
+      "amount": 1200.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "monthlyModelling": {
+    "options": {
+      "incorporateIncomeChanges": "No",
+      "incorporateExpenditureChanges": "No",
+      "forgoNonEssentialExpenditure": "No",
+      "excludeConsolidatedExpenditure": "No",
+      "excludeRepaidExpenditure": "No",
+      "hasRebrokerProtection": "No"
+    },
+    "agreedMonthlyBudget": {
+      "amount": 800.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "notes": "Client wants to invest £800/month regularly for retirement"
+  },
+
+  "monthlyAffordability": {
+    "revisedIncome": {
+      "amount": 3800.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "revisedExpenditure": {
+      "amount": 2600.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "consolidatedExpenditurePayments": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "expenditurePaymentsTobeRepaid": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "protectionPremiums": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "finalDisposableIncome": {
+      "amount": 1200.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "lumpsumAffordability": {
+    "totalLumpSumAvailable": {
+      "amount": 80000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "agreedInvestmentAmount": {
+      "amount": 70000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "sourceOfInvestment": "PropertySale",
+    "isInvestmentAvailableWithoutPenalty": "Yes",
+    "notes": "BTL property sale completed January 2026. Retaining £10,000 for potential home improvements.",
+    "totalFundsAvailable": {
+      "amount": 80000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 15000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "requiredAmount": {
+      "amount": 12000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "shortfall": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "createdAt": "2026-02-20T11:15:00Z",
+  "lastUpdatedAt": "2026-02-20T11:15:00Z"
+}
+```
+
+**Interpretation:**
+- **Monthly capacity:** £1,200 disposable income available
+- **Proposed monthly investment:** £800 (67% of disposable income)
+- **Buffer remaining:** £400/month for unexpected costs
+- **Lumpsum capacity:** £70,000 from property sale (retaining £10,000)
+- **Emergency fund:** Fully funded (no shortfall) ✓
+- **Affordability verdict:** AFFORDABLE ✓
+- **Recommendation:**
+  * Lumpsum investment: £70,000 into diversified pension/ISA
+  * Regular contribution: £800/month
+  * Review after 12 months (lifestyle may improve without rental property costs)
+
+---
+
+##### Example 3: Retirement Planning Scenario
+
+**Context:**
+- Retired couple (ages 68 and 66)
+- Fixed pension income
+- Mortgage paid off
+- Want to assess sustainability of current expenditure
+- Considering one-off luxury cruise: £12,000
+
+**POST /api/v2/factfinds/555/affordability**
+
+```json
+{
+  "clients": [
+    { "id": 301 },
+    { "id": 302 }
+  ],
+
+  "incomes": [
+    { "id": 701 },
+    { "id": 702 },
+    { "id": 703 }
+  ],
+
+  "expenditures": [
+    { "id": 1001 },
+    { "id": 1002 },
+    { "id": 1003 },
+    { "id": 1004 }
+  ],
+
+  "monthlyModelling": {
+    "options": {
+      "incorporateIncomeChanges": "Yes",
+      "incorporateExpenditureChanges": "Yes",
+      "forgoNonEssentialExpenditure": "No",
+      "excludeConsolidatedExpenditure": "No",
+      "excludeRepaidExpenditure": "No",
+      "hasRebrokerProtection": "No"
+    },
+    "agreedMonthlyBudget": {
+      "amount": 0.00,
+      "currency": { "code": "GBP" }
+    },
+    "notes": "Retirement sustainability check. State pension increases incorporated."
+  },
+
+  "lumpsumAffordability": {
+    "totalLumpSumAvailable": {
+      "amount": 45000.00,
+      "currency": { "code": "GBP" }
+    },
+    "agreedInvestmentAmount": {
+      "amount": 12000.00,
+      "currency": { "code": "GBP" }
+    },
+    "sourceOfInvestment": "Savings",
+    "isInvestmentAvailableWithoutPenalty": "Yes",
+    "notes": "Accessible savings for planned cruise in 2026. Want to ensure affordability without compromising financial security."
+  },
+
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 20000.00,
+      "currency": { "code": "GBP" }
+    },
+    "requiredAmount": {
+      "amount": 15000.00,
+      "currency": { "code": "GBP" }
+    }
+  }
+}
+```
+
+**Response: 201 Created**
+
+```json
+{
+  "id": 4001,
+  "href": "/api/v2/factfinds/555/affordability/4001",
+
+  "factfind": {
+    "id": 555,
+    "href": "/api/v2/factfinds/555"
+  },
+
+  "clients": [
+    { "id": 301, "href": "/api/v2/factfinds/555/clients/301" },
+    { "id": 302, "href": "/api/v2/factfinds/555/clients/302" }
+  ],
+
+  "incomes": [
+    { "id": 701, "href": "/api/v2/factfinds/555/clients/301/incomes/701" },
+    { "id": 702, "href": "/api/v2/factfinds/555/clients/301/incomes/702" },
+    { "id": 703, "href": "/api/v2/factfinds/555/clients/302/incomes/703" }
+  ],
+
+  "expenditures": [
+    { "id": 1001, "href": "/api/v2/factfinds/555/clients/301/expenditures/1001" },
+    { "id": 1002, "href": "/api/v2/factfinds/555/clients/301/expenditures/1002" },
+    { "id": 1003, "href": "/api/v2/factfinds/555/clients/302/expenditures/1003" },
+    { "id": 1004, "href": "/api/v2/factfinds/555/clients/302/expenditures/1004" }
+  ],
+
+  "monthlyCashFlow": {
+    "totalNetIncome": {
+      "amount": 3200.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "totalExpenditure": {
+      "amount": 2400.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "disposableIncome": {
+      "amount": 800.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "monthlyModelling": {
+    "options": {
+      "incorporateIncomeChanges": "Yes",
+      "incorporateExpenditureChanges": "Yes",
+      "forgoNonEssentialExpenditure": "No",
+      "excludeConsolidatedExpenditure": "No",
+      "excludeRepaidExpenditure": "No",
+      "hasRebrokerProtection": "No"
+    },
+    "agreedMonthlyBudget": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "notes": "Retirement sustainability check. State pension increases incorporated."
+  },
+
+  "monthlyAffordability": {
+    "revisedIncome": {
+      "amount": 3350.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "revisedExpenditure": {
+      "amount": 2500.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "consolidatedExpenditurePayments": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "expenditurePaymentsTobeRepaid": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "protectionPremiums": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "finalDisposableIncome": {
+      "amount": 850.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "lumpsumAffordability": {
+    "totalLumpSumAvailable": {
+      "amount": 45000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "agreedInvestmentAmount": {
+      "amount": 12000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "sourceOfInvestment": "Savings",
+    "isInvestmentAvailableWithoutPenalty": "Yes",
+    "notes": "Accessible savings for planned cruise in 2026. Want to ensure affordability without compromising financial security.",
+    "totalFundsAvailable": {
+      "amount": 45000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "emergencyFund": {
+    "committedAmount": {
+      "amount": 20000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "requiredAmount": {
+      "amount": 15000.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    },
+    "shortfall": {
+      "amount": 0.00,
+      "currency": { "code": "GBP", "display": "British Pound", "symbol": "£" }
+    }
+  },
+
+  "createdAt": "2026-02-20T14:20:00Z",
+  "lastUpdatedAt": "2026-02-20T14:20:00Z"
+}
+```
+
+**Interpretation:**
+- **Current position:** £800/month surplus (sustainable) ✓
+- **Future position:** £850/month surplus (with state pension increases) ✓
+- **Cruise affordability:** £12,000 from £45,000 savings (27%)
+- **Remaining savings after cruise:** £33,000 (well above £20,000 emergency fund)
+- **Emergency fund:** Fully funded with £5,000 buffer ✓
+- **Affordability verdict:** CRUISE IS AFFORDABLE ✓
+- **Recommendation:**
+  * Retirement income sustainable with comfortable margin
+  * Cruise affordable without compromising financial security
+  * Maintain £20,000 emergency fund
+  * Annual surplus of ~£10,000 available for discretionary spending
+  * Consider inflation impact on fixed incomes - review annually
 
 ---
 

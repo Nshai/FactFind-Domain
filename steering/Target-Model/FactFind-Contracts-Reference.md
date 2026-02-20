@@ -4560,164 +4560,197 @@ The `ExpenditureChanges` contract represents anticipated changes to a client's e
 
 ### Business Purpose
 
-Evaluates the client's ability to afford financial commitments such as mortgages or regular investment contributions.
+The Affordability Assessment evaluates a client's financial capacity to take on new commitments or make investment decisions. It provides comprehensive analysis of both monthly cashflow sustainability and lumpsum capital availability, supporting mortgage applications, investment advice, protection planning, debt consolidation, and retirement planning.
 
 ### Key Features
 
-- Calculates disposable income
-- Applies stress tests for interest rate changes
-- Checks against regulatory lending criteria
-- Provides affordability verdict
+- **Monthly Cashflow Analysis** - Calculates disposable income based on actual income and expenditure
+- **Scenario Modelling** - Tests "what-if" scenarios with configurable options (forgo non-essentials, exclude debts, etc.)
+- **Lumpsum Assessment** - Evaluates available capital for investment or major purchases
+- **Emergency Fund Planning** - Tracks adequacy of emergency reserves
+- **Multi-Client Support** - Handles joint assessments for couples
+- **Automated Calculations** - All derived fields calculated automatically by the system
+- **Regulatory Compliance** - Built-in validation for FCA affordability requirements
+
+### Common Scenarios
+
+**Mortgage Applications:**
+- Demonstrate affordability for mortgage lending criteria
+- Model impact of new mortgage payment on cashflow
+- Show effect of consolidating existing debts
+- Exclude current mortgage payment (being replaced)
+
+**Investment Advice:**
+- Determine sustainable monthly investment capacity
+- Assess lumpsum investment from property sale or inheritance
+- Ensure emergency fund adequacy before investing
+- Calculate remaining buffer after commitments
+
+**Retirement Planning:**
+- Assess sustainability of retirement income vs expenditure
+- Model effect of state pension increases
+- Evaluate affordability of one-off expenses (holidays, home improvements)
+- Long-term cashflow sustainability checks
+
+**Debt Consolidation:**
+- Model improved cashflow from consolidating multiple debts
+- Compare current position vs consolidated scenario
+- Demonstrate monthly savings from consolidation
+- Ensure sustainable repayment capacity
 
 ### Fields
-
 
 #### Main Fields
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| affordabilityCalculations | Complex Data |  | Complex object |
-| assessmentDate | Date |  | 2026-02-19 |
-| assessmentType | Text |  | MORTGAGE_AFFORDABILITY |
-| clients | List of Complex Data | Client segment classification (A, B, C, D for prioritization) | List with 2 item(s) |
-| createdAt | Date | When this record was created in the system | 2026-02-19T14:30:00Z |
-| expenditureAnalysis | Complex Data |  | Complex object |
-| factfindRef | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Number | Unique system identifier for this record | 1111 |
-| incomeAnalysis | Complex Data |  | Complex object |
-| proposedMortgage | Complex Data | Current age (calculated from date of birth) | Complex object |
-| recommendation | Complex Data |  | Complex object |
-| regulatoryCompliance | Complex Data |  | Complex object |
-| stressTesting | Complex Data |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-19T14:30:00Z |
+|-----------|------|-------------|---------------|
+| id | Number | Unique identifier | 1001 |
+| href | Link | Web address for this assessment | /api/v2/factfinds/456/affordability/1001 |
+| factfind | Link to FactFind | The fact-find this assessment belongs to | FactFind #456 |
+| clients | List of Client Links | Clients included in this assessment (minimum 1) | Client #456, Client #457 |
+| incomes | List of Income Links | Income sources to include in calculation (minimum 1) | 3 income sources |
+| expenditures | List of Expenditure Links | Expenditures to include in calculation | 12 expenditure items |
+| createdAt | Date/Time | When this assessment was created | 2026-01-15T10:30:00Z |
+| lastUpdatedAt | Date/Time | When this assessment was last changed | 2026-01-29T14:45:00Z |
 
-#### Nested Field Groups
+**Important:** The assessment references specific income and expenditure records. The system uses these to calculate all the cashflow figures automatically.
 
-**affordabilityCalculations:**
+---
+
+#### Monthly Cash Flow (Calculated Automatically)
+
+These values are calculated by the system based on the incomes and expenditures you've selected. You cannot edit these directly.
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| affordabilityRatio | Number |  | 24.56 |
-| debtToIncomeRatio | Number |  | 37.5 |
-| isAffordable | Yes/No |  | Yes |
-| loanToIncomeMultiple | Number |  | 3.68 |
-| surplusIncome | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 1471.67 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
+|-----------|------|-------------|---------------|
+| totalNetIncome | Currency Amount | Total monthly income after tax | £4,500.00 |
+| totalExpenditure | Currency Amount | Total monthly spending | £2,800.00 |
+| disposableIncome | Currency Amount | Money left over each month | £1,700.00 |
 
-**expenditureAnalysis:**
+**How it's calculated:**
+- **totalNetIncome** = Sum of all selected income sources (converted to monthly)
+- **totalExpenditure** = Sum of all selected expenditures (converted to monthly)
+- **disposableIncome** = totalNetIncome minus totalExpenditure
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| discretionaryExpenditure | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 450.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| essentialExpenditure | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 2800.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| existingCreditCommitments | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 500.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| totalMonthlyExpenditure | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 3250.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
+---
 
-**factfindRef:**
+#### Monthly Modelling Options
+
+These settings control which "what-if" scenarios are applied to calculate the revised affordability.
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
+|-----------|------|-------------|---------------|
+| incorporateIncomeChanges | Yes/No | Include planned future income changes? | Yes |
+| incorporateExpenditureChanges | Yes/No | Include planned future expenditure changes? | Yes |
+| forgoNonEssentialExpenditure | Yes/No | Exclude all non-essential spending? (conservative scenario) | No |
+| excludeConsolidatedExpenditure | Yes/No | Remove debts that will be consolidated? | Yes |
+| excludeRepaidExpenditure | Yes/No | Remove debts that will be paid off? | Yes |
+| hasRebrokerProtection | Yes/No | Include cost of new/rebrokered protection policies? | No |
+| agreedMonthlyBudget | Currency Amount | Monthly amount client commits to for new commitment | £1,500.00 |
+| notes | Text | Explanation of modelling assumptions | "Client has variable income from bonus" |
 
-**incomeAnalysis:**
+**Typical Use Cases:**
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| includedIncomeSources | List of Complex Data |  | List with 2 item(s) |
-| monthlyGrossIncome | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 7916.67 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| monthlyNetIncome | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 5666.67 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| totalGrossIncome | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 95000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| totalNetIncome | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 68000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
+- **Mortgage Application:** Set `excludeRepaidExpenditure = Yes` to remove current mortgage (being replaced)
+- **Debt Consolidation:** Set `excludeConsolidatedExpenditure = Yes` to show improved cashflow
+- **Conservative Assessment:** Set `forgoNonEssentialExpenditure = Yes` to show worst-case scenario
+- **Investment Planning:** Keep all options = No to use current actual position
+- **Retirement Planning:** Set `incorporateIncomeChanges = Yes` to include state pension increases
 
-**proposedMortgage:**
+---
+
+#### Monthly Affordability (Calculated Automatically)
+
+These values are calculated by applying your modelling options to the base cashflow. You cannot edit these directly.
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| interestRate | Number |  | 4.5 |
-| loanAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 350000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| monthlyPayment | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 1945.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| repaymentType | Text |  | Capital and Interest |
-| termYears | Number |  | 25 |
+|-----------|------|-------------|---------------|
+| revisedIncome | Currency Amount | Income after incorporating planned changes | £4,700.00 |
+| revisedExpenditure | Currency Amount | Spending after applying scenario options | £2,900.00 |
+| consolidatedExpenditurePayments | Currency Amount | Total payments for debts being consolidated | £500.00 |
+| expenditurePaymentsTobeRepaid | Currency Amount | Total payments for debts being paid off | £300.00 |
+| protectionPremiums | Currency Amount | Cost of new/rebrokered protection policies | £150.00 |
+| finalDisposableIncome | Currency Amount | Final monthly surplus after all adjustments | £1,250.00 |
 
-**recommendation:**
+**How it's calculated:**
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| isAffordable | Yes/No |  | Yes |
-| maxAffordableLoan | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 375000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| notes | Text |  | Clients demonstrate strong affordability with comf... |
+1. **revisedIncome:** Starts with totalNetIncome, adds future increases if incorporateIncomeChanges = Yes
+2. **revisedExpenditure:** Starts with totalExpenditure, applies all your scenario options
+3. **consolidatedExpenditurePayments:** Sum of expenditures marked as "to be consolidated"
+4. **expenditurePaymentsTobeRepaid:** Sum of expenditures marked as "to be repaid"
+5. **protectionPremiums:** Cost of protection if hasRebrokerProtection = Yes
+6. **finalDisposableIncome:** revisedIncome minus revisedExpenditure (this is the key figure for affordability)
 
-**regulatoryCompliance:**
+**Key Figure:** `finalDisposableIncome` is the most important number - it shows how much surplus the client has available each month for new commitments after applying all scenarios.
+
+---
+
+#### Lumpsum Affordability
+
+Assesses available capital for investment, house purchase, or debt repayment.
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| fcaAffordabilityChecks | Yes/No |  | Yes |
-| responsibleLendingCriteria | Yes/No |  | Yes |
-| vulnerableCustomerConsiderations | Yes/No | Unique system identifier for this record | No |
+|-----------|------|-------------|---------------|
+| totalLumpSumAvailable | Currency Amount | Total cash available | £50,000.00 |
+| agreedInvestmentAmount | Currency Amount | Amount client agrees to invest/commit | £30,000.00 |
+| sourceOfInvestment | Text | Where the money comes from | Property Sale |
+| isInvestmentAvailableWithoutPenalty | Yes/No | Can access without penalties or early exit charges? | Yes |
+| notes | Text | Additional context | "From property sale completion expected March 2026" |
+| totalFundsAvailable | Currency Amount | Total funds (may include other sources) - Calculated | £55,000.00 |
 
-**stressTesting:**
+**Common Sources:**
+- **PropertySale** - Proceeds from selling a property
+- **Inheritance** - Inherited funds
+- **Bonus** - Employment bonus payment
+- **InvestmentMaturity** - Maturing investment or bond
+- **Savings** - Accumulated savings
+- **Gift** - Gift from family member
+- **PensionLumpSum** - Tax-free pension lump sum (typically 25%)
+- **Redundancy** - Redundancy payment
+- **Other** - Other lump sum source
+
+**Important Considerations:**
+- Ensure emergency fund is adequate before committing lumpsum
+- Check penalty-free access (early withdrawal charges may apply)
+- Consider keeping a liquidity buffer for unexpected needs
+- Document source for regulatory compliance (money laundering checks)
+
+---
+
+#### Emergency Fund
+
+Tracks adequacy of emergency reserves (typically 3-6 months of essential expenditure).
 
 | Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| passesStressTest | Yes/No |  | Yes |
-| stressTestRate | Number |  | 7.0 |
-| stressedMonthlyPayment | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 2475.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| stressedSurplusIncome | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 941.67 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
+|-----------|------|-------------|---------------|
+| committedAmount | Currency Amount | Amount client has set aside for emergencies | £5,000.00 |
+| requiredAmount | Currency Amount | Recommended emergency fund | £8,000.00 |
+| shortfall | Currency Amount | Gap to close (calculated automatically) | £3,000.00 |
+
+**How it's calculated:**
+- **shortfall** = requiredAmount minus committedAmount (minimum zero)
+- If committedAmount exceeds requiredAmount, shortfall = £0
+
+**Typical Recommendations:**
+- **Conservative (6 months):** Self-employed, single income household, uncertain employment
+- **Moderate (4 months):** Dual income household, stable employment
+- **Minimum (3 months):** Very stable employment, strong family support network
+
+**Essential Expenditure:**
+Essential monthly expenditure typically includes:
+- Mortgage/rent
+- Utilities (gas, electric, water)
+- Council tax
+- Food shopping
+- Insurance premiums
+- Minimum debt payments
+
+Does NOT include:
+- Entertainment
+- Dining out
+- Gym memberships
+- Subscriptions (Netflix, etc.)
+- Non-essential shopping
 
 ---
 
@@ -4725,20 +4758,212 @@ Evaluates the client's ability to afford financial commitments such as mortgages
 
 This contract connects to:
 
-- Belongs to a Client
-- Belongs to a FactFind
-- References Income records
-- References Expenditure records
-- May relate to specific Arrangement (e.g., mortgage)
-
-### Business Validation Rules
-
-- totalIncome must be >= totalExpenditure + commitment
-- stress test must pass for mortgage applications
-- Must comply with FCA affordability rules
+- **Belongs to a FactFind** - Each assessment is part of a specific fact-find
+- **Includes Clients** - One or more clients (for joint assessments)
+- **References Incomes** - Specific income records to include in calculation
+- **References Expenditures** - Specific expenditure records to include in calculation
+- **May support Arrangements** - Assessment may justify a specific mortgage, investment, or protection recommendation
 
 ---
 
+### Business Validation Rules
+
+**When Creating an Assessment:**
+- Must select at least 1 client
+- Must select at least 1 income source
+- Expenditures can be empty (client with no recorded expenditure)
+- All referenced clients, incomes, and expenditures must exist and belong to the fact-find
+- Cannot mix records from different fact-finds
+
+**Money Values:**
+- All amounts must be zero or positive (no negative numbers)
+- agreedMonthlyBudget cannot exceed finalDisposableIncome
+- agreedInvestmentAmount cannot exceed totalLumpSumAvailable
+- All currency amounts should use the same currency (mixing currencies not recommended)
+
+**Yes/No Fields:**
+- Must be exactly "Yes" or "No" (case-sensitive)
+- Invalid values like "yes", "true", "1" will be rejected
+
+**Emergency Fund:**
+- committedAmount should be realistic (actual accessible savings)
+- requiredAmount typically = essential monthly expenditure × 3 to 6 months
+- Shortfall automatically calculated (cannot be edited)
+
+---
+
+### Calculation Examples
+
+#### Example 1: Basic Monthly Affordability
+
+**Client's Position:**
+- Salary: £45,000/year (£3,000/month after tax)
+- Rental income: £12,000/year (£1,000/month after tax)
+- Total monthly income: £4,000
+
+**Expenditures:**
+- Mortgage: £1,200/month
+- Living expenses: £1,500/month
+- Car loan: £300/month
+- Total expenditure: £3,000/month
+
+**Result:**
+- **disposableIncome** = £4,000 - £3,000 = **£1,000/month**
+
+---
+
+#### Example 2: Mortgage Application with Debt Consolidation
+
+**Scenario:** Client remortgaging and consolidating car loan and credit card
+
+**Current Position:**
+- Total income: £4,000/month
+- Current mortgage: £1,200/month (being replaced)
+- Car loan: £300/month (being consolidated)
+- Credit card: £200/month (being consolidated)
+- Other expenses: £1,500/month
+- Current disposable income: £800/month
+
+**Modelling Options:**
+- `excludeRepaidExpenditure` = Yes (current mortgage will be repaid)
+- `excludeConsolidatedExpenditure` = Yes (car loan and credit card will be consolidated)
+
+**Revised Position:**
+- Total income: £4,000/month
+- Other expenses: £1,500/month (only)
+- **revisedExpenditure** = £1,500
+- **consolidatedExpenditurePayments** = £500 (car £300 + credit card £200)
+- **expenditurePaymentsTobeRepaid** = £1,200 (current mortgage)
+- **finalDisposableIncome** = £4,000 - £1,500 = **£2,500/month**
+
+**New mortgage payment:** £1,600/month
+
+**Assessment:** AFFORDABLE - Client has £2,500 available, new mortgage is £1,600, leaving £900 surplus
+
+---
+
+#### Example 3: Investment Capacity with Emergency Fund
+
+**Scenario:** Client wants to invest lumpsum and start monthly contributions
+
+**Financial Position:**
+- Monthly disposable income: £1,200
+- Lumpsum available: £50,000 (from property sale)
+- Current emergency fund: £8,000
+- Required emergency fund: £12,000
+
+**Analysis:**
+- **Emergency fund shortfall:** £4,000
+- **Available for lumpsum investment:** £50,000 - £4,000 = £46,000 (reserve £4,000 to complete emergency fund)
+- **Monthly investment capacity:** Recommend £800/month (leaving £400 buffer)
+
+**Recommendation:**
+- Invest £45,000 lumpsum (retain £1,000 extra buffer)
+- Top up emergency fund with £4,000 first
+- Start £800/month regular contribution
+- Retain £400/month buffer for flexibility
+
+---
+
+#### Example 4: Retirement Sustainability Check
+
+**Scenario:** Retired couple checking if they can afford £10,000 cruise
+
+**Income:**
+- State pensions: £1,800/month combined
+- Private pension: £1,500/month
+- Total: £3,300/month
+
+**Expenditure:**
+- Living expenses: £2,400/month (no mortgage - paid off)
+- **disposableIncome** = £900/month
+
+**Annual Surplus:**
+- £900 × 12 = £10,800/year
+
+**Emergency Fund:**
+- Committed: £18,000 (fully funded)
+- Required: £14,400 (6 months × £2,400)
+- Surplus: £3,600 above required
+
+**Cruise Assessment:**
+- Cost: £10,000
+- Can afford from one year's surplus: £10,800 ✓
+- Emergency fund remains intact: £18,000 ✓
+
+**Result:** AFFORDABLE - Cruise can be funded from annual surplus without touching emergency fund
+
+---
+
+### Typical Workflow
+
+**Step 1: Gather Information**
+1. Identify all clients involved (individual or joint)
+2. Record all income sources
+3. Record all expenditures
+4. Understand the purpose (mortgage, investment, retirement check, etc.)
+
+**Step 2: Create Assessment**
+1. Select which clients to include
+2. Select which incomes to include (usually all)
+3. Select which expenditures to include (usually all)
+4. System automatically calculates base position
+
+**Step 3: Apply Scenarios**
+1. Choose appropriate modelling options for the situation
+2. Set agreedMonthlyBudget if applying for new commitment
+3. Add notes explaining assumptions
+4. System recalculates with scenarios applied
+
+**Step 4: Assess Lumpsum (if applicable)**
+1. Enter totalLumpSumAvailable
+2. Specify sourceOfInvestment
+3. Confirm if available without penalty
+4. Set agreedInvestmentAmount
+5. Check emergency fund is adequate first
+
+**Step 5: Check Emergency Fund**
+1. Enter committedAmount (actual savings)
+2. Calculate requiredAmount (3-6 months essential expenditure)
+3. System calculates shortfall
+4. Address shortfall before major commitments
+
+**Step 6: Make Recommendation**
+1. Review finalDisposableIncome figure
+2. Ensure new commitment is affordable with buffer
+3. Check lumpsum doesn't compromise emergency fund
+4. Document recommendation with reference to assessment
+
+---
+
+### Regulatory Considerations
+
+**FCA Requirements:**
+- Comprehensive affordability assessment required for regulated mortgages (MCOB)
+- Must consider foreseeable future changes (retirement, children, career changes)
+- Stress testing required (can client afford if interest rates rise?)
+- Consumer Duty requires understanding of vulnerability and financial resilience
+
+**Documentation:**
+- Assessment should be documented and retained
+- Support suitability of recommendations
+- Evidence of consideration of client circumstances
+- Notes field should explain key assumptions
+
+**Vulnerable Customers:**
+- Extra care if client has vulnerability indicators
+- Conservative approach to affordability
+- Ensure adequate emergency fund
+- Consider impact of foreseeable changes
+
+**Best Practice:**
+- Use conservative assumptions (don't rely on uncertain bonuses)
+- Stress test key figures (what if income drops 10%?)
+- Maintain adequate emergency fund before major commitments
+- Build in buffer (don't commit 100% of disposable income)
+- Review annually or when circumstances change
+
+---
 
 ## 13.31 Contact Contract
 ### Overview
