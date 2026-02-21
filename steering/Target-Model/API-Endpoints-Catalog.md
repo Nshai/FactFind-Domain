@@ -301,8 +301,6 @@
 | PATCH | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail` | Update property detail | ⭐ Embedded detail |
 | GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/valuations` | Get valuation history | ⭐ Property valuations |
 | POST | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/valuations` | Add property valuation | ⭐ New valuation |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/ltv` | Calculate LTV | ⭐ Loan-to-value |
-| GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/rental-yield` | Calculate rental yield | ⭐ Rental income |
 | GET | `/api/v1/factfinds/{id}/assets/{assetId}/property-detail/capital-gains` | Calculate CGT | ⭐ Tax calculation |--------|----------|-------------|-------|
 
 ### Aggregated Views
@@ -313,7 +311,9 @@
 | GET | `/api/v1/factfinds/{id}/liabilities/summary` | Get liabilities summary | ⭐ Aggregated totals |
 | GET | `/api/v1/factfinds/{id}/net-worth` | Calculate net worth | ⭐ Assets - Liabilities |
 
-**Total Endpoints:** 24 (24 new in v3.0)
+**Total Endpoints:** 23 (23 new in v3.0)
+
+**Note:** Rental yield values are calculated and stored as part of the property details contract. No separate calculation endpoint is provided.
 
 ---
 
@@ -623,12 +623,12 @@
 | **1. FactFind Root** | 11 | 11 ⭐ |
 | **2. Client Onboarding & KYC** | 96 | 85 ⭐ |
 | **3. Circumstances** | 26 | 26 ⭐ |
-| **4. Assets & Liabilities** | 24 | 24 ⭐ |
+| **4. Assets & Liabilities** | 23 | 23 ⭐ |
 | **5. Arrangements** | 109 | 109 ⭐ |
 | **6. Goals** | 31 | 31 ⭐ |
 | **7. ATR** | 22 | 22 ⭐ |
 | **8. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **343** | **315** |
+| **TOTAL** | **342** | **314** |
 
 
 ### Net Worth
@@ -648,11 +648,11 @@ Calculate and track client net worth.
 
 | Method | Count | Percentage |
 |--------|-------|------------|
-| GET | 164 | 48% |
+| GET | 163 | 48% |
 | POST | 82 | 24% |
 | PATCH | 85 | 25% |
 | DELETE | 12 | 3% |
-| **TOTAL** | **343** | **100%** |
+| **TOTAL** | **342** | **100%** |
 
 ### Hierarchical Depth Analysis
 
@@ -758,5 +758,5 @@ Calculate and track client net worth.
 **Document End**
 
 **Version:** 3.0
-**Last Updated:** 2026-02-18
-**Total Endpoints:** 348
+**Last Updated:** 2026-02-20
+**Total Endpoints:** 347

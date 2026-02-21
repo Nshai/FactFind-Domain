@@ -213,11 +213,9 @@ The FactFind API provides comprehensive digital capabilities for:
       - [10.3.1 List Assets](#1031-list-assets)
       - [10.3.2 Create Asset](#1032-create-asset)
       - [10.3.3 Get Property Details](#1033-get-property-details)
-      - [10.3.4 Calculate LTV (Loan-to-Value)](#1034-calculate-ltv-loan-to-value)
-      - [10.3.5 Calculate Rental Yield](#1035-calculate-rental-yield)
-      - [10.3.6 List Liabilities](#1036-list-liabilities)
-      - [10.3.7 Get Assets Summary](#1037-get-assets-summary)
-      - [10.3.8 Calculate Net Worth](#1038-calculate-net-worth)
+      - [10.3.4 List Liabilities](#1034-list-liabilities)
+      - [10.3.5 Get Assets Summary](#1035-get-assets-summary)
+      - [10.3.6 Calculate Net Worth](#1036-calculate-net-worth)
 11. [Arrangements API (Type-Based Routing)](#11-arrangements-api-type-based-routing)
    - [11.1 Overview](#111-overview)
    - [11.2 Arrangement Types and Routing](#112-arrangement-types-and-routing)
@@ -8680,15 +8678,15 @@ Mortgage impact:
 | PUT | `/api/v2/factfinds/{id}/property-details/{propertyId}` | Update property detail | `assets:write` |
 | GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/valuations` | Get valuation history | `assets:read` |
 | POST | `/api/v2/factfinds/{id}/property-details/{propertyId}/valuations` | Add property valuation | `assets:write` |
-| GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/ltv` | Calculate LTV | `assets:read` |
-| GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/rental-yield` | Calculate rental yield | `assets:read` |
 | GET | `/api/v2/factfinds/{id}/property-details/{propertyId}/capital-gains` | Calculate CGT | `assets:read` |
 | **Aggregated Views** | | | |
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/assets/summary` | Get client assets summary | `assets:read` |
 | GET | `/api/v2/factfinds/{id}/liabilities/summary` | Get liabilities summary | `liabilities:read` |
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/net-worth` | Calculate client net worth | `assets:read` |
 
-**Total Endpoints:** 24
+**Total Endpoints:** 22
+
+**Note:** Rental yield values (`rentalYieldGross` and `rentalYieldNet`) are calculated and stored as part of the property details contract. No separate calculation endpoint is provided - rental yield is automatically recalculated when rental income or property value changes.
 
 ### 10.3 Key Endpoints
 
@@ -8985,106 +8983,7 @@ Mortgage impact:
 }
 ```
 
-#### 10.3.4 Calculate LTV (Loan-to-Value)
-
-**Endpoint:** `GET /api/v2/factfinds/{id}/property-details/{propertyId}/ltv`
-
-**Description:** Calculate the Loan-to-Value ratio for a property by comparing linked mortgages to current property value.
-
-**Response:**
-
-```json
-{
-  "asset": { "id": 123 },
-  "currentValue": {
-    "amount": 450000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "totalMortgageBalance": {
-    "amount": 180000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "ltvRatio": 40.0,
-  "equity": {
-    "amount": 270000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "linkedMortgages": [
-    {
-      "liability": { "id": 789 },
-      "outstandingBalance": {
-        "amount": 180000.00,
-        "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-      }
-    }
-  ],
-  "calculatedAt": "2026-02-18T10:30:00Z"
-}
-```
-
-#### 10.3.5 Calculate Rental Yield
-
-**Endpoint:** `GET /api/v2/factfinds/{id}/property-details/{propertyId}/rental-yield`
-
-**Description:** Calculate gross and net rental yield for a buy-to-let property.
-
-**Response:**
-
-```json
-{
-  "asset": { "id": 123 },
-  "propertyValue": {
-    "amount": 275000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "annualRentalIncome": {
-    "amount": 21600.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "annualExpenses": {
-    "amount": 4200.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      },
-    "breakdown": {
-      "maintenance": { "amount": 1200.00 },
-      "insurance": { "amount": 800.00 },
-      "managementFees": { "amount": 2200.00 }
-    }
-  },
-  "grossYield": 7.85,
-  "netYield": 6.33,
-  "calculatedAt": "2026-02-18T10:30:00Z"
-}
-```
-
-#### 10.3.6 List Liabilities
+#### 10.3.4 List Liabilities
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/liabilities`
 
@@ -9156,7 +9055,7 @@ Mortgage impact:
 }
 ```
 
-#### 10.3.7 Get Assets Summary
+#### 10.3.5 Get Assets Summary
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/assets/summary`
 
@@ -9233,7 +9132,7 @@ Mortgage impact:
 }
 ```
 
-#### 10.3.8 Calculate Net Worth
+#### 10.3.6 Calculate Net Worth
 
 **Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/net-worth`
 
@@ -9292,7 +9191,7 @@ Mortgage impact:
 ```
 
 
-#### 10.3.9 List Net Worth Calculations
+#### 10.3.7 List Net Worth Calculations
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/networth`
 
@@ -9371,7 +9270,7 @@ Mortgage impact:
 }
 ```
 
-#### 10.3.10 Create Net Worth Calculation
+#### 10.3.8 Create Net Worth Calculation
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/networth`
 
@@ -9480,7 +9379,7 @@ Returns the complete Net Worth object with system-calculated fields (see Section
 - System automatically calculates totalAssets, totalLiabilities, and netWorth
 - All amounts must be non-negative except netWorth which can be negative
 
-#### 10.3.11 Get Net Worth Calculation
+#### 10.3.9 Get Net Worth Calculation
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/networth/{networthId}`
 
@@ -9611,7 +9510,7 @@ Returns the complete Net Worth object with system-calculated fields (see Section
 
 See Section 14.31 for complete field definitions.
 
-#### 10.3.12 Update Net Worth Calculation
+#### 10.3.10 Update Net Worth Calculation
 
 **Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/networth/{networthId}`
 
@@ -9643,7 +9542,7 @@ Returns the updated complete Net Worth object with recalculated totals.
 
 **Note:** Updating any asset or liability amounts will trigger automatic recalculation of totalAssets, totalLiabilities, and netWorth.
 
-#### 10.3.13 Delete Net Worth Calculation
+#### 10.3.11 Delete Net Worth Calculation
 
 **Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/networth/{networthId}`
 
@@ -12645,6 +12544,8 @@ The Arrangements API provides comprehensive management of client financial produ
 
 **Purpose:** Manage mortgage arrangements including traditional mortgages and equity release products linked to property assets.
 
+**Note on LTV (Loan-to-Value):** LTV is calculated automatically based on the property value and outstanding mortgage balance, and is stored as part of the mortgage arrangement contract. There is no separate LTV calculation endpoint - the LTV ratio is included in the mortgage arrangement response and updated whenever the property value or mortgage balance changes.
+
 **Operations:**
 
 | Method | Endpoint | Description | Auth Required |
@@ -14866,7 +14767,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 - Track risk profile changes over time
 - Regulatory audit trail
 
-See Section 10.3.4 for the main history endpoint.
+See Section 13.3.4 for the main history endpoint.
 
 #### 13.5.1 Compare Two Assessments
 
