@@ -120,15 +120,13 @@
 | PATCH | `/api/v1/factfinds/{id}/clients/{clientId}/relationships/{relationshipId}` | Update relationship | ⭐ New in v3.0 |
 | DELETE | `/api/v1/factfinds/{id}/clients/{clientId}/relationships/{relationshipId}` | Delete relationship | ⭐ New in v3.0 |
 
-### DPA Consent
+### DPA Agreements
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/dpa-consent` | Get DPA consent status | ⭐ New in v3.0 |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/dpa-consent` | Record DPA consent | ⭐ GDPR compliance |
-| PATCH | `/api/v1/factfinds/{id}/clients/{clientId}/dpa-consent` | Update DPA consent | ⭐ New in v3.0 |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/dpa-consent/history` | Get consent history | ⭐ Audit trail |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/dpa-consent/withdraw` | Withdraw consent | ⭐ GDPR right |
+| POST | `/api/v2/factfinds/{id}/clients/{clientId}/dpa-agreements` | Create DPA agreement | ⭐ GDPR compliance |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/dpa-agreements` | List all DPA agreements | ⭐ Pagination support |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/dpa-agreements/{agreementId}` | Get specific DPA agreement | ⭐ Use 'current' for latest |
 | DELETE | `/api/v1/factfinds/{id}/clients/{clientId}/data` | Right to be forgotten (RTBF) | ⭐ GDPR compliance |
 | POST | `/api/v1/factfinds/{id}/clients/{clientId}/data/export` | Data portability request | ⭐ GDPR compliance |
 
@@ -186,7 +184,7 @@
 | GET | `/api/v1/factfinds/{id}/clients/{clientId}/pension-summary` | Get pension summary | ⭐ New in v3.0 |
 | POST | `/api/v1/factfinds/{id}/clients/{clientId}/pension-summary/calculate` | Calculate pension projection | ⭐ New in v3.0 |
 
-**Total Endpoints:** 96 (85 new in v3.0)
+**Total Endpoints:** 94 (83 new in v3.0)
 
 ---
 
@@ -610,14 +608,14 @@
 | API Context | Total Endpoints | New in v3.0 |
 |-------------|-----------------|-------------|
 | **1. FactFind Root** | 11 | 11 ⭐ |
-| **2. Client Onboarding & KYC** | 96 | 85 ⭐ |
+| **2. Client Onboarding & KYC** | 94 | 83 ⭐ |
 | **3. Circumstances** | 26 | 26 ⭐ |
 | **4. Assets & Liabilities** | 23 | 23 ⭐ |
 | **5. Arrangements** | 109 | 109 ⭐ |
 | **6. Goals** | 31 | 31 ⭐ |
 | **7. ATR** | 22 | 22 ⭐ |
 | **8. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **342** | **314** |
+| **TOTAL** | **340** | **312** |
 
 
 ### Net Worth
@@ -638,10 +636,10 @@ Calculate and track client net worth.
 | Method | Count | Percentage |
 |--------|-------|------------|
 | GET | 163 | 48% |
-| POST | 82 | 24% |
-| PATCH | 85 | 25% |
+| POST | 81 | 24% |
+| PATCH | 84 | 25% |
 | DELETE | 12 | 3% |
-| **TOTAL** | **342** | **100%** |
+| **TOTAL** | **340** | **100%** |
 
 ### Hierarchical Depth Analysis
 
@@ -747,5 +745,5 @@ Calculate and track client net worth.
 **Document End**
 
 **Version:** 3.0
-**Last Updated:** 2026-02-20
-**Total Endpoints:** 347
+**Last Updated:** 2026-02-23
+**Total Endpoints:** 345

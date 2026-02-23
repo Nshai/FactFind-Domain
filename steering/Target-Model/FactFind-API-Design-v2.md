@@ -176,6 +176,11 @@ The FactFind API provides comprehensive digital capabilities for:
    - [5.10 Marketing Preferences](#510-marketing-preferences)
       - [5.10.1 Get Marketing Preferences](#5101-get-marketing-preferences)
       - [5.10.2 Update Marketing Preferences](#5102-update-marketing-preferences)
+   - [5.11 DPA Agreements](#511-dpa-agreements)
+      - [5.11.1 Operations Summary](#5111-operations-summary)
+      - [5.11.2 Create DPA Agreement](#5112-create-dpa-agreement)
+      - [5.11.3 List DPA Agreements](#5113-list-dpa-agreements)
+      - [5.11.4 Get DPA Agreement](#5114-get-dpa-agreement)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -2105,7 +2110,7 @@ All subsequent API sections (5-11) document resources that are **nested under** 
 
 **Total Endpoints:** 12
 
-**Note:** For client management operations (clients, addresses, contacts, relationships, estate planning, dependants, vulnerabilities, identity verification, marketing preferences, notes, custom questions, DPA consent), see Section 5 - Client Management API.
+**Note:** For client management operations (clients, addresses, contacts, relationships, estate planning, dependants, vulnerabilities, identity verification, marketing preferences, notes, custom questions, DPA agreements), see Section 5 - Client Management API.
 
 ### 4.3 Key Endpoints
 
@@ -2867,8 +2872,12 @@ The financial health score is calculated on a 0-100 scale with five components:
 | **Marketing Preferences** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get marketing preferences | `client:read` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update marketing preferences | `client:write` |
+| **DPA Agreements** | | | |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | Create DPA agreement | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | List all DPA agreements | `client:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}` | Get specific DPA agreement | `client:read` |
 
-**Total Endpoints:** 59
+**Total Endpoints:** 62
 
 ---
 
@@ -5572,6 +5581,254 @@ Use: Demonstrate suitability in file review
 - Third-party contact permissions are independent of company contact permissions
 - Consent timestamp must be captured when preferences are first set or modified
 - PECR and GDPR compliance requires explicit opt-in for marketing communications
+
+---
+
+### 5.11 DPA Agreements
+
+**Description:** Manage Data Protection Agreement (DPA) policy agreements for clients. DPA agreements record a client's acceptance of the firm's data protection policy statements. Each client can have multiple DPA agreements over time as policies are updated.
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements`
+
+**Key Concepts:**
+- DPA agreements link clients to specific DPA policies
+- Each agreement captures client responses to up to 5 policy statements
+- Agreements are immutable once created - policy updates require new agreements
+- For valid agreements, all statements must be accepted
+- Agreements are scoped to both the client and the factfind context
+
+#### 5.11.1 Operations Summary
+
+| Method | Endpoint | Description | Scope |
+|--------|----------|-------------|-------|
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | Create DPA agreement | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | List all DPA agreements | `client:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}` | Get specific DPA agreement | `client:read` |
+
+#### 5.11.2 Create DPA Agreement
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements`
+
+**Description:** Create a new DPA policy agreement for a client. The agreement records the client's response to the firm's DPA policy statements. In order to be valid, all policy statements must be accepted ("accepted": true) and the agreement date must be populated.
+
+**Request Body:**
+```json
+{
+  "policy": {
+    "id": 42
+  },
+  "agreedAt": "2026-02-23T14:30:00Z",
+  "statements": {
+    "statement1": {
+      "accepted": true
+    },
+    "statement2": {
+      "accepted": true
+    },
+    "statement3": {
+      "accepted": true
+    },
+    "statement4": {
+      "accepted": true
+    },
+    "statement5": {
+      "accepted": true
+    }
+  }
+}
+```
+
+**Response:** `201 Created`
+```json
+{
+  "id": 7890,
+  "href": "v2/factfinds/234/clients/1234/dpa-agreements/7890",
+  "client": {
+    "id": 1234,
+    "href": "v2/factfinds/234/clients/1234"
+  },
+  "factfind": {
+    "id": 234,
+    "href": "v2/factfinds/234"
+  },
+  "policy": {
+    "id": 42,
+    "name": "Standard DPA Policy 2026",
+    "href": "v2/dpa_policies/42"
+  },
+  "agreedAt": "2026-02-23T14:30:00Z",
+  "statements": {
+    "statement1": {
+      "text": "I confirm that I have read and understood the data protection policy.",
+      "accepted": true
+    },
+    "statement2": {
+      "text": "I consent to the processing of my personal data for the purposes of financial advice.",
+      "accepted": true
+    },
+    "statement3": {
+      "text": "I understand that I can withdraw my consent at any time.",
+      "accepted": true
+    },
+    "statement4": {
+      "text": "I consent to my data being shared with relevant third parties for advice purposes.",
+      "accepted": true
+    },
+    "statement5": {
+      "text": "I confirm that the information provided is accurate and complete.",
+      "accepted": true
+    }
+  },
+  "createdAt": "2026-02-23T14:30:05Z",
+  "createdBy": "adviser@example.com"
+}
+```
+
+**Validation Rules:**
+- `policy.id` - Required, must reference an existing DPA policy
+- `agreedAt` - Required, must be a valid ISO 8601 date-time
+- `statements.statement1` - Required, must have accepted field
+- `statements.statement1.accepted` - Required, boolean
+- At least statement1 must be present; statements 2-5 are optional
+- The `text` field is read-only and populated from the policy
+
+**Business Rules:**
+- The firm's existing DPA policy must be specified
+- For a valid agreement, all policy statements present must have accepted = true
+- The agreement date must be populated
+- Once created, agreements are immutable (read-only)
+- The client and factfind IDs in the path are automatically linked to the agreement
+- Statement text is retrieved from the policy definition, not provided in the request
+
+#### 5.11.3 List DPA Agreements
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements`
+
+**Description:** Retrieve a list of all DPA policy agreements for a client within a factfind. Results are paginated and can be filtered.
+
+**Query Parameters:**
+- `skip` - Number of records to skip (default: 0)
+- `top` - Number of records to retrieve (default: 25, max: 100)
+- `orderby` - Sort by field (e.g., "agreedAt desc")
+
+**Response:** `200 OK`
+```json
+{
+  "href": "v2/factfinds/234/clients/1234/dpa-agreements?skip=0&top=25",
+  "items": [
+    {
+      "id": 7890,
+      "href": "v2/factfinds/234/clients/1234/dpa-agreements/7890",
+      "client": {
+        "id": 1234,
+        "href": "v2/factfinds/234/clients/1234"
+      },
+      "factfind": {
+        "id": 234,
+        "href": "v2/factfinds/234"
+      },
+      "policy": {
+        "id": 42,
+        "name": "Standard DPA Policy 2026",
+        "href": "v2/dpa_policies/42"
+      },
+      "agreedAt": "2026-02-23T14:30:00Z",
+      "statements": {
+        "statement1": {
+          "text": "I confirm that I have read and understood the data protection policy.",
+          "accepted": true
+        },
+        "statement2": {
+          "text": "I consent to the processing of my personal data for the purposes of financial advice.",
+          "accepted": true
+        },
+        "statement3": {
+          "text": "I understand that I can withdraw my consent at any time.",
+          "accepted": true
+        },
+        "statement4": {
+          "text": "I consent to my data being shared with relevant third parties for advice purposes.",
+          "accepted": true
+        },
+        "statement5": {
+          "text": "I confirm that the information provided is accurate and complete.",
+          "accepted": true
+        }
+      },
+      "createdAt": "2026-02-23T14:30:05Z",
+      "createdBy": "adviser@example.com"
+    }
+  ],
+  "count": 1,
+  "first_href": "v2/factfinds/234/clients/1234/dpa-agreements?skip=0&top=25",
+  "last_href": "v2/factfinds/234/clients/1234/dpa-agreements?skip=0&top=25"
+}
+```
+
+#### 5.11.4 Get DPA Agreement
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}`
+
+**Description:** Retrieve a single DPA policy agreement by ID. The special value 'current' can be used as the agreementId to retrieve the most recent agreement for the client.
+
+**Response:** `200 OK`
+```json
+{
+  "id": 7890,
+  "href": "v2/factfinds/234/clients/1234/dpa-agreements/7890",
+  "client": {
+    "id": 1234,
+    "href": "v2/factfinds/234/clients/1234"
+  },
+  "factfind": {
+    "id": 234,
+    "href": "v2/factfinds/234"
+  },
+  "policy": {
+    "id": 42,
+    "name": "Standard DPA Policy 2026",
+    "href": "v2/dpa_policies/42"
+  },
+  "agreedAt": "2026-02-23T14:30:00Z",
+  "statements": {
+    "statement1": {
+      "text": "I confirm that I have read and understood the data protection policy.",
+      "accepted": true
+    },
+    "statement2": {
+      "text": "I consent to the processing of my personal data for the purposes of financial advice.",
+      "accepted": true
+    },
+    "statement3": {
+      "text": "I understand that I can withdraw my consent at any time.",
+      "accepted": true
+    },
+    "statement4": {
+      "text": "I consent to my data being shared with relevant third parties for advice purposes.",
+      "accepted": true
+    },
+    "statement5": {
+      "text": "I confirm that the information provided is accurate and complete.",
+      "accepted": true
+    }
+  },
+  "createdAt": "2026-02-23T14:30:05Z",
+  "createdBy": "adviser@example.com"
+}
+```
+
+**Notes:**
+- A DPA policy agreement has a maximum of 5 statements with Yes/No (accepted true/false) responses
+- The agreement date (agreedAt) is required
+- Statement text is read-only and comes from the policy definition
+- Use `agreementId = "current"` to retrieve the latest agreement
+- Agreements are immutable once created
+
+**GDPR Compliance:**
+- DPA agreements provide audit trail for data processing consent
+- Supports demonstrating lawful basis for data processing
+- Records when and which policy was agreed to by the client
+- Immutable records ensure compliance with record-keeping requirements
 
 ---
 
@@ -34782,7 +35039,7 @@ Assessment rate: Typically 5.5% (stress test rate)
 - CONTACT_DETAIL → `/api/v2/factfinds/{factfindId}/clients/{id}/contacts`
 - PROFESSIONAL_CONTACT → `/api/v2/factfinds/{factfindId}/clients/{id}/professional-contacts`
 - CLIENT_RELATIONSHIP → `/api/v2/factfinds/{factfindId}/clients/{id}/relationships`
-- DPA_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/dpa-consent`
+- DPA_AGREEMENT → `/api/v2/factfinds/{factfindId}/clients/{id}/dpa-agreements`
 - MARKETING_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/marketing-preferences`
 - VULNERABLE_CUSTOMER_FLAG → `/api/v2/factfinds/{factfindId}/clients/{id}/vulnerabilities`
 - DEPENDANT → `/api/v2/factfinds/{factfindId}/clients/{id}/dependants`

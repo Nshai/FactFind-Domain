@@ -62,15 +62,16 @@ Each contract section includes:
 - [13.33 Professional Contact Contract](#1333-professional-contact-contract)
 - [13.34 Vulnerability Contract](#1334-vulnerability-contract)
 - [13.35 Marketing Preferences Contract](#1335-marketing-preferences-contract)
-- [13.36 Estate Planning - Will Contract](#1336-estate-planning---will-contract)
-- [13.37 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1337-estate-planning---lasting-power-of-attorney-lpa-contract)
-- [13.38 Estate Planning - Gift Contract](#1338-estate-planning---gift-contract)
-- [13.39 Estate Planning - Trust Contract](#1339-estate-planning---trust-contract)
-- [13.40 Identity Verification Contract](#1340-identity-verification-contract)
-- [13.41 Arrangement - Mortgage Contract](#1341-arrangement---mortgage-contract)
-- [13.42 Arrangement - Investment Contract (General Investment Account)](#1342-arrangement---investment-contract-general-investment-account)
-- [13.43 Arrangement - Protection Contract (Life Assurance)](#1343-arrangement---protection-contract-life-assurance)
-- [13.44 Arrangement - Pension Contract (Personal Pension)](#1344-arrangement---pension-contract-personal-pension)
+- [13.36 DPA Policy Agreement Contract](#1336-dpa-policy-agreement-contract)
+- [13.37 Estate Planning - Will Contract](#1337-estate-planning---will-contract)
+- [13.38 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1338-estate-planning---lasting-power-of-attorney-lpa-contract)
+- [13.39 Estate Planning - Gift Contract](#1339-estate-planning---gift-contract)
+- [13.40 Estate Planning - Trust Contract](#1340-estate-planning---trust-contract)
+- [13.41 Identity Verification Contract](#1341-identity-verification-contract)
+- [13.42 Arrangement - Mortgage Contract](#1342-arrangement---mortgage-contract)
+- [13.43 Arrangement - Investment Contract (General Investment Account)](#1343-arrangement---investment-contract-general-investment-account)
+- [13.44 Arrangement - Protection Contract (Life Assurance)](#1344-arrangement---protection-contract-life-assurance)
+- [13.45 Arrangement - Pension Contract (Personal Pension)](#1345-arrangement---pension-contract-personal-pension)
 
 ### Appendices
 - [Appendix A: Common Value Types](#appendix-a-common-value-types)
@@ -5318,7 +5319,136 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 
 ---
 
-## 13.36 Estate Planning - Will Contract
+## 13.36 DPA Policy Agreement Contract
+
+### Overview
+The `DPAPolicyAgreement` contract represents a client's acceptance of the firm's Data Protection Agreement (DPA) policy. This contract records the client's response to data protection policy statements and provides an audit trail for GDPR compliance.
+
+### Business Purpose
+- Record client consent to data protection policies
+- Provide audit trail for regulatory compliance (GDPR, Data Protection Act 2018)
+- Track which version of the DPA policy was agreed to by the client
+- Demonstrate lawful basis for data processing
+- Support data subject access requests (DSAR)
+
+### Key Features
+- Immutable once created - policy updates require new agreements
+- Links to specific DPA policy version
+- Records acceptance of up to 5 policy statements
+- Scoped to both client and factfind context
+- Timestamps when agreement was created
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique identifier for the DPA agreement | 7890 |
+| href | Text | Resource URL for this agreement | v2/factfinds/234/clients/1234/dpa-agreements/7890 |
+| client | Reference Link | Reference to the client | Complex object |
+| factfind | Reference Link | Reference to the factfind | Complex object |
+| policy | Reference Link | Reference to the DPA policy | Complex object |
+| agreedAt | Date and Time | When the client agreed to the policy | 2026-02-23T14:30:00Z |
+| statements | Complex Data | Policy statements and responses | See statements below |
+| createdAt | Date and Time | When this agreement was created (read-only) | 2026-02-23T14:30:05Z |
+| createdBy | Text | User who created this agreement (read-only) | adviser@example.com |
+
+#### Nested Field Groups
+
+**client:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique client identifier | 1234 |
+| href | Text | Client resource URL | v2/factfinds/234/clients/1234 |
+
+**factfind:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique FactFind identifier | 234 |
+| href | Text | FactFind resource URL | v2/factfinds/234 |
+
+**policy:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique policy identifier | 42 |
+| name | Text | Policy name (read-only) | Standard DPA Policy 2026 |
+| href | Text | Policy resource URL | v2/dpa_policies/42 |
+
+**statements:**
+
+The statements object contains up to 5 statement fields (statement1 through statement5). Each statement has the following structure:
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| text | Text | Statement text from policy (read-only) | I confirm that I have read and understood the data protection policy. |
+| accepted | Yes/No | Whether the client accepted this statement | Yes |
+
+**Example statements structure:**
+- `statements.statement1.text` - First statement text (read-only)
+- `statements.statement1.accepted` - First statement acceptance (required)
+- `statements.statement2.text` - Second statement text (read-only)
+- `statements.statement2.accepted` - Second statement acceptance (optional)
+- `statements.statement3.text` - Third statement text (read-only)
+- `statements.statement3.accepted` - Third statement acceptance (optional)
+- `statements.statement4.text` - Fourth statement text (read-only)
+- `statements.statement4.accepted` - Fourth statement acceptance (optional)
+- `statements.statement5.text` - Fifth statement text (read-only)
+- `statements.statement5.accepted` - Fifth statement acceptance (optional)
+
+### Validation Rules
+- `id` - System-generated, read-only
+- `href` - System-generated, read-only
+- `policy.id` - Required on create, must reference an existing DPA policy
+- `agreedAt` - Required, must be valid ISO 8601 date-time
+- `statements.statement1` - Required, at least the first statement must be present
+- `statements.statement1.accepted` - Required, boolean value
+- `statements.statementN.accepted` - Required if statementN is present (N = 2-5)
+- Statement `text` fields are read-only, populated from the policy definition
+- `createdAt` and `createdBy` are system-managed, read-only
+
+### Business Rules
+- Agreements are immutable once created
+- For a valid agreement, all statements present must have accepted = true
+- Statement text comes from the policy definition, not the request
+- When a policy is updated, clients must create new agreements
+- Each client can have multiple agreements over time
+- Use agreementId = "current" to retrieve the most recent agreement
+- Supports up to 5 policy statements per agreement
+
+### GDPR Compliance Notes
+- Provides audit trail for Article 7 (consent)
+- Demonstrates lawful basis for processing (Article 6)
+- Supports right of access (Article 15) through agreement history
+- Records timestamp and content of consent
+- Immutable records ensure compliance with record-keeping requirements
+
+### Example Usage Scenarios
+
+**Scenario 1: Client onboarding**
+- Client is presented with current DPA policy
+- Client reads and accepts all policy statements
+- System creates DPA agreement linking client, factfind, and policy
+- Agreement ID is returned for reference
+
+**Scenario 2: Policy update**
+- Firm updates its DPA policy (new policy version created)
+- Existing clients are prompted to accept new policy
+- New DPA agreement created for each client's acceptance
+- Historical agreements remain in system for audit purposes
+
+**Scenario 3: Compliance audit**
+- Regulator requests proof of data processing consent
+- System retrieves all DPA agreements for client
+- Agreements show which policies were accepted and when
+- Demonstrates continuous consent management
+
+---
+
+## 13.37 Estate Planning - Will Contract
 ### Overview
 The `Will` contract represents a client's last will and testament details.
 
@@ -5378,7 +5508,7 @@ The `Will` contract represents a client's last will and testament details.
 
 ---
 
-## 13.37 Estate Planning - Lasting Power of Attorney (LPA) Contract
+## 13.38 Estate Planning - Lasting Power of Attorney (LPA) Contract
 ### Overview
 The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
@@ -5438,7 +5568,7 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
 ---
 
-## 13.38 Estate Planning - Gift Contract
+## 13.39 Estate Planning - Gift Contract
 ### Overview
 The `Gift` contract represents gifts made or planned by the client for inheritance tax planning.
 
@@ -5520,7 +5650,7 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 
 ---
 
-## 13.39 Estate Planning - Trust Contract
+## 13.40 Estate Planning - Trust Contract
 ### Overview
 The `Trust` contract represents trusts established by or benefiting the client.
 
@@ -5593,7 +5723,7 @@ The `Trust` contract represents trusts established by or benefiting the client.
 
 ---
 
-## 13.40 Identity Verification Contract
+## 13.41 Identity Verification Contract
 ### Overview
 The `IdentityVerification` contract represents comprehensive identity verification and KYC/AML compliance data for a client. This is a singleton resource - each client has exactly one identity verification record.
 
@@ -5752,7 +5882,7 @@ The `IdentityVerification` contract represents comprehensive identity verificati
 
 ---
 
-## 13.41 Arrangement - Mortgage Contract
+## 13.42 Arrangement - Mortgage Contract
 
 ### Business Purpose
 
@@ -6074,7 +6204,7 @@ This contract connects to:
 ---
 
 
-## 13.42 Arrangement - Investment Contract (General Investment Account)
+## 13.43 Arrangement - Investment Contract (General Investment Account)
 
 ### Business Purpose
 
@@ -6242,7 +6372,7 @@ This contract connects to:
 ---
 
 
-## 13.43 Arrangement - Protection Contract (Life Assurance)
+## 13.44 Arrangement - Protection Contract (Life Assurance)
 
 ### Business Purpose
 
@@ -6407,7 +6537,7 @@ This contract connects to:
 ---
 
 
-## 13.44 Arrangement - Pension Contract (Personal Pension)
+## 13.45 Arrangement - Pension Contract (Personal Pension)
 
 ### Business Purpose
 
@@ -6653,7 +6783,7 @@ This contract connects to:
 
 ---
 
-## 13.45 Arrangement - Pension Contract (SIPP)
+## 13.46 Arrangement - Pension Contract (SIPP)
 
 ### Business Purpose
 
@@ -6691,7 +6821,7 @@ Represents a Self-Invested Personal Pension with wider investment choices includ
 
 ---
 
-## 13.46 Arrangement - Pension Contract (Final Salary/Defined Benefit)
+## 13.47 Arrangement - Pension Contract (Final Salary/Defined Benefit)
 
 ### Business Purpose
 
@@ -6731,7 +6861,7 @@ Represents a Final Salary or Defined Benefit pension providing guaranteed income
 
 ---
 
-## 13.47 Arrangement - Pension Contract (Money Purchase/Defined Contribution)
+## 13.48 Arrangement - Pension Contract (Money Purchase/Defined Contribution)
 
 ### Business Purpose
 
@@ -6770,7 +6900,7 @@ Represents a workplace Defined Contribution pension with employer matching contr
 
 ---
 
-## 13.48 Arrangement - Pension Contract (State Pension)
+## 13.49 Arrangement - Pension Contract (State Pension)
 
 ### Business Purpose
 
@@ -6811,7 +6941,7 @@ Represents UK State Pension entitlement based on National Insurance contribution
 
 ---
 
-## 13.49 Arrangement - Investment Contract (Stocks & Shares ISA)
+## 13.50 Arrangement - Investment Contract (Stocks & Shares ISA)
 
 ### Business Purpose
 
