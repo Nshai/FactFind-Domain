@@ -138,11 +138,13 @@ The FactFind API provides comprehensive digital capabilities for:
       - [5.3.15 Delete Client Contact](#5315-delete-client-contact)
    - [5.4 Estate Planning](#54-estate-planning)
       - [5.4.1 Operations Summary](#541-operations-summary)
-      - [5.4.2 Get Estate Planning Overview](#542-get-estate-planning-overview)
-      - [5.4.3 Update Estate Planning Details](#543-update-estate-planning-details)
-      - [5.4.4 Record Gift](#544-record-gift)
-      - [5.4.5 List Gifts](#545-list-gifts)
-      - [5.4.6 Create Gift Trust](#546-create-gift-trust)
+      - [5.4.2 Get Estate Planning](#542-get-estate-planning)
+      - [5.4.3 Update Estate Planning](#543-update-estate-planning)
+      - [5.4.4 List Gifts](#544-list-gifts)
+      - [5.4.5 Create Gift](#545-create-gift)
+      - [5.4.6 Get Gift](#546-get-gift)
+      - [5.4.7 Update Gift](#547-update-gift)
+      - [5.4.8 Delete Gift](#548-delete-gift)
    - [5.5 Dependants](#55-dependants)
       - [5.5.1 Operations Summary](#551-operations-summary)
       - [5.5.2 List Dependants](#552-list-dependants)
@@ -185,6 +187,13 @@ The FactFind API provides comprehensive digital capabilities for:
    - [5.12 Financial Profile](#512-financial-profile)
       - [5.12.1 Get Financial Profile](#5121-get-financial-profile)
       - [5.12.2 Update Financial Profile](#5122-update-financial-profile)
+   - [5.13 Client Relationships](#513-client-relationships)
+      - [5.13.1 Operations Summary](#5131-operations-summary)
+      - [5.13.2 Create Client Relationship](#5132-create-client-relationship)
+      - [5.13.3 List Client Relationships](#5133-list-client-relationships)
+      - [5.13.4 Get Client Relationship](#5134-get-client-relationship)
+      - [5.13.5 Update Client Relationship](#5135-update-client-relationship)
+      - [5.13.6 Delete Client Relationship](#5136-delete-client-relationship)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -2834,17 +2843,12 @@ The financial health score is calculated on a 0-100 scale with five components:
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Delete contact | `client:write` |
 | **Estate Planning** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Record a new gift | `estate:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts by client | `estate:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts | `estate:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Create a new gift | `estate:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get gift details | `estate:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift record | `estate:write` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | Create gift trust | `estate:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | List client's trusts | `estate:read` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Get trust details | `estate:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Update trust | `estate:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |
 | **Dependants** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List all client's dependants | `client:read` |
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add new dependant | `client:write` |
@@ -2884,6 +2888,12 @@ The financial health score is calculated on a 0-100 scale with five components:
 | **Financial Profile** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile` | Get financial profile | `client:read` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile` | Update financial profile | `client:write` |
+| **Client Relationships** | | | |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | Create client relationship | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | List all relationships | `client:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Get specific relationship | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Update relationship | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Delete relationship | `client:write` |
 
 **Total Endpoints:** 65
 
@@ -3335,24 +3345,319 @@ Returns the updated contact.
 
 ### 5.4 Estate Planning
 
-Estate planning operations including wills, lasting powers of attorney, gifts, and trusts.
+**Description:** Manage estate planning information including wills, inheritance tax planning, gifts, and trusts. Estate planning is a singleton resource per client that captures overall estate planning details, with gifts managed as a sub-collection.
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+
+**Key Concepts:**
+- Estate planning is a singleton - one record per client
+- Captures will details, asset values, and inheritance tax planning
+- Gifts are managed as a sub-resource with full CRUD operations
+- Supports both standard gifts (PET) and trust-based gifts (loan trusts, discounted gift trusts)
+- Tracks gift exemptions and inheritance tax reliefs
 
 #### 5.4.1 Operations Summary
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+| Method | Endpoint | Description | Scope |
+|--------|----------|-------------|-------|
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Record a new gift | `estate:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts by client | `estate:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts | `estate:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Create a new gift | `estate:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get gift details | `estate:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift record | `estate:write` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | Create gift trust | `estate:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | List client's trusts | `estate:read` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Get trust details | `estate:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Update trust | `estate:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |
+
+#### 5.4.2 Get Estate Planning
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+
+**Description:** Retrieve estate planning details for a client, including will information, asset values, IHT planning, and associated gifts.
+
+**Response:**
+```json
+{
+  "href": "v2/factfinds/345/clients/456/estate-planning",
+  "client": {
+    "id": 456,
+    "href": "v2/factfinds/345/clients/456",
+    "name": "John Smith"
+  },
+  "factfind": {
+    "id": 345,
+    "href": "v2/factfinds/345"
+  },
+  "willDetails": "Standard will with spouse as primary beneficiary. Assets divided equally among three children.",
+  "totalAssets": {
+    "currency": "GBP",
+    "amount": 500000.00
+  },
+  "totalJointAssets": {
+    "currency": "GBP",
+    "amount": 350000.00
+  },
+  "giftInLast7YearsDetails": "Gifted £10,000 to daughter in 2020 for house deposit",
+  "recentGiftDetails": "Used £3,000 annual exemption this tax year for grandson's education",
+  "regularGiftDetails": "£200 monthly to grandchildren from income since 2022",
+  "expectingInheritanceDetails": "Expecting £50,000 from father's estate, probate in progress",
+  "propertyAdditionalNrb": {
+    "currency": "GBP",
+    "amount": 175000.00
+  },
+  "taxYearWhenPropertySold": 2023,
+  "widowsReliefNrbDeceasedPercentage": 50.00,
+  "widowsReliefPropertyAdditionalNrbDeceasedPercentage": 50.00,
+  "businessAssetRelief": {
+    "currency": "GBP",
+    "amount": 0.00
+  },
+  "gifts": [
+    {
+      "id": "gift-001",
+      "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-001",
+      "description": "Gift to daughter for house deposit",
+      "giftType": "PotentiallyExemptTransfer",
+      "isTrust": false,
+      "giftValue": {
+        "currency": "GBP",
+        "amount": 50000.00
+      },
+      "exemption1": "AnnualExemption",
+      "exemption2": null,
+      "exemption3": null
+    },
+    {
+      "id": "gift-002",
+      "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-002",
+      "description": "Loan Trust for grandchildren education",
+      "giftType": "LoanTrust",
+      "isTrust": true,
+      "originalInvestmentAmount": {
+        "currency": "GBP",
+        "amount": 100000.00
+      },
+      "discountValue": {
+        "currency": "GBP",
+        "amount": 10000.00
+      },
+      "income": {
+        "currency": "GBP",
+        "amount": 5000.00
+      },
+      "incomeStartYear": 2024,
+      "repeatGiftYears": 10,
+      "exemption1": "NoExemption",
+      "exemption2": null,
+      "exemption3": null
+    }
+  ],
+  "createdAt": "2026-01-15T09:00:00Z",
+  "updatedAt": "2026-02-23T14:30:00Z"
+}
+```
+
+#### 5.4.3 Update Estate Planning
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+
+**Description:** Update or create estate planning details for a client. This is a singleton resource - it will create the record if it doesn't exist, or update it if it does.
+
+**Request Body:**
+```json
+{
+  "willDetails": "Standard will with spouse as primary beneficiary. Assets divided equally among three children.",
+  "totalAssets": {
+    "currency": "GBP",
+    "amount": 500000.00
+  },
+  "totalJointAssets": {
+    "currency": "GBP",
+    "amount": 350000.00
+  },
+  "giftInLast7YearsDetails": "Gifted £10,000 to daughter in 2020 for house deposit",
+  "recentGiftDetails": "Used £3,000 annual exemption this tax year for grandson's education",
+  "regularGiftDetails": "£200 monthly to grandchildren from income since 2022",
+  "expectingInheritanceDetails": "Expecting £50,000 from father's estate, probate in progress",
+  "propertyAdditionalNrb": {
+    "currency": "GBP",
+    "amount": 175000.00
+  },
+  "taxYearWhenPropertySold": 2023,
+  "widowsReliefNrbDeceasedPercentage": 50.00,
+  "widowsReliefPropertyAdditionalNrbDeceasedPercentage": 50.00,
+  "businessAssetRelief": {
+    "currency": "GBP",
+    "amount": 0.00
+  }
+}
+```
+
+**Response:** Same as GET response above (without gifts array - gifts are managed separately).
+
+**Validation Rules:**
+- All fields are optional
+- Currency amounts must include both currency code and amount if provided
+- Percentages must be between 0 and 100
+- `taxYearWhenPropertySold` must be a valid year if provided
+
+**Business Rules:**
+- Estate planning is a singleton per client
+- Gifts are managed separately via the gifts sub-resource
+- Total assets should include property, investments, pensions, etc.
+- Total joint assets should be included in total assets value
+- Property additional NRB (residence nil rate band) max £175,000 per person
+- Widow's relief percentages represent transferred allowance from deceased spouse
+- Business asset relief applies to qualifying business property
+
+#### 5.4.4 List Gifts
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
+
+**Description:** Retrieve all gifts recorded for a client's estate planning.
+
+**Query Parameters:**
+- `skip` - Number of records to skip (default: 0)
+- `top` - Number of records to retrieve (default: 25, max: 100)
+- `giftType` - Filter by gift type (PotentiallyExemptTransfer, LoanTrust, etc.)
+- `isTrust` - Filter by trust status (true/false)
+- `orderby` - Sort by field (e.g., "giftValue desc")
+
+**Response:**
+```json
+{
+  "href": "v2/factfinds/345/clients/456/estate-planning/gifts?skip=0&top=25",
+  "items": [
+    {
+      "id": "gift-001",
+      "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-001",
+      "description": "Gift to daughter for house deposit",
+      "giftType": "PotentiallyExemptTransfer",
+      "isTrust": false,
+      "giftValue": {
+        "currency": "GBP",
+        "amount": 50000.00
+      },
+      "exemption1": "AnnualExemption",
+      "exemption2": null,
+      "exemption3": null
+    }
+  ],
+  "count": 1,
+  "first_href": "v2/factfinds/345/clients/456/estate-planning/gifts?skip=0&top=25",
+  "last_href": "v2/factfinds/345/clients/456/estate-planning/gifts?skip=0&top=25"
+}
+```
+
+#### 5.4.5 Create Gift
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts`
+
+**Description:** Create a new gift record for estate planning. Supports both standard gifts (PET) and trust-based gifts.
+
+**Request Body (Standard Gift):**
+```json
+{
+  "description": "Gift to daughter for house deposit",
+  "giftType": "PotentiallyExemptTransfer",
+  "isTrust": false,
+  "giftValue": {
+    "currency": "GBP",
+    "amount": 50000.00
+  },
+  "exemption1": "AnnualExemption",
+  "exemption2": null,
+  "exemption3": null
+}
+```
+
+**Request Body (Trust Gift):**
+```json
+{
+  "description": "Loan Trust for grandchildren education",
+  "giftType": "LoanTrust",
+  "isTrust": true,
+  "originalInvestmentAmount": {
+    "currency": "GBP",
+    "amount": 100000.00
+  },
+  "discountValue": {
+    "currency": "GBP",
+    "amount": 10000.00
+  },
+  "income": {
+    "currency": "GBP",
+    "amount": 5000.00
+  },
+  "incomeStartYear": 2024,
+  "repeatGiftYears": 10,
+  "exemption1": "NoExemption",
+  "exemption2": null,
+  "exemption3": null
+}
+```
+
+**Response:** `201 Created` (same structure as request with added id, href, createdAt, updatedAt)
+
+**Validation Rules:**
+- `description` - Required, max 500 characters
+- `giftType` - Required, must be valid gift type enum
+- `isTrust` - Required boolean
+- For standard gifts: `giftValue` is required
+- For trust gifts: `originalInvestmentAmount` is required
+- `exemption1`, `exemption2`, `exemption3` - Optional, must be valid exemption types if provided
+
+#### 5.4.6 Get Gift
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}`
+
+**Description:** Retrieve details of a specific gift.
+
+**Response:** Same structure as create gift response.
+
+#### 5.4.7 Update Gift
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}`
+
+**Description:** Update an existing gift record.
+
+**Request Body:** Same as create gift request body.
+
+**Response:** `200 OK` (same structure as GET response)
+
+#### 5.4.8 Delete Gift
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}`
+
+**Description:** Delete a gift record from estate planning.
+
+**Response:** `204 No Content`
+
+**Gift Type Enumerations:**
+- `PotentiallyExemptTransfer` - Standard PET gift (becomes exempt after 7 years)
+- `LoanTrust` - Loan trust arrangement
+- `DiscountedGiftTrust` - Discounted gift trust
+- `BareGift` - Bare/absolute gift to trust
+- `GiftWithReservation` - Gift with reservation of benefit
+- `ChargableLifetimeTransfer` - CLT (immediate IHT charge)
+
+**Gift Exemption Enumerations:**
+- `NoExemption` - No exemption applies
+- `AnnualExemption` - £3,000 annual exemption
+- `SmallGiftExemption` - £250 small gifts exemption
+- `MarriageExemption` - Marriage/civil partnership gift exemption
+- `RegularGiftsFromIncome` - Regular gifts from surplus income
+- `NormalExpenditure` - Normal expenditure out of income
+- `MainResidence` - Main residence exemption (partial)
+
+**Business Rules:**
+- Gifts are linked to estate planning for IHT calculations
+- PET gifts become exempt after 7 years (taper relief applies years 3-7)
+- Trust gifts may have immediate IHT implications
+- Multiple exemptions can be applied to a single gift (exemption1, exemption2, exemption3)
+- Annual exemption is £3,000 per tax year (can carry forward one year)
+- Regular gifts from income must meet specific criteria (surplus income, regular pattern)
+- Loan trusts: Original investment remains in estate, growth is outside
+- Discounted gift trusts: Discount value is IHT gift, remainder stays in estate
 
 ---
 
@@ -6043,6 +6348,318 @@ Use: Demonstrate suitability in file review
 3. **Planning Scenarios:** Update projected figures for what-if analysis
 4. **Portfolio Review:** Track changes in net worth over time
 5. **Household View:** Compare individual vs. joint financial positions
+
+---
+
+### 5.13 Client Relationships
+
+**Description:** Manage relationships between clients (family members, partners, business associates, etc.). Client relationships enable tracking of family groupings, partnerships, and data sharing permissions between related clients.
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships`
+
+**Key Concepts:**
+- Relationships are bidirectional - creating a relationship from Client A to Client B may imply a reciprocal relationship
+- Relationships can represent family connections (spouse, parent, child, sibling) or business connections
+- Supports permission management for data sharing and viewing between related clients
+- Family grouping enables household-level reporting and analysis
+- Partner flag identifies primary partner/spouse relationships
+
+#### 5.13.1 Operations Summary
+
+| Method | Endpoint | Description | Scope |
+|--------|----------|-------------|-------|
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | Create client relationship | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | List all relationships | `client:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Get specific relationship | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Update relationship | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Delete relationship | `client:write` |
+
+#### 5.13.2 Create Client Relationship
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/relationships`
+
+**Description:** Create a new relationship between the specified client and another client. The relationship describes how the related client is connected to the primary client.
+
+**Request Body:**
+```json
+{
+  "relatedClient": {
+    "id": 1235
+  },
+  "relationshipType": "Spouse",
+  "partner": true,
+  "familyGrouping": true,
+  "canRelatedViewClientsPlansAssets": true,
+  "canClientViewRelatedsPlansAssets": true,
+  "canRelatedAccessClientsData": false,
+  "canClientAccessRelatedsData": false
+}
+```
+
+**Response:** `201 Created`
+```json
+{
+  "id": 9876,
+  "href": "v2/factfinds/234/clients/1234/relationships/9876",
+  "client": {
+    "id": 1234,
+    "href": "v2/factfinds/234/clients/1234",
+    "name": "John Smith"
+  },
+  "factfind": {
+    "id": 234,
+    "href": "v2/factfinds/234"
+  },
+  "relatedClient": {
+    "id": 1235,
+    "href": "v2/factfinds/234/clients/1235",
+    "name": "Sarah Smith"
+  },
+  "relationshipType": "Spouse",
+  "partner": true,
+  "familyGrouping": true,
+  "canRelatedViewClientsPlansAssets": true,
+  "canClientViewRelatedsPlansAssets": true,
+  "canRelatedAccessClientsData": false,
+  "canClientAccessRelatedsData": false,
+  "createdAt": "2026-02-23T10:30:00Z",
+  "updatedAt": "2026-02-23T10:30:00Z",
+  "createdBy": "adviser@example.com",
+  "updatedBy": "adviser@example.com"
+}
+```
+
+**Validation Rules:**
+- `relatedClient.id` - Required, must reference an existing client in the same factfind
+- `relationshipType` - Required, must be a valid relationship type (see enumerations below)
+- `partner` - Optional boolean, default: false
+- `familyGrouping` - Optional boolean, default: false
+- Permission flags (`can*`) - Optional booleans, default: false
+- Cannot create a relationship from a client to themselves
+- Cannot create duplicate relationships (same client pair and relationship type)
+
+**Business Rules:**
+- Related client must exist in the same factfind
+- Only one relationship can be marked as `partner: true` for a client
+- Family grouping enables household-level aggregation and reporting
+- Permission flags control data visibility and access between related clients
+- Creating a Spouse relationship automatically sets `partner: true` if not specified
+- Deleting a client does not automatically delete their relationships (must be handled separately)
+
+#### 5.13.3 List Client Relationships
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/relationships`
+
+**Description:** Retrieve all relationships for a specific client. Results can be filtered and paginated.
+
+**Query Parameters:**
+- `skip` - Number of records to skip (default: 0)
+- `top` - Number of records to retrieve (default: 25, max: 100)
+- `relationshipType` - Filter by relationship type (e.g., "Spouse", "Child", "Parent")
+- `partner` - Filter by partner status (true/false)
+- `familyGrouping` - Filter by family grouping (true/false)
+- `orderby` - Sort by field (e.g., "relationshipType", "createdAt desc")
+
+**Response:** `200 OK`
+```json
+{
+  "href": "v2/factfinds/234/clients/1234/relationships?skip=0&top=25",
+  "items": [
+    {
+      "id": 9876,
+      "href": "v2/factfinds/234/clients/1234/relationships/9876",
+      "client": {
+        "id": 1234,
+        "href": "v2/factfinds/234/clients/1234",
+        "name": "John Smith"
+      },
+      "factfind": {
+        "id": 234,
+        "href": "v2/factfinds/234"
+      },
+      "relatedClient": {
+        "id": 1235,
+        "href": "v2/factfinds/234/clients/1235",
+        "name": "Sarah Smith"
+      },
+      "relationshipType": "Spouse",
+      "partner": true,
+      "familyGrouping": true,
+      "canRelatedViewClientsPlansAssets": true,
+      "canClientViewRelatedsPlansAssets": true,
+      "canRelatedAccessClientsData": false,
+      "canClientAccessRelatedsData": false,
+      "createdAt": "2026-02-23T10:30:00Z",
+      "updatedAt": "2026-02-23T10:30:00Z"
+    },
+    {
+      "id": 9877,
+      "href": "v2/factfinds/234/clients/1234/relationships/9877",
+      "client": {
+        "id": 1234,
+        "href": "v2/factfinds/234/clients/1234",
+        "name": "John Smith"
+      },
+      "factfind": {
+        "id": 234,
+        "href": "v2/factfinds/234"
+      },
+      "relatedClient": {
+        "id": 1236,
+        "href": "v2/factfinds/234/clients/1236",
+        "name": "Emily Smith"
+      },
+      "relationshipType": "Daughter",
+      "partner": false,
+      "familyGrouping": true,
+      "canRelatedViewClientsPlansAssets": false,
+      "canClientViewRelatedsPlansAssets": true,
+      "canRelatedAccessClientsData": false,
+      "canClientAccessRelatedsData": false,
+      "createdAt": "2026-02-23T10:35:00Z",
+      "updatedAt": "2026-02-23T10:35:00Z"
+    }
+  ],
+  "count": 2,
+  "first_href": "v2/factfinds/234/clients/1234/relationships?skip=0&top=25",
+  "last_href": "v2/factfinds/234/clients/1234/relationships?skip=0&top=25"
+}
+```
+
+#### 5.13.4 Get Client Relationship
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}`
+
+**Description:** Retrieve a specific relationship by ID.
+
+**Response:** `200 OK`
+```json
+{
+  "id": 9876,
+  "href": "v2/factfinds/234/clients/1234/relationships/9876",
+  "client": {
+    "id": 1234,
+    "href": "v2/factfinds/234/clients/1234",
+    "name": "John Smith"
+  },
+  "factfind": {
+    "id": 234,
+    "href": "v2/factfinds/234"
+  },
+  "relatedClient": {
+    "id": 1235,
+    "href": "v2/factfinds/234/clients/1235",
+    "name": "Sarah Smith"
+  },
+  "relationshipType": "Spouse",
+  "partner": true,
+  "familyGrouping": true,
+  "canRelatedViewClientsPlansAssets": true,
+  "canClientViewRelatedsPlansAssets": true,
+  "canRelatedAccessClientsData": false,
+  "canClientAccessRelatedsData": false,
+  "createdAt": "2026-02-23T10:30:00Z",
+  "updatedAt": "2026-02-23T10:30:00Z",
+  "createdBy": "adviser@example.com",
+  "updatedBy": "adviser@example.com"
+}
+```
+
+#### 5.13.5 Update Client Relationship
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}`
+
+**Description:** Update an existing client relationship. The client IDs cannot be changed; only the relationship type and permission flags can be updated.
+
+**Request Body:**
+```json
+{
+  "relationshipType": "Spouse",
+  "partner": true,
+  "familyGrouping": true,
+  "canRelatedViewClientsPlansAssets": true,
+  "canClientViewRelatedsPlansAssets": true,
+  "canRelatedAccessClientsData": true,
+  "canClientAccessRelatedsData": true
+}
+```
+
+**Response:** `200 OK` (same format as GET response)
+
+**Validation Rules:**
+- Cannot change `client` or `relatedClient` references (create new relationship instead)
+- `relationshipType` - Optional, must be valid if provided
+- All permission flags are optional booleans
+
+#### 5.13.6 Delete Client Relationship
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}`
+
+**Description:** Delete a client relationship. This removes the link between the two clients but does not delete the client records themselves.
+
+**Response:** `204 No Content`
+
+**Business Rules:**
+- Deleting a relationship does not delete the related client records
+- Deleting a relationship does not automatically delete the reciprocal relationship (if one exists)
+- Cannot delete relationships if they are referenced by other system constraints
+
+**Relationship Types (Enumerations):**
+
+Common relationship types include:
+
+| Code | Description | Notes |
+|------|-------------|-------|
+| Spouse | Married partner | Typically sets partner=true |
+| Partner | Unmarried partner | Typically sets partner=true |
+| CivilPartner | Civil partnership | Typically sets partner=true |
+| Son | Son | Family relationship |
+| Daughter | Daughter | Family relationship |
+| Father | Father | Family relationship |
+| Mother | Mother | Family relationship |
+| Brother | Brother | Family relationship |
+| Sister | Sister | Family relationship |
+| Grandfather | Grandfather | Extended family |
+| Grandmother | Grandmother | Extended family |
+| Grandson | Grandson | Extended family |
+| Granddaughter | Granddaughter | Extended family |
+| Uncle | Uncle | Extended family |
+| Aunt | Aunt | Extended family |
+| Nephew | Nephew | Extended family |
+| Niece | Niece | Extended family |
+| Cousin | Cousin | Extended family |
+| StepFather | Step-father | Blended family |
+| StepMother | Step-mother | Blended family |
+| StepSon | Step-son | Blended family |
+| StepDaughter | Step-daughter | Blended family |
+| StepBrother | Step-brother | Blended family |
+| StepSister | Step-sister | Blended family |
+| FatherInLaw | Father-in-law | In-law relationships |
+| MotherInLaw | Mother-in-law | In-law relationships |
+| SonInLaw | Son-in-law | In-law relationships |
+| DaughterInLaw | Daughter-in-law | In-law relationships |
+| BrotherInLaw | Brother-in-law | In-law relationships |
+| SisterInLaw | Sister-in-law | In-law relationships |
+| BusinessPartner | Business partner | Non-family |
+| Trustee | Trustee | Non-family |
+| Guardian | Guardian | Non-family |
+| Dependant | Dependant | Non-family |
+| Other | Other relationship | Non-family |
+
+**Use Cases:**
+
+1. **Joint Factfind Setup:** Link married couple as spouses with partner flag for household reporting
+2. **Family Planning:** Track family members for inheritance and estate planning purposes
+3. **Data Sharing:** Configure permissions for adult children to view parents' financial plans
+4. **Business Relationships:** Link business partners for corporate financial advice
+5. **Trust Arrangements:** Link trustees and beneficiaries
+
+**Permission Flags Explained:**
+
+- **canRelatedViewClientsPlansAssets**: Can the related client view this client's financial plans and assets?
+- **canClientViewRelatedsPlansAssets**: Can this client view the related client's financial plans and assets?
+- **canRelatedAccessClientsData**: Can the related client access/modify this client's data?
+- **canClientAccessRelatedsData**: Can this client access/modify the related client's data?
 
 ---
 

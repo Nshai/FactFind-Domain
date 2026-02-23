@@ -62,15 +62,16 @@ Each contract section includes:
 - [13.35 Marketing Preferences Contract](#1335-marketing-preferences-contract)
 - [13.36 DPA Policy Agreement Contract](#1336-dpa-policy-agreement-contract)
 - [13.37 Financial Profile Contract](#1337-financial-profile-contract)
-- [13.38 Estate Planning - Will Contract](#1338-estate-planning---will-contract)
-- [13.39 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1339-estate-planning---lasting-power-of-attorney-lpa-contract)
-- [13.40 Estate Planning - Gift Contract](#1340-estate-planning---gift-contract)
-- [13.41 Estate Planning - Trust Contract](#1341-estate-planning---trust-contract)
-- [13.42 Identity Verification Contract](#1342-identity-verification-contract)
-- [13.43 Arrangement - Mortgage Contract](#1343-arrangement---mortgage-contract)
-- [13.44 Arrangement - Investment Contract (General Investment Account)](#1344-arrangement---investment-contract-general-investment-account)
-- [13.45 Arrangement - Protection Contract (Life Assurance)](#1345-arrangement---protection-contract-life-assurance)
-- [13.46 Arrangement - Pension Contract (Personal Pension)](#1346-arrangement---pension-contract-personal-pension)
+- [13.38 Client Relationship Contract](#1338-client-relationship-contract)
+- [13.39 Estate Planning - Will Contract](#1339-estate-planning---will-contract)
+- [13.40 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1340-estate-planning---lasting-power-of-attorney-lpa-contract)
+- [13.41 Estate Planning - Gift Contract](#1341-estate-planning---gift-contract)
+- [13.42 Estate Planning - Trust Contract](#1342-estate-planning---trust-contract)
+- [13.43 Identity Verification Contract](#1343-identity-verification-contract)
+- [13.44 Arrangement - Mortgage Contract](#1344-arrangement---mortgage-contract)
+- [13.45 Arrangement - Investment Contract (General Investment Account)](#1345-arrangement---investment-contract-general-investment-account)
+- [13.46 Arrangement - Protection Contract (Life Assurance)](#1346-arrangement---protection-contract-life-assurance)
+- [13.47 Arrangement - Pension Contract (Personal Pension)](#1347-arrangement---pension-contract-personal-pension)
 
 ### Appendices
 - [Appendix A: Common Value Types](#appendix-a-common-value-types)
@@ -5017,7 +5018,337 @@ The `FinancialProfile` contract represents a summary of a client's financial pos
 
 ---
 
-## 13.38 Estate Planning - Will Contract
+## 13.38 Client Relationship Contract
+
+### Overview
+The `ClientRelationship` contract represents a connection between two clients within a factfind. Relationships track family connections (spouse, parent, child), business partnerships, and data sharing permissions between related clients.
+
+### Business Purpose
+- Track family groupings for household-level reporting and analysis
+- Identify partner/spouse relationships for joint financial planning
+- Manage data sharing permissions between related clients
+- Support estate planning and inheritance considerations
+- Enable consolidated household financial views
+
+### Key Features
+- Bidirectional relationships between clients in the same factfind
+- Supports family relationships (spouse, parent, child, sibling, etc.)
+- Supports non-family relationships (business partner, trustee, guardian)
+- Configurable permission flags for data viewing and access
+- Partner flag for primary spouse/partner identification
+- Family grouping for household aggregation
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique identifier for the relationship | 9876 |
+| href | Text | Resource URL for this relationship | v2/factfinds/234/clients/1234/relationships/9876 |
+| client | Reference Link | The primary client in this relationship | Complex object |
+| factfind | Reference Link | FactFind reference | Complex object |
+| relatedClient | Reference Link | The related client | Complex object |
+| relationshipType | Enum (Text) | Type of relationship. See enumerations below | Spouse |
+| partner | Yes/No | Whether this is a partner/spouse relationship | Yes |
+| familyGrouping | Yes/No | Whether to include in family grouping/household reporting | Yes |
+| canRelatedViewClientsPlansAssets | Yes/No | Can related client view this client's plans and assets? | Yes |
+| canClientViewRelatedsPlansAssets | Yes/No | Can this client view related client's plans and assets? | Yes |
+| canRelatedAccessClientsData | Yes/No | Can related client access/modify this client's data? | No |
+| canClientAccessRelatedsData | Yes/No | Can this client access/modify related client's data? | No |
+| createdAt | Date and Time | When this record was created (read-only) | 2026-02-23T10:30:00Z |
+| updatedAt | Date and Time | When this record was last updated (read-only) | 2026-02-23T10:30:00Z |
+| createdBy | Text | User who created this record (read-only) | adviser@example.com |
+| updatedBy | Text | User who last updated this record (read-only) | adviser@example.com |
+
+#### Nested Field Groups
+
+**client:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique client identifier | 1234 |
+| href | Text | Client resource URL | v2/factfinds/234/clients/1234 |
+| name | Text | Client name | John Smith |
+
+**factfind:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique FactFind identifier | 234 |
+| href | Text | FactFind resource URL | v2/factfinds/234 |
+
+**relatedClient:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique client identifier | 1235 |
+| href | Text | Client resource URL | v2/factfinds/234/clients/1235 |
+| name | Text | Client name | Sarah Smith |
+
+### Enumerations
+
+#### relationshipType Values
+
+**Immediate Family:**
+- `Spouse` - Married partner
+- `Partner` - Unmarried partner
+- `CivilPartner` - Civil partnership
+- `Son` - Son
+- `Daughter` - Daughter
+- `Father` - Father
+- `Mother` - Mother
+- `Brother` - Brother
+- `Sister` - Sister
+
+**Extended Family:**
+- `Grandfather` - Grandfather
+- `Grandmother` - Grandmother
+- `Grandson` - Grandson
+- `Granddaughter` - Granddaughter
+- `Uncle` - Uncle
+- `Aunt` - Aunt
+- `Nephew` - Nephew
+- `Niece` - Niece
+- `Cousin` - Cousin
+
+**Blended Family:**
+- `StepFather` - Step-father
+- `StepMother` - Step-mother
+- `StepSon` - Step-son
+- `StepDaughter` - Step-daughter
+- `StepBrother` - Step-brother
+- `StepSister` - Step-sister
+
+**In-Law Relationships:**
+- `FatherInLaw` - Father-in-law
+- `MotherInLaw` - Mother-in-law
+- `SonInLaw` - Son-in-law
+- `DaughterInLaw` - Daughter-in-law
+- `BrotherInLaw` - Brother-in-law
+- `SisterInLaw` - Sister-in-law
+
+**Non-Family:**
+- `BusinessPartner` - Business partner
+- `Trustee` - Trustee
+- `Guardian` - Guardian
+- `Dependant` - Dependant
+- `Other` - Other relationship type
+
+### Validation Rules
+- `relatedClient.id` - Required, must reference an existing client in the same factfind
+- `relationshipType` - Required, must be a valid relationship type from the enumeration
+- `partner` - Optional boolean, default: false
+- `familyGrouping` - Optional boolean, default: false
+- Permission flags (`can*`) - Optional booleans, default: false
+- Cannot create a relationship from a client to themselves
+- Cannot create duplicate relationships (same client pair and relationship type)
+- `client` and `relatedClient` are immutable after creation
+
+### Business Rules
+- Related client must exist in the same factfind
+- Only one relationship per client can be marked as `partner: true`
+- Family grouping enables household-level aggregation in reporting
+- Permission flags control data visibility and access between related clients
+- Creating a Spouse, Partner, or CivilPartner relationship automatically sets `partner: true` if not specified
+- Deleting a client does not automatically delete their relationships
+- Relationships are directional - reciprocal relationships must be created separately if needed
+
+### Permission Flags Explained
+
+- **canRelatedViewClientsPlansAssets**: Allows the related client to view (read-only) this client's financial plans, goals, and asset information
+- **canClientViewRelatedsPlansAssets**: Allows this client to view (read-only) the related client's financial plans, goals, and asset information
+- **canRelatedAccessClientsData**: Allows the related client to access and potentially modify this client's data (requires additional authorization)
+- **canClientAccessRelatedsData**: Allows this client to access and potentially modify the related client's data (requires additional authorization)
+
+### Usage Scenarios
+
+**Scenario 1: Married couple joint factfind**
+- Create Spouse relationship between husband and wife
+- Set `partner: true` and `familyGrouping: true`
+- Enable bidirectional viewing permissions for transparency
+- Household reporting aggregates both clients' finances
+
+**Scenario 2: Parent-child relationship**
+- Create Father/Mother relationship from parent to adult child
+- Set `familyGrouping: true` for estate planning purposes
+- Set `canClientViewRelatedsPlansAssets: true` if parent wants to monitor child's finances
+- Keep access permissions false for privacy
+
+**Scenario 3: Business partners**
+- Create BusinessPartner relationship between corporate clients
+- Set `familyGrouping: false`
+- Configure viewing permissions based on business agreement
+- Supports business succession planning
+
+**Scenario 4: Trust arrangement**
+- Create Trustee relationship from settlor to trustee
+- Set `canRelatedViewClientsPlansAssets: true` for trustee oversight
+- Track relationship for estate planning documentation
+
+### Calculation Impact
+
+Client relationships affect:
+- **Household Income**: Sum of income across family grouping
+- **Household Net Worth**: Combined net worth of family grouping
+- **Joint Assets**: Assets marked as jointly owned between related clients
+- **Estate Planning**: Beneficiary and inheritance calculations
+- **Affordability**: Combined household income for joint mortgage applications
+
+---
+
+## 13.39 Estate Planning Contract
+
+### Overview
+The `EstatePlanning` contract represents a comprehensive overview of a client's estate planning arrangements. This is a singleton resource - each client has exactly one estate planning record that captures will details, asset values, inheritance tax planning, and associated gifts.
+
+### Business Purpose
+- Provide centralized estate planning information for IHT calculations
+- Track will details and beneficiary arrangements
+- Record gifts made and planned (PETs, trusts, exemptions)
+- Calculate inheritance tax liability and available reliefs
+- Support estate planning advice and recommendations
+
+### Key Features
+- Singleton resource per client
+- Captures will details in free text format
+- Tracks total assets and joint assets for IHT calculations
+- Records gift history (last 7 years, recent, regular)
+- Supports inheritance tax reliefs (RNRB, widow's relief, business asset relief)
+- Includes gifts collection as sub-resource
+- Supports both standard gifts and trust-based arrangements
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| href | Text | Resource URL for this estate planning record | v2/factfinds/345/clients/456/estate-planning |
+| client | Reference Link | Client reference | Complex object |
+| factfind | Reference Link | FactFind reference | Complex object |
+| willDetails | Text | Free-text description of will arrangements | Standard will with spouse as primary beneficiary... |
+| totalAssets | Currency Amount | Total value of client's estate | Complex object |
+| totalJointAssets | Currency Amount | Total value of jointly owned assets | Complex object |
+| giftInLast7YearsDetails | Text | Description of gifts made in last 7 years | Gifted £10,000 to daughter in 2020 for house deposit |
+| recentGiftDetails | Text | Description of recent gifts (current tax year) | Used £3,000 annual exemption this tax year... |
+| regularGiftDetails | Text | Description of regular gifts from income | £200 monthly to grandchildren from income since 2022 |
+| expectingInheritanceDetails | Text | Description of expected inheritance | Expecting £50,000 from father's estate... |
+| propertyAdditionalNrb | Currency Amount | Residence nil rate band (max £175,000) | Complex object |
+| taxYearWhenPropertySold | Number | Tax year when main residence was sold (if applicable) | 2023 |
+| widowsReliefNrbDeceasedPercentage | Number (Percentage) | Percentage of deceased spouse's NRB available to transfer | 50.00 |
+| widowsReliefPropertyAdditionalNrbDeceasedPercentage | Number (Percentage) | Percentage of deceased spouse's RNRB available to transfer | 50.00 |
+| businessAssetRelief | Currency Amount | Business property relief available | Complex object |
+| gifts | List of Complex Data | Collection of gifts (see Gift contract) | List with 2 item(s) |
+| createdAt | Date and Time | When this record was created (read-only) | 2026-01-15T09:00:00Z |
+| updatedAt | Date and Time | When this record was last updated (read-only) | 2026-02-23T14:30:00Z |
+
+#### Nested Field Groups
+
+**client:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique client identifier | 456 |
+| href | Text | Client resource URL | v2/factfinds/345/clients/456 |
+| name | Text | Client name | John Smith |
+
+**factfind:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique FactFind identifier | 345 |
+| href | Text | FactFind resource URL | v2/factfinds/345 |
+
+**Currency Amount Structure (applies to totalAssets, totalJointAssets, propertyAdditionalNrb, businessAssetRelief):**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| currency | Text | ISO currency code | GBP |
+| amount | Number | The monetary value | 500000.00 |
+
+**Gift Item Structure (gifts array):**
+
+See section 13.41 Estate Planning - Gift Contract for full gift structure.
+
+### Validation Rules
+- All text fields are optional, max 2000 characters
+- Currency amounts must include both currency and amount if provided
+- `taxYearWhenPropertySold` - Must be a valid tax year (e.g., 2023) if provided
+- `widowsReliefNrbDeceasedPercentage` - Must be between 0 and 100 if provided
+- `widowsReliefPropertyAdditionalNrbDeceasedPercentage` - Must be between 0 and 100 if provided
+- `propertyAdditionalNrb` - Maximum £175,000 per person (2024/25 tax year)
+- `totalJointAssets` - Should be included in `totalAssets` value
+
+### Business Rules
+- Estate planning is a singleton per client
+- Total assets should include all property, investments, pensions, savings, etc.
+- Total joint assets represents portion of total assets owned jointly
+- Gifts are managed as sub-resource via separate API endpoints
+- Property additional NRB (RNRB) applies only if main residence left to direct descendants
+- RNRB tapers away for estates over £2 million
+- Widow's relief allows transfer of unused NRB/RNRB from deceased spouse
+- Business asset relief provides 50% or 100% relief on qualifying business property
+- Gifts in last 7 years affect IHT calculation (taper relief applies years 3-7)
+
+### IHT Planning Notes
+
+**Nil Rate Band (NRB):**
+- £325,000 per person (frozen until 2030)
+- Transferable to surviving spouse/civil partner
+- Applies to lifetime gifts and death estate
+
+**Residence Nil Rate Band (RNRB):**
+- Additional £175,000 per person (2024/25)
+- Only if main residence left to direct descendants
+- Tapers for estates over £2 million (£1 lost per £2 over threshold)
+- Transferable to surviving spouse/civil partner
+
+**Potentially Exempt Transfers (PETs):**
+- Gifts to individuals become exempt after 7 years
+- Taper relief applies if donor dies within 3-7 years
+- Full IHT at 40% if donor dies within 3 years
+
+**Regular Gifts from Income:**
+- Exempt if from surplus income (not capital)
+- Must be regular pattern of giving
+- Must not affect donor's standard of living
+- No limit on amount
+
+**Annual Exemptions:**
+- £3,000 per tax year
+- Can carry forward one year if unused
+- Plus £250 small gifts exemption per recipient
+
+### Usage Scenarios
+
+**Scenario 1: Initial estate planning discussion**
+- Capture will details and beneficiary wishes
+- Record total estate value and joint assets
+- Document any gifts made or planned
+- Calculate potential IHT liability
+
+**Scenario 2: IHT calculation**
+- Use total assets to determine estate value
+- Apply NRB and RNRB allowances
+- Factor in widow's relief if applicable
+- Deduct business asset relief
+- Account for gifts in last 7 years with taper relief
+
+**Scenario 3: Widow with transferred allowances**
+- Widow has 50% of deceased husband's NRB unused
+- Set `widowsReliefNrbDeceasedPercentage: 50`
+- Total NRB available: £325k + £162.5k = £487,500
+
+**Scenario 4: Downsizing**
+- Client sold main residence in 2023
+- May still claim RNRB if downsized
+- Record `taxYearWhenPropertySold: 2023`
+- RNRB available if meets downsizing rules
+
+---
+
+## 13.40 Estate Planning - Will Contract
 ### Overview
 The `Will` contract represents a client's last will and testament details.
 
@@ -5077,7 +5408,7 @@ The `Will` contract represents a client's last will and testament details.
 
 ---
 
-## 13.39 Estate Planning - Lasting Power of Attorney (LPA) Contract
+## 13.40 Estate Planning - Lasting Power of Attorney (LPA) Contract
 ### Overview
 The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
@@ -5137,9 +5468,9 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
 ---
 
-## 13.40 Estate Planning - Gift Contract
+## 13.41 Estate Planning - Gift Contract
 ### Overview
-The `Gift` contract represents gifts made or planned by the client for inheritance tax planning.
+The `Gift` contract represents gifts made or planned by the client for inheritance tax (IHT) planning. Gifts can be either standard potentially exempt transfers (PETs) or trust-based gifts such as loan trusts and discounted gift trusts.
 
 ### Fields
 
@@ -5147,79 +5478,185 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| client | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2024-12-26T10:00:00Z |
-| exemptionsClaimed | List of Complex Data |  | List with 1 item(s) |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| giftDate | Date |  | 2024-12-25 |
-| giftDescription | Text | Description of the goal | Cash gift to help with house deposit |
-| giftType | Text |  | POTENTIALLY_EXEMPT_TRANSFER |
-| giftValue | Currency Amount | The contact value (email address, phone number, etc.) | Complex object |
-| id | Number | Unique system identifier for this record | 9999 |
-| ihtImplications | Complex Data |  | Complex object |
-| isOutOfIncome | Yes/No |  | No |
-| isRegularGift | Yes/No |  | No |
-| notes | Text |  | Gift to daughter for house purchase. Annual exempt... |
-| potentiallyExemptTransfer | Complex Data |  | Complex object |
-| recipient | Complex Data |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-15T09:00:00Z |
+| description | Text | Description of the gift | Cash gift to help with house deposit |
+| discountValue | Currency Amount | **Trust gifts only.** The discount value for discounted gift trusts | Complex object |
+| exemption1 | Text | Primary exemption applied to the gift | AnnualExemption |
+| exemption2 | Text | Secondary exemption applied to the gift (optional) | SmallGiftExemption |
+| exemption3 | Text | Tertiary exemption applied to the gift (optional) | NoExemption |
+| giftType | Text | Type of gift for IHT planning purposes | PotentiallyExemptTransfer |
+| giftValue | Currency Amount | **Standard gifts only.** The monetary value of the gift | Complex object |
+| href | Text | API resource link | v2/factfinds/345/clients/456/estate-planning/gifts/gift-001 |
+| id | Text | Unique identifier for this gift | gift-001 |
+| income | Currency Amount | **Trust gifts only.** Annual income generated by the trust | Complex object |
+| incomeStartYear | Number | **Trust gifts only.** Year when income payments begin | 2024 |
+| isTrust | Yes/No | Indicates whether this is a trust-based gift | No |
+| originalInvestmentAmount | Currency Amount | **Trust gifts only.** Original amount invested in the trust | Complex object |
+| repeatGiftYears | Number | **Trust gifts only.** Number of years the gift is repeated | 10 |
+
+### Gift Types
+
+| Gift Type | Description |
+|---|---|
+| **PotentiallyExemptTransfer** | Standard gift that becomes exempt if donor survives 7 years |
+| **LoanTrust** | Loan trust arrangement where capital can be reclaimed |
+| **DiscountedGiftTrust** | Gift with retained income rights, reducing IHT value |
+| **BareGift** | Simple outright gift with no strings attached |
+| **GiftWithReservation** | Gift where donor retains benefit (counted in estate) |
+| **ChritableGift** | Gift to registered charity (immediately exempt) |
+| **PoliticalGift** | Gift to registered political party (immediately exempt) |
+
+### Gift Exemptions
+
+| Exemption | Annual Limit | Description |
+|---|---|---|
+| **NoExemption** | N/A | No exemption claimed for this gift |
+| **AnnualExemption** | £3,000 | Annual gift exemption (can carry forward 1 year) |
+| **SmallGiftExemption** | £250 | Small gifts to any number of people (cannot combine with annual exemption to same person) |
+| **MarriageExemption** | £5,000 / £2,500 / £1,000 | Wedding/civil partnership gifts (varies by relationship) |
+| **RegularGiftsFromIncome** | Unlimited | Regular gifts from surplus income that don't affect living standards |
+| **MaintenancePayments** | Unlimited | Maintenance for dependent relatives |
+| **NormalExpenditure** | Unlimited | Normal expenditure from income patterns |
 
 #### Nested Field Groups
 
-**client:**
+**giftValue** (for standard gifts):
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
+| amount | Number | Monetary value of the gift | 50000.00 |
+| currency | Text | Currency code | GBP |
 
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-
-**giftValue:**
+**originalInvestmentAmount** (for trust gifts):
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| amount | Number | Amount spent | 25000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
+| amount | Number | Original amount invested | 200000.00 |
+| currency | Text | Currency code | GBP |
 
-**ihtImplications:**
+**discountValue** (for discounted gift trusts):
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| currentTaxableAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 22000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| includedInEstate | Yes/No |  | Yes |
+| amount | Number | Discount applied to gift value | 80000.00 |
+| currency | Text | Currency code | GBP |
 
-**potentiallyExemptTransfer:**
+**income** (for trust gifts with income):
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| isPET | Yes/No |  | Yes |
-| sevenYearAnniversary | Date |  | 2031-12-25 |
-| taperRelief | Complex Data |  | Complex object |
-| applicableRate | Number |  | 100 |
-| reliefAmount | Number | Amount spent | 0 |
-| yearsRemaining | Number |  | 5.85 |
+| amount | Number | Annual income amount | 12000.00 |
+| currency | Text | Currency code | GBP |
 
-**recipient:**
+### Gift Structure Patterns
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| dateOfBirth | Date | Date of birth | 1995-03-15 |
-| name | Text | First name (given name) | Emily Smith |
-| relationship | Text |  | Daughter |
+#### Standard Gift (PET)
+Standard gifts use the `giftValue` field and typically qualify for annual or small gift exemptions:
+
+```json
+{
+  "id": "gift-001",
+  "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-001",
+  "description": "Cash gift to help with house deposit",
+  "giftType": "PotentiallyExemptTransfer",
+  "isTrust": false,
+  "giftValue": {"currency": "GBP", "amount": 50000.00},
+  "exemption1": "AnnualExemption",
+  "exemption2": "SmallGiftExemption",
+  "exemption3": "NoExemption"
+}
+```
+
+#### Loan Trust Gift
+Loan trusts use trust-specific fields and typically have no exemptions as the capital can be reclaimed:
+
+```json
+{
+  "id": "gift-002",
+  "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-002",
+  "description": "Loan trust for estate planning",
+  "giftType": "LoanTrust",
+  "isTrust": true,
+  "originalInvestmentAmount": {"currency": "GBP", "amount": 200000.00},
+  "income": {"currency": "GBP", "amount": 12000.00},
+  "incomeStartYear": 2024,
+  "repeatGiftYears": 10,
+  "exemption1": "NoExemption",
+  "exemption2": "NoExemption",
+  "exemption3": "NoExemption"
+}
+```
+
+#### Discounted Gift Trust
+Discounted gift trusts include a discount value based on retained income rights:
+
+```json
+{
+  "id": "gift-003",
+  "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-003",
+  "description": "Discounted gift trust with retained income",
+  "giftType": "DiscountedGiftTrust",
+  "isTrust": true,
+  "originalInvestmentAmount": {"currency": "GBP", "amount": 300000.00},
+  "discountValue": {"currency": "GBP", "amount": 100000.00},
+  "income": {"currency": "GBP", "amount": 15000.00},
+  "incomeStartYear": 2024,
+  "exemption1": "NoExemption",
+  "exemption2": "NoExemption",
+  "exemption3": "NoExemption"
+}
+```
+
+### Business Rules
+
+1. **Gift Type and Fields:**
+   - Standard gifts (`isTrust: false`) MUST have `giftValue`
+   - Trust gifts (`isTrust: true`) MUST have `originalInvestmentAmount`
+   - Discounted gift trusts MUST have `discountValue`
+   - Standard gifts MUST NOT have trust-specific fields (originalInvestmentAmount, discountValue, income, incomeStartYear, repeatGiftYears)
+
+2. **Exemption Rules:**
+   - `exemption1` is required (use `NoExemption` if no exemption applies)
+   - `exemption2` and `exemption3` are optional additional exemptions
+   - Annual exemption (£3,000) can be carried forward one year if unused
+   - Small gift exemption (£250) cannot be combined with annual exemption for same recipient
+   - Marriage exemption varies by relationship: £5,000 (child), £2,500 (grandchild), £1,000 (other)
+
+3. **Trust Gift Taxation:**
+   - Loan trusts: Capital can be reclaimed, so not immediately chargeable
+   - Discounted gift trusts: Only discounted value (original - discount) is potentially exempt
+   - Income retained from discounted gift trusts does not add to estate value
+
+4. **PET Rules:**
+   - Potentially exempt transfers become fully exempt after 7 years
+   - Taper relief applies to PETs between 3-7 years if donor dies
+   - Taper relief: 3-4 years (20% relief), 4-5 years (40%), 5-6 years (60%), 6-7 years (80%)
+
+### IHT Planning Considerations
+
+**Seven-Year Rule:**
+- Gifts become exempt if donor survives 7 years
+- Taper relief applies between years 3-7
+- Important to track gift dates for estate planning
+
+**Annual Exemptions Strategy:**
+- Use £3,000 annual exemption each year
+- Carry forward unused exemption from previous year
+- Combine with small gift exemption (£250) for multiple recipients
+
+**Trust-Based Gifts:**
+- Loan trusts allow capital access while removing growth from estate
+- Discounted gift trusts provide income while reducing estate value
+- Trust gifts typically more complex but offer flexibility
+
+**Regular Gifts from Income:**
+- Immediately exempt if from surplus income
+- Must not reduce donor's living standards
+- Must establish pattern of regular gifts
+- Documentation critical for claiming exemption
 
 ---
 
-## 13.41 Estate Planning - Trust Contract
+## 13.42 Estate Planning - Trust Contract
 ### Overview
 The `Trust` contract represents trusts established by or benefiting the client.
 
@@ -5292,7 +5729,7 @@ The `Trust` contract represents trusts established by or benefiting the client.
 
 ---
 
-## 13.42 Identity Verification Contract
+## 13.43 Identity Verification Contract
 ### Overview
 The `IdentityVerification` contract represents comprehensive identity verification and KYC/AML compliance data for a client. This is a singleton resource - each client has exactly one identity verification record.
 
@@ -5451,7 +5888,7 @@ The `IdentityVerification` contract represents comprehensive identity verificati
 
 ---
 
-## 13.43 Arrangement - Mortgage Contract
+## 13.44 Arrangement - Mortgage Contract
 
 ### Business Purpose
 
@@ -5773,7 +6210,7 @@ This contract connects to:
 ---
 
 
-## 13.44 Arrangement - Investment Contract (General Investment Account)
+## 13.45 Arrangement - Investment Contract (General Investment Account)
 
 ### Business Purpose
 
@@ -5941,7 +6378,7 @@ This contract connects to:
 ---
 
 
-## 13.45 Arrangement - Protection Contract (Life Assurance)
+## 13.46 Arrangement - Protection Contract (Life Assurance)
 
 ### Business Purpose
 
@@ -6106,7 +6543,7 @@ This contract connects to:
 ---
 
 
-## 13.46 Arrangement - Pension Contract (Personal Pension)
+## 13.47 Arrangement - Pension Contract (Personal Pension)
 
 ### Business Purpose
 
@@ -6352,7 +6789,7 @@ This contract connects to:
 
 ---
 
-## 13.47 Arrangement - Pension Contract (SIPP)
+## 13.48 Arrangement - Pension Contract (SIPP)
 
 ### Business Purpose
 
@@ -6390,7 +6827,7 @@ Represents a Self-Invested Personal Pension with wider investment choices includ
 
 ---
 
-## 13.48 Arrangement - Pension Contract (Final Salary/Defined Benefit)
+## 13.49 Arrangement - Pension Contract (Final Salary/Defined Benefit)
 
 ### Business Purpose
 
@@ -6430,7 +6867,7 @@ Represents a Final Salary or Defined Benefit pension providing guaranteed income
 
 ---
 
-## 13.49 Arrangement - Pension Contract (Money Purchase/Defined Contribution)
+## 13.50 Arrangement - Pension Contract (Money Purchase/Defined Contribution)
 
 ### Business Purpose
 
@@ -6469,7 +6906,7 @@ Represents a workplace Defined Contribution pension with employer matching contr
 
 ---
 
-## 13.50 Arrangement - Pension Contract (State Pension)
+## 13.51 Arrangement - Pension Contract (State Pension)
 
 ### Business Purpose
 
@@ -6510,7 +6947,7 @@ Represents UK State Pension entitlement based on National Insurance contribution
 
 ---
 
-## 13.51 Arrangement - Investment Contract (Stocks & Shares ISA)
+## 13.52 Arrangement - Investment Contract (Stocks & Shares ISA)
 
 ### Business Purpose
 
