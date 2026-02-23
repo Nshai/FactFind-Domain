@@ -111,8 +111,6 @@ The FactFind API provides comprehensive digital capabilities for:
       - [4.3.2 Get Client](#432-get-client)
       - [4.3.3 List Clients](#433-list-clients)
       - [4.3.4 Add Address](#434-add-address)
-      - [4.3.5 Client Vulnerability Assessment](#435-client-vulnerability-assessment)
-      - [4.3.6 Identity Verification](#436-identity-verification)
    - [4.4 Current Position Summary API](#44-current-position-summary-api)
       - [4.4.1 Operations Summary](#441-operations-summary)
       - [4.4.2 Key Endpoints](#442-key-endpoints)
@@ -154,6 +152,14 @@ The FactFind API provides comprehensive digital capabilities for:
       - [5.7.6 Delete Custom Question](#576-delete-custom-question)
       - [5.7.7 Submit Question Answers](#577-submit-question-answers)
       - [5.7.8 Get Question Answers](#578-get-question-answers)
+   - [5.8 Client Vulnerabilities](#58-client-vulnerabilities)
+      - [5.8.1 List Client Vulnerabilities](#581-list-client-vulnerabilities)
+      - [5.8.2 Create Vulnerability](#582-create-vulnerability)
+      - [5.8.3 Update Vulnerability](#583-update-vulnerability)
+      - [5.8.4 Delete Vulnerability](#584-delete-vulnerability)
+   - [5.9 Identity Verification](#59-identity-verification)
+      - [5.9.1 Get Identity Verification](#591-get-identity-verification)
+      - [5.9.2 Update Identity Verification](#592-update-identity-verification)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -2557,504 +2563,6 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/addresses/456
 - `addressType` - Required, one of: Residential, Correspondence, Previous, Business
 - `residencyStatus` - Optional, one of: Owner, Tenant, LivingWithFamily, Other
 
-#### 4.3.5 Client Vulnerability Assessment
-
-**Description:** Support multiple vulnerability records for a given client for Consumer Duty compliance.
-
-##### 4.3.5.1 List Client Vulnerabilities
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
-
-**Description:** Retrieve all vulnerabilities for a specific client.
-
-**Response:**
-```json
-[
-  {
-    "id": 789,
-    "client": {
-      "id": 123,
-      "href": "/api/v2/factfinds/{factfindId}/clients/123",
-      "name": "John Smith"
-    },
-    "hasVulnerability": "Yes",
-    "type": "Permanent",
-    "categories": ["Health", "Capability"],
-    "notes": "Client has limited mobility and requires accessible venues for meetings",
-    "createdBy": {
-      "id": 999,
-      "href": "/api/v2/users/999"
-    },
-    "assessedOn": "2026-02-16T14:30:00Z",
-    "reviewOn": "2026-08-16T00:00:00Z",
-    "isClientPortalSuitable": "WithSupport",
-    "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
-  }
-]
-```
-
-##### 4.3.5.2 Create Vulnerability
-
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
-
-**Description:** Create a new vulnerability assessment for a client.
-
-**Request Body:**
-```json
-{
-  "client": {
-    "name": "John Smith"
-  },
-  "hasVulnerability": "Yes",
-  "type": "Permanent",
-  "categories": ["Health", "Capability"],
-  "notes": "Client has limited mobility and requires accessible venues for meetings",
-  "createdBy": {
-    "id": 999,
-    "href": "/api/v2/users/999"
-  },
-  "assessedOn": "2026-02-23T12:37:54.051Z",
-  "reviewOn": "2026-08-23T12:37:54.051Z",
-  "isClientPortalSuitable": "WithSupport",
-  "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
-}
-```
-
-**Response:**
-```json
-{
-  "id": 789,
-  "client": {
-    "id": 123,
-    "href": "/api/v2/factfinds/{factfindId}/clients/123",
-    "name": "John Smith"
-  },
-  "hasVulnerability": "Yes",
-  "type": "Permanent",
-  "categories": ["Health", "Capability"],
-  "notes": "Client has limited mobility and requires accessible venues for meetings",
-  "createdBy": {
-    "id": 999,
-    "href": "/api/v2/users/999"
-  },
-  "assessedOn": "2026-02-23T12:37:54.051Z",
-  "reviewOn": "2026-08-23T12:37:54.051Z",
-  "isClientPortalSuitable": "WithSupport",
-  "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
-}
-```
-
-##### 4.3.5.3 Update Vulnerability
-
-**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}`
-
-**Description:** Update an existing vulnerability assessment.
-
-**Request Body:**
-```json
-{
-  "client": {
-    "name": "John Smith"
-  },
-  "hasVulnerability": "Yes",
-  "type": "Temporary",
-  "categories": ["Health", "LifeEvent"],
-  "notes": "Client recently bereaved and experiencing temporary financial stress",
-  "createdBy": {
-    "id": 999,
-    "href": "/api/v2/users/999"
-  },
-  "assessedOn": "2026-02-23T12:37:54.051Z",
-  "reviewOn": "2026-05-23T12:37:54.051Z",
-  "isClientPortalSuitable": "Yes",
-  "vulnerabilityActionTaken": "Extra time allowed for decision making, partner invited to meetings"
-}
-```
-
-**Response:**
-```json
-{
-  "id": 789,
-  "client": {
-    "id": 123,
-    "href": "/api/v2/factfinds/{factfindId}/clients/123",
-    "name": "John Smith"
-  },
-  "hasVulnerability": "Yes",
-  "type": "Temporary",
-  "categories": ["Health", "LifeEvent"],
-  "notes": "Client recently bereaved and experiencing temporary financial stress",
-  "createdBy": {
-    "id": 999,
-    "href": "/api/v2/users/999"
-  },
-  "assessedOn": "2026-02-23T12:37:54.051Z",
-  "reviewOn": "2026-05-23T12:37:54.051Z",
-  "isClientPortalSuitable": "Yes",
-  "vulnerabilityActionTaken": "Extra time allowed for decision making, partner invited to meetings"
-}
-```
-
-##### 4.3.5.4 Delete Vulnerability
-
-**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}`
-
-**Description:** Delete a vulnerability assessment.
-
-**Response:** `204 No Content`
-
-**Validation Rules:**
-- `hasVulnerability` - Required, one of: Yes, No, Potential (maxLength: 10, minLength: 1)
-- `type` - Required, one of: Temporary, Permanent (maxLength: 10, minLength: 1)
-- `categories` - Optional array of enum values: Health, LifeEvent, Resilience, Capability
-- `notes` - Optional, max length 4000 characters
-- `assessedOn` - Required, must not be in future
-- `reviewOn` - Optional, must be after assessedOn
-- `vulnerabilityActionTaken` - Optional, max length 300 characters
-
-**Business Rules:**
-- Review date should typically be 6-12 months after assessment for Permanent type
-- Review date should typically be 3-6 months after assessment for Temporary type
-- Action taken details required if vulnerability identified (hasVulnerability = "Yes")
-- Assessment triggers notification to primary adviser
-
----
-
-#### 4.3.6 Identity Verification
-
-**Description:** Manage identity verification details for KYC/AML compliance. This is a singleton resource per client - each client has exactly one identity verification record.
-
-##### 4.3.6.1 Get Identity Verification
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification`
-
-**Description:** Retrieve identity verification details for a client.
-
-**Response:**
-```json
-{
-  "href": "v2/factfinds/3454/clients/31514626/idverifications",
-  "client": {
-    "id": 31514626,
-    "href": "v2/factfinds/3454/clients/31514626",
-    "title": "Mr",
-    "firstName": "John",
-    "middleName": "David",
-    "lastName": "Smith",
-    "gender": "Male",
-    "dateOfBirth": "1985-03-15T00:00:00",
-    "mothersMaidenName": "Johnson",
-    "placeOfBirth": "London",
-    "countryOfBirth": {
-      "code": "GB"
-    },
-    "placeOfBirthOther": "Westminster Hospital"
-  },
-  "contacts": [
-    {
-      "type": "Telephone",
-      "value": "+44 7700 900123"
-    }
-  ],
-  "currentAddress": {
-    "residentFrom": "2020-01-15T00:00:00",
-    "yearsAtAddress": "4",
-    "address": {
-      "line1": "123 High Street",
-      "line2": "Flat 4B",
-      "line3": "Westminster",
-      "line4": "Greater London",
-      "locality": "London",
-      "postalCode": "SW1A 1AA",
-      "country": {
-        "code": "GB"
-      },
-      "county": {
-        "code": "GB-LND"
-      }
-    }
-  },
-  "previousAddresses": [
-    {
-      "residentFrom": "2015-06-01T00:00:00",
-      "yearsAtAddress": "5",
-      "address": {
-        "line1": "456 Old Road",
-        "line2": "Flat 2",
-        "line3": null,
-        "line4": null,
-        "locality": "Manchester",
-        "postalCode": "M1 1AA",
-        "country": {
-          "code": "GB"
-        },
-        "county": null
-      }
-    }
-  ],
-  "clientIdentity": {
-    "passport": {
-      "referenceNo": "GB123456789",
-      "seenOn": "2024-01-10T00:00:00",
-      "expiryOn": "2030-12-31T00:00:00",
-      "countryOfOrigin": {
-        "code": "GB"
-      }
-    },
-    "drivingLicence": {
-      "referenceNo": "SMITH851234JD9AB",
-      "seenOn": "2024-01-10T00:00:00",
-      "expiryOn": "2030-12-31T00:00:00",
-      "countryOfOrigin": {
-        "code": "GB"
-      }
-    },
-    "microfiche": {
-      "number": "MF123456",
-      "issuedOn": "2020-05-15T00:00:00"
-    },
-    "electricityBill": {
-      "referenceNo": "ELEC-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "utilitiesBill": {
-      "referenceNo": "UTIL-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "councilTaxBill": {
-      "referenceNo": "COUNCIL-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "irTaxNotification": {
-      "referenceNo": "IRTAX-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "bankStatement": {
-      "referenceNo": "BANK-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "mortgageStatement": {
-      "referenceNo": "MORT-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "firearmOrShotgunCertificate": {
-      "referenceNo": "FIRE-2024-001",
-      "seenOn": "2024-01-10T00:00:00",
-      "expiryOn": "2030-12-31T00:00:00"
-    }
-  },
-  "supportingDocuments": [
-    {
-      "id": 5001,
-      "href": "v2/documents/5001"
-    }
-  ],
-  "adviser": {
-    "id": 789,
-    "href": "v2/advisers/789"
-  },
-  "verification": {
-    "witness": {
-      "position": "Financial Adviser",
-      "witnessedOn": "2024-01-10T00:00:00"
-    },
-    "premises": {
-      "lastVisitedOn": "2024-01-08T00:00:00",
-      "enteredOn": "2024-01-08T00:00:00"
-    },
-    "expiryOn": "2027-01-10T00:00:00"
-  },
-  "verificationResult": {
-    "providerName": "GBG",
-    "status": "Completed",
-    "outcome": "Pass",
-    "score": 95,
-    "verifiedOn": "2024-01-16T10:30:45Z",
-    "certificateDocument": {
-      "id": 6001,
-      "href": "v2/documents/6001"
-    },
-    "createdAt": "2024-01-16T10:15:00Z",
-    "updatedAt": "2024-01-16T10:30:45Z"
-  },
-  "comments": "successful.",
-  "createdAt": "2024-01-16T09:00:00Z",
-  "updatedAt": "2024-01-16T15:20:00Z",
-  "createdBy": "adviser@example.com",
-  "updatedBy": "adviser@example.com"
-}
-```
-
-##### 4.3.6.2 Update Identity Verification
-
-**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification`
-
-**Description:** Update identity verification details for a client. This endpoint creates or updates the singleton identity verification record.
-
-**Request Body:**
-```json
-{
-  "client": {
-    "title": "Mr",
-    "firstName": "John",
-    "middleName": "David",
-    "lastName": "Smith",
-    "gender": "Male",
-    "dateOfBirth": "1985-03-15T00:00:00",
-    "mothersMaidenName": "Johnson",
-    "placeOfBirth": "London",
-    "countryOfBirth": {
-      "code": "GB"
-    },
-    "placeOfBirthOther": "Westminster Hospital"
-  },
-  "contacts": [
-    {
-      "type": "Telephone",
-      "value": "+44 7700 900123"
-    }
-  ],
-  "currentAddress": {
-    "residentFrom": "2020-01-15T00:00:00",
-    "yearsAtAddress": "4",
-    "address": {
-      "line1": "123 High Street",
-      "line2": "Flat 4B",
-      "line3": "Westminster",
-      "line4": "Greater London",
-      "locality": "London",
-      "postalCode": "SW1A 1AA",
-      "country": {
-        "code": "GB"
-      },
-      "county": {
-        "code": "GB-LND"
-      }
-    }
-  },
-  "previousAddresses": [
-    {
-      "residentFrom": "2015-06-01T00:00:00",
-      "yearsAtAddress": "5",
-      "address": {
-        "line1": "456 Old Road",
-        "line2": "Flat 2",
-        "line3": null,
-        "line4": null,
-        "locality": "Manchester",
-        "postalCode": "M1 1AA",
-        "country": {
-          "code": "GB"
-        },
-        "county": null
-      }
-    }
-  ],
-  "clientIdentity": {
-    "passport": {
-      "referenceNo": "GB123456789",
-      "seenOn": "2024-01-10T00:00:00",
-      "expiryOn": "2030-12-31T00:00:00",
-      "countryOfOrigin": {
-        "code": "GB"
-      }
-    },
-    "drivingLicence": {
-      "referenceNo": "SMITH851234JD9AB",
-      "seenOn": "2024-01-10T00:00:00",
-      "expiryOn": "2030-12-31T00:00:00",
-      "countryOfOrigin": {
-        "code": "GB"
-      }
-    },
-    "microfiche": {
-      "number": "MF123456",
-      "issuedOn": "2020-05-15T00:00:00"
-    },
-    "electricityBill": {
-      "referenceNo": "ELEC-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "utilitiesBill": {
-      "referenceNo": "UTIL-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "councilTaxBill": {
-      "referenceNo": "COUNCIL-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "irTaxNotification": {
-      "referenceNo": "IRTAX-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "bankStatement": {
-      "referenceNo": "BANK-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "mortgageStatement": {
-      "referenceNo": "MORT-2024-001",
-      "seenOn": "2024-01-15T00:00:00"
-    },
-    "firearmOrShotgunCertificate": {
-      "referenceNo": "FIRE-2024-001",
-      "seenOn": "2024-01-10T00:00:00",
-      "expiryOn": "2030-12-31T00:00:00"
-    }
-  },
-  "supportingDocuments": [
-    {
-      "id": 5001,
-      "href": "v2/documents/5001"
-    }
-  ],
-  "adviser": {
-    "id": 789,
-    "href": "v2/advisers/789"
-  },
-  "verification": {
-    "witness": {
-      "position": "Financial Adviser",
-      "witnessedOn": "2024-01-10T00:00:00"
-    },
-    "premises": {
-      "lastVisitedOn": "2024-01-08T00:00:00",
-      "enteredOn": "2024-01-08T00:00:00"
-    },
-    "expiryOn": "2027-01-10T00:00:00"
-  },
-  "verificationResult": {
-    "providerName": "GBG",
-    "status": "Completed",
-    "outcome": "Pass",
-    "score": 95,
-    "verifiedOn": "2024-01-16T10:30:45Z",
-    "certificateDocument": {
-      "id": 6001,
-      "href": "v2/documents/6001"
-    }
-  },
-  "comments": "successful."
-}
-```
-
-**Response:** Same as GET response above.
-
-**Validation Rules:**
-- `client.dateOfBirth` - Required, must be in the past
-- `contacts` - At least one contact method required
-- `currentAddress` - Required
-- `clientIdentity` - At least one identity document required (passport or drivingLicence)
-- `verificationResult.status` - Enum: Rejected, ManualReview, Accepted, Completed
-
-**Business Rules:**
-- Identity verification must be completed before client can proceed with certain operations
-- Verification expires based on `verification.expiryOn` date
-- Supporting documents should be retained for regulatory compliance (typically 7 years)
-- AML checks should be refreshed periodically based on risk assessment
-
----
-
-
 ### 4.4 Current Position Summary API
 
 **Purpose:** Provide aggregated financial position snapshot including net worth, asset allocation, income vs. expenditure comparison, and financial health scoring.
@@ -3359,7 +2867,7 @@ The financial health score is calculated on a 0-100 scale with five components:
 
 **Base Path:** `/api/v2/factfinds/{factfindId}/clients`
 
-**Purpose:** Capture comprehensive client circumstances and current financial position for financial planning.
+**Purpose:** Capture comprehensive client circumstances, regulatory compliance data, and current financial position for financial planning.
 
 **Scope:**
 - Fact find session management (ADVICE_CASE aggregate root)
@@ -3369,13 +2877,20 @@ The financial health score is calculated on a 0-100 scale with five components:
 - Expenditure and income changes (future projections)
 - Budget analysis and affordability calculations
 - Emergency fund assessment
+- Estate planning (wills, gifts, trusts)
+- Dependants management
+- Notes and supplementary questions
+- Client vulnerabilities (Consumer Duty compliance)
+- Identity verification (KYC/AML compliance)
 
 **Aggregate Root:** ADVICE_CASE (FactFind)
 
 **Regulatory Compliance:**
 - FCA COBS 9.2 (Assessing Suitability)
 - MCOB (Mortgage affordability)
-- Consumer Duty (Understanding customer needs)
+- Consumer Duty (Understanding customer needs and vulnerabilities)
+- MLR 2017 (Money Laundering Regulations - KYC/AML)
+- GDPR (Data Protection)
 
 ### 5.2 Operations Summary
 
@@ -5059,6 +4574,503 @@ Use: Demonstrate suitability in file review
 - Questions marked as "adviserOnly" hidden from client portal
 - Audit log tracks all question and answer modifications
 - GDPR right-to-erasure: soft delete retains regulatory minimum
+
+---
+
+### 5.8 Client Vulnerabilities
+
+**Description:** Support multiple vulnerability records for a given client for Consumer Duty compliance.
+
+#### 5.8.1 List Client Vulnerabilities
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
+
+**Description:** Retrieve all vulnerabilities for a specific client.
+
+**Response:**
+```json
+[
+  {
+    "id": 789,
+    "client": {
+      "id": 123,
+      "href": "/api/v2/factfinds/{factfindId}/clients/123",
+      "name": "John Smith"
+    },
+    "hasVulnerability": "Yes",
+    "type": "Permanent",
+    "categories": ["Health", "Capability"],
+    "notes": "Client has limited mobility and requires accessible venues for meetings",
+    "createdBy": {
+      "id": 999,
+      "href": "/api/v2/users/999"
+    },
+    "assessedOn": "2026-02-16T14:30:00Z",
+    "reviewOn": "2026-08-16T00:00:00Z",
+    "isClientPortalSuitable": "WithSupport",
+    "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
+  }
+]
+```
+
+#### 5.8.2 Create Vulnerability
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
+
+**Description:** Create a new vulnerability assessment for a client.
+
+**Request Body:**
+```json
+{
+  "client": {
+    "name": "John Smith"
+  },
+  "hasVulnerability": "Yes",
+  "type": "Permanent",
+  "categories": ["Health", "Capability"],
+  "notes": "Client has limited mobility and requires accessible venues for meetings",
+  "createdBy": {
+    "id": 999,
+    "href": "/api/v2/users/999"
+  },
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-08-23T12:37:54.051Z",
+  "isClientPortalSuitable": "WithSupport",
+  "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 789,
+  "client": {
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
+    "name": "John Smith"
+  },
+  "hasVulnerability": "Yes",
+  "type": "Permanent",
+  "categories": ["Health", "Capability"],
+  "notes": "Client has limited mobility and requires accessible venues for meetings",
+  "createdBy": {
+    "id": 999,
+    "href": "/api/v2/users/999"
+  },
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-08-23T12:37:54.051Z",
+  "isClientPortalSuitable": "WithSupport",
+  "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
+}
+```
+
+#### 5.8.3 Update Vulnerability
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}`
+
+**Description:** Update an existing vulnerability assessment.
+
+**Request Body:**
+```json
+{
+  "client": {
+    "name": "John Smith"
+  },
+  "hasVulnerability": "Yes",
+  "type": "Temporary",
+  "categories": ["Health", "LifeEvent"],
+  "notes": "Client recently bereaved and experiencing temporary financial stress",
+  "createdBy": {
+    "id": 999,
+    "href": "/api/v2/users/999"
+  },
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-05-23T12:37:54.051Z",
+  "isClientPortalSuitable": "Yes",
+  "vulnerabilityActionTaken": "Extra time allowed for decision making, partner invited to meetings"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 789,
+  "client": {
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
+    "name": "John Smith"
+  },
+  "hasVulnerability": "Yes",
+  "type": "Temporary",
+  "categories": ["Health", "LifeEvent"],
+  "notes": "Client recently bereaved and experiencing temporary financial stress",
+  "createdBy": {
+    "id": 999,
+    "href": "/api/v2/users/999"
+  },
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-05-23T12:37:54.051Z",
+  "isClientPortalSuitable": "Yes",
+  "vulnerabilityActionTaken": "Extra time allowed for decision making, partner invited to meetings"
+}
+```
+
+#### 5.8.4 Delete Vulnerability
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}`
+
+**Description:** Delete a vulnerability assessment.
+
+**Response:** `204 No Content`
+
+**Validation Rules:**
+- `hasVulnerability` - Required, one of: Yes, No, Potential (maxLength: 10, minLength: 1)
+- `type` - Required, one of: Temporary, Permanent (maxLength: 10, minLength: 1)
+- `categories` - Optional array of enum values: Health, LifeEvent, Resilience, Capability
+- `notes` - Optional, max length 4000 characters
+- `assessedOn` - Required, must not be in future
+- `reviewOn` - Optional, must be after assessedOn
+- `vulnerabilityActionTaken` - Optional, max length 300 characters
+
+**Business Rules:**
+- Review date should typically be 6-12 months after assessment for Permanent type
+- Review date should typically be 3-6 months after assessment for Temporary type
+- Action taken details required if vulnerability identified (hasVulnerability = "Yes")
+- Assessment triggers notification to primary adviser
+
+---
+
+### 5.9 Identity Verification
+
+**Description:** Manage identity verification details for KYC/AML compliance. This is a singleton resource per client - each client has exactly one identity verification record.
+
+#### 5.9.1 Get Identity Verification
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification`
+
+**Description:** Retrieve identity verification details for a client.
+
+**Response:**
+```json
+{
+  "href": "v2/factfinds/3454/clients/31514626/idverifications",
+  "client": {
+    "id": 31514626,
+    "href": "v2/factfinds/3454/clients/31514626",
+    "title": "Mr",
+    "firstName": "John",
+    "middleName": "David",
+    "lastName": "Smith",
+    "gender": "Male",
+    "dateOfBirth": "1985-03-15T00:00:00",
+    "mothersMaidenName": "Johnson",
+    "placeOfBirth": "London",
+    "countryOfBirth": {
+      "code": "GB"
+    },
+    "placeOfBirthOther": "Westminster Hospital"
+  },
+  "contacts": [
+    {
+      "type": "Telephone",
+      "value": "+44 7700 900123"
+    }
+  ],
+  "currentAddress": {
+    "residentFrom": "2020-01-15T00:00:00",
+    "yearsAtAddress": "4",
+    "address": {
+      "line1": "123 High Street",
+      "line2": "Flat 4B",
+      "line3": "Westminster",
+      "line4": "Greater London",
+      "locality": "London",
+      "postalCode": "SW1A 1AA",
+      "country": {
+        "code": "GB"
+      },
+      "county": {
+        "code": "GB-LND"
+      }
+    }
+  },
+  "previousAddresses": [
+    {
+      "residentFrom": "2015-06-01T00:00:00",
+      "yearsAtAddress": "5",
+      "address": {
+        "line1": "456 Old Road",
+        "line2": "Flat 2",
+        "line3": null,
+        "line4": null,
+        "locality": "Manchester",
+        "postalCode": "M1 1AA",
+        "country": {
+          "code": "GB"
+        },
+        "county": null
+      }
+    }
+  ],
+  "clientIdentity": {
+    "passport": {
+      "referenceNo": "GB123456789",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "drivingLicence": {
+      "referenceNo": "SMITH851234JD9AB",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "microfiche": {
+      "number": "MF123456",
+      "issuedOn": "2020-05-15T00:00:00"
+    },
+    "electricityBill": {
+      "referenceNo": "ELEC-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "utilitiesBill": {
+      "referenceNo": "UTIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "councilTaxBill": {
+      "referenceNo": "COUNCIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "irTaxNotification": {
+      "referenceNo": "IRTAX-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "bankStatement": {
+      "referenceNo": "BANK-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "mortgageStatement": {
+      "referenceNo": "MORT-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "firearmOrShotgunCertificate": {
+      "referenceNo": "FIRE-2024-001",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00"
+    }
+  },
+  "supportingDocuments": [
+    {
+      "id": 5001,
+      "href": "v2/documents/5001"
+    }
+  ],
+  "adviser": {
+    "id": 789,
+    "href": "v2/advisers/789"
+  },
+  "verification": {
+    "witness": {
+      "position": "Financial Adviser",
+      "witnessedOn": "2024-01-10T00:00:00"
+    },
+    "premises": {
+      "lastVisitedOn": "2024-01-08T00:00:00",
+      "enteredOn": "2024-01-08T00:00:00"
+    },
+    "expiryOn": "2027-01-10T00:00:00"
+  },
+  "verificationResult": {
+    "providerName": "GBG",
+    "status": "Completed",
+    "outcome": "Pass",
+    "score": 95,
+    "verifiedOn": "2024-01-16T10:30:45Z",
+    "certificateDocument": {
+      "id": 6001,
+      "href": "v2/documents/6001"
+    },
+    "createdAt": "2024-01-16T10:15:00Z",
+    "updatedAt": "2024-01-16T10:30:45Z"
+  },
+  "comments": "successful.",
+  "createdAt": "2024-01-16T09:00:00Z",
+  "updatedAt": "2024-01-16T15:20:00Z",
+  "createdBy": "adviser@example.com",
+  "updatedBy": "adviser@example.com"
+}
+```
+
+#### 5.9.2 Update Identity Verification
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification`
+
+**Description:** Update identity verification details for a client. This endpoint creates or updates the singleton identity verification record.
+
+**Request Body:**
+```json
+{
+  "client": {
+    "title": "Mr",
+    "firstName": "John",
+    "middleName": "David",
+    "lastName": "Smith",
+    "gender": "Male",
+    "dateOfBirth": "1985-03-15T00:00:00",
+    "mothersMaidenName": "Johnson",
+    "placeOfBirth": "London",
+    "countryOfBirth": {
+      "code": "GB"
+    },
+    "placeOfBirthOther": "Westminster Hospital"
+  },
+  "contacts": [
+    {
+      "type": "Telephone",
+      "value": "+44 7700 900123"
+    }
+  ],
+  "currentAddress": {
+    "residentFrom": "2020-01-15T00:00:00",
+    "yearsAtAddress": "4",
+    "address": {
+      "line1": "123 High Street",
+      "line2": "Flat 4B",
+      "line3": "Westminster",
+      "line4": "Greater London",
+      "locality": "London",
+      "postalCode": "SW1A 1AA",
+      "country": {
+        "code": "GB"
+      },
+      "county": {
+        "code": "GB-LND"
+      }
+    }
+  },
+  "previousAddresses": [
+    {
+      "residentFrom": "2015-06-01T00:00:00",
+      "yearsAtAddress": "5",
+      "address": {
+        "line1": "456 Old Road",
+        "line2": "Flat 2",
+        "line3": null,
+        "line4": null,
+        "locality": "Manchester",
+        "postalCode": "M1 1AA",
+        "country": {
+          "code": "GB"
+        },
+        "county": null
+      }
+    }
+  ],
+  "clientIdentity": {
+    "passport": {
+      "referenceNo": "GB123456789",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "drivingLicence": {
+      "referenceNo": "SMITH851234JD9AB",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "microfiche": {
+      "number": "MF123456",
+      "issuedOn": "2020-05-15T00:00:00"
+    },
+    "electricityBill": {
+      "referenceNo": "ELEC-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "utilitiesBill": {
+      "referenceNo": "UTIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "councilTaxBill": {
+      "referenceNo": "COUNCIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "irTaxNotification": {
+      "referenceNo": "IRTAX-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "bankStatement": {
+      "referenceNo": "BANK-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "mortgageStatement": {
+      "referenceNo": "MORT-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "firearmOrShotgunCertificate": {
+      "referenceNo": "FIRE-2024-001",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00"
+    }
+  },
+  "supportingDocuments": [
+    {
+      "id": 5001,
+      "href": "v2/documents/5001"
+    }
+  ],
+  "adviser": {
+    "id": 789,
+    "href": "v2/advisers/789"
+  },
+  "verification": {
+    "witness": {
+      "position": "Financial Adviser",
+      "witnessedOn": "2024-01-10T00:00:00"
+    },
+    "premises": {
+      "lastVisitedOn": "2024-01-08T00:00:00",
+      "enteredOn": "2024-01-08T00:00:00"
+    },
+    "expiryOn": "2027-01-10T00:00:00"
+  },
+  "verificationResult": {
+    "providerName": "GBG",
+    "status": "Completed",
+    "outcome": "Pass",
+    "score": 95,
+    "verifiedOn": "2024-01-16T10:30:45Z",
+    "certificateDocument": {
+      "id": 6001,
+      "href": "v2/documents/6001"
+    }
+  },
+  "comments": "successful."
+}
+```
+
+**Response:** Same as GET response above.
+
+**Validation Rules:**
+- `client.dateOfBirth` - Required, must be in the past
+- `contacts` - At least one contact method required
+- `currentAddress` - Required
+- `clientIdentity` - At least one identity document required (passport or drivingLicence)
+- `verificationResult.status` - Enum: Rejected, ManualReview, Accepted, Completed
+
+**Business Rules:**
+- Identity verification must be completed before client can proceed with certain operations
+- Verification expires based on `verification.expiryOn` date
+- Supporting documents should be retained for regulatory compliance (typically 7 years)
+- AML checks should be refreshed periodically based on risk assessment
 
 ---
 
