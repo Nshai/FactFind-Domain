@@ -5197,7 +5197,7 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 
 ## 13.34 Vulnerability Contract
 ### Overview
-The `Vulnerability` contract represents a client vulnerability indicator for Consumer Duty compliance.
+The `Vulnerability` contract represents a client vulnerability indicator for Consumer Duty compliance. Multiple vulnerability records can be associated with a single client.
 
 ### Fields
 
@@ -5205,19 +5205,17 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| client | Reference Link |  | Complex object |
-| consumerDutyCompliance | Complex Data |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2026-01-15T10:00:00Z |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| hasVulnerabilities | Yes/No | Consumer Duty vulnerabilities and required adjustments | Yes |
 | id | Number | Unique system identifier for this record | 5555 |
-| identifiedDate | Date | Unique system identifier for this record | 2026-01-15 |
-| isReviewRequired | Yes/No |  | No |
-| notes | Text |  | Client appreciates extra care taken. Partner very ... |
-| reasonableAdjustments | List of str |  | List with 4 item(s) |
-| reviewDate | Date | When these figures were last reviewed | 2026-07-15 |
-| updatedAt | Date | When this record was last modified | 2026-01-15T10:00:00Z |
-| vulnerabilityCategories | List of Complex Data |  | List with 2 item(s) |
+| client | Reference Link | Reference to the client | Complex object |
+| hasVulnerability | Enum (string) | Whether client has vulnerability. Possible values: Yes, No, Potential (maxLength: 10, minLength: 1) | Yes |
+| type | Enum (string) | Type of vulnerability. Possible values: Temporary, Permanent (maxLength: 10, minLength: 1) | Permanent |
+| categories | List of Enum (string) | List of vulnerability categories. Possible values: Health, LifeEvent, Resilience, Capability | ["Health", "Capability"] |
+| notes | Text | Vulnerability notes (max 4000 characters) | Client has limited mobility and requires accessible... |
+| createdBy | Reference Link | User who created the record | Complex object |
+| assessedOn | DateTime | When vulnerability was assessed | 2026-02-23T12:37:54.051Z |
+| reviewOn | DateTime | When vulnerability should be reviewed | 2026-08-23T12:37:54.051Z |
+| isClientPortalSuitable | Text | Whether client portal is suitable for the vulnerable client | WithSupport |
+| vulnerabilityActionTaken | Text | Vulnerability action taken notes (max 300 characters) | Home visits arranged, large print documents provided |
 
 #### Nested Field Groups
 
@@ -5225,22 +5223,32 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
+| id | Number | Unique system identifier for this record | 123 |
+| name | Text | Client name | John Smith |
 
-**consumerDutyCompliance:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adjustmentsMade | Yes/No |  | Yes |
-| communicationTailored | Yes/No |  | Yes |
-| needsIdentified | Yes/No | Unique system identifier for this record | Yes |
-| ongoingMonitoring | Yes/No |  | Yes |
-
-**factfind:**
+**createdBy:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
+| id | Number | Unique system identifier for this record | 999 |
+| href | Text | Link to user resource | /api/v2/users/999 |
+
+### Enumerations
+
+#### Has Vulnerability Values
+- `Yes` - Client has confirmed vulnerability
+- `No` - Client has no vulnerability
+- `Potential` - Potential vulnerability identified but not confirmed
+
+#### Vulnerability Type Values
+- `Temporary` - Temporary vulnerability (e.g., recent bereavement, job loss)
+- `Permanent` - Permanent vulnerability (e.g., disability, chronic illness)
+
+#### Vulnerability Categories
+- `Health` - Health-related vulnerabilities
+- `LifeEvent` - Life event vulnerabilities
+- `Resilience` - Resilience-related vulnerabilities
+- `Capability` - Capability-related vulnerabilities
 
 ---
 

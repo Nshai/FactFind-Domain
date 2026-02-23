@@ -148,10 +148,10 @@
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/vulnerabilities` | Get vulnerability assessment | ⭐ New in v3.0 |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/vulnerabilities` | Record vulnerability | ⭐ FCA compliance |
-| PATCH | `/api/v1/factfinds/{id}/clients/{clientId}/vulnerabilities` | Update vulnerability | ⭐ New in v3.0 |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/vulnerabilities/history` | Get vulnerability history | ⭐ Audit trail |
+| GET | `/api/v1/factfinds/{id}/clients/{clientId}/vulnerabilities` | List all client vulnerabilities | ⭐ FCA compliance |
+| POST | `/api/v1/factfinds/{id}/clients/{clientId}/vulnerabilities` | Create a vulnerability | ⭐ FCA compliance |
+| PUT | `/api/v1/factfinds/{id}/clients/{clientId}/vulnerabilities/{vulnerabilityId}` | Update a vulnerability | ⭐ New in v3.0 |
+| DELETE | `/api/v1/factfinds/{id}/clients/{clientId}/vulnerabilities/{vulnerabilityId}` | Delete a vulnerability | ⭐ New in v3.0 |
 
 ### Dependants
 

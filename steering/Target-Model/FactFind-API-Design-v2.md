@@ -111,7 +111,7 @@ The FactFind API provides comprehensive digital capabilities for:
       - [4.3.2 Get Client](#432-get-client)
       - [4.3.3 List Clients](#433-list-clients)
       - [4.3.4 Add Address](#434-add-address)
-      - [4.3.5 Update Vulnerability Assessment](#435-update-vulnerability-assessment)
+      - [4.3.5 Client Vulnerability Assessment](#435-client-vulnerability-assessment)
    - [4.4 Current Position Summary API](#44-current-position-summary-api)
       - [4.4.1 Operations Summary](#441-operations-summary)
       - [4.4.2 Key Endpoints](#442-key-endpoints)
@@ -2092,8 +2092,10 @@ All subsequent API sections (5-11) document resources that are **nested under** 
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Update DPA consent | `client:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Get marketing preferences | `client:read` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Update marketing consent | `client:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerability` | Get vulnerability assessment | `client:read` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerability` | Update vulnerability | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | List all client vulnerabilities | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | Create a vulnerability | `client:write` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}` | Update a vulnerability | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}` | Delete a vulnerability | `client:write` |
 
 ### 4.3 Key Endpoints
 
@@ -2554,23 +2556,66 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/addresses/456
 - `addressType` - Required, one of: Residential, Correspondence, Previous, Business
 - `residencyStatus` - Optional, one of: Owner, Tenant, LivingWithFamily, Other
 
-#### 4.3.5 Update Vulnerability Assessment
+#### 4.3.5 Client Vulnerability Assessment
 
-**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerability`
+**Description:** Support multiple vulnerability records for a given client for Consumer Duty compliance.
 
-**Description:** Update client vulnerability assessment for Consumer Duty compliance.
+##### 4.3.5.1 List Client Vulnerabilities
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
+
+**Description:** Retrieve all vulnerabilities for a specific client.
+
+**Response:**
+```json
+[
+  {
+    "id": 789,
+    "client": {
+      "id": 123,
+      "href": "/api/v2/factfinds/{factfindId}/clients/123",
+      "name": "John Smith"
+    },
+    "hasVulnerability": "Yes",
+    "type": "Permanent",
+    "categories": ["Health", "Capability"],
+    "notes": "Client has limited mobility and requires accessible venues for meetings",
+    "createdBy": {
+      "id": 999,
+      "href": "/api/v2/users/999"
+    },
+    "assessedOn": "2026-02-16T14:30:00Z",
+    "reviewOn": "2026-08-16T00:00:00Z",
+    "isClientPortalSuitable": "WithSupport",
+    "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
+  }
+]
+```
+
+##### 4.3.5.2 Create Vulnerability
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
+
+**Description:** Create a new vulnerability assessment for a client.
 
 **Request Body:**
 ```json
 {
+  "client": {
+    "name": "John Smith"
+  },
   "hasVulnerability": "Yes",
-  "vulnerabilityType": "Physical",
-  "vulnerabilityCategory": "HealthCondition",
-  "vulnerabilityActionTakenDetails": "Large print documents provided, additional time given during meetings, family member invited to participate",
+  "type": "Permanent",
+  "categories": ["Health", "Capability"],
+  "notes": "Client has limited mobility and requires accessible venues for meetings",
+  "createdBy": {
+    "id": 999,
+    "href": "/api/v2/users/999"
+  },
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-08-23T12:37:54.051Z",
   "isClientPortalSuitable": "WithSupport",
-  "clientPortalSuitabilityDetails": "Can use portal with assistance from family member",
-  "dateAssessed": "2026-02-16",
-  "reviewDate": "2026-08-16"
+  "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
 }
 ```
 
@@ -2581,38 +2626,95 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/addresses/456
   "client": {
     "id": 123,
     "href": "/api/v2/factfinds/{factfindId}/clients/123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
+    "name": "John Smith"
   },
   "hasVulnerability": "Yes",
-  "vulnerabilityType": "Physical",
-  "vulnerabilityCategory": "HealthCondition",
-  "vulnerabilityActionTakenDetails": "Large print documents provided, additional time given during meetings, family member invited to participate",
-  "isClientPortalSuitable": "WithSupport",
-  "clientPortalSuitabilityDetails": "Can use portal with assistance from family member",
-  "dateAssessed": "2026-02-16",
-  "reviewDate": "2026-08-16",
-  "updatedAt": "2026-02-16T14:30:00Z",
-  "updatedBy": {
+  "type": "Permanent",
+  "categories": ["Health", "Capability"],
+  "notes": "Client has limited mobility and requires accessible venues for meetings",
+  "createdBy": {
     "id": 999,
-    "name": "Jane Doe"
-  }/clients/123/vulnerability" },
-    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" },
-    "history": { "href": "/api/v2/factfinds/{factfindId}/clients/123/vulnerability/history" }
-  }
+    "href": "/api/v2/users/999"
+  },
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-08-23T12:37:54.051Z",
+  "isClientPortalSuitable": "WithSupport",
+  "vulnerabilityActionTaken": "Home visits arranged, large print documents provided"
 }
 ```
 
+##### 4.3.5.3 Update Vulnerability
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}`
+
+**Description:** Update an existing vulnerability assessment.
+
+**Request Body:**
+```json
+{
+  "client": {
+    "name": "John Smith"
+  },
+  "hasVulnerability": "Yes",
+  "type": "Temporary",
+  "categories": ["Health", "LifeEvent"],
+  "notes": "Client recently bereaved and experiencing temporary financial stress",
+  "createdBy": {
+    "id": 999,
+    "href": "/api/v2/users/999"
+  },
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-05-23T12:37:54.051Z",
+  "isClientPortalSuitable": "Yes",
+  "vulnerabilityActionTaken": "Extra time allowed for decision making, partner invited to meetings"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 789,
+  "client": {
+    "id": 123,
+    "href": "/api/v2/factfinds/{factfindId}/clients/123",
+    "name": "John Smith"
+  },
+  "hasVulnerability": "Yes",
+  "type": "Temporary",
+  "categories": ["Health", "LifeEvent"],
+  "notes": "Client recently bereaved and experiencing temporary financial stress",
+  "createdBy": {
+    "id": 999,
+    "href": "/api/v2/users/999"
+  },
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-05-23T12:37:54.051Z",
+  "isClientPortalSuitable": "Yes",
+  "vulnerabilityActionTaken": "Extra time allowed for decision making, partner invited to meetings"
+}
+```
+
+##### 4.3.5.4 Delete Vulnerability
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}`
+
+**Description:** Delete a vulnerability assessment.
+
+**Response:** `204 No Content`
+
 **Validation Rules:**
-- `hasVulnerability` - Required, one of: Yes, No, Unknown
-- `vulnerabilityType` - Required if hasVulnerability=Yes, one of: Physical, Mental, Financial, LifeEvent
-- `dateAssessed` - Required, must not be in future
-- `reviewDate` - Optional, must be after dateAssessed
+- `hasVulnerability` - Required, one of: Yes, No, Potential (maxLength: 10, minLength: 1)
+- `type` - Required, one of: Temporary, Permanent (maxLength: 10, minLength: 1)
+- `categories` - Optional array of enum values: Health, LifeEvent, Resilience, Capability
+- `notes` - Optional, max length 4000 characters
+- `assessedOn` - Required, must not be in future
+- `reviewOn` - Optional, must be after assessedOn
+- `vulnerabilityActionTaken` - Optional, max length 300 characters
 
 **Business Rules:**
-- Review date should typically be 6-12 months after assessment
-- Action taken details required if vulnerability identified
+- Review date should typically be 6-12 months after assessment for Permanent type
+- Review date should typically be 3-6 months after assessment for Temporary type
+- Action taken details required if vulnerability identified (hasVulnerability = "Yes")
 - Assessment triggers notification to primary adviser
 
 ---
@@ -26935,16 +27037,16 @@ The `ProfessionalContact` contract represents a client's professional adviser (s
 
 ### 14.34 Vulnerability Contract
 
-The `Vulnerability` contract represents a client vulnerability indicator for Consumer Duty compliance.
+The `Vulnerability` contract represents a client vulnerability indicator for Consumer Duty compliance. Multiple vulnerability records can be associated with a single client.
 
 **Reference Type:** Vulnerability is a reference type with identity (has `id` field).
 
 **Key Features:**
-- Multiple vulnerability categories (Health, Life Events, Resilience, Capability)
+- Multiple vulnerabilities per client
+- Temporary or Permanent vulnerability types
+- Multiple vulnerability categories (Health, LifeEvent, Resilience, Capability)
 - FCA Consumer Duty compliance
-- Specific vulnerability indicators
-- Impact assessment
-- Support needs identification
+- Action tracking and suitability assessment
 - Regular review tracking
 
 #### Complete Vulnerability Contract
@@ -26952,91 +27054,65 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 ```json
 {
   "id": 5555,
-  "href": "/api/v2/factfinds/679/clients/123/vulnerabilities/5555",
-  "factfind": {
-    "id": 679,
-    "href": "/api/v2/factfinds/679"
-  },
   "client": {
     "id": 123,
-    "href": "/api/v2/factfinds/679/clients/123"
+    "name": "John Smith"
   },
-  "hasVulnerabilities": true,
-  "identifiedDate": "2026-01-15",
-  "vulnerabilityCategories": [
-    {
-      "category": "HEALTH",
-      "indicators": [
-        {
-          "code": "PHYSICAL_DISABILITY",
-          "display": "Physical Disability",
-          "description": "Client has limited mobility - uses wheelchair"
-        }
-      ],
-      "impactLevel": "MODERATE",
-      "supportNeeds": [
-        "Home visits preferred",
-        "Accessible venue for meetings",
-        "Additional time for discussions"
-      ]
-    },
-    {
-      "category": "CAPABILITY",
-      "indicators": [
-        {
-          "code": "LOW_FINANCIAL_LITERACY",
-          "display": "Low Financial Literacy",
-          "description": "Client has limited understanding of financial products"
-        }
-      ],
-      "impactLevel": "MODERATE",
-      "supportNeeds": [
-        "Use plain language",
-        "Provide written summaries",
-        "Allow extra time for explanations"
-      ]
-    }
-  ],
-  "reasonableAdjustments": [
-    "Home visits arranged",
-    "Extra time allowed for meetings",
-    "Partner invited to attend meetings for support",
-    "All documents provided in large print"
-  ],
-  "consumerDutyCompliance": {
-    "needsIdentified": true,
-    "adjustmentsMade": true,
-    "communicationTailored": true,
-    "ongoingMonitoring": true
+  "hasVulnerability": "Yes",
+  "type": "Permanent",
+  "categories": ["Health", "Capability"],
+  "notes": "Client has limited mobility and requires accessible venues for meetings. Also requires plain language explanations.",
+  "createdBy": {
+    "id": 999,
+    "href": "/api/v2/users/999"
   },
-  "reviewDate": "2026-07-15",
-  "isReviewRequired": false,
-  "notes": "Client appreciates extra care taken. Partner very supportive and usually attends meetings.",
-  "createdAt": "2026-01-15T10:00:00Z",
-  "updatedAt": "2026-01-15T10:00:00Z"
+  "assessedOn": "2026-02-23T12:37:54.051Z",
+  "reviewOn": "2026-08-23T12:37:54.051Z",
+  "isClientPortalSuitable": "WithSupport",
+  "vulnerabilityActionTaken": "Home visits arranged, extra time allowed for meetings, partner invited to attend meetings, all documents provided in large print"
 }
 ```
 
+#### Field Descriptions
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | number | Auto-generated | Unique vulnerability identifier |
+| `client.name` | string | Yes | Client name |
+| `hasVulnerability` | string | Yes | Whether client has vulnerability. Enum: Yes, No, Potential (maxLength: 10, minLength: 1) |
+| `type` | string | Yes | Type of vulnerability. Enum: Temporary, Permanent (maxLength: 10, minLength: 1) |
+| `categories` | array[string] | No | List of vulnerability categories. Enum values: Health, LifeEvent, Resilience, Capability |
+| `notes` | string | No | Vulnerability notes (max 4000 characters) |
+| `createdBy.id` | number | Yes | User ID who created the record |
+| `createdBy.href` | string | Yes | Link to user resource |
+| `assessedOn` | datetime | Yes | When vulnerability was assessed |
+| `reviewOn` | datetime | No | When vulnerability should be reviewed |
+| `isClientPortalSuitable` | string | No | Whether client portal is suitable for the vulnerable client |
+| `vulnerabilityActionTaken` | string | No | Vulnerability action taken notes (max 300 characters) |
+
 #### Vulnerability Category Codes
 
-| Code | Display Name |
+| Code | Description |
 |------|-------------|
-| `HEALTH` | Health (physical, mental health, illness, disability) |
-| `LIFE_EVENTS` | Life Events (bereavement, relationship breakdown, caring responsibilities) |
-| `RESILIENCE` | Resilience (low income, debt, unemployment) |
-| `CAPABILITY` | Capability (low literacy, financial inexperience, learning difficulties) |
+| `Health` | Health-related vulnerabilities (physical, mental health, illness, disability) |
+| `LifeEvent` | Life event vulnerabilities (bereavement, relationship breakdown, caring responsibilities) |
+| `Resilience` | Resilience-related vulnerabilities (low income, debt, unemployment) |
+| `Capability` | Capability-related vulnerabilities (low literacy, financial inexperience, learning difficulties) |
 
-#### Health Vulnerability Indicators
+#### Vulnerability Type Codes
 
-| Code | Display Name |
+| Code | Description |
 |------|-------------|
-| `PHYSICAL_DISABILITY` | Physical Disability |
-| `MENTAL_HEALTH` | Mental Health Condition |
-| `LEARNING_DISABILITY` | Learning Disability |
-| `HEARING_IMPAIRMENT` | Hearing Impairment |
-| `VISUAL_IMPAIRMENT` | Visual Impairment |
-| `CHRONIC_ILLNESS` | Chronic Illness |
-| `DEMENTIA` | Dementia/Cognitive Impairment |
+| `Temporary` | Temporary vulnerability (e.g., recent bereavement, job loss) |
+| `Permanent` | Permanent vulnerability (e.g., disability, chronic illness) |
+
+#### Has Vulnerability Codes
+
+| Code | Description |
+|------|-------------|
+| `Yes` | Client has confirmed vulnerability |
+| `No` | Client has no vulnerability |
+| `Potential` | Potential vulnerability identified but not confirmed |
 
 ---
 
@@ -33784,7 +33860,7 @@ Assessment rate: Typically 5.5% (stress test rate)
 - CLIENT_RELATIONSHIP → `/api/v2/factfinds/{factfindId}/clients/{id}/relationships`
 - DPA_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/dpa-consent`
 - MARKETING_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/marketing-consent`
-- VULNERABLE_CUSTOMER_FLAG → `/api/v2/factfinds/{factfindId}/clients/{id}/vulnerability`
+- VULNERABLE_CUSTOMER_FLAG → `/api/v2/factfinds/{factfindId}/clients/{id}/vulnerabilities`
 - DEPENDANT → `/api/v2/factfinds/{factfindId}/clients/{id}/dependants`
 
 **Circumstances Context:**
