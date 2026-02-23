@@ -127,6 +127,14 @@
 | POST | `/api/v2/factfinds/{id}/clients/{clientId}/dpa-agreements` | Create DPA agreement | ⭐ GDPR compliance |
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/dpa-agreements` | List all DPA agreements | ⭐ Pagination support |
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/dpa-agreements/{agreementId}` | Get specific DPA agreement | ⭐ Use 'current' for latest |
+| DELETE | `/api/v2/factfinds/{id}/clients/{clientId}/dpa-agreements/{agreementId}` | Delete DPA agreement | ⭐ Use with caution |
+
+### Financial Profile
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/financial-profile` | Get financial profile | ⭐ Singleton resource |
+| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/financial-profile` | Update financial profile | ⭐ Summary of finances |
 | DELETE | `/api/v1/factfinds/{id}/clients/{clientId}/data` | Right to be forgotten (RTBF) | ⭐ GDPR compliance |
 | POST | `/api/v1/factfinds/{id}/clients/{clientId}/data/export` | Data portability request | ⭐ GDPR compliance |
 
@@ -184,7 +192,7 @@
 | GET | `/api/v1/factfinds/{id}/clients/{clientId}/pension-summary` | Get pension summary | ⭐ New in v3.0 |
 | POST | `/api/v1/factfinds/{id}/clients/{clientId}/pension-summary/calculate` | Calculate pension projection | ⭐ New in v3.0 |
 
-**Total Endpoints:** 94 (83 new in v3.0)
+**Total Endpoints:** 97 (86 new in v3.0)
 
 ---
 
@@ -608,14 +616,14 @@
 | API Context | Total Endpoints | New in v3.0 |
 |-------------|-----------------|-------------|
 | **1. FactFind Root** | 11 | 11 ⭐ |
-| **2. Client Onboarding & KYC** | 94 | 83 ⭐ |
+| **2. Client Onboarding & KYC** | 97 | 86 ⭐ |
 | **3. Circumstances** | 26 | 26 ⭐ |
 | **4. Assets & Liabilities** | 23 | 23 ⭐ |
 | **5. Arrangements** | 109 | 109 ⭐ |
 | **6. Goals** | 31 | 31 ⭐ |
 | **7. ATR** | 22 | 22 ⭐ |
 | **8. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **340** | **312** |
+| **TOTAL** | **343** | **315** |
 
 
 ### Net Worth
@@ -635,11 +643,12 @@ Calculate and track client net worth.
 
 | Method | Count | Percentage |
 |--------|-------|------------|
-| GET | 163 | 48% |
+| GET | 164 | 48% |
 | POST | 81 | 24% |
-| PATCH | 84 | 25% |
-| DELETE | 12 | 3% |
-| **TOTAL** | **340** | **100%** |
+| PATCH | 84 | 24% |
+| PUT | 1 | <1% |
+| DELETE | 13 | 4% |
+| **TOTAL** | **343** | **100%** |
 
 ### Hierarchical Depth Analysis
 
@@ -746,4 +755,4 @@ Calculate and track client net worth.
 
 **Version:** 3.0
 **Last Updated:** 2026-02-23
-**Total Endpoints:** 345
+**Total Endpoints:** 348

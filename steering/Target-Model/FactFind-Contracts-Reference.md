@@ -42,13 +42,11 @@ Each contract section includes:
 - [13.9 Property Contract](#139-property-contract)
 - [13.10 Equity Contract](#1310-equity-contract)
 - [13.11 IdentityVerification Contract](#1311-identityverification-contract)
-- [13.12 Consent Contract](#1312-consent-contract)
 - [13.17 Asset Contract](#1317-asset-contract)
 - [13.18 Liability Contract](#1318-liability-contract)
 - [13.19 Employment Contract](#1319-employment-contract)
 - [13.20 Budget Contract](#1320-budget-contract)
 - [13.21 Expenditure Contract](#1321-expenditure-contract)
-- [13.22 Expense Contract - DEPRECATED](#1322-expense-contract)
 - [13.23 Credit History Contract](#1323-credit-history-contract)
 - [13.24 Property Detail Contract](#1324-property-detail-contract)
 - [13.26 Notes Contract](#1326-notes-contract)
@@ -63,15 +61,16 @@ Each contract section includes:
 - [13.34 Vulnerability Contract](#1334-vulnerability-contract)
 - [13.35 Marketing Preferences Contract](#1335-marketing-preferences-contract)
 - [13.36 DPA Policy Agreement Contract](#1336-dpa-policy-agreement-contract)
-- [13.37 Estate Planning - Will Contract](#1337-estate-planning---will-contract)
-- [13.38 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1338-estate-planning---lasting-power-of-attorney-lpa-contract)
-- [13.39 Estate Planning - Gift Contract](#1339-estate-planning---gift-contract)
-- [13.40 Estate Planning - Trust Contract](#1340-estate-planning---trust-contract)
-- [13.41 Identity Verification Contract](#1341-identity-verification-contract)
-- [13.42 Arrangement - Mortgage Contract](#1342-arrangement---mortgage-contract)
-- [13.43 Arrangement - Investment Contract (General Investment Account)](#1343-arrangement---investment-contract-general-investment-account)
-- [13.44 Arrangement - Protection Contract (Life Assurance)](#1344-arrangement---protection-contract-life-assurance)
-- [13.45 Arrangement - Pension Contract (Personal Pension)](#1345-arrangement---pension-contract-personal-pension)
+- [13.37 Financial Profile Contract](#1337-financial-profile-contract)
+- [13.38 Estate Planning - Will Contract](#1338-estate-planning---will-contract)
+- [13.39 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1339-estate-planning---lasting-power-of-attorney-lpa-contract)
+- [13.40 Estate Planning - Gift Contract](#1340-estate-planning---gift-contract)
+- [13.41 Estate Planning - Trust Contract](#1341-estate-planning---trust-contract)
+- [13.42 Identity Verification Contract](#1342-identity-verification-contract)
+- [13.43 Arrangement - Mortgage Contract](#1343-arrangement---mortgage-contract)
+- [13.44 Arrangement - Investment Contract (General Investment Account)](#1344-arrangement---investment-contract-general-investment-account)
+- [13.45 Arrangement - Protection Contract (Life Assurance)](#1345-arrangement---protection-contract-life-assurance)
+- [13.46 Arrangement - Pension Contract (Personal Pension)](#1346-arrangement---pension-contract-personal-pension)
 
 ### Appendices
 - [Appendix A: Common Value Types](#appendix-a-common-value-types)
@@ -89,12 +88,10 @@ Represents an individual person, company, or trust that receives financial advic
 ### Key Features
 
 - Supports three client types: Person (individual), Corporate (company), and Trust
-- Captures complete demographic and contact information
-- Manages regulatory compliance (KYC, AML, MLR)
-- Tracks GDPR consent and data protection requirements
-- Records marketing preferences and communication consents
-- Supports estate planning for individuals (wills, LPAs, IHT)
+- Captures core demographic and administrative information
 - Enables joint client relationships (married couples, partners)
+- Links to related resources via dedicated APIs (addresses, contacts, vulnerabilities, etc.)
+- Maintains territorial profile (residency, domicile, citizenship)
 
 ### Fields
 
@@ -103,27 +100,19 @@ Represents an individual person, company, or trust that receives financial advic
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| addresses | List of Complex Data | List of all addresses for this client (current and historical) | List with 2 item(s) |
 | adviser | Reference Link | The adviser responsible for this client | Complex object |
 | clientCategory | Text | Client category (e.g., HighNetWorth, Mass Market) | HighNetWorth |
 | clientNumber | Text | Client reference number assigned by your organization | C00001234 |
 | clientSegment | Text | Client segment classification (A, B, C, D for prioritization) | A |
 | clientSegmentDate | Date | Client segment classification (A, B, C, D for prioritization) | 2020-01-15 |
 | clientType | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
-| contacts | List of Complex Data | Contact information including email, phone, mobile, and website | List with 4 item(s) |
 | createdAt | Date | When this record was created in the system | 2020-01-15T10:30:00Z |
 | createdBy | Complex Data | User who created this record | Complex object |
-| dataProtection | Complex Data | GDPR consent, data protection, and privacy management | Complex object |
-| dependants | List of Complex Data | List of financially dependent children and relatives | List with 2 item(s) |
-| estatePlanning | Complex Data | Will, power of attorney, gifts, trusts, and inheritance tax planning | Complex object |
 | factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| financialProfile | Complex Data | Summary of income, assets, liabilities, and net worth | Complex object |
 | id | Number | Unique system identifier for this record | 8496 |
-| identityVerification | Complex Data | Identity verification, KYC, AML checks, and compliance status | Complex object |
 | isHeadOfFamilyGroup | Yes/No | Whether this client is the primary contact for the family group | Yes |
 | isJoint | Yes/No | Whether this client is part of a joint (couple) fact find | Yes |
 | isMatchingServiceProposition | Yes/No | Whether this client requires matching service due to vulnerability | No |
-| marketingPreferences | Complex Data | Marketing channel preferences and opt-in/opt-out status | Complex object |
 | matchingServicePropositionReason | Text |  | None |
 | officeRef | Complex Data | The office/branch where this client is managed | Complex object |
 | paraplannerRef | Reference Link | The paraplanner assigned to this client | Complex object |
@@ -152,148 +141,6 @@ Represents an individual person, company, or trust that receives financial advic
 | id | Number | Unique system identifier for this record | 8724 |
 | name | Text | First name (given name) | Jane Doe |
 
-**dataProtection:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| breachNotifications | Complex Data |  | Complex object |
-| breachCount | Number |  | 0 |
-| breachesNotified | List |  | Empty list |
-| lastBreachDate | Text |  | None |
-| dataRetention | Complex Data |  | Complex object |
-| archiveDate | Text |  | None |
-| relationshipEndDate | Text | Employment end date (null if current) | None |
-| retentionBasis | Text |  | FCA Regulatory Requirement |
-| retentionEndDate | Text | Employment end date (null if current) | None |
-| retentionPeriod | Text |  | 7 years after relationship ends |
-| gdprConsent | Complex Data |  | Complex object |
-| dataProcessing | Complex Data |  | Complex object |
-| consentDate | Date |  | 2020-01-15 |
-| consentMethod | Text |  | Explicit |
-| consentText | Text |  | I consent to my personal data being processed for ... |
-| consented | Yes/No |  | Yes |
-| lawfulBasis | Text |  | Consent |
-| version | Text |  | 1.0 |
-| marketing | Complex Data | Marketing channel preferences and opt-in/opt-out status | Complex object |
-| consentDate | Date |  | 2020-01-15 |
-| consentMethod | Text |  | Explicit |
-| consentText | Text |  | I consent to receiving marketing communications |
-| consented | Yes/No |  | Yes |
-| lawfulBasis | Text |  | Consent |
-| version | Text |  | 1.0 |
-| profiling | Complex Data |  | Complex object |
-| consentDate | Text |  | None |
-| consentMethod | Text |  | None |
-| consentText | Text |  | None |
-| consented | Yes/No |  | No |
-| lawfulBasis | Text |  | None |
-| version | Text |  | None |
-| thirdPartySharing | Complex Data |  | Complex object |
-| consentDate | Text |  | None |
-| consentMethod | Text |  | None |
-| consentText | Text |  | None |
-| consented | Yes/No |  | No |
-| lawfulBasis | Text |  | None |
-| version | Text |  | None |
-| privacyPolicy | Complex Data |  | Complex object |
-| acceptanceMethod | Text |  | Electronic |
-| acceptedDate | Date |  | 2020-01-15 |
-| url | Text |  | https://api.factfind.com/privacy-policy |
-| version | Text |  | 2.1 |
-| rightsExercised | Complex Data |  | Complex object |
-| dsarRequests | Number |  | 0 |
-| erasureRequests | Number |  | 0 |
-| lastRequestDate | Text |  | None |
-| lastRequestType | Text |  | None |
-| objectionRequests | Number |  | 0 |
-| portabilityRequests | Number |  | 0 |
-| rectificationRequests | Number |  | 0 |
-| restrictionRequests | Number |  | 0 |
-
-**estatePlanning:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| gifts | Complex Data |  | Complex object |
-| annualExemptionAvailable | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 0.0 |
-| currency | Selection |  | Complex object |
-| annualExemptionUsed | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 6000.0 |
-| currency | Selection |  | Complex object |
-| petDetails | List of Complex Data |  | List with 2 item(s) |
-| petsOutstanding | Number |  | 2 |
-| regularGiftsFromIncome | Complex Data |  | Complex object |
-| amount | Currency Amount | Amount spent | Complex object |
-| frequency | Text | How often (Monthly, Annual, etc.) | Monthly |
-| hasRegularGifts | Yes/No |  | Yes |
-| recipient | Text |  | Grandchildren |
-| totalGiftsLastYear | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 6000.0 |
-| currency | Selection |  | Complex object |
-| healthWelfareLPA | Complex Data |  | Complex object |
-| attorneys | List of Complex Data |  | List with 1 item(s) |
-| hasHealthWelfareLPA | Yes/No |  | Yes |
-| lpaDate | Date |  | 2021-05-10 |
-| lpaRegistered | Yes/No |  | Yes |
-| lpaRegistrationDate | Date |  | 2021-05-15 |
-| ihtEstimate | Complex Data |  | Complex object |
-| calculationDate | Date |  | 2026-02-18 |
-| estimatedEstate | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 650000.0 |
-| currency | Selection |  | Complex object |
-| estimatedIHT | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 60000.0 |
-| currency | Selection |  | Complex object |
-| ihtRate | Number |  | 0.4 |
-| nextReviewDate | Date |  | 2027-02-18 |
-| nilRateBand | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 325000.0 |
-| currency | Selection |  | Complex object |
-| residenceNilRateBand | Currency Amount | Unique system identifier for this record | Complex object |
-| amount | Number | Amount spent | 175000.0 |
-| currency | Selection |  | Complex object |
-| taxableEstate | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 150000.0 |
-| currency | Selection |  | Complex object |
-| totalNilRateBand | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 500000.0 |
-| currency | Selection |  | Complex object |
-| transferableNilRateBand | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 0.0 |
-| currency | Selection |  | Complex object |
-| lifeInsuranceInTrust | Complex Data |  | Complex object |
-| hasLifeInsuranceInTrust | Yes/No |  | Yes |
-| policies | List of Complex Data |  | List with 1 item(s) |
-| powerOfAttorney | Complex Data |  | Complex object |
-| advisedByUs | Yes/No |  | Yes |
-| advisedDate | Date |  | 2021-04-15 |
-| attorneys | List of Complex Data |  | List with 1 item(s) |
-| hasLPA | Yes/No |  | Yes |
-| instructions | Text |  | Can act jointly and severally |
-| lpaDate | Date |  | 2021-05-10 |
-| lpaExpiryDate | Text |  | None |
-| lpaRegistered | Yes/No |  | Yes |
-| lpaRegistrationDate | Date |  | 2021-05-15 |
-| lpaType | Text |  | Property and Financial Affairs |
-| trusts | Complex Data |  | Complex object |
-| hasTrusts | Yes/No |  | No |
-| numberOfTrusts | Number |  | 0 |
-| trustDetails | List |  | Empty list |
-| will | Complex Data |  | Complex object |
-| advisedByUs | Yes/No |  | Yes |
-| advisedDate | Date |  | 2020-06-01 |
-| beneficiaries | List of Complex Data | List of trust beneficiaries | List with 1 item(s) |
-| executors | List of Complex Data |  | List with 2 item(s) |
-| hasWill | Yes/No |  | Yes |
-| isUpToDate | Yes/No | Date moved from this address (null if current) | Yes |
-| lastReviewed | Date |  | 2024-06-15 |
-| nextReviewDate | Date |  | 2027-06-15 |
-| willDate | Date |  | 2020-06-15 |
-| willStoredLocation | Text |  | London Office |
-| willStoredWith | Text |  | Smith & Co Solicitors |
-| willType | Text |  | Simple Will |
-
 **factfind:**
 
 | Field Name | Type | Description | Example Value |
@@ -301,162 +148,6 @@ Represents an individual person, company, or trust that receives financial advic
 | factFindNumber | Text |  | FF-2025-00123 |
 | id | Number | Unique system identifier for this record | 2405 |
 | status | Text | Current status of the goal | INP |
-
-**financialProfile:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| calculatedAt | Date | When these figures were calculated | 2026-02-18T10:30:00Z |
-| grossAnnualIncome | Currency Amount | Total gross annual income before tax | Complex object |
-| amount | Number | Amount spent | 75000.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-| householdIncome | Currency Amount | Combined household income (all clients) | Complex object |
-| amount | Number | Amount spent | 120000.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-| householdNetWorth | Currency Amount | Combined household net worth | Complex object |
-| amount | Number | Amount spent | 650000.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-| lastReviewDate | Date | When these figures were last reviewed | 2026-02-18 |
-| netWorth | Currency Amount | Total net worth (assets minus liabilities) | Complex object |
-| amount | Number | Amount spent | 450000.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-| totalAssets | Currency Amount | Total value of all assets | Complex object |
-| amount | Number | Amount spent | 500000.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-| totalJointAssets | Currency Amount | Total value of jointly owned assets | Complex object |
-| amount | Number | Amount spent | 200000.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-
-**identityVerification:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amlChecks | Complex Data |  | Complex object |
-| adverseMediaCheckSource | Text |  | LexisNexis |
-| adverseMediaChecked | Yes/No |  | Yes |
-| adverseMediaMatches | Number |  | 0 |
-| checkPerformedBy | Complex Data |  | Complex object |
-| id | Number | Unique system identifier for this record | 8724 |
-| name | Text | First name (given name) | Jane Doe |
-| isPep | Yes/No |  | No |
-| lastCheckDate | Date |  | 2020-01-15 |
-| nextCheckDate | Date |  | 2025-01-15 |
-| overallStatus | Text | Current status of the goal | Clear |
-| pepCheckSource | Text |  | World-Check |
-| pepChecked | Yes/No |  | Yes |
-| riskRating | Text |  | Low |
-| sanctionsCheckSource | Text |  | World-Check |
-| sanctionsChecked | Yes/No |  | Yes |
-| sanctionsMatches | Number |  | 0 |
-| documents | List of Complex Data |  | List with 2 item(s) |
-| expiryDate | Date |  | 2025-01-15 |
-| mlrCompliance | Complex Data |  | Complex object |
-| cddCompleted | Yes/No |  | Yes |
-| cddCompletedDate | Date |  | 2020-01-15 |
-| complianceDate | Date |  | 2020-01-15 |
-| complianceStatus | Text | Current status of the goal | Compliant |
-| eddCompletedDate | Text |  | None |
-| eddRequired | Yes/No |  | No |
-| kycComplianceDate | Date |  | 2020-01-15 |
-| kycCompliant | Yes/No |  | Yes |
-| lastReviewDate | Date | When these figures were last reviewed | 2025-01-15 |
-| nextReviewDate | Date |  | 2026-01-15 |
-| reviewPeriod | Text |  | Annual |
-| nextReviewDate | Date |  | 2025-01-15 |
-| sourceOfFunds | Complex Data |  | Complex object |
-| description | Text | Description of the goal | Personal savings accumulated over 20 years |
-| evidenceProvided | Yes/No | Unique system identifier for this record | Yes |
-| evidenceType | Text | Unique system identifier for this record | Bank Statements |
-| source | Text |  | Savings |
-| verifiedDate | Date | When this contact was verified | 2020-01-15 |
-| sourceOfWealth | Complex Data |  | Complex object |
-| description | Text | Description of the goal | Senior executive salary and investment portfolio |
-| evidenceProvided | Yes/No | Unique system identifier for this record | Yes |
-| evidenceType | Text | Unique system identifier for this record | Payslips, Investment Statements |
-| primarySource | Text |  | Employment |
-| secondarySource | Text |  | Investments |
-| verifiedDate | Date | When this contact was verified | 2020-01-15 |
-| verificationDate | Date |  | 2020-01-15 |
-| verificationMethod | Text |  | Electronic |
-| verificationStatus | Text | Current status of the goal | Verified |
-| verifiedBy | Complex Data |  | Complex object |
-| id | Number | Unique system identifier for this record | 8724 |
-| name | Text | First name (given name) | Jane Doe |
-
-**marketingPreferences:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| channels | Complex Data |  | Complex object |
-| email | Complex Data |  | Complex object |
-| consentDate | Date |  | 2020-01-15 |
-| consented | Yes/No |  | Yes |
-| doubleOptInDate | Date |  | 2020-01-15 |
-| frequency | Text | How often (Monthly, Annual, etc.) | Monthly |
-| lastContactDate | Date |  | 2026-02-01 |
-| optOutDate | Text |  | None |
-| unsubscribed | Yes/No |  | No |
-| phone | Complex Data |  | Complex object |
-| consentDate | Text |  | None |
-| consented | Yes/No |  | No |
-| frequency | Text | How often (Monthly, Annual, etc.) | None |
-| lastContactDate | Text |  | None |
-| optOutDate | Text |  | None |
-| tpsCheckDate | Date |  | 2020-01-15 |
-| tpsChecked | Yes/No |  | Yes |
-| tpsRegistered | Yes/No |  | No |
-| unsubscribed | Yes/No |  | No |
-| post | Complex Data | Postcode/ZIP code | Complex object |
-| consentDate | Text |  | None |
-| consented | Yes/No |  | No |
-| frequency | Text | How often (Monthly, Annual, etc.) | None |
-| lastContactDate | Text |  | None |
-| mpsCheckDate | Date |  | 2020-01-15 |
-| mpsChecked | Yes/No |  | Yes |
-| mpsRegistered | Yes/No |  | No |
-| optOutDate | Text |  | None |
-| unsubscribed | Yes/No |  | No |
-| sms | Complex Data |  | Complex object |
-| consentDate | Date |  | 2020-01-15 |
-| consented | Yes/No |  | Yes |
-| frequency | Text | How often (Monthly, Annual, etc.) | Quarterly |
-| lastContactDate | Date |  | 2026-01-15 |
-| optOutDate | Text |  | None |
-| unsubscribed | Yes/No |  | No |
-| socialMedia | Complex Data |  | Complex object |
-| consentDate | Text |  | None |
-| consented | Yes/No |  | No |
-| frequency | Text | How often (Monthly, Annual, etc.) | None |
-| lastContactDate | Text |  | None |
-| optOutDate | Text |  | None |
-| unsubscribed | Yes/No |  | No |
-| doNotContact | Yes/No |  | No |
-| doNotContactReason | Text |  | None |
-| interests | List of str |  | List with 4 item(s) |
-| lastUpdated | Date |  | 2020-01-15 |
-| preferredContactTime | Text |  | Weekday Evenings |
-| productInterests | List of str |  | List with 4 item(s) |
-| suppressionList | Yes/No |  | No |
-| unsubscribeAll | Yes/No |  | No |
-| unsubscribeAllDate | Text |  | None |
 
 **officeRef:**
 
@@ -508,7 +199,6 @@ Represents an individual person, company, or trust that receives financial advic
 | salutation | Text | How to address the client (e.g., "Mr Smith") | Mr Smith |
 | smokingStatus | Text | Smoking status for insurance purposes | NEVER |
 | title | Text | Title (Mr, Mrs, Ms, Dr, etc.) | MR |
-| vulnerabilities | List of Complex Data | Consumer Duty vulnerabilities and required adjustments | List with 1 item(s) |
 
 **spouseRef:**
 
@@ -2700,236 +2390,6 @@ The `IdentityVerification` contract represents identity verification status with
 
 ---
 
-## 13.12 Consent Contract
-### Overview
-The `Consent` contract represents GDPR consent tracking with purpose-specific consents and audit trail.
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| audit | Complex Data |  | Complex object |
-| client | Reference Link |  | Complex object |
-| complianceChecks | Complex Data |  | Complex object |
-| consentChannel | Text |  | WEB |
-| consentExpiryDate | Date |  | 2028-02-10 |
-| consentGivenDate | Date |  | 2026-02-10T14:00:00Z |
-| consentMethod | Text |  | EXPLICIT |
-| consentPurpose | Text |  | DATA_PROCESSING |
-| consentPurposeDescription | Text | Description of the goal | Processing of personal and financial data for the ... |
-| consentRenewal | Complex Data |  | Complex object |
-| consentStatus | Text | Current status of the goal | GIVEN |
-| consentText | Text |  | I consent to the collection, storage, and processi... |
-| consentVersion | Text |  | 2.1 |
-| consentWithdrawnDate | Text |  | None |
-| createdAt | Date | When this record was created in the system | 2026-02-10T14:00:00Z |
-| createdBy | Complex Data | User who created this record | Complex object |
-| dataProcessing | Complex Data |  | Complex object |
-| dataSubjectRights | Complex Data |  | Complex object |
-| daysUntilExpiry | Number |  | 730 |
-| documents | List of Complex Data |  | List with 2 item(s) |
-| dsarHistory | List of Complex Data |  | List with 1 item(s) |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Number | Unique system identifier for this record | consent-555 |
-| isActive | Yes/No |  | Yes |
-| isExpired | Yes/No |  | No |
-| lawfulBasis | Text |  | CONSENT |
-| lawfulBasisDetails | Text |  | Consent freely given for data processing under GDP... |
-| marketingConsent | Complex Data |  | Complex object |
-| notes | Text |  | Initial consent obtained during client onboarding.... |
-| privacyPolicy | Complex Data |  | Complex object |
-| profilingConsent | Complex Data |  | Complex object |
-| relatedConsents | List of Complex Data |  | List with 2 item(s) |
-| specialCategoryData | Complex Data | Expenditure category (Housing, Transport, Food, etc.) | Complex object |
-| thirdPartySharing | Complex Data |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-10T14:30:00Z |
-| updatedBy | Complex Data | User who last modified this record | Complex object |
-
-#### Nested Field Groups
-
-**audit:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| consentEvidence | Complex Data | Unique system identifier for this record | Complex object |
-| evidenceTimestamp | Date | Unique system identifier for this record | 2026-02-10T14:00:00Z |
-| evidenceType | Text | Unique system identifier for this record | CHECKBOX |
-| evidenceUrl | Text | Unique system identifier for this record | /api/v2/consent-evidence/consent-555 |
-| witnessRequired | Yes/No |  | No |
-| consentRecordedAt | Date |  | 2026-02-10T14:00:00Z |
-| consentRecordedBy | Complex Data |  | Complex object |
-| id | Number | Unique system identifier for this record | user-789 |
-| name | Text | First name (given name) | Jane Doe |
-| role | Text |  | Financial Adviser |
-| deviceType | Text |  | Desktop |
-| ipAddress | Text |  | 192.168.1.100 |
-| location | Complex Data |  | Complex object |
-| city | Text | City/town | London |
-| country | Text | Country | United Kingdom |
-| userAgent | Text | Current age (calculated from date of birth) | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb... |
-| verificationMethod | Text |  | EMAIL_VERIFIED |
-
-**client:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Number | Unique system identifier for this record | 8496 |
-| name | Text | First name (given name) | John Smith |
-| type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
-
-**complianceChecks:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| fcaComplianceDate | Date |  | 2026-02-10 |
-| fcaCompliant | Yes/No |  | Yes |
-| gdprComplianceDate | Date |  | 2026-02-10 |
-| gdprCompliant | Yes/No |  | Yes |
-| lastComplianceReview | Date |  | 2026-02-10 |
-| nextComplianceReview | Date |  | 2027-02-10 |
-| peComplianceDate | Date |  | 2026-02-10 |
-| pecompliant | Yes/No |  | Yes |
-
-**consentRenewal:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| renewalDate | Date |  | 2028-02-10 |
-| renewalFrequency | Text | How often (Monthly, Annual, etc.) | BIENNIAL |
-| renewalHistory | List of Complex Data |  | List with 1 item(s) |
-| renewalReminderDate | Text |  | None |
-| renewalReminderSent | Yes/No |  | No |
-| renewalRequired | Yes/No |  | Yes |
-
-**createdBy:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | user-789 |
-| name | Text | First name (given name) | Jane Doe |
-
-**dataProcessing:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| dataCategories | List of Complex Data |  | List with 3 item(s) |
-| dataRetentionPeriod | Complex Data |  | Complex object |
-| reason | Text |  | Regulatory requirement - FCA indefinite retention ... |
-| unit | Text |  | years |
-| value | Number | The contact value (email address, phone number, etc.) | 7 |
-| dataSharedWith | List of Complex Data |  | List with 3 item(s) |
-| processingActivities | List of Complex Data |  | List with 3 item(s) |
-
-**dataSubjectRights:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| rightToAccess | Complex Data |  | Complex object |
-| lastRequestDate | Text |  | None |
-| requestsReceived | Number |  | 0 |
-| rightExplained | Yes/No |  | Yes |
-| rightToDataPortability | Complex Data |  | Complex object |
-| lastRequestDate | Text |  | None |
-| requestsReceived | Number |  | 0 |
-| rightExplained | Yes/No |  | Yes |
-| rightToErasure | Complex Data |  | Complex object |
-| lastRequestDate | Text |  | None |
-| limitations | Text |  | Data may be retained for regulatory compliance (FC... |
-| requestsReceived | Number |  | 0 |
-| rightExplained | Yes/No |  | Yes |
-| rightToObject | Complex Data |  | Complex object |
-| lastRequestDate | Text |  | None |
-| requestsReceived | Number |  | 0 |
-| rightExplained | Yes/No |  | Yes |
-| rightToRectification | Complex Data |  | Complex object |
-| lastRequestDate | Text |  | None |
-| requestsReceived | Number |  | 0 |
-| rightExplained | Yes/No |  | Yes |
-| rightToRestriction | Complex Data |  | Complex object |
-| lastRequestDate | Text |  | None |
-| requestsReceived | Number |  | 0 |
-| rightExplained | Yes/No |  | Yes |
-| rightToWithdrawConsent | Complex Data |  | Complex object |
-| canWithdraw | Yes/No |  | Yes |
-| rightExplained | Yes/No |  | Yes |
-| withdrawalImpact | Text |  | May affect ability to provide advice services |
-| withdrawalMethod | Text |  | Email, phone, or written request |
-| rightsInformed | Yes/No |  | Yes |
-| rightsInformedDate | Date |  | 2026-02-10T14:00:00Z |
-
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| factFindNumber | Text |  | FF-2025-00123 |
-| id | Number | Unique system identifier for this record | 4066 |
-| status | Text | Current status of the goal | INP |
-
-**marketingConsent:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| hasMarketingConsent | Yes/No |  | Yes |
-| marketingChannels | List of Complex Data |  | List with 4 item(s) |
-| marketingConsentDate | Date |  | 2026-02-10T14:00:00Z |
-| marketingFrequency | Text | How often (Monthly, Annual, etc.) | MONTHLY |
-| marketingInterests | List of str |  | List with 4 item(s) |
-| thirdPartyMarketing | Complex Data |  | Complex object |
-| consentDate | Text |  | None |
-| isConsented | Yes/No |  | No |
-
-**privacyPolicy:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| privacyNoticeMethod | Text |  | ONLINE |
-| privacyNoticeProvided | Yes/No | Unique system identifier for this record | Yes |
-| privacyPolicyAcceptedDate | Date |  | 2026-02-10T14:00:00Z |
-| privacyPolicyEffectiveDate | Date |  | 2026-01-01 |
-| privacyPolicyLastUpdated | Date |  | 2026-01-01 |
-| privacyPolicyUrl | Text |  | https://www.example-advisor.com/privacy-policy |
-| privacyPolicyVersion | Text |  | 2.1 |
-
-**profilingConsent:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| automatedDecisionMaking | Complex Data |  | Complex object |
-| description | Text | Description of the goal | Automated risk assessment questionnaire scoring |
-| humanReview | Yes/No |  | Yes |
-| isUsed | Yes/No |  | Yes |
-| hasProfilingConsent | Yes/No |  | Yes |
-| profilingConsentDate | Date |  | 2026-02-10T14:00:00Z |
-| profilingPurpose | Text |  | Risk profiling and investment suitability assessme... |
-
-**specialCategoryData:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| isSpecialCategory | Yes/No | Expenditure category (Housing, Transport, Food, etc.) | No |
-| lawfulBasisSpecialCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | None |
-| specialCategoryTypes | List | Expenditure category (Housing, Transport, Food, etc.) | Empty list |
-
-**thirdPartySharing:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| hasThirdPartyConsent | Yes/No |  | Yes |
-| thirdParties | List of str |  | List with 3 item(s) |
-| thirdPartyConsentDate | Date |  | 2026-02-10T14:00:00Z |
-
-**updatedBy:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | user-789 |
-| name | Text | First name (given name) | Jane Doe |
-
----
-
 ## 13.17 Asset Contract
 ### Overview
 The `Asset` contract represents a client's asset (property, business, cash, investments, etc.) with ownership, valuation, and tax planning information.
@@ -3679,22 +3139,6 @@ This contract connects to:
 - Lenders must ensure borrowers can afford payments under stressed scenarios
 - Consumer Duty requires fair treatment and consideration of actual living costs
 - Expenditure verification may require bank statements or evidence
-
----
-
-
-## 13.22 Expense Contract
-
-**DEPRECATED:** This contract has been replaced by the simplified Expenditure Contract (13.21).
-
-In v2.2, the separate Expense entity has been removed. Individual expenditure items are now tracked directly as Expenditure entities, eliminating the need for a nested aggregate structure.
-
-**Migration Note:**
-- Old `Expense` records should be migrated to `Expenditure` entities
-- The `expenditure` parent relationship is no longer needed
-- Each expense becomes a standalone expenditure item with direct client reference
-
-See **Section 13.21 Expenditure Contract** for the current structure.
 
 ---
 
@@ -5411,13 +4855,15 @@ The statements object contains up to 5 statement fields (statement1 through stat
 - `createdAt` and `createdBy` are system-managed, read-only
 
 ### Business Rules
-- Agreements are immutable once created
+- Agreements are immutable once created (cannot be updated)
 - For a valid agreement, all statements present must have accepted = true
 - Statement text comes from the policy definition, not the request
 - When a policy is updated, clients must create new agreements
 - Each client can have multiple agreements over time
 - Use agreementId = "current" to retrieve the most recent agreement
 - Supports up to 5 policy statements per agreement
+- Agreements can be deleted but this should be restricted to specific scenarios (data correction, test cleanup)
+- Consider GDPR compliance implications before implementing delete functionality
 
 ### GDPR Compliance Notes
 - Provides audit trail for Article 7 (consent)
@@ -5446,9 +4892,132 @@ The statements object contains up to 5 statement fields (statement1 through stat
 - Agreements show which policies were accepted and when
 - Demonstrates continuous consent management
 
+**Scenario 4: Data correction**
+- Test agreement was created with incorrect data
+- Administrator deletes the incorrect agreement record
+- New agreement is created with correct information
+- Deletion is logged for audit purposes
+
 ---
 
-## 13.37 Estate Planning - Will Contract
+## 13.37 Financial Profile Contract
+
+### Overview
+The `FinancialProfile` contract represents a summary of a client's financial position. This is a singleton resource - each client has exactly one financial profile record that provides a high-level view of their income, assets, liabilities, and net worth.
+
+### Business Purpose
+- Provide quick summary of client's financial position
+- Track net worth and household finances over time
+- Support portfolio review and planning discussions
+- Enable what-if scenario planning with projected figures
+- Aggregate individual and joint financial metrics
+
+### Key Features
+- Singleton resource per client
+- Captures both individual and household-level metrics
+- Can be manually entered or calculated from underlying records
+- Supports historical tracking via calculatedAt and lastReviewDate
+- All currency amounts include currency code
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| client | Reference Link | Client reference | Complex object |
+| factfind | Reference Link | FactFind reference | Complex object |
+| grossAnnualIncome | Currency Amount | Total gross annual income before tax | Complex object |
+| netAnnualIncome | Currency Amount | Total net annual income after tax | Complex object |
+| totalAssets | Currency Amount | Total value of all assets | Complex object |
+| totalLiabilities | Currency Amount | Total value of all liabilities | Complex object |
+| netWorth | Currency Amount | Total net worth (assets minus liabilities) | Complex object |
+| householdIncome | Currency Amount | Combined household income (all clients) | Complex object |
+| householdNetWorth | Currency Amount | Combined household net worth | Complex object |
+| totalJointAssets | Currency Amount | Total value of jointly owned assets | Complex object |
+| calculatedAt | Date and Time | When these figures were calculated | 2026-02-23T10:30:00Z |
+| lastReviewDate | Date | When these figures were last reviewed | 2026-02-23 |
+| createdAt | Date and Time | When this record was created (read-only) | 2026-01-15T09:00:00Z |
+| updatedAt | Date and Time | When this record was last updated (read-only) | 2026-02-23T10:30:00Z |
+
+#### Nested Field Groups
+
+**client:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique client identifier | 1234 |
+| href | Text | Client resource URL | v2/factfinds/234/clients/1234 |
+
+**factfind:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique FactFind identifier | 234 |
+| href | Text | FactFind resource URL | v2/factfinds/234 |
+
+**Currency Amount Structure (applies to all amount fields):**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| amount | Number | The monetary value | 75000.0 |
+| currency | Complex Data | Currency information | Complex object |
+| code | Text | ISO currency code | GBP |
+| symbol | Text | Currency symbol | £ |
+
+### Validation Rules
+- All currency amounts are optional
+- If provided, currency amounts must include both amount and currency.code
+- `lastReviewDate` - Must be a valid date not in the future if provided
+- All amounts must be non-negative
+- `netWorth` should equal `totalAssets` minus `totalLiabilities` if all are provided
+- Currency must be consistent across all amounts for a single profile
+
+### Business Rules
+- Financial profile is a singleton - one record per client
+- Automatically created when a client is created
+- Values can be manually entered or calculated from underlying income, asset, and liability records
+- Household metrics aggregate values across joint clients in the factfind
+- Net worth calculation: Total Assets - Total Liabilities
+- `calculatedAt` is system-managed and records when figures were last computed
+- Profile is typically updated after changes to income, assets, or liabilities
+- Supports both actual figures and projected/planning scenario figures
+
+### Usage Scenarios
+
+**Scenario 1: Initial client onboarding**
+- Client provides high-level financial summary during first meeting
+- Adviser creates financial profile with rough estimates
+- Profile is refined as detailed information is gathered
+
+**Scenario 2: Portfolio review**
+- Adviser reviews client's financial position
+- Compares current net worth to previous review
+- Updates lastReviewDate to track review completion
+
+**Scenario 3: Planning scenario**
+- Adviser creates what-if scenario with projected figures
+- Updates profile with anticipated future income and assets
+- Discusses implications with client
+
+**Scenario 4: Household comparison**
+- Joint factfind with two clients
+- Individual profiles show each client's position
+- Household metrics show combined family finances
+
+### Calculation Notes
+- **Gross Annual Income**: Sum of all income sources before tax
+- **Net Annual Income**: Income after tax and deductions
+- **Total Assets**: Sum of property, investments, savings, pensions, etc.
+- **Total Liabilities**: Sum of mortgages, loans, credit cards, etc.
+- **Net Worth**: Total Assets minus Total Liabilities
+- **Household Income**: Combined income of all clients in factfind
+- **Household Net Worth**: Combined net worth of all clients
+- **Total Joint Assets**: Assets owned jointly by multiple clients
+
+---
+
+## 13.38 Estate Planning - Will Contract
 ### Overview
 The `Will` contract represents a client's last will and testament details.
 
@@ -5508,7 +5077,7 @@ The `Will` contract represents a client's last will and testament details.
 
 ---
 
-## 13.38 Estate Planning - Lasting Power of Attorney (LPA) Contract
+## 13.39 Estate Planning - Lasting Power of Attorney (LPA) Contract
 ### Overview
 The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
@@ -5568,7 +5137,7 @@ The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
 
 ---
 
-## 13.39 Estate Planning - Gift Contract
+## 13.40 Estate Planning - Gift Contract
 ### Overview
 The `Gift` contract represents gifts made or planned by the client for inheritance tax planning.
 
@@ -5650,7 +5219,7 @@ The `Gift` contract represents gifts made or planned by the client for inheritan
 
 ---
 
-## 13.40 Estate Planning - Trust Contract
+## 13.41 Estate Planning - Trust Contract
 ### Overview
 The `Trust` contract represents trusts established by or benefiting the client.
 
@@ -5723,7 +5292,7 @@ The `Trust` contract represents trusts established by or benefiting the client.
 
 ---
 
-## 13.41 Identity Verification Contract
+## 13.42 Identity Verification Contract
 ### Overview
 The `IdentityVerification` contract represents comprehensive identity verification and KYC/AML compliance data for a client. This is a singleton resource - each client has exactly one identity verification record.
 
@@ -5882,7 +5451,7 @@ The `IdentityVerification` contract represents comprehensive identity verificati
 
 ---
 
-## 13.42 Arrangement - Mortgage Contract
+## 13.43 Arrangement - Mortgage Contract
 
 ### Business Purpose
 
@@ -6204,7 +5773,7 @@ This contract connects to:
 ---
 
 
-## 13.43 Arrangement - Investment Contract (General Investment Account)
+## 13.44 Arrangement - Investment Contract (General Investment Account)
 
 ### Business Purpose
 
@@ -6372,7 +5941,7 @@ This contract connects to:
 ---
 
 
-## 13.44 Arrangement - Protection Contract (Life Assurance)
+## 13.45 Arrangement - Protection Contract (Life Assurance)
 
 ### Business Purpose
 
@@ -6537,7 +6106,7 @@ This contract connects to:
 ---
 
 
-## 13.45 Arrangement - Pension Contract (Personal Pension)
+## 13.46 Arrangement - Pension Contract (Personal Pension)
 
 ### Business Purpose
 
@@ -6783,7 +6352,7 @@ This contract connects to:
 
 ---
 
-## 13.46 Arrangement - Pension Contract (SIPP)
+## 13.47 Arrangement - Pension Contract (SIPP)
 
 ### Business Purpose
 
@@ -6821,7 +6390,7 @@ Represents a Self-Invested Personal Pension with wider investment choices includ
 
 ---
 
-## 13.47 Arrangement - Pension Contract (Final Salary/Defined Benefit)
+## 13.48 Arrangement - Pension Contract (Final Salary/Defined Benefit)
 
 ### Business Purpose
 
@@ -6861,7 +6430,7 @@ Represents a Final Salary or Defined Benefit pension providing guaranteed income
 
 ---
 
-## 13.48 Arrangement - Pension Contract (Money Purchase/Defined Contribution)
+## 13.49 Arrangement - Pension Contract (Money Purchase/Defined Contribution)
 
 ### Business Purpose
 
@@ -6900,7 +6469,7 @@ Represents a workplace Defined Contribution pension with employer matching contr
 
 ---
 
-## 13.49 Arrangement - Pension Contract (State Pension)
+## 13.50 Arrangement - Pension Contract (State Pension)
 
 ### Business Purpose
 
@@ -6941,7 +6510,7 @@ Represents UK State Pension entitlement based on National Insurance contribution
 
 ---
 
-## 13.50 Arrangement - Investment Contract (Stocks & Shares ISA)
+## 13.51 Arrangement - Investment Contract (Stocks & Shares ISA)
 
 ### Business Purpose
 

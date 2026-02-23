@@ -181,6 +181,10 @@ The FactFind API provides comprehensive digital capabilities for:
       - [5.11.2 Create DPA Agreement](#5112-create-dpa-agreement)
       - [5.11.3 List DPA Agreements](#5113-list-dpa-agreements)
       - [5.11.4 Get DPA Agreement](#5114-get-dpa-agreement)
+      - [5.11.5 Delete DPA Agreement](#5115-delete-dpa-agreement)
+   - [5.12 Financial Profile](#512-financial-profile)
+      - [5.12.1 Get Financial Profile](#5121-get-financial-profile)
+      - [5.12.2 Update Financial Profile](#5122-update-financial-profile)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -328,8 +332,8 @@ The FactFind API provides comprehensive digital capabilities for:
    - [14.9 Property Contract](#149-property-contract)
    - [14.10 Equity Contract](#1410-equity-contract)
    - [14.11 IdentityVerification Contract](#1411-identityverification-contract)
-   - [14.12 Consent Contract](#1412-consent-contract)
-   - [14.13 Collection Response Wrapper](#1413-collection-response-wrapper)
+   - [14.12 Collection Response Wrapper](#1412-collection-response-wrapper)
+   - [14.13 Contract Extension for Other Entities](#1413-contract-extension-for-other-entities)
    - [14.14 Contract Extension for Other Entities](#1414-contract-extension-for-other-entities)
    - [14.15 Standard Value Types](#1415-standard-value-types)
       - [14.15.1 MoneyValue](#14151-moneyvalue)
@@ -569,7 +573,7 @@ Resources are organized into **business contexts** that reflect the domain model
 
 | Context | Resources | Base Path |
 |---------|-----------|-----------|
-| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Preferences, Vulnerabilities, ID Verification, Professional Contacts | `/api/v2/factfinds/{id}/clients/{id}/*` |
+| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Agreements, Marketing Preferences, Vulnerabilities, ID Verification, Professional Contacts | `/api/v2/factfinds/{id}/clients/{id}/*` |
 | **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v2/factfinds/{id}/clients/{id}/*` |
 | **Assets & Liabilities** | **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v2/factfinds/{id}/arrangements/{type}` |
 | **Goals & Objectives** | Objectives (investment, pension, protection, mortgages, budget, estate-planning), Needs | `/api/v2/factfinds/{id}/objectives/{type}` |
@@ -2876,8 +2880,12 @@ The financial health score is calculated on a 0-100 scale with five components:
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | Create DPA agreement | `client:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | List all DPA agreements | `client:read` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}` | Get specific DPA agreement | `client:read` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}` | Delete DPA agreement | `client:write` |
+| **Financial Profile** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile` | Get financial profile | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile` | Update financial profile | `client:write` |
 
-**Total Endpoints:** 62
+**Total Endpoints:** 65
 
 ---
 
@@ -5604,6 +5612,7 @@ Use: Demonstrate suitability in file review
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | Create DPA agreement | `client:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | List all DPA agreements | `client:read` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}` | Get specific DPA agreement | `client:read` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}` | Delete DPA agreement | `client:write` |
 
 #### 5.11.2 Create DPA Agreement
 
@@ -5822,13 +5831,218 @@ Use: Demonstrate suitability in file review
 - The agreement date (agreedAt) is required
 - Statement text is read-only and comes from the policy definition
 - Use `agreementId = "current"` to retrieve the latest agreement
-- Agreements are immutable once created
+
+#### 5.11.5 Delete DPA Agreement
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}`
+
+**Description:** Delete a DPA policy agreement. This operation permanently removes the agreement record. Use with caution as this affects compliance audit trails.
+
+**Response:** `204 No Content`
+
+**Error Responses:**
+- `404 Not Found` - Agreement not found
+- `403 Forbidden` - Insufficient permissions
+
+**Usage Notes:**
+- Deleting agreements should be restricted to specific scenarios (e.g., data correction, test data cleanup)
+- Consider the implications for GDPR compliance audit trails before deletion
+- In production, consider soft-delete or archival instead of hard delete
+- Cannot delete using `agreementId = "current"` - must specify actual agreement ID
+
+**Business Rules:**
+- Only agreements belonging to the specified client and factfind can be deleted
+- Deletion is permanent and cannot be undone
+- Consider regulatory requirements before implementing delete functionality
+- May require elevated permissions or admin role
 
 **GDPR Compliance:**
 - DPA agreements provide audit trail for data processing consent
 - Supports demonstrating lawful basis for data processing
 - Records when and which policy was agreed to by the client
 - Immutable records ensure compliance with record-keeping requirements
+
+---
+
+### 5.12 Financial Profile
+
+**Description:** Manage the financial profile summary for a client. This is a singleton resource per client - each client has exactly one financial profile record that provides a high-level summary of their financial position.
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile`
+
+**Key Concepts:**
+- Financial profile is a singleton - one record per client
+- Provides summary view of income, assets, liabilities, and net worth
+- Automatically calculated from underlying income, asset, and liability records
+- Can be manually updated for planning scenarios
+- Supports both individual and household-level metrics
+
+#### 5.12.1 Get Financial Profile
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile`
+
+**Description:** Retrieve the financial profile summary for a client.
+
+**Response:**
+```json
+{
+  "client": {
+    "id": 1234,
+    "href": "v2/factfinds/234/clients/1234"
+  },
+  "factfind": {
+    "id": 234,
+    "href": "v2/factfinds/234"
+  },
+  "grossAnnualIncome": {
+    "amount": 75000.0,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "netAnnualIncome": {
+    "amount": 55000.0,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "totalAssets": {
+    "amount": 500000.0,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "totalLiabilities": {
+    "amount": 50000.0,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "netWorth": {
+    "amount": 450000.0,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "householdIncome": {
+    "amount": 120000.0,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "householdNetWorth": {
+    "amount": 650000.0,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "totalJointAssets": {
+    "amount": 200000.0,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "calculatedAt": "2026-02-23T10:30:00Z",
+  "lastReviewDate": "2026-02-23",
+  "createdAt": "2026-01-15T09:00:00Z",
+  "updatedAt": "2026-02-23T10:30:00Z"
+}
+```
+
+#### 5.12.2 Update Financial Profile
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile`
+
+**Description:** Update or create the financial profile for a client. This endpoint creates or updates the singleton financial profile record.
+
+**Request Body:**
+```json
+{
+  "grossAnnualIncome": {
+    "amount": 78000.0,
+    "currency": {
+      "code": "GBP"
+    }
+  },
+  "netAnnualIncome": {
+    "amount": 57000.0,
+    "currency": {
+      "code": "GBP"
+    }
+  },
+  "totalAssets": {
+    "amount": 520000.0,
+    "currency": {
+      "code": "GBP"
+    }
+  },
+  "totalLiabilities": {
+    "amount": 48000.0,
+    "currency": {
+      "code": "GBP"
+    }
+  },
+  "netWorth": {
+    "amount": 472000.0,
+    "currency": {
+      "code": "GBP"
+    }
+  },
+  "householdIncome": {
+    "amount": 125000.0,
+    "currency": {
+      "code": "GBP"
+    }
+  },
+  "householdNetWorth": {
+    "amount": 680000.0,
+    "currency": {
+      "code": "GBP"
+    }
+  },
+  "totalJointAssets": {
+    "amount": 210000.0,
+    "currency": {
+      "code": "GBP"
+    }
+  },
+  "lastReviewDate": "2026-02-23"
+}
+```
+
+**Response:** Same as GET response above.
+
+**Validation Rules:**
+- All currency amounts are optional
+- If provided, currency amounts must include both amount and currency.code
+- `lastReviewDate` - Optional, must be a valid date not in the future
+- All amounts must be non-negative
+- `netWorth` should equal `totalAssets` minus `totalLiabilities` if all are provided
+
+**Business Rules:**
+- Financial profile is automatically created when a client is created
+- Values can be manually entered or calculated from underlying records
+- Household metrics aggregate values across joint clients
+- Net worth calculation: Total Assets - Total Liabilities
+- Currency must be consistent across all amounts (default: GBP)
+- Profile is typically updated after changes to income, assets, or liabilities
+- `calculatedAt` is system-managed and records when figures were last computed
+
+**Use Cases:**
+
+1. **Initial Setup:** When onboarding a client, capture high-level financial position
+2. **Quick Reference:** Provide summary view without drilling into detailed records
+3. **Planning Scenarios:** Update projected figures for what-if analysis
+4. **Portfolio Review:** Track changes in net worth over time
+5. **Household View:** Compare individual vs. joint financial positions
 
 ---
 
@@ -23318,32 +23532,57 @@ Only specified fields are updated. Returns complete contract.
 
 ---
 
-### 14.12 Consent Contract
+### 14.12 Collection Response Wrapper
 
-The `Consent` contract represents GDPR consent tracking with purpose-specific consents and audit trail.
-
-**Reference Type:** Consent is a reference type with identity (has `id` field).
+All list/collection endpoints use a standard wrapper contract:
 
 ```json
 {
-  "id": 555,
-  "client": {
-    "id": 123,
-    "href": "/api/v2/factfinds/{factfindId}/clients/123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
+  "data": [
+    { /* Complete entity contract */ },
+    { /* Complete entity contract */ }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 20,
+    "totalPages": 5,
+    "totalCount": 95,
+    "hasMore": true
   },
-  "factfind": {
-    "id": 123,
-    "href": "/api/v2/factfinds/123",
-    "factFindNumber": "FF-2025-00123",
-    "status": "INP"
-  },
-  "consentPurpose": "DATA_PROCESSING",
-  "consentPurposeDescription": "Processing of personal and financial data for the purpose of financial advice and planning",
-  "consentStatus": "GIVEN",
-  "consentGivenDate": "2026-02-10T14:00:00Z",
+  "_links": {
+    "first": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "prev": null,
+    "self": { "href": "/api/v2/factfinds/{factfindId}/clients?page=1&pageSize=20" },
+    "next": { "href": "/api/v2/factfinds/{factfindId}/clients?page=2&pageSize=20" },
+    "last": { "href": "/api/v2/factfinds/{factfindId}/clients?page=5&pageSize=20" }
+  }
+}
+```
+
+The `data` array contains complete entity contracts. Clients can use field selection (`?fields=id,name`) to reduce response size.
+
+---
+
+### 14.13 Contract Extension for Other Entities
+
+All other entities in the FactFind system follow the same Single Contract Principle:
+
+**Circumstances Entities:**
+- `Employment` - Employment history within FactFind
+- `Expenditure` - Expenditure items within FactFind
+- `Asset` - Assets (property, savings, investments)
+- `Liability` - Liabilities (mortgages, loans, credit cards)
+
+**Estate Planning Entities:**
+- `Gift` - Gifts made or intended
+- `GiftTrust` - Trust arrangements for gifts
+- `Beneficiary` - Beneficiaries of estates/trusts
+
+---
+
+## 15. Appendix A: Entity-to-Endpoint Mapping
+
+This appendix provides the complete mapping between domain entities and their corresponding API endpoints under the context-based FactFind API Design.
   "consentWithdrawnDate": null,
   "consentExpiryDate": "2028-02-10",
   "isExpired": false,
