@@ -5254,7 +5254,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 
 ## 13.35 Marketing Preferences Contract
 ### Overview
-The `MarketingPreferences` contract represents a client's marketing consent and communication preferences.
+The `MarketingPreferences` contract represents a client's marketing consent and communication preferences. This is a singleton resource - each client has exactly one marketing preferences record.
 
 ### Fields
 
@@ -5262,63 +5262,59 @@ The `MarketingPreferences` contract represents a client's marketing consent and 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| channelPreferences | Complex Data |  | Complex object |
-| client | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2026-01-15T10:00:00Z |
-| dataRetentionConsent | Yes/No |  | Yes |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Number | Unique system identifier for this record | 6666 |
-| lastUpdated | Date |  | 2026-01-15 |
-| notes | Text |  | Client prefers email contact for newsletters and u... |
-| overallConsent | Yes/No |  | Yes |
-| privacyNoticeAcceptedDate | Date |  | 2026-01-15 |
-| privacyNoticeVersion | Text |  | 2.1 |
-| productInterests | List of Complex Data |  | List with 4 item(s) |
-| suppressionList | Yes/No |  | No |
-| thirdPartyMarketing | Complex Data |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-01-15T10:00:00Z |
+| client | Reference Link | Client reference | Complex object |
+| factfind | Reference Link | FactFind reference | Complex object |
+| allowCompanyContactByTelephone | Yes/No | Permission for company telephone contact | Yes |
+| allowCompanyContactByMail | Yes/No | Permission for company mail contact | Yes |
+| allowCompanyContactByEmail | Yes/No | Permission for company email contact | Yes |
+| allowCompanyContactBySms | Yes/No | Permission for company SMS contact | Yes |
+| allowCompanyContactBySocialMedia | Yes/No | Permission for company social media contact | Yes |
+| allowCompanyContactByAutomatedCalls | Yes/No | Permission for company automated calls | Yes |
+| allowCompanyContactByPfp | Yes/No | Permission for company PFP contact | Yes |
+| allowThirdPartyContactByTelephone | Yes/No | Permission for third-party telephone contact | Yes |
+| allowThirdPartyContactByMail | Yes/No | Permission for third-party mail contact | Yes |
+| allowThirdPartyContactByEmail | Yes/No | Permission for third-party email contact | Yes |
+| allowThirdPartyContactBySms | Yes/No | Permission for third-party SMS contact | Yes |
+| allowThirdPartyContactBySocialMedia | Yes/No | Permission for third-party social media contact | Yes |
+| allowThirdPartyContactByAutomatedCalls | Yes/No | Permission for third-party automated calls | Yes |
+| allowThirdPartyContactByPfp | Yes/No | Permission for third-party PFP contact | Yes |
+| canContactForMarketingPurposes | Enum (Text) | Whether marketing contact is permitted. Enum: Yes, No | Yes |
+| consentedAt | DateTime | Timestamp when consent was given | 2026-02-23T17:49:54.183Z |
+| deliveryMethod | Enum (Text) | Preferred delivery method. Enum: NoPreference, Electronic, Post | NoPreference |
+| accessibleFormat | Enum (Text) | Required accessible format. Enum: NoRequirement, LargePrint, AudioTape, Braille | NoRequirement |
 
 #### Nested Field Groups
-
-**channelPreferences:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| email | Complex Data |  | Complex object |
-| consentDate | Date |  | 2026-01-15 |
-| consentMethod | Text |  | Online Form |
-| optIn | Yes/No |  | Yes |
-| phone | Complex Data |  | Complex object |
-| consentDate | Text |  | None |
-| consentMethod | Text |  | None |
-| optIn | Yes/No |  | No |
-| post | Complex Data | Postcode/ZIP code | Complex object |
-| consentDate | Date |  | 2026-01-15 |
-| consentMethod | Text |  | Written Consent |
-| optIn | Yes/No |  | Yes |
-| sms | Complex Data |  | Complex object |
-| consentDate | Text |  | None |
-| consentMethod | Text |  | None |
-| optIn | Yes/No |  | No |
 
 **client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
+| id | Number | Unique client identifier | 1234 |
+| href | Text | Client resource URL | v2/factfinds/234/clients/1234 |
 
 **factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
+| id | Number | Unique FactFind identifier | 234 |
+| href | Text | FactFind resource URL | v2/factfinds/234 |
 
-**thirdPartyMarketing:**
+### Enumerations
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| consentDate | Text |  | None |
-| optIn | Yes/No |  | No |
+#### canContactForMarketingPurposes Values
+- `Yes` - Client has consented to marketing contact
+- `No` - Client has not consented or has withdrawn consent
+
+#### deliveryMethod Values
+- `NoPreference` - No preference specified
+- `Electronic` - Prefers electronic delivery
+- `Post` - Prefers postal delivery
+
+#### accessibleFormat Values
+- `NoRequirement` - No accessible format required
+- `LargePrint` - Large print format required
+- `AudioTape` - Audio tape format required
+- `Braille` - Braille format required
 
 ---
 

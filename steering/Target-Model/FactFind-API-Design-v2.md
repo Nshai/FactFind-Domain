@@ -160,6 +160,9 @@ The FactFind API provides comprehensive digital capabilities for:
    - [5.9 Identity Verification](#59-identity-verification)
       - [5.9.1 Get Identity Verification](#591-get-identity-verification)
       - [5.9.2 Update Identity Verification](#592-update-identity-verification)
+   - [5.10 Marketing Preferences](#510-marketing-preferences)
+      - [5.10.1 Get Marketing Preferences](#5101-get-marketing-preferences)
+      - [5.10.2 Update Marketing Preferences](#5102-update-marketing-preferences)
 6. [Income & Expenditure API (Circumstances Context)](#6-income--expenditure-api-circumstances-context)
    - [6.1 Overview](#61-overview)
    - [6.2 Operations Summary](#62-operations-summary)
@@ -548,7 +551,7 @@ Resources are organized into **business contexts** that reflect the domain model
 
 | Context | Resources | Base Path |
 |---------|-----------|-----------|
-| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Consent, Vulnerabilities, ID Verification, Professional Contacts | `/api/v2/factfinds/{id}/clients/{id}/*` |
+| **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Consent, Marketing Preferences, Vulnerabilities, ID Verification, Professional Contacts | `/api/v2/factfinds/{id}/clients/{id}/*` |
 | **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v2/factfinds/{id}/clients/{id}/*` |
 | **Assets & Liabilities** | **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v2/factfinds/{id}/arrangements/{type}` |
 | **Goals & Objectives** | Objectives (investment, pension, protection, mortgages, budget, estate-planning), Needs | `/api/v2/factfinds/{id}/objectives/{type}` |
@@ -2097,8 +2100,8 @@ All subsequent API sections (5-11) document resources that are **nested under** 
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Update identity verification details | `client:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Get data protection consent | `client:read` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Update DPA consent | `client:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Get marketing preferences | `client:read` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Update marketing consent | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get marketing preferences | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update marketing preferences | `client:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | List all client vulnerabilities | `client:read` |
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | Create a vulnerability | `client:write` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}` | Update a vulnerability | `client:write` |
@@ -5071,6 +5074,96 @@ Use: Demonstrate suitability in file review
 - Verification expires based on `verification.expiryOn` date
 - Supporting documents should be retained for regulatory compliance (typically 7 years)
 - AML checks should be refreshed periodically based on risk assessment
+
+---
+
+### 5.10 Marketing Preferences
+
+**Description:** Manage marketing consent and communication preferences for a client. This is a singleton resource per client - each client has exactly one marketing preferences record.
+
+#### 5.10.1 Get Marketing Preferences
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences`
+
+**Description:** Retrieve marketing preferences for a client.
+
+**Response:**
+```json
+{
+  "client": {
+    "id": 1234,
+    "href": "v2/factfinds/234/clients/1234"
+  },
+  "factfind": {
+    "id": 234,
+    "href": "v2/factfinds/234"
+  },
+  "allowCompanyContactByTelephone": true,
+  "allowCompanyContactByMail": true,
+  "allowCompanyContactByEmail": true,
+  "allowCompanyContactBySms": true,
+  "allowCompanyContactBySocialMedia": true,
+  "allowCompanyContactByAutomatedCalls": true,
+  "allowCompanyContactByPfp": true,
+  "allowThirdPartyContactByTelephone": true,
+  "allowThirdPartyContactByMail": true,
+  "allowThirdPartyContactByEmail": true,
+  "allowThirdPartyContactBySms": true,
+  "allowThirdPartyContactBySocialMedia": true,
+  "allowThirdPartyContactByAutomatedCalls": true,
+  "allowThirdPartyContactByPfp": true,
+  "canContactForMarketingPurposes": "Yes",
+  "consentedAt": "2026-02-23T17:49:54.183Z",
+  "deliveryMethod": "NoPreference",
+  "accessibleFormat": "NoRequirement"
+}
+```
+
+#### 5.10.2 Update Marketing Preferences
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences`
+
+**Description:** Update marketing preferences for a client. This endpoint creates or updates the singleton marketing preferences record.
+
+**Request Body:**
+```json
+{
+  "allowCompanyContactByTelephone": true,
+  "allowCompanyContactByMail": true,
+  "allowCompanyContactByEmail": true,
+  "allowCompanyContactBySms": false,
+  "allowCompanyContactBySocialMedia": false,
+  "allowCompanyContactByAutomatedCalls": false,
+  "allowCompanyContactByPfp": true,
+  "allowThirdPartyContactByTelephone": false,
+  "allowThirdPartyContactByMail": false,
+  "allowThirdPartyContactByEmail": false,
+  "allowThirdPartyContactBySms": false,
+  "allowThirdPartyContactBySocialMedia": false,
+  "allowThirdPartyContactByAutomatedCalls": false,
+  "allowThirdPartyContactByPfp": false,
+  "canContactForMarketingPurposes": "Yes",
+  "consentedAt": "2026-02-23T17:49:54.183Z",
+  "deliveryMethod": "Electronic",
+  "accessibleFormat": "NoRequirement"
+}
+```
+
+**Response:** Same as GET response above.
+
+**Validation Rules:**
+- `canContactForMarketingPurposes` - Required, enum: Yes, No
+- `consentedAt` - Required when canContactForMarketingPurposes = "Yes"
+- `deliveryMethod` - Optional, enum: NoPreference, Electronic, Post
+- `accessibleFormat` - Optional, enum: NoRequirement, LargePrint, AudioTape, Braille
+- All `allow*` fields are boolean (true/false)
+
+**Business Rules:**
+- If `canContactForMarketingPurposes` = "No", all allow* fields should be false
+- At least one company contact channel should be true if canContactForMarketingPurposes = "Yes"
+- Third-party contact permissions are independent of company contact permissions
+- Consent timestamp must be captured when preferences are first set or modified
+- PECR and GDPR compliance requires explicit opt-in for marketing communications
 
 ---
 
@@ -27465,87 +27558,93 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 
 ### 14.35 Marketing Preferences Contract
 
-The `MarketingPreferences` contract represents a client's marketing consent and communication preferences.
+The `MarketingPreferences` contract represents a client's marketing consent and communication preferences. This is a singleton resource per client.
 
-**Reference Type:** MarketingPreferences is a reference type with identity (has `id` field).
+**Singleton Resource:** Each client has exactly one marketing preferences record.
 
 **Key Features:**
-- GDPR-compliant consent tracking
-- Channel-specific preferences (email, phone, post, SMS)
-- Product/service interest categories
-- Consent date and source tracking
-- Opt-out management
-- Third-party marketing consent
+- GDPR and PECR-compliant consent tracking
+- Channel-specific permissions for company and third-party communications
+- Delivery method preferences
+- Accessible format requirements
+- Explicit consent timestamp
 
 #### Complete Marketing Preferences Contract
 
 ```json
 {
-  "id": 6666,
-  "href": "/api/v2/factfinds/679/clients/123/marketing-preferences/6666",
-  "factfind": {
-    "id": 679,
-    "href": "/api/v2/factfinds/679"
-  },
   "client": {
-    "id": 123,
-    "href": "/api/v2/factfinds/679/clients/123"
+    "id": 1234,
+    "href": "v2/factfinds/234/clients/1234"
   },
-  "lastUpdated": "2026-01-15",
-  "overallConsent": true,
-  "channelPreferences": {
-    "email": {
-      "optIn": true,
-      "consentDate": "2026-01-15",
-      "consentMethod": "Online Form"
-    },
-    "phone": {
-      "optIn": false,
-      "consentDate": null,
-      "consentMethod": null
-    },
-    "post": {
-      "optIn": true,
-      "consentDate": "2026-01-15",
-      "consentMethod": "Written Consent"
-    },
-    "sms": {
-      "optIn": false,
-      "consentDate": null,
-      "consentMethod": null
-    }
+  "factfind": {
+    "id": 234,
+    "href": "v2/factfinds/234"
   },
-  "productInterests": [
-    {
-      "category": "Pensions",
-      "interestedIn": true
-    },
-    {
-      "category": "Investments",
-      "interestedIn": true
-    },
-    {
-      "category": "Mortgages",
-      "interestedIn": false
-    },
-    {
-      "category": "Protection",
-      "interestedIn": true
-    }
-  ],
-  "thirdPartyMarketing": {
-    "optIn": false,
-    "consentDate": null
-  },
-  "suppressionList": false,
-  "dataRetentionConsent": true,
-  "privacyNoticeVersion": "2.1",
-  "privacyNoticeAcceptedDate": "2026-01-15",
-  "notes": "Client prefers email contact for newsletters and updates",
-  "createdAt": "2026-01-15T10:00:00Z",
-  "updatedAt": "2026-01-15T10:00:00Z"
+  "allowCompanyContactByTelephone": true,
+  "allowCompanyContactByMail": true,
+  "allowCompanyContactByEmail": true,
+  "allowCompanyContactBySms": true,
+  "allowCompanyContactBySocialMedia": true,
+  "allowCompanyContactByAutomatedCalls": true,
+  "allowCompanyContactByPfp": true,
+  "allowThirdPartyContactByTelephone": true,
+  "allowThirdPartyContactByMail": true,
+  "allowThirdPartyContactByEmail": true,
+  "allowThirdPartyContactBySms": true,
+  "allowThirdPartyContactBySocialMedia": true,
+  "allowThirdPartyContactByAutomatedCalls": true,
+  "allowThirdPartyContactByPfp": true,
+  "canContactForMarketingPurposes": "Yes",
+  "consentedAt": "2026-02-23T17:49:54.183Z",
+  "deliveryMethod": "NoPreference",
+  "accessibleFormat": "NoRequirement"
 }
 ```
+
+#### Field Descriptions
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `client.id` | number | Yes | Client identifier |
+| `client.href` | string | Yes | Client resource URL |
+| `factfind.id` | number | Yes | FactFind identifier |
+| `factfind.href` | string | Yes | FactFind resource URL |
+| `allowCompanyContactByTelephone` | boolean | Yes | Permission for company telephone contact |
+| `allowCompanyContactByMail` | boolean | Yes | Permission for company mail contact |
+| `allowCompanyContactByEmail` | boolean | Yes | Permission for company email contact |
+| `allowCompanyContactBySms` | boolean | Yes | Permission for company SMS contact |
+| `allowCompanyContactBySocialMedia` | boolean | Yes | Permission for company social media contact |
+| `allowCompanyContactByAutomatedCalls` | boolean | Yes | Permission for company automated calls |
+| `allowCompanyContactByPfp` | boolean | Yes | Permission for company PFP contact |
+| `allowThirdPartyContactByTelephone` | boolean | Yes | Permission for third-party telephone contact |
+| `allowThirdPartyContactByMail` | boolean | Yes | Permission for third-party mail contact |
+| `allowThirdPartyContactByEmail` | boolean | Yes | Permission for third-party email contact |
+| `allowThirdPartyContactBySms` | boolean | Yes | Permission for third-party SMS contact |
+| `allowThirdPartyContactBySocialMedia` | boolean | Yes | Permission for third-party social media contact |
+| `allowThirdPartyContactByAutomatedCalls` | boolean | Yes | Permission for third-party automated calls |
+| `allowThirdPartyContactByPfp` | boolean | Yes | Permission for third-party PFP contact |
+| `canContactForMarketingPurposes` | string | Yes | Whether marketing contact is permitted. Enum: Yes, No |
+| `consentedAt` | datetime | Yes* | Timestamp when consent was given (*Required when canContactForMarketingPurposes = "Yes") |
+| `deliveryMethod` | string | No | Preferred delivery method. Enum: NoPreference, Electronic, Post |
+| `accessibleFormat` | string | No | Required accessible format. Enum: NoRequirement, LargePrint, AudioTape, Braille |
+
+#### Enumeration Values
+
+**canContactForMarketingPurposes:**
+- `Yes` - Client has consented to marketing contact
+- `No` - Client has not consented or has withdrawn consent
+
+**deliveryMethod:**
+- `NoPreference` - No preference specified
+- `Electronic` - Prefers electronic delivery
+- `Post` - Prefers postal delivery
+
+**accessibleFormat:**
+- `NoRequirement` - No accessible format required
+- `LargePrint` - Large print format required
+- `AudioTape` - Audio tape format required
+- `Braille` - Braille format required
 
 ---
 
@@ -34276,7 +34375,7 @@ Assessment rate: Typically 5.5% (stress test rate)
 - PROFESSIONAL_CONTACT → `/api/v2/factfinds/{factfindId}/clients/{id}/professional-contacts`
 - CLIENT_RELATIONSHIP → `/api/v2/factfinds/{factfindId}/clients/{id}/relationships`
 - DPA_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/dpa-consent`
-- MARKETING_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/marketing-consent`
+- MARKETING_CONSENT → `/api/v2/factfinds/{factfindId}/clients/{id}/marketing-preferences`
 - VULNERABLE_CUSTOMER_FLAG → `/api/v2/factfinds/{factfindId}/clients/{id}/vulnerabilities`
 - DEPENDANT → `/api/v2/factfinds/{factfindId}/clients/{id}/dependants`
 

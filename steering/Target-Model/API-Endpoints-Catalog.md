@@ -132,17 +132,12 @@
 | DELETE | `/api/v1/factfinds/{id}/clients/{clientId}/data` | Right to be forgotten (RTBF) | ⭐ GDPR compliance |
 | POST | `/api/v1/factfinds/{id}/clients/{clientId}/data/export` | Data portability request | ⭐ GDPR compliance |
 
-### Marketing Consent
+### Marketing Preferences
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-consent` | Get marketing consent | ⭐ New in v3.0 |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-consent` | Record marketing consent | ⭐ PECR compliance |
-| PATCH | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-consent` | Update marketing consent | ⭐ New in v3.0 |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-consent/history` | Get consent history | ⭐ Audit trail |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-consent/opt-in` | Opt-in to marketing | ⭐ PECR compliance |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-consent/opt-out` | Opt-out of marketing | ⭐ PECR compliance |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-consent/unsubscribe` | Unsubscribe (one-click) | ⭐ PECR compliance |
+| GET | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-preferences` | Get marketing preferences | ⭐ Singleton resource per client |
+| PUT | `/api/v1/factfinds/{id}/clients/{clientId}/marketing-preferences` | Update marketing preferences | ⭐ PECR/GDPR compliance |
 
 ### Vulnerabilities
 
@@ -698,7 +693,7 @@ Calculate and track client net worth.
 
 ### GDPR Compliance
 - Section 2.7: DPA Consent API (Data processing consent)
-- Section 2.8: Marketing Consent API (Marketing consent)
+- Section 2.8: Marketing Preferences API (Marketing consent)
 - Section 2.11: Identity Verification (Data processing)
 - Section 7.3: Declaration Capture (Consent management)
 
@@ -708,7 +703,7 @@ Calculate and track client net worth.
 - Section 2.5: Professional Contacts (Beneficial ownership)
 
 ### PECR Compliance
-- Section 2.8: Marketing Consent API (Electronic marketing)
+- Section 2.8: Marketing Preferences API (Electronic marketing)
 - Section 2.7: DPA Consent (Privacy and communications)
 
 ### Tax Compliance
