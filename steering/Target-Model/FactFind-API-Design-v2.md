@@ -2051,517 +2051,413 @@ All subsequent API sections (5-11) document resources that are **nested under** 
 ---
 ### 4.1 Overview
 
-**Purpose:** Manage client identities, relationships, and regulatory onboarding requirements.
+**Purpose:** Manage FactFind resources as the aggregate root for financial planning sessions.
 
 **Scope:**
-- Client registration (Person, Corporate, Trust)
-- Contact details management
-- Address management
-- Identity verification (KYC/AML)
-- Data protection consent (GDPR)
-- Marketing preferences
-- Vulnerability assessments
-- Professional contacts (solicitors, accountants)
-- Family relationships and dependants
+- FactFind lifecycle management (create, read, update, delete)
+- FactFind status and completion tracking
+- Aggregated financial position summaries
+- Net worth calculations
+- Financial health metrics
+- Cash flow analysis
+- Asset allocation summaries
 
-**Aggregate Root:** FactFind (clients are nested within)
+**Aggregate Root:** FactFind
+
+**Nested Resources:** All other resources (clients, arrangements, objectives, etc.) are nested under FactFind
 
 **Regulatory Compliance:**
-- FCA COBS (Client Classification)
-- Money Laundering Regulations 2017 (AML/CTF)
-- GDPR (Data Protection)
-- Consumer Duty (Vulnerable Customers)
+- FCA COBS 9.2 (Assessing Suitability)
+- Consumer Duty (Understanding customer needs)
+- MiFID II (Product Governance)
 
 ### 4.2 Operations Summary
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| **Core Client Operations** | | | |
-| GET | `/api/v2/factfinds/{factfindId}/clients` | List clients with filtering | `client:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients` | Create new client | `client:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Get client details | `client:read` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Update client | `client:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Delete client (soft delete) | `client:write` |
-| **Address Management** | | | |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | `client:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | Add address | `client:write` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Update address | `client:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Remove address | `client:write` |
-| **Contact Management** | | | |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact details | `client:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact detail | `client:write` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Update contact | `client:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Remove contact | `client:write` |
-| **Relationship Management** | | | |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | List relationships | `client:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | Create relationship | `client:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{id}` | Remove relationship | `client:write` |
-| **DPA Consent** | | | |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Get data protection consent | `client:read` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Update DPA consent | `client:write` |
+| **FactFind Lifecycle** | | | |
+| GET | `/api/v2/factfinds` | List all fact finds | `factfind:read` |
+| POST | `/api/v2/factfinds` | Create new fact find | `factfind:write` |
+| GET | `/api/v2/factfinds/{factfindId}` | Get fact find details | `factfind:read` |
+| PUT | `/api/v2/factfinds/{factfindId}` | Update fact find | `factfind:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}` | Delete fact find (soft delete) | `factfind:write` |
+| POST | `/api/v2/factfinds/{factfindId}/complete` | Mark fact find as complete | `factfind:write` |
+| **Aggregated Views** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/summary` | Get financial summary | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/current-position` | Get current financial position | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/net-worth` | Get net worth calculation | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/financial-health` | Get financial health score | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/cash-flow` | Get cash flow analysis | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/asset-allocation` | Get asset allocation breakdown | `factfind:read` |
 
-**Total Endpoints:** 21
+**Total Endpoints:** 12
 
-**Note:** For client management operations (estate planning, dependants, vulnerabilities, identity verification, marketing preferences, notes, custom questions), see Section 5 - Client Management API.
+**Note:** For client management operations (clients, addresses, contacts, relationships, estate planning, dependants, vulnerabilities, identity verification, marketing preferences, notes, custom questions, DPA consent), see Section 5 - Client Management API.
 
 ### 4.3 Key Endpoints
 
-#### 4.3.1 Create Client
+This section documents the core FactFind resource operations for managing the lifecycle of fact-finding sessions.
 
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients`
+#### 4.3.1 List FactFinds
 
-**Description:** Create a new client record (Person, Corporate, or Trust).
+**Endpoint:** `GET /api/v2/factfinds`
 
-**Contract:** Uses the unified `Client` contract (see Section 12.1). The same contract structure is used for request and response. Read-only fields (`id`, `createdAt`, `updatedAt`, computed fields) are ignored in the request and populated by the server in the response.
+**Description:** Retrieve a list of all fact finds accessible by the authenticated user, with optional filtering and pagination.
 
-**Request Headers:**
-```http
-Content-Type: application/json
-Authorization: Bearer {token}
-```
-
-**Request Body (Person):**
-Client contract with required-on-create fields. Read-only and computed fields are ignored.
-```json
-{
-  "clientType": "Person",
-  "name": {
-    "title": "MR",
-    "firstName": "John",
-    "middleName": "Michael",
-    "lastName": "Smith",
-    "preferredName": "John"
-  },
-  "salutation": "Mr Smith",
-  "dateOfBirth": "1980-05-15",
-  "gender": "M",
-  "maritalStatus": "MAR",
-  "taxDetails": {
-    "niNumber": "AB123456C"
-  },
-  "nationalityCountry": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfBirth": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfResidence": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "isUkResident": true,
-  "isExpatriate": false,
-  "isDeceased": false,
-  "hasEverSmoked": false,
-  "inGoodHealth": true,
-  "hasWill": true,
-  "isWillUpToDate": true,
-  "isPowerOfAttorneyGranted": false,
-  "adviser": {
-    "id": 789
-  }
-}
-```
-
-**Response:**
-Complete `Client` contract with all fields populated, including server-generated fields.
-
-```http
-HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/123
-ETag: "33a64df551425fcc55e4d42a148795d9f25f89d4"
-Content-Type: application/json
-
-{
-  "id": 123,
-  "clientNumber": "C00001234",
-  "clientType": "Person",
-  "name": {
-    "title": "MR",
-    "firstName": "John",
-    "middleName": "Michael",
-    "lastName": "Smith",
-    "preferredName": "John"
-  },
-  "fullName": "Mr John Michael Smith",
-  "salutation": "Mr Smith",
-  "dateOfBirth": "1980-05-15",
-  "age": 45,
-  "gender": "M",
-  "maritalStatus": "MAR",
-  "taxDetails": {
-    "niNumber": "AB123456C"
-  },
-  "nationalityCountry": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfBirth": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfResidence": {
-    "code": "GB",
-    "name": "United Kingdom"
-  },
-  "isUkResident": true,
-  "isExpatriate": false,
-  "isDeceased": false,
-  "hasEverSmoked": false,
-  "isSmoker": "Never",
-  "inGoodHealth": true,
-  "hasWill": true,
-  "isWillUpToDate": true,
-  "isPowerOfAttorneyGranted": false,
-  "primaryAdviser": {
-    "id": 789,
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "href": "/api/v2/advisers/789"
-  },
-  "serviceStatus": "Active",
-  "clientSegment": "A",
-  "createdAt": "2026-02-16T14:30:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z",
-  "createdBy": {
-    "id": 999,
-    "name": "System Admin"
-  },
-  "updatedBy": {
-    "id": 999,
-    "name": "System Admin"
-  }/clients/123"
-    },
-    "update": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/123",
-      "method": "PUT"
-    },
-    "addresses": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/123/addresses"
-    },
-    "contacts": {
-      "href": "/api/v2/factfinds/{factfindId}/clients/123/contacts"
-    },
-    "factfinds": {
-      "href": "/api/v2/factfinds?clientId=123"
-    },
-    "arrangements": {
-      "href": "/api/v2/factfinds/{factfindId}/arrangements?clientId=123"
-    }
-  }
-}
-```
-
-**Status Codes:**
-- `201 Created` - Client created successfully
-- `400 Bad Request` - Validation errors
-- `401 Unauthorized` - Invalid or missing authentication token
-- `403 Forbidden` - Insufficient permissions
-- `409 Conflict` - Client with same NI number already exists
-
-**Validation Rules:**
-- `firstName` - Required, max 100 characters
-- `lastName` - Required, max 100 characters
-- `dateOfBirth` - Required, must be in past, minimum age 18
-- `nationalInsuranceNumber` - Optional, UK NI format validation
-- `clientType` - Required, one of: Person, Corporate, Trust
-- `gender` - Required for Person, one of: Male, Female, Other, PreferNotToSay
-- `maritalStatus` - Optional, one of: Single, Married, Divorced, Widowed, CivilPartnership, Separated
-
-**Business Rules:**
-- National Insurance Number must be unique across all clients
-- Date of Birth must represent age 18 or older for full client
-- UK resident requires UK address
-- Primary adviser must be an active adviser in the system
-
-#### 4.3.2 Get Client
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}`
-
-**Description:** Retrieve complete client details including demographic information.
-
-**Contract:** Returns the complete unified `Client` contract (see Section 12.1) with all fields populated.
-
-**Request Headers:**
-```http
-Authorization: Bearer {token}
-```
+**Authorization:** `factfind:read`
 
 **Query Parameters:**
-- `expand` (optional) - Comma-separated list: `addresses,contacts,dependants,relationships`
-- `fields` (optional) - Comma-separated field list for sparse fieldsets (returns `Client` contract with only requested fields)
+- `status` (string, optional) - Filter by status: `INP` (In Progress), `COM` (Completed), `ARC` (Archived)
+- `adviserId` (integer, optional) - Filter by adviser ID
+- `clientId` (integer, optional) - Filter by client ID
+- `fromDate` (date, optional) - Filter fact finds created on or after this date (ISO 8601 format)
+- `toDate` (date, optional) - Filter fact finds created on or before this date (ISO 8601 format)
+- `page` (integer, optional) - Page number (default: 1)
+- `pageSize` (integer, optional) - Number of records per page (default: 50, max: 100)
+- `sortBy` (string, optional) - Sort field: `createdAt`, `updatedAt`, `factFindNumber` (default: `createdAt`)
+- `sortOrder` (string, optional) - Sort order: `asc`, `desc` (default: `desc`)
 
-**Response:**
-Complete `Client` contract.
-```json
-{
-  "id": 123,
-  "clientType": "Person",
-  "name": {
-    "title": "MR",
-    "firstName": "John",
-    "middleName": "Michael",
-    "lastName": "Smith"
-  },
-  "fullName": "Mr John Michael Smith",
-  "dateOfBirth": "1980-05-15",
-  "age": 45,
-  "gender": "M",
-  "maritalStatus": {
-    "code": "MAR",
-    "display": "Married",
-    "effectiveFrom": "2005-06-20"
-  },
-  "nationalInsuranceNumber": "AB123456C",
-  "nationalityCountry": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfBirth": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "countryOfResidence": {
-    "code": "GB",
-    "display": "United Kingdom",
-    "alpha3": "GBR"
-  },
-  "isUkResident": true,
-  "isExpatriate": false,
-  "hasWill": true,
-  "isWillUpToDate": true,
-  "willDetails": "Will created in 2020, held by Smith & Co Solicitors",
-  "isPowerOfAttorneyGranted": false,
-  "hasEverSmoked": false,
-  "isSmoker": "Never",
-  "inGoodHealth": true,
-  "serviceStatus": "Active",
-  "serviceStatusDate": "2020-01-15",
-  "clientSegment": "A",
-  "clientSegmentDate": "2020-01-15",
-  "financialProfile": {
-    "grossAnnualIncome": {
-      "amount": 75000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "householdIncome": {
-      "amount": 120000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "netWorth": {
-      "amount": 450000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "totalAssets": {
-      "amount": 500000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "calculatedAt": "2026-02-18T10:30:00Z",
-    "lastReviewDate": "2026-02-18"
-  },
-  "primaryAdviser": {
-    "id": 789,
-    "firstName": "Jane",
-    "lastName": "Doe",
-    "email": "jane.doe@example.com",
-    "href": "/api/v2/advisers/789"
-  },
-  "createdAt": "2020-01-15T10:30:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z"/clients/123" },
-    "update": { "href": "/api/v2/factfinds/{factfindId}/clients/123", "method": "PUT" },
-    "addresses": { "href": "/api/v2/factfinds/{factfindId}/clients/123/addresses" },
-    "contacts": { "href": "/api/v2/factfinds/{factfindId}/clients/123/contacts" },
-    "relationships": { "href": "/api/v2/factfinds/{factfindId}/clients/123/relationships" },
-    "dependants": { "href": "/api/v2/factfinds/{factfindId}/clients/123/dependants" },
-    "factfinds": { "href": "/api/v2/factfinds?clientId=123" },
-    "arrangements": { "href": "/api/v2/factfinds/{factfindId}/arrangements?clientId=123" },
-    "goals": { "href": "/api/v2/factfinds/{factfindId}/objectives?clientId=123" }
-  }
-}
-```
-
-**Status Codes:**
-- `200 OK` - Client retrieved successfully
-- `401 Unauthorized` - Invalid authentication
-- `403 Forbidden` - Insufficient permissions
-- `404 Not Found` - Client does not exist
-
-#### 4.3.3 List Clients
-
-**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients`
-
-**Description:** List clients with filtering, sorting, and pagination.
-
-**Contract:** Returns collection wrapper (see Section 12.8) containing an array of `Client` contracts. Use `fields` query parameter for sparse fieldsets.
-
-**Query Parameters:**
-- `search` (optional) - Full-text search across name fields
-- `clientType` (optional) - Filter by type: Person, Corporate, Trust
-- `serviceStatus` (optional) - Filter by status: Active, Inactive, Prospect
-- `adviserId` (optional) - Filter by primary adviser
-- `hasWill` (optional) - Filter by will status: true, false
-- `maritalStatus` (optional) - Filter by marital status
-- `sortBy` (optional) - Sort field: lastName, firstName, createdAt (default: lastName)
-- `sortOrder` (optional) - Sort direction: asc, desc (default: asc)
-- `limit` (optional) - Page size (default: 20, max: 100)
-- `cursor` (optional) - Pagination cursor
-- `expand` (optional) - Include related resources: addresses, contacts
-- `fields` (optional) - Comma-separated field list for sparse fieldsets (e.g., `id,fullName,serviceStatus`)
-
-**Response:**
-Collection wrapper with array of `Client` contracts (partial fields shown for brevity).
+**Response:** `200 OK`
 
 ```json
 {
   "data": [
     {
-      "id": 123,
-      "clientType": "Person",
-      "fullName": "Mr John Smith",
-      "firstName": "John",
-      "lastName": "Smith",
-      "dateOfBirth": "1980-05-15",
-      "age": 45,
-      "maritalStatus": "Married",
-      "serviceStatus": "Active",
-      "primaryAdviser": {
+      "id": 456,
+      "factFindNumber": "FF001234",
+      "status": "INP",
+      "client": {
+        "id": 123,
+        "href": "/api/v2/factfinds/456/clients/123",
+        "name": "John Smith",
+        "clientNumber": "C00001234"
+      },
+      "adviser": {
         "id": 789,
+        "href": "/api/v2/advisers/789",
         "name": "Jane Doe",
-        "href": "/api/v2/advisers/789"
-      }/clients/123" }
-      }
-    },
-    {
-      "id": 124,
-      "clientType": "Person",
-      "fullName": "Mrs Sarah Smith",
-      "firstName": "Sarah",
-      "lastName": "Smith",
-      "dateOfBirth": "1982-08-22",
-      "age": 43,
-      "maritalStatus": "Married",
-      "serviceStatus": "Active",
-      "primaryAdviser": {
-        "id": 789,
-        "name": "Jane Doe",
-        "href": "/api/v2/advisers/789"
-      }/clients/124" }
-      }
+        "code": "ADV001"
+      },
+      "meetingDetails": {
+        "meetingDate": "2026-02-16",
+        "meetingType": "INIT"
+      },
+      "createdAt": "2026-02-15T09:00:00Z",
+      "updatedAt": "2026-02-16T14:30:00Z"
     }
   ],
   "pagination": {
-    "limit": 20,
-    "hasMore": true,
-    "nextCursor": "eyJpZCI6MTI0fQ==",
-    "totalCount": 156
-  }/clients?limit=20"
-    },
-    "next": {
-      "href": "/api/v2/factfinds/{factfindId}/clients?limit=20&cursor=eyJpZCI6MTI0fQ=="
+    "page": 1,
+    "pageSize": 50,
+    "totalRecords": 1,
+    "totalPages": 1
+  }
+}
+```
+
+**Error Responses:**
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+
+---
+
+#### 4.3.2 Create FactFind
+
+**Endpoint:** `POST /api/v2/factfinds`
+
+**Description:** Create a new fact find session. This is the starting point for the fact-finding process.
+
+**Authorization:** `factfind:write`
+
+**Request Body:**
+
+```json
+{
+  "factFindNumber": "FF001234",
+  "clientRef": {
+    "id": 123
+  },
+  "jointClientRef": {
+    "id": 124
+  },
+  "adviserRef": {
+    "id": 789
+  },
+  "meetingDetails": {
+    "meetingDate": "2026-02-16",
+    "meetingType": "INIT",
+    "clientsPresent": "BothClients",
+    "othersPresent": false,
+    "scopeOfAdvice": {
+      "retirementPlanning": true,
+      "savingsAndInvestments": true,
+      "protection": true,
+      "mortgage": false,
+      "estatePlanning": false
     }
   }
 }
 ```
 
-#### 4.3.4 Add Address
+**Response:** `201 Created`
 
-**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{id}/addresses`
+Returns the complete FactFind contract (see Section 14.2 for full structure).
 
-**Description:** Add a new address for a client (residential, correspondence, etc.).
-
-**Request Body:**
 ```json
 {
-  "addressType": "Residential",
-  "addressLine1": "123 High Street",
-  "addressLine2": "Apartment 4B",
-  "city": "London",
-  "postcode": "SW1A 1AA",
-  "county": {
-    "code": "GB-LND",
-    "name": "London"
-  },
-  "country": {
-    "code": "GB",
-    "name": "United Kingdom"
-  },
-  "correspondenceAddress": true,
-  "residentFromDate": "2020-01-15",
-  "residencyStatus": "Owner",
-  "isOnElectoralRoll": true
-}
-```
-
-**Response:**
-```http
-HTTP/1.1 201 Created
-Location: /api/v2/factfinds/{factfindId}/clients/123/addresses/456
-
-{
   "id": 456,
+  "factFindNumber": "FF001234",
+  "status": "INP",
   "client": {
     "id": 123,
-    "href": "/api/v2/factfinds/{factfindId}/clients/123",
+    "href": "/api/v2/factfinds/456/clients/123",
     "name": "John Smith",
     "clientNumber": "C00001234",
     "type": "Person"
   },
-  "addressType": "Residential",
-  "address": {
-    "line1": "123 High Street",
-    "line2": "Apartment 4B",
-    "city": "London",
-    "county": "Greater London",
-    "postcode": "SW1A 1AA",
-    "country": "GB"
+  "jointClientRef": {
+    "id": 124,
+    "href": "/api/v2/factfinds/456/clients/124",
+    "name": "Sarah Smith",
+    "clientNumber": "C00001235",
+    "type": "Person"
   },
-  "isCorrespondenceAddress": true,
-  "residencyPeriod": {
-    "startDate": "2020-01-15",
-    "endDate": null
+  "adviser": {
+    "id": 789,
+    "href": "/api/v2/advisers/789",
+    "name": "Jane Doe",
+    "code": "ADV001"
   },
-  "residencyStatus": "Owner",
-  "isOnElectoralRoll": true,
-  "durationAtAddressYears": 6,
-  "durationAtAddressMonths": 1,
-  "createdAt": "2026-02-16T14:30:00Z"/clients/123/addresses/address-456" },
-    "client": { "href": "/api/v2/factfinds/{factfindId}/clients/123" }
+  "meetingDetails": {
+    "meetingDate": "2026-02-16",
+    "meetingType": "INIT",
+    "clientsPresent": "BothClients",
+    "othersPresent": false,
+    "othersPresentDetails": null,
+    "scopeOfAdvice": {
+      "retirementPlanning": true,
+      "savingsAndInvestments": true,
+      "protection": true,
+      "mortgage": false,
+      "estatePlanning": false
+    }
+  },
+  "createdAt": "2026-02-15T09:00:00Z",
+  "updatedAt": "2026-02-15T09:00:00Z"
+}
+```
+
+**Error Responses:**
+- `400 Bad Request` - Invalid request data or validation errors
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Referenced client or adviser not found
+- `409 Conflict` - Duplicate factFindNumber
+
+---
+
+#### 4.3.3 Get FactFind
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}`
+
+**Description:** Retrieve detailed information about a specific fact find, including all computed summaries and aggregate data.
+
+**Authorization:** `factfind:read`
+
+**Path Parameters:**
+- `factfindId` (integer, required) - The unique identifier of the fact find
+
+**Query Parameters:**
+- `include` (string, optional) - Comma-separated list of related resources to include: `financialSummary`, `assetHoldings`, `investmentCapacity`, `completionStatus`, `atrAssessment`
+
+**Response:** `200 OK`
+
+Returns the complete FactFind contract with all requested includes (see Section 14.2 for full contract structure).
+
+```json
+{
+  "id": 456,
+  "factFindNumber": "FF001234",
+  "status": "INP",
+  "client": {
+    "id": 123,
+    "href": "/api/v2/factfinds/456/clients/123",
+    "name": "John Smith",
+    "clientNumber": "C00001234",
+    "type": "Person"
+  },
+  "adviser": {
+    "id": 789,
+    "href": "/api/v2/advisers/789",
+    "name": "Jane Doe",
+    "code": "ADV001"
+  },
+  "meetingDetails": {
+    "meetingDate": "2026-02-16",
+    "meetingType": "INIT",
+    "clientsPresent": "BothClients"
+  },
+  "financialSummary": {
+    "income": {
+      "annualGross": {
+        "amount": 120000.00,
+        "currency": {"code": "GBP", "symbol": "£"}
+      }
+    },
+    "expenditure": {
+      "monthlyTotal": {
+        "amount": 4500.00,
+        "currency": {"code": "GBP", "symbol": "£"}
+      }
+    }
+  },
+  "createdAt": "2026-02-15T09:00:00Z",
+  "updatedAt": "2026-02-16T14:30:00Z"
+}
+```
+
+**Error Responses:**
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+
+---
+
+#### 4.3.4 Update FactFind
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}`
+
+**Description:** Update an existing fact find's details. Only updatable fields can be modified (see Section 14.2 for field annotations).
+
+**Authorization:** `factfind:write`
+
+**Path Parameters:**
+- `factfindId` (integer, required) - The unique identifier of the fact find
+
+**Request Body:**
+
+```json
+{
+  "factFindNumber": "FF001234-UPDATED",
+  "meetingDetails": {
+    "meetingDate": "2026-02-20",
+    "meetingType": "REV",
+    "clientsPresent": "BothClients",
+    "othersPresent": true,
+    "othersPresentDetails": "Accountant present for tax discussion",
+    "scopeOfAdvice": {
+      "retirementPlanning": true,
+      "savingsAndInvestments": true,
+      "protection": true,
+      "mortgage": true,
+      "estatePlanning": true
+    }
   }
 }
 ```
 
-**Validation Rules:**
-- `addressLine1` - Required, max 100 characters
-- `city` - Required, max 50 characters
-- `postcode` - Required for UK addresses, format validation
-- `country` - Required
-- `addressType` - Required, one of: Residential, Correspondence, Previous, Business
-- `residencyStatus` - Optional, one of: Owner, Tenant, LivingWithFamily, Other
+**Response:** `200 OK`
+
+Returns the updated FactFind contract (see Section 14.2 for full structure).
+
+**Error Responses:**
+- `400 Bad Request` - Invalid request data or validation errors
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions or fact find is completed
+- `404 Not Found` - FactFind not found
+- `409 Conflict` - Duplicate factFindNumber or concurrent modification
+
+---
+
+#### 4.3.5 Delete FactFind
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}`
+
+**Description:** Soft delete a fact find. The fact find is marked as deleted but not physically removed from the database for audit purposes.
+
+**Authorization:** `factfind:write`
+
+**Path Parameters:**
+- `factfindId` (integer, required) - The unique identifier of the fact find
+
+**Response:** `204 No Content`
+
+**Error Responses:**
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions or fact find is completed
+- `404 Not Found` - FactFind not found
+- `409 Conflict` - FactFind cannot be deleted (e.g., has completed recommendations)
+
+**Note:** Completed fact finds cannot be deleted to maintain regulatory audit trails. Use archival workflows instead.
+
+---
+
+#### 4.3.6 Complete FactFind
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/complete`
+
+**Description:** Mark a fact find as complete. This operation performs validation checks to ensure all required data is present and compliant before transitioning to completed status.
+
+**Authorization:** `factfind:write`
+
+**Path Parameters:**
+- `factfindId` (integer, required) - The unique identifier of the fact find
+
+**Request Body:**
+
+```json
+{
+  "completedBy": {
+    "id": 789
+  },
+  "completionNotes": "All client information verified. ATR assessment completed. Ready for recommendation."
+}
+```
+
+**Response:** `200 OK`
+
+```json
+{
+  "id": 456,
+  "factFindNumber": "FF001234",
+  "status": "COM",
+  "completionStatus": {
+    "isComplete": true,
+    "completedAt": "2026-02-20T16:45:00Z",
+    "completedBy": {
+      "id": 789,
+      "name": "Jane Doe"
+    },
+    "completionNotes": "All client information verified. ATR assessment completed. Ready for recommendation.",
+    "validationResults": {
+      "allChecksPass": true,
+      "requiredDataPresent": true,
+      "regulatoryCompliance": true,
+      "atrComplete": true,
+      "vulnerabilitiesAssessed": true
+    }
+  },
+  "createdAt": "2026-02-15T09:00:00Z",
+  "updatedAt": "2026-02-20T16:45:00Z"
+}
+```
+
+**Validation Checks:**
+- At least one client present
+- Client demographic information complete
+- ATR assessment completed (if investment advice required)
+- Vulnerability assessment performed (Consumer Duty)
+- DPA consent recorded
+- All mandatory sections completed based on scope of advice
+
+**Error Responses:**
+- `400 Bad Request` - Validation checks failed (response includes details of failed checks)
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+- `409 Conflict` - FactFind already completed
+
+---
 
 ### 4.4 Current Position Summary API
 
@@ -2896,6 +2792,24 @@ The financial health score is calculated on a 0-100 scale with five components:
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
+| **Client Management** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients` | List all clients in fact find | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients` | Create new client | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Get client details | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Update client | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Delete client | `client:write` |
+| **Address Management** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | Add new address | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Get address details | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Update address | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Delete address | `client:write` |
+| **Contact Management** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | List client contacts | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | Add new contact | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Get contact details | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Update contact | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Delete contact | `client:write` |
 | **Estate Planning** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
 | PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
@@ -2941,7 +2855,492 @@ The financial health score is calculated on a 0-100 scale with five components:
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get marketing preferences | `client:read` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update marketing preferences | `client:write` |
 
-**Total Endpoints:** 44
+**Total Endpoints:** 59
+
+---
+
+### 5.3 Client, Address, and Contact Management
+
+This section documents operations for managing clients and their associated addresses and contacts within a fact find.
+
+#### 5.3.1 List Clients
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients`
+
+**Description:** Retrieve all clients associated with a specific fact find.
+
+**Authorization:** `client:read`
+
+**Query Parameters:**
+- `clientType` (string, optional) - Filter by client type: `Person`, `Corporate`, `Trust`
+- `includeAddresses` (boolean, optional) - Include address history (default: false)
+- `includeContacts` (boolean, optional) - Include contact information (default: false)
+
+**Response:** `200 OK`
+
+```json
+{
+  "factfind": {
+    "id": 456,
+    "href": "/api/v2/factfinds/456",
+    "factFindNumber": "FF001234"
+  },
+  "clients": [
+    {
+      "id": 123,
+      "clientNumber": "C00001234",
+      "clientType": "Person",
+      "factfind": {
+        "id": 456,
+        "href": "/api/v2/factfinds/456"
+      },
+      "personValue": {
+        "firstName": "John",
+        "lastName": "Smith",
+        "fullName": "Mr John Smith",
+        "dateOfBirth": "1980-05-15"
+      }
+    }
+  ]
+}
+```
+
+**Error Responses:**
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+
+---
+
+#### 5.3.2 Create Client
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients`
+
+**Description:** Create a new client within a fact find. Supports Person, Corporate, and Trust client types.
+
+**Authorization:** `client:write`
+
+**Request Body (Person Client):**
+
+```json
+{
+  "clientType": "Person",
+  "personValue": {
+    "title": "MR",
+    "firstName": "John",
+    "lastName": "Smith",
+    "dateOfBirth": "1980-05-15",
+    "gender": "M",
+    "niNumber": "AB123456C"
+  },
+  "territorialProfile": {
+    "ukResident": true,
+    "ukDomicile": true,
+    "countryOfBirth": {
+      "code": "GB",
+      "display": "United Kingdom"
+    }
+  }
+}
+```
+
+**Response:** `201 Created`
+
+Returns the complete Client contract (see Section 14.1 for full structure).
+
+**Error Responses:**
+- `400 Bad Request` - Invalid request data or validation errors
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind not found
+- `409 Conflict` - Duplicate client number
+
+---
+
+#### 5.3.3 Get Client
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}`
+
+**Description:** Retrieve detailed information about a specific client.
+
+**Authorization:** `client:read`
+
+**Path Parameters:**
+- `factfindId` (integer, required) - The fact find identifier
+- `clientId` (integer, required) - The client identifier
+
+**Query Parameters:**
+- `include` (string, optional) - Comma-separated list: `addresses`, `contacts`, `territorialProfile`, `vulnerabilities`, `idVerification`, `marketingPreferences`
+
+**Response:** `200 OK`
+
+Returns the complete Client contract (see Section 14.1).
+
+**Error Responses:**
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client or FactFind not found
+
+---
+
+#### 5.3.4 Update Client
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}`
+
+**Description:** Update an existing client's information.
+
+**Authorization:** `client:write`
+
+**Path Parameters:**
+- `factfindId` (integer, required) - The fact find identifier
+- `clientId` (integer, required) - The client identifier
+
+**Request Body:**
+
+```json
+{
+  "personValue": {
+    "title": "MR",
+    "firstName": "John",
+    "middleNames": "Michael",
+    "lastName": "Smith",
+    "dateOfBirth": "1980-05-15",
+    "gender": "M",
+    "maritalStatus": {
+      "code": "MAR",
+      "display": "Married",
+      "effectiveFrom": "2005-06-20"
+    },
+    "occupation": "Senior Software Engineer",
+    "employmentStatus": "Employed"
+  }
+}
+```
+
+**Response:** `200 OK`
+
+Returns the updated Client contract.
+
+**Error Responses:**
+- `400 Bad Request` - Invalid request data or validation errors
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client or FactFind not found
+- `409 Conflict` - Concurrent modification
+
+---
+
+#### 5.3.5 Delete Client
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}`
+
+**Description:** Delete a client from a fact find. This is a soft delete for audit purposes.
+
+**Authorization:** `client:write`
+
+**Path Parameters:**
+- `factfindId` (integer, required) - The fact find identifier
+- `clientId` (integer, required) - The client identifier
+
+**Response:** `204 No Content`
+
+**Error Responses:**
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client or FactFind not found
+- `409 Conflict` - Client has associated arrangements or cannot be deleted
+
+---
+
+#### 5.3.6 List Client Addresses
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/addresses`
+
+**Description:** Retrieve all addresses associated with a client, including current and historical addresses.
+
+**Authorization:** `client:read`
+
+**Query Parameters:**
+- `addressType` (string, optional) - Filter by type: `RES` (Residential), `PREV` (Previous), `MAIL` (Mailing)
+- `isPrimary` (boolean, optional) - Filter by primary address
+- `includeHistorical` (boolean, optional) - Include historical addresses (default: true)
+
+**Response:** `200 OK`
+
+```json
+{
+  "client": {
+    "id": 123,
+    "fullName": "John Smith",
+    "href": "/api/v2/factfinds/456/clients/123"
+  },
+  "addresses": [
+    {
+      "id": 1,
+      "addressType": "RES",
+      "line1": "123 Main Street",
+      "line2": "Apartment 4B",
+      "city": "London",
+      "postcode": "SW1A 1AA",
+      "country": {
+        "code": "GB",
+        "display": "United Kingdom"
+      },
+      "isPrimary": true,
+      "fromDate": "2020-01-15",
+      "toDate": null,
+      "yearsAtAddress": 6
+    }
+  ]
+}
+```
+
+---
+
+#### 5.3.7 Add Client Address
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/addresses`
+
+**Description:** Add a new address to a client's address history.
+
+**Authorization:** `client:write`
+
+**Request Body:**
+
+```json
+{
+  "addressType": "RES",
+  "line1": "123 Main Street",
+  "line2": "Apartment 4B",
+  "city": "London",
+  "county": "GLA",
+  "postcode": "SW1A 1AA",
+  "country": {
+    "code": "GB",
+    "display": "United Kingdom"
+  },
+  "isPrimary": true,
+  "fromDate": "2020-01-15"
+}
+```
+
+**Response:** `201 Created`
+
+Returns the created address with generated `id`.
+
+**Error Responses:**
+- `400 Bad Request` - Invalid address data or validation errors
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client or FactFind not found
+
+---
+
+#### 5.3.8 Get Client Address
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}`
+
+**Description:** Retrieve details of a specific address.
+
+**Authorization:** `client:read`
+
+**Response:** `200 OK`
+
+Returns the address details.
+
+---
+
+#### 5.3.9 Update Client Address
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}`
+
+**Description:** Update an existing address.
+
+**Authorization:** `client:write`
+
+**Request Body:** Same structure as Add Client Address
+
+**Response:** `200 OK`
+
+Returns the updated address.
+
+---
+
+#### 5.3.10 Delete Client Address
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}`
+
+**Description:** Remove an address from the client's address history.
+
+**Authorization:** `client:write`
+
+**Response:** `204 No Content`
+
+**Error Responses:**
+- `400 Bad Request` - Cannot delete primary address if other addresses exist
+- `404 Not Found` - Address not found
+
+---
+
+#### 5.3.11 List Client Contacts
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/contacts`
+
+**Description:** Retrieve all contact methods for a client.
+
+**Authorization:** `client:read`
+
+**Query Parameters:**
+- `contactType` (string, optional) - Filter by type: `EMAIL`, `MOBILE`, `PHONE`, `WORK`, `FAX`
+- `isPrimary` (boolean, optional) - Filter by primary contact
+- `isVerified` (boolean, optional) - Filter by verification status
+
+**Response:** `200 OK`
+
+```json
+{
+  "client": {
+    "id": 123,
+    "fullName": "John Smith",
+    "href": "/api/v2/factfinds/456/clients/123"
+  },
+  "contacts": [
+    {
+      "id": 1,
+      "contactType": "EMAIL",
+      "value": "john.smith@example.com",
+      "isPrimary": true,
+      "isVerified": true,
+      "verifiedDate": "2020-01-15"
+    },
+    {
+      "id": 2,
+      "contactType": "MOBILE",
+      "value": "+44 7700 900123",
+      "isPrimary": true,
+      "isVerified": true
+    }
+  ]
+}
+```
+
+---
+
+#### 5.3.12 Add Client Contact
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/clients/{clientId}/contacts`
+
+**Description:** Add a new contact method for a client.
+
+**Authorization:** `client:write`
+
+**Request Body:**
+
+```json
+{
+  "contactType": "EMAIL",
+  "value": "john.smith@example.com",
+  "isPrimary": true,
+  "isVerified": false
+}
+```
+
+**Response:** `201 Created`
+
+Returns the created contact with generated `id`.
+
+**Error Responses:**
+- `400 Bad Request` - Invalid contact data or duplicate contact
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Client or FactFind not found
+
+---
+
+#### 5.3.13 Get Client Contact
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}`
+
+**Description:** Retrieve details of a specific contact method.
+
+**Authorization:** `client:read`
+
+**Response:** `200 OK`
+
+Returns the contact details.
+
+---
+
+#### 5.3.14 Update Client Contact
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}`
+
+**Description:** Update an existing contact method.
+
+**Authorization:** `client:write`
+
+**Request Body:** Same structure as Add Client Contact
+
+**Response:** `200 OK`
+
+Returns the updated contact.
+
+---
+
+#### 5.3.15 Delete Client Contact
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}`
+
+**Description:** Remove a contact method from the client.
+
+**Authorization:** `client:write`
+
+**Response:** `204 No Content`
+
+**Error Responses:**
+- `400 Bad Request` - Cannot delete primary contact if other contacts exist
+- `404 Not Found` - Contact not found
+
+---
+
+### 5.4 Estate Planning
+
+Estate planning operations including wills, lasting powers of attorney, gifts, and trusts.
+
+#### 5.4.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Record a new gift | `estate:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts by client | `estate:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get gift details | `estate:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift record | `estate:write` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | Create gift trust | `estate:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | List client's trusts | `estate:read` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Get trust details | `estate:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Update trust | `estate:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |
+
+---
+
+### 5.5 Dependants
+
+Operations for managing client dependants and their financial dependency information.
+
+#### 5.5.1 Operations Summary
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List all client's dependants | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add new dependant | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | `client:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Update dependant | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Delete dependant | `client:write` |
+
+---
 
 #### 5.5.2 List Dependants
 
