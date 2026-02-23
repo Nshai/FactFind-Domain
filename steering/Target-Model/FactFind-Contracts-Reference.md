@@ -66,7 +66,7 @@ Each contract section includes:
 - [13.37 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1337-estate-planning---lasting-power-of-attorney-lpa-contract)
 - [13.38 Estate Planning - Gift Contract](#1338-estate-planning---gift-contract)
 - [13.39 Estate Planning - Trust Contract](#1339-estate-planning---trust-contract)
-- [13.40 Identity Verification & Data Protection Consent Contract](#1340-identity-verification-&-data-protection-consent-contract)
+- [13.40 Identity Verification Contract](#1340-identity-verification-contract)
 - [13.41 Arrangement - Mortgage Contract](#1341-arrangement---mortgage-contract)
 - [13.42 Arrangement - Investment Contract (General Investment Account)](#1342-arrangement---investment-contract-general-investment-account)
 - [13.43 Arrangement - Protection Contract (Life Assurance)](#1343-arrangement---protection-contract-life-assurance)
@@ -5597,9 +5597,9 @@ The `Trust` contract represents trusts established by or benefiting the client.
 
 ---
 
-## 13.40 Identity Verification & Data Protection Consent Contract
+## 13.40 Identity Verification Contract
 ### Overview
-The `IdentityVerification` contract represents identity verification checks and data protection consents.
+The `IdentityVerification` contract represents comprehensive identity verification and KYC/AML compliance data for a client. This is a singleton resource - each client has exactly one identity verification record.
 
 ### Fields
 
@@ -5607,91 +5607,152 @@ The `IdentityVerification` contract represents identity verification checks and 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| amlChecks | Complex Data |  | Complex object |
-| client | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2026-01-05T10:00:00Z |
-| dataProtectionConsent | Complex Data | GDPR consent, data protection, and privacy management | Complex object |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| gdprRights | Complex Data |  | Complex object |
-| id | Number | Unique system identifier for this record | 11111 |
-| identityDocuments | List of Complex Data | Unique system identifier for this record | List with 2 item(s) |
-| nextReviewDate | Date |  | 2027-01-05 |
-| notes | Text |  | Full identity verification completed via Experian.... |
-| sourceOfWealth | Complex Data |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-01-05T10:00:00Z |
-| verificationDate | Date |  | 2026-01-05 |
-| verificationMethod | Text |  | ELECTRONIC_VERIFICATION |
-| verificationProvider | Text | Unique system identifier for this record | Experian Identity Check |
-| verificationReference | Text |  | EXP-2026-123456 |
-| verificationStatus | Text | Current status of the goal | VERIFIED |
+| href | Text | Resource URL | v2/factfinds/3454/clients/31514626/idverifications |
+| client | Complex Data | Client personal information | Complex object |
+| contacts | List of Complex Data | Contact methods | List with 1 item(s) |
+| currentAddress | Complex Data | Current residential address | Complex object |
+| previousAddresses | List of Complex Data | Address history | List with 1 item(s) |
+| clientIdentity | Complex Data | Identity documents | Complex object |
+| supportingDocuments | List of Reference Link | Uploaded document references | List with 1 item(s) |
+| adviser | Reference Link | Adviser who performed verification | Complex object |
+| verification | Complex Data | Witness and premises verification | Complex object |
+| verificationResult | Complex Data | Third-party verification result | Complex object |
+| comments | Text | Additional notes | successful. |
+| createdAt | DateTime | Record creation timestamp | 2024-01-16T09:00:00Z |
+| updatedAt | DateTime | Last update timestamp | 2024-01-16T15:20:00Z |
+| createdBy | Text | User who created the record | adviser@example.com |
+| updatedBy | Text | User who last updated the record | adviser@example.com |
 
 #### Nested Field Groups
-
-**amlChecks:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adverseMediaCheck | Complex Data |  | Complex object |
-| checkDate | Date |  | 2026-01-05 |
-| performed | Yes/No |  | Yes |
-| result | Text |  | Clear |
-| pepCheck | Complex Data |  | Complex object |
-| checkDate | Date |  | 2026-01-05 |
-| isPoliticallyExposed | Yes/No |  | No |
-| performed | Yes/No |  | Yes |
-| result | Text |  | Clear |
-| sanctionsCheck | Complex Data |  | Complex object |
-| checkDate | Date |  | 2026-01-05 |
-| performed | Yes/No |  | Yes |
-| provider | Text | Financial institution or provider | World-Check |
-| result | Text |  | Clear |
 
 **client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
+| id | Number | Unique client identifier | 31514626 |
+| href | Text | Client resource URL | v2/factfinds/3454/clients/31514626 |
+| title | Text | Title (Mr, Mrs, Ms, etc.) | Mr |
+| firstName | Text | First name | John |
+| middleName | Text | Middle name | David |
+| lastName | Text | Last name | Smith |
+| gender | Text | Gender | Male |
+| dateOfBirth | DateTime | Date of birth | 1985-03-15T00:00:00 |
+| mothersMaidenName | Text | Mother's maiden name | Johnson |
+| placeOfBirth | Text | Place of birth | London |
+| countryOfBirth | Complex Data | Country of birth code | Complex object |
+| code | Text | ISO country code | GB |
+| placeOfBirthOther | Text | Additional birth location details | Westminster Hospital |
 
-**dataProtectionConsent:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| consentDate | Date |  | 2026-01-05 |
-| consentGiven | Yes/No |  | Yes |
-| consentMethod | Text |  | Electronic Signature |
-| dataProcessingPurposes | List of str |  | List with 4 item(s) |
-| dataRetentionPeriod | Text |  | 7 years from last contact |
-| privacyNoticeProvided | Yes/No | Unique system identifier for this record | Yes |
-| privacyNoticeVersion | Text |  | 2.1 |
-| rightToWithdrawConsent | Yes/No |  | Yes |
-| thirdPartyDisclosure | Complex Data |  | Complex object |
-| consentGiven | Yes/No |  | Yes |
-| disclosureReasons | List of str |  | List with 3 item(s) |
-
-**factfind:**
+**contacts:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
+| type | Text | Contact type (Telephone, Email, etc.) | Telephone |
+| value | Text | Contact value | +44 7700 900123 |
 
-**gdprRights:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| rightToAccess | Yes/No |  | Yes |
-| rightToDataPortability | Yes/No |  | Yes |
-| rightToErasure | Yes/No |  | Yes |
-| rightToObject | Yes/No |  | Yes |
-| rightToRectification | Yes/No |  | Yes |
-| rightToRestriction | Yes/No |  | Yes |
-
-**sourceOfWealth:**
+**currentAddress:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| description | Text | Description of the goal | Senior Software Engineer - employed for 15 years |
-| isVerified | Yes/No | Whether this contact has been verified | Yes |
-| primarySource | Text |  | EMPLOYMENT |
+| residentFrom | DateTime | Date moved to address | 2020-01-15T00:00:00 |
+| yearsAtAddress | Text | Years at address | 4 |
+| address | Complex Data | Address details | Complex object |
+| line1 | Text | Address line 1 | 123 High Street |
+| line2 | Text | Address line 2 | Flat 4B |
+| line3 | Text | Address line 3 | Westminster |
+| line4 | Text | Address line 4 | Greater London |
+| locality | Text | City/town | London |
+| postalCode | Text | Postal code | SW1A 1AA |
+| country | Complex Data | Country code | Complex object |
+| code | Text | ISO country code | GB |
+| county | Complex Data | County code | Complex object |
+| code | Text | County code | GB-LND |
+
+**previousAddresses:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| residentFrom | DateTime | Date moved to address | 2015-06-01T00:00:00 |
+| yearsAtAddress | Text | Years at address | 5 |
+| address | Complex Data | Address details (same structure as currentAddress) | Complex object |
+
+**clientIdentity:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| passport | Complex Data | Passport details | Complex object |
+| referenceNo | Text | Passport number | GB123456789 |
+| seenOn | DateTime | Date document seen | 2024-01-10T00:00:00 |
+| expiryOn | DateTime | Expiry date | 2030-12-31T00:00:00 |
+| countryOfOrigin | Complex Data | Issuing country | Complex object |
+| code | Text | ISO country code | GB |
+| drivingLicence | Complex Data | Driving licence details | Complex object |
+| referenceNo | Text | Licence number | SMITH851234JD9AB |
+| seenOn | DateTime | Date document seen | 2024-01-10T00:00:00 |
+| expiryOn | DateTime | Expiry date | 2030-12-31T00:00:00 |
+| countryOfOrigin | Complex Data | Issuing country | Complex object |
+| code | Text | ISO country code | GB |
+| microfiche | Complex Data | Microfiche details | Complex object |
+| number | Text | Microfiche number | MF123456 |
+| issuedOn | DateTime | Issue date | 2020-05-15T00:00:00 |
+| electricityBill | Complex Data | Electricity bill details | Complex object |
+| referenceNo | Text | Bill reference | ELEC-2024-001 |
+| seenOn | DateTime | Date document seen | 2024-01-15T00:00:00 |
+| utilitiesBill | Complex Data | Utilities bill details | Complex object |
+| councilTaxBill | Complex Data | Council tax bill details | Complex object |
+| irTaxNotification | Complex Data | IR tax notification details | Complex object |
+| bankStatement | Complex Data | Bank statement details | Complex object |
+| mortgageStatement | Complex Data | Mortgage statement details | Complex object |
+| firearmOrShotgunCertificate | Complex Data | Firearm certificate details | Complex object |
+
+**supportingDocuments:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Document ID | 5001 |
+| href | Text | Document resource URL | v2/documents/5001 |
+
+**adviser:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Adviser ID | 789 |
+| href | Text | Adviser resource URL | v2/advisers/789 |
+
+**verification:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| witness | Complex Data | Witness verification | Complex object |
+| position | Text | Witness position | Financial Adviser |
+| witnessedOn | DateTime | Date witnessed | 2024-01-10T00:00:00 |
+| premises | Complex Data | Premises verification | Complex object |
+| lastVisitedOn | DateTime | Last visit date | 2024-01-08T00:00:00 |
+| enteredOn | DateTime | Entry date | 2024-01-08T00:00:00 |
+| expiryOn | DateTime | Verification expiry date | 2027-01-10T00:00:00 |
+
+**verificationResult:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| providerName | Text | Verification provider | GBG |
+| status | Enum (Text) | Status: Rejected, ManualReview, Accepted, Completed | Completed |
+| outcome | Text | Verification outcome | Pass |
+| score | Number | Verification score | 95 |
+| verifiedOn | DateTime | Verification timestamp | 2024-01-16T10:30:45Z |
+| certificateDocument | Reference Link | Certificate document | Complex object |
+| id | Number | Document ID | 6001 |
+| href | Text | Document resource URL | v2/documents/6001 |
+| createdAt | DateTime | Result creation timestamp | 2024-01-16T10:15:00Z |
+| updatedAt | DateTime | Result update timestamp | 2024-01-16T10:30:45Z |
+
+### Enumerations
+
+#### Verification Status
+- `Rejected` - Verification failed
+- `ManualReview` - Requires manual review
+- `Accepted` - Verification accepted
+- `Completed` - Verification completed successfully
 
 ---
 

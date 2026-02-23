@@ -167,14 +167,8 @@
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/identity-verification` | Get verification status | ⭐ MLR 2017 |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/identity-verification` | Submit identity document | ⭐ KYC/AML |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/identity-verification/{verificationId}` | Get verification details | ⭐ New in v3.0 |
-| PATCH | `/api/v1/factfinds/{id}/clients/{clientId}/identity-verification/{verificationId}` | Update verification | ⭐ New in v3.0 |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/identity-verification/history` | Get verification history | ⭐ Audit trail |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/identity-verification/{verificationId}/aml-check` | Trigger AML check | ⭐ MLR 2017 |
-| GET | `/api/v1/factfinds/{id}/clients/{clientId}/identity-verification/{verificationId}/documents` | Get documents | ⭐ Document list |
-| POST | `/api/v1/factfinds/{id}/clients/{clientId}/identity-verification/{verificationId}/documents` | Upload document | ⭐ Document upload |
+| GET | `/api/v1/factfinds/{id}/clients/{clientId}/id-verification` | Get identity verification details | ⭐ Singleton resource per client |
+| PUT | `/api/v1/factfinds/{id}/clients/{clientId}/id-verification` | Update identity verification details | ⭐ MLR 2017 / KYC/AML |
 
 ### Credit History
 

@@ -112,6 +112,7 @@ The FactFind API provides comprehensive digital capabilities for:
       - [4.3.3 List Clients](#433-list-clients)
       - [4.3.4 Add Address](#434-add-address)
       - [4.3.5 Client Vulnerability Assessment](#435-client-vulnerability-assessment)
+      - [4.3.6 Identity Verification](#436-identity-verification)
    - [4.4 Current Position Summary API](#44-current-position-summary-api)
       - [4.4.1 Operations Summary](#441-operations-summary)
       - [4.4.2 Key Endpoints](#442-key-endpoints)
@@ -343,7 +344,7 @@ The FactFind API provides comprehensive digital capabilities for:
    - [14.36 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1436-estate-planning---lasting-power-of-attorney-lpa-contract)
    - [14.38 Estate Planning - Gift Contract](#1438-estate-planning---gift-contract)
    - [14.39 Estate Planning - Trust Contract](#1439-estate-planning---trust-contract)
-   - [14.40 Identity Verification & Data Protection Consent Contract](#1440-identity-verification--data-protection-consent-contract)
+   - [14.40 Identity Verification Contract](#1440-identity-verification-contract)
    - [14.41 Arrangement - Mortgage Contract](#1441-arrangement---mortgage-contract)
    - [14.42 Arrangement - Investment Contract (General Investment Account)](#1442-arrangement---investment-contract-general-investment-account)
    - [14.43 Arrangement - Protection Contract (Life Assurance)](#1443-arrangement---protection-contract-life-assurance)
@@ -2086,8 +2087,8 @@ All subsequent API sections (5-11) document resources that are **nested under** 
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add dependant | `client:write` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Update dependant | `client:write` |
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Remove dependant | `client:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get ID verification docs | `client:pii:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Upload ID document | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get identity verification details | `client:pii:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Update identity verification details | `client:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Get data protection consent | `client:read` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Update DPA consent | `client:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-consent` | Get marketing preferences | `client:read` |
@@ -2716,6 +2717,340 @@ Location: /api/v2/factfinds/{factfindId}/clients/123/addresses/456
 - Review date should typically be 3-6 months after assessment for Temporary type
 - Action taken details required if vulnerability identified (hasVulnerability = "Yes")
 - Assessment triggers notification to primary adviser
+
+---
+
+#### 4.3.6 Identity Verification
+
+**Description:** Manage identity verification details for KYC/AML compliance. This is a singleton resource per client - each client has exactly one identity verification record.
+
+##### 4.3.6.1 Get Identity Verification
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification`
+
+**Description:** Retrieve identity verification details for a client.
+
+**Response:**
+```json
+{
+  "href": "v2/factfinds/3454/clients/31514626/idverifications",
+  "client": {
+    "id": 31514626,
+    "href": "v2/factfinds/3454/clients/31514626",
+    "title": "Mr",
+    "firstName": "John",
+    "middleName": "David",
+    "lastName": "Smith",
+    "gender": "Male",
+    "dateOfBirth": "1985-03-15T00:00:00",
+    "mothersMaidenName": "Johnson",
+    "placeOfBirth": "London",
+    "countryOfBirth": {
+      "code": "GB"
+    },
+    "placeOfBirthOther": "Westminster Hospital"
+  },
+  "contacts": [
+    {
+      "type": "Telephone",
+      "value": "+44 7700 900123"
+    }
+  ],
+  "currentAddress": {
+    "residentFrom": "2020-01-15T00:00:00",
+    "yearsAtAddress": "4",
+    "address": {
+      "line1": "123 High Street",
+      "line2": "Flat 4B",
+      "line3": "Westminster",
+      "line4": "Greater London",
+      "locality": "London",
+      "postalCode": "SW1A 1AA",
+      "country": {
+        "code": "GB"
+      },
+      "county": {
+        "code": "GB-LND"
+      }
+    }
+  },
+  "previousAddresses": [
+    {
+      "residentFrom": "2015-06-01T00:00:00",
+      "yearsAtAddress": "5",
+      "address": {
+        "line1": "456 Old Road",
+        "line2": "Flat 2",
+        "line3": null,
+        "line4": null,
+        "locality": "Manchester",
+        "postalCode": "M1 1AA",
+        "country": {
+          "code": "GB"
+        },
+        "county": null
+      }
+    }
+  ],
+  "clientIdentity": {
+    "passport": {
+      "referenceNo": "GB123456789",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "drivingLicence": {
+      "referenceNo": "SMITH851234JD9AB",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "microfiche": {
+      "number": "MF123456",
+      "issuedOn": "2020-05-15T00:00:00"
+    },
+    "electricityBill": {
+      "referenceNo": "ELEC-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "utilitiesBill": {
+      "referenceNo": "UTIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "councilTaxBill": {
+      "referenceNo": "COUNCIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "irTaxNotification": {
+      "referenceNo": "IRTAX-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "bankStatement": {
+      "referenceNo": "BANK-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "mortgageStatement": {
+      "referenceNo": "MORT-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "firearmOrShotgunCertificate": {
+      "referenceNo": "FIRE-2024-001",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00"
+    }
+  },
+  "supportingDocuments": [
+    {
+      "id": 5001,
+      "href": "v2/documents/5001"
+    }
+  ],
+  "adviser": {
+    "id": 789,
+    "href": "v2/advisers/789"
+  },
+  "verification": {
+    "witness": {
+      "position": "Financial Adviser",
+      "witnessedOn": "2024-01-10T00:00:00"
+    },
+    "premises": {
+      "lastVisitedOn": "2024-01-08T00:00:00",
+      "enteredOn": "2024-01-08T00:00:00"
+    },
+    "expiryOn": "2027-01-10T00:00:00"
+  },
+  "verificationResult": {
+    "providerName": "GBG",
+    "status": "Completed",
+    "outcome": "Pass",
+    "score": 95,
+    "verifiedOn": "2024-01-16T10:30:45Z",
+    "certificateDocument": {
+      "id": 6001,
+      "href": "v2/documents/6001"
+    },
+    "createdAt": "2024-01-16T10:15:00Z",
+    "updatedAt": "2024-01-16T10:30:45Z"
+  },
+  "comments": "successful.",
+  "createdAt": "2024-01-16T09:00:00Z",
+  "updatedAt": "2024-01-16T15:20:00Z",
+  "createdBy": "adviser@example.com",
+  "updatedBy": "adviser@example.com"
+}
+```
+
+##### 4.3.6.2 Update Identity Verification
+
+**Endpoint:** `PUT /api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification`
+
+**Description:** Update identity verification details for a client. This endpoint creates or updates the singleton identity verification record.
+
+**Request Body:**
+```json
+{
+  "client": {
+    "title": "Mr",
+    "firstName": "John",
+    "middleName": "David",
+    "lastName": "Smith",
+    "gender": "Male",
+    "dateOfBirth": "1985-03-15T00:00:00",
+    "mothersMaidenName": "Johnson",
+    "placeOfBirth": "London",
+    "countryOfBirth": {
+      "code": "GB"
+    },
+    "placeOfBirthOther": "Westminster Hospital"
+  },
+  "contacts": [
+    {
+      "type": "Telephone",
+      "value": "+44 7700 900123"
+    }
+  ],
+  "currentAddress": {
+    "residentFrom": "2020-01-15T00:00:00",
+    "yearsAtAddress": "4",
+    "address": {
+      "line1": "123 High Street",
+      "line2": "Flat 4B",
+      "line3": "Westminster",
+      "line4": "Greater London",
+      "locality": "London",
+      "postalCode": "SW1A 1AA",
+      "country": {
+        "code": "GB"
+      },
+      "county": {
+        "code": "GB-LND"
+      }
+    }
+  },
+  "previousAddresses": [
+    {
+      "residentFrom": "2015-06-01T00:00:00",
+      "yearsAtAddress": "5",
+      "address": {
+        "line1": "456 Old Road",
+        "line2": "Flat 2",
+        "line3": null,
+        "line4": null,
+        "locality": "Manchester",
+        "postalCode": "M1 1AA",
+        "country": {
+          "code": "GB"
+        },
+        "county": null
+      }
+    }
+  ],
+  "clientIdentity": {
+    "passport": {
+      "referenceNo": "GB123456789",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "drivingLicence": {
+      "referenceNo": "SMITH851234JD9AB",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "microfiche": {
+      "number": "MF123456",
+      "issuedOn": "2020-05-15T00:00:00"
+    },
+    "electricityBill": {
+      "referenceNo": "ELEC-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "utilitiesBill": {
+      "referenceNo": "UTIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "councilTaxBill": {
+      "referenceNo": "COUNCIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "irTaxNotification": {
+      "referenceNo": "IRTAX-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "bankStatement": {
+      "referenceNo": "BANK-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "mortgageStatement": {
+      "referenceNo": "MORT-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "firearmOrShotgunCertificate": {
+      "referenceNo": "FIRE-2024-001",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00"
+    }
+  },
+  "supportingDocuments": [
+    {
+      "id": 5001,
+      "href": "v2/documents/5001"
+    }
+  ],
+  "adviser": {
+    "id": 789,
+    "href": "v2/advisers/789"
+  },
+  "verification": {
+    "witness": {
+      "position": "Financial Adviser",
+      "witnessedOn": "2024-01-10T00:00:00"
+    },
+    "premises": {
+      "lastVisitedOn": "2024-01-08T00:00:00",
+      "enteredOn": "2024-01-08T00:00:00"
+    },
+    "expiryOn": "2027-01-10T00:00:00"
+  },
+  "verificationResult": {
+    "providerName": "GBG",
+    "status": "Completed",
+    "outcome": "Pass",
+    "score": 95,
+    "verifiedOn": "2024-01-16T10:30:45Z",
+    "certificateDocument": {
+      "id": 6001,
+      "href": "v2/documents/6001"
+    }
+  },
+  "comments": "successful."
+}
+```
+
+**Response:** Same as GET response above.
+
+**Validation Rules:**
+- `client.dateOfBirth` - Required, must be in the past
+- `contacts` - At least one contact method required
+- `currentAddress` - Required
+- `clientIdentity` - At least one identity document required (passport or drivingLicence)
+- `verificationResult.status` - Enum: Rejected, ManualReview, Accepted, Completed
+
+**Business Rules:**
+- Identity verification must be completed before client can proceed with certain operations
+- Verification expires based on `verification.expiryOn` date
+- Supporting documents should be retained for regulatory compliance (typically 7 years)
+- AML checks should be refreshed periodically based on risk assessment
 
 ---
 
@@ -27606,149 +27941,219 @@ The `Trust` contract represents trusts established by or benefiting the client.
 
 ---
 
-### 14.40 Identity Verification & Data Protection Consent Contract
+### 14.40 Identity Verification Contract
 
-The `IdentityVerification` contract represents identity verification checks and data protection consents.
+The `IdentityVerification` contract represents comprehensive identity verification and KYC/AML compliance data for a client. This is a singleton resource per client.
 
-**Reference Type:** IdentityVerification is a reference type with identity (has `id` field).
+**Singleton Resource:** Each client has exactly one identity verification record.
 
 **Key Features:**
 - KYC (Know Your Customer) compliance
 - AML (Anti-Money Laundering) checks
 - Identity document verification
-- GDPR consent tracking
-- Data processing agreements
+- Address history tracking
+- Third-party verification integration
+- Supporting document management
 
 #### Complete Identity Verification Contract
 
 ```json
 {
-  "id": 11111,
-  "href": "/api/v2/factfinds/679/clients/123/identity-verification/11111",
-  "factfind": {
-    "id": 679,
-    "href": "/api/v2/factfinds/679"
-  },
+  "href": "v2/factfinds/3454/clients/31514626/idverifications",
   "client": {
-    "id": 123,
-    "href": "/api/v2/factfinds/679/clients/123"
-  },
-  "verificationDate": "2026-01-05",
-  "verificationMethod": "ELECTRONIC_VERIFICATION",
-  "verificationProvider": "Experian Identity Check",
-  "verificationReference": "EXP-2026-123456",
-  "verificationStatus": "VERIFIED",
-  "identityDocuments": [
-    {
-      "documentType": "PASSPORT",
-      "documentNumber": "123456789",
-      "issuingCountry": "GB",
-      "issueDate": "2021-06-15",
-      "expiryDate": "2031-06-15",
-      "isVerified": true,
-      "verifiedDate": "2026-01-05"
+    "id": 31514626,
+    "href": "v2/factfinds/3454/clients/31514626",
+    "title": "Mr",
+    "firstName": "John",
+    "middleName": "David",
+    "lastName": "Smith",
+    "gender": "Male",
+    "dateOfBirth": "1985-03-15T00:00:00",
+    "mothersMaidenName": "Johnson",
+    "placeOfBirth": "London",
+    "countryOfBirth": {
+      "code": "GB"
     },
+    "placeOfBirthOther": "Westminster Hospital"
+  },
+  "contacts": [
     {
-      "documentType": "UTILITY_BILL",
-      "documentDescription": "Council Tax Bill",
-      "documentDate": "2025-12-15",
-      "isVerified": true,
-      "verifiedDate": "2026-01-05"
+      "type": "Telephone",
+      "value": "+44 7700 900123"
     }
   ],
-  "amlChecks": {
-    "sanctionsCheck": {
-      "performed": true,
-      "checkDate": "2026-01-05",
-      "result": "Clear",
-      "provider": "World-Check"
-    },
-    "pepCheck": {
-      "performed": true,
-      "checkDate": "2026-01-05",
-      "isPoliticallyExposed": false,
-      "result": "Clear"
-    },
-    "adverseMediaCheck": {
-      "performed": true,
-      "checkDate": "2026-01-05",
-      "result": "Clear"
+  "currentAddress": {
+    "residentFrom": "2020-01-15T00:00:00",
+    "yearsAtAddress": "4",
+    "address": {
+      "line1": "123 High Street",
+      "line2": "Flat 4B",
+      "line3": "Westminster",
+      "line4": "Greater London",
+      "locality": "London",
+      "postalCode": "SW1A 1AA",
+      "country": {
+        "code": "GB"
+      },
+      "county": {
+        "code": "GB-LND"
+      }
     }
   },
-  "sourceOfWealth": {
-    "primarySource": "EMPLOYMENT",
-    "description": "Senior Software Engineer - employed for 15 years",
-    "isVerified": true
-  },
-  "dataProtectionConsent": {
-    "consentGiven": true,
-    "consentDate": "2026-01-05",
-    "consentMethod": "Electronic Signature",
-    "privacyNoticeVersion": "2.1",
-    "privacyNoticeProvided": true,
-    "dataProcessingPurposes": [
-      "Providing financial advice",
-      "Regulatory compliance",
-      "Customer service",
-      "Marketing (opted in)"
-    ],
-    "rightToWithdrawConsent": true,
-    "dataRetentionPeriod": "7 years from last contact",
-    "thirdPartyDisclosure": {
-      "consentGiven": true,
-      "disclosureReasons": [
-        "Product providers",
-        "Regulatory bodies",
-        "Professional indemnity insurers"
-      ]
+  "previousAddresses": [
+    {
+      "residentFrom": "2015-06-01T00:00:00",
+      "yearsAtAddress": "5",
+      "address": {
+        "line1": "456 Old Road",
+        "line2": "Flat 2",
+        "line3": null,
+        "line4": null,
+        "locality": "Manchester",
+        "postalCode": "M1 1AA",
+        "country": {
+          "code": "GB"
+        },
+        "county": null
+      }
+    }
+  ],
+  "clientIdentity": {
+    "passport": {
+      "referenceNo": "GB123456789",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "drivingLicence": {
+      "referenceNo": "SMITH851234JD9AB",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00",
+      "countryOfOrigin": {
+        "code": "GB"
+      }
+    },
+    "microfiche": {
+      "number": "MF123456",
+      "issuedOn": "2020-05-15T00:00:00"
+    },
+    "electricityBill": {
+      "referenceNo": "ELEC-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "utilitiesBill": {
+      "referenceNo": "UTIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "councilTaxBill": {
+      "referenceNo": "COUNCIL-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "irTaxNotification": {
+      "referenceNo": "IRTAX-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "bankStatement": {
+      "referenceNo": "BANK-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "mortgageStatement": {
+      "referenceNo": "MORT-2024-001",
+      "seenOn": "2024-01-15T00:00:00"
+    },
+    "firearmOrShotgunCertificate": {
+      "referenceNo": "FIRE-2024-001",
+      "seenOn": "2024-01-10T00:00:00",
+      "expiryOn": "2030-12-31T00:00:00"
     }
   },
-  "gdprRights": {
-    "rightToAccess": true,
-    "rightToRectification": true,
-    "rightToErasure": true,
-    "rightToRestriction": true,
-    "rightToDataPortability": true,
-    "rightToObject": true
+  "supportingDocuments": [
+    {
+      "id": 5001,
+      "href": "v2/documents/5001"
+    }
+  ],
+  "adviser": {
+    "id": 789,
+    "href": "v2/advisers/789"
   },
-  "nextReviewDate": "2027-01-05",
-  "notes": "Full identity verification completed via Experian. All AML checks clear. GDPR consents obtained.",
-  "createdAt": "2026-01-05T10:00:00Z",
-  "updatedAt": "2026-01-05T10:00:00Z"
+  "verification": {
+    "witness": {
+      "position": "Financial Adviser",
+      "witnessedOn": "2024-01-10T00:00:00"
+    },
+    "premises": {
+      "lastVisitedOn": "2024-01-08T00:00:00",
+      "enteredOn": "2024-01-08T00:00:00"
+    },
+    "expiryOn": "2027-01-10T00:00:00"
+  },
+  "verificationResult": {
+    "providerName": "GBG",
+    "status": "Completed",
+    "outcome": "Pass",
+    "score": 95,
+    "verifiedOn": "2024-01-16T10:30:45Z",
+    "certificateDocument": {
+      "id": 6001,
+      "href": "v2/documents/6001"
+    },
+    "createdAt": "2024-01-16T10:15:00Z",
+    "updatedAt": "2024-01-16T10:30:45Z"
+  },
+  "comments": "successful.",
+  "createdAt": "2024-01-16T09:00:00Z",
+  "updatedAt": "2024-01-16T15:20:00Z",
+  "createdBy": "adviser@example.com",
+  "updatedBy": "adviser@example.com"
 }
 ```
 
-#### Verification Method Codes
+#### Field Descriptions
 
-| Code | Display Name |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `href` | string | Auto-generated | Resource URL |
+| `client` | object | Yes | Client details including personal information |
+| `contacts` | array | Yes | Contact methods (at least one required) |
+| `currentAddress` | object | Yes | Current residential address with residency period |
+| `previousAddresses` | array | No | Address history for AML checks |
+| `clientIdentity` | object | Yes | Identity documents (at least passport or drivingLicence required) |
+| `supportingDocuments` | array | No | References to uploaded document files |
+| `adviser` | object | Yes | Adviser who performed verification |
+| `verification` | object | No | Witness and premises verification details |
+| `verificationResult` | object | No | Third-party verification service result |
+| `comments` | string | No | Additional notes |
+| `createdAt` | datetime | Auto-generated | Record creation timestamp |
+| `updatedAt` | datetime | Auto-generated | Last update timestamp |
+| `createdBy` | string | Auto-generated | User who created the record |
+| `updatedBy` | string | Auto-generated | User who last updated the record |
+
+#### Verification Status Codes
+
+| Code | Description |
 |------|-------------|
-| `ELECTRONIC_VERIFICATION` | Electronic Verification |
-| `FACE_TO_FACE` | Face-to-Face with Documents |
-| `CERTIFIED_DOCUMENTS` | Certified Documents |
-| `VIDEO_VERIFICATION` | Video Verification |
+| `Rejected` | Verification failed |
+| `ManualReview` | Requires manual review |
+| `Accepted` | Verification accepted |
+| `Completed` | Verification completed successfully |
 
-#### Document Type Codes
+#### Identity Document Types
 
-| Code | Display Name |
-|------|-------------|
-| `PASSPORT` | Passport |
-| `DRIVING_LICENCE` | Driving Licence |
-| `NATIONAL_ID_CARD` | National ID Card |
-| `UTILITY_BILL` | Utility Bill |
-| `BANK_STATEMENT` | Bank Statement |
-| `COUNCIL_TAX_BILL` | Council Tax Bill |
-
-#### Source of Wealth Codes
-
-| Code | Display Name |
-|------|-------------|
-| `EMPLOYMENT` | Employment Income |
-| `BUSINESS_INCOME` | Business Income |
-| `INVESTMENTS` | Investments |
-| `INHERITANCE` | Inheritance |
-| `PROPERTY_SALE` | Property Sale |
-| `PENSION` | Pension Income |
-| `GIFT` | Gift |
+| Field | Description |
+|-------|-------------|
+| `passport` | Passport details |
+| `drivingLicence` | UK driving licence |
+| `microfiche` | Microfiche reference |
+| `electricityBill` | Electricity bill for proof of address |
+| `utilitiesBill` | Utilities bill for proof of address |
+| `councilTaxBill` | Council tax bill for proof of address |
+| `irTaxNotification` | IR tax notification |
+| `bankStatement` | Bank statement for proof of address |
+| `mortgageStatement` | Mortgage statement for proof of address |
+| `firearmOrShotgunCertificate` | Firearm/shotgun certificate |
 
 ---
 
