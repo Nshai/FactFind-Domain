@@ -294,6 +294,7 @@ The FactFind API provides comprehensive digital capabilities for:
       - [12.3.2 Submit/Update ATR Assessment](#1232-submitupdate-atr-assessment)
       - [12.3.3 Choose Risk Profile](#1233-choose-risk-profile)
       - [12.3.4 Get ATR Assessment History (Risk Replay)](#1234-get-atr-assessment-history-risk-replay)
+      - [12.3.5 Get Specific Historical Assessment](#1235-get-specific-historical-assessment)
    - [12.4 ATR Templates Reference Data](#124-atr-templates-reference-data)
       - [12.4.1 List Available ATR Templates](#1241-list-available-atr-templates)
       - [12.4.2 Get ATR Template Details](#1242-get-atr-template-details)
@@ -16186,7 +16187,7 @@ The Arrangements API provides comprehensive management of client financial produ
 ---
 ## 12. Risk Profile API
 
-### 13.1 Overview
+### 12.1 Overview
 
 **Purpose:** Capture and manage client Attitude to Risk (ATR) assessment as an embedded part of the FactFind.
 
@@ -16195,16 +16196,18 @@ The Arrangements API provides comprehensive management of client financial produ
 - **Templates are reference data** - Risk questionnaire templates are system configuration, not managed via API
 - **Simplified assessment flow** - Submit, view, and choose risk profiles directly on the fact find
 - **Historical tracking** - Risk Replay mechanism for viewing past assessments and comparing changes
+- **Comprehensive question capture** - All client answers to 15 core + 45 supplementary questions preserved
 
 **Key Concepts:**
 
 The ATR Assessment is a critical component of the FactFind that captures:
-1. **15 Standard ATR Questions** - Time horizon, risk tolerance, investment experience, etc.
+1. **15 Standard ATR Questions** - Time horizon, risk tolerance, investment experience, etc. with client answers
 2. **45 Supplementary Questions** - Additional context (dependents, will status, emergency funds, etc.)
-3. **Risk Profile Generation** - System generates 3 adjacent risk profiles based on scores
+3. **Risk Profile Generation** - System generates 3 adjacent risk profiles based on weighted scores
 4. **Client Choice** - Client chooses their preferred profile from the 3 options
 5. **Capacity for Loss Assessment** - Adviser assesses financial capacity to sustain losses
 6. **Declarations** - Client and adviser declarations confirming assessment accuracy and suitability
+7. **Historical Preservation** - All previous assessments preserved for regulatory audit trail
 
 **Aggregate Root:** FactFind (ATR is part of the FactFind lifecycle)
 
@@ -16214,30 +16217,33 @@ The ATR Assessment is a critical component of the FactFind that captures:
 - ESMA Guidelines on Suitability Assessment
 - FCA Handbook COBS 9 Annex 2 (Risk Profiling)
 - Consumer Duty (Understanding Customer Risk Tolerance)
+- GDPR Article 30 (Records of Processing - Audit Trail)
 
-### 13.2 Operations Summary
+### 12.2 Operations Summary
 
 **ATR Assessment Endpoints:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/atr-assessment` | Get current ATR assessment | `factfind:read` |
-| PUT | `/api/v2/factfinds/{factfindId}/atr-assessment` | Submit/update ATR assessment | `factfind:write` |
-| POST | `/api/v2/factfinds/{factfindId}/atr-assessment/choose-profile` | Choose risk profile from options | `factfind:write` |
-| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/history` | Get ATR history (Risk Replay) | `factfind:read` |
-| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/history/{assessmentId}` | Get specific historical assessment | `factfind:read` |
-| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/compare` | Compare two assessments | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/atr-assessment` | Get current ATR assessment with all answers | `factfind:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/atr-assessment` | Submit/update ATR assessment with all questions | `factfind:write` |
+| POST | `/api/v2/factfinds/{factfindId}/atr-assessment/choose-profile` | Choose risk profile from 3 generated options | `factfind:write` |
+| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/history` | Get ATR assessment history (Risk Replay) | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/history/{assessmentId}` | Get specific historical assessment with full details | `factfind:read` |
+| GET | `/api/v2/factfinds/{factfindId}/atr-assessment/compare` | Compare two assessments side-by-side | `factfind:read` |
 
 **Reference Data Endpoints:**
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v2/reference/atr-templates` | List available ATR templates | Public |
-| GET | `/api/v2/reference/atr-templates/{templateId}` | Get template details | Public |
+| GET | `/api/v2/reference/atr-templates` | List available ATR questionnaire templates | Public |
+| GET | `/api/v2/reference/atr-templates/{templateId}` | Get template details with all questions | Public |
 
-### 13.3 Key Endpoints
+**Total Endpoints:** 8 (6 main operations + 2 reference data)
 
-#### 13.3.1 Get Current ATR Assessment
+### 12.3 Key Endpoints
+
+#### 12.3.1 Get Current ATR Assessment
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment`
 
@@ -16402,11 +16408,11 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-#### 13.3.2 Submit/Update ATR Assessment
+#### 12.3.2 Submit/Update ATR Assessment
 
 **Endpoint:** `PUT /api/v2/factfinds/{factfindId}/atr-assessment`
 
-**Description:** Submit or update the ATR assessment for a fact find. This includes all 15 standard questions, 45 supplementary questions, and capacity for loss assessment.
+**Description:** Submit or update the ATR assessment for a fact find. This includes all 15 standard questions, 45 supplementary questions, and capacity for loss assessment. The system automatically calculates the total score and generates 3 adjacent risk profiles.
 
 **Path Parameters:**
 - `factfindId` (required) - The fact find identifier
@@ -16426,6 +16432,104 @@ The ATR Assessment is a critical component of the FactFind that captures:
         "answerId": "A1-3",
         "score": 5
       }
+    },
+    {
+      "questionId": "Q2",
+      "answer": {
+        "value": 7,
+        "score": 7
+      }
+    },
+    {
+      "questionId": "Q3",
+      "answer": {
+        "answerId": "A3-2",
+        "score": 6
+      }
+    },
+    {
+      "questionId": "Q4",
+      "answer": {
+        "answerId": "A4-3",
+        "score": 5
+      }
+    },
+    {
+      "questionId": "Q5",
+      "answer": {
+        "answerId": "A5-2",
+        "score": 4
+      }
+    },
+    {
+      "questionId": "Q6",
+      "answer": {
+        "answerId": "A6-3",
+        "score": 6
+      }
+    },
+    {
+      "questionId": "Q7",
+      "answer": {
+        "answerId": "A7-2",
+        "score": 5
+      }
+    },
+    {
+      "questionId": "Q8",
+      "answer": {
+        "answerId": "A8-3",
+        "score": 6
+      }
+    },
+    {
+      "questionId": "Q9",
+      "answer": {
+        "answerId": "A9-2",
+        "score": 4
+      }
+    },
+    {
+      "questionId": "Q10",
+      "answer": {
+        "answerId": "A10-3",
+        "score": 5
+      }
+    },
+    {
+      "questionId": "Q11",
+      "answer": {
+        "answerId": "A11-2",
+        "score": 4
+      }
+    },
+    {
+      "questionId": "Q12",
+      "answer": {
+        "answerId": "A12-3",
+        "score": 6
+      }
+    },
+    {
+      "questionId": "Q13",
+      "answer": {
+        "answerId": "A13-2",
+        "score": 5
+      }
+    },
+    {
+      "questionId": "Q14",
+      "answer": {
+        "answerId": "A14-3",
+        "score": 6
+      }
+    },
+    {
+      "questionId": "Q15",
+      "answer": {
+        "answerId": "A15-2",
+        "score": 3
+      }
     }
   ],
   "supplementaryQuestions": [
@@ -16435,6 +16539,41 @@ The ATR Assessment is a critical component of the FactFind that captures:
         "answerType": "Number",
         "value": 2
       }
+    },
+    {
+      "questionId": "SQ-R2",
+      "answer": {
+        "answerType": "Boolean",
+        "value": false
+      }
+    },
+    {
+      "questionId": "SQ-R3",
+      "answer": {
+        "answerType": "Number",
+        "value": 12
+      }
+    },
+    {
+      "questionId": "SQ-G1",
+      "answer": {
+        "answerType": "Boolean",
+        "value": true
+      }
+    },
+    {
+      "questionId": "SQ-G2",
+      "answer": {
+        "answerType": "Boolean",
+        "value": true
+      }
+    },
+    {
+      "questionId": "SQ-F1",
+      "answer": {
+        "answerType": "Text",
+        "value": "Moderate"
+      }
     }
   ],
   "capacityForLoss": {
@@ -16442,7 +16581,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
     "emergencyFundMonths": 6,
     "essentialExpensesCovered": true,
     "dependantsProvisionAdequate": true,
-    "assessmentNotes": "Client has sufficient emergency fund and no debt"
+    "assessmentNotes": "Client has sufficient emergency fund (6 months expenses) and no unsecured debt. Mortgage is manageable and protected by life insurance. Client can afford potential investment losses without impact to lifestyle."
   },
   "declarations": {
     "clientDeclaration": {
@@ -16459,36 +16598,225 @@ The ATR Assessment is a critical component of the FactFind that captures:
 }
 ```
 
-**Response:**
+**Response (201 Created - First Assessment):**
 
 ```json
 {
   "atrAssessment": {
-    // ... full assessment with generated risk profiles
+    "href": "v2/factfinds/123/atr-assessment",
+    "id": "atr-20260218-001",
+    "templateRef": {
+      "id": 5407,
+      "version": "5.0",
+      "name": "FCA Standard ATR 2025",
+      "regulatoryApprovalDate": "2025-01-01"
+    },
+    "assessmentDate": "2026-02-18T10:30:00Z",
+    "assessedBy": {
+      "id": 789,
+      "name": "Jane Doe"
+    },
+    "questions": [
+      {
+        "questionId": "Q1",
+        "questionText": "How long do you plan to invest for?",
+        "questionType": "SingleChoice",
+        "answer": {
+          "answerId": "A1-3",
+          "answerText": "10-15 years",
+          "score": 5
+        }
+      },
+      {
+        "questionId": "Q2",
+        "questionText": "What is your attitude to investment risk?",
+        "questionType": "Slider",
+        "answer": {
+          "value": 7,
+          "minLabel": "Very Cautious",
+          "maxLabel": "Very Adventurous",
+          "score": 7
+        }
+      }
+      // ... remaining 13 questions with answers
+    ],
+    "supplementaryQuestions": [
+      {
+        "category": "Risk",
+        "questionId": "SQ-R1",
+        "questionText": "Number of financial dependants",
+        "answer": {
+          "answerType": "Number",
+          "value": 2
+        }
+      },
+      {
+        "category": "Risk",
+        "questionId": "SQ-R2",
+        "questionText": "Do you own property with a mortgage?",
+        "answer": {
+          "answerType": "Boolean",
+          "value": false
+        }
+      },
+      {
+        "category": "Risk",
+        "questionId": "SQ-R3",
+        "questionText": "Months until retirement",
+        "answer": {
+          "answerType": "Number",
+          "value": 12
+        }
+      },
+      {
+        "category": "General",
+        "questionId": "SQ-G1",
+        "questionText": "Do you have a valid Will?",
+        "answer": {
+          "answerType": "Boolean",
+          "value": true
+        }
+      },
+      {
+        "category": "General",
+        "questionId": "SQ-G2",
+        "questionText": "Do you have life insurance?",
+        "answer": {
+          "answerType": "Boolean",
+          "value": true
+        }
+      },
+      {
+        "category": "Financial",
+        "questionId": "SQ-F1",
+        "questionText": "Current debt level",
+        "answer": {
+          "answerType": "Text",
+          "value": "Moderate"
+        }
+      }
+      // ... remaining 39 supplementary questions
+    ],
+    "totalScore": 67,
+    "maxScore": 100,
+    "riskProfiles": {
+      "generated": [
+        {
+          "riskRating": "Balanced",
+          "riskScore": 45,
+          "scoreRange": "40-50",
+          "description": "You have a balanced attitude to risk, seeking reasonable returns while accepting moderate fluctuations. You understand that investments can go down as well as up and are comfortable with a diversified portfolio.",
+          "assetAllocation": {
+            "equities": 60,
+            "bonds": 30,
+            "cash": 5,
+            "alternatives": 5
+          },
+          "volatilityTolerance": "Medium",
+          "timePeriod": "10-15 years",
+          "potentialLossAcceptance": "10-15%"
+        },
+        {
+          "riskRating": "Cautious",
+          "riskScore": 35,
+          "scoreRange": "30-40",
+          "description": "A more cautious approach with lower risk and steadier returns. This profile reduces exposure to market volatility while still seeking growth above inflation.",
+          "assetAllocation": {
+            "equities": 40,
+            "bonds": 45,
+            "cash": 10,
+            "alternatives": 5
+          },
+          "volatilityTolerance": "Low-Medium",
+          "timePeriod": "7-10 years",
+          "potentialLossAcceptance": "5-10%"
+        },
+        {
+          "riskRating": "Adventurous",
+          "riskScore": 55,
+          "scoreRange": "50-60",
+          "description": "A more adventurous approach seeking higher returns with increased volatility. This profile accepts greater short-term fluctuations for potentially higher long-term growth.",
+          "assetAllocation": {
+            "equities": 75,
+            "bonds": 15,
+            "cash": 5,
+            "alternatives": 5
+          },
+          "volatilityTolerance": "Medium-High",
+          "timePeriod": "15+ years",
+          "potentialLossAcceptance": "15-20%"
+        }
+      ],
+      "chosen": null
+    },
+    "capacityForLoss": {
+      "canAffordLosses": true,
+      "emergencyFundMonths": 6,
+      "essentialExpensesCovered": true,
+      "dependantsProvisionAdequate": true,
+      "assessmentNotes": "Client has sufficient emergency fund (6 months expenses) and no unsecured debt. Mortgage is manageable and protected by life insurance. Client can afford potential investment losses without impact to lifestyle."
+    },
+    "declarations": {
+      "clientDeclaration": {
+        "declarationType": "ATR_Accuracy",
+        "declarationText": "I confirm that the answers I have provided in this risk assessment are accurate and complete to the best of my knowledge. I understand that this assessment will be used to determine suitable investment recommendations.",
+        "signed": true,
+        "signedDate": "2026-02-18T10:45:00Z",
+        "signatureType": "Electronic",
+        "ipAddress": "192.168.1.100"
+      },
+      "adviserDeclaration": {
+        "declarationType": "ATR_Suitable",
+        "declarationText": "I confirm that the risk profile assessment has been conducted appropriately and the generated profiles are suitable for this client based on their circumstances, objectives, and capacity for loss.",
+        "signed": true,
+        "signedDate": "2026-02-18T10:50:00Z",
+        "signedBy": {
+          "id": 789,
+          "name": "Jane Doe"
+        }
+      }
+    },
+    "completedAt": "2026-02-18T10:50:00Z",
+    "reviewDate": "2027-02-18"
   },
+  "_links": {
+    "self": { "href": "/api/v2/factfinds/123/atr-assessment" },
     "factfind": { "href": "/api/v2/factfinds/123" },
+    "history": { "href": "/api/v2/factfinds/123/atr-assessment/history" },
     "chooseProfile": { "href": "/api/v2/factfinds/123/atr-assessment/choose-profile", "method": "POST" }
   }
 }
 ```
 
 **Status Codes:**
-- `200 OK` - ATR assessment updated successfully
+- `200 OK` - ATR assessment updated successfully (reassessment)
 - `201 Created` - ATR assessment created for the first time
-- `400 Bad Request` - Invalid request (missing required questions, invalid scores)
+- `400 Bad Request` - Invalid request (missing required questions, invalid scores, incomplete declarations)
 - `404 Not Found` - Fact find not found
 - `403 Forbidden` - User lacks permission to update this fact find
+- `422 Unprocessable Entity` - Business rule violation (e.g., capacity for loss lower than risk tolerance but not adjusted)
 
 **Business Rules:**
-1. All 15 standard questions must be answered
-2. Supplementary questions are optional but recommended
-3. System automatically generates 3 adjacent risk profiles based on total score
-4. Capacity for loss must be assessed before finalizing
-5. Both client and adviser declarations required for completion
+1. **Question Completion**: All 15 standard questions must be answered with valid scores
+2. **Supplementary Questions**: Optional but highly recommended for comprehensive assessment
+3. **Automatic Scoring**: System automatically calculates total weighted score from all question answers
+4. **Profile Generation**: System automatically generates 3 adjacent risk profiles based on total score
+5. **Capacity for Loss**: Must be assessed and documented before finalizing
+6. **Declarations**: Both client and adviser declarations required for completion
+7. **Template Version**: Must use an active ATR template; archived templates not accepted for new assessments
+8. **Historical Preservation**: Previous assessment automatically saved to history when updated
+
+**Validation Rules:**
+- Template ID must exist and be active
+- All question IDs must match the specified template
+- Answer IDs must be valid for the specific question
+- Scores must match template scoring rules
+- Emergency fund months must be >= 0
+- IP address required for electronic signatures
 
 ---
 
-#### 13.3.3 Choose Risk Profile
+#### 12.3.3 Choose Risk Profile
 
 **Endpoint:** `POST /api/v2/factfinds/{factfindId}/atr-assessment/choose-profile`
 
@@ -16538,7 +16866,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-#### 13.3.4 Get ATR Assessment History (Risk Replay)
+#### 12.3.4 Get ATR Assessment History (Risk Replay)
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment/history`
 
@@ -16616,7 +16944,199 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-### 13.4 ATR Templates Reference Data
+#### 12.3.5 Get Specific Historical Assessment
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment/history/{assessmentId}`
+
+**Description:** Retrieve full details of a specific historical ATR assessment. This provides complete access to all questions, answers, and risk profiles from a previous assessment.
+
+**Path Parameters:**
+- `factfindId` (required) - The fact find identifier
+- `assessmentId` (required) - The historical assessment identifier
+
+**Response:**
+
+```json
+{
+  "atrAssessment": {
+    "href": "v2/factfinds/123/atr-assessment/history/atr-20250215-001",
+    "id": "atr-20250215-001",
+    "isHistorical": true,
+    "templateRef": {
+      "id": 6130,
+      "version": "4.0",
+      "name": "FCA Standard ATR 2024",
+      "regulatoryApprovalDate": "2024-01-01"
+    },
+    "assessmentDate": "2025-02-15T14:20:00Z",
+    "assessedBy": {
+      "id": 789,
+      "name": "Jane Doe"
+    },
+    "questions": [
+      {
+        "questionId": "Q1",
+        "questionText": "How long do you plan to invest for?",
+        "questionType": "SingleChoice",
+        "answer": {
+          "answerId": "A1-2",
+          "answerText": "3-5 years",
+          "score": 3
+        }
+      },
+      {
+        "questionId": "Q2",
+        "questionText": "What is your attitude to investment risk?",
+        "questionType": "Slider",
+        "answer": {
+          "value": 5,
+          "minLabel": "Very Cautious",
+          "maxLabel": "Very Adventurous",
+          "score": 5
+        }
+      }
+      // ... remaining questions from this historical assessment
+    ],
+    "supplementaryQuestions": [
+      {
+        "category": "Risk",
+        "questionId": "SQ-R1",
+        "questionText": "Number of financial dependants",
+        "answer": {
+          "answerType": "Number",
+          "value": 3
+        }
+      },
+      {
+        "category": "General",
+        "questionId": "SQ-G1",
+        "questionText": "Do you have a valid Will?",
+        "answer": {
+          "answerType": "Boolean",
+          "value": false
+        }
+      }
+      // ... remaining supplementary questions from this assessment
+    ],
+    "totalScore": 62,
+    "maxScore": 100,
+    "riskProfiles": {
+      "generated": [
+        {
+          "riskRating": "Cautious",
+          "riskScore": 40,
+          "scoreRange": "35-45",
+          "description": "You have a cautious attitude to risk...",
+          "assetAllocation": {
+            "equities": 40,
+            "bonds": 45,
+            "cash": 10,
+            "alternatives": 5
+          },
+          "volatilityTolerance": "Low",
+          "timePeriod": "5-7 years",
+          "potentialLossAcceptance": "5-10%"
+        },
+        {
+          "riskRating": "VeryLowRisk",
+          "riskScore": 30,
+          "scoreRange": "25-35",
+          "description": "A very low risk approach...",
+          "assetAllocation": {
+            "equities": 25,
+            "bonds": 60,
+            "cash": 10,
+            "alternatives": 5
+          }
+        },
+        {
+          "riskRating": "Balanced",
+          "riskScore": 50,
+          "scoreRange": "45-55",
+          "description": "A balanced approach...",
+          "assetAllocation": {
+            "equities": 60,
+            "bonds": 30,
+            "cash": 5,
+            "alternatives": 5
+          }
+        }
+      ],
+      "chosen": {
+        "riskRating": "Cautious",
+        "riskScore": 40,
+        "chosenBy": "Client",
+        "chosenDate": "2025-02-15T15:00:00Z",
+        "reasonForChoice": "Prefer lower risk during pre-retirement phase",
+        "adviserNotes": "Appropriate choice given client approaching retirement in 12 months"
+      }
+    },
+    "capacityForLoss": {
+      "canAffordLosses": false,
+      "emergencyFundMonths": 3,
+      "essentialExpensesCovered": true,
+      "dependantsProvisionAdequate": false,
+      "assessmentNotes": "Limited emergency fund and approaching retirement. Lower capacity for loss appropriate."
+    },
+    "declarations": {
+      "clientDeclaration": {
+        "declarationType": "ATR_Accuracy",
+        "declarationText": "I confirm that the answers I have provided are accurate...",
+        "signed": true,
+        "signedDate": "2025-02-15T14:50:00Z",
+        "signatureType": "Electronic",
+        "ipAddress": "192.168.1.95"
+      },
+      "adviserDeclaration": {
+        "declarationType": "ATR_Suitable",
+        "declarationText": "I confirm that the risk profile assessment is suitable...",
+        "signed": true,
+        "signedDate": "2025-02-15T15:00:00Z",
+        "signedBy": {
+          "id": 789,
+          "name": "Jane Doe"
+        }
+      }
+    },
+    "completedAt": "2025-02-15T15:00:00Z",
+    "reviewDate": "2026-02-15",
+    "supersededBy": {
+      "assessmentId": "atr-20260218-001",
+      "assessmentDate": "2026-02-18T10:30:00Z",
+      "href": "/api/v2/factfinds/123/atr-assessment"
+    }
+  },
+  "_links": {
+    "self": { "href": "/api/v2/factfinds/123/atr-assessment/history/atr-20250215-001" },
+    "factfind": { "href": "/api/v2/factfinds/123" },
+    "current": { "href": "/api/v2/factfinds/123/atr-assessment" },
+    "history": { "href": "/api/v2/factfinds/123/atr-assessment/history" },
+    "compareWithCurrent": { "href": "/api/v2/factfinds/123/atr-assessment/compare?from=atr-20250215-001&to=current" }
+  }
+}
+```
+
+**Status Codes:**
+- `200 OK` - Historical assessment retrieved successfully
+- `404 Not Found` - Fact find or assessment not found
+- `403 Forbidden` - User lacks permission
+
+**Use Cases:**
+1. **Regulatory Review** - Retrieve exact assessment used for past advice
+2. **Audit Trail** - Evidence of risk profiling at specific point in time
+3. **Client Discussion** - Review how their risk profile has evolved
+4. **Suitability File** - Document historical risk assessment for compliance
+
+**Key Features:**
+- `isHistorical: true` flag indicates this is not the current assessment
+- `supersededBy` shows which assessment replaced this one
+- Template version preserved (may differ from current active template)
+- All questions, answers, and declarations preserved exactly as submitted
+- Links provided to compare with current or other historical assessments
+
+---
+
+### 12.4 ATR Templates Reference Data
 
 **Purpose:** ATR questionnaire templates are system configuration and reference data. They are not managed via the main API but can be queried to see available templates.
 
@@ -16626,7 +17146,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 - Templates include the full questionnaire structure, scoring algorithms, and risk rating categories
 - Multiple template versions can exist but only one is "active" at any time
 
-#### 13.4.1 List Available ATR Templates
+#### 12.4.1 List Available ATR Templates
 
 **Endpoint:** `GET /api/v2/reference/atr-templates`
 
@@ -16681,7 +17201,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-#### 13.4.2 Get ATR Template Details
+#### 12.4.2 Get ATR Template Details
 
 **Endpoint:** `GET /api/v2/reference/atr-templates/{templateId}`
 
@@ -16795,7 +17315,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-### 13.5 Risk Assessment History API
+### 12.5 Risk Assessment History API
 
 **Purpose:** Historical tracking and comparison of ATR assessments over time (Risk Replay).
 
@@ -16805,9 +17325,9 @@ The ATR Assessment is a critical component of the FactFind that captures:
 - Track risk profile changes over time
 - Regulatory audit trail
 
-See Section 13.3.4 for the main history endpoint.
+See Section 12.3.4 for the main history endpoint.
 
-#### 13.5.1 Compare Two Assessments
+#### 12.5.1 Compare Two Assessments
 
 **Endpoint:** `GET /api/v2/factfinds/{factfindId}/atr-assessment/compare`
 
@@ -16876,33 +17396,37 @@ See Section 13.3.4 for the main history endpoint.
 
 ---
 
-### 13.6 Integration with FactFind Workflow
+### 12.6 Integration with FactFind Workflow
 
 **ATR Assessment Lifecycle:**
 
 1. **Initiate FactFind** - Create fact find with client details
 2. **Gather Circumstances** - Income, expenditure, arrangements, goals
-3. **Conduct ATR Assessment** - Submit 15 questions + supplementary questions
-4. **System Generates Profiles** - 3 adjacent risk profiles created automatically
+3. **Conduct ATR Assessment** - Submit 15 questions + supplementary questions with all client answers
+4. **System Generates Profiles** - 3 adjacent risk profiles created automatically based on weighted scores
 5. **Client Chooses Profile** - Client selects preferred profile with adviser guidance
-6. **Capacity for Loss** - Adviser assesses financial capacity
-7. **Declarations** - Both parties sign off
+6. **Capacity for Loss** - Adviser assesses financial capacity to sustain losses
+7. **Declarations** - Both client and adviser sign off on assessment accuracy and suitability
 8. **Complete FactFind** - ATR assessment is now part of the completed fact find
+9. **Historical Preservation** - Previous assessment automatically archived for audit trail
 
 **Key Integration Points:**
 
-- ATR assessment embedded in FactFind Contract (Section 12.2)
+- ATR assessment embedded in FactFind Contract (Section 13.32)
 - No separate ATR entity - it's a complex value type on FactFind
 - History maintained automatically when ATR is updated
-- Risk profile influences product recommendations
+- Risk profile influences product recommendations throughout arrangements
+- Client answers preserved for regulatory compliance and audit
 
 **Business Rules:**
 
 1. **ATR Required for Completion** - FactFind cannot be marked complete without ATR assessment
-2. **Annual Review** - ATR should be reviewed annually or after life events
+2. **Annual Review** - ATR should be reviewed annually or after life events (retirement, inheritance, divorce, redundancy)
 3. **Capacity vs. Tolerance** - Both must align; if capacity is lower, use capacity-based profile
 4. **Three Options Rule** - Always present 3 adjacent profiles (main, +1 band, -1 band)
-5. **Regulatory Documentation** - All assessments preserved for audit trail
+5. **Regulatory Documentation** - All assessments preserved for audit trail with full question/answer history
+6. **Question Completion** - All 15 core questions must be answered; supplementary questions highly recommended
+7. **Declarations Mandatory** - Both client and adviser declarations required before assessment is complete
 
 ---
 ## 13. Reference Data API

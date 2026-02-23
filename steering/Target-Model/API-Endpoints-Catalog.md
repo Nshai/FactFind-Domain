@@ -524,52 +524,37 @@
 
 ## 7. ATR Context
 
-**Base Path:** `/api/v1/factfinds/{id}`
+**Base Path:** `/api/v2/factfinds/{id}`
 
-**Description:** Attitude to Risk (ATR) assessment including risk questionnaires, supplementary questions, and declarations.
+**Description:** Attitude to Risk (ATR) assessment with embedded questions, answers, risk profiles, capacity for loss, and declarations. All client answers to 15 core + 45 supplementary questions preserved for audit.
 
 ### ATR Assessment
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/attitude-to-risk` | Get ATR assessment | ⭐ New in v3.0 |
-| POST | `/api/v1/factfinds/{id}/attitude-to-risk` | Create ATR assessment | ⭐ New in v3.0 |
-| PATCH | `/api/v1/factfinds/{id}/attitude-to-risk` | Update ATR assessment | ⭐ New in v3.0 |
-| GET | `/api/v1/factfinds/{id}/attitude-to-risk/history` | Get ATR history | ⭐ Historical assessments |
-| GET | `/api/v1/factfinds/{id}/attitude-to-risk/compare` | Compare ATR (Risk Replay) | ⭐ Compare assessments |
+| GET | `/api/v2/factfinds/{id}/atr-assessment` | Get ATR with all answers | ⭐ Complete assessment |
+| PUT | `/api/v2/factfinds/{id}/atr-assessment` | Submit/update ATR | ⭐ All 15 questions |
+| POST | `/api/v2/factfinds/{id}/atr-assessment/choose-profile` | Choose risk profile | ⭐ Select from 3 options |
+| GET | `/api/v2/factfinds/{id}/atr-assessment/history` | Get ATR history | ⭐ Risk Replay |
+| GET | `/api/v2/factfinds/{id}/atr-assessment/history/{assessmentId}` | Get historical assessment | ⭐ Full details |
+| GET | `/api/v2/factfinds/{id}/atr-assessment/compare` | Compare assessments | ⭐ Side-by-side |
 
-### Risk Questionnaire
-
-| Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/attitude-to-risk/questionnaire` | Get questionnaire | ⭐ Active questionnaire |
-| POST | `/api/v1/factfinds/{id}/attitude-to-risk/questionnaire/responses` | Submit responses | ⭐ Submit answers |
-| GET | `/api/v1/factfinds/{id}/attitude-to-risk/questionnaire/responses` | Get responses | ⭐ Get answers |
-| PATCH | `/api/v1/factfinds/{id}/attitude-to-risk/questionnaire/responses/{responseId}` | Update response | ⭐ Update answer |
-
-### Supplementary Questions
+### ATR Templates (Reference Data)
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/supplementary-questions` | Get supplementary questions | ⭐ New in v3.0 |
-| POST | `/api/v1/factfinds/{id}/supplementary-questions/responses` | Submit responses | ⭐ New in v3.0 |
-| GET | `/api/v1/factfinds/{id}/supplementary-questions/responses` | Get responses | ⭐ New in v3.0 |
-| PATCH | `/api/v1/factfinds/{id}/supplementary-questions/responses/{responseId}` | Update response | ⭐ New in v3.0 |
-| GET | `/api/v1/factfinds/{id}/supplementary-questions/completion-status` | Get completion status | ⭐ New in v3.0 |
+| GET | `/api/v2/reference/atr-templates` | List ATR templates | ⭐ Available templates |
+| GET | `/api/v2/reference/atr-templates/{templateId}` | Get template details | ⭐ All questions |
 
-### Declaration Capture
+**Total Endpoints:** 8 (8 new in v3.0)
 
-| Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v1/factfinds/{id}/declarations` | Get declarations | ⭐ New in v3.0 |
-| GET | `/api/v1/factfinds/{id}/declarations/status` | Get signature status | ⭐ New in v3.0 |
-| POST | `/api/v1/factfinds/{id}/declarations/client-sign` | Client signature | ⭐ Client signs |
-| POST | `/api/v1/factfinds/{id}/declarations/adviser-sign` | Adviser signature | ⭐ Adviser signs |
-| POST | `/api/v1/factfinds/{id}/declarations/consent` | Record consent | ⭐ Consent capture |
-| GET | `/api/v1/factfinds/{id}/declarations/signature-history` | Get signature history | ⭐ Audit trail |
-| GET | `/api/v1/factfinds/{id}/declarations/consent-audit` | Get consent audit | ⭐ Consent audit |
-
-**Total Endpoints:** 22 (22 new in v3.0)
+**Key Features:**
+- **Embedded Answers**: All client answers stored with assessment
+- **Risk Profile Generation**: System generates 3 adjacent profiles automatically
+- **Capacity for Loss**: Financial capacity assessment included
+- **Declarations**: Client and adviser sign-offs embedded
+- **Historical Preservation**: All past assessments preserved for audit
+- **Risk Replay**: Compare current and historical assessments
 
 ---
 
@@ -634,9 +619,9 @@
 | **4. Assets & Liabilities** | 23 | 23 ⭐ |
 | **5. Arrangements** | 109 | 109 ⭐ |
 | **6. Goals** | 31 | 31 ⭐ |
-| **7. ATR** | 22 | 22 ⭐ |
+| **7. ATR** | 8 | 8 ⭐ |
 | **8. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **351** | **323** |
+| **TOTAL** | **337** | **309** |
 
 
 ### Net Worth
@@ -656,12 +641,12 @@ Calculate and track client net worth.
 
 | Method | Count | Percentage |
 |--------|-------|------------|
-| GET | 167 | 48% |
-| POST | 82 | 23% |
-| PATCH | 83 | 24% |
-| PUT | 4 | 1% |
-| DELETE | 15 | 4% |
-| **TOTAL** | **351** | **100%** |
+| GET | 161 | 48% |
+| POST | 77 | 23% |
+| PATCH | 80 | 24% |
+| PUT | 5 | 1% |
+| DELETE | 14 | 4% |
+| **TOTAL** | **337** | **100%** |
 
 ### Hierarchical Depth Analysis
 

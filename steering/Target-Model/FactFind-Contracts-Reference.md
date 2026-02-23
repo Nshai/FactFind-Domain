@@ -4504,9 +4504,17 @@ The `Contact` contract represents a contact method (email, phone, mobile, work p
 
 ---
 
-## 13.32 Attitude to Risk (ATR) Contract
+## 13.32 Attitude to Risk (ATR) Assessment Contract
 ### Overview
-The `AttitudeToRisk` contract represents a client's risk tolerance assessment, typically completed via questionnaire for investment and pension advice.
+The `ATR Assessment` contract represents a comprehensive client risk tolerance assessment completed via questionnaire for investment and pension advice. It includes all client answers to ATR questions, generated risk profiles, chosen profile, capacity for loss assessment, and regulatory declarations.
+
+### Key Components
+1. **15 Standard ATR Questions** with client answers and scores
+2. **45 Supplementary Questions** providing additional context
+3. **3 Generated Risk Profiles** (main + adjacent higher/lower)
+4. **Chosen Risk Profile** selected by client with adviser guidance
+5. **Capacity for Loss Assessment** evaluating financial ability to sustain losses
+6. **Client & Adviser Declarations** for regulatory compliance
 
 ### Fields
 
@@ -4514,73 +4522,403 @@ The `AttitudeToRisk` contract represents a client's risk tolerance assessment, t
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| assessmentDate | Date |  | 2026-02-10 |
-| assessmentMethod | Text |  | QUESTIONNAIRE |
-| capacityForLoss | Text | City/town | MEDIUM |
-| client | Reference Link |  | Complex object |
+| assessmentDate | Date | When the assessment was conducted | 2026-02-10 |
+| assessedBy | Reference Link | Adviser who conducted the assessment | Complex object |
+| capacityForLoss | Complex Data | Financial capacity to sustain investment losses | Complex object |
+| client | Reference Link | Reference to the client being assessed | Complex object |
+| completedAt | Date | When assessment was fully completed (all questions + declarations) | 2026-02-10T15:30:00Z |
 | createdAt | Date | When this record was created in the system | 2026-02-10T11:00:00Z |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Number | Unique system identifier for this record | 3333 |
-| investmentObjective | Text |  | GROWTH |
-| isValid | Yes/No | Unique system identifier for this record | Yes |
-| knowledgeAndExperience | Complex Data |  | Complex object |
-| notes | Text |  | Client comfortable with balanced risk/return profi... |
-| questionnaireUsed | Text |  | FinaMetrica Risk Profile |
-| recommendedAssetAllocation | Complex Data |  | Complex object |
-| reviewRequired | Yes/No |  | No |
-| riskLevel | Number |  | 6 |
-| riskProfile | Text |  | BALANCED |
-| riskScore | Number |  | 65 |
-| timeHorizon | Complex Data |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-10T11:00:00Z |
-| validUntil | Date | Unique system identifier for this record | 2027-02-10 |
-| volatilityTolerance | Complex Data |  | Complex object |
+| declarations | Complex Data | Client and adviser declarations | Complex object |
+| factfind | Reference Link | Link to the FactFind that this assessment belongs to | Complex object |
+| href | Text | API resource link | v2/factfinds/679/atr-assessment |
+| id | Text | Unique system identifier for this assessment | atr-20260210-001 |
+| maxScore | Number | Maximum possible score for this assessment | 100 |
+| questions | List of Complex Data | 15 standard ATR questions with client answers | List with 15 item(s) |
+| reviewDate | Date | Date when this assessment should be reviewed | 2027-02-10 |
+| riskProfiles | Complex Data | Generated and chosen risk profiles | Complex object |
+| supplementaryQuestions | List of Complex Data | 45 additional context questions with answers | List with 45 item(s) |
+| templateRef | Complex Data | Reference to the ATR template used | Complex object |
+| totalScore | Number | Total weighted score from all questions | 67 |
+| updatedAt | Date | When this record was last modified | 2026-02-10T15:30:00Z |
+
+### Question and Answer Structure
+
+#### Standard Questions
+Each of the 15 standard questions captures:
+- **questionId**: Unique identifier (Q1, Q2, etc.)
+- **questionText**: The question presented to client
+- **questionType**: SingleChoice, MultipleChoice, Slider, etc.
+- **answer**: Client's answer including answerId, answerText, and score
+
+#### Supplementary Questions
+Each of the 45 supplementary questions captures:
+- **questionId**: Unique identifier (SQ-R1, SQ-G1, etc.)
+- **category**: Risk, General, Financial, Personal
+- **questionText**: The question presented to client
+- **answer**: Client's answer with type-specific value (Number, Boolean, Text, Date)
 
 #### Nested Field Groups
+
+**assessedBy:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Adviser unique identifier | 789 |
+| name | Text | Adviser full name | Jane Doe |
 
 **client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 8496 |
+| href | Text | API link to client resource | v2/factfinds/679/clients/8496 |
+| name | Text | Client full name | John Smith |
 
 **factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 679 |
+| href | Text | API link to factfind resource | v2/factfinds/679 |
 
-**knowledgeAndExperience:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| investmentExperience | Text |  | MODERATE |
-| investmentKnowledge | Text |  | GOOD |
-| productsHeld | List of str |  | List with 3 item(s) |
-
-**recommendedAssetAllocation:**
+**templateRef:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| alternatives | Number |  | 5 |
-| bonds | Number |  | 30 |
-| cash | Number |  | 5 |
-| equities | Number |  | 60 |
+| id | Number | Template unique identifier | 5407 |
+| version | Text | Template version number | 5.0 |
+| name | Text | Template display name | FCA Standard ATR 2025 |
+| regulatoryApprovalDate | Date | Date template was approved | 2025-01-01 |
 
-**timeHorizon:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| category | Text | Expenditure category (Housing, Transport, Food, etc.) | Long Term |
-| years | Number | Number of years at this address | 15 |
-
-**volatilityTolerance:**
+**questions** (array of question objects):
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| comfortWithFluctuation | Text |  | Moderate |
-| maxAcceptableLoss | Number |  | 20 |
-| reactionToLosses | Text |  | Would review strategy but remain invested |
+| questionId | Text | Question identifier | Q1 |
+| questionText | Text | The question text | How long do you plan to invest for? |
+| questionType | Text | Type of question | SingleChoice |
+| answer | Complex Data | Client's answer | Complex object |
+
+**questions[].answer** (for SingleChoice questions):
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| answerId | Text | Selected answer identifier | A1-3 |
+| answerText | Text | Selected answer text | 10-15 years |
+| score | Number | Score for this answer | 5 |
+
+**questions[].answer** (for Slider questions):
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| value | Number | Slider value selected | 7 |
+| minLabel | Text | Label for minimum value | Very Cautious |
+| maxLabel | Text | Label for maximum value | Very Adventurous |
+| score | Number | Score for this value | 7 |
+
+**supplementaryQuestions** (array of supplementary question objects):
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| category | Text | Question category | Risk |
+| questionId | Text | Question identifier | SQ-R1 |
+| questionText | Text | The question text | Number of financial dependants |
+| answer | Complex Data | Client's answer | Complex object |
+
+**supplementaryQuestions[].answer**:
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| answerType | Text | Type of answer | Number, Boolean, Text, Date |
+| value | Various | The answer value | 2 |
+
+**riskProfiles:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| generated | List of Complex Data | Three generated risk profiles (main + adjacent) | List with 3 item(s) |
+| chosen | Complex Data | The risk profile chosen by client | Complex object |
+
+**riskProfiles.generated[]** (each generated profile):
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| riskRating | Text | Risk category name | Balanced |
+| riskScore | Number | Numeric risk score | 45 |
+| scoreRange | Text | Score range for this category | 40-50 |
+| description | Text | Full description of this risk profile | You have a balanced attitude to risk... |
+| assetAllocation | Complex Data | Recommended asset mix | Complex object |
+| volatilityTolerance | Text | Expected volatility comfort | Medium |
+| timePeriod | Text | Recommended investment period | 10-15 years |
+| potentialLossAcceptance | Text | Expected loss tolerance | 10-15% |
+
+**riskProfiles.generated[].assetAllocation:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| equities | Number | Equity allocation percentage | 60 |
+| bonds | Number | Bond allocation percentage | 30 |
+| cash | Number | Cash allocation percentage | 5 |
+| alternatives | Number | Alternative investments percentage | 5 |
+
+**riskProfiles.chosen:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| riskRating | Text | Chosen risk category name | Balanced |
+| riskScore | Number | Chosen risk score | 45 |
+| chosenBy | Text | Who made the choice | Client |
+| chosenDate | Date | When choice was made | 2026-02-10T14:30:00Z |
+| reasonForChoice | Text | Client's reason for choosing this profile | Matches my investment goals and risk tolerance |
+| adviserNotes | Text | Adviser notes on the choice | Client comfortable with balanced approach, discussed volatility expectations |
+
+**capacityForLoss:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| canAffordLosses | Boolean | Can client afford investment losses | true |
+| emergencyFundMonths | Number | Months of expenses in emergency fund | 6 |
+| essentialExpensesCovered | Boolean | Essential expenses adequately covered | true |
+| dependantsProvisionAdequate | Boolean | Adequate provision for dependants | true |
+| assessmentNotes | Text | Adviser assessment notes | Client has sufficient emergency fund and no debt |
+
+**declarations:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| clientDeclaration | Complex Data | Client's declaration | Complex object |
+| adviserDeclaration | Complex Data | Adviser's declaration | Complex object |
+
+**declarations.clientDeclaration:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| declarationType | Text | Type of declaration | ATR_Accuracy |
+| declarationText | Text | Full declaration text | I confirm that the answers I have provided... |
+| signed | Boolean | Whether declaration is signed | true |
+| signedDate | Date | When declaration was signed | 2026-02-10T14:35:00Z |
+| signatureType | Text | Type of signature | Electronic |
+| ipAddress | Text | IP address where signed | 192.168.1.100 |
+
+**declarations.adviserDeclaration:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| declarationType | Text | Type of declaration | ATR_Suitable |
+| declarationText | Text | Full declaration text | I confirm that the risk profile assessment... |
+| signed | Boolean | Whether declaration is signed | true |
+| signedDate | Date | When declaration was signed | 2026-02-10T15:30:00Z |
+| signedBy | Complex Data | Adviser who signed | Complex object |
+
+**declarations.adviserDeclaration.signedBy:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Adviser unique identifier | 789 |
+| name | Text | Adviser full name | Jane Doe |
+
+### Complete Example
+
+```json
+{
+  "href": "v2/factfinds/679/atr-assessment",
+  "id": "atr-20260210-001",
+  "client": {
+    "id": 8496,
+    "href": "v2/factfinds/679/clients/8496",
+    "name": "John Smith"
+  },
+  "factfind": {
+    "id": 679,
+    "href": "v2/factfinds/679"
+  },
+  "templateRef": {
+    "id": 5407,
+    "version": "5.0",
+    "name": "FCA Standard ATR 2025",
+    "regulatoryApprovalDate": "2025-01-01"
+  },
+  "assessmentDate": "2026-02-10T11:00:00Z",
+  "assessedBy": {
+    "id": 789,
+    "name": "Jane Doe"
+  },
+  "questions": [
+    {
+      "questionId": "Q1",
+      "questionText": "How long do you plan to invest for?",
+      "questionType": "SingleChoice",
+      "answer": {
+        "answerId": "A1-3",
+        "answerText": "10-15 years",
+        "score": 5
+      }
+    },
+    {
+      "questionId": "Q2",
+      "questionText": "What is your attitude to investment risk?",
+      "questionType": "Slider",
+      "answer": {
+        "value": 7,
+        "minLabel": "Very Cautious",
+        "maxLabel": "Very Adventurous",
+        "score": 7
+      }
+    }
+  ],
+  "supplementaryQuestions": [
+    {
+      "category": "Risk",
+      "questionId": "SQ-R1",
+      "questionText": "Number of financial dependants",
+      "answer": {
+        "answerType": "Number",
+        "value": 2
+      }
+    },
+    {
+      "category": "General",
+      "questionId": "SQ-G1",
+      "questionText": "Do you have a valid Will?",
+      "answer": {
+        "answerType": "Boolean",
+        "value": true
+      }
+    }
+  ],
+  "totalScore": 67,
+  "maxScore": 100,
+  "riskProfiles": {
+    "generated": [
+      {
+        "riskRating": "Balanced",
+        "riskScore": 45,
+        "scoreRange": "40-50",
+        "description": "You have a balanced attitude to risk...",
+        "assetAllocation": {
+          "equities": 60,
+          "bonds": 30,
+          "cash": 5,
+          "alternatives": 5
+        },
+        "volatilityTolerance": "Medium",
+        "timePeriod": "10-15 years",
+        "potentialLossAcceptance": "10-15%"
+      },
+      {
+        "riskRating": "Cautious",
+        "riskScore": 35,
+        "scoreRange": "30-40",
+        "description": "Adjacent lower risk option...",
+        "assetAllocation": {
+          "equities": 40,
+          "bonds": 45,
+          "cash": 10,
+          "alternatives": 5
+        }
+      },
+      {
+        "riskRating": "Adventurous",
+        "riskScore": 55,
+        "scoreRange": "50-60",
+        "description": "Adjacent higher risk option...",
+        "assetAllocation": {
+          "equities": 75,
+          "bonds": 15,
+          "cash": 5,
+          "alternatives": 5
+        }
+      }
+    ],
+    "chosen": {
+      "riskRating": "Balanced",
+      "riskScore": 45,
+      "chosenBy": "Client",
+      "chosenDate": "2026-02-10T14:30:00Z",
+      "reasonForChoice": "Matches my investment goals and risk tolerance",
+      "adviserNotes": "Client comfortable with balanced approach, discussed volatility expectations"
+    }
+  },
+  "capacityForLoss": {
+    "canAffordLosses": true,
+    "emergencyFundMonths": 6,
+    "essentialExpensesCovered": true,
+    "dependantsProvisionAdequate": true,
+    "assessmentNotes": "Client has sufficient emergency fund and no debt"
+  },
+  "declarations": {
+    "clientDeclaration": {
+      "declarationType": "ATR_Accuracy",
+      "declarationText": "I confirm that the answers I have provided are accurate and complete...",
+      "signed": true,
+      "signedDate": "2026-02-10T14:35:00Z",
+      "signatureType": "Electronic",
+      "ipAddress": "192.168.1.100"
+    },
+    "adviserDeclaration": {
+      "declarationType": "ATR_Suitable",
+      "declarationText": "I confirm that the risk profile assessment is suitable for this client...",
+      "signed": true,
+      "signedDate": "2026-02-10T15:30:00Z",
+      "signedBy": {
+        "id": 789,
+        "name": "Jane Doe"
+      }
+    }
+  },
+  "completedAt": "2026-02-10T15:30:00Z",
+  "reviewDate": "2027-02-10",
+  "createdAt": "2026-02-10T11:00:00Z",
+  "updatedAt": "2026-02-10T15:30:00Z"
+}
+```
+
+### Regulatory Compliance
+
+**FCA Requirements:**
+- **COBS 9.2**: Assessing suitability requires understanding client risk profile
+- **MiFID II Article 25**: Assessment must consider knowledge, experience, and objectives
+- **Consumer Duty**: Risk assessment must be clear and support good outcomes
+
+**Key Compliance Points:**
+1. **Complete Documentation**: All 15 questions must be answered
+2. **Three Options Rule**: Always present 3 adjacent profiles
+3. **Capacity vs Tolerance**: If capacity is lower than tolerance, use capacity-based profile
+4. **Declarations Required**: Both client and adviser must sign off
+5. **Annual Review**: Assessment should be reviewed annually or after major life events
+6. **Audit Trail**: All historical assessments preserved for regulatory review
+
+### Business Rules
+
+1. **Question Completion:**
+   - All 15 standard questions MUST be answered
+   - Supplementary questions are optional but recommended
+   - System prevents submission without all required answers
+
+2. **Risk Profile Generation:**
+   - System automatically generates 3 adjacent risk profiles
+   - Profiles based on total weighted score from questions
+   - Asset allocation derived from regulatory-approved template
+
+3. **Profile Selection:**
+   - Client must choose from one of the 3 generated profiles
+   - Adviser can guide but should not override client choice
+   - Reason for choice must be documented
+
+4. **Capacity for Loss:**
+   - Must be assessed before finalizing ATR
+   - If capacity is lower than tolerance, must adjust recommendation
+   - Emergency fund of 6+ months recommended before high-risk investments
+
+5. **Declarations:**
+   - Client declaration confirms answer accuracy
+   - Adviser declaration confirms suitability assessment
+   - Both required before ATR is considered complete
+
+6. **Review Period:**
+   - Valid for 12 months unless life event occurs
+   - Major life events trigger mandatory reassessment: retirement, inheritance, divorce, redundancy
+   - System flags ATR for review 30 days before expiry
 
 ---
 
