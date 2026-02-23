@@ -2076,36 +2076,33 @@ All subsequent API sections (5-11) document resources that are **nested under** 
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
+| **Core Client Operations** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients` | List clients with filtering | `client:read` |
 | POST | `/api/v2/factfinds/{factfindId}/clients` | Create new client | `client:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Get client details | `client:read` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Update client | `client:write` |
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Delete client (soft delete) | `client:write` |
+| **Address Management** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | `client:read` |
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | Add address | `client:write` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Update address | `client:write` |
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{id}` | Remove address | `client:write` |
+| **Contact Management** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact details | `client:read` |
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact detail | `client:write` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Update contact | `client:write` |
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{id}` | Remove contact | `client:write` |
+| **Relationship Management** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | List relationships | `client:read` |
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | Create relationship | `client:write` |
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{id}` | Remove relationship | `client:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List dependants | `client:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add dependant | `client:write` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Update dependant | `client:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{id}` | Remove dependant | `client:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get identity verification details | `client:pii:read` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Update identity verification details | `client:write` |
+| **DPA Consent** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Get data protection consent | `client:read` |
 | PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-consent` | Update DPA consent | `client:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get marketing preferences | `client:read` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update marketing preferences | `client:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | List all client vulnerabilities | `client:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | Create a vulnerability | `client:write` |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}` | Update a vulnerability | `client:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}` | Delete a vulnerability | `client:write` |
+
+**Total Endpoints:** 21
+
+**Note:** For client management operations (estate planning, dependants, vulnerabilities, identity verification, marketing preferences, notes, custom questions), see Section 5 - Client Management API.
 
 ### 4.3 Key Endpoints
 
@@ -2899,53 +2896,52 @@ The financial health score is calculated on a 0-100 scale with five components:
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds` | List fact finds | `factfind:read` |
-| POST | `/api/v2/factfinds` | Create new fact find | `factfind:write` |
-| GET | `/api/v2/factfinds/{id}` | Get fact find summary | `factfind:read` |
-| PUT | `/api/v2/factfinds/{id}` | Update fact find | `factfind:write` |
-| DELETE | `/api/v2/factfinds/{id}` | Delete fact find | `factfind:write` |
-| POST | `/api/v2/factfinds/{id}/complete` | Mark fact find as complete | `factfind:write` |
-| GET | `/api/v2/factfinds/{id}/summary` | Get financial summary | `factfind:read` |
-| GET | `/api/v2/factfinds/{id}/employment` | List employment records | `factfind:read` |
-| POST | `/api/v2/factfinds/{id}/employment` | Add employment | `factfind:write` |
-| PUT | `/api/v2/factfinds/{id}/employment/{empId}` | Update employment | `factfind:write` |
-| DELETE | `/api/v2/factfinds/{id}/employment/{empId}` | Remove employment | `factfind:write` |
-| GET | `/api/v2/factfinds/{id}/income` | List income sources | `factfind:read` |
-| POST | `/api/v2/factfinds/{id}/income` | Add income | `factfind:write` |
-| PUT | `/api/v2/factfinds/{id}/income/{incomeId}` | Update income | `factfind:write` |
-| DELETE | `/api/v2/factfinds/{id}/income/{incomeId}` | Remove income | `factfind:write` |
-| GET | `/api/v2/factfinds/{id}/expenditure` | List expenditure | `factfind:read` |
-| POST | `/api/v2/factfinds/{id}/expenditure` | Add expenditure | `factfind:write` |
-| PUT | `/api/v2/factfinds/{id}/expenditure/{expId}` | Update expenditure | `factfind:write` |
-| DELETE | `/api/v2/factfinds/{id}/expenditure/{expId}` | Remove expenditure | `factfind:write` |
-| GET | `/api/v2/factfinds/{id}/income-changes` | List expected income changes | `factfind:read` |
-| POST | `/api/v2/factfinds/{id}/income-changes` | Add income change | `factfind:write` |
-| GET | `/api/v2/factfinds/{id}/expenditure-changes` | List expected expenditure changes | `factfind:read` |
-| POST | `/api/v2/factfinds/{id}/expenditure-changes` | Add expenditure change | `factfind:write` |
-| GET | `/api/v2/factfinds/{id}/affordability` | Calculate affordability | `factfind:read` |
-| GET | `/api/v2/factfinds/{id}/complete` | Get complete aggregate | `factfind:read` |--------|----------|-------------|---------------|
-| **Estate Planning Overview** | | | |
+| **Estate Planning** | | | |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning overview | `estate:read` |
 | PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning details | `estate:write` |
-| **Gifts Management** | | | |
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Record a new gift | `estate:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts by client | `estate:read` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get gift details | `estate:read` |
 | PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift record | `estate:write` |
 | DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift record | `estate:write` |
-| **Trusts Management** | | | |
 | POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | Create gift trust | `estate:write` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts` | List client's trusts | `estate:read` |
 | GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Get trust details | `estate:read` |
 | PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Update trust | `estate:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List all client's dependants | `clients:read` |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add new dependant | `clients:write` |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | `clients:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Update dependant | `clients:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Delete dependant | `clients:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/trusts/{trustId}` | Delete trust | `estate:write` |
+| **Dependants** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List all client's dependants | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add new dependant | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | `client:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Update dependant | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Delete dependant | `client:write` |
+| **Notes** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes` | List client notes | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes` | Create note | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Get note details | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Update note | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes/{noteId}` | Delete note | `client:write` |
+| **Custom Questions** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions` | List custom questions | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions` | Create custom question | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Get question details | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Update question | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/{questionId}` | Delete question | `client:write` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers` | Submit answers | `client:write` |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions/answers` | Get answers | `client:read` |
+| **Client Vulnerabilities** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | List all client vulnerabilities | `client:read` |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | Create a vulnerability | `client:write` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}` | Update a vulnerability | `client:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{id}` | Delete a vulnerability | `client:write` |
+| **Identity Verification** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get identity verification details | `client:pii:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Update identity verification details | `client:write` |
+| **Marketing Preferences** | | | |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get marketing preferences | `client:read` |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update marketing preferences | `client:write` |
 
-**Total Endpoints:** 5
+**Total Endpoints:** 44
 
 #### 5.5.2 List Dependants
 
