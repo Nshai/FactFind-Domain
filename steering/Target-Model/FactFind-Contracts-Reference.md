@@ -730,22 +730,25 @@ Represents any financial product or arrangement including pensions, investments,
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | adviser | Reference Link | The adviser responsible for this client | Complex object |
-| arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | PENSION |
+| arrangementCategory | Text | Type of arrangement (INVESTMENT, PENSION, MORTGAGE, PROTECTION) | PENSION |
 | arrangementNumber | Text |  | ARR123456 |
 | arrangementPeriod | Complex Data |  | Complex object |
-| clientOwners | List of Complex Data | Who owns this arrangement | List with 1 item(s) |
+| owners | List of Complex Data | Who owns this arrangement | List with 1 item(s) |
 | contributionFrequency | Selection | How often (Monthly, Annual, etc.) | Complex object |
 | createdAt | Date | When this record was created in the system | 2015-01-01T10:00:00Z |
 | currentValue | Currency Amount | Current value of the arrangement | Complex object |
 | expectedRetirementAge | Number | Current age (calculated from date of birth) | 67 |
 | factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
 | hasGuaranteedAnnuityRate | Yes/No |  | No |
-| hasProtectedTaxFreeAmount | Yes/No | Amount spent | No |
+| hasProtectedTaxFreeAmount | Yes/No | Whether pension has protected tax-free amount | No |
 | id | Number | Unique system identifier for this record | 2348 |
 | isInDrawdown | Yes/No |  | No |
-| isSalarySacrifice | Yes/No | Annual salary | No |
+| isSalarySacrifice | Yes/No | Whether pension contributions are via salary sacrifice | No |
 | notes | Text |  | Consolidated from previous workplace pensions |
-| pensionType | Text |  | PERSONAL_PENSION |
+| pensionType | Text | Sub-type when arrangementCategory=PENSION | PERSONAL_PENSION |
+| investmentType | Text | Sub-type when arrangementCategory=INVESTMENT | STOCKS_SHARES_ISA |
+| mortgageType | Text | Sub-type when arrangementCategory=MORTGAGE | RESIDENTIAL |
+| protectionType | Text | Sub-type when arrangementCategory=PROTECTION | LIFE_ASSURANCE |
 | policyNumber | Text | Policy or account number | POL123456 |
 | productName | Text | Name of the financial product | ABC SIPP |
 | projectedValueAtRetirement | Currency Amount | The contact value (email address, phone number, etc.) | Complex object |
@@ -841,7 +844,7 @@ This contract connects to:
 
 ### Business Validation Rules
 
-- arrangementType is required
+- arrangementCategory is required
 - provider is required
 - policyNumber must be unique per provider
 - Joint arrangements must have secondOwnerRef
@@ -6902,7 +6905,7 @@ Represents a personal pension, workplace pension, SIPP, or other pension arrange
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | adviserDetails | Complex Data |  | Complex object |
-| arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | PENSION |
+| arrangementCategory | Text | Type of arrangement (INVESTMENT, PENSION, MORTGAGE, PROTECTION) | PENSION |
 | assetAllocation | Complex Data |  | Complex object |
 | charges | Complex Data |  | Complex object |
 | client | Reference Link |  | Complex object |
@@ -7788,12 +7791,27 @@ These are predefined selection lists used throughout the system.
 - **STATE_PENSION**: State pension
 
 ### Investment Sub-Type
-- **GIA**: General Investment Account
-- **ISA**: Individual Savings Account
-- **BOND**: Investment Bond
-- **OFFSHORE_BOND**: Offshore Investment Bond
+- **GENERAL_INVESTMENT_ACCOUNT**: General Investment Account (GIA)
+- **STOCKS_SHARES_ISA**: Stocks & Shares ISA
+- **CASH_ISA**: Cash ISA
+- **LIFETIME_ISA**: Lifetime ISA
+- **INNOVATIVE_FINANCE_ISA**: Innovative Finance ISA
+- **JUNIOR_ISA**: Junior ISA
+- **INVESTMENT_BOND_ONSHORE**: Onshore Investment Bond
+- **INVESTMENT_BOND_OFFSHORE**: Offshore Investment Bond
 - **UNIT_TRUST**: Unit Trust
 - **OEIC**: Open-Ended Investment Company
+- **INVESTMENT_TRUST**: Investment Trust
+- **SAVINGS_ACCOUNT**: Savings Account
+- **PLATFORM_ACCOUNT**: Platform Account
+- **VCT**: Venture Capital Trust
+- **EIS**: Enterprise Investment Scheme
+
+**Deprecated values (for backward compatibility):**
+- **GIA**: Use GENERAL_INVESTMENT_ACCOUNT instead
+- **ISA**: Use specific ISA type (STOCKS_SHARES_ISA, CASH_ISA, etc.)
+- **BOND**: Use INVESTMENT_BOND_ONSHORE or INVESTMENT_BOND_OFFSHORE
+- **OFFSHORE_BOND**: Use INVESTMENT_BOND_OFFSHORE instead
 
 ### Protection Sub-Type
 - **LIFE_ASSURANCE**: Life assurance

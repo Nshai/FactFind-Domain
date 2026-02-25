@@ -11040,7 +11040,7 @@ Mortgage impact:
     {
       "id": 789,
       "factfind": { "id": 456 },
-      "liabilityType": "MORTGAGE",
+      "liabilityCategory": "MORTGAGE",
       "lender": "First National Bank",
       "accountNumber": "****1234",
       "outstandingBalance": {
@@ -11760,7 +11760,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "GIA",
+  "arrangementCategory": "GIA",
   "provider": {
     "name": "Vanguard UK",
     "reference": "VANG-UK-001",
@@ -11843,7 +11843,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/investments/GIA/arr-gia-001",
-  "arrangementType": "GIA",
+  "arrangementCategory": "GIA",
   "arrangementCategory": "INVESTMENT",
   "provider": {
     "name": "Vanguard UK",
@@ -11968,7 +11968,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "ISA",
+  "arrangementCategory": "ISA",
   "isaType": "STOCKS_SHARES",
   "provider": {
     "name": "Hargreaves Lansdown",
@@ -12074,7 +12074,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 2,
   "href": "/api/v2/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
-  "arrangementType": "ISA",
+  "arrangementCategory": "ISA",
   "arrangementCategory": "INVESTMENT",
   "isaType": "STOCKS_SHARES",
   "provider": {
@@ -12428,7 +12428,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "Cash",
+  "arrangementCategory": "Cash",
   "arrangementCategory": "INVESTMENT",
   "provider": {
     "name": "HSBC UK",
@@ -12499,7 +12499,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/investments/Cash/arr-cash-001",
-  "arrangementType": "Cash",
+  "arrangementCategory": "Cash",
   "arrangementCategory": "INVESTMENT",
   "provider": {
     "name": "HSBC UK",
@@ -12713,7 +12713,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "PERSONAL_PENSION",
+  "arrangementCategory": "PERSONAL_PENSION",
   "provider": {
     "name": "Standard Life",
     "reference": "SL-UK-001",
@@ -12841,7 +12841,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 3,
   "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003",
-  "arrangementType": "PERSONAL_PENSION",
+  "arrangementCategory": "PERSONAL_PENSION",
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "Standard Life",
@@ -13042,7 +13042,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "STATE_PENSION",
+  "arrangementCategory": "STATE_PENSION",
   "nationalInsuranceNumber": "AB123456C",
   "qualifyingYears": 35,
   "yearsToStatePensionAge": 12,
@@ -13199,7 +13199,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "FINAL_SALARY",
+  "arrangementCategory": "FINAL_SALARY",
   "provider": {
     "name": "NHS Pension Scheme",
     "reference": "NHS-PS-001"
@@ -13335,7 +13335,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 4,
   "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-004",
-  "arrangementType": "FINAL_SALARY",
+  "arrangementCategory": "FINAL_SALARY",
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "NHS Pension Scheme",
@@ -13667,7 +13667,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 5,
   "href": "/api/v2/factfinds/ff-456/arrangements/pensions/final-salary/arr-db-005",
-  "arrangementType": "FINAL_SALARY",
+  "arrangementCategory": "FINAL_SALARY",
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "Aviva Master Trust",
@@ -13965,7 +13965,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "MONEY_PURCHASE",
+  "arrangementCategory": "MONEY_PURCHASE",
   "provider": {
     "name": "Scottish Widows",
     "reference": "SW-001"
@@ -14072,7 +14072,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 1,
   "href": "/api/v2/factfinds/ff-456/arrangements/pensions/money-purchase/arr-mp-001",
-  "arrangementType": "MONEY_PURCHASE",
+  "arrangementCategory": "MONEY_PURCHASE",
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "Scottish Widows",
@@ -14451,7 +14451,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 2,
   "href": "/api/v2/factfinds/ff-789/arrangements/pensions/money-purchase/arr-mp-002",
-  "arrangementType": "MONEY_PURCHASE",
+  "arrangementCategory": "MONEY_PURCHASE",
   "arrangementCategory": "PENSION",
   "provider": {
     "name": "Standard Life",
@@ -15089,7 +15089,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "PROTECTION",
+  "arrangementCategory": "PROTECTION",
   "protectionType": "LIFE_COVER",
   "provider": {
     "name": "Legal & General",
@@ -15175,7 +15175,7 @@ The Arrangements API provides comprehensive management of client financial produ
 {
   "id": 6,
   "href": "/api/v2/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006",
-  "arrangementType": "PROTECTION",
+  "arrangementCategory": "PROTECTION",
   "arrangementCategory": "PROTECTION",
   "protectionType": "LIFE_COVER",
   "provider": {
@@ -15367,7 +15367,7 @@ The Arrangements API provides comprehensive management of client financial produ
 
 ```json
 {
-  "arrangementType": "GENERAL_INSURANCE",
+  "arrangementCategory": "GENERAL_INSURANCE",
   "insuranceType": "BUILDINGS",
   "provider": {
     "name": "Aviva",
@@ -21512,7 +21512,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
   "arrangementNumber": "ARR123456",
   "arrangementCategory": "PENSION",
   "pensionType": "PERSONAL_PENSION",
-  "clientOwners": [
+  "owners": [
     {
       "id": 123,
       "href": "/api/v2/factfinds/{factfindId}/clients/123",
@@ -22749,7 +22749,7 @@ The `Property` contract represents a property asset with valuation tracking, mor
       "mortgage": {
         "id": 789,
         "href": "/api/v2/factfinds/{factfindId}/arrangements/789",
-        "arrangementType": "Mortgage",
+        "arrangementCategory": "Mortgage",
         "provider": "Nationwide Building Society",
         "policyNumber": "MTG-987654321"
       },
@@ -30591,7 +30591,7 @@ The `MortgageArrangement` contract represents mortgage and equity release secure
     {
       "id": 99999,
       "href": "/api/v2/factfinds/679/arrangements/99999",
-      "arrangementType": "Endowment"
+      "arrangementCategory": "Endowment"
     }
   ],
 
