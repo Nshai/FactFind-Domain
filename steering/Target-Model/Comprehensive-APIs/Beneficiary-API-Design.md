@@ -65,19 +65,50 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Beneficiary Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | ✓ | Unique identifier for this beneficiary record |
+| `href` | string |  | Link to this beneficiary resource |
+| `arrangement` | Reference Link |  | Link to the parent arrangement (pension, protection, trust) |
+| `client` | Reference Link |  | Link to the client being nominated as beneficiary |
+| `beneficiaryType` | Selection |  | Type of beneficiary: Primary, Contingent, or Residual |
+| `relationship` | Selection |  | Relationship to policy holder: Spouse, Child, Parent, Sibling, Other, Trust |
+| `fullName` | string |  | Full name of the beneficiary |
+| `dateOfBirth` | date |  | Date of birth (if individual) |
+| `percentage` | decimal |  | Percentage of benefit allocated to this beneficiary (0-100) |
+| `fixedAmount` | Money |  | Fixed amount allocated (alternative to percentage) |
+| `isRevocable` | boolean |  | Whether this nomination can be changed |
+| `nominatedOn` | date |  | Date when nomination was made |
+| `notes` | string |  | Additional notes about this nomination |
+| `createdAt` | timestamp |  | When this record was created |
+| `updatedAt` | timestamp |  | When this record was last modified |
+
+*Total: 15 properties*
+
+### Referenced Type Definitions
+
+The following types are referenced in the resource properties above:
+
+#### Reference Link
+
+*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+
+#### Selection
+
+*Enumeration with code and display* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+
+#### Money
+
+*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
 
 
 ### Related Resources
 
 **Parent Resource:** Arrangement
 
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Arrangements domain
-
----
 
 ## Data Model
 

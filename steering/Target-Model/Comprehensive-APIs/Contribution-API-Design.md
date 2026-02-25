@@ -65,19 +65,51 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Contribution Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | ✓ | Unique identifier for this contribution record |
+| `href` | string |  | Link to this contribution resource |
+| `arrangement` | Reference Link |  | Link to the parent arrangement |
+| `contributionType` | Selection |  | Type: Regular, Single, Employer, Personal, Transfer |
+| `frequency` | Selection |  | How often: Monthly, Quarterly, Annually, One-off |
+| `grossAmount` | Money |  | Gross contribution amount before tax relief |
+| `netAmount` | Money |  | Net contribution amount (what client actually pays) |
+| `taxRelief` | Money |  | Tax relief amount |
+| `employerContribution` | Money |  | Employer contribution amount (if applicable) |
+| `isSalarySacrifice` | boolean |  | Whether this is via salary sacrifice |
+| `isActive` | boolean |  | Whether contribution is currently active |
+| `startsOn` | date |  | Date when contribution started |
+| `endsOn` | date |  | Date when contribution ends (if known) |
+| `notes` | string |  | Additional notes about this contribution |
+| `createdAt` | timestamp |  | When this record was created |
+| `updatedAt` | timestamp |  | When this record was last modified |
+
+*Total: 16 properties*
+
+### Referenced Type Definitions
+
+The following types are referenced in the resource properties above:
+
+#### Reference Link
+
+*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+
+#### Selection
+
+*Enumeration with code and display* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+
+#### Money
+
+*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
 
 
 ### Related Resources
 
 **Parent Resource:** Arrangement
 
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Arrangements domain
-
----
 
 ## Data Model
 

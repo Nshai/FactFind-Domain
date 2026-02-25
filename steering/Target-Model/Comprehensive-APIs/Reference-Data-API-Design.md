@@ -65,19 +65,45 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Reference-Data Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | ✓ | Unique identifier for this reference data item |
+| `code` | string | ✓ | Unique code for this item |
+| `type` | Selection | ✓ | Type of reference data: IncomeType, ExpenseType, AssetType, etc. |
+| `display` | string | ✓ | Display text for this item |
+| `description` | string |  | Detailed description |
+| `category` | string |  | Category or group |
+| `sortOrder` | integer |  | Display sort order |
+| `isActive` | boolean |  | Whether this item is currently active/available |
+| `isSystem` | boolean |  | Whether this is a system-defined (non-editable) item |
+| `effectiveFrom` | date |  | Date from which this item is effective |
+| `effectiveTo` | date |  | Date until which this item is effective |
+| `metadata` | Complex Data |  | Additional metadata as key-value pairs |
+| `createdAt` | timestamp |  | When this item was created |
+| `updatedAt` | timestamp |  | When this item was last modified |
+
+*Total: 14 properties*
+
+### Referenced Type Definitions
+
+The following types are referenced in the resource properties above:
+
+#### Selection
+
+*Enumeration with code and display* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+
+#### Complex Data
+
+*Nested object structure* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
 
 
 ### Related Resources
 
 **Parent Resource:** Reference
 
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Reference Data domain
-
----
 
 ## Data Model
 

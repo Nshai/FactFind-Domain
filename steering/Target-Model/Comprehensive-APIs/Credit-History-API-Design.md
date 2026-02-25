@@ -68,6 +68,8 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
+
 ### Credit-History Resource Properties
 
 | Property | Type | Required | Description |
@@ -76,12 +78,27 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `href` | string |  | Web link to access this credit history record |
 | `factfind` | Reference Link |  | Link to the FactFind this credit history belongs to |
 | `client` | Reference Link |  | Link to the client this credit history belongs to |
+| `creditScore` | Complex Data |  | Credit score information from Credit Reference Agency |
+| `hasAdverseCredit` | boolean |  | Does the client have any adverse credit events on their record? |
+| `hasCCJ` | boolean |  | Does the client have any County Court Judgments? |
+| `hasBeenRefusedCredit` | boolean |  | Has the client been refused credit in the past? |
+| `ivaHistory` | boolean |  | Does the client have an Individual Voluntary Arrangement (IVA) history? |
+| `hasDefault` | boolean |  | Does the client have any defaults registered on their credit file? |
+| `hasBankruptcyHistory` | boolean |  | Does the client have bankruptcy history? |
+| `hasArrears` | boolean |  | Does the client currently have or have had payment arrears? |
+| `adverseCreditEvents` | List<Event> |  | Detailed list of adverse credit events with financial and timeline information |
+| `missedPayments` | Complex Data |  | Summary of missed payment history |
+| `mortgageSuitability` | Complex Data |  | Automated assessment of mortgage lending eligibility |
+| `notes` | string |  | Free-text notes about credit history, mitigating circumstances, or additional context (max 2000 characters) |
+| `createdAt` | timestamp |  | When this credit history record was created in the system |
+| `updatedAt` | timestamp |  | When this credit history record was last modified |
 
-*Total: 4 properties*
+*Total: 18 properties*
 
 
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

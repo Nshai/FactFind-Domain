@@ -73,6 +73,8 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
+
 ### Employment Resource Properties
 
 | Property | Type | Required | Description |
@@ -80,13 +82,46 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `id` | integer | ✓ | System-assigned employment record ID |
 | `factfindRef` | Reference |  | Reference to parent fact find |
 | `client` | Reference |  | Reference to the client |
+| `employmentStatus` | Status |  | Current employment status (see types above) |
+| `employmentBusinessType` | Status |  | Business type (only for self-employed) |
+| `employmentStatusDescription` | string |  | Additional employment details |
+| `occupation` | string |  | Job title or occupation |
+| `employer` | string |  | Employer or business name |
+| `industryType` | string |  | Industry or sector |
+| `highestTaxRate` | string |  | Marginal tax rate (20, 40, 45) |
+| `startsOn` | date |  | Employment start date |
+| `endsOn` | date |  | Employment end date (blank if current) |
+| `isCurrentEmployment` | boolean |  | Is this current employment? (auto-calculated) |
+| `continuousEmploymentMonths` | integer |  | Months of continuous employment (auto-calculated) |
+| `inProbation` | boolean |  | Currently in probation period? |
+| `probationPeriodInMonths` | integer |  | Length of probation period |
+| `intendedRetirementAge` | integer |  | Planned retirement age |
+| `address.line1` | string |  | Address line 1 |
+| `address.line2` | string |  | Address line 2 |
+| `address.locality` | string |  | City/town |
+| `address.postalCode` | string |  | Postal code |
+| `address.county` | string |  | County |
+| `address.country` | string |  | Country |
+| `grossProfit` | Money |  | Gross profit for the year |
+| `netProfit` | Money |  | Net profit after expenses |
+| `shareOfCompanyProfit` | Money |  | Individual's share of profit |
+| `grossDividend` | Money |  | Gross dividend received |
+| `netDividend` | Money |  | Net dividend after tax |
+| `grossSalary` | Money |  | Gross salary/director's salary |
+| `netSalary` | Money |  | Net salary after tax |
+| `yearEnd` | date |  | Accounting year end |
+| `includeInAffordability` | boolean |  | Use in affordability calculations |
+| `incomesHref` | Link |  | Link to related income records |
+| `createdAt` | timestamp |  | When this record was created |
+| `updatedAt` | timestamp |  | When this record was last updated |
 
-*Total: 3 properties*
+*Total: 35 properties*
 
 
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model
 

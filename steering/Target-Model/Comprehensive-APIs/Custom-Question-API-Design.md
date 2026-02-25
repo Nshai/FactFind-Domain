@@ -65,19 +65,45 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Custom-Question Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | ✓ | Unique identifier for this custom question |
+| `href` | string |  | Link to this custom question resource |
+| `factfind` | Reference Link |  | Link to the parent fact-find |
+| `client` | Reference Link |  | Link to the client (if question is client-specific) |
+| `category` | Selection |  | Question category: General, Financial, Health, Lifestyle, Goals, Other |
+| `question` | string | ✓ | The question text |
+| `answer` | string |  | The answer provided |
+| `answerType` | Selection |  | Type of answer expected: Text, Number, Yes/No, Date, Selection |
+| `isRequired` | boolean |  | Whether this question must be answered |
+| `displayOrder` | integer |  | Order in which to display this question |
+| `notes` | string |  | Additional notes or context |
+| `createdBy` | Reference Link |  | User who created this question |
+| `createdAt` | timestamp |  | When this question was created |
+| `updatedAt` | timestamp |  | When this question was last modified |
+
+*Total: 14 properties*
+
+### Referenced Type Definitions
+
+The following types are referenced in the resource properties above:
+
+#### Reference Link
+
+*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+
+#### Selection
+
+*Enumeration with code and display* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
 
 
 ### Related Resources
 
 **Parent Resource:** Client
 
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
 
 ## Data Model
 

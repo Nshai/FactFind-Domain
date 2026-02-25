@@ -68,6 +68,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Net-Worth Resource Properties
 
 | Property | Type | Required | Description |
