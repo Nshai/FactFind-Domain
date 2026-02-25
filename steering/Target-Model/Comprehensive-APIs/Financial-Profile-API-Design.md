@@ -65,19 +65,30 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
-### Financial-Profile Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+### Financial Profile Resource Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `client` | Reference Link |  | Client reference |
+| `factfind` | Reference Link |  | FactFind reference |
+| `grossAnnualIncome` | Money |  | Total gross annual income before tax |
+| `netAnnualIncome` | Money |  | Total net annual income after tax |
+| `totalAssets` | Money |  | Total value of all assets |
+| `totalLiabilities` | Money |  | Total value of all liabilities |
+| `netWorth` | Money |  | Total net worth (assets minus liabilities) |
+| `householdIncome` | Money |  | Combined household income (all clients) |
+| `householdNetWorth` | Money |  | Combined household net worth |
+| `totalJointAssets` | Money |  | Total value of jointly owned assets |
+| `calculatedAt` | timestamp |  | When these figures were calculated |
+| `lastReviewDate` | date |  | When these figures were last reviewed |
+| `createdAt` | timestamp |  | When this record was created (read-only) |
+| `updatedAt` | timestamp |  | When this record was last updated (read-only) |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

@@ -65,19 +65,34 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
-### Estate-Planning Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+### Estate Planning Resource Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `href` | string |  | Resource URL for this estate planning record |
+| `client` | Reference Link |  | Client reference |
+| `factfind` | Reference Link |  | FactFind reference |
+| `willDetails` | string |  | Free-text description of will arrangements |
+| `totalAssets` | Money |  | Total value of client's estate |
+| `totalJointAssets` | Money |  | Total value of jointly owned assets |
+| `giftInLast7YearsDetails` | string |  | Description of gifts made in last 7 years |
+| `recentGiftDetails` | string |  | Description of recent gifts (current tax year) |
+| `regularGiftDetails` | string |  | Description of regular gifts from income |
+| `expectingInheritanceDetails` | string |  | Description of expected inheritance |
+| `propertyAdditionalNrb` | Money |  | Residence nil rate band (max £175,000) |
+| `taxYearWhenPropertySold` | integer |  | Tax year when main residence was sold (if applicable) |
+| `widowsReliefNrbDeceasedPercentage` | Number(Percentage) |  | Percentage of deceased spouse's NRB available to transfer |
+| `widowsReliefPropertyAdditionalNrbDeceasedPercentage` | Number(Percentage) |  | Percentage of deceased spouse's RNRB available to transfer |
+| `businessAssetRelief` | Money |  | Business property relief available |
+| `gifts` | ListofComplexData |  | Collection of gifts (see Gift contract) |
+| `createdAt` | timestamp |  | When this record was created (read-only) |
+| `updatedAt` | timestamp |  | When this record was last updated (read-only) |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

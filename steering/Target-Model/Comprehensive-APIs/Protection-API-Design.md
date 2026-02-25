@@ -65,19 +65,38 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Protection Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `adviserDetails` | Complex Data |  |  |
+| `arrangementCategory` | string |  | Expenditure category (Housing, Transport, Food, etc.) |
+| `beneficiaries` | ListofComplexData |  | List of trust beneficiaries |
+| `client` | Reference Link |  |  |
+| `createdAt` | date |  | When this record was created in the system |
+| `currentSumAssured` | Money |  |  |
+| `endDate` | date |  | Employment end date (null if current) |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `indexation` | Complex Data |  |  |
+| `isInTrust` | boolean |  |  |
+| `linkedTo` | Complex Data |  |  |
+| `notes` | string |  |  |
+| `policyNumber` | string |  | Policy or account number |
+| `policyType` | string |  |  |
+| `premium` | Money |  |  |
+| `premiumFrequency` | string |  | How often (Monthly, Annual, etc.) |
+| `premiumType` | string |  |  |
+| `productName` | string |  | Name of the financial product |
+| `protectionType` | string |  |  |
+
+*Showing first 20 of 29 properties. See contracts reference for complete list.*
 
 
 ### Related Resources
 
-**Parent Resource:** Arrangement
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Arrangements domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

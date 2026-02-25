@@ -65,19 +65,32 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Relationship Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | ✓ | Unique identifier for the relationship |
+| `href` | string |  | Resource URL for this relationship |
+| `client` | Reference Link |  | The primary client in this relationship |
+| `factfind` | Reference Link |  | FactFind reference |
+| `relatedClient` | Reference Link |  | The related client |
+| `relationshipType` | Enum(Text) |  | Type of relationship. See enumerations below |
+| `partner` | boolean |  | Whether this is a partner/spouse relationship |
+| `familyGrouping` | boolean |  | Whether to include in family grouping/household reporting |
+| `canRelatedViewClientsPlansAssets` | boolean |  | Can related client view this client's plans and assets? |
+| `canClientViewRelatedsPlansAssets` | boolean |  | Can this client view related client's plans and assets? |
+| `canRelatedAccessClientsData` | boolean |  | Can related client access/modify this client's data? |
+| `canClientAccessRelatedsData` | boolean |  | Can this client access/modify related client's data? |
+| `createdAt` | timestamp |  | When this record was created (read-only) |
+| `updatedAt` | timestamp |  | When this record was last updated (read-only) |
+| `createdBy` | string |  | User who created this record (read-only) |
+| `updatedBy` | string |  | User who last updated this record (read-only) |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

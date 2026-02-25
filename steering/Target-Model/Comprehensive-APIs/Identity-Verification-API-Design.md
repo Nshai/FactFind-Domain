@@ -65,19 +65,31 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
-### Identity-Verification Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+### Identity Verification Resource Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `href` | string |  | Resource URL |
+| `client` | Complex Data |  | Client personal information |
+| `contacts` | ListofComplexData |  | Contact methods |
+| `currentAddress` | Complex Data |  | Current residential address |
+| `previousAddresses` | ListofComplexData |  | Address history |
+| `clientIdentity` | Complex Data |  | Identity documents |
+| `supportingDocuments` | ListofReferenceLink |  | Uploaded document references |
+| `adviser` | Reference Link |  | Adviser who performed verification |
+| `verification` | Complex Data |  | Witness and premises verification |
+| `verificationResult` | Complex Data |  | Third-party verification result |
+| `comments` | string |  | Additional notes |
+| `createdAt` | timestamp |  | Record creation timestamp |
+| `updatedAt` | timestamp |  | Last update timestamp |
+| `createdBy` | string |  | User who created the record |
+| `updatedBy` | string |  | User who last updated the record |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

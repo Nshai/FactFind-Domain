@@ -65,19 +65,29 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Note Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `attachments` | ListofComplexData |  |  |
+| `content` | string |  |  |
+| `contentType` | string |  |  |
+| `createdAt` | date |  | When this record was created in the system |
+| `createdBy` | Complex Data |  | User who created this record |
+| `entity` | Reference Link |  |  |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `isSystemGenerated` | boolean |  |  |
+| `isVisibleToClient` | boolean |  |  |
+| `noteDiscriminator` | string |  |  |
+| `subject` | string |  |  |
+| `updatedAt` | date |  | When this record was last modified |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

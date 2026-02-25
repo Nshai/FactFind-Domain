@@ -65,19 +65,23 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Affordability Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `href` | Link |  | Web address for this assessment |
+| `factfind` | LinktoFactFind |  | The fact-find this assessment belongs to |
+| `clients` | ListofClientLinks |  | Clients included in this assessment (minimum 1) |
+| `incomes` | ListofIncomeLinks |  | Income sources to include in calculation (minimum 1) |
+| `expenditures` | ListofExpenditureLinks |  | Expenditures to include in calculation |
+| `createdAt` | Date/Time |  | When this assessment was created |
+| `lastUpdatedAt` | Date/Time |  | When this assessment was last changed |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Circumstances domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

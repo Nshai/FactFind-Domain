@@ -65,19 +65,32 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### FactFind Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `additionalNotes` | string |  |  |
+| `adviser` | Reference Link |  | The adviser responsible for this client |
+| `assetHoldings` | Complex Data |  |  |
+| `atrAssessment` | Complex Data |  |  |
+| `client` | Reference Link |  |  |
+| `completionStatus` | Complex Data |  | Current status of the goal |
+| `createdAt` | date |  | When this record was created in the system |
+| `customQuestions` | ListofComplexData |  |  |
+| `factFindNumber` | string |  |  |
+| `financialSummary` | Complex Data |  |  |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `investmentCapacity` | Complex Data |  | City/town |
+| `jointClientRef` | Reference Link |  |  |
+| `meetingDetails` | Complex Data |  |  |
+| `notes` | string |  |  |
+| `updatedAt` | date |  | When this record was last modified |
 
 
 ### Related Resources
 
-**Parent Resource:** FactFind
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the FactFind Root domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

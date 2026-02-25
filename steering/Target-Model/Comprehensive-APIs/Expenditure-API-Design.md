@@ -65,19 +65,32 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Expenditure Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | ✓ | Unique identifier for the expenditure |
+| `href` | string |  | Link to this expenditure resource |
+| `factfind` | LinktoFactFind |  | The fact-find that this expenditure belongs to |
+| `client` | LinktoClient |  | The client who has this expenditure |
+| `description` | string |  | Description of the expenditure |
+| `expenditureType` | Selection |  | Type/category of expenditure |
+| `netAmount` | Money |  | Amount paid (after tax if applicable) - includes currency code, name, and symbol |
+| `frequency` | Selection |  | How often the payment is made |
+| `startsOn` | date |  | When the expenditure started |
+| `endsOn` | date |  | When the expenditure ends (if known) |
+| `isConsolidated` | boolean |  | Is this part of a debt consolidation? |
+| `isLiabilityToBeRepaid` | boolean |  | Is this paying off a specific debt? |
+| `liability` | LinktoLiability |  | The debt/liability being repaid |
+| `notes` | string |  | Additional notes |
+| `createdAt` | date |  | When this record was created in the system |
+| `updatedAt` | date |  | When this record was last modified |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Circumstances domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

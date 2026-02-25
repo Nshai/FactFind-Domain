@@ -65,19 +65,25 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
-### DPA-Agreement Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+### DPA Agreement Resource Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | ✓ | Unique identifier for the DPA agreement |
+| `href` | string |  | Resource URL for this agreement |
+| `client` | Reference Link |  | Reference to the client |
+| `factfind` | Reference Link |  | Reference to the factfind |
+| `policy` | Reference Link |  | Reference to the DPA policy |
+| `agreedAt` | timestamp |  | When the client agreed to the policy |
+| `statements` | Complex Data |  | Policy statements and responses |
+| `createdAt` | timestamp |  | When this agreement was created (read-only) |
+| `createdBy` | string |  | User who created this agreement (read-only) |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

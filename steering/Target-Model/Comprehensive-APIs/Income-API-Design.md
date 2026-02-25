@@ -65,19 +65,36 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Income Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `client` | Reference Link |  |  |
+| `createdAt` | date |  | When this record was created in the system |
+| `description` | string |  | Description of the goal |
+| `employment` | Reference Link |  |  |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `frequency` | Selection |  | How often (Monthly, Annual, etc.) |
+| `grossAmount` | Money |  | Amount spent |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `incomePeriod` | Complex Data |  |  |
+| `incomeType` | string |  |  |
+| `isTaxable` | boolean |  | Is this income taxable? Some income like Child Benefit or ISA interest may be tax-free. |
+| `asset` | LinktoAsset |  | Link to the asset (property, investment, business) that generates this income. For example, renta... |
+| `isGuaranteed` | boolean |  |  |
+| `isOngoing` | boolean |  |  |
+| `isPrimary` | boolean |  | Whether this is the primary/main address |
+| `nationalInsuranceDeducted` | Money |  |  |
+| `netAmount` | Money |  | Amount spent |
+| `notes` | string |  |  |
+| `taxDeducted` | Money |  |  |
+| `updatedAt` | date |  | When this record was last modified |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Circumstances domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

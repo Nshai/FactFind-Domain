@@ -65,19 +65,38 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Asset Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `arrangement` | Reference Link |  |  |
+| `assetType` | string |  |  |
+| `createdAt` | date |  | When this record was created in the system |
+| `currentValue` | Money |  | Current value of the arrangement |
+| `description` | string |  | Description of the goal |
+| `dividends` | Complex Data |  | Unique system identifier for this record |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `income` | Reference Link |  |  |
+| `isBusinessAssetDisposalRelief` | boolean |  |  |
+| `isBusinessReliefQualifying` | boolean |  |  |
+| `isFreeFromInheritanceTax` | boolean |  |  |
+| `isHolding` | boolean |  |  |
+| `isVisibleToClient` | boolean |  |  |
+| `notes` | string |  |  |
+| `originalValue` | Money |  | The contact value (email address, phone number, etc.) |
+| `ownership` | Complex Data |  | Who owns this arrangement |
+| `property` | Reference Link |  |  |
+| `purchasedOn` | date |  |  |
+| `rentalExpenses` | Money |  |  |
+
+*Showing first 20 of 24 properties. See contracts reference for complete list.*
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Assets & Liabilities domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

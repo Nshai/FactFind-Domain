@@ -65,19 +65,20 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
-### Credit-History Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+### Credit History Resource Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | ✓ | Unique system identifier for this credit history record |
+| `href` | string |  | Web link to access this credit history record |
+| `factfind` | Reference Link |  | Link to the FactFind this credit history belongs to |
+| `client` | Reference Link |  | Link to the client this credit history belongs to |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Circumstances domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

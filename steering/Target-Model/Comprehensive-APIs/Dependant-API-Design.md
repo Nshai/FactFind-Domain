@@ -65,19 +65,35 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
 ### Dependant Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `age` | integer |  | Current age (calculated from date of birth) |
+| `clients` | ListofComplexData |  | Client segment classification (A, B, C, D for prioritization) |
+| `createdAt` | date |  | When this record was created in the system |
+| `dateOfBirth` | date |  | Date of birth |
+| `dependencyDetails` | Complex Data |  |  |
+| `educationDetails` | Complex Data |  |  |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `firstName` | string |  | First name (given name) |
+| `fullName` | string |  | Complete formatted name including title |
+| `gender` | string |  | Gender (M=Male, F=Female, O=Other, X=Prefer not to say) |
+| `healthDetails` | Complex Data |  |  |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `isFinanciallyDependent` | boolean |  |  |
+| `lastName` | string |  | Last name (surname/family name) |
+| `livingArrangements` | Complex Data |  |  |
+| `middleNames` | string |  | Middle name(s) |
+| `notes` | string |  |  |
+| `relationship` | string |  |  |
+| `updatedAt` | date |  | When this record was last modified |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 

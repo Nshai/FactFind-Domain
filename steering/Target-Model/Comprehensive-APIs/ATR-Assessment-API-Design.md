@@ -65,19 +65,34 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
-### ATR-Assessment Resource Properties
 
-*Refer to contracts reference document for complete field specifications.*
+### ATR Assessment Resource Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `assessmentDate` | date |  | When the assessment was conducted |
+| `assessedBy` | Reference Link |  | Adviser who conducted the assessment |
+| `capacityForLoss` | Complex Data |  | Financial capacity to sustain investment losses |
+| `client` | Reference Link |  | Reference to the client being assessed |
+| `completedAt` | date |  | When assessment was fully completed (all questions + declarations) |
+| `createdAt` | date |  | When this record was created in the system |
+| `declarations` | Complex Data |  | Client and adviser declarations |
+| `factfind` | Reference Link |  | Link to the FactFind that this assessment belongs to |
+| `href` | string |  | API resource link |
+| `id` | string | ✓ | Unique system identifier for this assessment |
+| `maxScore` | integer |  | Maximum possible score for this assessment |
+| `questions` | ListofComplexData |  | 15 standard ATR questions with client answers |
+| `reviewDate` | date |  | Date when this assessment should be reviewed |
+| `riskProfiles` | Complex Data |  | Generated and chosen risk profiles |
+| `supplementaryQuestions` | ListofComplexData |  | 45 additional context questions with answers |
+| `templateRef` | Complex Data |  | Reference to the ATR template used |
+| `totalScore` | integer |  | Total weighted score from all questions |
+| `updatedAt` | date |  | When this record was last modified |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Risk Profiling domain
-
----
+*See parent document for related entities.*
 
 ## Data Model
 
