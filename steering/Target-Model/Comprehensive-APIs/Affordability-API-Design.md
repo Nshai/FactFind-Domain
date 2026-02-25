@@ -69,24 +69,59 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Affordability Resource Properties
+
+*Fields organized into 6 sections*
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `href` | Link |  | Web address for this assessment |
-| `factfind` | Link to FactFind |  | The fact-find this assessment belongs to |
-| `clients` | List of Client Links |  | Clients included in this assessment (minimum 1) |
-| `incomes` | List of Income Links |  | Income sources to include in calculation (minimum 1) |
-| `expenditures` | List of Expenditure Links |  | Expenditures to include in calculation |
-| `createdAt` | Date/Time |  | When this assessment was created |
-| `lastUpdatedAt` | Date/Time |  | When this assessment was last changed |
+| **Main Fields** | | | |
+| `href` | string |  | Web address for this assessment |
+| `factfind` | Reference Link |  | The fact-find this assessment belongs to |
+| `clients` | List<Reference Link> |  | Clients included in this assessment (minimum 1) |
+| `incomes` | List<Reference Link> |  | Income sources to include in calculation (minimum 1) |
+| `expenditures` | List<Reference Link> |  | Expenditures to include in calculation |
+| `createdAt` | timestamp |  | When this assessment was created |
+| `lastUpdatedAt` | timestamp |  | When this assessment was last changed |
+| **Monthly Cash Flow (Calculated Automatically)** | | | |
+| `totalNetIncome` | Money |  | Total monthly income after tax |
+| `totalExpenditure` | Money |  | Total monthly spending |
+| `disposableIncome` | Money |  | Money left over each month |
+| **Monthly Modelling Options** | | | |
+| `incorporateIncomeChanges` | boolean |  | Include planned future income changes? |
+| `incorporateExpenditureChanges` | boolean |  | Include planned future expenditure changes? |
+| `forgoNonEssentialExpenditure` | boolean |  | Exclude all non-essential spending? (conservative scenario) |
+| `excludeConsolidatedExpenditure` | boolean |  | Remove debts that will be consolidated? |
+| `excludeRepaidExpenditure` | boolean |  | Remove debts that will be paid off? |
+| `hasRebrokerProtection` | boolean |  | Include cost of new/rebrokered protection policies? |
+| `agreedMonthlyBudget` | Money |  | Monthly amount client commits to for new commitment |
+| `notes` | string |  | Explanation of modelling assumptions |
+| **Monthly Affordability (Calculated Automatically)** | | | |
+| `revisedIncome` | Money |  | Income after incorporating planned changes |
+| `revisedExpenditure` | Money |  | Spending after applying scenario options |
+| `consolidatedExpenditurePayments` | Money |  | Total payments for debts being consolidated |
+| `expenditurePaymentsTobeRepaid` | Money |  | Total payments for debts being paid off |
+| `protectionPremiums` | Money |  | Cost of new/rebrokered protection policies |
+| `finalDisposableIncome` | Money |  | Final monthly surplus after all adjustments |
+| **Lumpsum Affordability** | | | |
+| `totalLumpSumAvailable` | Money |  | Total cash available |
+| `agreedInvestmentAmount` | Money |  | Amount client agrees to invest/commit |
+| `sourceOfInvestment` | string |  | Where the money comes from |
+| `isInvestmentAvailableWithoutPenalty` | boolean |  | Can access without penalties or early exit charges? |
+| `totalFundsAvailable` | Money |  | Total funds (may include other sources) - Calculated |
+| **Emergency Fund** | | | |
+| `committedAmount` | Money |  | Amount client has set aside for emergencies |
+| `requiredAmount` | Money |  | Recommended emergency fund |
+| `shortfall` | Money |  | Gap to close (calculated automatically) |
 
-*Total: 7 properties*
+*Total: 32 properties*
 
 
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model
 

@@ -69,6 +69,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Protection Resource Properties
 
 | Property | Type | Required | Description |
@@ -106,104 +107,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 *Total: 29 properties*
 
 
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### adviserDetails
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `adviceDate` | date |  |
-| `adviserName` | string |  |
-| `firmName` | string |  |
-
-#### client
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique system identifier for this record |
-
-#### currentSumAssured
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Complex Data |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `symbol` | string |  |
-| `note` | string |  |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique system identifier for this record |
-
-#### indexation
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `isIndexLinked` | boolean |  |
-
-#### linkedTo
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `liability` | Reference Link |  |
-| `id` | integer | Unique system identifier for this record |
-| `mortgage` | Reference Link | Current age (calculated from date of birth) |
-| `id` | integer | Unique system identifier for this record |
-
-#### premium
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Complex Data |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `symbol` | string |  |
-
-#### provider
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique system identifier for this record |
-
-#### sumAssured
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Complex Data |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `symbol` | string |  |
-
-#### termRemaining
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `months` | integer |  |
-| `years` | integer | Number of years at this address |
-
-#### trustDetails
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `beneficiaries` | List of str | List of trust beneficiaries |
-| `trustType` | string | Type of trust (Discretionary, Bare, Interest in Possession, etc.) |
-| `trustees` | List of str | List of trustees |
-
-#### underwriting
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `completedDate` | date |  |
-| `exclusions` | List |  |
-
-
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

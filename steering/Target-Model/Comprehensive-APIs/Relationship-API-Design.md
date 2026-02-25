@@ -69,6 +69,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Relationship Resource Properties
 
 | Property | Type | Required | Description |
@@ -85,44 +86,17 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `canClientViewRelatedsPlansAssets` | boolean |  | Can this client view related client's plans and assets? |
 | `canRelatedAccessClientsData` | boolean |  | Can related client access/modify this client's data? |
 | `canClientAccessRelatedsData` | boolean |  | Can this client access/modify related client's data? |
-| `createdAt` | timestamp |  | When this record was created (read-only) |
-| `updatedAt` | timestamp |  | When this record was last updated (read-only) |
+| `createdAt` | Date and Time |  | When this record was created (read-only) |
+| `updatedAt` | Date and Time |  | When this record was last updated (read-only) |
 | `createdBy` | string |  | User who created this record (read-only) |
 | `updatedBy` | string |  | User who last updated this record (read-only) |
 
 *Total: 16 properties*
 
 
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### client
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique client identifier |
-| `href` | string | Client resource URL |
-| `name` | string | Client name |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique FactFind identifier |
-| `href` | string | FactFind resource URL |
-
-#### relatedClient
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique client identifier |
-| `href` | string | Client resource URL |
-| `name` | string | Client name |
-
-
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

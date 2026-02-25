@@ -69,6 +69,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Income Resource Properties
 
 | Property | Type | Required | Description |
@@ -84,7 +85,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `incomePeriod` | Complex Data |  |  |
 | `incomeType` | string |  |  |
 | `isTaxable` | boolean |  | Is this income taxable? Some income like Child Benefit or ISA interest may be tax-free. |
-| `asset` | Link to Asset |  | Link to the asset (property, investment, business) that generates this income. For example, rental income links to th... |
+| `asset` | Link to Asset |  | Link to the asset (property, investment, business) that generates this income. For example, rental income links to the rental property. |
 | `isGuaranteed` | boolean |  |  |
 | `isOngoing` | boolean |  |  |
 | `isPrimary` | boolean |  | Whether this is the primary/main address |
@@ -97,105 +98,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 *Total: 20 properties*
 
 
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### asset
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique identifier for the asset that generates this income |
-| `href` | string | Link to the asset resource |
-| `assetType` | string | Type of asset (Property, Investment, Business, Other) |
-| `description` | string | Description of the asset |
-| `Rental Income` | Property | Links to residential or commercial property generating rental income |
-| `Dividend Income` | Investment | Links to stocks, shares, or investment accounts paying dividends |
-| `Interest Income` | Savings/Investment | Links to bank accounts, bonds, or other interest-bearing investments |
-
-#### client
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `clientNumber` | string | Client reference number assigned by your organization |
-| `id` | integer | Unique system identifier for this record |
-| `name` | string | First name (given name) |
-| `type` | string | Type of client: Person (individual), Corporate (company), or Trust |
-
-#### employment
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `employerName` | string | Name of the employer |
-| `id` | integer | Unique system identifier for this record |
-| `status` | string | Current status of the goal |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `factFindNumber` | string |  |
-| `id` | integer | Unique system identifier for this record |
-| `status` | string | Current status of the goal |
-
-#### frequency
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `display` | string |  |
-| `periodsPerYear` | integer |  |
-
-#### grossAmount
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Selection |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `display` | string |  |
-| `symbol` | string |  |
-
-#### incomePeriod
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `endDate` | string | Employment end date (null if current) |
-| `startDate` | date | Employment start date |
-
-#### nationalInsuranceDeducted
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Selection |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `display` | string |  |
-| `symbol` | string |  |
-
-#### netAmount
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Selection |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `display` | string |  |
-| `symbol` | string |  |
-
-#### taxDeducted
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Selection |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `display` | string |  |
-| `symbol` | string |  |
-
-
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

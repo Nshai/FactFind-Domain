@@ -75,13 +75,18 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Employment Resource Properties
+
+*Fields organized into 7 sections*
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
+| **Identification** | | | |
 | `id` | integer | ✓ | System-assigned employment record ID |
 | `factfindRef` | Reference |  | Reference to parent fact find |
 | `client` | Reference |  | Reference to the client |
+| **Employment Details** | | | |
 | `employmentStatus` | Status |  | Current employment status (see types above) |
 | `employmentBusinessType` | Status |  | Business type (only for self-employed) |
 | `employmentStatusDescription` | string |  | Additional employment details |
@@ -89,6 +94,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `employer` | string |  | Employer or business name |
 | `industryType` | string |  | Industry or sector |
 | `highestTaxRate` | string |  | Marginal tax rate (20, 40, 45) |
+| **Employment Period** | | | |
 | `startsOn` | date |  | Employment start date |
 | `endsOn` | date |  | Employment end date (blank if current) |
 | `isCurrentEmployment` | boolean |  | Is this current employment? (auto-calculated) |
@@ -96,12 +102,14 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `inProbation` | boolean |  | Currently in probation period? |
 | `probationPeriodInMonths` | integer |  | Length of probation period |
 | `intendedRetirementAge` | integer |  | Planned retirement age |
+| **Employer Address** | | | |
 | `address.line1` | string |  | Address line 1 |
 | `address.line2` | string |  | Address line 2 |
 | `address.locality` | string |  | City/town |
 | `address.postalCode` | string |  | Postal code |
 | `address.county` | string |  | County |
 | `address.country` | string |  | Country |
+| **Self-Employed Income (3 Years of Accounts)** | | | |
 | `grossProfit` | Money |  | Gross profit for the year |
 | `netProfit` | Money |  | Net profit after expenses |
 | `shareOfCompanyProfit` | Money |  | Individual's share of profit |
@@ -111,9 +119,11 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `netSalary` | Money |  | Net salary after tax |
 | `yearEnd` | date |  | Accounting year end |
 | `includeInAffordability` | boolean |  | Use in affordability calculations |
-| `incomesHref` | Link |  | Link to related income records |
-| `createdAt` | timestamp |  | When this record was created |
-| `updatedAt` | timestamp |  | When this record was last updated |
+| **Related Resources** | | | |
+| `incomesHref` | string |  | Link to related income records |
+| **Audit Trail** | | | |
+| `createdAt` | DateTime |  | When this record was created |
+| `updatedAt` | DateTime |  | When this record was last updated |
 
 *Total: 35 properties*
 

@@ -69,6 +69,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Financial-Profile Resource Properties
 
 | Property | Type | Required | Description |
@@ -83,44 +84,17 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `householdIncome` | Money |  | Combined household income (all clients) |
 | `householdNetWorth` | Money |  | Combined household net worth |
 | `totalJointAssets` | Money |  | Total value of jointly owned assets |
-| `calculatedAt` | timestamp |  | When these figures were calculated |
+| `calculatedAt` | Date and Time |  | When these figures were calculated |
 | `lastReviewDate` | date |  | When these figures were last reviewed |
-| `createdAt` | timestamp |  | When this record was created (read-only) |
-| `updatedAt` | timestamp |  | When this record was last updated (read-only) |
+| `createdAt` | Date and Time |  | When this record was created (read-only) |
+| `updatedAt` | Date and Time |  | When this record was last updated (read-only) |
 
 *Total: 14 properties*
-
-
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### Currency Amount Structure (applies to all amount fields)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | The monetary value |
-| `currency` | Complex Data | Currency information |
-| `code` | string | ISO currency code |
-| `symbol` | string | Currency symbol |
-
-#### client
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique client identifier |
-| `href` | string | Client resource URL |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique FactFind identifier |
-| `href` | string | FactFind resource URL |
 
 
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

@@ -74,6 +74,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Address Resource Properties
 
 | Property | Type | Required | Description |
@@ -93,47 +94,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 *Total: 11 properties*
 
 
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### address
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `city` | string | City/town |
-| `country` | string | Country |
-| `county` | string | County/region |
-| `line1` | string | Address line 1 |
-| `line2` | string | Address line 2 |
-| `postcode` | string | Postcode/ZIP code |
-
-#### client
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `clientNumber` | string | Client reference number assigned by your organization |
-| `id` | integer | Unique system identifier for this record |
-| `name` | string | First name (given name) |
-| `type` | string | Type of client: Person (individual), Corporate (company), or Trust |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `factFindNumber` | string |  |
-| `id` | integer | Unique system identifier for this record |
-| `status` | string | Current status of the goal |
-
-#### residencyPeriod
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `endDate` | string | Employment end date (null if current) |
-
-
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

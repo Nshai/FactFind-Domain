@@ -69,25 +69,44 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Net-Worth Resource Properties
+
+*Fields organized into 4 sections*
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
+| **Main Fields** | | | |
 | `id` | integer | ✓ | Unique identifier |
-| `href` | Link |  | Web address for this net worth record |
-| `factfind` | Link to FactFind |  | The fact-find this belongs to |
-| `clients` | List of Client Links |  | Clients included in this calculation |
-| `calculatedOn` | Date/Time |  | When this net worth was calculated |
+| `href` | string |  | Web address for this net worth record |
+| `factfind` | Reference Link |  | The fact-find this belongs to |
+| `clients` | List<Reference Link> |  | Clients included in this calculation |
+| `calculatedOn` | timestamp |  | When this net worth was calculated |
 | `notes` | string |  | Context for this calculation |
-| `createdAt` | Date/Time |  | When this record was created |
-| `updatedAt` | Date/Time |  | When this record was last modified |
+| `createdAt` | timestamp |  | When this record was created |
+| `updatedAt` | timestamp |  | When this record was last modified |
+| **Asset Breakdown** | | | |
+| `property` | Money |  | Total property asset value |
+| `pensions` | Money |  | Total pension asset value |
+| `investments` | Money |  | Total investment asset value |
+| `cash` | Money |  | Total cash and savings |
+| `other` | Money |  | Other assets (business, collectibles, etc.) |
+| `totalAssets` | Money |  | Sum of all asset categories (calculated) |
+| **Liability Breakdown** | | | |
+| `mortgages` | Money |  | Total outstanding mortgages |
+| `loans` | Money |  | Total loans (personal, secured, unsecured) |
+| `creditCards` | Money |  | Total credit card balances |
+| `totalLiabilities` | Money |  | Sum of all liability categories (calculated) |
+| **Net Worth** | | | |
+| `netWorth` | Money |  | Total assets minus total liabilities (calculated) |
 
-*Total: 8 properties*
+*Total: 19 properties*
 
 
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model
 

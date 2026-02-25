@@ -69,6 +69,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Estate-Planning Resource Properties
 
 | Property | Type | Required | Description |
@@ -89,41 +90,15 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `widowsReliefPropertyAdditionalNrbDeceasedPercentage` | Number (Percentage) |  | Percentage of deceased spouse's RNRB available to transfer |
 | `businessAssetRelief` | Money |  | Business property relief available |
 | `gifts` | List of Complex Data |  | Collection of gifts (see Gift contract) |
-| `createdAt` | timestamp |  | When this record was created (read-only) |
-| `updatedAt` | timestamp |  | When this record was last updated (read-only) |
+| `createdAt` | Date and Time |  | When this record was created (read-only) |
+| `updatedAt` | Date and Time |  | When this record was last updated (read-only) |
 
 *Total: 18 properties*
-
-
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### Currency Amount Structure (applies to totalAssets, totalJointAssets, propertyAdditionalNrb, businessAssetRelief)
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `currency` | string | ISO currency code |
-| `amount` | integer | The monetary value |
-
-#### client
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique client identifier |
-| `href` | string | Client resource URL |
-| `name` | string | Client name |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique FactFind identifier |
-| `href` | string | FactFind resource URL |
 
 
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

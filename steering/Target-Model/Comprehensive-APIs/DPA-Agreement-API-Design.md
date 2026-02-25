@@ -69,6 +69,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### DPA-Agreement Resource Properties
 
 | Property | Type | Required | Description |
@@ -78,43 +79,17 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `client` | Reference Link |  | Reference to the client |
 | `factfind` | Reference Link |  | Reference to the factfind |
 | `policy` | Reference Link |  | Reference to the DPA policy |
-| `agreedAt` | timestamp |  | When the client agreed to the policy |
+| `agreedAt` | Date and Time |  | When the client agreed to the policy |
 | `statements` | Complex Data |  | Policy statements and responses |
-| `createdAt` | timestamp |  | When this agreement was created (read-only) |
+| `createdAt` | Date and Time |  | When this agreement was created (read-only) |
 | `createdBy` | string |  | User who created this agreement (read-only) |
 
 *Total: 9 properties*
 
 
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### client
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique client identifier |
-| `href` | string | Client resource URL |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique FactFind identifier |
-| `href` | string | FactFind resource URL |
-
-#### policy
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique policy identifier |
-| `name` | string | Policy name (read-only) |
-| `href` | string | Policy resource URL |
-
-
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

@@ -69,6 +69,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Asset Resource Properties
 
 | Property | Type | Required | Description |
@@ -101,74 +102,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 *Total: 24 properties*
 
 
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### arrangement
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique system identifier for this record |
-
-#### current
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Complex Data |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `symbol` | string |  |
-
-#### dividends
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `owners` | List of Complex Data | Who owns this arrangement |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique system identifier for this record |
-
-#### income
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique system identifier for this record |
-
-#### original
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-| `currency` | Complex Data |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `symbol` | string |  |
-
-#### ownership
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `owners` | List of Complex Data | Who owns this arrangement |
-| `ownershipType` | string | Who owns this arrangement |
-
-#### property
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique system identifier for this record |
-
-#### rentalExpenses
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `amount` | integer | Amount spent |
-
-
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model

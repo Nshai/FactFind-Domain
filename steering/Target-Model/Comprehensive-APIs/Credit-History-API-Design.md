@@ -70,15 +70,21 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Credit-History Resource Properties
+
+*Fields organized into 8 sections*
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
+| **Identification** | | | |
 | `id` | integer | ✓ | Unique system identifier for this credit history record |
 | `href` | string |  | Web link to access this credit history record |
 | `factfind` | Reference Link |  | Link to the FactFind this credit history belongs to |
 | `client` | Reference Link |  | Link to the client this credit history belongs to |
+| **Credit Score Assessment** | | | |
 | `creditScore` | Complex Data |  | Credit score information from Credit Reference Agency |
+| **Adverse Credit Indicators (Summary)** | | | |
 | `hasAdverseCredit` | boolean |  | Does the client have any adverse credit events on their record? |
 | `hasCCJ` | boolean |  | Does the client have any County Court Judgments? |
 | `hasBeenRefusedCredit` | boolean |  | Has the client been refused credit in the past? |
@@ -86,10 +92,15 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `hasDefault` | boolean |  | Does the client have any defaults registered on their credit file? |
 | `hasBankruptcyHistory` | boolean |  | Does the client have bankruptcy history? |
 | `hasArrears` | boolean |  | Does the client currently have or have had payment arrears? |
-| `adverseCreditEvents` | List<Event> |  | Detailed list of adverse credit events with financial and timeline information |
+| **Adverse Credit Events (Detailed Records)** | | | |
+| `adverseCreditEvents` | List of Events |  | Detailed list of adverse credit events with financial and timeline information |
+| **Missed Payments Summary** | | | |
 | `missedPayments` | Complex Data |  | Summary of missed payment history |
+| **Mortgage Suitability Assessment** | | | |
 | `mortgageSuitability` | Complex Data |  | Automated assessment of mortgage lending eligibility |
+| **Additional Information** | | | |
 | `notes` | string |  | Free-text notes about credit history, mitigating circumstances, or additional context (max 2000 characters) |
+| **System Fields** | | | |
 | `createdAt` | timestamp |  | When this credit history record was created in the system |
 | `updatedAt` | timestamp |  | When this credit history record was last modified |
 

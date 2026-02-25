@@ -69,6 +69,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 
 
+
 ### Dependant Resource Properties
 
 | Property | Type | Required | Description |
@@ -96,63 +97,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 *Total: 19 properties*
 
 
-### Referenced Type Definitions
-
-The following complex types are used in the properties above:
-
-#### dependencyDetails
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `annualCost` | Money |  |
-| `amount` | integer | Amount spent |
-| `currency` | Complex Data |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `symbol` | string |  |
-| `estimatedDependencyEndAge` | integer | Current age (calculated from date of birth) |
-| `estimatedDependencyEndDate` | date | Employment end date (null if current) |
-| `monthlyCost` | Money |  |
-| `amount` | integer | Amount spent |
-| `currency` | Complex Data |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `symbol` | string |  |
-
-#### educationDetails
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `currentEducationLevel` | string |  |
-| `estimatedEducationCosts` | Money |  |
-| `amount` | integer | Amount spent |
-| `currency` | Complex Data |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `symbol` | string |  |
-| `isInPrivateEducation` | boolean |  |
-| `plannedHigherEducation` | boolean |  |
-
-#### factfind
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | integer | Unique system identifier for this record |
-
-#### healthDetails
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `hasSpecialNeeds` | boolean |  |
-| `healthNotes` | string |  |
-| `requiresOngoingCare` | boolean |  |
-
-#### livingArrangements
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `custodyArrangement` | string |  |
-
-
 ### Related Resources
 
 *See parent document for relationships to other entities.*
+
 
 ## Data Model
