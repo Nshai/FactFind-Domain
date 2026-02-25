@@ -101,6 +101,71 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 *Total: 24 properties*
 
+### Referenced Type Definitions
+
+The following complex types are used in the properties above:
+
+#### arrangement
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for the linked arrangement |
+
+#### currentValue (Money Structure)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | decimal | Current value amount |
+| `currency` | Complex Data | Currency details |
+| `code` | string | Currency code (e.g., GBP) |
+| `symbol` | string | Currency symbol (e.g., £) |
+
+#### dividends
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `owners` | List<Complex Data> | Dividend ownership details |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique identifier for the parent fact-find |
+
+#### income
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique identifier for linked income record |
+
+#### originalValue (Money Structure)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | decimal | Original purchase/acquisition value |
+| `currency` | Complex Data | Currency details |
+| `code` | string | Currency code (e.g., GBP) |
+| `symbol` | string | Currency symbol (e.g., £) |
+
+#### ownership
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `owners` | List<Complex Data> | List of owners with percentages |
+| `ownershipType` | string | Type of ownership (e.g., JOINT, SOLE) |
+
+#### property
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique identifier for linked property record |
+
+#### rentalExpenses (Money Structure)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | decimal | Monthly rental expenses amount |
+| `currency` | string | Currency code |
 
 ### Related Resources
 

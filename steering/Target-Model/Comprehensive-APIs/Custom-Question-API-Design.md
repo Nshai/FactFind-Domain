@@ -93,11 +93,40 @@ The following types are referenced in the resource properties above:
 
 #### Reference Link
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+Standard reference structure used throughout the API:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique identifier of the referenced entity |
+| `href` | string | API endpoint URL for the referenced entity |
+
+**Used for:** `factfind`, `client`, `createdBy`
 
 #### Selection
 
-*Enumeration with code and display* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+Enumeration structure with code and display value:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | string | Machine-readable code value |
+| `display` | string | Human-readable display text |
+
+**Used for:** `category`, `answerType`
+
+**Category Values:**
+- `GENERAL` - General questions
+- `FINANCIAL` - Financial information questions
+- `HEALTH` - Health and medical questions
+- `LIFESTYLE` - Lifestyle and preferences
+- `GOALS` - Goals and objectives
+- `OTHER` - Other custom categories
+
+**AnswerType Values:**
+- `TEXT` - Free text answer
+- `NUMBER` - Numeric answer
+- `YES_NO` - Boolean yes/no answer
+- `DATE` - Date value answer
+- `SELECTION` - Multiple choice selection
 
 
 ### Related Resources
@@ -159,9 +188,26 @@ For common business rules applicable to all entities, refer to **[Master API Des
 
 ```json
 {
-  "field1": "value1",
-  "field2": "value2",
-  "...": "entity-specific fields"
+  "factfind": {
+    "id": 456,
+    "href": "/api/v2/factfinds/456"
+  },
+  "client": {
+    "id": 789,
+    "href": "/api/v2/factfinds/456/clients/789"
+  },
+  "category": {
+    "code": "LIFESTYLE",
+    "display": "Lifestyle"
+  },
+  "question": "Do you have any plans to relocate in the next 5 years?",
+  "answerType": {
+    "code": "YES_NO",
+    "display": "Yes/No"
+  },
+  "isRequired": true,
+  "displayOrder": 10,
+  "notes": "Important for long-term financial planning"
 }
 ```
 
@@ -170,11 +216,34 @@ For common business rules applicable to all entities, refer to **[Master API Des
 ```json
 {
   "id": 123,
-  "field1": "value1",
-  "field2": "value2",
-  "created": "2026-02-25T10:00:00Z",
-  "modified": "2026-02-25T10:00:00Z",
-  "...": "entity-specific fields"
+  "href": "/api/v2/factfinds/456/custom-questions/123",
+  "factfind": {
+    "id": 456,
+    "href": "/api/v2/factfinds/456"
+  },
+  "client": {
+    "id": 789,
+    "href": "/api/v2/factfinds/456/clients/789"
+  },
+  "category": {
+    "code": "LIFESTYLE",
+    "display": "Lifestyle"
+  },
+  "question": "Do you have any plans to relocate in the next 5 years?",
+  "answer": "No",
+  "answerType": {
+    "code": "YES_NO",
+    "display": "Yes/No"
+  },
+  "isRequired": true,
+  "displayOrder": 10,
+  "notes": "Important for long-term financial planning",
+  "createdBy": {
+    "id": 42,
+    "href": "/api/v2/users/42"
+  },
+  "createdAt": "2026-02-25T10:00:00Z",
+  "updatedAt": "2026-02-25T10:00:00Z"
 }
 ```
 

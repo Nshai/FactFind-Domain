@@ -97,6 +97,81 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 *Total: 20 properties*
 
+### Referenced Type Definitions
+
+The following complex types are used in the properties above:
+
+#### Money
+
+Currency amount structure used for all monetary values:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | decimal | Monetary amount |
+| `currency` | Complex Data | Currency details |
+| `code` | string | Currency code (e.g., GBP, USD, EUR) |
+| `symbol` | string | Currency symbol (e.g., £, $, €) |
+
+**Used for:** `grossAmount`, `netAmount`, `nationalInsuranceDeducted`, `taxDeducted`
+
+#### Selection
+
+Enumeration structure with code and display value:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | string | Machine-readable code value |
+| `display` | string | Human-readable display text |
+
+**Used for:** `frequency`
+
+**Frequency Values:**
+- `WEEKLY` - Weekly income
+- `FORTNIGHTLY` - Fortnightly income
+- `FOUR_WEEKLY` - Four-weekly income
+- `MONTHLY` - Monthly income
+- `QUARTERLY` - Quarterly income
+- `HALF_YEARLY` - Half-yearly income
+- `ANNUALLY` - Annual income
+- `ONE_OFF` - One-off payment
+
+#### Reference Link
+
+Standard reference structure for linked entities:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique identifier of the referenced entity |
+| `href` | string | API endpoint URL for the referenced entity |
+
+**Used for:** `client`, `employment`, `factfind`, `asset`
+
+#### incomePeriod
+
+Income period details (for incomes that aren't ongoing):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `startsOn` | date | Date when income started/will start |
+| `endsOn` | date | Date when income ends/will end (if known) |
+| `isOngoing` | boolean | Whether income is ongoing (no end date) |
+
+**Income Types by Source:**
+- **Employment Income:** Linked to `employment` record (salary, wages, bonus, commission)
+- **Rental Income:** Linked to `asset` record (property generating rental income)
+- **Investment Income:** Linked to `asset` record (dividends, interest from investments)
+- **Pension Income:** From pension arrangements
+- **State Benefits:** Child benefit, state pension, disability benefits (typically tax-free)
+- **Other Income:** Trust income, maintenance payments, etc.
+
+**Tax Treatment:**
+- `isTaxable`: Indicates if income is subject to tax (state benefits often aren't)
+- `grossAmount`: Total income before deductions
+- `taxDeducted`: Income tax deducted at source (PAYE for employment)
+- `nationalInsuranceDeducted`: NI contributions deducted
+- `netAmount`: Take-home income after all deductions
+
+**Calculation:** `netAmount = grossAmount - taxDeducted - nationalInsuranceDeducted`
 
 ### Related Resources
 

@@ -17,9 +17,10 @@
 3. [Circumstances Context](#3-circumstances-context)
 4. [Assets & Liabilities Context](#4-assets--liabilities-context)
 5. [Arrangements Context](#5-arrangements-context)
-6. [Goals Context](#6-goals-context)
-7. [ATR Context](#7-atr-context)
-8. [Reference Data API](#8-reference-data-api)
+6. [Plans & Investments Context](#6-plans--investments-context)
+7. [Goals Context](#7-goals-context)
+8. [ATR Context](#8-atr-context)
+9. [Reference Data API](#9-reference-data-api)
 9. [Summary Statistics](#summary-statistics)
 
 ---
@@ -329,90 +330,13 @@
 
 **Base Path:** `/api/v2/factfinds/{id}/arrangements`
 
-**Description:** Type-based financial arrangements including investments, pensions, mortgages, and protection policies. Hierarchical structure with type-specific endpoints.
+**Description:** Type-based financial arrangements including pensions, mortgages, and protection policies. Hierarchical structure with type-specific endpoints.
+
+**Note:** Investments are now managed separately under Plans & Investments Context (Section 6).
 
 ### List All Arrangements
 
 | Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds/{id}/arrangements` | List all arrangements | ⭐ Common properties only |
-
-### Investment Arrangements
-
-| Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds/{id}/arrangements/investments` | List all investments | ⭐ All investment types |
-| POST | `/api/v2/factfinds/{id}/arrangements/investments/GIA` | Create GIA | ⭐ General Investment Account |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/GIA` | List GIAs | ⭐ Filter by type |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/GIA/{arrangementId}` | Get GIA details | ⭐ Specific GIA |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/investments/GIA/{arrangementId}` | Update GIA | ⭐ Partial updates |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/investments/GIA/{arrangementId}` | Delete GIA | ⭐ Soft delete |
-| POST | `/api/v2/factfinds/{id}/arrangements/investments/ISA` | Create ISA | ⭐ Individual Savings Account |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/ISA` | List ISAs | ⭐ Filter by type |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/ISA/{arrangementId}` | Get ISA details | ⭐ Specific ISA |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/investments/ISA/{arrangementId}` | Update ISA | ⭐ Partial updates |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/investments/ISA/{arrangementId}` | Delete ISA | ⭐ Soft delete |
-| POST | `/api/v2/factfinds/{id}/arrangements/investments/Bonds` | Create Bond | ⭐ Investment Bonds |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/Bonds` | List Bonds | ⭐ Filter by type |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/Bonds/{arrangementId}` | Get Bond details | ⭐ Specific Bond |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/investments/Bonds/{arrangementId}` | Update Bond | ⭐ Partial updates |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/investments/Bonds/{arrangementId}` | Delete Bond | ⭐ Soft delete |
-| POST | `/api/v2/factfinds/{id}/arrangements/investments/Investment-Trust` | Create Investment Trust | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/Investment-Trust` | List Investment Trusts | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/Investment-Trust/{arrangementId}` | Get Investment Trust | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/investments/Investment-Trust/{arrangementId}` | Update Investment Trust | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/investments/Investment-Trust/{arrangementId}` | Delete Investment Trust | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/investments/Platform-Account` | Create Platform Account | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/Platform-Account` | List Platform Accounts | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/Platform-Account/{arrangementId}` | Get Platform Account | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/investments/Platform-Account/{arrangementId}` | Update Platform Account | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/investments/Platform-Account/{arrangementId}` | Delete Platform Account | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/investments/Offshore-Bond` | Create Offshore Bond | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/Offshore-Bond` | List Offshore Bonds | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/investments/Offshore-Bond/{arrangementId}` | Get Offshore Bond | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/investments/Offshore-Bond/{arrangementId}` | Update Offshore Bond | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/investments/Offshore-Bond/{arrangementId}` | Delete Offshore Bond | ⭐ New in v3.0 |
-
-### Pension Arrangements
-
-| Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions` | List all pensions | ⭐ All pension types |
-| POST | `/api/v2/factfinds/{id}/arrangements/pensions/personal-pension` | Create Personal Pension | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/personal-pension` | List Personal Pensions | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/personal-pension/{arrangementId}` | Get Personal Pension | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/pensions/personal-pension/{arrangementId}` | Update Personal Pension | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/pensions/personal-pension/{arrangementId}` | Delete Personal Pension | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/pensions/state-pension` | Create State Pension | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/state-pension` | List State Pensions | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/state-pension/{arrangementId}` | Get State Pension | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/pensions/state-pension/{arrangementId}` | Update State Pension | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/pensions/state-pension/{arrangementId}` | Delete State Pension | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/pensions/workplace-pension` | Create Workplace Pension | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/workplace-pension` | List Workplace Pensions | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/workplace-pension/{arrangementId}` | Get Workplace Pension | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/pensions/workplace-pension/{arrangementId}` | Update Workplace Pension | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/pensions/workplace-pension/{arrangementId}` | Delete Workplace Pension | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/pensions/SIPP` | Create SIPP | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/SIPP` | List SIPPs | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/SIPP/{arrangementId}` | Get SIPP | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/pensions/SIPP/{arrangementId}` | Update SIPP | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/pensions/SIPP/{arrangementId}` | Delete SIPP | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/pensions/final-salary` | Create Final Salary | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/final-salary` | List Final Salary | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/final-salary/{arrangementId}` | Get Final Salary | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/pensions/final-salary/{arrangementId}` | Update Final Salary | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/pensions/final-salary/{arrangementId}` | Delete Final Salary | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/pensions/drawdown` | Create Drawdown | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/drawdown` | List Drawdowns | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/drawdown/{arrangementId}` | Get Drawdown | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/pensions/drawdown/{arrangementId}` | Update Drawdown | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/pensions/drawdown/{arrangementId}` | Delete Drawdown | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/pensions/annuity` | Create Annuity | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/annuity` | List Annuities | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/pensions/annuity/{arrangementId}` | Get Annuity | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/pensions/annuity/{arrangementId}` | Update Annuity | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/pensions/annuity/{arrangementId}` | Delete Annuity | ⭐ New in v3.0 |
 
 ### Mortgage Arrangements
 
@@ -465,11 +389,145 @@
 | PATCH | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/valuations/{valuationId}` | Update valuation | ⭐ Partial updates |
 | DELETE | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/valuations/{valuationId}` | Delete valuation | ⭐ Remove valuation |
 
-**Total Endpoints:** 109 (109 new in v3.0)
+**Total Endpoints:** 32 (32 new in v3.0)
+
+**Note:**
+- Investment arrangements have been moved to Plans & Investments Context (Section 6).
+- ALL Pension arrangements (Personal Pension, State Pension, Workplace Pension, SIPP, Final Salary, Drawdown, Annuity, etc.) have been moved to Plans & Investments Context (Section 6) as standalone Plans entities.
 
 ---
 
-## 6. Goals Context
+## 6. Plans & Investments Context
+
+**Base Path:** `/api/v2/factfinds/{id}/investments`
+
+**Description:** Comprehensive investment management including investment accounts, life-assured investments, cash bank accounts, and investment bonds. Supports multi-category investments with flexible contribution tracking and fund holdings management.
+
+### Core Investment Operations
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/investments` | List all investments | ⭐ Supports filtering by category |
+| POST | `/api/v2/factfinds/{id}/investments` | Create investment | ⭐ All investment types |
+| GET | `/api/v2/factfinds/{id}/investments/{investmentId}` | Get investment details | ⭐ Full investment record |
+| PATCH | `/api/v2/factfinds/{id}/investments/{investmentId}` | Update investment | ⭐ Partial updates |
+| DELETE | `/api/v2/factfinds/{id}/investments/{investmentId}` | Delete investment | ⭐ Soft delete |
+
+**Investment Categories:**
+- **CashBankAccount** - Bank accounts, savings accounts, cash ISAs
+- **Investment** - General investments, unit trusts, OEICs, investment bonds (without life cover)
+- **lifeAssuredInvestment** - Investment bonds with life assurance, whole of life policies with investment element
+
+**Key Features:**
+- Multi-owner support (joint investments)
+- Flexible contributions (regular, lumpsum, transfer)
+- Fund holdings with multiple identification codes (ISIN, SEDOL, Platform codes)
+- Life assurance benefits (life cover, critical illness)
+- Maturity projections (low, medium, high scenarios)
+- Wrap/platform account linking
+- Product provider tracking
+- Selling adviser tracking
+- Lifecycle stage management
+
+### Core Final Salary Pension Operations
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/pensions/finalsalary` | List all final salary pensions | ⭐ Supports filtering by scheme type |
+| POST | `/api/v2/factfinds/{id}/pensions/finalsalary` | Create final salary pension | ⭐ Defined benefit pensions |
+| GET | `/api/v2/factfinds/{id}/pensions/finalsalary/{pensionId}` | Get pension details | ⭐ Full pension record |
+| PATCH | `/api/v2/factfinds/{id}/pensions/finalsalary/{pensionId}` | Update pension | ⭐ Partial updates |
+| DELETE | `/api/v2/factfinds/{id}/pensions/finalsalary/{pensionId}` | Delete pension | ⭐ Soft delete |
+
+**Pension Categories:**
+- **PensionDefinedBenefit** - Final Salary and CARE (Career Average Revalued Earnings) schemes
+
+**Scheme Types:**
+- **FinalSalary** - Benefits based on final salary and service
+- **CARE** - Career Average Revalued Earnings schemes
+- **Hybrid** - Combination of defined benefit and defined contribution
+
+**Key Features:**
+- Prospective benefits tracking (pension with/without lump sum)
+- Cash Equivalent Transfer Value (CETV) with expiry dates
+- Accrual rate tracking (1/60, 1/80, etc.)
+- Death in service benefits
+- Early retirement provisions
+- Guaranteed Minimum Pension (GMP) tracking
+- Dependant benefits (spouse, children)
+- Purchase of added years
+- Affinity DC scheme integration
+- Wrap/platform account linking
+
+### Core Annuity Operations
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/pensions/annuities` | List all annuities | ⭐ Supports filtering by annuity type |
+| POST | `/api/v2/factfinds/{id}/pensions/annuities` | Create annuity | ⭐ Guaranteed income pensions |
+| GET | `/api/v2/factfinds/{id}/pensions/annuities/{annuityId}` | Get annuity details | ⭐ Full annuity record |
+| PATCH | `/api/v2/factfinds/{id}/pensions/annuities/{annuityId}` | Update annuity | ⭐ Partial updates |
+| DELETE | `/api/v2/factfinds/{id}/pensions/annuities/{annuityId}` | Delete annuity | ⭐ Soft delete |
+
+**Pension Categories:**
+- **Annuity** - Guaranteed retirement income for life or fixed term
+
+**Annuity Types:**
+- **LIFETIME** - Annuity payable for life
+- **FIXED_TERM** - Annuity payable for fixed period
+- **JOINT_LIFE** - Continues on death to spouse
+- **LEVEL** - Fixed income amount
+- **ESCALATING** - Income increases annually
+- **RPI_LINKED** - Linked to Retail Price Index
+- **CPI_LINKED** - Linked to Consumer Price Index
+
+**Key Features:**
+- Purchase amount tracking
+- Income structure (frequency, escalation)
+- Guarantee periods (5, 10, 15 years)
+- Spouse/dependant benefits (50%, 66.67%, 100%)
+- PCLS (Pension Commencement Lump Sum) handling
+- Overlay benefits (value protection, guaranteed minimums)
+- Payment timing (advance or arrears)
+- Enhanced annuity rates for health conditions
+- Wrap/platform account linking
+
+### Core Personal Pension Operations
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/pensions/personalpension` | List all personal pensions | ⭐ Supports filtering by crystallisation status |
+| POST | `/api/v2/factfinds/{id}/pensions/personalpension` | Create personal pension | ⭐ DC pensions, drawdown, SIPPs |
+| GET | `/api/v2/factfinds/{id}/pensions/personalpension/{pensionId}` | Get pension details | ⭐ Full pension record |
+| PATCH | `/api/v2/factfinds/{id}/pensions/personalpension/{pensionId}` | Update pension | ⭐ Partial updates |
+| DELETE | `/api/v2/factfinds/{id}/pensions/personalpension/{pensionId}` | Delete pension | ⭐ Soft delete |
+
+**Pension Categories:**
+- **PensionContributionDrawdown** - Personal pensions with contribution and drawdown features
+
+**Crystallisation Status:**
+- **Crystallised** - Entire pension accessed/drawn down
+- **PartCrystallised** - Some funds accessed, some uncrystallised
+- **Uncrystallised** - No benefits taken yet
+
+**Key Features:**
+- Contribution tracking (regular, lump sum, transfer)
+- Fund holdings with multiple codes (ISIN, SEDOL, Platform)
+- Crystallisation status monitoring
+- GAD compliance (Guaranteed Annuity Drawdown limits)
+- PCLS (Pension Commencement Lump Sum) management
+- Lifetime allowance usage tracking
+- Enhanced benefits (guaranteed annuity rates, loyalty bonuses)
+- Death benefits tracking
+- Lifestyling strategies
+- Trust arrangements
+- Wrap/platform account linking
+
+**Total Endpoints:** 20 (5 investments + 5 final salary + 5 annuities + 5 personal pensions)
+
+---
+
+## 7. Goals Context
 
 **Base Path:** `/api/v2/factfinds/{id}/objectives`
 
@@ -522,7 +580,7 @@
 
 ---
 
-## 7. ATR Context
+## 8. ATR Context
 
 **Base Path:** `/api/v2/factfinds/{id}`
 
@@ -558,7 +616,7 @@
 
 ---
 
-## 8. Reference Data API
+## 9. Reference Data API
 
 **Base Path:** `/api/v2/reference`
 
@@ -617,11 +675,12 @@
 | **2. Client Onboarding & KYC** | 105 | 94 ⭐ |
 | **3. Circumstances** | 26 | 26 ⭐ |
 | **4. Assets & Liabilities** | 23 | 23 ⭐ |
-| **5. Arrangements** | 109 | 109 ⭐ |
-| **6. Goals** | 31 | 31 ⭐ |
-| **7. ATR** | 8 | 8 ⭐ |
-| **8. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **337** | **309** |
+| **5. Arrangements** | 32 | 32 ⭐ |
+| **6. Plans & Investments** | 20 | 20 ⭐ |
+| **7. Goals** | 31 | 31 ⭐ |
+| **8. ATR** | 8 | 8 ⭐ |
+| **9. Reference Data** | 24 | 7 ⭐ |
+| **TOTAL** | **280** | **252** |
 
 
 ### Net Worth
@@ -641,12 +700,12 @@ Calculate and track client net worth.
 
 | Method | Count | Percentage |
 |--------|-------|------------|
-| GET | 161 | 48% |
-| POST | 77 | 23% |
-| PATCH | 80 | 24% |
-| PUT | 5 | 1% |
-| DELETE | 14 | 4% |
-| **TOTAL** | **337** | **100%** |
+| GET | 150 | 48% |
+| POST | 72 | 23% |
+| PATCH | 75 | 24% |
+| PUT | 5 | 2% |
+| DELETE | 9 | 3% |
+| **TOTAL** | **311** | **100%** |
 
 ### Hierarchical Depth Analysis
 

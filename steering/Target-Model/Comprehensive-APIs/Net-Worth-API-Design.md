@@ -100,8 +100,161 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | **Net Worth** | | | |
 | `netWorth` | Money |  | Total assets minus total liabilities (calculated) |
 
-*Total: 19 properties*
+*Total: 19 properties across 4 sections*
 
+### Referenced Type Definitions
+
+The following complex types are used in the properties above:
+
+#### Money
+
+Currency amount structure used for all monetary values:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | decimal | Monetary amount |
+| `currency` | Complex Data | Currency details |
+| `code` | string | Currency code (e.g., GBP, USD, EUR) |
+| `symbol` | string | Currency symbol (e.g., £, $, €) |
+
+**Used for:** All asset values, liability values, and net worth total
+
+#### Reference Link
+
+Standard reference structure for linked entities:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique identifier of referenced entity |
+| `href` | string | API endpoint URL for referenced entity |
+
+**Used for:** `factfind`, `clients` (list)
+
+### Net Worth Calculation
+
+**Formula:**
+```
+Net Worth = Total Assets - Total Liabilities
+```
+
+**Asset Breakdown:**
+```
+Total Assets = property + pensions + investments + cash + other
+```
+
+**Liability Breakdown:**
+```
+Total Liabilities = mortgages + loans + creditCards
+```
+
+**Complete Calculation:**
+```
+Net Worth = (property + pensions + investments + cash + other)
+          - (mortgages + loans + creditCards)
+```
+
+### Asset Categories
+
+**Property:**
+- Main residence (equity only, not total value)
+- Buy-to-let properties
+- Second homes
+- Commercial property
+- Land
+
+**Pensions:**
+- Personal pensions
+- Workplace pensions
+- SIPPs (Self-Invested Personal Pensions)
+- Final salary schemes (transfer value)
+- State pension (not typically included)
+
+**Investments:**
+- ISAs (Individual Savings Accounts)
+- General Investment Accounts
+- Stocks and shares
+- Bonds
+- Investment funds
+- Offshore accounts
+
+**Cash:**
+- Current accounts
+- Savings accounts
+- Premium bonds
+- Cash ISAs
+- Foreign currency accounts
+
+**Other Assets:**
+- Business ownership
+- Business assets
+- Collectibles (art, antiques, jewelry)
+- Vehicles
+- Life insurance surrender values
+
+### Liability Categories
+
+**Mortgages:**
+- Residential mortgages
+- Buy-to-let mortgages
+- Commercial mortgages
+- Second charge mortgages
+
+**Loans:**
+- Personal loans
+- Car loans
+- Secured loans
+- Student loans
+- Business loans
+- Hire purchase agreements
+
+**Credit Cards:**
+- Credit card balances
+- Store card balances
+- Overdrafts
+
+**Excluded Liabilities:**
+- Future mortgage payments (only current balance counts)
+- Ongoing bills and expenses (these affect cashflow, not net worth)
+
+### Use Cases
+
+**Financial Planning:**
+- Baseline for retirement planning
+- Asset allocation analysis
+- Wealth accumulation tracking
+- Estate planning
+
+**Lending Assessment:**
+- Mortgage affordability
+- Secured lending decisions
+- Wealth verification
+
+**Risk Profiling:**
+- Loss capacity assessment
+- Investment capacity analysis
+- Financial resilience evaluation
+
+**Pension Planning:**
+- Retirement adequacy assessment
+- Income drawdown planning
+- Lifetime allowance monitoring
+
+### Snapshot vs. Ongoing Tracking
+
+**Snapshot Approach:**
+- Point-in-time net worth calculation
+- Captured during fact-find process
+- May be recalculated periodically
+- Historical snapshots preserved for tracking
+
+**Property Valuations:**
+- Use recent valuations or online estimates (Zoopla, Rightmove)
+- For mortgages: Equity = Property Value - Outstanding Mortgage
+
+**Pension Valuations:**
+- Use latest annual statements
+- For defined benefit: Use Cash Equivalent Transfer Value (CETV)
+- May need to request valuations from providers
 
 ### Related Resources
 
@@ -162,24 +315,126 @@ For common business rules applicable to all entities, refer to **[Master API Des
 
 ```json
 {
-  "field1": "value1",
-  "field2": "value2",
-  "...": "entity-specific fields"
+  "factfind": {
+    "id": 456,
+    "href": "/api/v2/factfinds/456"
+  },
+  "clients": [
+    {
+      "id": 789,
+      "href": "/api/v2/factfinds/456/clients/789"
+    }
+  ],
+  "notes": "Net worth calculated at point of initial fact-find"
 }
 ```
+
+**Note:** Asset and liability breakdowns are typically calculated automatically by aggregating from Asset and Liability entities.
 
 ### Example Response (Success)
 
 ```json
 {
   "id": 123,
-  "field1": "value1",
-  "field2": "value2",
-  "created": "2026-02-25T10:00:00Z",
-  "modified": "2026-02-25T10:00:00Z",
-  "...": "entity-specific fields"
+  "href": "/api/v2/factfinds/456/net-worth/123",
+  "factfind": {
+    "id": 456,
+    "href": "/api/v2/factfinds/456"
+  },
+  "clients": [
+    {
+      "id": 789,
+      "href": "/api/v2/factfinds/456/clients/789"
+    }
+  ],
+  "calculatedOn": "2026-02-25T10:00:00Z",
+  "property": {
+    "amount": 350000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "pensions": {
+    "amount": 185000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "investments": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "cash": {
+    "amount": 25000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "other": {
+    "amount": 15000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "totalAssets": {
+    "amount": 650000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "mortgages": {
+    "amount": 180000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "loans": {
+    "amount": 12000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "creditCards": {
+    "amount": 3000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "totalLiabilities": {
+    "amount": 195000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "netWorth": {
+    "amount": 455000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "notes": "Net worth calculated at point of initial fact-find",
+  "createdAt": "2026-02-25T10:00:00Z",
+  "updatedAt": "2026-02-25T10:00:00Z"
 }
 ```
+
+**Calculation Verification:**
+- Total Assets: £350k (property) + £185k (pensions) + £75k (investments) + £25k (cash) + £15k (other) = **£650,000**
+- Total Liabilities: £180k (mortgages) + £12k (loans) + £3k (credit cards) = **£195,000**
+- Net Worth: £650,000 - £195,000 = **£455,000**
 
 ### Example Error Response
 

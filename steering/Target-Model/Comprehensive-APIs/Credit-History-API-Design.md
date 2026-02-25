@@ -104,8 +104,106 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `createdAt` | timestamp |  | When this credit history record was created in the system |
 | `updatedAt` | timestamp |  | When this credit history record was last modified |
 
-*Total: 18 properties*
+*Total: 18 properties across 8 sections*
 
+### Referenced Type Definitions
+
+The following complex types are used in the properties above:
+
+#### creditScore
+
+Credit score information from Credit Reference Agency:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `score` | integer | Credit score value (0-999 for Experian, 0-700 for Equifax, 0-710 for TransUnion) |
+| `maxScore` | integer | Maximum possible score for this provider |
+| `rating` | Selection | Credit rating category: Excellent, Good, Fair, Poor, Very Poor |
+| `provider` | Selection | Credit Reference Agency: Experian, Equifax, TransUnion |
+| `checkedDate` | date | Date when credit score was obtained |
+
+#### adverseCreditEvents
+
+Each adverse credit event contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `type` | Selection | Type: CCJ, Default, IVA, Bankruptcy, Arrears, Repossession, Debt Relief Order |
+| `registeredOn` | timestamp | Date/time when event was registered with Credit Reference Agencies |
+| `satisfiedOrClearedOn` | timestamp | Date/time when the debt was satisfied or cleared |
+| `reposessedOn` | timestamp | Date of property repossession (if applicable) |
+| `dischargedOn` | timestamp | Date when bankruptcy or IVA was discharged |
+| `amountRegistered` | Money | Original amount registered when event occurred |
+| `amountOutstanding` | Money | Current outstanding amount (if any) |
+| `isDebtOutstanding` | boolean | Is the debt still outstanding or has it been fully paid? |
+| `numberOfPaymentsMissed` | integer | Total number of payments missed for this event |
+| `consecutivePaymentsMissed` | integer | Maximum number of consecutive payments missed |
+| `numberOfPaymentsInArrears` | integer | Number of payments currently in arrears |
+| `isArrearsClearedUponCompletion` | boolean | Were arrears cleared when arrangement completed? |
+| `yearsMaintained` | integer | Number of years successfully maintained after event (for IVA/payment plans) |
+| `lender` | string | Name of lender or creditor involved in the adverse event |
+| `liability` | Reference Link | Link to related liability record (if applicable) |
+| `concurrencyId` | integer | System version control number (automatic) |
+| `createdAt` | timestamp | When this event record was created in the system |
+| `lastUpdatedAt` | timestamp | When this event record was last modified |
+
+*Total: 18 fields per event*
+
+#### missedPayments
+
+Summary of missed payment history:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `last12Months` | integer | Count of missed payments in the last 12 months (0 = clean record) |
+| `last6Years` | integer | Count of missed payments in the last 6 years (used for mortgage affordability) |
+
+#### mortgageSuitability
+
+Automated assessment of mortgage lending eligibility:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `overallAssessment` | Selection | Overall suitability: Excellent, Good, Fair, Poor, Very Poor |
+| `eligibleForStandardLending` | boolean | Can access standard mainstream mortgage lenders |
+| `requiresSpecialistLender` | boolean | May need specialist adverse credit lender |
+| `estimatedLTV` | decimal | Estimated Loan-to-Value ratio client may achieve (percentage) |
+| `notes` | string | Additional notes about mortgage suitability factors |
+
+#### Reference Link
+
+Standard reference structure:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique identifier of the referenced entity |
+| `href` | string | API endpoint URL for the referenced entity |
+
+**Used for:** `factfind`, `client`, `liability` (in adverse events)
+
+#### Selection
+
+Enumeration structure:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | string | Machine-readable code value |
+| `display` | string | Human-readable display text |
+
+**Used for:** Credit rating, provider, adverse event types, mortgage suitability
+
+#### Money
+
+Currency amount structure:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | decimal | Monetary amount |
+| `currency` | Complex Data | Currency details |
+| `code` | string | Currency code (e.g., GBP) |
+| `symbol` | string | Currency symbol (e.g., £) |
+
+**Used for:** `amountRegistered`, `amountOutstanding` in adverse events
 
 ### Related Resources
 
