@@ -71,102 +71,129 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
+
 ### Client Resource Properties
 
-**Base Properties (All Client Types):**
-
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `id` | integer | ✓ | Unique client identifier |
-| `clientNumber` | string | ✓ | Client reference number |
-| `clientType` | string | ✓ | Discriminator: "Person", "Corporate", or "Trust" |
-| `factfind` | FactFindRef | ✓ | Reference to parent FactFind |
-| `adviser` | AdviserRef | ✓ | Assigned adviser reference |
-| `serviceStatus` | string | ✓ | Status: Active, Inactive, Prospect, etc. |
-| `isJoint` | boolean |  | Whether this is a joint client |
-| `spouseRef` | ClientRef |  | Reference to spouse/partner (if joint) |
-| `territorialProfile` | TerritorialProfile |  | Residency, domicile, citizenship details |
-| `createdAt` | timestamp |  | Creation timestamp |
-| `updatedAt` | timestamp |  | Last modification timestamp |
+| `adviser` | Reference Link |  | The adviser responsible for this client |
+| `clientCategory` | string |  | Client category (e.g., HighNetWorth, Mass Market) |
+| `clientNumber` | string |  | Client reference number assigned by your organization |
+| `clientSegment` | string |  | Client segment classification (A, B, C, D for prioritization) |
+| `clientSegmentDate` | date |  | Client segment classification (A, B, C, D for prioritization) |
+| `clientType` | string |  | Type of client: Person (individual), Corporate (company), or Trust |
+| `createdAt` | date |  | When this record was created in the system |
+| `createdBy` | Complex Data |  | User who created this record |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `isHeadOfFamilyGroup` | boolean |  | Whether this client is the primary contact for the family group |
+| `isJoint` | boolean |  | Whether this client is part of a joint (couple) fact find |
+| `isMatchingServiceProposition` | boolean |  | Whether this client requires matching service due to vulnerability |
+| `matchingServicePropositionReason` | string |  |  |
+| `officeRef` | Complex Data |  | The office/branch where this client is managed |
+| `paraplannerRef` | Reference Link |  | The paraplanner assigned to this client |
+| `personValue` | Complex Data |  | Personal information (only for individual clients) |
+| `serviceStatus` | string |  | Current service status (Active, Inactive, Prospect, etc.) |
+| `serviceStatusDate` | date |  | Current service status (Active, Inactive, Prospect, etc.) |
+| `spouseRef` | Reference Link |  | Link to the spouse/partner client record (for joint fact finds) |
+| `territorialProfile` | Complex Data |  | Residency, domicile, citizenship, and territorial tax status |
+| `updatedAt` | date |  | When this record was last modified |
+| `updatedBy` | Complex Data |  | User who last modified this record |
 
-**Discriminated Value Types (based on clientType):**
-
-### For Person Clients (clientType = "Person")
-
-`personValue` object contains:
-
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `title` | string |  | Title: MR, MRS, MISS, MS, DR, etc. |
-| `firstName` | string | ✓ | First name (given name) |
-| `middleNames` | string |  | Middle name(s) |
-| `lastName` | string | ✓ | Last name (surname/family name) |
-| `fullName` | string |  | Complete formatted name with title |
-| `preferredName` | string |  | Name client prefers to be called |
-| `dateOfBirth` | date | ✓ | Date of birth |
-| `age` | integer |  | Current age (calculated) |
-| `gender` | string |  | Gender: M, F, O, X (prefer not to say) |
-| `niNumber` | string |  | National Insurance Number (UK) |
-| `maritalStatus` | MaritalStatus |  | Marital status with effective date |
-| `employmentStatus` | string |  | Employment status |
-| `occupation` | string |  | Current occupation/job title |
-| `smokingStatus` | string |  | Smoking status: NEVER, FORMER, LIGHT, MODERATE, HEAVY |
-| `healthMetrics` | HealthMetrics |  | Height, weight, BMI for health assessment |
-| `isDeceased` | boolean |  | Whether the person has passed away |
-| `deceasedDate` | date |  | Date of death (if applicable) |
-
-### For Corporate Clients (clientType = "Corporate")
-
-`corporateValue` object contains:
-
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `companyName` | string | ✓ | Official registered company name |
-| `tradingName` | string |  | Trading name (if different) |
-| `registrationNumber` | string | ✓ | Company registration number |
-| `incorporationDate` | date |  | Date of incorporation |
-| `companyType` | string | ✓ | Company type: LTD, PLC, LLP, etc. |
-| `vatNumber` | string |  | VAT registration number |
-| `companyStatus` | string |  | Status: ACTIVE, DISSOLVED, etc. |
-| `sicCodes` | SICCode[] |  | Standard Industrial Classification codes |
-| `numberOfEmployees` | integer |  | Number of employees |
-| `annualTurnover` | Money |  | Annual turnover amount |
-| `directors` | Director[] |  | List of company directors with shareholding |
-| `countryOfIncorporation` | Country |  | Country where company is incorporated |
-
-### For Trust Clients (clientType = "Trust")
-
-`trustValue` object contains:
-
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `trustName` | string | ✓ | Name of the trust |
-| `trustType` | string | ✓ | Type: DISCRETIONARY, BARE, INTEREST_IN_POSSESSION, etc. |
-| `settlementDate` | date | ✓ | Date trust was established |
-| `trustRegistrationNumber` | string |  | Trust Registration Number (TRN) |
-| `taxReference` | string |  | Tax reference number |
-| `trustDeed` | TrustDeed |  | Trust deed document details |
-| `settlor` | Settlor | ✓ | Person who established the trust |
-| `trustees` | Trustee[] | ✓ | List of trustees managing the trust |
-| `beneficiaries` | Beneficiary[] |  | List of trust beneficiaries |
-| `trustPurpose` | string |  | Purpose of the trust |
-
-
-### Related Resources
-
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*Total: 23 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### TerritorialProfile Structure
+#### adviser
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
+
+#### createdBy
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `factFindNumber` | string |  |
+| `id` | integer | Unique system identifier for this record |
+| `status` | string | Current status of the goal |
+
+#### office Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
+
+#### paraplanner Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
+
+#### person
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `age` | integer | Current age (calculated from date of birth) |
+| `dateOfBirth` | date | Date of birth |
+| `deceasedDate` | string | Date of death (if applicable) |
+| `employmentStatus` | string | Current employment status |
+| `firstName` | string | First name (given name) |
+| `fullName` | string | Complete formatted name including title |
+| `gender` | string | Gender (M=Male, F=Female, O=Other, X=Prefer not to say) |
+| `healthMetrics` | Complex Data | Height, weight, BMI for health and insurance assessment |
+| `bmi` | integer |  |
+| `bmiCategory` | string | Expenditure category (Housing, Transport, Food, etc.) |
+| `heightCm` | integer |  |
+| `lastMeasured` | date |  |
+| `weightKg` | integer |  |
+| `isDeceased` | boolean | Whether the client has passed away |
+| `lastName` | string | Last name (surname/family name) |
+| `maritalStatus` | Selection | Current marital status (Single, Married, Divorced, etc.) |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `display` | string |  |
+| `effectiveFrom` | date |  |
+| `middleNames` | string | Middle name(s) |
+| `niNumber` | string | National Insurance number (UK) |
+| `occupation` | string | Current occupation/job title |
+| `occupationCode` | Selection | Standard Occupational Classification (SOC) code |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `display` | string |  |
+| `socVersion` | string |  |
+| `preferredName` | string | Name the client prefers to be called |
+| `salutation` | string | How to address the client (e.g., "Mr Smith") |
+| `smokingStatus` | string | Smoking status for insurance purposes |
+| `title` | string | Title (Mr, Mrs, Ms, Dr, etc.) |
+
+*Showing all 30 fields*
+
+#### spouse Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `clientNumber` | string | Client reference number assigned by your organization |
+| `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
+| `type` | string | Type of client: Person (individual), Corporate (company), or Trust |
+
+#### territorialProfile
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -180,19 +207,29 @@ The following types are referenced in the resource properties above:
 | `code` | string | Standard Occupational Classification (SOC) code |
 | `display` | string |  |
 | `countryOfOrigin` | Selection | Country of origin |
-
-*Showing first 10 of 21 fields.*
-
-### Money Structure
-
-*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
-
-### Country Structure
-
-| Field | Type | Description |
-|-------|------|-------------|
 | `alpha3` | string |  |
 | `code` | string | Standard Occupational Classification (SOC) code |
 | `display` | string |  |
+| `countryOfResidence` | Selection | Current country of residence |
+| `alpha3` | string |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `display` | string |  |
+| `expatriate` | boolean | Whether the client is an expatriate |
+| `placeOfBirth` | string | City/town where the client was born |
+| `ukDomicile` | boolean | Whether the client is UK domiciled |
+| `ukResident` | boolean | Whether the client is UK tax resident |
+
+*Showing all 21 fields*
+
+#### updatedBy
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

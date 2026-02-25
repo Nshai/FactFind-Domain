@@ -66,7 +66,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
-### DPA Agreement Resource Properties
+
+
+### DPA-Agreement Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -80,22 +82,38 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `createdAt` | timestamp |  | When this agreement was created (read-only) |
 | `createdBy` | string |  | User who created this agreement (read-only) |
 
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 9 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Complex Data Structure
+#### client
 
-*Nested object structure* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique client identifier |
+| `href` | string | Client resource URL |
 
-### Reference Link Structure
+#### factfind
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique FactFind identifier |
+| `href` | string | FactFind resource URL |
+
+#### policy
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique policy identifier |
+| `name` | string | Policy name (read-only) |
+| `href` | string | Policy resource URL |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

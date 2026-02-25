@@ -66,12 +66,14 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
+
+
 ### Dependant Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | `age` | integer |  | Current age (calculated from date of birth) |
-| `clients` | ListofComplexData |  | Client segment classification (A, B, C, D for prioritization) |
+| `clients` | List of Complex Data |  | Client segment classification (A, B, C, D for prioritization) |
 | `createdAt` | date |  | When this record was created in the system |
 | `dateOfBirth` | date |  | Date of birth |
 | `dependencyDetails` | Complex Data |  |  |
@@ -90,22 +92,66 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `relationship` | string |  |  |
 | `updatedAt` | date |  | When this record was last modified |
 
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 19 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Complex Data Structure
+#### dependencyDetails
 
-*Nested object structure* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `annualCost` | Money |  |
+| `amount` | integer | Amount spent |
+| `currency` | Complex Data |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `symbol` | string |  |
+| `estimatedDependencyEndAge` | integer | Current age (calculated from date of birth) |
+| `estimatedDependencyEndDate` | date | Employment end date (null if current) |
+| `monthlyCost` | Money |  |
+| `amount` | integer | Amount spent |
+| `currency` | Complex Data |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `symbol` | string |  |
 
-### Reference Link Structure
+#### educationDetails
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `currentEducationLevel` | string |  |
+| `estimatedEducationCosts` | Money |  |
+| `amount` | integer | Amount spent |
+| `currency` | Complex Data |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `symbol` | string |  |
+| `isInPrivateEducation` | boolean |  |
+| `plannedHigherEducation` | boolean |  |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+
+#### healthDetails
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `hasSpecialNeeds` | boolean |  |
+| `healthNotes` | string |  |
+| `requiresOngoingCare` | boolean |  |
+
+#### livingArrangements
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `custodyArrangement` | string |  |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

@@ -71,41 +71,68 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
+
 ### Address Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `id` | integer | ✓ | Unique address identifier |
-| `addressType` | string | ✓ | Type: Current, Previous |
-| `line1` | string | ✓ | Address line 1 |
-| `line2` | string |  | Address line 2 |
-| `locality` | string | ✓ | Town/City |
-| `postalCode` | string | ✓ | Postal code |
-| `country` | Country | ✓ | Country object with isoCode |
-| `movedInDate` | date |  | Date moved in |
-| `movedOutDate` | date |  | Date moved out |
+| `address` | Complex Data |  | List of all addresses for this client (current and historical) |
+| `addressType` | string |  | Type of address (Residential, Previous, Business, etc.) |
+| `client` | Reference Link |  |  |
+| `createdAt` | date |  | When this record was created in the system |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `isCorrespondenceAddress` | boolean |  |  |
+| `isOnElectoralRoll` | boolean |  |  |
+| `residencyPeriod` | Complex Data |  | Unique system identifier for this record |
+| `residencyStatus` | string |  | Unique system identifier for this record |
+| `updatedAt` | date |  | When this record was last modified |
 
-
-### Related Resources
-
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*Total: 11 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Country Structure
+#### address
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `alpha3` | string |  |
-| `code` | string | Standard Occupational Classification (SOC) code |
-| `display` | string |  |
+| `city` | string | City/town |
+| `country` | string | Country |
+| `county` | string | County/region |
+| `line1` | string | Address line 1 |
+| `line2` | string | Address line 2 |
+| `postcode` | string | Postcode/ZIP code |
+
+#### client
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `clientNumber` | string | Client reference number assigned by your organization |
+| `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
+| `type` | string | Type of client: Person (individual), Corporate (company), or Trust |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `factFindNumber` | string |  |
+| `id` | integer | Unique system identifier for this record |
+| `status` | string | Current status of the goal |
+
+#### residencyPeriod
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `endDate` | string | Employment end date (null if current) |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

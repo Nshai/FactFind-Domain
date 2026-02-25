@@ -66,6 +66,8 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
+
+
 ### Asset Resource Properties
 
 | Property | Type | Required | Description |
@@ -90,29 +92,82 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `property` | Reference Link |  |  |
 | `purchasedOn` | date |  |  |
 | `rentalExpenses` | Money |  |  |
+| `rnrbEligibility` | string |  |  |
+| `updatedAt` | date |  | When this record was last modified |
+| `valuationBasis` | string |  |  |
+| `valuedOn` | date |  | The contact value (email address, phone number, etc.) |
 
-*Showing first 20 of 24 properties. See contracts reference for complete list.*
-
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 24 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Complex Data Structure
+#### arrangement
 
-*Nested object structure* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
 
-### Money Structure
+#### current
 
-*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+| `currency` | Complex Data |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `symbol` | string |  |
 
-### Reference Link Structure
+#### dividends
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `owners` | List of Complex Data | Who owns this arrangement |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+
+#### income
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+
+#### original
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+| `currency` | Complex Data |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `symbol` | string |  |
+
+#### ownership
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `owners` | List of Complex Data | Who owns this arrangement |
+| `ownershipType` | string | Who owns this arrangement |
+
+#### property
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+
+#### rentalExpenses
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

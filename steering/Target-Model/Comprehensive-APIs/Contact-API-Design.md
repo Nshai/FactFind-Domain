@@ -69,25 +69,44 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
+
 ### Contact Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `id` | integer | ✓ | Unique contact identifier |
-| `contactType` | string | ✓ | Type: Phone, Mobile, Email |
-| `value` | string | ✓ | Contact value (phone number or email) |
-| `isPrimary` | boolean | ✓ | Whether this is primary contact |
-| `notes` | string |  | Additional notes |
+| `client` | Reference Link |  |  |
+| `contactType` | string |  | Type of contact (Email, Phone, Mobile, etc.) |
+| `createdAt` | date |  | When this record was created in the system |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `isPreferred` | boolean |  |  |
+| `isPrimary` | boolean |  | Whether this is the primary/main address |
+| `isValidForMarketing` | boolean |  | Unique system identifier for this record |
+| `isVerified` | boolean |  | Whether this contact has been verified |
+| `marketingOptIn` | boolean |  |  |
+| `notes` | string |  |  |
+| `updatedAt` | date |  | When this record was last modified |
+| `value` | string |  | The contact value (email address, phone number, etc.) |
+| `verifiedDate` | date |  | When this contact was verified |
+
+*Total: 14 properties*
+
+
+### Referenced Type Definitions
+
+The following complex types are used in the properties above:
+
+#### client
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Client Management domain
-
----
+*See parent document for relationships to other entities.*
 
 ## Data Model
 

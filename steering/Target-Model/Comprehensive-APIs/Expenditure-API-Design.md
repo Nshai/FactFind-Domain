@@ -66,14 +66,16 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
+
+
 ### Expenditure Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | `id` | integer | ✓ | Unique identifier for the expenditure |
 | `href` | string |  | Link to this expenditure resource |
-| `factfind` | LinktoFactFind |  | The fact-find that this expenditure belongs to |
-| `client` | LinktoClient |  | The client who has this expenditure |
+| `factfind` | Link to FactFind |  | The fact-find that this expenditure belongs to |
+| `client` | Link to Client |  | The client who has this expenditure |
 | `description` | string |  | Description of the expenditure |
 | `expenditureType` | Selection |  | Type/category of expenditure |
 | `netAmount` | Money |  | Amount paid (after tax if applicable) - includes currency code, name, and symbol |
@@ -82,27 +84,51 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `endsOn` | date |  | When the expenditure ends (if known) |
 | `isConsolidated` | boolean |  | Is this part of a debt consolidation? |
 | `isLiabilityToBeRepaid` | boolean |  | Is this paying off a specific debt? |
-| `liability` | LinktoLiability |  | The debt/liability being repaid |
+| `liability` | Link to Liability |  | The debt/liability being repaid |
 | `notes` | string |  | Additional notes |
 | `createdAt` | date |  | When this record was created in the system |
 | `updatedAt` | date |  | When this record was last modified |
 
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 16 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Selection Structure
+#### client
 
-*Enumeration with code and display* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Client identifier |
+| `href` | string | Link to the client |
 
-### Money Structure
+#### factfind
 
-*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | FactFind identifier |
+| `href` | string | Link to the fact-find |
+
+#### liability (optional)
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Liability identifier |
+| `href` | string | Link to the liability |
+
+#### netAmount
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | The monetary amount |
+| `currency.code` | string | ISO 4217 currency code |
+| `currency.display` | string | Full currency name |
+| `currency.symbol` | string | Currency symbol |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

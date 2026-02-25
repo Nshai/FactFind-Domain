@@ -66,7 +66,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
-### ATR Assessment Resource Properties
+
+
+### ATR-Assessment Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -81,30 +83,127 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `href` | string |  | API resource link |
 | `id` | string | ✓ | Unique system identifier for this assessment |
 | `maxScore` | integer |  | Maximum possible score for this assessment |
-| `questions` | ListofComplexData |  | 15 standard ATR questions with client answers |
+| `questions` | List of Complex Data |  | 15 standard ATR questions with client answers |
 | `reviewDate` | date |  | Date when this assessment should be reviewed |
 | `riskProfiles` | Complex Data |  | Generated and chosen risk profiles |
-| `supplementaryQuestions` | ListofComplexData |  | 45 additional context questions with answers |
+| `supplementaryQuestions` | List of Complex Data |  | 45 additional context questions with answers |
 | `templateRef` | Complex Data |  | Reference to the ATR template used |
 | `totalScore` | integer |  | Total weighted score from all questions |
 | `updatedAt` | date |  | When this record was last modified |
 
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 18 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Complex Data Structure
+#### assessedBy
 
-*Nested object structure* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Adviser unique identifier |
+| `name` | string | Adviser full name |
 
-### Reference Link Structure
+#### capacityForLoss
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `canAffordLosses` | boolean | Can client afford investment losses |
+| `emergencyFundMonths` | integer | Months of expenses in emergency fund |
+| `essentialExpensesCovered` | boolean | Essential expenses adequately covered |
+| `dependantsProvisionAdequate` | boolean | Adequate provision for dependants |
+| `assessmentNotes` | string | Adviser assessment notes |
+
+#### client
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+| `href` | string | API link to client resource |
+| `name` | string | Client full name |
+
+#### declarations
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `clientDeclaration` | Complex Data | Client's declaration |
+| `adviserDeclaration` | Complex Data | Adviser's declaration |
+
+#### declarations.adviserDeclaration
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `declarationType` | string | Type of declaration |
+| `declarationText` | string | Full declaration text |
+| `signed` | boolean | Whether declaration is signed |
+| `signedDate` | date | When declaration was signed |
+| `signedBy` | Complex Data | Adviser who signed |
+
+#### declarations.adviserDeclaration.signedBy
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Adviser unique identifier |
+| `name` | string | Adviser full name |
+
+#### declarations.clientDeclaration
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `declarationType` | string | Type of declaration |
+| `declarationText` | string | Full declaration text |
+| `signed` | boolean | Whether declaration is signed |
+| `signedDate` | date | When declaration was signed |
+| `signatureType` | string | Type of signature |
+| `ipAddress` | string | IP address where signed |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+| `href` | string | API link to factfind resource |
+
+#### riskProfiles
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `generated` | List of Complex Data | Three generated risk profiles (main + adjacent) |
+| `chosen` | Complex Data | The risk profile chosen by client |
+
+#### riskProfiles.chosen
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `riskRating` | string | Chosen risk category name |
+| `riskScore` | integer | Chosen risk score |
+| `chosenBy` | string | Who made the choice |
+| `chosenDate` | date | When choice was made |
+| `reasonForChoice` | string | Client's reason for choosing this profile |
+| `adviserNotes` | string | Adviser notes on the choice |
+
+#### riskProfiles.generated[].assetAllocation
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `equities` | integer | Equity allocation percentage |
+| `bonds` | integer | Bond allocation percentage |
+| `cash` | integer | Cash allocation percentage |
+| `alternatives` | integer | Alternative investments percentage |
+
+#### template Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Template unique identifier |
+| `version` | string | Template version number |
+| `name` | string | Template display name |
+| `regulatoryApprovalDate` | date | Date template was approved |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

@@ -71,42 +71,119 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
+
 ### Pension Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `id` | integer | ✓ | Unique pension identifier |
-| `arrangementCategory` | string | ✓ | Category: PENSION |
-| `pensionType` | string | ✓ | Type: PersonalPension, SIPP, FinalSalary, etc. |
-| `provider` | Provider | ✓ | Provider information |
-| `policyNumber` | string |  | Policy number |
-| `currentValue` | Money | ✓ | Current pension value |
-| `owners` | Owner[] | ✓ | Pension owners |
-| `status` | string | ✓ | Status: ACTIVE, DEFERRED, IN_PAYMENT, etc. |
+| `adviser` | Reference Link |  | The adviser responsible for this client |
+| `arrangementCategory` | string |  | Type of arrangement (INVESTMENT, PENSION, MORTGAGE, PROTECTION) |
+| `arrangementNumber` | string |  |  |
+| `arrangementPeriod` | Complex Data |  |  |
+| `owners` | List of Complex Data |  | Who owns this arrangement |
+| `contributionFrequency` | Selection |  | How often (Monthly, Annual, etc.) |
+| `createdAt` | date |  | When this record was created in the system |
+| `currentValue` | Money |  | Current value of the arrangement |
+| `expectedRetirementAge` | integer |  | Current age (calculated from date of birth) |
+| `factfind` | Reference Link |  | Link to the FactFind that this client belongs to |
+| `hasGuaranteedAnnuityRate` | boolean |  |  |
+| `hasProtectedTaxFreeAmount` | boolean |  | Whether pension has protected tax-free amount |
+| `id` | integer | ✓ | Unique system identifier for this record |
+| `isInDrawdown` | boolean |  |  |
+| `isSalarySacrifice` | boolean |  | Whether pension contributions are via salary sacrifice |
+| `notes` | string |  |  |
+| `pensionType` | string |  | Sub-type when arrangementCategory=PENSION |
+| `investmentType` | string |  | Sub-type when arrangementCategory=INVESTMENT |
+| `mortgageType` | string |  | Sub-type when arrangementCategory=MORTGAGE |
+| `protectionType` | string |  | Sub-type when arrangementCategory=PROTECTION |
+| `policyNumber` | string |  | Policy or account number |
+| `productName` | string |  | Name of the financial product |
+| `projectedValueAtRetirement` | Money |  | The contact value (email address, phone number, etc.) |
+| `provider` | Reference Link |  | Unique system identifier for this record |
+| `regularContribution` | Money |  |  |
+| `status` | string |  | Current status of the goal |
+| `updatedAt` | date |  | When this record was last modified |
+| `valuationDate` | date |  |  |
 
-
-### Related Resources
-
-**Parent Resource:** Arrangement
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Arrangements domain
-
----
+*Total: 28 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Provider Structure
+#### adviser
 
 | Field | Type | Description |
 |-------|------|-------------|
+| `code` | string | Standard Occupational Classification (SOC) code |
 | `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
 
-### Money Structure
+#### arrangementPeriod
 
-*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `endDate` | string | Employment end date (null if current) |
+| `startDate` | date | Employment start date |
+
+#### contributionFrequency
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `display` | string |  |
+| `periodsPerYear` | integer |  |
+
+#### current
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+| `currency` | Selection |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `display` | string |  |
+| `symbol` | string |  |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `factFindNumber` | string |  |
+| `id` | integer | Unique system identifier for this record |
+| `status` | string | Current status of the goal |
+
+#### projectedAtRetirement
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+| `currency` | Selection |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `display` | string |  |
+| `symbol` | string |  |
+
+#### provider
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `frnNumber` | string |  |
+| `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
+
+#### regularContribution
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+| `currency` | Selection |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `display` | string |  |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

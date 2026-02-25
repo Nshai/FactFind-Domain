@@ -66,7 +66,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
-### Estate Planning Resource Properties
+
+
+### Estate-Planning Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -82,29 +84,45 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `expectingInheritanceDetails` | string |  | Description of expected inheritance |
 | `propertyAdditionalNrb` | Money |  | Residence nil rate band (max £175,000) |
 | `taxYearWhenPropertySold` | integer |  | Tax year when main residence was sold (if applicable) |
-| `widowsReliefNrbDeceasedPercentage` | Number(Percentage) |  | Percentage of deceased spouse's NRB available to transfer |
-| `widowsReliefPropertyAdditionalNrbDeceasedPercentage` | Number(Percentage) |  | Percentage of deceased spouse's RNRB available to transfer |
+| `widowsReliefNrbDeceasedPercentage` | Number (Percentage) |  | Percentage of deceased spouse's NRB available to transfer |
+| `widowsReliefPropertyAdditionalNrbDeceasedPercentage` | Number (Percentage) |  | Percentage of deceased spouse's RNRB available to transfer |
 | `businessAssetRelief` | Money |  | Business property relief available |
-| `gifts` | ListofComplexData |  | Collection of gifts (see Gift contract) |
+| `gifts` | List of Complex Data |  | Collection of gifts (see Gift contract) |
 | `createdAt` | timestamp |  | When this record was created (read-only) |
 | `updatedAt` | timestamp |  | When this record was last updated (read-only) |
 
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 18 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Money Structure
+#### Currency Amount Structure (applies to totalAssets, totalJointAssets, propertyAdditionalNrb, businessAssetRelief)
 
-*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `currency` | string | ISO currency code |
+| `amount` | integer | The monetary value |
 
-### Reference Link Structure
+#### client
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique client identifier |
+| `href` | string | Client resource URL |
+| `name` | string | Client name |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique FactFind identifier |
+| `href` | string | FactFind resource URL |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

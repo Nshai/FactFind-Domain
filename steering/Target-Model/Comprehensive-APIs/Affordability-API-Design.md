@@ -66,22 +66,26 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
+
+
 ### Affordability Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | `href` | Link |  | Web address for this assessment |
-| `factfind` | LinktoFactFind |  | The fact-find this assessment belongs to |
-| `clients` | ListofClientLinks |  | Clients included in this assessment (minimum 1) |
-| `incomes` | ListofIncomeLinks |  | Income sources to include in calculation (minimum 1) |
-| `expenditures` | ListofExpenditureLinks |  | Expenditures to include in calculation |
+| `factfind` | Link to FactFind |  | The fact-find this assessment belongs to |
+| `clients` | List of Client Links |  | Clients included in this assessment (minimum 1) |
+| `incomes` | List of Income Links |  | Income sources to include in calculation (minimum 1) |
+| `expenditures` | List of Expenditure Links |  | Expenditures to include in calculation |
 | `createdAt` | Date/Time |  | When this assessment was created |
 | `lastUpdatedAt` | Date/Time |  | When this assessment was last changed |
+
+*Total: 7 properties*
 
 
 ### Related Resources
 
-*See parent document for related entities.*
+*See parent document for relationships to other entities.*
 
 ## Data Model
 

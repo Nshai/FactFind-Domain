@@ -66,7 +66,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
-### Credit History Resource Properties
+
+
+### Credit-History Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -75,18 +77,11 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `factfind` | Reference Link |  | Link to the FactFind this credit history belongs to |
 | `client` | Reference Link |  | Link to the client this credit history belongs to |
 
+*Total: 4 properties*
+
 
 ### Related Resources
 
-*See parent document for related entities.*
-
-
-### Referenced Type Definitions
-
-The following types are referenced in the resource properties above:
-
-### Reference Link Structure
-
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+*See parent document for relationships to other entities.*
 
 ## Data Model

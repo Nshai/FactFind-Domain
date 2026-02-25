@@ -71,28 +71,22 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 ## Resource Summary
 
+
+
 ### Employment Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `id` | integer | ✓ | Unique employment identifier |
-| `employmentStatus` | string | ✓ | Status: Employed, SelfEmployed, Retired, etc. |
-| `occupation` | string | ✓ | Occupation/job title |
-| `employer` | string |  | Employer name |
-| `startsOn` | date | ✓ | Employment start date |
-| `endsOn` | date |  | Employment end date |
-| `intendedRetirementAge` | integer |  | Intended retirement age |
-| `industryType` | string |  | Industry sector |
+| `id` | integer | ✓ | System-assigned employment record ID |
+| `factfindRef` | Reference |  | Reference to parent fact find |
+| `client` | Reference |  | Reference to the client |
+
+*Total: 3 properties*
 
 
 ### Related Resources
 
-**Parent Resource:** Client
-
-**Related APIs:**
-- See [Master API Design - Section 11](./MASTER-API-DESIGN.md#11-entity-apis-by-domain) for related APIs in the Circumstances domain
-
----
+*See parent document for relationships to other entities.*
 
 ## Data Model
 

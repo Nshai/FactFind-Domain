@@ -66,13 +66,15 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
+
+
 ### Protection Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | `adviserDetails` | Complex Data |  |  |
 | `arrangementCategory` | string |  | Expenditure category (Housing, Transport, Food, etc.) |
-| `beneficiaries` | ListofComplexData |  | List of trust beneficiaries |
+| `beneficiaries` | List of Complex Data |  | List of trust beneficiaries |
 | `client` | Reference Link |  |  |
 | `createdAt` | date |  | When this record was created in the system |
 | `currentSumAssured` | Money |  |  |
@@ -90,29 +92,117 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `premiumType` | string |  |  |
 | `productName` | string |  | Name of the financial product |
 | `protectionType` | string |  |  |
+| `providerName` | string |  | Unique system identifier for this record |
+| `provider` | Reference Link |  | Unique system identifier for this record |
+| `reviewDate` | date |  | When these figures were last reviewed |
+| `startDate` | date |  | Employment start date |
+| `sumAssured` | Money |  |  |
+| `termRemaining` | Complex Data |  |  |
+| `trustDetails` | Complex Data |  |  |
+| `underwriting` | Complex Data |  |  |
+| `updatedAt` | date |  | When this record was last modified |
 
-*Showing first 20 of 29 properties. See contracts reference for complete list.*
-
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 29 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Complex Data Structure
+#### adviserDetails
 
-*Nested object structure* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `adviceDate` | date |  |
+| `adviserName` | string |  |
+| `firmName` | string |  |
 
-### Money Structure
+#### client
 
-*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
 
-### Reference Link Structure
+#### currentSumAssured
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+| `currency` | Complex Data |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `symbol` | string |  |
+| `note` | string |  |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+
+#### indexation
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `isIndexLinked` | boolean |  |
+
+#### linkedTo
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `liability` | Reference Link |  |
+| `id` | integer | Unique system identifier for this record |
+| `mortgage` | Reference Link | Current age (calculated from date of birth) |
+| `id` | integer | Unique system identifier for this record |
+
+#### premium
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+| `currency` | Complex Data |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `symbol` | string |  |
+
+#### provider
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+
+#### sumAssured
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | Amount spent |
+| `currency` | Complex Data |  |
+| `code` | string | Standard Occupational Classification (SOC) code |
+| `symbol` | string |  |
+
+#### termRemaining
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `months` | integer |  |
+| `years` | integer | Number of years at this address |
+
+#### trustDetails
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `beneficiaries` | List of str | List of trust beneficiaries |
+| `trustType` | string | Type of trust (Discretionary, Bare, Interest in Possession, etc.) |
+| `trustees` | List of str | List of trustees |
+
+#### underwriting
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `completedDate` | date |  |
+| `exclusions` | List |  |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

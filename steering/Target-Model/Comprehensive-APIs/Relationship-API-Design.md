@@ -66,6 +66,8 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
+
+
 ### Relationship Resource Properties
 
 | Property | Type | Required | Description |
@@ -75,7 +77,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `client` | Reference Link |  | The primary client in this relationship |
 | `factfind` | Reference Link |  | FactFind reference |
 | `relatedClient` | Reference Link |  | The related client |
-| `relationshipType` | Enum(Text) |  | Type of relationship. See enumerations below |
+| `relationshipType` | Enum (Text) |  | Type of relationship. See enumerations below |
 | `partner` | boolean |  | Whether this is a partner/spouse relationship |
 | `familyGrouping` | boolean |  | Whether to include in family grouping/household reporting |
 | `canRelatedViewClientsPlansAssets` | boolean |  | Can related client view this client's plans and assets? |
@@ -87,18 +89,39 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `createdBy` | string |  | User who created this record (read-only) |
 | `updatedBy` | string |  | User who last updated this record (read-only) |
 
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 16 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Reference Link Structure
+#### client
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique client identifier |
+| `href` | string | Client resource URL |
+| `name` | string | Client name |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique FactFind identifier |
+| `href` | string | FactFind resource URL |
+
+#### relatedClient
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique client identifier |
+| `href` | string | Client resource URL |
+| `name` | string | Client name |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

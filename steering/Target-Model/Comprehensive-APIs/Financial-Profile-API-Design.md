@@ -66,7 +66,9 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
-### Financial Profile Resource Properties
+
+
+### Financial-Profile Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -85,22 +87,39 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `createdAt` | timestamp |  | When this record was created (read-only) |
 | `updatedAt` | timestamp |  | When this record was last updated (read-only) |
 
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 14 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Money Structure
+#### Currency Amount Structure (applies to all amount fields)
 
-*Currency amount with code* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | integer | The monetary value |
+| `currency` | Complex Data | Currency information |
+| `code` | string | ISO currency code |
+| `symbol` | string | Currency symbol |
 
-### Reference Link Structure
+#### client
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique client identifier |
+| `href` | string | Client resource URL |
+
+#### factfind
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique FactFind identifier |
+| `href` | string | FactFind resource URL |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

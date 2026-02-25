@@ -66,11 +66,13 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
+
+
 ### Note Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `attachments` | ListofComplexData |  |  |
+| `attachments` | List of Complex Data |  |  |
 | `content` | string |  |  |
 | `contentType` | string |  |  |
 | `createdAt` | date |  | When this record was created in the system |
@@ -84,22 +86,30 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 | `subject` | string |  |  |
 | `updatedAt` | date |  | When this record was last modified |
 
-
-### Related Resources
-
-*See parent document for related entities.*
+*Total: 13 properties*
 
 
 ### Referenced Type Definitions
 
-The following types are referenced in the resource properties above:
+The following complex types are used in the properties above:
 
-### Complex Data Structure
+#### createdBy
 
-*Nested object structure* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+| `name` | string | First name (given name) |
 
-### Reference Link Structure
+#### entity
 
-*Reference to another entity* - See [FactFind Contracts Reference](../../FactFind-Contracts-Reference.md) for complete definition.
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique system identifier for this record |
+| `type` | string | Type of client: Person (individual), Corporate (company), or Trust |
+
+
+### Related Resources
+
+*See parent document for relationships to other entities.*
 
 ## Data Model

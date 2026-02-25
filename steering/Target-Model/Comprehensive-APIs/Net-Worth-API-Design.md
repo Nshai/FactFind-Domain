@@ -66,23 +66,27 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ## Resource Summary
 
 
-### Net Worth Resource Properties
+
+
+### Net-Worth Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
 | `id` | integer | ✓ | Unique identifier |
 | `href` | Link |  | Web address for this net worth record |
-| `factfind` | LinktoFactFind |  | The fact-find this belongs to |
-| `clients` | ListofClientLinks |  | Clients included in this calculation |
+| `factfind` | Link to FactFind |  | The fact-find this belongs to |
+| `clients` | List of Client Links |  | Clients included in this calculation |
 | `calculatedOn` | Date/Time |  | When this net worth was calculated |
 | `notes` | string |  | Context for this calculation |
 | `createdAt` | Date/Time |  | When this record was created |
 | `updatedAt` | Date/Time |  | When this record was last modified |
 
+*Total: 8 properties*
+
 
 ### Related Resources
 
-*See parent document for related entities.*
+*See parent document for relationships to other entities.*
 
 ## Data Model
 
