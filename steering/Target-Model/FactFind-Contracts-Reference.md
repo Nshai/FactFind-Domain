@@ -35,7 +35,6 @@ Each contract section includes:
 - [13.2 FactFind Contract](#132-factfind-contract)
 - [13.3 Address Contract](#133-address-contract)
 - [13.4 Income Contract](#134-income-contract)
-- [13.5 Arrangement Contract](#135-arrangement-contract)
 - [13.6 Goal Contract](#136-goal-contract)
 - [13.7 RiskProfile Contract](#137-riskprofile-contract)
 - [13.8 Investment Contract](#138-investment-contract)
@@ -68,11 +67,7 @@ Each contract section includes:
 - [13.41 Estate Planning - Gift Contract](#1341-estate-planning---gift-contract)
 - [13.42 Estate Planning - Trust Contract](#1342-estate-planning---trust-contract)
 - [13.43 Identity Verification Contract](#1343-identity-verification-contract)
-- [13.44 Arrangement - Mortgage Contract](#1344-arrangement---mortgage-contract)
-- [13.44A Investment Contract](#1344a-investment-contract)
-- [13.45 Arrangement - Investment Contract (General Investment Account)](#1345-arrangement---investment-contract-general-investment-account)
-- [13.46 Arrangement - Protection Contract (Life Assurance)](#1346-arrangement---protection-contract-life-assurance)
-- [13.47 Arrangement - Pension Contract (Personal Pension)](#1347-arrangement---pension-contract-personal-pension)
+- [13.57 PersonalProtection Contract](#1357-personalprotection-contract)
 
 ### Appendices
 - [Appendix A: Common Value Types](#appendix-a-common-value-types)
@@ -258,7 +253,7 @@ This contract connects to:
 - Contains multiple Addresses
 - Contains multiple Contact methods
 - Contains multiple Dependants
-- Links to multiple Arrangements (pensions, investments, etc.)
+- Links to multiple financial products (pensions, investments, mortgages, protections)
 - Links to multiple Employment records
 - Links to multiple Assets and Liabilities
 
@@ -286,7 +281,7 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 
 - Can be individual or joint (for couples)
 - Tracks completion status and workflow
-- Links to all clients, arrangements, goals, and documents
+- Links to all clients, financial products, goals, and documents
 - Maintains audit trail of creation and updates
 
 ### Fields
@@ -504,7 +499,7 @@ This contract connects to:
 
 - Contains one or more Clients
 - Contains multiple Goals/Objectives
-- Contains multiple Arrangements
+- Contains multiple financial products (Investments, Pensions, Mortgages, Protections)
 - Contains multiple Assets and Liabilities
 - Contains multiple Documents
 - Assigned to an Adviser
@@ -709,152 +704,6 @@ The `Income` contract represents an income source within a FactFind.
 
 ---
 
-## 13.5 Arrangement Contract
-
-### Business Purpose
-
-Represents any financial product or arrangement including pensions, investments, mortgages, protection policies, and bank accounts.
-
-### Key Features
-
-- Unified structure for all arrangement types
-- Tracks current values and contributions
-- Manages provider and product information
-- Supports single and joint ownership
-- Links to underlying investments and funds
-
-### Fields
-
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adviser | Reference Link | The adviser responsible for this client | Complex object |
-| arrangementCategory | Text | Type of arrangement (INVESTMENT, PENSION, MORTGAGE, PROTECTION) | PENSION |
-| arrangementNumber | Text |  | ARR123456 |
-| arrangementPeriod | Complex Data |  | Complex object |
-| owners | List of Complex Data | Who owns this arrangement | List with 1 item(s) |
-| contributionFrequency | Selection | How often (Monthly, Annual, etc.) | Complex object |
-| createdAt | Date | When this record was created in the system | 2015-01-01T10:00:00Z |
-| currentValue | Currency Amount | Current value of the arrangement | Complex object |
-| expectedRetirementAge | Number | Current age (calculated from date of birth) | 67 |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| hasGuaranteedAnnuityRate | Yes/No |  | No |
-| hasProtectedTaxFreeAmount | Yes/No | Whether pension has protected tax-free amount | No |
-| id | Number | Unique system identifier for this record | 2348 |
-| isInDrawdown | Yes/No |  | No |
-| isSalarySacrifice | Yes/No | Whether pension contributions are via salary sacrifice | No |
-| notes | Text |  | Consolidated from previous workplace pensions |
-| pensionType | Text | Sub-type when arrangementCategory=PENSION | PERSONAL_PENSION |
-| investmentType | Text | Sub-type when arrangementCategory=INVESTMENT | STOCKS_SHARES_ISA |
-| mortgageType | Text | Sub-type when arrangementCategory=MORTGAGE | RESIDENTIAL |
-| protectionType | Text | Sub-type when arrangementCategory=PROTECTION | LIFE_ASSURANCE |
-| policyNumber | Text | Policy or account number | POL123456 |
-| productName | Text | Name of the financial product | ABC SIPP |
-| projectedValueAtRetirement | Currency Amount | The contact value (email address, phone number, etc.) | Complex object |
-| provider | Reference Link | Unique system identifier for this record | Complex object |
-| regularContribution | Currency Amount |  | Complex object |
-| status | Text | Current status of the goal | ACT |
-| updatedAt | Date | When this record was last modified | 2026-02-16T14:30:00Z |
-| valuationDate | Date |  | 2026-02-01 |
-
-#### Nested Field Groups
-
-**adviser:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| code | Text | Standard Occupational Classification (SOC) code | ADV001 |
-| id | Number | Unique system identifier for this record | 8724 |
-| name | Text | First name (given name) | Jane Doe |
-
-**arrangementPeriod:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| endDate | Text | Employment end date (null if current) | None |
-| startDate | Date | Employment start date | 2015-01-01 |
-
-**contributionFrequency:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| code | Text | Standard Occupational Classification (SOC) code | M |
-| display | Text |  | Monthly |
-| periodsPerYear | Number |  | 12 |
-
-**currentValue:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 125000.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| factFindNumber | Text |  | FF-2025-00123 |
-| id | Number | Unique system identifier for this record | 2405 |
-| status | Text | Current status of the goal | INP |
-
-**projectedValueAtRetirement:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 450000.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-
-**provider:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| frnNumber | Text |  | 123456 |
-| id | Number | Unique system identifier for this record | 577 |
-| name | Text | First name (given name) | ABC Pension Provider Ltd |
-
-**regularContribution:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 500.0 |
-| currency | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| display | Text |  | British Pound |
-| symbol | Text |  | £ |
-
----
-
-### Relationships
-
-This contract connects to:
-
-- Belongs to a Client (owner)
-- Belongs to a FactFind
-- May have joint owner (secondOwnerRef)
-- Contains multiple Investment holdings
-- May link to Property (for mortgages)
-- May link to Employment (for workplace pensions)
-
-### Business Validation Rules
-
-- arrangementCategory is required
-- provider is required
-- policyNumber must be unique per provider
-- Joint arrangements must have secondOwnerRef
-- Current value must be >= 0
-- Mortgage must link to a property
-
----
-
-
 ## 13.6 Goal Contract
 
 ### Business Purpose
@@ -865,7 +714,7 @@ Represents a financial goal or objective that the client wants to achieve, such 
 
 - Defines target amount and target date
 - Tracks priority and status
-- Links goals to specific arrangements and assets
+- Links goals to specific financial products and assets
 - Supports progress tracking
 
 ### Fields
@@ -961,7 +810,7 @@ This contract connects to:
 
 - Belongs to a Client
 - Belongs to a FactFind
-- May link to specific Arrangements
+- May link to specific financial products
 - May link to specific Assets
 
 ### Business Validation Rules
@@ -1040,7 +889,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 
 ## 13.8 Investment Contract
 ### Overview
-The `Investment` contract extends the Arrangement contract with investment-specific fields for ISAs, GIAs, Bonds, and Investment Trusts.
+The `Investment` contract represents investment products including ISAs, GIAs, Bonds, and Investment Trusts managed under the Plans & Investments Context.
 
 ### Fields
 
@@ -6230,2556 +6079,269 @@ The `IdentityVerification` contract represents comprehensive identity verificati
 
 ---
 
-## 13.44 Arrangement - Mortgage Contract
+## 13.57 PersonalProtection Contract
 
 ### Business Purpose
 
-Represents a mortgage loan secured against a property, including terms, repayments, and property details.
+Represents personal protection arrangements including life cover, critical illness cover, income protection, expense cover, and severity-based protection products. This consolidated contract replaces the legacy Arrangement - Protection contracts and provides comprehensive protection policy management under the Plans domain.
 
 ### Key Features
 
-- Tracks mortgage amount, rate, and term
-- Records monthly repayments
-- Links to the secured property
-- Manages multiple mortgages per property
+- **Multi-Cover Support**: Single policy can include life, critical illness, income, expense, and severity covers
+- **Flexible Premium Structures**: Stepped, level, or hybrid premium configurations
+- **Trust Arrangements**: Record policies held in trust with beneficiary details
+- **Indexation Options**: RPI, CPI, fixed percentage, or level premiums
+- **Benefits Configuration**: Comprehensive benefit payment terms including deferred periods and qualification periods
+- **Commission Tracking**: Full commission details (indemnity, non-indemnity, renewal)
+- **Provider Integration**: Links to insurance providers and selling advisers
+- **Multi-Owner Support**: Joint policies with ownership percentage splits
 
 ### Fields
-
 
 #### Main Fields
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| accountNumber | Text |  | MTG-001234 |
-| agencyStatus | Text | Current age (calculated from date of birth) | NotUnderAgency |
-| agencyStatusDate | Date | Current age (calculated from date of birth) | 2023-02-06 |
-| arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | MORTGAGE |
-| asset | Reference Link | Total value of all assets | Complex object |
-| createdAt | Date | When this record was created in the system | 2023-01-15T10:00:00Z |
-| description | Text | Description of the goal | Main residence mortgage - 25 year fixed |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| feesAndCharges | Complex Data |  | Complex object |
-| id | Number | Unique system identifier for this record | 5001 |
-| illustrationReference | Text |  | IOB-REF-123456 |
-| interestTerms | Complex Data |  | Complex object |
-| keyDates | Complex Data |  | Complex object |
-| lenderName | Text |  | National Bank plc |
-| linkedArrangements | List of Complex Data |  | List with 1 item(s) |
-| loanAmounts | Complex Data | Amount spent | Complex object |
-| notes | Text |  | Main residence mortgage. Fixed rate ends February ... |
-| offsetFeatures | Complex Data |  | Complex object |
-| owners | List of Complex Data | Who owns this arrangement | List with 1 item(s) |
-| policyNumber | Text | Policy or account number | POL-98765 |
-| productName | Text | Name of the financial product | Fixed Rate Mortgage Premium |
-| productType | Text |  | FixedRateMortgage |
-| property | Reference Link | Type of property (Residential, Buy-to-Let, Commercial, etc.) | Complex object |
-| propertyDetail | Reference Link |  | Complex object |
-| redemptionTerms | Complex Data |  | Complex object |
-| repaymentStructure | Complex Data |  | Complex object |
-| sellingAdviser | Reference Link |  | Complex object |
-| sharedOwnershipDetails | Complex Data | Who owns this arrangement | Complex object |
-| specialFeatures | Complex Data |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-10T14:30:00Z |
+| id | Number | Unique system identifier | 15001 |
+| href | Text | Resource URI | /api/v2/factfinds/679/protections/15001 |
+| factfind | Reference Link | Link to parent FactFind | { id: 679, href: "/api/v2/factfinds/679" } |
+| sellingAdviser | Reference Link | Selling adviser reference | { id: 123, href: "/api/v2/advisers/123", name: "Jane Adviser" } |
+| owners | List of Reference Links | Policy owner(s) | [{ id: 8496, href: "/api/v2/factfinds/679/clients/8496", name: "John Smith" }] |
+| provider | Reference Link | Insurance provider | { id: 456, href: "/api/v2/productproviders/456", name: "Legal & General" } |
+| protectionCategory | Text | Protection category | PersonalProtection |
+| protectionType | Reference Link | Protection type reference | { id: 123, href: "/api/v2/plantypes?filter=id eq 123", name: "Life and Critical Illness" } |
+| lifeCycle | Reference Link | Life cycle stage | { id: 45, href: "/api/v2/lifecycles/45", name: "Accumulation" } |
+| premiums | List of Complex Data | Premium details | List with premium entries |
+| lifeCover | Complex Data | Life cover details | See LifeCoverValue below |
+| criticalIllnessCover | Complex Data | Critical illness cover details | See CriticalIllnessCoverValue below |
+| incomeCover | Complex Data | Income protection details | See IncomeCoverValue below |
+| expenseCover | Complex Data | Expense cover details | See ExpenseCoverValue below |
+| severityCover | Complex Data | Severity-based cover details | See SeverityCoverValue below |
+| benefitsPayable | Complex Data | Benefits payment configuration | See BenefitsPayableValue below |
+| indexType | Text (Selection) | Indexation type | LevelNotIndexed, RPI, FixedPercentage, AEI, Decreasing, CPI |
+| inTrust | Yes/No | Whether policy is held in trust | Yes |
+| inTrustToWhom | Text | Trust beneficiary details (max 250 chars) | Spouse and children |
+| benefitOptions | List of Text | Benefit options | ["Convertible", "Reviewable"] |
+| isRated | Yes/No | Whether policy has premium rating | No |
+| isPremiumWaiverWoc | Yes/No | Premium waiver on claim | Yes |
+| benefitSummary | Text | Summary of benefits | Level term life and CI cover with waiver |
+| exclusionNotes | Text | Policy exclusions | Hazardous sports exclusion |
+| initialEarningsPeriod | Text (ISO-8601) | Commission clawback period | P180D (180 days) |
+| waitingPeriod | Text (ISO-8601) | Waiting period before eligibility | P90D (90 days) |
+| premiumLoading | Text (max 50 chars) | Premium loading details | 10% loading due to occupation |
+| owner2PercentOfSumAssured | Number | Co-owner's percentage of sum assured | 50.00 |
+| sumAssured | Currency Amount | Total sum assured | £500,000 |
+| commissions | List of Complex Data | Commission details | See CommissionValue below |
+| protectionPayoutType | Text (Selection) | Payout type | Agreed, Indemnity |
+| concurrencyId | Text | Optimistic concurrency token | f7a8b9c0-1234-5678-9abc-def012345678 |
+| createdAt | Date and Time | Creation timestamp | 2024-01-15T10:30:00Z |
+| updatedAt | Date and Time | Last update timestamp | 2024-01-15T10:30:00Z |
 
 #### Nested Field Groups
 
-**asset:**
+**PremiumValue** (in premiums list):
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 67890 |
+| startsOn | Date | Premium start date | 2024-01-01 |
+| stopsOn | Date | Premium end date (null if ongoing) | null |
+| value | Currency Amount | Premium amount | £150.00 |
+| frequency | Text (Selection) | Payment frequency | Monthly, Quarterly, Annually, Single |
+| type | Text (Selection) | Premium type | Regular, Single |
+| contributorType | Text (Selection) | Contributor type | Self, Employer, Both |
+| escalation | Complex Data | Escalation configuration | See EscalationValue below |
 
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-
-**feesAndCharges:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| lenderFees | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 995.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| ongoingContributions | Text | Regular contributions being made | None |
-
-**interestTerms:**
+**EscalationValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| annualPercentageRate | Number | Current age (calculated from date of birth) | 3.75 |
-| baseRateIndex | Text |  | SONIA |
-| collarRate | Text |  | None |
-| hasCollarRate | Yes/No |  | No |
-| initialRatePeriodEndsOn | Date |  | 2028-02-06 |
-| initialTermMonths | Number |  | 0 |
-| initialTermYears | Number |  | 5 |
-| interestRate | Number |  | 3.5 |
-| rateType | Text |  | Fixed |
-| remainingTermMonths | Number |  | 6 |
-| remainingTermYears | Number |  | 23 |
-| reversionRate | Number |  | 4.25 |
+| type | Text (Selection) | Escalation type | FixedPercentage, RPI, Level, NAEI, LPI |
+| percentage | Number | Escalation percentage | 3.0 |
 
-**keyDates:**
+**LifeCoverValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| applicationSubmittedDate | Date |  | 2023-01-20 |
-| balanceAsOfDate | Date |  | 2026-02-10 |
-| completionDate | Date |  | 2023-02-06 |
-| endDate | Date | Employment end date (null if current) | 2048-02-06 |
-| exchangeDate | Date |  | 2023-01-27 |
-| nextPaymentDueDate | Date |  | 2026-03-06 |
-| nextReviewDate | Date |  | 2028-02-01 |
-| offerIssuedDate | Date |  | 2023-01-30 |
-| schemeEndDate | Text | Employment end date (null if current) | None |
-| startDate | Date | Employment start date | 2023-02-06 |
-| targetCompletionDate | Date |  | 2023-02-06 |
-| valuationDate | Date |  | 2023-01-22 |
-| valuationInstructedDate | Date |  | 2023-01-15 |
-| valuationReceivedDate | Date |  | 2023-01-28 |
+| term | Text (ISO-8601) | Cover term | P25Y (25 years) |
+| sumAssured | Currency Amount | Sum assured amount | £500,000 |
+| premiumStructure | Text (Selection) | Premium structure | Stepped, Level, Hybrid |
+| additionalCover | Currency Amount | Additional cover amount | £50,000 |
+| paymentBasis | Text (Selection) | Payment basis | FirstDeath, SecondDeath, Both |
+| untilAge | Number | Cover until age (years) | 65 |
 
-**loanAmounts:**
+**CriticalIllnessCoverValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| currentBalance | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 235000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| currentPropertyValuation | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 385000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| depositAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 132000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| equityReleased | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 0.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| loanToValue | Complex Data | Loan-to-Value at origination | Complex object |
-| currentLTV | Complex Data | Current Loan-to-Value | Complex object |
-| originalLoanAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 250000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| originalPropertyValuation | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 382000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
+| premiumStructure | Text (Selection) | Premium structure | Stepped, Level, Hybrid |
+| amount | Currency Amount | Cover amount | £250,000 |
+| term | Text (ISO-8601) | Cover term | P25Y (25 years) |
+| untilAge | Number | Cover until age (years) | 65 |
 
-**loanToValue:**
+**IncomeCoverValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| percentage | Number | LTV percentage at origination | 75.0 |
-| propertyValue | Currency Amount | Property value at origination | Complex object |
-| amount | Number | Amount | 400000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| loanAmount | Currency Amount | Loan amount at origination | Complex object |
-| amount | Number | Amount | 300000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| calculatedOn | Date | Date of LTV calculation | 2018-06-15 |
+| premiumStructure | Text (Selection) | Premium structure | Stepped, Level, Hybrid |
+| amount | Currency Amount | Monthly income amount | £3,000 |
+| term | Text (ISO-8601) | Cover term | P30Y (30 years) |
+| untilAge | Number | Cover until age (years) | 65 |
 
-**currentLTV:**
+**ExpenseCoverValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| percentage | Number | Current LTV percentage | 57.65 |
-| outstandingBalance | Currency Amount | Current outstanding balance | Complex object |
-| amount | Number | Amount | 245000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| currentPropertyValue | Currency Amount | Current property value | Complex object |
-| amount | Number | Amount | 425000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| calculatedOn | Date | Date of current LTV calculation | 2026-02-18 |
+| premiumStructure | Text (Selection) | Premium structure | Stepped, Level, Hybrid |
+| amount | Currency Amount | Monthly expense amount | £2,000 |
+| term | Text (ISO-8601) | Cover term | P20Y (20 years) |
+| untilAge | Number | Cover until age (years) | 60 |
 
-**offsetFeatures:**
+**SeverityCoverValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| offsetLinkedAccountNumber | Text |  | OFFSET-123456 |
-| offsetOptions | List of str |  | List with 3 item(s) |
+| permanentTotalDisabilityCover | Complex Data | PTD cover details | See PermanentTotalDisabilityCoverValue |
+| severityBasedCover | Complex Data | Severity-based cover details | See SeverityBasedCoverValue |
 
-**property:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 12345 |
-
-**propertyDetail:**
+**PermanentTotalDisabilityCoverValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 5 |
+| premiumStructure | Text (Selection) | Premium structure | Level |
+| amount | Currency Amount | Cover amount | £200,000 |
+| term | Text (ISO-8601) | Cover term | P20Y |
+| untilAge | Number | Cover until age | 60 |
 
-**redemptionTerms:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| earlyRepaymentCharge | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 7500.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| earlyRepaymentChargeEndsOn | Date |  | 2028-02-06 |
-| earlyRepaymentChargeSecondCharge | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 0.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| earlyRepaymentTerms | Text |  | No repayment for first 2 years, 3% penalty for yea... |
-| hasEarlyRepaymentCharge | Yes/No |  | Yes |
-| netProceedsOnRedemption | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 227500.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**repaymentStructure:**
+**SeverityBasedCoverValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| capitalRepaymentAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 200000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| capitalTermMonths | Number |  | 0 |
-| capitalTermYears | Number |  | 25 |
-| currentRepaymentVehicles | List of str |  | List with 2 item(s) |
-| interestOnlyAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 50000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| interestOnlyRepaymentVehicle | Text |  | ISA |
-| interestOnlyTermMonths | Number |  | 0 |
-| interestOnlyTermYears | Number |  | 10 |
-| lumpSumAdvance | Text |  | None |
-| monthlyIncomeDrawdown | Text |  | None |
-| regularAnnualOverpayment | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 5000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| repaymentMethod | Text |  | CapitalAndInterest |
+| premiumStructure | Text (Selection) | Premium structure | Level |
+| amount | Currency Amount | Cover amount | £100,000 |
+| term | Text (ISO-8601) | Cover term | P20Y |
+| untilAge | Number | Cover until age | 60 |
 
-**sellingAdviser:**
+**BenefitsPayableValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| firmName | Text |  | ABC Mortgage Services |
-| id | Number | Unique system identifier for this record | 123 |
-| name | Text | First name (given name) | John Adviser |
+| benefitFrequency | Text (Selection) | Benefit frequency | Single, Weekly, Monthly, Quarterly, Annually |
+| benefitPeriod | Complex Data | Benefit period configuration | See BenefitPeriodValue |
+| benefitAmount | Currency Amount | Benefit amount | £500,000 |
+| deferredPeriod | Text (ISO-8601) | Deferred period | P90D (90 days) |
+| qualificationPeriod | Complex Data | Qualification period config | See QualificationPeriodValue |
+| splitBenefitFrequency | Text (Selection) | Split benefit frequency | None, Monthly |
+| splitBenefitValue | Currency Amount | Split benefit amount | £2,500 |
+| splitDeferredPeriod | Text (ISO-8601) | Split deferred period | P60D |
 
-**sharedOwnershipDetails:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| sharedEquityLoanAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 0.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| sharedEquityLoanPercentage | Text | Current age (calculated from date of birth) | None |
-| sharedEquityRepaymentStartsOn | Text |  | None |
-| sharedEquitySchemeProvider | Text | Unique system identifier for this record | None |
-| sharedEquitySchemeType | Text |  | None |
-| sharedOwnershipHousingAssociation | Text | Who owns this arrangement | None |
-| sharedOwnershipMonthlyRent | Currency Amount | Who owns this arrangement | Complex object |
-| amount | Number | Amount spent | 0.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| sharedOwnershipPercentageOwned | Text | Current age (calculated from date of birth) | None |
-
-**specialFeatures:**
+**BenefitPeriodValue**:
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| consentToLetExpiresOn | Text |  | None |
-| hasConsentToLet | Yes/No |  | No |
-| hasDebtConsolidation | Yes/No | Unique system identifier for this record | No |
-| hasDischargeOnCompletion | Yes/No |  | Yes |
-| hasGuarantor | Yes/No |  | No |
-| incomeVerificationStatus | Text | Current status of the goal | Employed |
-| isCurrentResidence | Yes/No | Unique system identifier for this record | Yes |
-| isFirstTimeBuyer | Yes/No |  | No |
-| isIncomeEvidenced | Yes/No | Unique system identifier for this record | Yes |
-| isPortable | Yes/No |  | Yes |
-| isPropertySold | Yes/No |  | No |
-| isRedeemed | Yes/No |  | No |
+| value | Text (ISO-8601) | Period in months | P24M (24 months) |
+| details | Text (max 255 chars) | Period details | 24 months with extension option |
 
----
+**QualificationPeriodValue**:
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| isBackToDayOne | Yes/No | Back to day one provision | Yes |
+| value | Text (ISO-8601) | Period | P30D (30 days) |
+
+**CommissionValue** (in commissions list):
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| frequency | Text (Selection) | Commission frequency | Monthly, Quarterly, Annually, Single |
+| type | Text (Selection) | Commission type | Indemnity, NonIndemnity, SinglePremium, Level, Renewal |
+| percentage | Number | Commission percentage (0-100) | 2.5 |
+| amount | Currency Amount | Commission amount | £3.75 |
 
 ### Relationships
 
-This contract connects to:
-
-- Belongs to a Client (borrower)
-- Links to Property record
-- May have joint borrower
-- Part of Affordability Assessment
-
-### Business Validation Rules
-
-- propertyRef is required
-- originalAmount must be > 0
-- outstandingBalance must be <= originalAmount
-- monthlyRepayment must be > 0
-- maturityDate must be after startDate
-
----
-
-
-## 13.44A Investment Contract
-
-### Business Purpose
-
-Represents a comprehensive investment entity including investment accounts, life-assured investments, cash bank accounts, and investment bonds. This contract serves as a unified investment wrapper for all investment types with conditional fields based on the investment category.
-
-**Note:** This is a standalone Plans entity, NOT part of Arrangements. Investments are managed independently at `/api/v2/factfinds/{id}/investments`.
-
-### Key Features
-
-- **Multi-Category Support** - Handles CashBankAccount, Investment, and lifeAssuredInvestment categories
-- **Flexible Contributions** - Supports regular, lumpsum, and transfer contributions
-- **Fund Holdings Management** - Tracks individual fund holdings with detailed codes and allocations
-- **Life Assurance Integration** - Includes life cover and critical illness benefits for life-assured investments
-- **Wrap Account Support** - Links to platform/wrap accounts
-- **Maturity Projections** - Records low, medium, and high maturity value projections
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 15001 |
-| href | Link | API resource link | /api/v2/factfinds/679/investments/15001 |
-| factfind | Reference Link | Link to the FactFind that this investment belongs to | Complex object |
-| owners | List of Complex Data | Clients who own this investment | List with 1-2 item(s) |
-| sellingAdviser | Complex Data | Adviser who arranged this investment | Complex object |
-| provider | Complex Data | Product provider/company | Complex object |
-| lifeCycle | Complex Data | Investment lifecycle stage | Complex object |
-| investmentCategory | Text | Category of investment | Investment |
-| investmentType | Complex Data | Specific investment type/plan | Complex object |
-| policyNumber | Text | Policy or account number | INV-123456789 |
-| agencyStatus | Text | Agency servicing status | NOT_UNDER_AGENCY |
-| productName | Text | Name of the investment product | Global Growth Portfolio |
-| startedOn | Date | Investment start date | 2020-06-15 |
-| endsOn | Date | Investment end/maturity date | 2035-06-15 |
-| wrap | Complex Data | Platform/wrap account details | Complex object |
-| valuation | Complex Data | Current valuation details | Complex object |
-| cashAccount | Complex Data | Cash account specific details (CashBankAccount only) | Complex object |
-| maturityDetails | Complex Data | Maturity projection details (Investment/lifeAssuredInvestment) | Complex object |
-| monthlyIncome | Currency Amount | Monthly income from investment (Investment/lifeAssuredInvestment) | Complex object |
-| isOriginalInvestmentProtected | Yes/No | Whether original capital is protected (Investment/lifeAssuredInvestment) | No |
-| benefits | Complex Data | Life cover and critical illness benefits (lifeAssuredInvestment only) | Complex object |
-| lifeAssured | List of Complex Data | Persons whose lives are assured (lifeAssuredInvestment only) | List with 1-2 item(s) |
-| contributions | List of Complex Data | Investment contributions (regular, lumpsum, transfer) | List with 2 item(s) |
-| fundHoldings | Complex Data | Individual fund holdings and allocations | Complex object |
-| createdAt | Date | When this record was created in the system | 2020-06-15T10:00:00Z |
-| updatedAt | Date | When this record was last modified | 2026-02-18T14:30:00Z |
-
-#### Nested Field Groups
-
-**owners:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Client unique identifier | 8496 |
-| href | Link | API link to client resource | /api/v2/factfinds/679/clients/8496 |
-| name | Text | Client full name | John Smith |
-
-**sellingAdviser:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Adviser unique identifier | 123 |
-| href | Link | API link to adviser resource | /api/v2/advisers/123 |
-| name | Text | Adviser full name | Jane Financial Adviser |
-
-**provider:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Product provider unique identifier | 456 |
-| href | Link | API link to product provider resource | /api/v2/productproviders/456 |
-| name | Text | Product provider name | Vanguard |
-
-**lifeCycle:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Lifecycle unique identifier | 45 |
-| href | Link | API link to lifecycle resource | /api/v2/lifecycles/45 |
-| name | Text | Lifecycle stage name | Accumulation |
-
-**investmentType:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Plan type unique identifier | 123 |
-| href | Link | API link to plan type | /api/v2/plantypes?filter=id eq 123 |
-| name | Text | Investment type name | Stocks & Shares ISA |
-
-**wrap:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Wrap account identifier | 9001 |
-| href | Link | Link to parent wrap account investment | /api/v2/factfinds/679/investments/9001 |
-| reference | Text | Wrap account reference | WRAP-987654 |
-
-**valuation:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| currentValue | Currency Amount | Current investment value | Complex object |
-| amount | Number | Value amount | 125000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| valuedOn | Date | Valuation date | 2026-02-18 |
-
-**cashAccount** (applicable only for CashBankAccount category):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| interestRate | Number | Current interest rate percentage | 4.25 |
-| currency | Text | Account currency | GBP |
-
-**maturityDetails** (applicable only for Investment and lifeAssuredInvestment categories):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| maturityOn | Date | Maturity date | 2035-06-15 |
-| lowMaturityValue | Currency Amount | Low projection value | Complex object |
-| amount | Number | Low projection amount | 180000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| mediumMaturityValue | Currency Amount | Medium projection value | Complex object |
-| amount | Number | Medium projection amount | 245000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| highMaturityValue | Currency Amount | High projection value | Complex object |
-| amount | Number | High projection amount | 325000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| maturityValueProjectionDetails | Text | Details on projection assumptions | Projections based on 3%, 5%, and 7% annual growth rates |
-
-**benefits** (applicable only for lifeAssuredInvestment category):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| lifeCover | Complex Data | Life cover details | Complex object |
-| criticalIllness | Complex Data | Critical illness cover details | Complex object |
-| paymentBasis | Text | When benefit pays out | FirstDeath |
-| isInTrust | Yes/No | Whether policy is held in trust | Yes |
-| inTrustToWhom | Text | Trust beneficiaries | Children: Emily and James Smith |
-
-**benefits.lifeCover:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| sumAssured | Currency Amount | Life cover amount | Complex object |
-| amount | Number | Cover amount | 250000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| termInYears | Number | Cover term in years | 20 |
-
-**benefits.criticalIllness:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| sumAssured | Currency Amount | Critical illness cover amount | Complex object |
-| amount | Number | Cover amount | 250000.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| termInYears | Number | Cover term in years | 20 |
-
-**lifeAssured** (applicable only for lifeAssuredInvestment category):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| title | Text | Title | Mr |
-| firstName | Text | First name | John |
-| lastName | Text | Last name | Smith |
-| dateOfBirth | Date | Date of birth | 1980-05-15 |
-| gender | Text | Gender | Male |
-| client | Complex Data | Link to client record | Complex object |
-| id | Number | Client identifier | 8496 |
-| href | Link | Link to client | /api/v2/factfinds/679/clients/8496 |
-
-**contributions:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| type | Text | Contribution type | regular |
-| value | Currency Amount | Contribution amount | Complex object |
-| amount | Number | Contribution amount | 500.0 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| startedOn | Date | Contribution start date | 2020-06-15 |
-| endOn | Date | Contribution end date (null if ongoing) | null |
-| contributor | Text | Who makes the contribution | Self |
-| transfer | Complex Data | Transfer details (if type = Transfer) | Complex object |
-
-**contributions.transfer** (when type = Transfer):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| transferType | Text | Type of transfer | Cash |
-| isFullTransfer | Yes/No | Whether full transfer | Yes |
-| ceedingPlan | Complex Data | Plan being transferred from | Complex object |
-| id | Number | Ceeding plan identifier | 8001 |
-| href | Link | Link to ceeding plan | /api/v2/factfinds/679/investments/8001 |
-| reference | Text | Ceeding plan reference | OLD-PLAN-12345 |
-
-**fundHoldings:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| model | Complex Data | Model portfolio details | Complex object |
-| funds | List of Complex Data | Individual fund holdings | List with 5 item(s) |
-
-**fundHoldings.model:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| code | Text | Model portfolio code | BALANCED-GROWTH-60-40 |
-| Name | Text | Model portfolio name | BALANCED GROWTH-60-40 |
-
-**fundHoldings.funds:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| codes | List of Complex Data | Fund identification codes | List with 2 item(s) |
-| name | Text | Fund name | Vanguard FTSE Global All Cap Index Fund |
-| holding | Complex Data | Holding details | Complex object |
-| isFeed | Yes/No | Whether this is a feeder fund | No |
-| type | Text | Fund type | Fund |
-
-**fundHoldings.funds.codes:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| code | Text | Code type | ISIN |
-| value | Text | Code value | GB00BD3RZ582 |
-
-**fundHoldings.funds.holding:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| units | Number | Number of units held | 1250.567 |
-| percentage | Number | Percentage of total portfolio | 35.5 |
-
-### Relationships
-
-This contract connects to:
-
-- Belongs to a FactFind
-- Owned by one or more Clients (owners)
-- Advised by a Selling Adviser
-- May be held within a Wrap account (parent investment)
-- May be ceeded to/from other investments (transfers)
-- Links to LifeCycle stage
-- References Investment Type/Plan Type
-
-### Business Validation Rules
-
-**Category-Based Validation:**
-- `cashAccount` fields only applicable when `investmentCategory = CashBankAccount`
-- `maturityDetails`, `monthlyIncome`, `isOriginalInvestmentProtected` only applicable for `Investment` or `lifeAssuredInvestment`
-- `benefits` and `lifeAssured` only applicable when `investmentCategory = lifeAssuredInvestment`
-
-**Required Fields:**
-- `investmentCategory` is required (defaults to "Investment")
-- `investmentType` is required
-- `owners` list must contain at least one owner
-- `valuation.currentValue` is required
-- `valuation.valuedOn` is required
-
-**Contribution Validation:**
-- When `contributions.type = Transfer`, `transfer` object is required
-- When `contributions.type = regular`, `startedOn` is required
-- `contributor` must be one of: Self, Employer, Other, N_A, Government, Relative, SalarySacrifice, PartnerOrSpouse, HeldInSuper
-
-**Fund Holdings Validation:**
-- `fundHoldings.funds.holding.percentage` values must sum to 100% across all funds
-- At least one fund code must be provided for each fund
-- `fundHoldings.funds.type` must be one of: Fund, Equity, Bond, Property, Cash, Commodity, Other
-
-**Investment Category Values:**
-- `CashBankAccount` - Bank accounts, savings accounts, cash ISAs
-- `Investment` - General investments, unit trusts, OEICs, investment bonds (without life cover)
-- `lifeAssuredInvestment` - Investment bonds with life assurance, whole of life policies with investment element
-
-**Agency Status Values:**
-- `NOT_UNDER_AGENCY` - Investment not under agency servicing
-- `UNDER_AGENCY_INFORMATION_ONLY` - Agency provides information only
-- `UNDER_AGENCY_SERVICING_AGENT` - Full agency servicing
-
-**Payment Basis Values** (for lifeAssuredInvestment):
-- `FirstDeath` - Benefit pays on first death
-- `SecondDeath` - Benefit pays on second death (survivorship)
-- `Both` - Separate benefits for each life
-
-**Contributor Values:**
-- `Self` - Client's own contributions
-- `Employer` - Employer contributions
-- `Other` - Other third party
-- `N_A` - Not applicable
-- `Government` - Government contributions (e.g., tax relief)
-- `Relative` - Family member contributions
-- `SalarySacrifice` - Salary sacrifice arrangements
-- `PartnerOrSpouse` - Partner or spouse contributions
-- `HeldInSuper` - Held in superannuation (non-UK)
-
-**Transfer Type Values:**
-- `Cash` - Cash transfer (liquidate and transfer proceeds)
-- `Inspecie` - In-specie transfer (transfer actual holdings)
-
-**Fund Code Types:**
-- `ISIN` - International Securities Identification Number
-- `SEDOL` - Stock Exchange Daily Official List
-- `PlatForm` - Platform-specific code
-- `CITI` - Citi fund code
-- `MEXID` - MEX ID
-- `Bloomberg` - Bloomberg ticker
-- Other provider-specific codes
-
-### Common Use Cases
-
-**1. Stocks & Shares ISA:**
-```
-investmentCategory: Investment
-investmentType: Stocks & Shares ISA
-contributions: regular, type: Self
-fundHoldings: Multiple funds with ISIN codes
-maturityDetails: Projections for long-term growth
+**This contract connects to:**
+- **FactFind Contract** (parent) - Protection is part of a fact find
+- **Client Contract** (owners) - One or more clients own the protection policy
+- **Provider Contract** (provider) - Insurance provider details
+- **Adviser Contract** (sellingAdviser) - Selling adviser information
+- **PlanType Contract** (protectionType) - Protection product type reference
+- **LifeCycle Contract** (lifeCycle) - Life cycle stage reference
+
+### Business Rules
+
+1. **Required Fields**: At least one owner, provider, protection type, premiums, sum assured, and benefits payable must be specified
+2. **Cover Type Rules**: At least one cover type (life, critical illness, income, expense, or severity) must be configured
+3. **Premium Rules**: Premium amount must be greater than zero; start date cannot be more than 30 days in the future
+4. **Term and Age Rules**: Cover term must be valid ISO-8601 duration; until age must be between 18 and 100
+5. **Benefits Rules**: Deferred period typically 0-365 days for income protection; qualification period must match back-to-day-one setting
+6. **Trust Rules**: If inTrust is true, inTrustToWhom should be specified (max 250 characters)
+7. **Commission Rules**: Commission percentage must be between 0 and 100
+8. **Co-Ownership Rules**: If multiple owners, ownership percentages should total 100%
+
+### Example Usage
+
+**Life and Critical Illness Cover Example:**
+
+```json
+{
+  "id": 15001,
+  "href": "/api/v2/factfinds/679/protections/15001",
+  "factfind": { "id": 679, "href": "/api/v2/factfinds/679" },
+  "sellingAdviser": { "id": 123, "href": "/api/v2/advisers/123", "name": "Jane Adviser" },
+  "owners": [{ "id": 8496, "href": "/api/v2/factfinds/679/clients/8496", "name": "John Smith" }],
+  "provider": { "id": 456, "href": "/api/v2/productproviders/456", "name": "Legal & General" },
+  "protectionCategory": "PersonalProtection",
+  "protectionType": { "id": 123, "href": "/api/v2/plantypes?filter=id eq 123", "name": "Life and CI" },
+  "lifeCycle": { "id": 45, "href": "/api/v2/lifecycles/45", "name": "Accumulation" },
+  "premiums": [{
+    "startsOn": "2024-01-01",
+    "value": { "amount": 150.00, "currency": { "code": "GBP", "symbol": "£" } },
+    "frequency": "Monthly",
+    "type": "Regular",
+    "contributorType": "Self",
+    "escalation": { "type": "RPI", "percentage": 0 }
+  }],
+  "lifeCover": {
+    "term": "P25Y",
+    "sumAssured": { "amount": 500000.00, "currency": { "code": "GBP", "symbol": "£" } },
+    "premiumStructure": "Level",
+    "paymentBasis": "FirstDeath",
+    "untilAge": 65
+  },
+  "criticalIllnessCover": {
+    "premiumStructure": "Level",
+    "amount": { "amount": 250000.00, "currency": { "code": "GBP", "symbol": "£" } },
+    "term": "P25Y",
+    "untilAge": 65
+  },
+  "benefitsPayable": {
+    "benefitFrequency": "Single",
+    "benefitAmount": { "amount": 500000.00, "currency": { "code": "GBP", "symbol": "£" } },
+    "deferredPeriod": "P0D",
+    "qualificationPeriod": { "isBackToDayOne": false, "value": "P30D" }
+  },
+  "indexType": "RPI",
+  "inTrust": true,
+  "inTrustToWhom": "Spouse and children",
+  "isRated": false,
+  "isPremiumWaiverWoc": true,
+  "sumAssured": { "amount": 500000.00, "currency": { "code": "GBP", "symbol": "£" } },
+  "protectionPayoutType": "Indemnity"
+}
 ```
 
-**2. Investment Bond with Life Cover:**
-```
-investmentCategory: lifeAssuredInvestment
-benefits: lifeCover and criticalIllness populated
-lifeAssured: List of assured lives
-contributions: lumpsum from pension transfer
-paymentBasis: FirstDeath
-isInTrust: Yes
-```
-
-**3. Cash Bank Account:**
-```
-investmentCategory: CashBankAccount
-cashAccount: interestRate populated
-contributions: regular deposits
-No maturityDetails or benefits
-```
-
-**4. Investment Transfer:**
-```
-contributions.type: Transfer
-contributions.transfer.transferType: Inspecie
-contributions.transfer.ceedingPlan: Link to old investment
-contributions.transfer.isFullTransfer: Yes
-```
-
-**5. Wrap Platform Account:**
-```
-wrap: null (this IS the wrap)
-Other investments reference this as their wrap.id
-fundHoldings: Aggregated across all sub-accounts
-```
-
----
-
-
-## 13.44B Final Salary Pension Contract
-
-### Business Purpose
-
-Represents a defined benefit (final salary) pension scheme including public sector schemes, private sector final salary schemes, and career average revalued earnings (CARE) schemes. This contract captures comprehensive pension benefits, transfer values, and retirement options.
-
-**Note:** This is a standalone Plans entity, NOT part of Arrangements. Final salary pensions are managed independently at `/api/v2/factfinds/{id}/pensions/finalsalary`.
-
-### Key Features
-
-- **Defined Benefit Tracking** - Accrual rates, pensionable salary, and prospective benefits
-- **Transfer Value Management** - Cash Equivalent Transfer Value (CETV) with expiry tracking
-- **Retirement Options** - Normal, early, and late retirement scenarios with reduction factors
-- **Death Benefits** - Spousal pensions, dependant benefits, and death in service provisions
-- **GMP Tracking** - Guaranteed Minimum Pension from contracting out
-- **Scheme Enhancements** - Additional Voluntary Contributions (AVCs), added years, affinity DC schemes
-- **Indexation** - Inflation protection and revaluation terms
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 15001 |
-| href | Link | API resource link | /api/v2/factfinds/679/pensions/finalsalary/15001 |
-| factfind | Reference Link | Link to the FactFind | Complex object |
-| owners | List of Complex Data | Clients who own this pension | List with 1 item(s) |
-| sellingAdviser | Complex Data | Adviser who provides advice on this pension | Complex object |
-| provider | Complex Data | Pension scheme provider/administrator | Complex object |
-| lifeCycle | Complex Data | Pension lifecycle stage | Complex object |
-| wrap | Complex Data | Platform/wrap account details | Complex object |
-| pensionCategory | Text | Category of pension | PensionDefinedBenefit |
-| pensionType | Complex Data | Specific pension type/plan | Complex object |
-| policyNumber | Text | Policy or scheme member number | NHS-DB-987654 |
-| agencyStatus | Text | Agency servicing status | NotUnderAgency |
-| agencyStatusDate | Date | Date of agency status | 2023-01-15 |
-| productName | Text | Name of the pension scheme | NHS Pension Scheme (1995 Section) |
-| currency | Complex Data | Scheme currency | Complex object |
-| status | Text | Current status | ACTIVE |
-| employer | Text | Employer providing the scheme | Royal London Hospital Trust |
-| normalRetirementAge | Number | Normal retirement age for the scheme | 60 |
-| pensionAtRetirement | Complex Data | Prospective pension benefits at retirement | Complex object |
-| accrualRate | Text | Benefit accrual rate | 1/80th |
-| schemeType | Text | Type of scheme | PUBLIC_SECTOR |
-| dateSchemeJoined | Date | Date member joined the scheme | 1995-09-01 |
-| expectedYearsOfService | Number | Expected total years of service | 35.0 |
-| pensionableSalary | Currency Amount | Current pensionable salary | Complex object |
-| isIndexed | Yes/No | Whether pension is inflation-linked | Yes |
-| indexationNotes | Text | Details of indexation provisions | CPI linked annual increases, capped at 5% p.a. |
-| isPreserved | Yes/No | Whether this is a preserved (deferred) pension | No |
-| transferValue | Complex Data | Cash Equivalent Transfer Value details | Complex object |
-| gmpAmount | Currency Amount | Guaranteed Minimum Pension amount | Complex object |
-| deathInService | Complex Data | Death in service benefits | Complex object |
-| earlyRetirement | Complex Data | Early retirement provisions | Complex object |
-| dependantBenefits | Text | Benefits for dependants | Children's pensions until age 23 |
-| purchaseAddedYears | Complex Data | Option to purchase added years | Complex object |
-| affinityDCScheme | Complex Data | Affinity defined contribution scheme | Complex object |
-| additionalNotes | Text | Additional scheme information | Protected rights included |
-| createdAt | Date | When this record was created | 2023-01-15T10:00:00Z |
-| updatedAt | Date | When this record was last modified | 2026-02-25T14:30:00Z |
-
-#### Nested Field Groups
-
-**owners:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Client unique identifier | 8496 |
-| href | Link | API link to client resource | /api/v2/factfinds/679/clients/8496 |
-| name | Text | Client full name | John Smith |
-| ownershipPercentage | Number | Ownership percentage | 100.0 |
-
-**sellingAdviser:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Adviser unique identifier | 123 |
-| href | Link | API link to adviser resource | /api/v2/advisers/123 |
-| name | Text | Adviser full name | Jane Financial Adviser |
-
-**provider:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Product provider unique identifier | 456 |
-| href | Link | API link to product provider resource | /api/v2/productproviders/456 |
-| name | Text | Scheme provider/administrator name | NHS Pensions |
-
-**lifeCycle:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Lifecycle unique identifier | 45 |
-| href | Link | API link to lifecycle resource | /api/v2/lifecycles/45 |
-| name | Text | Lifecycle stage name | Accumulation |
-
-**pensionType:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Plan type unique identifier | 123 |
-| href | Link | API link to plan type | /api/v2/plantypes?filter=id eq 123 |
-| name | Text | Pension type name | Final Salary Pension |
-
-**wrap:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Platform/wrap account identifier | 234 |
-| href | Link | API link to investment resource | /api/v2/factfinds/679/investments/234 |
-| reference | Text | Platform account reference | WRAP-ACC-123456 |
-
-**currency:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| code | Text | Currency code | GBP |
-| display | Text | Currency display name | British Pound |
-| symbol | Text | Currency symbol | £ |
-
-**pensionAtRetirement:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| prospectiveWithNoLumpsumTaken | Currency Amount | Annual pension if no lump sum taken | Complex object |
-| amount | Number | Pension amount | 45000.00 |
-| currency | Complex Data | Currency details | Complex object |
-| prospectiveWithLumpsumTaken | Currency Amount | Annual pension if maximum lump sum taken | Complex object |
-| amount | Number | Pension amount | 33750.00 |
-| currency | Complex Data | Currency details | Complex object |
-| prospectiveLumpSum | Currency Amount | Tax-free lump sum available | Complex object |
-| amount | Number | Lump sum amount | 135000.00 |
-| currency | Complex Data | Currency details | Complex object |
-
-**pensionableSalary:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Pensionable salary amount | 65000.00 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| display | Text | Currency display name | British Pound |
-| symbol | Text | Currency symbol | £ |
-
-**transferValue:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| cashEquivalentValue | Currency Amount | CETV amount | Complex object |
-| amount | Number | Transfer value | 950000.00 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-| expiryOn | Date | Date CETV expires | 2026-04-15 |
-
-**gmpAmount:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | GMP weekly amount | 1250.00 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| symbol | Text | Currency symbol | £ |
-
-**deathInService:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| spousalBenefits | Number | Spouse's pension as % of member's pension | 50.0 |
-| lumpsumMultiple | Number | Lump sum death benefit (multiple of salary) | 4.0 |
-| notes | Text | Additional death benefit details | Payable to nominated beneficiaries |
-
-**earlyRetirement:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| retirementAge | Number | Earliest retirement age | 55 |
-| reductionFactor | Number | Annual reduction percentage | 3.0 |
-| retirementConsiderations | Text | Early retirement terms | 3% reduction per year before age 60 |
-
-**purchaseAddedYears:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| isAvailable | Yes/No | Whether option available | Yes |
-| yearsPurchased | Number | Number of additional years purchased | 4 |
-| details | Text | Purchase details | Purchased via salary deduction 2015-2019 |
-
-**affinityDCScheme:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| isAvailable | Yes/No | Whether DC scheme available | Yes |
-| contributionRate | Number | Member contribution rate | 5.0 |
-| details | Text | Affinity scheme details | Additional DC pot alongside DB pension |
-
-### Relationships
-
-This contract connects to:
-
-- Belongs to a FactFind
-- Owned by one or more Clients (owners)
-- Advised by a Selling Adviser
-- Provided/administered by a Product Provider
-- Links to LifeCycle stage
-- References Pension Type/Plan Type
-- May link to Employer entity
-
-### Business Validation Rules
-
-**Required Fields:**
-- `pensionCategory` is required (defaults to "PensionDefinedBenefit")
-- `pensionType` is required
-- `owners` list must contain at least one owner
-- `employer` is required for occupational schemes
-- `normalRetirementAge` is required
-- `pensionableSalary` is required for active members
-
-**Pension Category Values:**
-- `PensionDefinedBenefit` - Final salary or defined benefit schemes
-
-**Scheme Type Values:**
-- `PUBLIC_SECTOR` - NHS, Teachers, Civil Service, Local Government, Police, Armed Forces
-- `PRIVATE_SECTOR` - Company final salary schemes
-- `UNFUNDED` - Unfunded public sector schemes (paid from current taxation)
-
-**Status Values:**
-- `ACTIVE` - Currently accruing benefits
-- `DEFERRED` - Preserved benefits, no longer accruing
-- `IN_PAYMENT` - Pension currently being drawn
-- `TRANSFERRED_OUT` - Benefits transferred to another arrangement
-
-**Accrual Rate Examples:**
-- `1/60th` - 1/60th of final salary per year of service
-- `1/80th` - 1/80th of final salary per year of service (with lump sum)
-- `1/54th` - Career Average scheme rate
-- `2.32%` - Percentage of revalued earnings
-
-**Agency Status Values:**
-- `NOT_UNDER_AGENCY` - Not under agency servicing
-- `UNDER_AGENCY_INFORMATION_ONLY` - Agency provides information only
-- `UNDER_AGENCY_SERVICING_AGENT` - Full agency servicing
-
-**Lifecycle Stage Values:**
-- `Accumulation` - Building benefits, active member
-- `Preservation` - Deferred member, preserved benefits
-- `Decumulation` - In payment, drawing pension
-- `Transfer` - Considering or processing transfer
-
-### UK Final Salary Pension Rules
-
-**Protected Rights:**
-- Pre-2016 schemes may have protected rights from contracting out
-- GMP accrued between 1978-1997 must be preserved
-- Section 32 buy-out plans for preserved benefits
-
-**Transfer Out Rules (October 2023+):**
-- Statutory right to transfer applies to deferred and active members
-- FCA requires advice for transfers over £30,000
-- Pension Scams regulations require due diligence
-- Transfer Value Analysis (TVA) required
-
-**Abatement:**
-- Some public sector schemes reduce pension if member returns to work
-- Applies to early retirement pensions in particular
-
-**Revaluation:**
-- Deferred pensions must be revalued annually
-- Statutory minimum revaluation: CPI capped at 5% or 2.5%
-- In-payment increases: CPI, RPI, or fixed percentage depending on scheme rules
-
-**Normal Retirement Age:**
-- State Pension Age alignment for post-2015 public sector schemes
-- Legacy schemes: age 60 or 65 typically
-- Protected retirement ages for some members
-
-### Common Use Cases
-
-**1. Active Public Sector Scheme:**
-```
-pensionCategory: PensionDefinedBenefit
-schemeType: PUBLIC_SECTOR
-employer: NHS Trust
-status: ACTIVE
-accrualRate: 1/54th (CARE scheme)
-normalRetirementAge: 68 (State Pension Age)
-isIndexed: true (CPI capped at 5%)
-```
-
-**2. Deferred Final Salary Pension:**
-```
-status: DEFERRED
-isPreserved: true
-dateSchemeJoined: 1995-01-01
-dateMemberLeft: 2010-05-31
-accrualRate: 1/60th
-pensionAtRetirement: Based on salary at leaving
-revaluation: Statutory minimum
-```
-
-**3. Enhanced Transfer Value Offer:**
-```
-transferValue.cashEquivalentValue: £850,000
-transferValue.expiryOn: 2026-03-31
-transferValue.notes: Enhanced 15% above standard CETV
-FCA advice required (>£30k)
-Pension Transfer Specialist required
-```
-
-**4. Protected Retirement Age:**
-```
-normalRetirementAge: 50 (protected)
-schemeType: PUBLIC_SECTOR (Police, Firefighter)
-earlyRetirement.retirementAge: 50
-earlyRetirement.reductionFactor: 0 (no reduction)
-```
-
-**5. Added Years Purchase:**
-```
-purchaseAddedYears.isAvailable: true
-purchaseAddedYears.yearsPurchased: 5
-Cost: £15,000 paid via salary deduction
-Effect: Increases service years from 25 to 30
-```
-
----
-
-## 13.44C Annuity Contract
-
-### Business Purpose
-
-Represents an annuity pension arrangement providing guaranteed retirement income for life or a fixed term. This contract captures comprehensive annuity details including purchase amounts, income payments, guarantee periods, spouse benefits, and overlay protections.
-
-**Note:** This is a standalone Plans entity, NOT part of Arrangements. Annuities are managed independently at `/api/v2/factfinds/{id}/pensions/annuities`.
-
-### Key Features
-
-- **Lifetime or Fixed Term Income** - Guaranteed income for life or specified period
-- **Purchase Amount Tracking** - Total amount used to purchase annuity
-- **Income Structure** - Flexible income amounts with frequency and escalation
-- **Guarantee Periods** - Minimum payment periods regardless of death
-- **Spouse/Dependant Benefits** - Percentage or fixed amount continuation benefits
-- **PCLS Handling** - Pension Commencement Lump Sum tracking
-- **Overlay Benefits** - Value protection and guaranteed minimum pensions
-- **Payment Timing** - Advance or arrears payment options
-- **Growth Assumptions** - Escalation rate tracking
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 15001 |
-| href | Link | API resource link | /api/v2/factfinds/679/pensions/annuities/15001 |
-| factfind | Reference Link | Link to the FactFind | Complex object |
-| owners | List of Complex Data | Clients who own this annuity | List with 1 item(s) |
-| sellingAdviser | Complex Data | Adviser who arranged this annuity | Complex object |
-| provider | Complex Data | Annuity provider/insurance company | Complex object |
-| lifeCycle | Complex Data | Annuity lifecycle stage | Complex object |
-| wrap | Complex Data | Platform/wrap account details | Complex object |
-| pensionCategory | Text | Category of pension | Annuity |
-| pensionType | Complex Data | Specific annuity type/plan | Complex object |
-| policyNumber | Text | Policy or annuity contract number | ANN-123456789 |
-| agencyStatus | Text | Agency servicing status | NotUnderAgency |
-| agencyStatusDate | Date | Date of agency status | 2023-01-15 |
-| productName | Text | Name of the annuity product | Guaranteed Lifetime Annuity |
-| currency | Complex Data | Payment currency | Complex object |
-| startDate | Date | Date annuity payments commenced | 2023-01-15 |
-| annuityType | Text | Type of annuity | LIFETIME |
-| totalPurchaseAmount | Currency Amount | Total amount used to purchase annuity | Complex object |
-| premiumStartDate | Date | Date premium payment started | 2023-01-15 |
-| incomeAmount | Complex Data | Annual income payment details | Complex object |
-| assumedGrowthRate | Complex Data | Annual escalation/growth rate | Complex object |
-| annuityPaymentType | Text | Payment timing | Advance |
-| pcls | Complex Data | Pension Commencement Lump Sum details | Complex object |
-| spouseOrDependantBenefits | Complex Data | Benefits for spouse/dependants | Complex object |
-| guaranteePeriod | Complex Data | Guaranteed payment period | Complex object |
-| guaranteedMinimumPensionAnnual | Currency Amount | Minimum annual pension guaranteed | Complex object |
-| overlayBenefits | Complex Data | Additional protection benefits | Complex object |
-| additionalNotes | Text | Additional annuity information | Protected pension with escalation |
-| createdAt | Date | When this record was created | 2023-01-15T10:00:00Z |
-| updatedAt | Date | When this record was last modified | 2026-02-25T14:30:00Z |
-
-#### Nested Field Groups
-
-**owners:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Client unique identifier | 8496 |
-| href | Link | API link to client resource | /api/v2/factfinds/679/clients/8496 |
-| name | Text | Client full name | John Smith |
-| ownershipPercentage | Number | Ownership percentage | 100.0 |
-
-**sellingAdviser:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Adviser unique identifier | 123 |
-| href | Link | API link to adviser resource | /api/v2/advisers/123 |
-| name | Text | Adviser full name | Jane Financial Adviser |
-
-**provider:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Product provider unique identifier | 456 |
-| href | Link | API link to product provider resource | /api/v2/productproviders/456 |
-| name | Text | Annuity provider name | Aviva |
-
-**lifeCycle:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Lifecycle unique identifier | 45 |
-| href | Link | API link to lifecycle resource | /api/v2/lifecycles/45 |
-| name | Text | Lifecycle stage name | In Payment |
-
-**pensionType:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Plan type unique identifier | 123 |
-| href | Link | API link to plan type | /api/v2/plantypes?filter=id eq 123 |
-| name | Text | Pension type name | Lifetime Annuity |
-
-**wrap:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Platform/wrap account identifier | 234 |
-| href | Link | API link to investment resource | /api/v2/factfinds/679/investments/234 |
-| reference | Text | Platform account reference | WRAP-ANN-123456 |
-
-**currency:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| code | Text | Currency code | GBP |
-| display | Text | Currency display name | British Pound |
-| symbol | Text | Currency symbol | £ |
-
-**totalPurchaseAmount:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Purchase amount | 250000.00 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| display | Text | Currency display name | British Pound |
-| symbol | Text | Currency symbol | £ |
-
-**incomeAmount:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| value | Currency Amount | Income payment amount | Complex object |
-| amount | Number | Annual income amount | 18500.00 |
-| currency | Complex Data | Currency details | Complex object |
-| frequency | Text | Payment frequency | Monthly |
-| effectiveDate | Date | Date income started | 2023-01-15 |
-
-**assumedGrowthRate:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| percentage | Number | Annual escalation percentage | 3.00 |
-
-**pcls:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| value | Currency Amount | Lump sum amount | Complex object |
-| amount | Number | PCLS amount | 62500.00 |
-| currency | Complex Data | Currency details | Complex object |
-| paidBy | Text | Who paid the PCLS | Originating Scheme |
-
-**spouseOrDependantBenefits:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| percentage | Number | Percentage of main income | 50.00 |
-| amount | Currency Amount | Fixed spouse benefit amount | Complex object |
-| amount | Number | Annual spouse benefit | 9250.00 |
-| currency | Complex Data | Currency details | Complex object |
-
-**guaranteePeriod:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| years | Number | Guarantee period in years | 5 |
-| endsOn | Date | Date guarantee period ends | 2028-01-15 |
-
-**guaranteedMinimumPensionAnnual:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Minimum annual pension | 18500.00 |
-| currency | Complex Data | Currency details | Complex object |
-| code | Text | Currency code | GBP |
-| display | Text | Currency display name | British Pound |
-| symbol | Text | Currency symbol | £ |
-
-**overlayBenefits:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| hasValueProtection | Yes/No | Whether capital value is protected | Yes |
-| protectedCapital | Currency Amount | Protected capital amount | Complex object |
-| amount | Number | Protected amount | 250000.00 |
-| currency | Complex Data | Currency details | Complex object |
-| hasGuaranteePeriod | Yes/No | Whether guarantee period applies | Yes |
-| guaranteeInYears | Number | Guarantee period in years | 10 |
-
-### Business Validation Rules
-
-**Annuity Type:**
-- LIFETIME - Annuity payable for life
-- FIXED_TERM - Annuity payable for fixed period
-- JOINT_LIFE - Continues on death to spouse
-- LEVEL - Fixed income amount
-- ESCALATING - Income increases annually
-- RPI_LINKED - Linked to Retail Price Index
-- CPI_LINKED - Linked to Consumer Price Index
-
-**Payment Type:**
-- Advance - Paid at start of period (monthly, quarterly, annually)
-- Arrears - Paid at end of period
-
-**PCLS Paid By:**
-- Originating Scheme - PCLS paid from original pension scheme
-- Receiving Scheme - PCLS paid by annuity provider
-- Separate Payment - PCLS taken separately, not from annuity
-
-**Guarantee Period:**
-- Common periods: 5, 10, 15 years
-- Payments continue to beneficiaries if annuitant dies within guarantee period
-- After guarantee period, payments cease on death (unless joint life)
-
-**Spouse Benefits:**
-- Can be percentage (e.g., 50%, 66.67%, 100%)
-- Or fixed amount
-- Payable on death of primary annuitant
-
-### UK Pension Regulations
-
-**Annuity Purchase Rules:**
-- Can purchase from age 55 (increasing to 57 in 2028)
-- Must use open market option (OMO) - can buy from any provider
-- 25% tax-free lump sum (PCLS) available at purchase
-- Remaining 75% used to purchase annuity income
-
-**Taxation:**
-- Annuity income taxed as earned income at marginal rate
-- PCLS is tax-free (up to 25% of fund value)
-- No further tax charges after purchase
-
-**Enhanced/Impaired Annuities:**
-- Higher rates for health conditions or lifestyle factors
-- Medical evidence may be required
-- Significantly higher income for serious conditions
-
-**Annuity Types (Regulatory):**
-- Compulsory Purchase Annuity (CPA) - Purchased with pension fund
-- Purchased Life Annuity (PLA) - Purchased with personal funds (different tax treatment)
-- Secured Pension - FCA term for pension annuities
-- Alternatively Secured Pension (ASP) - Legacy unsecured pensions
-
-**Protections:**
-- Financial Services Compensation Scheme (FSCS) - 100% protection for annuities
-- Pension Protection Fund (PPF) - Not applicable (annuities purchased from insurers)
-- Consumer Duty - Providers must ensure fair value
-
-### Use Cases
-
-**1. Standard Lifetime Annuity Purchase:**
-```
-Pension fund: £250,000
-PCLS (25%): £62,500 tax-free
-Amount for annuity: £187,500
-Age: 65
-Annuity rate: 6.5% (lifetime, level, single life)
-Annual income: £12,187
-Monthly income: £1,015
-Guarantee period: 5 years
-No spouse benefit
-```
-
-**2. Enhanced Annuity (Health Conditions):**
-```
-Pension fund: £180,000
-PCLS: £45,000
-Amount for annuity: £135,000
-Age: 63
-Health: Type 2 diabetes, high blood pressure, smoker
-Standard rate: 5.5%
-Enhanced rate: 7.8% (+42% uplift)
-Annual income: £10,530 (vs. £7,425 standard)
-Monthly income: £877 (vs. £619 standard)
-Additional income: £3,105 per year
-```
-
-**3. Joint Life Annuity with Escalation:**
-```
-Pension fund: £300,000
-PCLS: £75,000
-Amount for annuity: £225,000
-Ages: 67 and 65
-Annuity type: Joint life, 50% spouse benefit
-Escalation: 3% per annum
-Initial annual income: £10,125
-After 10 years: £13,605 (with escalation)
-After 20 years: £18,279
-Spouse income on death: 50% = £5,063 to £9,139
-```
-
-**4. Fixed Term Annuity (Bridge to State Pension):**
-```
-Pension fund: £100,000
-PCLS: £25,000
-Amount for annuity: £75,000
-Age: 63
-Term: 3 years (to age 66 - State Pension Age)
-Annual income: £26,850
-Total payments: £80,550 over 3 years
-Purpose: Bridge income gap until State Pension starts
-```
-
-**5. Guarantee Period Protection:**
-```
-Pension fund: £200,000
-PCLS: £50,000
-Amount for annuity: £150,000
-Age: 70
-Annual income: £11,400
-Guarantee period: 10 years
-Scenario: Annuitant dies after 2 years
-Remaining guarantee: 8 years
-Payments continue to estate: 8 × £11,400 = £91,200
-Total paid: £22,800 + £91,200 = £114,000
-```
-
----
-
-## 13.44D Personal Pension Contract
-
-### Business Purpose
-
-Represents a personal pension arrangement including contribution-based defined contribution pensions, drawdown pensions, and self-invested personal pensions (SIPPs). This contract captures comprehensive pension details including valuations, contributions, fund holdings, crystallisation status, GAD limits, and retirement options.
-
-**Note:** This is a standalone Plans entity, NOT part of Arrangements. Personal pensions are managed independently at `/api/v2/factfinds/{id}/pensions/personalpension`.
-
-### Key Features
-
-- **Contribution and Drawdown Management** - Track regular and lump sum contributions, transfers
-- **Fund Holdings** - Detailed fund allocation with multiple identification codes
-- **Crystallisation Tracking** - Monitor crystallised, part-crystallised, and uncrystallised funds
-- **GAD Compliance** - Track Guaranteed Annuity Drawdown income limits
-- **PCLS Management** - Pension Commencement Lump Sum tracking
-- **Lifetime Allowance** - Monitor percentage of lifetime allowance used
-- **Enhanced Benefits** - Track guaranteed annuity rates, loyalty bonuses, guaranteed growth
-- **Death Benefits** - Comprehensive death in service and death benefits tracking
-- **Lifestyling** - Automatic asset allocation strategies approaching retirement
-- **Trust Arrangements** - Pension held in trust for inheritance planning
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 15001 |
-| href | Link | API resource link | /api/v2/factfinds/679/pensions/personalpension/15001 |
-| factfind | Reference Link | Link to the FactFind | Complex object |
-| owners | List of Complex Data | Clients who own this pension | List with 1 item(s) |
-| sellingAdviser | Complex Data | Adviser who arranged this pension | Complex object |
-| provider | Complex Data | Pension provider/company | Complex object |
-| lifeCycle | Complex Data | Pension lifecycle stage | Complex object |
-| wrap | Complex Data | Platform/wrap account details | Complex object |
-| pensionCategory | Text | Category of pension | PensionContributionDrawdown |
-| pensionType | Complex Data | Specific pension type/plan | Complex object |
-| policyNumber | Text | Policy or pension account number | PP-123456789 |
-| agencyStatus | Text | Agency servicing status | NotUnderAgency |
-| agencyStatusDate | Date | Date of agency status | 2023-01-15 |
-| productName | Text | Name of the pension product | Vanguard Personal Pension |
-| currency | Complex Data | Pension currency | Complex object |
-| startedOn | Date | Date pension started | 2018-03-15 |
-| employer | Text | Employer name (if workplace pension) | ABC Corporation Ltd |
-| retirementAge | Number | Target retirement age | 65 |
-| valuation | Complex Data | Current valuation details | Complex object |
-| pensionArrangement | Text | Arrangement type | Physical |
-| crystallisationStatus | Text | Crystallisation status | Uncrystallised |
-| pcls | Complex Data | Pension Commencement Lump Sum details | Complex object |
-| gadMaximumIncomeLimitAnnual | Currency Amount | GAD maximum income limit per year | Complex object |
-| guaranteedMinimumIncomeLimitAnnual | Currency Amount | Guaranteed minimum income limit per year | Complex object |
-| gadCalculatedOn | Date | Date GAD was calculated | 2023-04-15 |
-| nextReviewOn | Date | Date of next pension review | 2024-04-15 |
-| isInTrust | Yes/No | Whether pension is held in trust | Yes |
-| gmpAmount | Currency Amount | Guaranteed Minimum Pension amount | Complex object |
-| enhancedTaxFreeCash | Currency Amount | Enhanced tax-free cash entitlement | Complex object |
-| guaranteedAnnuityRate | Text | Guaranteed annuity rate details | 4.5% at age 65 for single life annuity |
-| applicablePenalties | Text | Early exit or other penalties | Early exit penalty of 5% if withdrawn within 5 years |
-| erfLoyaltyBonusTerminalBonus | Text | ERF, loyalty, or terminal bonus details | Terminal bonus of 0.5% added at retirement |
-| guaranteedGrowthRates | Text | Guaranteed growth rate details | Guaranteed 3% p.a. for first 5 years |
-| deathInService | Complex Data | Death in service benefits | Complex object |
-| lifetimeAllowanceUsed | Number | Percentage of lifetime allowance used | 45.5 |
-| deathBenefits | Currency Amount | Death benefits payable | Complex object |
-| hasLifestylingStrategy | Yes/No | Whether lifestyling strategy is active | Yes |
-| lifestylingStrategyDetails | Text | Description of lifestyling strategy | Automatic switch from equity funds to bonds and cash starting at age 60 |
-| optionsAtRetirement | Text | Options available at retirement | Full drawdown, phased drawdown, annuity purchase, or UFPLS available |
-| otherBenefitsOrMaterialFeatures | Text | Other benefits or material features | Access to discounted fund platform with 0.2% p.a. rebate |
-| isIndexed | Yes/No | Whether pension is inflation-linked | Yes |
-| isPreserved | Yes/No | Whether this is a preserved pension | No |
-| contributions | List of Complex Data | Pension contributions | List with multiple items |
-| fundHoldings | Complex Data | Fund holdings and allocations | Complex object |
-| additionalNotes | Text | Additional pension information | Policy includes protected tax-free cash rights from A-Day |
-| createdAt | Date | When this record was created | 2023-01-15T10:00:00Z |
-| updatedAt | Date | When this record was last modified | 2026-02-25T14:30:00Z |
-
-*Total: 50 main fields*
-
-#### Nested Field Groups
-
-The contract includes the following nested field groups with detailed structures:
-
-- **owners** - Client references with ownership percentages
-- **sellingAdviser** - Adviser reference details
-- **provider** - Pension provider reference
-- **lifeCycle** - Lifecycle stage reference
-- **pensionType** - Pension type reference
-- **wrap** - Platform/wrap account reference
-- **currency** - Currency details (code, display, symbol)
-- **valuation** - currentValue (amount, currency), valuedOn (date)
-- **pcls** - value (amount, currency), paidBy (Originating Scheme | Receiving Scheme)
-- **gadMaximumIncomeLimitAnnual** - amount, currency
-- **guaranteedMinimumIncomeLimitAnnual** - amount, currency
-- **gmpAmount** - amount, currency
-- **enhancedTaxFreeCash** - amount, currency
-- **deathInService** - spousalBenefits (percentage)
-- **deathBenefits** - amount, currency
-- **contributions** - value (amount, currency), frequency, contributor (Self|Employer), startedOn, endsOn, contributionType (Regular|Lumpsum|Transfer), transfer (isFullTransfer, transferType, ceedingPlan)
-- **fundHoldings** - model (code, name), funds (type, isFeed, name, codes, holding with units and percentage)
-
-### Business Validation Rules
-
-**Pension Category:** PensionContributionDrawdown (default)
-
-**Pension Arrangement:**
-- Notional - Pension is notional allocation within group scheme
-- Physical - Actual segregated pension fund
-
-**Crystallisation Status:**
-- Crystallised - Entire pension accessed/drawn down
-- PartCrystallised - Some funds accessed, some uncrystallised
-- Uncrystallised - No benefits taken yet
-
-**Contribution Type:**
-- Regular - Ongoing regular contributions
-- Lumpsum - One-off lump sum contribution
-- Transfer - Transfer from another pension
-
-**Contributor:** Self | Employer | Both
-
-**Transfer Type:** Cash | Inspecie
-
-**Fund Type:** Fund | Equity | Bond | Cash | Property | Alternative
-
-### UK Pension Regulations
-
-- Pension Freedoms (2015) - Access from age 55, 25% PCLS
-- Annual Allowance: £60,000 (2024/25), MPAA £10,000
-- Lifetime Allowance: Abolished April 2024
-- GAD Rates - Apply to capped drawdown
-- Death Benefits - Tax treatment based on age at death
-
-### Use Cases
-
-**1. Active Personal Pension:** Regular contributions, target retirement age 65, lifestyling strategy active
-**2. Part-Crystallised:** Phased drawdown approach, tax-efficient withdrawals
-**3. Enhanced Tax-Free Cash:** Protected rights from A-Day giving 30% PCLS
-**4. Lifestyling Strategy:** Automatic de-risking approaching retirement
-**5. Pension Transfer:** Consolidation from workplace schemes
-
----
-
-
-## 13.45 Arrangement - Investment Contract (General Investment Account)
-
-### Business Purpose
-
-Represents a general investment account (GIA) or other investment wrapper.
-
-### Key Features
-
-- Tracks investment value and performance
-- Records asset allocation
-- Manages contributions and withdrawals
-- Links to underlying fund holdings
-
-### Fields
-
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| accountNumber | Text |  | GIA-987654321 |
-| adviserDetails | Complex Data |  | Complex object |
-| arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | INVESTMENT |
-| assetAllocation | Complex Data |  | Complex object |
-| charges | Complex Data |  | Complex object |
-| client | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2020-03-20T10:00:00Z |
-| currentValue | Currency Amount | Current value of the arrangement | Complex object |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| fundHoldings | List of Complex Data |  | List with 3 item(s) |
-| gainLoss | Currency Amount |  | Complex object |
-| id | Number | Unique system identifier for this record | 13001 |
-| investmentObjective | Text |  | Long-term capital growth for retirement planning |
-| investmentType | Text |  | GENERAL_INVESTMENT_ACCOUNT |
-| notes | Text |  | General Investment Account with monthly contributi... |
-| productName | Text | Name of the financial product | Vanguard Investment Account |
-| providerName | Text | Unique system identifier for this record | Vanguard |
-| provider | Reference Link | Unique system identifier for this record | Complex object |
-| regularContributions | Complex Data | Regular contributions being made | Complex object |
-| riskProfile | Complex Data |  | Complex object |
-| startDate | Date | Employment start date | 2020-03-15 |
-| taxWrapper | Text |  | TAXABLE |
-| totalContributions | Currency Amount | Regular contributions being made | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-18T14:00:00Z |
-| valuationDate | Date |  | 2026-02-18 |
-| withdrawals | Complex Data |  | Complex object |
-
-#### Nested Field Groups
-
-**adviserDetails:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adviceDate | Date |  | 2020-02-28 |
-| adviserName | Text |  | Jane Financial Adviser |
-| firmName | Text |  | XYZ Wealth Management |
-| lastReviewDate | Date | When these figures were last reviewed | 2025-11-15 |
-
-**assetAllocation:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| alternatives | Number |  | 5.0 |
-| bonds | Number |  | 25.0 |
-| cash | Number |  | 5.0 |
-| equities | Number |  | 65.0 |
-
-**charges:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| fundCharges | Number |  | 0.22 |
-| platformFee | Number |  | 0.25 |
-| totalAnnualCharge | Number |  | 0.47 |
-
-**client:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
-
-**currentValue:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 75000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-
-**gainLoss:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 15000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| percentage | Number | Current age (calculated from date of birth) | 25.0 |
-
-**provider:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 577 |
-
-**regularContributions:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 500.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| frequency | Text | How often (Monthly, Annual, etc.) | MONTHLY |
-| isActive | Yes/No |  | Yes |
-| startDate | Date | Employment start date | 2020-03-15 |
-
-**riskProfile:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| atrRef | Reference Link |  | Complex object |
-| id | Number | Unique system identifier for this record | 3333 |
-| targetRiskLevel | Number |  | 6 |
-
-**totalContributions:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 60000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**withdrawals:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| hasRegularWithdrawals | Yes/No |  | No |
-
----
-
-### Relationships
-
-This contract connects to:
-
-- Belongs to a Client
-- Contains multiple Investment holdings
-- May link to Financial Adviser
-- Part of total assets calculation
-
-### Business Validation Rules
-
-- currentValue must be >= 0
-- Units and prices must be consistent with value
-- Asset allocation must sum to 100%
-
----
-
-
-## 13.46 Arrangement - Protection Contract (Life Assurance)
-
-### Business Purpose
-
-Represents life assurance, critical illness cover, income protection, or other protection policies.
-
-### Key Features
-
-- Records sum assured and premium
-- Tracks beneficiaries
-- Manages policy terms and conditions
-- Links to life assurance trusts
-
-### Fields
-
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adviserDetails | Complex Data |  | Complex object |
-| arrangementCategory | Text | Expenditure category (Housing, Transport, Food, etc.) | PROTECTION |
-| beneficiaries | List of Complex Data | List of trust beneficiaries | List with 1 item(s) |
-| client | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2023-01-20T10:00:00Z |
-| currentSumAssured | Currency Amount |  | Complex object |
-| endDate | Date | Employment end date (null if current) | 2048-01-15 |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Number | Unique system identifier for this record | 20001 |
-| indexation | Complex Data |  | Complex object |
-| isInTrust | Yes/No |  | Yes |
-| linkedTo | Complex Data |  | Complex object |
-| notes | Text |  | Decreasing term assurance to protect mortgage. Wri... |
-| policyNumber | Text | Policy or account number | LA-12345678 |
-| policyType | Text |  | DECREASING_TERM |
-| premium | Currency Amount |  | Complex object |
-| premiumFrequency | Text | How often (Monthly, Annual, etc.) | MONTHLY |
-| premiumType | Text |  | GUARANTEED |
-| productName | Text | Name of the financial product | Mortgage Protection Plan |
-| protectionType | Text |  | LIFE_ASSURANCE |
-| providerName | Text | Unique system identifier for this record | Aviva |
-| provider | Reference Link | Unique system identifier for this record | Complex object |
-| reviewDate | Date | When these figures were last reviewed | 2027-01-15 |
-| startDate | Date | Employment start date | 2023-01-15 |
-| sumAssured | Currency Amount |  | Complex object |
-| termRemaining | Complex Data |  | Complex object |
-| trustDetails | Complex Data |  | Complex object |
-| underwriting | Complex Data |  | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-15T09:00:00Z |
-
-#### Nested Field Groups
-
-**adviserDetails:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adviceDate | Date |  | 2022-12-10 |
-| adviserName | Text |  | John Adviser |
-| firmName | Text |  | ABC Protection Services |
-
-**client:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
-
-**currentSumAssured:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 325000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| note | Text |  | Decreasing with mortgage balance |
-
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-
-**indexation:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| isIndexLinked | Yes/No |  | No |
-
-**linkedTo:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| liability | Reference Link |  | Complex object |
-| id | Number | Unique system identifier for this record | 5678 |
-| mortgage | Reference Link | Current age (calculated from date of birth) | Complex object |
-| id | Number | Unique system identifier for this record | 12001 |
-
-**premium:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 45.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**provider:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 3195 |
-
-**sumAssured:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 350000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**termRemaining:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| months | Number |  | 11 |
-| years | Number | Number of years at this address | 21 |
-
-**trustDetails:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| beneficiaries | List of str | List of trust beneficiaries | List with 2 item(s) |
-| trustType | Text | Type of trust (Discretionary, Bare, Interest in Possession, etc.) | Bare Trust |
-| trustees | List of str | List of trustees | List with 1 item(s) |
-
-**underwriting:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| completedDate | Date |  | 2023-01-10 |
-| exclusions | List |  | Empty list |
-| underwritingType | Text |  | Full Medical Underwriting |
-
----
-
-### Relationships
-
-This contract connects to:
-
-- Belongs to a Client (life assured)
-- May have different policy owner
-- May link to Trust
-- Part of protection needs analysis
-
-### Business Validation Rules
-
-- sumAssured must be > 0
-- premium must be > 0
-- At least one beneficiary required
-- Policy must be in force or lapsed
-
----
-
-
-## 13.47 Arrangement - Pension Contract (Personal Pension)
-
-### Business Purpose
-
-Represents a personal pension, workplace pension, SIPP, or other pension arrangement.
-
-### Key Features
-
-- Tracks pension fund value
-- Records contributions (personal and employer)
-- Manages pension scheme details
-- Calculates retirement projections
-
-### Fields
-
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adviserDetails | Complex Data |  | Complex object |
-| arrangementCategory | Text | Type of arrangement (INVESTMENT, PENSION, MORTGAGE, PROTECTION) | PENSION |
-| assetAllocation | Complex Data |  | Complex object |
-| charges | Complex Data |  | Complex object |
-| client | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2010-04-10T10:00:00Z |
-| crystallisedAmount | Currency Amount | Amount spent | Complex object |
-| currentValue | Currency Amount | Current value of the arrangement | Complex object |
-| deathBenefits | Complex Data |  | Complex object |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| fundHoldings | List of Complex Data |  | List with 3 item(s) |
-| growthToDate | Currency Amount | Date moved from this address (null if current) | Complex object |
-| id | Number | Unique system identifier for this record | 30001 |
-| lifetimeAllowanceUsed | Currency Amount |  | Complex object |
-| notes | Text |  | Personal pension with regular monthly contribution... |
-| pensionType | Text |  | PERSONAL_PENSION |
-| policyNumber | Text | Policy or account number | PP-123456789 |
-| productName | Text | Name of the financial product | Vanguard Personal Pension |
-| projectedValueAtRetirement | Complex Data | The contact value (email address, phone number, etc.) | Complex object |
-| providerName | Text | Unique system identifier for this record | Vanguard |
-| provider | Reference Link | Unique system identifier for this record | Complex object |
-| regularContributions | Complex Data | Regular contributions being made | Complex object |
-| retirementAge | Number | Current age (calculated from date of birth) | 67 |
-| selectedRetirementAge | Number | Current age (calculated from date of birth) | 65 |
-| startDate | Date | Employment start date | 2010-04-06 |
-| stateRetirementAge | Number | Current age (calculated from date of birth) | 67 |
-| taxFreeCashAvailable | Currency Amount |  | Complex object |
-| totalContributions | Currency Amount | Regular contributions being made | Complex object |
-| uncrystallisedAmount | Currency Amount | Amount spent | Complex object |
-| updatedAt | Date | When this record was last modified | 2026-02-18T14:00:00Z |
-| valuationDate | Date |  | 2026-02-18 |
-
-#### Nested Field Groups
-
-**adviserDetails:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adviceDate | Date |  | 2010-03-15 |
-| adviserName | Text |  | Jane Financial Adviser |
-| firmName | Text |  | XYZ Wealth Management |
-| lastReviewDate | Date | When these figures were last reviewed | 2025-09-20 |
-
-**assetAllocation:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| alternatives | Number |  | 2.0 |
-| bonds | Number |  | 15.0 |
-| cash | Number |  | 3.0 |
-| equities | Number |  | 80.0 |
-
-**charges:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| fundCharges | Number |  | 0.22 |
-| platformFee | Number |  | 0.15 |
-| totalAnnualCharge | Number |  | 0.37 |
-
-**client:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
-
-**crystallisedAmount:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 0.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**currentValue:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 185000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**deathBenefits:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| beforeRetirement | Complex Data |  | Complex object |
-| amount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 185000.0 |
-| currency | Complex Data |  | Complex object |
-| type | Text | Type of client: Person (individual), Corporate (company), or Trust | Full fund value |
-| isInTrust | Yes/No |  | Yes |
-| nominatedBeneficiaries | List of Complex Data | List of trust beneficiaries | List with 1 item(s) |
-
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-
-**growthToDate:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 65000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| percentage | Number | Current age (calculated from date of birth) | 54.2 |
-
-**lifetimeAllowanceUsed:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 185000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| note | Text |  | Lifetime Allowance abolished from April 2024 |
-| percentage | Number | Current age (calculated from date of birth) | 16.4 |
-
-**projectedValueAtRetirement:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| assumedRetirementAge | Number | Current age (calculated from date of birth) | 65 |
-| highGrowth | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 410000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| lowGrowth | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 285000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| mediumGrowth | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 340000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**provider:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 577 |
-
-**regularContributions:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| frequency | Text | How often (Monthly, Annual, etc.) | MONTHLY |
-| grossAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 800.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| isActive | Yes/No |  | Yes |
-| netAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 640.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| startDate | Date | Employment start date | 2010-04-06 |
-| taxRelief | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 160.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**taxFreeCashAvailable:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 46250.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| percentage | Number | Current age (calculated from date of birth) | 25 |
-
-**totalContributions:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 120000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
-**uncrystallisedAmount:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Amount spent | 185000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-
----
-
-### Relationships
-
-This contract connects to:
-
-- Belongs to a Client
-- May link to Employment (for workplace pensions)
-- Contains Investment holdings
-- Part of retirement planning
-
-### Business Validation Rules
-
-- currentValue must be >= 0
-- Contributions must not exceed annual allowance
-- normalRetirementAge must be >= 55
-- Pension scheme must be registered with HMRC
-
----
-
-
-
-
----
-
-## 13.48 Arrangement - Pension Contract (SIPP)
-
-### Business Purpose
-
-Represents a Self-Invested Personal Pension with wider investment choices including property and direct equities.
-
-### Key Features
-
-- Commercial property investment within pension wrapper
-- Direct equity holdings allowed
-- Greater investment flexibility than standard pensions
-- Higher charges for additional services
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | PENSION |
-| pensionType | Text | Specific pension type | SIPP |
-| currentValue | Currency Amount | Current total fund value | £425,000 |
-| sippSpecificFeatures | Complex Data | SIPP-specific investment features | Complex object |
-| allowsCommercialProperty | Yes/No | Whether can invest in commercial property | Yes |
-| hasPropertyHolding | Yes/No | Currently holds commercial property | Yes |
-| propertyHoldingsCount | Number | Number of properties held | 1 |
-| charges | Complex Data | SIPP fee structure | Complex object |
-| setupFee | Currency Amount | One-time setup fee | £0 (waived) |
-| annualAdministrationFee | Currency Amount | Annual admin charge | £400 |
-| propertyRelatedFees | Complex Data | Additional property fees | Complex object |
-
-### Business Validation Rules
-
-- Commercial property must be for business use only (not residential)
-- Property should not exceed 60% of total SIPP value
-- Annual contributions subject to £60,000 limit
-- SIPP provider must be FCA regulated
-
----
-
-## 13.49 Arrangement - Pension Contract (Final Salary/Defined Benefit)
-
-### Business Purpose
-
-Represents a Final Salary or Defined Benefit pension providing guaranteed income based on salary and service.
-
-### Key Features
-
-- Guaranteed pension income for life
-- Based on years of service and final/career average salary
-- Spouse and dependant pensions
-- Cash Equivalent Transfer Value (CETV) for transfer options
-- Early/late retirement factors
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | PENSION |
-| pensionType | Text | Specific pension type | FINAL_SALARY |
-| membershipStatus | Text | Current membership status | DEFERRED |
-| yearsOfService | Complex Data | Service years breakdown | 17 years, 5 months |
-| accrualRate | Text | Benefit accrual rate | 1/60th |
-| projectedPensionAtNRA | Currency Amount | Projected annual pension | £16,837 per year |
-| transferValue | Complex Data | CETV details | Complex object |
-| cashEquivalentTransferValue | Currency Amount | Current transfer value | £415,000 |
-| cetvDate | Date | Date CETV calculated | 2026-01-15 |
-| transferValueMultiplier | Number | CETV as multiple of pension | 24.6 |
-| deathBenefits | Complex Data | Death benefit structure | Complex object |
-| spousePension | Complex Data | Spouse's pension entitlement | 50% of member pension |
-
-### Business Validation Rules
-
-- Transfer advice mandatory if CETV ≥ £30,000 (FCA requirement)
-- Pension Wise guidance must be offered to members aged 50+
-- Transfer value expires after guarantee period (typically 3 months)
-- Accrual rate typically 1/60th or 1/80th for UK schemes
-
----
-
-## 13.50 Arrangement - Pension Contract (Money Purchase/Defined Contribution)
-
-### Business Purpose
-
-Represents a workplace Defined Contribution pension with employer matching contributions.
-
-### Key Features
-
-- Employer contribution matching
-- Auto-enrolment compliance
-- Lifestyling investment strategy
-- Member and employer contribution tracking
-- Salary sacrifice options available
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | PENSION |
-| pensionType | Text | Specific pension type | MONEY_PURCHASE |
-| currentValue | Currency Amount | Current fund value | £48,500 |
-| contributionStructure | Complex Data | Contribution breakdown | Complex object |
-| memberContribution | Complex Data | Employee contribution | 5% of salary |
-| employerContribution | Complex Data | Employer contribution | 7.5% of salary |
-| matchingStructure | Complex Data | Matching rules | 1.5:1 ratio |
-| autoEnrolmentDetails | Complex Data | Auto-enrolment compliance | Complex object |
-| minimumContributionsMet | Yes/No | Meets minimum 8% total | Yes |
-| lifestyling | Complex Data | Lifestyling strategy | Complex object |
-| lifestylingStartAge | Number | Age lifestyling begins | 55 |
-
-### Business Validation Rules
-
-- Minimum total contributions: 8% (3% employer + 5% employee from April 2019)
-- Qualifying earnings: £6,240 to £50,270 (2024/25)
-- Auto-enrolment age: 22 to State Pension Age
-- Re-enrolment every 3 years for opt-outs
-
----
-
-## 13.51 Arrangement - Pension Contract (State Pension)
-
-### Business Purpose
-
-Represents UK State Pension entitlement based on National Insurance contributions.
-
-### Key Features
-
-- National Insurance contributions record tracking
-- State Pension forecast calculations
-- Voluntary contributions options
-- Deferral benefits
-- Contracted-out impact assessment
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | PENSION |
-| pensionType | Text | Specific pension type | STATE_PENSION |
-| statePensionType | Text | New or Basic State Pension | NEW_STATE_PENSION |
-| nationalInsuranceNumber | Text | NI number | AB123456C |
-| stateRetirementAge | Number | State Pension Age | 67 |
-| nationalInsuranceRecord | Complex Data | NI contributions history | Complex object |
-| qualifyingYears | Number | Years with full NI credits | 23 |
-| yearsRequired | Number | Years needed for full pension | 35 |
-| statePensionForecast | Complex Data | Forecast amounts | Complex object |
-| forecastWeeklyAmount | Currency Amount | Forecast weekly pension | £203.85 per week |
-| forecastAnnualAmount | Currency Amount | Forecast annual pension | £10,600 per year |
-| voluntaryContributions | Complex Data | Options to fill gaps | Complex object |
-| costToFillOneYear | Currency Amount | Cost per year of gaps | £824.20 |
-
-### Business Validation Rules
-
-- Minimum 10 qualifying years needed for any State Pension
-- Full State Pension requires 35 qualifying years
-- Maximum State Pension 2024/25: £221.20 per week
-- Voluntary contributions deadline: typically within 6 years
-
----
-
-## 13.52 Arrangement - Investment Contract (Stocks & Shares ISA)
-
-### Business Purpose
-
-Represents a tax-efficient investment wrapper providing tax-free growth and income on investments.
-
-### Key Features
-
-- Annual subscription limit (£20,000 for 2024/25)
-- Tax-free dividends and capital gains
-- Flexible ISA withdrawal replacement
-- Wide investment choice
-- ISA transfer capabilities
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | INVESTMENT |
-| investmentType | Text | Specific investment type | STOCKS_SHARES_ISA |
-| currentValue | Currency Amount | Current ISA value | £142,000 |
-| isaAllowanceTracking | Complex Data | ISA allowance details | Complex object |
-| annualAllowance | Currency Amount | Current year allowance | £20,000 |
-| usedThisYear | Currency Amount | Allowance used this year | £15,000 |
-| remainingThisYear | Currency Amount | Allowance remaining | £5,000 |
-| flexibleISA | Complex Data | Flexible ISA features | Complex object |
-| isFlexibleISA | Yes/No | Allows withdrawal replacement | Yes |
-| withdrawalsThisYear | Currency Amount | Amount withdrawn this year | £5,000 |
-| replacementAllowanceAvailable | Currency Amount | Extra allowance from withdrawals | £5,000 |
-| incomeGenerated | Complex Data | Tax-free income tracking | Complex object |
-| dividendsReceivedThisYear | Currency Amount | Dividends received | £3,200 |
-| taxTreatment | Text | Tax status | TAX_FREE |
-
-### Business Validation Rules
-
-- One Stocks & Shares ISA per tax year
-- Age 18+ required
-- UK resident (or Crown employee/spouse serving overseas)
-- Transfers don't count towards annual allowance
-
----
-
-## 13.50 Arrangement - Investment Contract (Lifetime ISA)
-
-### Business Purpose
-
-Represents a Lifetime ISA for first-time home buyers or retirement savings with government bonus.
-
-### Key Features
-
-- 25% government bonus on contributions (max £1,000/year)
-- £4,000 annual contribution limit
-- Use for first home (≤£450k) or age 60+ withdrawal
-- 25% penalty on early withdrawal
-- Counts towards £20,000 ISA allowance
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | INVESTMENT |
-| investmentType | Text | Specific investment type | LIFETIME_ISA |
-| lisaType | Text | Cash or Stocks & Shares | STOCKS_SHARES_LISA |
-| currentValue | Currency Amount | Total fund value | £17,200 |
-| memberContributions | Currency Amount | Client contributions (excl bonus) | £12,000 |
-| governmentBonus | Currency Amount | Total bonus received | £3,000 |
-| eligibilityAndWithdrawal | Complex Data | Eligibility rules | Complex object |
-| ageAtOpening | Number | Age when opened | 28 |
-| earlyWithdrawalPenalty | Number | Penalty percentage | 25% |
-| firstHomeEligibility | Complex Data | First home purchase rules | Complex object |
-| maxPropertyPrice | Currency Amount | Maximum property value | £450,000 |
-| penaltyCalculation | Complex Data | Penalty breakdown | Complex object |
-| penaltyAmount | Currency Amount | Calculated penalty | £4,300 |
-| bonusLost | Currency Amount | Bonus lost to penalty | £3,000 |
-
-### Business Validation Rules
-
-- Age 18-39 to open
-- Contribute until day before 50th birthday
-- Maximum £4,000 per tax year
-- Government bonus: 25% (max £1,000/year)
-- First home: UK property, ≤£450k, main residence, use mortgage
-
----
-
-## 13.51 Arrangement - Investment Contract (Investment Bond - Onshore)
-
-### Business Purpose
-
-Represents an onshore investment bond (life insurance wrapper) with tax-deferred growth.
-
-### Key Features
-
-- Life insurance wrapper with tax benefits
-- 5% annual withdrawal allowance (cumulative)
-- Top-slicing relief on chargeable gains
-- Segment structure for partial encashment
-- 20% basic rate tax paid within bond
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | INVESTMENT |
-| investmentType | Text | Specific investment type | INVESTMENT_BOND_ONSHORE |
-| currentValue | Currency Amount | Current bond value | £285,000 |
-| bondStructure | Complex Data | Segment structure | Complex object |
-| numberOfSegments | Number | Total segments | 100 |
-| segmentValue | Currency Amount | Value per segment | £2,850 |
-| withdrawalAllowance | Complex Data | 5% allowance tracking | Complex object |
-| annualAllowancePercentage | Number | Annual allowance | 5% |
-| cumulativeAllowanceAvailable | Currency Amount | Total unused allowance | £100,000 |
-| taxPosition | Complex Data | Tax treatment | Complex object |
-| bondType | Text | Onshore or offshore | ONSHORE |
-| topSlicingReliefAvailable | Yes/No | Tax relief available | Yes |
-| basicRateTaxCredit | Number | Tax already paid | 20% |
-
-### Business Validation Rules
-
-- 5% annual withdrawal allowance accumulates if unused
-- Calculation: Total invested × 5% × years elapsed
-- Top-slicing relief: Gain ÷ years held = average gain
-- Chargeable gain on full or partial surrender
-
----
-
-## 13.52 Arrangement - Protection Contract (Critical Illness Cover)
-
-### Business Purpose
-
-Represents critical illness insurance paying lump sum on diagnosis of specified conditions.
-
-### Key Features
-
-- Defined list of covered conditions (typically 40-50)
-- Full and partial pay-out conditions
-- Severity-based benefits
-- Children's cover included
-- Additional payment cover options
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | PROTECTION |
-| protectionType | Text | Specific protection type | CRITICAL_ILLNESS_COVER |
-| policyType | Text | Standalone or combined | STANDALONE_CRITICAL_ILLNESS |
-| sumAssured | Currency Amount | Lump sum benefit | £200,000 |
-| premium | Currency Amount | Monthly premium | £95 |
-| coverageDetails | Complex Data | Coverage specifics | Complex object |
-| numberOfConditionsCovered | Number | Total conditions covered | 47 |
-| fullPayOutConditions | Number | Full benefit conditions | 42 |
-| partialPayOutConditions | Number | Partial benefit conditions | 5 |
-| childrensCoverIncluded | Yes/No | Children's cover | Yes |
-| childrensCoverAmount | Currency Amount | Children's benefit | £25,000 |
-| additionalPaymentCover | Yes/No | Extra payment option | Yes |
-
-### Business Validation Rules
-
-- Full pay-out: 100% of sum assured for major conditions
-- Partial pay-out: typically 25% for less severe conditions
-- Examples: Cancer, heart attack, stroke, major organ transplant
-- Children's cover: typically £10k-£50k per child
-
----
-
-## 13.53 Arrangement - Protection Contract (Income Protection)
-
-### Business Purpose
-
-Represents income protection insurance providing replacement income during illness or injury.
-
-### Key Features
-
-- Deferred period before benefit starts
-- Benefit percentage (typically 50-70% of income)
-- Payment until retirement age or fixed term
-- Own occupation vs any occupation definition
-- Rehabilitation support
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | PROTECTION |
-| protectionType | Text | Specific protection type | INCOME_PROTECTION |
-| monthlyBenefit | Currency Amount | Monthly income benefit | £3,500 |
-| premium | Currency Amount | Monthly premium | £87.50 |
-| deferredPeriod | Complex Data | Waiting period | Complex object |
-| weeks | Number | Weeks before benefit starts | 13 |
-| benefitDetails | Complex Data | Benefit structure | Complex object |
-| benefitPercentageOfIncome | Number | Percentage of income covered | 60% |
-| paymentPeriod | Text | How long benefits paid | TO_RETIREMENT_AGE |
-| occupationDefinition | Complex Data | Definition of incapacity | Complex object |
-| definitionType | Text | Type of definition | OWN_OCCUPATION |
-| rehabilitationBenefit | Currency Amount | Support for return to work | £3,500 |
-
-### Business Validation Rules
-
-- Deferred period: typically 4, 8, 13, 26, or 52 weeks
-- Benefit percentage: usually 50-70% of gross income (prevents over-insurance)
-- Own occupation: can't perform your specific job
-- Payment period: typically to age 60, 65, or 70
-
----
-
-## 13.54 Arrangement - Protection Contract (Buildings Insurance)
-
-### Business Purpose
-
-Represents buildings insurance providing structural protection for property.
-
-### Key Features
-
-- Based on rebuild cost (not market value)
-- Structural damage cover
-- Subsidence and landslip protection
-- Alternative accommodation provision
-- Public liability included
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | PROTECTION |
-| protectionType | Text | Specific protection type | BUILDINGS_INSURANCE |
-| sumInsured | Currency Amount | Rebuild cost estimate | £450,000 |
-| valuationBasis | Text | How sum insured determined | REBUILD_COST |
-| annualPremium | Currency Amount | Annual premium | £385 |
-| excess | Currency Amount | Standard excess | £250 |
-| subsidenceExcess | Currency Amount | Subsidence-specific excess | £1,000 |
-| coverageDetails | Complex Data | What's covered | Complex object |
-| subsidenceAndHeave | Yes/No | Subsidence cover included | Yes |
-| alternativeAccommodation | Currency Amount | Max alternative accommodation | £50,000 |
-| publicLiability | Currency Amount | Public liability cover | £2,000,000 |
-
-### Business Validation Rules
-
-- Sum insured should equal rebuild cost (not market value)
-- Rebuild cost typically lower than market value
-- Review annually to account for building cost inflation
-- Subsidence excess typically £1,000
-
----
-
-## 13.55 Arrangement - Mortgage Contract (Lifetime Mortgage)
-
-### Business Purpose
-
-Represents a lifetime mortgage (equity release) for homeowners aged 55+ with no monthly repayments.
-
-### Key Features
-
-- No monthly repayments (interest rolls up)
-- No negative equity guarantee
-- Fixed or capped interest rate for life
-- Voluntary payment options
-- Inheritance protection available
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | MORTGAGE |
-| productType | Text | Specific mortgage type | LifetimeMortgage |
-| lenderName | Text | Equity release provider | Aviva Equity Release |
-| youngestBorrowerAge | Number | Age of youngest borrower | 66 |
-| loanDetails | Complex Data | Loan structure | Complex object |
-| initialAdvance | Currency Amount | Lump sum released | £85,000 |
-| currentBalance | Currency Amount | Current amount owed | £87,650 |
-| interestDetails | Complex Data | Interest terms | Complex object |
-| interestRate | Number | Annual interest rate | 5.95% |
-| rollUpMethod | Text | How interest compounds | COMPOUND_INTEREST |
-| noPaymentRequired | Yes/No | No monthly payments | Yes |
-| equityReleaseCouncilStandards | Complex Data | ERC compliance | Complex object |
-| noNegativeEquityGuarantee | Yes/No | Balance never exceeds value | Yes |
-| inheritanceProtection | Complex Data | Protected amount | Complex object |
-| protectionPercentage | Number | Percentage protected | 20% |
-
-### Business Validation Rules
-
-- Minimum age: typically 55 (youngest borrower)
-- No negative equity guarantee: balance never exceeds property value
-- Interest rolls up: £85k at 5.95% for 20 years = £256k
-- Equity Release Council membership recommended
-- Lifetime occupancy guarantee
-
----
-
-## 13.56 Arrangement - Mortgage Contract (Buy-to-Let Mortgage)
-
-### Business Purpose
-
-Represents a buy-to-let mortgage for investment properties assessed on rental income.
-
-### Key Features
-
-- Rental income assessment (125-145% ICR requirement)
-- Higher interest rates than residential
-- Interest coverage ratio stress testing
-- Section 24 tax implications (for personal ownership)
-- Portfolio landlord considerations
-
-### Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| arrangementCategory | Text | Type of arrangement | MORTGAGE |
-| productType | Text | Specific mortgage type | BuyToLetMortgage |
-| lenderName | Text | BTL mortgage lender | Paragon Bank |
-| loanDetails | Complex Data | Loan structure | Complex object |
-| currentBalance | Currency Amount | Amount owed | £175,000 |
-| interestDetails | Complex Data | Interest terms | Complex object |
-| interestRate | Number | Annual interest rate | 4.75% |
-| monthlyPayment | Currency Amount | Monthly interest payment | £976 |
-| rentalIncome | Complex Data | Rental income details | Complex object |
-| monthlyRental | Currency Amount | Monthly rent | £1,450 |
-| annualRental | Currency Amount | Annual rent | £17,400 |
-| interestCoverageRatio | Complex Data | ICR calculation | Complex object |
-| requiredICR | Number | Minimum ICR required | 125% |
-| actualICR | Number | Actual ICR achieved | 145% |
-| ownershipStructure | Complex Data | Tax structure | Complex object |
-| ownershipType | Text | Personal or limited company | PERSONAL |
-| section24TaxApplies | Yes/No | Section 24 restrictions | Yes |
-
-### Business Validation Rules
-
-- Interest Coverage Ratio: (Annual Rent ÷ Annual Interest) × 100
-- Required ICR: 125% standard, 145% for higher rate taxpayers
-- Assessment rate: typically 5.5% (stress test)
-- Section 24: Interest relief restricted to 20% for personal ownership
-- Portfolio landlord: typically 4+ mortgaged BTL properties
+### Regulatory Context
+
+**FCA ICOBS (Insurance Conduct of Business)**
+- Premium ratings must be justified and disclosed
+- Exclusions must be clearly stated
+- Trust arrangements must comply with trust law
+- Commission disclosure requirements apply
+
+**IDD (Insurance Distribution Directive)**
+- Demands and needs assessment required
+- Product governance requirements
+- Customer best interest rule applies
 
 ---
 

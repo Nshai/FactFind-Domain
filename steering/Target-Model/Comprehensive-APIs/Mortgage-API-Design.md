@@ -3,7 +3,7 @@
 **Version:** 2.0
 **Date:** 2026-02-25
 **Status:** Active
-**Domain:** Arrangements
+**Domain:** Plans
 
 ---
 
@@ -21,14 +21,14 @@
 | Attribute | Value |
 |-----------|-------|
 | **Entity Name** | Mortgage |
-| **Domain** | Arrangements |
-| **Aggregate Root** | Arrangement |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/arrangements/mortgages` |
+| **Domain** | Plans |
+| **Aggregate Root** | Client |
+| **Base Path** | `/api/v2/factfinds/{factfindId}/mortgages` |
 | **Resource Type** | Collection |
 
 ### Description
 
-Mortgage arrangements and lending products
+Comprehensive management of mortgage arrangements including traditional mortgages, buy-to-let mortgages, and equity release products secured against property assets with automatic LTV calculation, interest term tracking, and redemption management.
 
 ---
 
@@ -51,19 +51,19 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/mortgages` | List all mortgages | Query params | Mortgage[] | 200, 401, 403 | Mortgage, List |
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/mortgages` | Create mortgage | MortgageRequest | Mortgage | 201, 400, 401, 403, 422 | Mortgage, Create |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Get mortgage by ID | Path params | Mortgage | 200, 401, 403, 404 | Mortgage, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Update mortgage | MortgagePatch | Mortgage | 200, 400, 401, 403, 404, 422 | Mortgage, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Delete mortgage | Path params | None | 204, 401, 403, 404, 422 | Mortgage, Delete |
+| GET | `/api/v2/factfinds/{factfindId}/mortgages` | List all mortgages | Query params | Mortgage[] | 200, 401, 403 | Mortgage, List |
+| POST | `/api/v2/factfinds/{factfindId}/mortgages` | Create mortgage | MortgageRequest | Mortgage | 201, 400, 401, 403, 422 | Mortgage, Create |
+| GET | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Get mortgage by ID | Path params | Mortgage | 200, 401, 403, 404 | Mortgage, Retrieve |
+| PATCH | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Update mortgage | MortgagePatch | Mortgage | 200, 400, 401, 403, 404, 422 | Mortgage, Update |
+| DELETE | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Delete mortgage | Path params | None | 204, 401, 403, 404, 422 | Mortgage, Delete |
 
 
 ### Authorization
 
 **Required Scopes:**
-- `mortgage:read` - Read access (GET operations)
-- `mortgage:write` - Create and update access (POST, PUT, PATCH)
-- `mortgage:delete` - Delete access (DELETE operations)
+- `mortgages:read` - Read access (GET operations)
+- `mortgages:write` - Create and update access (POST, PUT, PATCH)
+- `mortgages:delete` - Delete access (DELETE operations)
 
 Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authentication--authorization)** for authentication details.
 
@@ -323,7 +323,671 @@ This entity supports compliance with:
 
 ### Related Resources
 
-*See parent document for relationships to other entities.*
+Mortgages link to:
+- **Property Detail** - The secured property asset
+- **Clients** - Mortgage owners/borrowers
+- **Selling Adviser** - The mortgage adviser
+- **Linked Arrangements** - Associated life assurance and insurance policies
 
+---
 
-## Data Model
+## Complete Contract Schema
+
+### Residential Mortgage Example (Fixed Rate)
+
+```json
+{
+  "id": 5001,
+  "href": "/api/v2/factfinds/679/mortgages/5001",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "MORTGAGE",
+  "accountNumber": "NBS-MORT-123456",
+  "policyNumber": "POL-98765",
+  "illustrationReference": "ILL-REF-2018-456",
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "fullName": "John Smith",
+      "ownershipPercentage": 50.0
+    },
+    {
+      "id": 8497,
+      "href": "/api/v2/factfinds/679/clients/8497",
+      "fullName": "Jane Smith",
+      "ownershipPercentage": 50.0
+    }
+  ],
+  "sellingAdviser": {
+    "id": 123,
+    "href": "/api/v2/advisers/123",
+    "name": "Jane Financial Adviser"
+  },
+  "productType": "FixedRateMortgage",
+  "lenderName": "Nationwide Building Society",
+  "productName": "5 Year Fixed Rate Mortgage",
+  "description": "Main residence mortgage - 25 year term",
+  "loanAmounts": {
+    "originalLoanAmount": {
+      "amount": 300000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "currentBalance": {
+      "amount": 245000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "depositAmount": {
+      "amount": 100000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "originalPropertyValuation": {
+      "amount": 400000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentPropertyValuation": {
+      "amount": 425000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "loanToValue": {
+      "percentage": 75.0,
+      "propertyValue": {
+        "amount": 400000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "loanAmount": {
+        "amount": 300000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2018-06-15"
+    },
+    "currentLTV": {
+      "percentage": 57.65,
+      "outstandingBalance": {
+        "amount": 245000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "currentPropertyValue": {
+        "amount": 425000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-18"
+    }
+  },
+  "interestTerms": {
+    "interestRate": 4.25,
+    "annualPercentageRate": 4.35,
+    "rateType": "Fixed",
+    "baseRateIndex": null,
+    "reversionRate": 7.99,
+    "hasCollarRate": false,
+    "collarRate": null,
+    "initialRatePeriodEndsOn": "2028-06-30",
+    "initialTermYears": 5,
+    "initialTermMonths": 0,
+    "remainingTermYears": 17,
+    "remainingTermMonths": 4
+  },
+  "repaymentStructure": {
+    "repaymentMethod": "CapitalAndInterest",
+    "capitalRepaymentAmount": {
+      "amount": 300000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "capitalTermYears": 25,
+    "capitalTermMonths": 0,
+    "interestOnlyAmount": null,
+    "interestOnlyTermYears": null,
+    "interestOnlyTermMonths": null,
+    "interestOnlyRepaymentVehicle": null,
+    "lumpSumAdvance": null,
+    "monthlyIncomeDrawdown": null,
+    "regularAnnualOverpayment": null,
+    "currentRepaymentVehicles": []
+  },
+  "feesAndCharges": {
+    "lenderFees": {
+      "amount": 999.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "ongoingContributions": null
+  },
+  "keyDates": {
+    "startDate": "2018-06-15",
+    "endDate": "2043-06-15",
+    "completionDate": "2018-06-15",
+    "exchangeDate": "2018-06-08",
+    "nextPaymentDueDate": "2026-03-15",
+    "nextReviewDate": "2028-01-01",
+    "balanceAsOfDate": "2026-02-18",
+    "applicationSubmittedDate": "2018-05-10",
+    "valuationInstructedDate": "2018-05-12",
+    "valuationDate": "2018-05-18",
+    "valuationReceivedDate": "2018-05-22",
+    "offerIssuedDate": "2018-05-28",
+    "targetCompletionDate": "2018-06-15",
+    "schemeEndDate": null
+  },
+  "redemptionTerms": {
+    "hasEarlyRepaymentCharge": true,
+    "earlyRepaymentTerms": "4% of outstanding balance until 2028-06-30",
+    "earlyRepaymentChargeEndsOn": "2028-06-30",
+    "earlyRepaymentCharge": {
+      "amount": 9800.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "earlyRepaymentChargeSecondCharge": null,
+    "netProceedsOnRedemption": {
+      "amount": 235200.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    }
+  },
+  "specialFeatures": {
+    "isFirstTimeBuyer": false,
+    "isCurrentResidence": true,
+    "hasGuarantor": false,
+    "isPortable": true,
+    "isPropertySold": false,
+    "isRedeemed": false,
+    "hasDischargeOnCompletion": false,
+    "hasConsentToLet": false,
+    "consentToLetExpiresOn": null,
+    "hasDebtConsolidation": false,
+    "incomeVerificationStatus": "Employed",
+    "isIncomeEvidenced": true
+  },
+  "propertyDetail": {
+    "id": 1001,
+    "href": "/api/v2/factfinds/679/property-details/1001"
+  },
+  "asset": {
+    "id": 67890,
+    "href": "/api/v2/factfinds/679/assets/67890"
+  },
+  "linkedArrangements": [
+    {
+      "arrangementType": "LifeAssurance",
+      "arrangementId": 6001,
+      "policyNumber": "LIFE-123456",
+      "provider": "Aviva",
+      "sumAssured": {
+        "amount": 300000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    }
+  ],
+  "agencyStatus": "NOT_UNDER_AGENCY",
+  "agencyStatusDate": "2018-06-15",
+  "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before.",
+  "createdAt": "2018-06-15T11:00:00Z",
+  "updatedAt": "2026-02-25T14:30:00Z"
+}
+```
+
+### Buy-to-Let Mortgage Example (Tracker Rate)
+
+```json
+{
+  "id": 5002,
+  "href": "/api/v2/factfinds/679/mortgages/5002",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "MORTGAGE",
+  "accountNumber": "BTL-789456",
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "fullName": "John Smith",
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "productType": "BuyToLetMortgage",
+  "lenderName": "Paragon Bank",
+  "productName": "Buy-to-Let Tracker Mortgage",
+  "description": "Rental property investment - Leicester flat",
+  "loanAmounts": {
+    "originalLoanAmount": {
+      "amount": 150000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentBalance": {
+      "amount": 138000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "depositAmount": {
+      "amount": 50000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "originalPropertyValuation": {
+      "amount": 200000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentPropertyValuation": {
+      "amount": 220000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "loanToValue": {
+      "percentage": 75.0,
+      "propertyValue": {
+        "amount": 200000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "loanAmount": {
+        "amount": 150000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2020-09-01"
+    },
+    "currentLTV": {
+      "percentage": 62.73,
+      "outstandingBalance": {
+        "amount": 138000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "currentPropertyValue": {
+        "amount": 220000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-18"
+    }
+  },
+  "interestTerms": {
+    "interestRate": 6.24,
+    "annualPercentageRate": 6.35,
+    "rateType": "Tracker",
+    "baseRateIndex": "Bank of England Base Rate",
+    "trackerMargin": 1.49,
+    "reversionRate": 8.99,
+    "hasCollarRate": false,
+    "remainingTermYears": 19,
+    "remainingTermMonths": 7
+  },
+  "repaymentStructure": {
+    "repaymentMethod": "InterestOnly",
+    "interestOnlyAmount": {
+      "amount": 150000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "interestOnlyTermYears": 25,
+    "interestOnlyRepaymentVehicle": "Property Sale on Maturity"
+  },
+  "keyDates": {
+    "startDate": "2020-09-01",
+    "endDate": "2045-09-01",
+    "completionDate": "2020-09-01",
+    "nextPaymentDueDate": "2026-03-01",
+    "nextReviewDate": "2026-09-01",
+    "balanceAsOfDate": "2026-02-18"
+  },
+  "redemptionTerms": {
+    "hasEarlyRepaymentCharge": false
+  },
+  "specialFeatures": {
+    "isFirstTimeBuyer": false,
+    "isCurrentResidence": false,
+    "hasGuarantor": false,
+    "isPortable": false,
+    "hasConsentToLet": true,
+    "rentalIncome": {
+      "amount": 950.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      },
+      "frequency": "Monthly"
+    }
+  },
+  "propertyDetail": {
+    "id": 1002,
+    "href": "/api/v2/factfinds/679/property-details/1002"
+  },
+  "agencyStatus": "NOT_UNDER_AGENCY",
+  "notes": "BTL rental property. Current tenant lease expires Aug 2027. Rental yield 5.2%.",
+  "createdAt": "2020-09-01T10:00:00Z",
+  "updatedAt": "2026-02-25T14:30:00Z"
+}
+```
+
+### Equity Release (Lifetime Mortgage) Example
+
+```json
+{
+  "id": 5003,
+  "href": "/api/v2/factfinds/679/mortgages/5003",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "arrangementCategory": "MORTGAGE",
+  "accountNumber": "EQR-456789",
+  "owners": [
+    {
+      "id": 8498,
+      "href": "/api/v2/factfinds/679/clients/8498",
+      "fullName": "Mary Johnson",
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "productType": "LifetimeMortgage",
+  "lenderName": "Just Retirement",
+  "productName": "Lifetime Mortgage Plan",
+  "description": "Equity release for home improvements and gifting",
+  "loanAmounts": {
+    "originalLoanAmount": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentBalance": {
+      "amount": 95250.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "equityReleased": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "originalPropertyValuation": {
+      "amount": 350000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentPropertyValuation": {
+      "amount": 385000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "loanToValue": {
+      "percentage": 21.43,
+      "propertyValue": {
+        "amount": 350000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "loanAmount": {
+        "amount": 75000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2021-03-15"
+    },
+    "currentLTV": {
+      "percentage": 24.74,
+      "outstandingBalance": {
+        "amount": 95250.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "currentPropertyValue": {
+        "amount": 385000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-18"
+    }
+  },
+  "interestTerms": {
+    "interestRate": 6.10,
+    "annualPercentageRate": 6.10,
+    "rateType": "Fixed",
+    "interestRollUp": true,
+    "compoundFrequency": "Annual"
+  },
+  "repaymentStructure": {
+    "repaymentMethod": "InterestRollUp",
+    "interestOnlyAmount": {
+      "amount": 75000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "interestOnlyRepaymentVehicle": "Repayable on death or move to care"
+  },
+  "keyDates": {
+    "startDate": "2021-03-15",
+    "completionDate": "2021-03-15",
+    "balanceAsOfDate": "2026-02-18",
+    "nextReviewDate": "2027-03-15"
+  },
+  "redemptionTerms": {
+    "hasEarlyRepaymentCharge": true,
+    "earlyRepaymentTerms": "No ERC if moving to long-term care or death. 5% ERC for voluntary redemption in years 1-5, reducing by 1% per year.",
+    "earlyRepaymentChargeEndsOn": "2026-03-15"
+  },
+  "specialFeatures": {
+    "isCurrentResidence": true,
+    "hasNoNegativeEquityGuarantee": true,
+    "hasDownsizingProtection": true,
+    "hasInheritanceProtection": false,
+    "drawdownReserveFacility": {
+      "available": true,
+      "reserveAmount": {
+        "amount": 25000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      }
+    }
+  },
+  "propertyDetail": {
+    "id": 1003,
+    "href": "/api/v2/factfinds/679/property-details/1003"
+  },
+  "agencyStatus": "UNDER_AGENCY_SERVICING_AGENT",
+  "agencyStatusDate": "2021-03-15",
+  "notes": "Lifetime mortgage with drawdown reserve. No monthly payments. Interest rolls up. Protected by no negative equity guarantee.",
+  "createdAt": "2021-03-15T14:00:00Z",
+  "updatedAt": "2026-02-25T14:30:00Z"
+}
+```
+
+---
+
+## Business Validation Rules
+
+### Required Fields
+
+- `arrangementCategory` is required (must be "MORTGAGE")
+- `productType` is required
+- `lenderName` is required
+- `owners` list must contain at least one owner
+- `loanAmounts.originalLoanAmount` is required
+- `loanAmounts.currentBalance` is required
+- `interestTerms.interestRate` is required
+- `interestTerms.rateType` is required
+- `repaymentStructure.repaymentMethod` is required
+
+### Product Types
+
+- **FixedRateMortgage** - Fixed interest rate for initial period
+- **VariableRateMortgage** - Lender's standard variable rate
+- **TrackerMortgage** - Tracks base rate plus margin
+- **DiscountMortgage** - Discount off SVR for initial period
+- **BuyToLetMortgage** - Rental property mortgage
+- **LifetimeMortgage** - Equity release (interest roll-up)
+- **HomeReversionPlan** - Equity release (sell share of property)
+- **SecondChargeMortgage** - Additional loan secured against property
+- **SharedOwnershipMortgage** - Part-buy, part-rent scheme
+
+### Rate Types
+
+- **Fixed** - Rate fixed for initial period (e.g., 2, 5, 10 years)
+- **Variable** - Lender's standard variable rate (SVR)
+- **Tracker** - Tracks base rate plus margin (e.g., Base Rate + 2%)
+- **Discount** - Discount off SVR for initial period
+- **Capped** - Variable but with maximum rate cap
+
+### Repayment Methods
+
+- **CapitalAndInterest** - Principal and interest paid each month (repayment)
+- **InterestOnly** - Interest only paid; capital repaid at end
+- **PartAndPart** - Combination of repayment and interest-only
+- **InterestRollUp** - Interest added to balance (equity release)
+
+### LTV Validation
+
+- `loanToValue.percentage` must be calculated as: `(loanAmount / propertyValue) × 100`
+- `currentLTV.percentage` must be calculated as: `(currentBalance / currentPropertyValue) × 100`
+- Residential mortgages typically max 95% LTV
+- Buy-to-Let mortgages typically max 75-80% LTV
+- Equity release typically max 50-60% LTV (age-dependent)
+
+### Interest Terms Validation
+
+- `interestRate` must be greater than 0
+- `annualPercentageRate` (APR) must be greater than or equal to `interestRate`
+- When `rateType = Tracker`, `baseRateIndex` is required
+- `initialRatePeriodEndsOn` required for Fixed and Discount rates
+- `remainingTermYears` and `remainingTermMonths` must reflect time to maturity
+
+### Repayment Structure Validation
+
+- When `repaymentMethod = CapitalAndInterest`, `capitalRepaymentAmount` and `capitalTermYears` are required
+- When `repaymentMethod = InterestOnly`, `interestOnlyAmount` and `interestOnlyRepaymentVehicle` are required
+- When `repaymentMethod = PartAndPart`, both capital and interest-only fields are required
+
+---
+
+## UK Mortgage Regulations
+
+### Regulatory Framework
+
+- **FCA MCOB** - Mortgage Conduct of Business sourcebook
+- **Mortgage Credit Directive (MCD)** - EU consumer protection (retained in UK law)
+- **Responsible Lending** - Affordability assessments required
+- **Consumer Duty** - Fair value and good outcomes
+
+### Key Requirements
+
+**Affordability Assessment:**
+- Lenders must assess borrower's ability to repay
+- Income verification required
+- Expenditure analysis mandatory
+- Stress testing at higher rates
+
+**Loan-to-Value Limits:**
+- Residential: Typically max 95% LTV (95% maximum for high LTV lending)
+- Buy-to-Let: Typically max 75-80% LTV
+- Interest Coverage Ratio (ICR) of 125-145% for BTL
+
+**Early Repayment Charges:**
+- Must be disclosed upfront
+- Typically apply during initial rate period
+- Cannot exceed outstanding interest for the term
+
+**Equity Release Protections:**
+- **No Negative Equity Guarantee** - Debt cannot exceed property value
+- **Right to Remain** - Borrower can stay in home for life
+- **Fixed Interest Rate** - Rate cannot increase
+- **Downsizing Protection** - Ability to move without full ERC
+
+**Product Types:**
+- **Regulated Mortgage** - Primary residence (MCOB protection)
+- **Buy-to-Let** - Investment property (limited regulation)
+- **Second Charge** - Additional loan on property with existing mortgage
+
+---
+
+**Document Version:** 2.0
+**Last Updated:** 2026-02-25
+**Entity:** Mortgage
+**Domain:** Plans

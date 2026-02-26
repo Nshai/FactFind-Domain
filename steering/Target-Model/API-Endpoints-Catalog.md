@@ -16,11 +16,10 @@
 2. [Client Onboarding & KYC Context](#2-client-onboarding--kyc-context)
 3. [Circumstances Context](#3-circumstances-context)
 4. [Assets & Liabilities Context](#4-assets--liabilities-context)
-5. [Arrangements Context](#5-arrangements-context)
-6. [Plans & Investments Context](#6-plans--investments-context)
-7. [Goals Context](#7-goals-context)
-8. [ATR Context](#8-atr-context)
-9. [Reference Data API](#9-reference-data-api)
+5. [Plans & Investments Context](#5-plans--investments-context)
+6. [Goals Context](#6-goals-context)
+7. [ATR Context](#7-atr-context)
+8. [Reference Data API](#8-reference-data-api)
 9. [Summary Statistics](#summary-statistics)
 
 ---
@@ -326,78 +325,7 @@
 
 ---
 
-## 5. Arrangements Context
-
-**Base Path:** `/api/v2/factfinds/{id}/arrangements`
-
-**Description:** Type-based financial arrangements including pensions, mortgages, and protection policies. Hierarchical structure with type-specific endpoints.
-
-**Note:** Investments are now managed separately under Plans & Investments Context (Section 6).
-
-### List All Arrangements
-
-| Method | Endpoint | Description | Notes |
-
-### Mortgage Arrangements
-
-| Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds/{id}/arrangements/mortgages` | List all mortgages | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/mortgages` | Create mortgage | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/mortgages/{arrangementId}` | Get mortgage details | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/mortgages/{arrangementId}` | Update mortgage | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/mortgages/{arrangementId}` | Delete mortgage | ⭐ New in v3.0 |
-
-### Protection Arrangements
-
-| Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds/{id}/arrangements/protections` | List all protection | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/protections/personal-protection` | Create Personal Protection | ⭐ Life, CI, IP |
-| GET | `/api/v2/factfinds/{id}/arrangements/protections/personal-protection` | List Personal Protection | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/protections/personal-protection/{arrangementId}` | Get Personal Protection | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/protections/personal-protection/{arrangementId}` | Update Personal Protection | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/protections/personal-protection/{arrangementId}` | Delete Personal Protection | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/arrangements/protections/general-insurance` | Create General Insurance | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/protections/general-insurance` | List General Insurance | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/arrangements/protections/general-insurance/{arrangementId}` | Get General Insurance | ⭐ New in v3.0 |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/protections/general-insurance/{arrangementId}` | Update General Insurance | ⭐ New in v3.0 |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/protections/general-insurance/{arrangementId}` | Delete General Insurance | ⭐ New in v3.0 |
-
-### Arrangement Sub-resources
-
-| Method | Endpoint | Description | Notes |
-|--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/contributions` | List contributions | ⭐ All contribution records |
-| POST | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/contributions` | Add contribution | ⭐ New contribution |
-| GET | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/contributions/{contributionId}` | Get contribution details | ⭐ Specific contribution |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/contributions/{contributionId}` | Update contribution | ⭐ Partial updates |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/contributions/{contributionId}` | Delete contribution | ⭐ Remove contribution |
-| GET | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/withdrawals` | List withdrawals | ⭐ All withdrawal records |
-| POST | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/withdrawals` | Add withdrawal | ⭐ New withdrawal |
-| GET | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Get withdrawal details | ⭐ Specific withdrawal |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Update withdrawal | ⭐ Partial updates |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Delete withdrawal | ⭐ Remove withdrawal |
-| GET | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/beneficiaries` | List beneficiaries | ⭐ All beneficiaries |
-| POST | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/beneficiaries` | Add beneficiary | ⭐ New beneficiary |
-| GET | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Get beneficiary details | ⭐ Specific beneficiary |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Update beneficiary | ⭐ Partial updates |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Delete beneficiary | ⭐ Remove beneficiary |
-| GET | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/valuations` | List valuations | ⭐ Valuation history |
-| POST | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/valuations` | Add valuation | ⭐ New valuation |
-| GET | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/valuations/{valuationId}` | Get valuation details | ⭐ Specific valuation |
-| PATCH | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/valuations/{valuationId}` | Update valuation | ⭐ Partial updates |
-| DELETE | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/valuations/{valuationId}` | Delete valuation | ⭐ Remove valuation |
-
-**Total Endpoints:** 32 (32 new in v3.0)
-
-**Note:**
-- Investment arrangements have been moved to Plans & Investments Context (Section 6).
-- ALL Pension arrangements (Personal Pension, State Pension, Workplace Pension, SIPP, Final Salary, Drawdown, Annuity, etc.) have been moved to Plans & Investments Context (Section 6) as standalone Plans entities.
-
----
-
-## 6. Plans & Investments Context
+## 5. Plans & Investments Context
 
 **Base Path:** `/api/v2/factfinds/{id}/investments`
 
@@ -523,11 +451,80 @@
 - Trust arrangements
 - Wrap/platform account linking
 
-**Total Endpoints:** 20 (5 investments + 5 final salary + 5 annuities + 5 personal pensions)
+### Core Mortgage Operations
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/mortgages` | List all mortgages | ⭐ Supports filtering by product type |
+| POST | `/api/v2/factfinds/{id}/mortgages` | Create mortgage | ⭐ All mortgage types |
+| GET | `/api/v2/factfinds/{id}/mortgages/{mortgageId}` | Get mortgage details | ⭐ Full mortgage record |
+| PATCH | `/api/v2/factfinds/{id}/mortgages/{mortgageId}` | Update mortgage | ⭐ Partial updates |
+| DELETE | `/api/v2/factfinds/{id}/mortgages/{mortgageId}` | Delete mortgage | ⭐ Soft delete |
+
+**Product Types:**
+- **FixedRateMortgage** - Fixed interest rate for initial period
+- **VariableRateMortgage** - Lender's standard variable rate
+- **TrackerMortgage** - Tracks base rate plus margin
+- **BuyToLetMortgage** - Rental property mortgage
+- **LifetimeMortgage** - Equity release (interest roll-up)
+- **SecondChargeMortgage** - Additional loan secured against property
+- **SharedOwnershipMortgage** - Part-buy, part-rent scheme
+
+**Repayment Methods:**
+- **CapitalAndInterest** - Principal and interest paid each month
+- **InterestOnly** - Interest only paid; capital repaid at end
+- **PartAndPart** - Combination of repayment and interest-only
+- **InterestRollUp** - Interest added to balance (equity release)
+
+**Key Features:**
+- Loan amount and LTV tracking (automatic calculation)
+- Interest terms (rate, APR, rate type)
+- Repayment structure management
+- Early repayment charge (ERC) tracking
+- Property integration (links to secured property)
+- Linked arrangements (life assurance, buildings insurance)
+- Offset mortgage features
+- Shared ownership details
+- Special features (portability, payment holidays, overpayments)
+- Key dates tracking (application, completion, review, maturity)
+
+### Core Personal Protection Operations
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/protections` | List all protections | ⭐ Supports filtering by protection type |
+| POST | `/api/v2/factfinds/{id}/protections` | Create protection | ⭐ All protection types |
+| GET | `/api/v2/factfinds/{id}/protections/{protectionId}` | Get protection details | ⭐ Full protection record |
+| PATCH | `/api/v2/factfinds/{id}/protections/{protectionId}` | Update protection | ⭐ Partial updates |
+| DELETE | `/api/v2/factfinds/{id}/protections/{protectionId}` | Delete protection | ⭐ Soft delete |
+
+**Protection Category:**
+- **PersonalProtection** - Life cover, critical illness, income protection, expense cover, severity cover
+
+**Cover Types:**
+- **Life Cover** - Death benefit (first death, second death, both)
+- **Critical Illness Cover** - Lump sum on diagnosis of critical illness
+- **Income Cover** - Monthly income replacement (income protection insurance)
+- **Expense Cover** - Monthly expense cover (e.g., mortgage protection)
+- **Severity Cover** - Permanent total disability and severity-based benefits
+
+**Key Features:**
+- Multi-cover support (life, CI, income, expense, severity in one policy)
+- Premium structures (stepped, level, hybrid)
+- Indexation options (RPI, CPI, fixed percentage, level)
+- Trust arrangements (in trust to beneficiaries)
+- Benefits configuration (frequency, deferred periods, qualification periods)
+- Commission tracking (indemnity, non-indemnity, renewal)
+- Premium waiver on claim
+- Policy ratings and loadings
+- Benefit options (convertible, reviewable)
+- Waiting periods and exclusions
+
+**Total Endpoints:** 30 (5 investments + 5 final salary + 5 annuities + 5 personal pensions + 5 mortgages + 5 protections)
 
 ---
 
-## 7. Goals Context
+## 6. Goals Context
 
 **Base Path:** `/api/v2/factfinds/{id}/objectives`
 
@@ -580,7 +577,7 @@
 
 ---
 
-## 8. ATR Context
+## 7. ATR Context
 
 **Base Path:** `/api/v2/factfinds/{id}`
 
@@ -616,7 +613,7 @@
 
 ---
 
-## 9. Reference Data API
+## 8. Reference Data API
 
 **Base Path:** `/api/v2/reference`
 
@@ -639,7 +636,6 @@
 | GET | `/api/v2/reference/liability-types` | Get liability type values | ⭐ New in v3.0 |
 | GET | `/api/v2/reference/income-types` | Get income type values | ⭐ New in v3.0 |
 | GET | `/api/v2/reference/expenditure-types` | Get expenditure type values | ⭐ New in v3.0 |
-| GET | `/api/v2/reference/arrangement-types` | Get arrangement type values | ⭐ New in v3.0 |
 | GET | `/api/v2/reference/objective-types` | Get objective type values | ⭐ New in v3.0 |
 
 ### Lookup Value Types
@@ -675,12 +671,15 @@
 | **2. Client Onboarding & KYC** | 105 | 94 ⭐ |
 | **3. Circumstances** | 26 | 26 ⭐ |
 | **4. Assets & Liabilities** | 23 | 23 ⭐ |
-| **5. Arrangements** | 32 | 32 ⭐ |
-| **6. Plans & Investments** | 20 | 20 ⭐ |
-| **7. Goals** | 31 | 31 ⭐ |
-| **8. ATR** | 8 | 8 ⭐ |
-| **9. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **280** | **252** |
+| **5. Plans & Investments** | 30 | 30 ⭐ |
+| **6. Goals** | 31 | 31 ⭐ |
+| **7. ATR** | 8 | 8 ⭐ |
+| **8. Reference Data** | 24 | 7 ⭐ |
+| **TOTAL** | **258** | **230** |
+
+**Notes:**
+- Arrangements context has been removed - all products now managed under specific contexts (Mortgages and Personal Protection under Plans & Investments)
+- Plans & Investments includes: 5 Investments + 5 Final Salary Pensions + 5 Annuities + 5 Personal Pensions + 5 Mortgages + 5 Personal Protections
 
 
 ### Net Worth
@@ -714,7 +713,7 @@ Calculate and track client net worth.
 | **Level 1** | `/api/v2/factfinds` | 11 |
 | **Level 2** | `/api/v2/factfinds/{id}/clients` | 48 |
 | **Level 3** | `/api/v2/factfinds/{id}/clients/{clientId}/addresses` | 142 |
-| **Level 4** | `/api/v2/factfinds/{id}/arrangements/{arrangementId}/contributions/{contributionId}` | 147 |
+| **Level 4** | `/api/v2/factfinds/{id}/clients/{clientId}/estate-planning/gifts/{giftId}` | 147 |
 
 ---
 
@@ -725,7 +724,7 @@ Calculate and track client net worth.
 - `client:read` - Read client information
 - `circumstances:read` - Read income/expenditure
 - `assets:read` - Read assets and liabilities
-- `arrangements:read` - Read arrangements
+- `investments:read` - Read investments and plans
 - `objectives:read` - Read objectives
 - `atr:read` - Read ATR assessment
 - `credit:read` - Read credit history
@@ -735,7 +734,7 @@ Calculate and track client net worth.
 - `client:write` - Create/update clients
 - `circumstances:write` - Manage income/expenditure
 - `assets:write` - Manage assets and liabilities
-- `arrangements:write` - Manage arrangements
+- `investments:write` - Manage investments and plans
 - `objectives:write` - Manage objectives
 - `atr:write` - Manage ATR assessment
 - `credit:write` - Add credit scores
@@ -752,7 +751,7 @@ Calculate and track client net worth.
 ### FCA/MiFID II Compliance
 - Section 7: ATR Assessment (Risk profiling)
 - Section 6: Goals Context (Suitability)
-- Section 5: Arrangements Context (Product governance)
+- Section 5: Plans & Investments Context (Product governance)
 - Section 2.11: Vulnerabilities (Consumer Duty)
 
 ### GDPR Compliance
@@ -772,7 +771,7 @@ Calculate and track client net worth.
 
 ### Tax Compliance
 - Section 4.3: Property Details (CGT, SDLT, PRR)
-- Section 5: Arrangements Context (ISA allowances, pension relief)
+- Section 5: Plans & Investments Context (ISA allowances, pension relief)
 - Section 3: Circumstances Context (Income tax, NI)
 
 ---

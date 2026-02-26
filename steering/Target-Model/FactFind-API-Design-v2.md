@@ -29,7 +29,7 @@ The FactFind API provides comprehensive digital capabilities for:
 
 1. **Client Onboarding & KYC** - Client management, identity verification, regulatory compliance
 2. **Circumstances Discovery** - Fact-finding, employment, income, expenditure tracking
-3. **Arrangements Management** - Pensions, investments, protection, mortgages
+3. **Plans & Investments Management** - Pensions, investments, protection, mortgages
 4. **Goals & Objectives** - Financial goal setting and tracking
 5. **Risk Profiling** - Attitude to risk assessment and capacity for loss
 6. **Estate Planning** - Gifts, trusts, and inheritance tax planning
@@ -290,145 +290,126 @@ The FactFind API provides comprehensive digital capabilities for:
       - [11.4.7 Update Personal Pension](#1147-update-personal-pension)
       - [11.4.8 List Personal Pensions](#1148-list-personal-pensions)
       - [11.4.9 Delete Personal Pension](#1149-delete-personal-pension)
-12. [Arrangements API (Type-Based Routing)](#12-arrangements-api-type-based-routing)
+12. [Mortgages API](#12-mortgages-api)
    - [12.1 Overview](#121-overview)
-   - [12.2 Arrangement Types and Routing](#122-arrangement-types-and-routing)
-   - [12.3 Mortgage Arrangements](#123-mortgage-arrangements)
-   - [12.4 Protection Arrangements](#124-protection-arrangements)
-      - [12.4.1 Personal Protection (Life, CI, IP)](#1241-personal-protection-life-ci-ip)
-      - [12.4.2 General Insurance](#1242-general-insurance)
-   - [12.5 Arrangement Sub-Resources](#125-arrangement-sub-resources)
-      - [12.5.1 Contributions](#1251-contributions)
-      - [12.5.2 Withdrawals](#1252-withdrawals)
-      - [12.5.3 Beneficiaries](#1253-beneficiaries)
-      - [12.5.4 Valuations](#1254-valuations)
-13. [Risk Profile API](#13-risk-profile-api)
+   - [12.2 Operations Summary](#122-operations-summary)
+   - [12.3 Mortgage Contract Schema](#123-mortgage-contract-schema)
+   - [12.4 Query Parameters](#124-query-parameters)
+   - [12.5 Create Mortgage](#125-create-mortgage)
+   - [12.6 Get Mortgage by ID](#126-get-mortgage-by-id)
+   - [12.7 Update Mortgage](#127-update-mortgage)
+   - [12.8 List Mortgages](#128-list-mortgages)
+   - [12.9 Delete Mortgage](#129-delete-mortgage)
+13. [Personal Protection API](#13-personal-protection-api)
    - [13.1 Overview](#131-overview)
    - [13.2 Operations Summary](#132-operations-summary)
-   - [13.3 Key Endpoints](#133-key-endpoints)
-      - [13.3.1 Get Current ATR Assessment](#1331-get-current-atr-assessment)
-      - [13.3.2 Submit/Update ATR Assessment](#1332-submitupdate-atr-assessment)
-      - [13.3.3 Choose Risk Profile](#1333-choose-risk-profile)
-      - [13.3.4 Get ATR Assessment History (Risk Replay)](#1334-get-atr-assessment-history-risk-replay)
-      - [13.3.5 Get Specific Historical Assessment](#1335-get-specific-historical-assessment)
-   - [13.4 ATR Templates Reference Data](#134-atr-templates-reference-data)
-      - [13.4.1 List Available ATR Templates](#1341-list-available-atr-templates)
-      - [13.4.2 Get ATR Template Details](#1342-get-atr-template-details)
-   - [13.5 Risk Assessment History API](#135-risk-assessment-history-api)
-      - [13.5.1 Compare Two Assessments](#1351-compare-two-assessments)
-   - [13.6 Integration with FactFind Workflow](#136-integration-with-factfind-workflow)
-14. [Reference Data API](#14-reference-data-api)
-   - [14.1 Performance Considerations](#141-performance-considerations)
-   - [14.2 Caching Strategy](#142-caching-strategy)
-   - [14.3 Rate Limiting](#143-rate-limiting)
-   - [14.4 API Versioning](#144-api-versioning)
-   - [14.5 Security Best Practices](#145-security-best-practices)
-15. [Entity Contracts](#15-entity-contracts)
-   - [15.1 Client Contract](#151-client-contract)
-      - [15.1.1 Person Client Example](#1511-person-client-example)
-      - [15.1.2 Corporate Client Example](#1512-corporate-client-example)
-      - [15.1.3 Trust Client Example](#1513-trust-client-example)
-      - [15.1.4 Field Behaviors (Composition Pattern)](#1514-field-behaviors-composition-pattern)
-      - [15.1.5 PersonValue Type Definition](#1515-personvalue-type-definition)
-      - [15.1.6 CorporateValue Type Definition](#1516-corporatevalue-type-definition)
-      - [15.1.7 TrustValue Type Definition](#1517-trustvalue-type-definition)
-      - [15.1.8 AddressValue Type](#1518-addressvalue-type)
-      - [15.1.9 ContactValue Type](#1519-contactvalue-type)
-      - [15.1.10 IdentityVerificationValue Type](#15110-identityverificationvalue-type)
-      - [15.1.11 VulnerabilityValue Type](#15111-vulnerabilityvalue-type)
-      - [15.1.12 DataProtectionValue Type](#15112-dataprotectionvalue-type)
-      - [15.1.13 MarketingPreferencesValue Type](#15113-marketingpreferencesvalue-type)
-      - [15.1.14 EstatePlanningValue Type](#15114-estateplanningvalue-type)
-      - [15.1.15 FinancialProfileValue Type](#15115-financialprofilevalue-type)
-      - [15.1.16 TerritorialProfileValue Type](#15116-territorialprofilevalue-type)
-      - [15.1.17 Validation Rules by Client Type](#15117-validation-rules-by-client-type)
-      - [15.1.18 Usage Examples](#15118-usage-examples)
-   - [15.2 FactFind Contract](#152-factfind-contract)
-      - [15.2.1 MeetingDetailsValue Type](#1521-meetingdetailsvalue-type)
-      - [15.2.2 FinancialSummaryValue Type](#1522-financialsummaryvalue-type)
-      - [15.2.3 AssetHoldingsValue Type](#1523-assetholdingsvalue-type)
-      - [15.2.4 InvestmentCapacityValue Type](#1524-investmentcapacityvalue-type)
-      - [15.2.5 CompletionStatusValue Type](#1525-completionstatusvalue-type)
-   - [15.3 Address Contract](#153-address-contract)
-   - [15.4 Income Contract](#154-income-contract)
-   - [15.5 Arrangement Contract](#155-arrangement-contract)
-   - [15.6 Goal Contract](#156-goal-contract)
-   - [15.7 RiskProfile Contract](#157-riskprofile-contract)
-   - [15.8 Investment Contract](#158-investment-contract)
-   - [15.9 Property Contract](#159-property-contract)
-   - [15.10 Equity Contract](#1510-equity-contract)
-   - [15.11 IdentityVerification Contract](#1511-identityverification-contract)
-   - [15.12 Collection Response Wrapper](#1512-collection-response-wrapper)
-   - [15.13 Contract Extension for Other Entities](#1513-contract-extension-for-other-entities)
-   - [15.15 Standard Value Types](#1515-standard-value-types)
-      - [15.15.1 MoneyValue](#15151-moneyvalue)
-      - [15.15.2 AddressValue](#15152-addressvalue)
-      - [15.15.3 DateRangeValue](#15153-daterangevalue)
-      - [15.15.4 NameValue](#15154-namevalue)
-      - [15.15.5 ContactValue](#15155-contactvalue)
-      - [15.15.6 PercentageValue](#15156-percentagevalue)
-      - [15.15.7 RateValue](#15157-ratevalue)
-      - [15.15.8 TaxDetailsValue](#15158-taxdetailsvalue)
-      - [15.15.9 AdverseCreditEvent](#15159-adversecreditevent)
-      - [15.15.10 Enumeration Value Types](#151510-enumeration-value-types)
-   - [15.16 Standard Reference Types](#1516-standard-reference-types)
-      - [15.16.1 ClientRef](#15161-clientref)
-      - [15.16.2 AdviserRef](#15162-adviserref)
-      - [15.16.3 ProviderRef](#15163-providerref)
-      - [15.16.4 ArrangementRef](#15164-arrangementref)
-      - [15.16.5 EmploymentRef](#15165-employmentref)
-      - [15.16.6 GoalRef](#15166-goalref)
-      - [15.16.7 FactFindRef](#15167-factfindref)
-   - [15.17 Asset Contract](#1517-asset-contract)
-   - [15.18 Liability Contract](#1518-liability-contract)
-   - [15.19 Employment Contract](#1519-employment-contract)
-   - [15.20 Budget Contract](#1520-budget-contract)
-   - [15.21 Expenditure Contract](#1521-expenditure-contract)
-   - [15.22 Credit History Contract](#1522-credit-history-contract)
-   - [15.23 Property Detail Contract](#1523-property-detail-contract)
-   - [15.25 Notes Contract](#1525-notes-contract)
-   - [15.26 Dependant Contract](#1526-dependant-contract)
-   - [15.27 Income Changes Contract](#1527-income-changes-contract)
-   - [14.28 Expenditure Changes Contract](#1428-expenditure-changes-contract)
-   - [14.29 Affordability](#1429-affordability)
-   - [14.30 Contact Contract](#1430-contact-contract)
-   - [14.31 Attitude to Risk (ATR) Contract](#1431-attitude-to-risk-atr-contract)
-   - [14.32 Professional Contact Contract](#1432-professional-contact-contract)
-   - [14.33 Vulnerability Contract](#1433-vulnerability-contract)
-   - [14.34 Marketing Preferences Contract](#1434-marketing-preferences-contract)
-   - [14.35 Estate Planning - Will Contract](#1435-estate-planning---will-contract)
-   - [14.36 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1436-estate-planning---lasting-power-of-attorney-lpa-contract)
-   - [14.38 Estate Planning - Gift Contract](#1438-estate-planning---gift-contract)
-   - [14.39 Estate Planning - Trust Contract](#1439-estate-planning---trust-contract)
-   - [14.40 Identity Verification Contract](#1440-identity-verification-contract)
-   - [14.41 Arrangement - Mortgage Contract](#1441-arrangement---mortgage-contract)
-   - [14.42 Arrangement - Investment Contract (General Investment Account)](#1442-arrangement---investment-contract-general-investment-account)
-   - [14.43 Arrangement - Protection Contract (Life Assurance)](#1443-arrangement---protection-contract-life-assurance)
-   - [14.44 Arrangement - Pension Contract (Personal Pension)](#1444-arrangement---pension-contract-personal-pension)
-   - [14.45 Arrangement - Pension Contract (SIPP)](#1445-arrangement---pension-contract-sipp)
-   - [14.46 Arrangement - Pension Contract (Final Salary / Defined Benefit)](#1446-arrangement---pension-contract-final-salary--defined-benefit)
-   - [14.47 Arrangement - Pension Contract (Money Purchase)](#1447-arrangement---pension-contract-money-purchase)
-   - [14.48 Arrangement - Pension Contract (State Pension)](#1448-arrangement---pension-contract-state-pension)
-   - [14.49 Arrangement - Pension Contract (Stakeholder Pension)](#1449-arrangement---pension-contract-stakeholder-pension)
-   - [14.50 Arrangement - Pension Contract (Group Personal Pension)](#1450-arrangement---pension-contract-group-personal-pension)
-   - [14.51 Arrangement - Pension Contract (Executive Pension Plan)](#1451-arrangement---pension-contract-executive-pension-plan)
-   - [14.52 Arrangement - Investment Contract (Stocks & Shares ISA)](#1452-arrangement---investment-contract-stocks--shares-isa)
-   - [14.53 Arrangement - Investment Contract (Cash ISA)](#1453-arrangement---investment-contract-cash-isa)
-   - [14.54 Arrangement - Investment Contract (Lifetime ISA)](#1454-arrangement---investment-contract-lifetime-isa)
-   - [14.55 Arrangement - Investment Contract (Investment Bond - Onshore)](#1455-arrangement---investment-contract-investment-bond---onshore)
-   - [14.56 Arrangement - Investment Contract (Investment Bond - Offshore)](#1456-arrangement---investment-contract-investment-bond---offshore)
-   - [14.57 Arrangement - Investment Contract (Savings Account / Cash Deposit)](#1457-arrangement---investment-contract-savings-account--cash-deposit)
-   - [14.58 Arrangement - Protection Contract (Critical Illness Cover)](#1458-arrangement---protection-contract-critical-illness-cover)
-   - [14.59 Arrangement - Protection Contract (Income Protection Insurance)](#1459-arrangement---protection-contract-income-protection-insurance)
-   - [14.60 Arrangement - Protection Contract (Buildings Insurance)](#1460-arrangement---protection-contract-buildings-insurance)
-   - [14.61 Arrangement - Protection Contract (Contents Insurance)](#1461-arrangement---protection-contract-contents-insurance)
-   - [14.62 Arrangement - Protection Contract (Private Medical Insurance)](#1462-arrangement---protection-contract-private-medical-insurance)
-   - [14.63 Arrangement - Mortgage Contract (Lifetime Mortgage - Equity Release)](#1463-arrangement---mortgage-contract-lifetime-mortgage---equity-release)
-   - [14.64 Arrangement - Mortgage Contract (Buy-to-Let Mortgage)](#1464-arrangement---mortgage-contract-buy-to-let-mortgage)
-
+   - [13.3 Personal Protection Contract Schema](#133-personal-protection-contract-schema)
+   - [13.4 Query Parameters](#134-query-parameters)
+   - [13.5 Create Personal Protection](#135-create-personal-protection)
+   - [13.6 Get Personal Protection by ID](#136-get-personal-protection-by-id)
+   - [13.7 Update Personal Protection](#137-update-personal-protection)
+   - [13.8 List Personal Protections](#138-list-personal-protections)
+   - [13.9 Delete Personal Protection](#139-delete-personal-protection)
+14. [Risk Profile API](#14-risk-profile-api)
+   - [14.1 Overview](#141-overview)
+   - [14.2 Operations Summary](#142-operations-summary)
+   - [14.3 Key Endpoints](#143-key-endpoints)
+      - [14.3.1 Get Current ATR Assessment](#1431-get-current-atr-assessment)
+      - [14.3.2 Submit/Update ATR Assessment](#1432-submitupdate-atr-assessment)
+      - [14.3.3 Choose Risk Profile](#1433-choose-risk-profile)
+      - [14.3.4 Get ATR Assessment History (Risk Replay)](#1434-get-atr-assessment-history-risk-replay)
+      - [14.3.5 Get Specific Historical Assessment](#1435-get-specific-historical-assessment)
+   - [14.4 ATR Templates Reference Data](#144-atr-templates-reference-data)
+      - [14.4.1 List Available ATR Templates](#1441-list-available-atr-templates)
+      - [14.4.2 Get ATR Template Details](#1442-get-atr-template-details)
+   - [14.5 Risk Assessment History API](#145-risk-assessment-history-api)
+      - [14.5.1 Compare Two Assessments](#1451-compare-two-assessments)
+   - [14.6 Integration with FactFind Workflow](#146-integration-with-factfind-workflow)
+15. [Reference Data API](#15-reference-data-api)
+   - [15.1 Performance Considerations](#151-performance-considerations)
+   - [15.2 Caching Strategy](#152-caching-strategy)
+   - [15.3 Rate Limiting](#153-rate-limiting)
+   - [15.4 API Versioning](#154-api-versioning)
+   - [15.5 Security Best Practices](#155-security-best-practices)
+16. [Entity Contracts](#16-entity-contracts)
+   - [16.1 Client Contract](#161-client-contract)
+      - [16.1.1 Person Client Example](#1611-person-client-example)
+      - [16.1.2 Corporate Client Example](#1612-corporate-client-example)
+      - [16.1.3 Trust Client Example](#1613-trust-client-example)
+      - [16.1.4 Field Behaviors (Composition Pattern)](#1614-field-behaviors-composition-pattern)
+      - [16.1.5 PersonValue Type Definition](#1615-personvalue-type-definition)
+      - [16.1.6 CorporateValue Type Definition](#1616-corporatevalue-type-definition)
+      - [16.1.7 TrustValue Type Definition](#1617-trustvalue-type-definition)
+      - [16.1.8 AddressValue Type](#1618-addressvalue-type)
+      - [16.1.9 ContactValue Type](#1619-contactvalue-type)
+      - [16.1.10 IdentityVerificationValue Type](#16110-identityverificationvalue-type)
+      - [16.1.11 VulnerabilityValue Type](#16111-vulnerabilityvalue-type)
+      - [16.1.12 DataProtectionValue Type](#16112-dataprotectionvalue-type)
+      - [16.1.13 MarketingPreferencesValue Type](#16113-marketingpreferencesvalue-type)
+      - [16.1.14 EstatePlanningValue Type](#16114-estateplanningvalue-type)
+      - [16.1.15 FinancialProfileValue Type](#16115-financialprofilevalue-type)
+      - [16.1.16 TerritorialProfileValue Type](#16116-territorialprofilevalue-type)
+      - [16.1.17 Validation Rules by Client Type](#16117-validation-rules-by-client-type)
+      - [16.1.18 Usage Examples](#16118-usage-examples)
+   - [16.2 FactFind Contract](#162-factfind-contract)
+      - [16.2.1 MeetingDetailsValue Type](#1621-meetingdetailsvalue-type)
+      - [16.2.2 FinancialSummaryValue Type](#1622-financialsummaryvalue-type)
+      - [16.2.3 AssetHoldingsValue Type](#1623-assetholdingsvalue-type)
+      - [16.2.4 InvestmentCapacityValue Type](#1624-investmentcapacityvalue-type)
+      - [16.2.5 CompletionStatusValue Type](#1625-completionstatusvalue-type)
+   - [16.3 Address Contract](#163-address-contract)
+   - [16.4 Income Contract](#164-income-contract)
+   - [16.6 Goal Contract](#166-goal-contract)
+   - [16.7 RiskProfile Contract](#167-riskprofile-contract)
+   - [16.8 Investment Contract](#168-investment-contract)
+   - [16.9 Property Contract](#169-property-contract)
+   - [16.10 Equity Contract](#1610-equity-contract)
+   - [16.11 IdentityVerification Contract](#1611-identityverification-contract)
+   - [16.12 Collection Response Wrapper](#1612-collection-response-wrapper)
+   - [16.13 Contract Extension for Other Entities](#1613-contract-extension-for-other-entities)
+   - [16.15 Standard Value Types](#1615-standard-value-types)
+      - [16.15.1 MoneyValue](#16151-moneyvalue)
+      - [16.15.2 AddressValue](#16152-addressvalue)
+      - [16.15.3 DateRangeValue](#16153-daterangevalue)
+      - [16.15.4 NameValue](#16154-namevalue)
+      - [16.15.5 ContactValue](#16155-contactvalue)
+      - [16.15.6 PercentageValue](#16156-percentagevalue)
+      - [16.15.7 RateValue](#16157-ratevalue)
+      - [16.15.8 TaxDetailsValue](#16158-taxdetailsvalue)
+      - [16.15.9 AdverseCreditEvent](#16159-adversecreditevent)
+      - [16.15.10 Enumeration Value Types](#161510-enumeration-value-types)
+   - [16.16 Standard Reference Types](#1616-standard-reference-types)
+      - [16.16.1 ClientRef](#16161-clientref)
+      - [16.16.2 AdviserRef](#16162-adviserref)
+      - [16.16.3 ProviderRef](#16163-providerref)
+      - [16.16.5 EmploymentRef](#16165-employmentref)
+      - [16.16.6 GoalRef](#16166-goalref)
+      - [16.16.7 FactFindRef](#16167-factfindref)
+   - [16.17 Asset Contract](#1617-asset-contract)
+   - [16.18 Liability Contract](#1618-liability-contract)
+   - [16.19 Employment Contract](#1619-employment-contract)
+   - [16.20 Budget Contract](#1620-budget-contract)
+   - [16.21 Expenditure Contract](#1621-expenditure-contract)
+   - [16.22 Credit History Contract](#1622-credit-history-contract)
+   - [16.23 Property Detail Contract](#1623-property-detail-contract)
+   - [16.25 Notes Contract](#1625-notes-contract)
+   - [16.26 Dependant Contract](#1626-dependant-contract)
+   - [16.27 Income Changes Contract](#1627-income-changes-contract)
+   - [16.28 Expenditure Changes Contract](#1628-expenditure-changes-contract)
+   - [16.29 Affordability](#1629-affordability)
+   - [16.30 Contact Contract](#1630-contact-contract)
+   - [16.31 Attitude to Risk (ATR) Contract](#1631-attitude-to-risk-atr-contract)
+   - [16.32 Professional Contact Contract](#1632-professional-contact-contract)
+   - [16.33 Vulnerability Contract](#1633-vulnerability-contract)
+   - [16.34 Marketing Preferences Contract](#1634-marketing-preferences-contract)
+   - [16.35 Estate Planning - Will Contract](#1635-estate-planning---will-contract)
+   - [16.36 Estate Planning - Lasting Power of Attorney (LPA) Contract](#1636-estate-planning---lasting-power-of-attorney-lpa-contract)
+   - [16.38 Estate Planning - Gift Contract](#1638-estate-planning---gift-contract)
+   - [16.39 Estate Planning - Trust Contract](#1639-estate-planning---trust-contract)
+   - [16.40 Identity Verification Contract](#1640-identity-verification-contract)
 
 **Appendices:**
-- [16. Appendix A: Entity-to-Endpoint Mapping](#16-appendix-a-entity-to-endpoint-mapping)
+- [17. Appendix A: Entity-to-Endpoint Mapping](#17-appendix-a-entity-to-endpoint-mapping)
 - [Appendix B: HTTP Status Code Reference](#appendix-b-http-status-code-reference)
 - [Appendix C: Data Type Formats](#appendix-c-data-type-formats)
 - [Appendix D: Common Enumerations](#appendix-d-common-enumerations)
@@ -600,7 +581,8 @@ Resources are organized into **business contexts** that reflect the domain model
 |---------|-----------|-----------|
 | **Client Onboarding & KYC** | Clients, Addresses, Contacts, Relationships, Dependants, Estate Planning, DPA Agreements, Marketing Preferences, Vulnerabilities, ID Verification, Professional Contacts | `/api/v2/factfinds/{id}/clients/{id}/*` |
 | **Circumstances** | Employment, Income, Income Changes, Expenditure, Expenditure Changes | `/api/v2/factfinds/{id}/clients/{id}/*` |
-| **Assets & Liabilities** | **Arrangements** | Investment Arrangements (GIA, ISA, Bonds), Pension Arrangements (personal-pension, state-pension), Mortgage Arrangements, Protection Arrangements (personal-protection, general-insurance), Contributions, Withdrawals, Beneficiaries, Client Pension Summary | `/api/v2/factfinds/{id}/arrangements/{type}` |
+| **Assets & Liabilities** | Assets, Liabilities, Properties, Equities, Credit History | `/api/v2/factfinds/{id}/assets`, `/api/v2/factfinds/{id}/liabilities` |
+| **Plans & Investments** | Investments, Pensions (Personal, Final Salary, Annuities), Mortgages, Personal Protection | `/api/v2/factfinds/{id}/investments`, `/api/v2/factfinds/{id}/pensions/*`, `/api/v2/factfinds/{id}/mortgages`, `/api/v2/factfinds/{id}/protections` |
 | **Goals & Objectives** | Objectives (investment, pension, protection, mortgages, budget, estate-planning), Needs | `/api/v2/factfinds/{id}/objectives/{type}` |
 | **Risk Profiling** | ATR (client ATR), Supplementary Questions | `/api/v2/factfinds/{id}/attitude-to-risk` |
 | **Estate Planning** | Gifts, Trusts (nested under clients) | `/api/v2/factfinds/{id}/clients/{id}/estate-planning` |
@@ -609,7 +591,7 @@ Resources are organized into **business contexts** that reflect the domain model
 
 **1. Clear Data Ownership**
 - Every resource has a clear parent (ultimately, the fact-find)
-- No ambiguity about which fact-find a client or arrangement belongs to
+- No ambiguity about which fact-find a client or financial product belongs to
 - Simplifies multi-tenancy and data isolation
 
 **2. Transactional Consistency**
@@ -869,14 +851,17 @@ Collection endpoints use a wrapper that contains an array of complete contracts:
 
 **Polymorphic Types:**
 
-For entities with subtypes (e.g., Arrangement with Pension, Investment, Protection), use a discriminator field in the unified contract:
+For entities with subtypes (e.g., Client with Person, Corporate, Trust), use a discriminator field in the unified contract:
 
 ```json
 {
   "id": 456,
-  "arrangementCategory": "PENSION", // discriminator (read-only, required-on-create, write-once)
-  "productName": "SIPP",            // common field
-  "pensionType": "PERSONAL_PENSION",
+  "clientType": "PERSON", // discriminator (read-only, required-on-create, write-once)
+  "name": {               // common field
+    "firstName": "John",
+    "lastName": "Smith"
+  },
+  "dateOfBirth": "1980-01-15", // person-specific field
   // ... other fields
 }
 ```
@@ -1050,7 +1035,6 @@ When one entity references another, use an expanded reference object containing:
 | `ClientRef` | `name`<br>`clientNumber`<br>`type` | `{ "id": 953, "href": "/api/v2/factfinds/{factfindId}/clients/123", "name": "John Smith", "clientNumber": "C00001", "type": "Person" }` |
 | `AdviserRef` | `name`<br>`code` | `{ "id": 953, "href": "/api/v2/advisers/789", "name": "Sarah Johnson", "code": "ADV001" }` |
 | `ProviderRef` | `name`<br>`frnNumber` | `{ "id": 953, "href": "/api/v2/providers/555", "name": "Aviva", "frnNumber": "123456" }` |
-| `ArrangementRef` | `policyNumber`<br>`productType`<br>`provider` | `{ "id": 953, "href": "/api/v2/factfinds/{factfindId}/arrangements/1001", "policyNumber": "POL12345", "productType": "Pension", "provider": "Aviva" }` |
 | `EmploymentRef` | `employerName`<br>`status` | `{ "id": 953, "href": "/api/v2/employments/3001", "employerName": "Acme Corp", "status": "Current" }` |
 | `GoalRef` | `goalName`<br>`priority` | `{ "id": 953, "href": "/api/v2/factfinds/{factfindId}/goals/7001", "goalName": "Retirement Planning", "priority": "High" }` |
 | `FactFindRef` | `factFindNumber`<br>`status` | `{ "id": 953, "href": "/api/v2/factfinds/456", "factFindNumber": "FF001234", "status": "InProgress" }` |
@@ -1308,13 +1292,13 @@ In Domain-Driven Design (DDD), an **aggregate** is a cluster of domain objects t
 
 **FactFind represents a complete fact-finding session** for one or more clients. It is the natural aggregate root because:
 
-1. **Contextual Ownership:** All data collected during fact-finding (clients, income, expenditure, arrangements, goals) belongs to that specific fact-finding session
+1. **Contextual Ownership:** All data collected during fact-finding (clients, income, expenditure, financial products, goals) belongs to that specific fact-finding session
 
 2. **Temporal Consistency:** The fact find represents a point-in-time snapshot of a client's financial situation. All data must be consistent with that point in time.
 
 3. **Business Process Boundary:** Fact-finding is a complete business process. Creating a fact find initiates the process; completing it marks the end.
 
-4. **Transactional Integrity:** Changes to any part of the fact find (adding income, recording arrangements, setting goals) should be transactionally consistent with the fact find state.
+4. **Transactional Integrity:** Changes to any part of the fact find (adding income, recording financial products, setting goals) should be transactionally consistent with the fact find state.
 
 5. **Access Control:** Authorization is naturally scoped to the fact find level. Users have permissions to view/edit specific fact finds, which includes all nested data.
 
@@ -1333,23 +1317,23 @@ DELETE /api/v2/factfinds/{id}   (Delete entire fact find and all data)
 
 **All Other Entities are Nested:**
 
-Clients, arrangements, goals, etc. are accessed through the fact find:
+Clients, financial products, goals, etc. are accessed through the fact find:
 ```
 POST /api/v2/factfinds/{factfindId}/clients
 GET /api/v2/factfinds/{factfindId}/clients/{clientId}
-POST /api/v2/factfinds/{factfindId}/arrangements
-GET /api/v2/factfinds/{factfindId}/arrangements/{arrangementId}
-POST /api/v2/factfinds/{factfindId}/goals
-GET /api/v2/factfinds/{factfindId}/goals/{goalId}
+POST /api/v2/factfinds/{factfindId}/investments
+GET /api/v2/factfinds/{factfindId}/investments/{investmentId}
+POST /api/v2/factfinds/{factfindId}/objectives
+GET /api/v2/factfinds/{factfindId}/objectives/{objectiveId}
 ```
 
 **No Independent Entity Access:**
 
 You CANNOT create or access these entities without a fact find context:
 ```
-❌ POST /api/v2/factfinds/{factfindId}/clients               (Not supported)
-❌ GET /api/v2/factfinds/{factfindId}/clients/{id}          (Not supported)
-❌ POST /api/v2/factfinds/{factfindId}/arrangements          (Not supported)
+❌ POST /api/v2/clients                                      (Not supported)
+❌ GET /api/v2/clients/{id}                                  (Not supported)
+❌ POST /api/v2/investments                                  (Not supported)
 ❌ GET /api/v2/factfinds/{factfindId}/arrangements/{id}     (Not supported)
 ❌ POST /api/v2/factfinds/{factfindId}/goals                 (Not supported)
 ```
@@ -14235,637 +14219,732 @@ Authorization: Bearer {token}
 **Note:** This operation performs a soft delete. The pension is marked as deleted but retained for audit purposes.
 
 ---
-## 12. Arrangements API (Type-Based Routing)
+
+## 12. Mortgages API
 
 ### 12.1 Overview
 
-**Purpose:** Manage financial arrangements held by clients including mortgages and protection policies with type-specific endpoints and operations.
+**Purpose:** Manage mortgage arrangements including traditional mortgages, buy-to-let mortgages, and equity release products secured against property assets.
 
-**Note:** Investments and Pensions are now managed separately under the Plans & Investments Context (Section 10).
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements`
+**Base Path:** `/api/v2/factfinds/{factfindId}/mortgages`
 
 **Key Features:**
 
-The Arrangements API provides comprehensive management of client financial products through a hierarchical, type-based routing structure:
+The Mortgages API provides comprehensive management of mortgage arrangements:
 
-1. **Type-Based Routing** - Separate endpoints for each arrangement category (mortgages, protection)
-2. **Sub-Type Specialization** - Further refined endpoints for specific product types
-3. **Unified Data Model** - Common base fields with type-specific extensions
-4. **Provider Integration** - Track provider details, policy numbers, and account references
-5. **Valuation History** - Complete audit trail of arrangement values over time
-6. **Ownership Tracking** - Multi-client ownership with percentage allocations
-7. **Sub-Resource Management** - Contributions, withdrawals, beneficiaries, and valuations
+1. **Loan Management** - Track original loan amount, current balance, and property valuations
+2. **Interest Terms** - Monitor interest rates, APR, rate types (Fixed, Variable, Tracker)
+3. **Repayment Structure** - Manage repayment methods (Capital & Interest, Interest-Only, Part-and-Part)
+4. **LTV Tracking** - Automatic Loan-to-Value calculation based on balance and property value
+5. **Redemption Terms** - Track early repayment charges and exit fees
+6. **Special Features** - Offset mortgages, payment holidays, overpayment options
+7. **Linked Arrangements** - Connect to life assurance and insurance policies
+8. **Property Integration** - Direct link to secured property asset details
+9. **Key Dates** - Track application, completion, review dates, and term end
+10. **Shared Ownership** - Support for part-buy, part-rent schemes
 
-**Aggregate Root:** FactFind (arrangements are part of the fact-find lifecycle)
+**Mortgage Types:**
+- **Residential** - Main residence or second home mortgages
+- **Buy-to-Let** - Rental investment property mortgages
+- **Equity Release** - Lifetime/retirement mortgages
+- **Right to Buy** - Council property purchase schemes
+- **Shared Ownership** - Housing association part-buy, part-rent
 
-**Arrangement Categories:**
-- **Mortgage Arrangements:** Residential, Buy-to-Let, Second Charge
-- **Protection Arrangements:** Personal Protection (Life, Critical Illness, Income Protection), General Insurance
+**Aggregate Root:** FactFind (Mortgages are part of the FactFind aggregate)
 
-**Note:** All Pensions (Personal Pension, Final Salary, Annuities, etc.) and Investments are now managed under Plans & Investments Context (Section 10) at `/api/v2/factfinds/{factfindId}/pensions/*` and `/api/v2/factfinds/{factfindId}/investments`.
+**Note on LTV (Loan-to-Value):** LTV is calculated automatically based on the property value and outstanding mortgage balance. There is no separate LTV calculation endpoint - the LTV ratio is included in the mortgage response and updated whenever the property value or mortgage balance changes.
 
 **Regulatory Compliance:**
-- FCA COBS 9.2 (Suitability Assessment)
-- FCA COBS 13 (Periodic Reporting)
-- MiFID II Article 25 (Suitability and Appropriateness)
-- Pension Schemes Act 2015 (Pension Freedoms)
-- Financial Services and Markets Act 2000 (Regulated Activities)
-- Consumer Duty (Product Governance and Fair Value)
-- IDD (Insurance Distribution Directive)
-- GDPR (Data Protection for Financial Records)
+- FCA MCOB (Mortgage Conduct of Business) Rules
+- Mortgage Credit Directive (MCD) - Consumer protections
+- Responsible Lending Standards - Affordability requirements
+- Consumer Duty - Fair value and outcomes
 
-### 12.2 Arrangement Types and Routing
+---
 
-**Hierarchical URL Structure:**
+### 12.2 Operations Summary
+
+**Mortgage Endpoints:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v2/factfinds/{factfindId}/mortgages` | List all mortgages | `mortgages:read` |
+| POST | `/api/v2/factfinds/{factfindId}/mortgages` | Create mortgage | `mortgages:write` |
+| GET | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Get mortgage details | `mortgages:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Update mortgage | `mortgages:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Delete mortgage | `mortgages:delete` |
+
+**Authorization:**
+- **mortgages:read** - Read access to mortgage information
+- **mortgages:write** - Create and modify mortgages
+- **mortgages:delete** - Delete mortgages
+
+---
+
+### 12.3 Mortgage Contract Schema
+
+See **[FactFind-Contracts-Reference.md Section 13.44](./FactFind-Contracts-Reference.md#1344-arrangement---mortgage-contract)** for the complete Mortgage contract definition.
+
+**Main Fields (30 properties):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | integer | Unique mortgage identifier |
+| `href` | string | API resource URL |
+| `factfind` | Reference Link | Parent FactFind |
+| `arrangementCategory` | string | Always "MORTGAGE" |
+| `owners` | List | Mortgage owners/borrowers |
+| `sellingAdviser` | Reference Link | Adviser who arranged mortgage |
+| `accountNumber` | string | Mortgage account number |
+| `policyNumber` | string | Policy/reference number |
+| `illustrationReference` | string | Illustration reference number |
+| `productType` | string | Mortgage product type |
+| `lenderName` | string | Lender/provider name |
+| `productName` | string | Product name |
+| `description` | string | Mortgage description |
+| `loanAmounts` | Complex Data | Loan amounts and LTV |
+| `interestTerms` | Complex Data | Interest rates and terms |
+| `repaymentStructure` | Complex Data | Repayment details |
+| `feesAndCharges` | Complex Data | Fees and charges |
+| `keyDates` | Complex Data | Important dates |
+| `redemptionTerms` | Complex Data | ERC and exit terms |
+| `offsetFeatures` | Complex Data | Offset account features |
+| `sharedOwnershipDetails` | Complex Data | Shared ownership details |
+| `specialFeatures` | Complex Data | Special features |
+| `linkedArrangements` | List | Linked insurance/protection |
+| `property` | Reference Link | Link to property asset |
+| `propertyDetail` | Reference Link | Link to property details |
+| `asset` | Reference Link | Link to asset record |
+| `agencyStatus` | string | Agency servicing status |
+| `agencyStatusDate` | date | Date of agency status |
+| `notes` | string | Additional notes |
+| `createdAt` | timestamp | Record creation date |
+| `updatedAt` | timestamp | Last update date |
+
+---
+
+### 12.4 Query Parameters
+
+**Standard Query Parameters:**
+
+- `$filter` - OData filter expression for field-based filtering
+- `$orderby` - Sort results by field(s)
+- `$top` - Limit number of results
+- `$skip` - Skip number of results (pagination)
+- `$select` - Select specific fields to return
+
+**Common Filter Examples:**
 
 ```
-/api/v2/factfinds/{factfindId}/arrangements
-├── /mortgages
-└── /protections
-    ├── /personal-protection
-    └── /general-insurance
+# Filter by lender
+GET /api/v2/factfinds/679/mortgages?$filter=lenderName eq 'Nationwide Building Society'
+
+# Filter by product type
+GET /api/v2/factfinds/679/mortgages?$filter=productType eq 'FixedRateMortgage'
+
+# Filter by current property (main residence)
+GET /api/v2/factfinds/679/mortgages?$filter=specialFeatures/isCurrentResidence eq true
+
+# Filter mortgages ending soon (within 6 months)
+GET /api/v2/factfinds/679/mortgages?$filter=interestTerms/initialRatePeriodEndsOn lt '2026-08-18'
+
+# Filter by ownership
+GET /api/v2/factfinds/679/mortgages?$filter=owners/any(o: o/id eq 8496)
 ```
 
-**Note:**
-- Pension arrangements (formerly under `/arrangements/pensions/*`) are now managed via the standalone Pensions API at `/api/v2/factfinds/{factfindId}/pensions/*`
-- Investment arrangements (formerly under `/arrangements/investments/*`) are now managed via the standalone Investments API at `/api/v2/factfinds/{factfindId}/investments`
+---
 
-**Common Operations (All Types):**
+### 12.5 Create Mortgage
 
-| Method | Endpoint Pattern | Description |
-|--------|-----------------|-------------|
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}` | Create new arrangement |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}` | List arrangements by type |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Get specific arrangement |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Update arrangement |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{category}/{type}/{arrangementId}` | Delete arrangement (soft) |
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/mortgages`
 
-**Common Fields (All Arrangements):**
+**Request Example:**
+
+```http
+POST /api/v2/factfinds/679/mortgages
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "arrangementCategory": "MORTGAGE",
+  "accountNumber": "NBS-MORT-123456",
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "ownershipPercentage": 100.0
+    }
+  ],
+  "productType": "FixedRateMortgage",
+  "lenderName": "Nationwide Building Society",
+  "productName": "5 Year Fixed Rate Mortgage",
+  "description": "Main residence mortgage",
+  "loanAmounts": {
+    "originalLoanAmount": {
+      "amount": 300000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "currentBalance": {
+      "amount": 245000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "depositAmount": {
+      "amount": 100000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "originalPropertyValuation": {
+      "amount": 400000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentPropertyValuation": {
+      "amount": 425000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "loanToValue": {
+      "percentage": 75.0,
+      "propertyValue": {
+        "amount": 400000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "loanAmount": {
+        "amount": 300000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2018-06-15"
+    },
+    "currentLTV": {
+      "percentage": 57.65,
+      "outstandingBalance": {
+        "amount": 245000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "currentPropertyValue": {
+        "amount": 425000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-18"
+    }
+  },
+  "interestTerms": {
+    "interestRate": 4.25,
+    "annualPercentageRate": 4.35,
+    "rateType": "Fixed",
+    "reversionRate": 7.99,
+    "initialRatePeriodEndsOn": "2028-06-30",
+    "initialTermYears": 5,
+    "remainingTermYears": 17,
+    "remainingTermMonths": 4
+  },
+  "repaymentStructure": {
+    "repaymentMethod": "CapitalAndInterest",
+    "capitalRepaymentAmount": {
+      "amount": 300000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "capitalTermYears": 25
+  },
+  "keyDates": {
+    "startDate": "2018-06-15",
+    "endDate": "2043-06-15",
+    "completionDate": "2018-06-15",
+    "nextReviewDate": "2028-01-01"
+  },
+  "propertyDetail": {
+    "id": 1001,
+    "href": "/api/v2/factfinds/679/property-details/1001"
+  }
+}
+```
+
+**Response (201 Created):**
 
 ```json
 {
-  "id": "string",
-  "href": "string",
-  "arrangementCategory": "string (enum)",
-  "provider": {
-    "name": "string",
-    "reference": "string",
-    "contactDetails": {}
+  "id": 5001,
+  "href": "/api/v2/factfinds/679/mortgages/5001",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
   },
-  "policyNumber": "string",
-  "accountNumber": "string",
-  "startDate": "date",
-  "maturityDate": "date",
-  "currentValue": "Money",
-  "valuationDate": "date",
+  "arrangementCategory": "MORTGAGE",
+  "accountNumber": "NBS-MORT-123456",
   "owners": [
     {
-      "client": "Reference",
-      "ownershipPercentage": "number"
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "fullName": "John Smith",
+      "ownershipPercentage": 100.0
     }
   ],
-  "status": "string (enum)",
+  "productType": "FixedRateMortgage",
+  "lenderName": "Nationwide Building Society",
+  "productName": "5 Year Fixed Rate Mortgage",
+  "description": "Main residence mortgage",
+  "loanAmounts": {
+    "originalLoanAmount": {
+      "amount": 300000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "currentBalance": {
+      "amount": 245000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "depositAmount": {
+      "amount": 100000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "originalPropertyValuation": {
+      "amount": 400000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentPropertyValuation": {
+      "amount": 425000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "loanToValue": {
+      "percentage": 75.0,
+      "propertyValue": {
+        "amount": 400000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "loanAmount": {
+        "amount": 300000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2018-06-15"
+    },
+    "currentLTV": {
+      "percentage": 57.65,
+      "outstandingBalance": {
+        "amount": 245000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "currentPropertyValue": {
+        "amount": 425000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-18"
+    }
+  },
+  "interestTerms": {
+    "interestRate": 4.25,
+    "annualPercentageRate": 4.35,
+    "rateType": "Fixed",
+    "reversionRate": 7.99,
+    "initialRatePeriodEndsOn": "2028-06-30",
+    "initialTermYears": 5,
+    "remainingTermYears": 17,
+    "remainingTermMonths": 4
+  },
+  "repaymentStructure": {
+    "repaymentMethod": "CapitalAndInterest",
+    "capitalRepaymentAmount": {
+      "amount": 300000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "capitalTermYears": 25
+  },
+  "keyDates": {
+    "startDate": "2018-06-15",
+    "endDate": "2043-06-15",
+    "completionDate": "2018-06-15",
+    "nextReviewDate": "2028-01-01"
+  },
+  "propertyDetail": {
+    "id": 1001,
+    "href": "/api/v2/factfinds/679/property-details/1001"
+  },
+  "createdAt": "2026-02-25T10:00:00Z",
+  "updatedAt": "2026-02-25T10:00:00Z"
+}
+```
+
+---
+
+### 12.6 Get Mortgage by ID
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/mortgages/{mortgageId}`
+
+**Request:**
+
+```http
+GET /api/v2/factfinds/679/mortgages/5001
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+
+See Create Mortgage response example above.
+
+---
+
+### 12.7 Update Mortgage
+
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/mortgages/{mortgageId}`
+
+**Request Example (Update current balance and property value):**
+
+```http
+PATCH /api/v2/factfinds/679/mortgages/5001
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "loanAmounts": {
+    "currentBalance": {
+      "amount": 238000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentPropertyValuation": {
+      "amount": 435000.00,
+      "currency": {
+        "code": "GBP",
+        "symbol": "£"
+      }
+    },
+    "currentLTV": {
+      "percentage": 54.71,
+      "outstandingBalance": {
+        "amount": 238000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "currentPropertyValue": {
+        "amount": 435000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "calculatedOn": "2026-02-25"
+    }
+  }
+}
+```
+
+**Response (200 OK):**
+
+Returns updated mortgage object with new LTV calculated.
+
+---
+
+### 12.8 List Mortgages
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/mortgages`
+
+**Request:**
+
+```http
+GET /api/v2/factfinds/679/mortgages
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "items": [
+    {
+      "id": 5001,
+      "href": "/api/v2/factfinds/679/mortgages/5001",
+      "accountNumber": "NBS-MORT-123456",
+      "lenderName": "Nationwide Building Society",
+      "productName": "5 Year Fixed Rate Mortgage",
+      "loanAmounts": {
+        "currentBalance": {
+          "amount": 245000.00,
+          "currency": {
+            "code": "GBP",
+            "symbol": "£"
+          }
+        },
+        "currentLTV": {
+          "percentage": 57.65
+        }
+      },
+      "interestTerms": {
+        "interestRate": 4.25,
+        "rateType": "Fixed",
+        "initialRatePeriodEndsOn": "2028-06-30"
+      }
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 20
+}
+```
+
+---
+
+### 12.9 Delete Mortgage
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/mortgages/{mortgageId}`
+
+**Request:**
+
+```http
+DELETE /api/v2/factfinds/679/mortgages/5001
+Authorization: Bearer {token}
+```
+
+**Response:** `204 No Content`
+
+**Note:** This operation performs a soft delete. The mortgage is marked as deleted but retained for audit purposes.
+
+---
+
+## 13. Personal Protection API
+
+### 13.1 Overview
+
+**Purpose:** Manage personal protection arrangements including life cover, critical illness cover, income protection, expense cover, and severity-based protection products.
+
+**Domain:** Plans
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/protections`
+
+**Key Features:**
+
+The Personal Protection API provides comprehensive management of protection products:
+
+1. **Multi-Cover Support** - Manage life, critical illness, income, expense, and severity covers
+2. **Flexible Premium Structures** - Regular, single, and stepped premiums with escalation options
+3. **Benefit Configuration** - Define benefit amounts, frequencies, deferred/qualification periods
+4. **Commission Tracking** - Track indemnity, non-indemnity, and renewal commissions
+5. **Trust Management** - Record trust arrangements and beneficiaries
+6. **Provider Integration** - Track provider details, policy numbers, and ratings
+7. **Regulatory Compliance** - Support FCA protection requirements and consumer duty
+
+**Aggregate Root:** FactFind (protections are part of the fact-find lifecycle)
+
+**Protection Categories:**
+- **PersonalProtection** (default) - Life, Critical Illness, Income Protection, Expense Cover, Severity Cover
+
+**Authorization Scopes:**
+- `protections:read` - Read protection arrangements
+- `protections:write` - Create and update protection arrangements
+- `protections:delete` - Delete protection arrangements
+
+**Regulatory Compliance:**
+- FCA ICOBS (Insurance Conduct of Business Sourcebook)
+- FCA COBS 9.2 (Suitability Assessment)
+- IDD (Insurance Distribution Directive)
+- Consumer Duty (Product Governance and Fair Value)
+
+---
+
+### 13.2 Operations Summary
+
+| Method | Endpoint | Description | Auth Scope |
+|--------|----------|-------------|------------|
+| POST | `/api/v2/factfinds/{factfindId}/protections` | Create new protection | `protections:write` |
+| GET | `/api/v2/factfinds/{factfindId}/protections` | List all protections | `protections:read` |
+| GET | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Get protection details | `protections:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Update protection | `protections:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Delete protection (soft) | `protections:delete` |
+
+---
+
+### 13.3 Personal Protection Contract Schema
+
+**See:** Section 16 (Entity Contracts) for complete contract definition.
+
+**Key Contract Elements:**
+
+```json
+{
+  "id": "integer",
+  "href": "string",
+  "factfind": "FactFindRef",
+  "sellingAdviser": "AdviserRef",
+  "owners": ["ClientRef"],
+  "provider": "ProviderRef",
+  "protectionCategory": "PersonalProtection",
+  "protectionType": "PlanTypeRef",
+  "lifeCycle": "LifeCycleRef",
+  "premiums": ["PremiumValue"],
+  "lifeCover": "LifeCoverValue",
+  "criticalIllnessCover": "CriticalIllnessCoverValue",
+  "incomeCover": "IncomeCoverValue",
+  "expenseCover": "ExpenseCoverValue",
+  "severityCover": "SeverityCoverValue",
+  "benefitsPayable": "BenefitsPayableValue",
+  "indexType": "enum",
+  "inTrust": "boolean",
+  "inTrustToWhom": "string",
+  "benefitOptions": ["string"],
+  "isRated": "boolean",
+  "isPremiumWaiverWoc": "boolean",
+  "benefitSummary": "string",
+  "exclusionNotes": "string",
+  "initialEarningsPeriod": "string (ISO-8601)",
+  "waitingPeriod": "string (ISO-8601)",
+  "premiumLoading": "string",
+  "owner2PercentOfSumAssured": "number",
+  "sumAssured": "MoneyValue",
+  "commissions": ["CommissionValue"],
+  "protectionPayoutType": "enum",
   "concurrencyId": "string",
   "createdAt": "datetime",
   "updatedAt": "datetime"
 }
 ```
 
-### 12.3 Mortgage Arrangements
+---
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/mortgages`
+### 13.4 Query Parameters
 
-**Purpose:** Manage mortgage arrangements including traditional mortgages and equity release products linked to property assets.
+**List Protections** supports the following query parameters:
 
-**Note on LTV (Loan-to-Value):** LTV is calculated automatically based on the property value and outstanding mortgage balance, and is stored as part of the mortgage arrangement contract. There is no separate LTV calculation endpoint - the LTV ratio is included in the mortgage arrangement response and updated whenever the property value or mortgage balance changes.
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `filter` | string | OData filter expression | `protectionType/name eq 'Life Cover'` |
+| `page` | integer | Page number (1-based) | `1` |
+| `pageSize` | integer | Items per page (max 100) | `20` |
+| `sort` | string | Sort field and direction | `createdAt desc` |
 
-**Operations:**
+**Common Filter Examples:**
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/mortgages` | Create Mortgage | `arrangements:write` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/mortgages` | List Mortgages | `arrangements:read` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Get Mortgage details | `arrangements:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Update Mortgage | `arrangements:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/mortgages/{arrangementId}` | Delete Mortgage | `arrangements:write` |
+```
+# Filter by protection type
+GET /api/v2/factfinds/679/protections?filter=protectionType/name eq 'Life Cover'
 
-**Create Mortgage Request:**
+# Filter by client owner
+GET /api/v2/factfinds/679/protections?filter=owners/any(o: o/id eq 8496)
 
-```json
-{
-  "arrangementCategory": "MORTGAGE",
-  "accountNumber": "NBS-MORT-123456",
-  "owners": [
-    {
-      "id": 123,
-      "href": "/api/v2/factfinds/ff-456/clients/123",
-      "ownershipPercentage": 50.0
-    },
-    {
-      "id": 124,
-      "href": "/api/v2/factfinds/ff-456/clients/124",
-      "ownershipPercentage": 50.0
-    }
-  ],
-  "productType": "FixedRateMortgage",
-  "lenderName": "Nationwide Building Society",
-  "productName": "5 Year Fixed Rate Mortgage",
-  "description": "Main residence mortgage",
-  "loanAmounts": {
-    "originalLoanAmount": {
-      "amount": 300000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "currentBalance": {
-      "amount": 245000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "depositAmount": {
-      "amount": 100000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "originalPropertyValuation": {
-      "amount": 400000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "currentPropertyValuation": {
-      "amount": 425000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "loanToValue": {
-      "percentage": 75.0,
-      "propertyValue": {
-        "amount": 400000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "loanAmount": {
-        "amount": 300000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "calculatedOn": "2018-06-15"
-    },
-    "currentLTV": {
-      "percentage": 57.65,
-      "outstandingBalance": {
-        "amount": 245000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "currentPropertyValue": {
-        "amount": 425000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "calculatedOn": "2026-02-18"
-    }
-  },
-  "interestTerms": {
-    "interestRate": 4.25,
-    "annualPercentageRate": 4.35,
-    "rateType": "Fixed",
-    "baseRateIndex": null,
-    "reversionRate": 7.99,
-    "hasCollarRate": false,
-    "collarRate": null,
-    "initialRatePeriodEndsOn": "2028-06-30",
-    "initialTermYears": 5,
-    "initialTermMonths": 0,
-    "remainingTermYears": 17,
-    "remainingTermMonths": 4
-  },
-  "repaymentStructure": {
-    "repaymentMethod": "CapitalAndInterest",
-    "capitalRepaymentAmount": {
-      "amount": 300000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "capitalTermYears": 25,
-    "capitalTermMonths": 0,
-    "interestOnlyAmount": null,
-    "interestOnlyTermYears": null,
-    "interestOnlyTermMonths": null,
-    "interestOnlyRepaymentVehicle": null,
-    "lumpSumAdvance": null,
-    "monthlyIncomeDrawdown": null,
-    "regularAnnualOverpayment": null,
-    "currentRepaymentVehicles": []
-  },
-  "feesAndCharges": {
-    "lenderFees": {
-      "amount": 999.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "ongoingContributions": null
-  },
-  "keyDates": {
-    "startDate": "2018-06-15",
-    "endDate": "2043-06-15",
-    "completionDate": "2018-06-15",
-    "exchangeDate": "2018-06-08",
-    "nextPaymentDueDate": "2026-03-15",
-    "nextReviewDate": "2028-01-01",
-    "balanceAsOfDate": "2026-02-18",
-    "applicationSubmittedDate": "2018-05-10",
-    "valuationInstructedDate": "2018-05-12",
-    "valuationDate": "2018-05-18",
-    "valuationReceivedDate": "2018-05-22",
-    "offerIssuedDate": "2018-05-28",
-    "targetCompletionDate": "2018-06-15",
-    "schemeEndDate": null
-  },
-  "redemptionTerms": {
-    "hasEarlyRepaymentCharge": true,
-    "earlyRepaymentTerms": "4% of outstanding balance until 2028-06-30",
-    "earlyRepaymentChargeEndsOn": "2028-06-30",
-    "earlyRepaymentCharge": {
-      "amount": 9800.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "earlyRepaymentChargeSecondCharge": null,
-    "netProceedsOnRedemption": {
-      "amount": 235200.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    }
-  },
-  "specialFeatures": {
-    "isFirstTimeBuyer": false,
-    "isCurrentResidence": true,
-    "hasGuarantor": false,
-    "isPortable": true,
-    "isPropertySold": false,
-    "isRedeemed": false,
-    "hasDischargeOnCompletion": false,
-    "hasConsentToLet": false,
-    "consentToLetExpiresOn": null,
-    "hasDebtConsolidation": false,
-    "incomeVerificationStatus": "Employed",
-    "isIncomeEvidenced": true
-  },
-  "propertyDetail": {
-    "id": 1,
-    "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001"
-  },
-  "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before."
-}
+# Filter by provider
+GET /api/v2/factfinds/679/protections?filter=provider/name eq 'Legal & General'
+
+# Filter by in trust
+GET /api/v2/factfinds/679/protections?filter=inTrust eq true
 ```
 
-**Response (201 Created):**
+---
 
-```json
-{
-  "id": 5,
-  "href": "/api/v2/factfinds/ff-456/arrangements/mortgages/arr-secl-005",
-  "factfind": {
-    "id": 456,
-    "href": "/api/v2/factfinds/ff-456"
-  },
-  "arrangementCategory": "MORTGAGE",
-  "accountNumber": "NBS-MORT-123456",
-  "policyNumber": null,
-  "illustrationReference": null,
-  "owners": [
-    {
-      "id": 123,
-      "href": "/api/v2/factfinds/ff-456/clients/123",
-      "fullName": "John Smith",
-      "ownershipPercentage": 50.0
-    },
-    {
-      "id": 124,
-      "href": "/api/v2/factfinds/ff-456/clients/124",
-      "fullName": "Jane Smith",
-      "ownershipPercentage": 50.0
-    }
-  ],
-  "sellingAdviser": null,
-  "agencyStatus": null,
-  "agencyStatusDate": null,
-  "productType": "FixedRateMortgage",
-  "lenderName": "Nationwide Building Society",
-  "productName": "5 Year Fixed Rate Mortgage",
-  "description": "Main residence mortgage",
-  "loanAmounts": {
-    "originalLoanAmount": {
-      "amount": 300000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "currentBalance": {
-      "amount": 245000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "depositAmount": {
-      "amount": 100000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "equityReleased": null,
-    "originalPropertyValuation": {
-      "amount": 400000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "currentPropertyValuation": {
-      "amount": 425000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "loanToValue": {
-      "percentage": 75.0,
-      "propertyValue": {
-        "amount": 400000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "loanAmount": {
-        "amount": 300000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "calculatedOn": "2018-06-15"
-    },
-    "currentLTV": {
-      "percentage": 57.65,
-      "outstandingBalance": {
-        "amount": 245000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "currentPropertyValue": {
-        "amount": 425000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
-        }
-      },
-      "calculatedOn": "2026-02-18"
-    }
-  },
-  "interestTerms": {
-    "interestRate": 4.25,
-    "annualPercentageRate": 4.35,
-    "rateType": "Fixed",
-    "baseRateIndex": null,
-    "reversionRate": 7.99,
-    "hasCollarRate": false,
-    "collarRate": null,
-    "initialRatePeriodEndsOn": "2028-06-30",
-    "initialTermYears": 5,
-    "initialTermMonths": 0,
-    "remainingTermYears": 17,
-    "remainingTermMonths": 4
-  },
-  "repaymentStructure": {
-    "repaymentMethod": "CapitalAndInterest",
-    "capitalRepaymentAmount": {
-      "amount": 300000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "capitalTermYears": 25,
-    "capitalTermMonths": 0,
-    "interestOnlyAmount": null,
-    "interestOnlyTermYears": null,
-    "interestOnlyTermMonths": null,
-    "interestOnlyRepaymentVehicle": null,
-    "lumpSumAdvance": null,
-    "monthlyIncomeDrawdown": null,
-    "regularAnnualOverpayment": null,
-    "currentRepaymentVehicles": []
-  },
-  "feesAndCharges": {
-    "lenderFees": {
-      "amount": 999.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "ongoingContributions": null
-  },
-  "keyDates": {
-    "startDate": "2018-06-15",
-    "endDate": "2043-06-15",
-    "completionDate": "2018-06-15",
-    "exchangeDate": "2018-06-08",
-    "nextPaymentDueDate": "2026-03-15",
-    "nextReviewDate": "2028-01-01",
-    "balanceAsOfDate": "2026-02-18",
-    "applicationSubmittedDate": "2018-05-10",
-    "valuationInstructedDate": "2018-05-12",
-    "valuationDate": "2018-05-18",
-    "valuationReceivedDate": "2018-05-22",
-    "offerIssuedDate": "2018-05-28",
-    "targetCompletionDate": "2018-06-15",
-    "schemeEndDate": null
-  },
-  "redemptionTerms": {
-    "hasEarlyRepaymentCharge": true,
-    "earlyRepaymentTerms": "4% of outstanding balance until 2028-06-30",
-    "earlyRepaymentChargeEndsOn": "2028-06-30",
-    "earlyRepaymentCharge": {
-      "amount": 9800.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "earlyRepaymentChargeSecondCharge": null,
-    "netProceedsOnRedemption": {
-      "amount": 235200.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    }
-  },
-  "specialFeatures": {
-    "isFirstTimeBuyer": false,
-    "isCurrentResidence": true,
-    "hasGuarantor": false,
-    "isPortable": true,
-    "isPropertySold": false,
-    "isRedeemed": false,
-    "hasDischargeOnCompletion": false,
-    "hasConsentToLet": false,
-    "consentToLetExpiresOn": null,
-    "hasDebtConsolidation": false,
-    "incomeVerificationStatus": "Employed",
-    "isIncomeEvidenced": true
-  },
-  "sharedOwnershipDetails": null,
-  "offsetFeatures": null,
-  "asset": null,
-  "property": {
-    "id": 1,
-    "href": "/api/v2/factfinds/ff-456/properties/asset-prop-001",
-    "address": "123 High Street, London"
-  },
-  "propertyDetail": {
-    "id": 1,
-    "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001"
-  },
-  "linkedArrangements": [],
-  "notes": "5 year fixed rate ends June 2028. Review remortgage options 6 months before.",
-  "createdAt": "2026-02-18T10:50:00Z",
-  "updatedAt": "2026-02-18T10:50:00Z",
-    "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "property": { "href": "/api/v2/factfinds/ff-456/properties/asset-prop-001" },
-    "propertyDetail": { "href": "/api/v2/factfinds/ff-456/property-details/asset-prop-001" },
-    "owners": [
-      { "href": "/api/v2/factfinds/ff-456/clients/123" },
-      { "href": "/api/v2/factfinds/ff-456/clients/124" }
-    ]
-  }
-}
+### 13.5 Create Personal Protection
+
+**Endpoint:** `POST /api/v2/factfinds/{factfindId}/protections`
+
+**Request:**
+
+```http
+POST /api/v2/factfinds/679/protections
+Authorization: Bearer {token}
+Content-Type: application/json
 ```
 
-**Validation Rules:**
-- `arrangementCategory` - Required, must be "MORTGAGE"
-- `productType` - Required, see Product Type Codes (FixedRateMortgage, LifetimeMortgage, etc.)
-- `propertyDetail` - Required, must link to existing property detail record
-- `owners` - Required, at least one owner with sum of ownershipPercentage = 100
-- Product-specific validation applies (see Section 13.41 Validation Rules)
-- `currentBalance` - Required, must be positive
-- `monthlyPayment` - Required, must be positive
-- `currentRate` - Required, must be > 0
-- LTV cannot exceed 95% for residential, 85% for BTL
-
-**Business Rules:**
-- LTV = (Current Balance / Property Value) * 100
-- Equity = Property Value - Current Balance
-- Stress test typically at current rate + 3%
-- ERC typically 1-5% of outstanding balance during fixed period
-- Remortgage review when deal expiry within 6 months
-- Affordability based on debt-to-income ratio (typically max 4.5x)
-
-### 12.4 Protection Arrangements
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/protections`
-
-**Purpose:** Manage protection policies including life insurance, critical illness, income protection, and general insurance.
-
-#### 11.6.1 Personal Protection (Life, CI, IP)
-
-**Operations:**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection` | Create Personal Protection | `arrangements:write` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection` | List Personal Protection | `arrangements:read` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Get Protection details | `arrangements:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Update Protection | `arrangements:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/protections/personal-protection/{arrangementId}` | Delete Protection | `arrangements:write` |
-
-**Create Personal Protection Request:**
-
 ```json
 {
-  "arrangementCategory": "PROTECTION",
-  "protectionType": "LIFE_COVER",
+  "sellingAdviser": {
+    "id": 123
+  },
+  "owners": [
+    {
+      "id": 8496
+    }
+  ],
   "provider": {
-    "name": "Legal & General",
-    "reference": "LG-UK-001",
-    "contactDetails": {
-      "phone": "0800 783 4137",
-      "email": "life@landg.com"
-    }
+    "id": 456
   },
-  "policyNumber": "LG-LIFE-789012",
-  "startDate": "2020-04-01",
-  "maturityDate": "2050-04-01",
-  "owners": [
+  "protectionCategory": "PersonalProtection",
+  "protectionType": {
+    "id": 123
+  },
+  "lifeCycle": {
+    "id": 45
+  },
+  "premiums": [
     {
-      "client": { "id": 123 },
-      "ownershipPercentage": 100.0
+      "startsOn": "2024-01-01",
+      "stopsOn": null,
+      "value": {
+        "amount": 150.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": "Monthly",
+      "type": "Regular",
+      "contributorType": "Self",
+      "escalation": {
+        "type": "RPI",
+        "percentage": 0
+      }
     }
   ],
-  "status": "ACTIVE",
-  "coverDetails": {
-    "coverAmount": {
+  "lifeCover": {
+    "term": "P25Y",
+    "sumAssured": {
       "amount": 500000.00,
       "currency": {
         "code": "GBP",
@@ -14873,95 +14952,158 @@ The Arrangements API provides comprehensive management of client financial produ
         "symbol": "£"
       }
     },
-    "coverType": "LEVEL_TERM",
-    "coverPeriod": {
-      "years": 30,
-      "endsOn": "2050-04-01"
-    }
-  },
-  "premiumDetails": {
-    "monthlyPremium": {
-      "amount": 35.50,
+    "premiumStructure": "Level",
+    "additionalCover": {
+      "amount": 0,
       "currency": {
         "code": "GBP",
         "display": "British Pound",
         "symbol": "£"
       }
     },
-    "annualPremium": {
-      "amount": 426.00,
+    "paymentBasis": "FirstDeath",
+    "untilAge": 65
+  },
+  "criticalIllnessCover": {
+    "premiumStructure": "Level",
+    "amount": {
+      "amount": 250000.00,
       "currency": {
         "code": "GBP",
         "display": "British Pound",
         "symbol": "£"
       }
     },
-    "paymentFrequency": "MONTHLY",
-    "reviewable": false,
-    "guaranteed": true
+    "term": "P25Y",
+    "untilAge": 65
   },
-  "beneficiaries": [
-    {
-      "name": "Jane Smith",
-      "relationship": "SPOUSE",
-      "percentage": 100.0,
-      "ref": { "id": 124 }
-    }
-  ],
-  "trustDetails": {
-    "inTrust": true,
-    "trustType": "SPLIT_TRUST",
-    "trustees": [
-      "Jane Smith",
-      "David Smith"
-    ]
+  "benefitsPayable": {
+    "benefitFrequency": "Single",
+    "benefitPeriod": {
+      "value": "P12M",
+      "details": "12 months benefit period"
+    },
+    "benefitAmount": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "deferredPeriod": "P0D",
+    "qualificationPeriod": {
+      "isBackToDayOne": false,
+      "value": "P30D"
+    },
+    "splitBenefitFrequency": "None",
+    "splitBenefitValue": {
+      "amount": 0,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "splitDeferredPeriod": "P0D"
   },
-  "underwritingDetails": {
-    "underwritingType": "FULL_MEDICAL",
-    "loadings": [],
-    "exclusions": []
-  }
-}
-```
-
-**Response (201 Created):**
-
-```json
-{
-  "id": 6,
-  "href": "/api/v2/factfinds/ff-456/arrangements/protections/personal-protection/arr-prot-006",
-  "arrangementCategory": "PROTECTION",
-  "arrangementCategory": "PROTECTION",
-  "protectionType": "LIFE_COVER",
-  "provider": {
-    "name": "Legal & General",
-    "reference": "LG-UK-001",
-    "contactDetails": {
-      "phone": "0800 783 4137",
-      "email": "life@landg.com"
-    }
-  },
-  "policyNumber": "LG-LIFE-789012",
-  "startDate": "2020-04-01",
-  "maturityDate": "2050-04-01",
-  "currentValue": {
+  "indexType": "RPI",
+  "inTrust": true,
+  "inTrustToWhom": "Spouse and children",
+  "benefitOptions": ["Convertible"],
+  "isRated": false,
+  "isPremiumWaiverWoc": true,
+  "benefitSummary": "Level term life and critical illness cover with premium waiver",
+  "exclusionNotes": "",
+  "sumAssured": {
     "amount": 500000.00,
-    "currency": { "code": "GBP", "symbol": "£", "display": "British Pound" }
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
   },
-  "valuationDate": "2026-02-18",
-  "owners": [
+  "commissions": [
     {
-      "client": {
-        "id": 123,
-        "fullName": "John Smith",
-        "href": "/api/v2/factfinds/ff-456/clients/123"
-      },
-      "ownershipPercentage": 100.0
+      "frequency": "Monthly",
+      "type": "Indemnity",
+      "percentage": 2.5,
+      "amount": {
+        "amount": 3.75,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
     }
   ],
-  "status": "ACTIVE",
-  "coverDetails": {
-    "coverAmount": {
+  "protectionPayoutType": "Indemnity"
+}
+```
+
+**Response:** `201 Created`
+
+```json
+{
+  "id": 15001,
+  "href": "/api/v2/factfinds/679/protections/15001",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "sellingAdviser": {
+    "id": 123,
+    "href": "/api/v2/advisers/123",
+    "name": "Jane Financial Adviser"
+  },
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "name": "John Smith"
+    }
+  ],
+  "provider": {
+    "id": 456,
+    "href": "/api/v2/productproviders/456",
+    "name": "Legal & General"
+  },
+  "protectionCategory": "PersonalProtection",
+  "protectionType": {
+    "id": 123,
+    "href": "/api/v2/plantypes?filter=id eq 123",
+    "name": "Life and Critical Illness"
+  },
+  "lifeCycle": {
+    "id": 45,
+    "href": "/api/v2/lifecycles/45",
+    "name": "Accumulation"
+  },
+  "premiums": [
+    {
+      "startsOn": "2024-01-01",
+      "stopsOn": null,
+      "value": {
+        "amount": 150.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": "Monthly",
+      "type": "Regular",
+      "contributorType": "Self",
+      "escalation": {
+        "type": "RPI",
+        "percentage": 0
+      }
+    }
+  ],
+  "lifeCover": {
+    "term": "P25Y",
+    "sumAssured": {
       "amount": 500000.00,
       "currency": {
         "code": "GBP",
@@ -14969,980 +15111,573 @@ The Arrangements API provides comprehensive management of client financial produ
         "symbol": "£"
       }
     },
-    "coverType": "LEVEL_TERM",
-    "coverPeriod": {
-      "years": 30,
-      "endsOn": "2050-04-01"
+    "premiumStructure": "Level",
+    "additionalCover": {
+      "amount": 0,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
     },
-    "yearsRemaining": 24.1
+    "paymentBasis": "FirstDeath",
+    "untilAge": 65
   },
-  "premiumDetails": {
-    "monthlyPremium": {
-      "amount": 35.50,
+  "criticalIllnessCover": {
+    "premiumStructure": "Level",
+    "amount": {
+      "amount": 250000.00,
       "currency": {
         "code": "GBP",
         "display": "British Pound",
         "symbol": "£"
       }
     },
-    "annualPremium": {
-      "amount": 426.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "paymentFrequency": "MONTHLY",
-    "totalPremiumsPaid": {
-      "amount": 2982.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "reviewable": false,
-    "guaranteed": true,
-    "nextReviewDate": null
+    "term": "P25Y",
+    "untilAge": 65
   },
-  "beneficiaries": [
+  "benefitsPayable": {
+    "benefitFrequency": "Single",
+    "benefitPeriod": {
+      "value": "P12M",
+      "details": "12 months benefit period"
+    },
+    "benefitAmount": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "deferredPeriod": "P0D",
+    "qualificationPeriod": {
+      "isBackToDayOne": false,
+      "value": "P30D"
+    },
+    "splitBenefitFrequency": "None",
+    "splitBenefitValue": {
+      "amount": 0,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "splitDeferredPeriod": "P0D"
+  },
+  "indexType": "RPI",
+  "inTrust": true,
+  "inTrustToWhom": "Spouse and children",
+  "benefitOptions": ["Convertible"],
+  "isRated": false,
+  "isPremiumWaiverWoc": true,
+  "benefitSummary": "Level term life and critical illness cover with premium waiver",
+  "exclusionNotes": "",
+  "sumAssured": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "commissions": [
     {
-      "id": 1,
-      "name": "Jane Smith",
-      "relationship": "SPOUSE",
-      "percentage": 100.0,
-      "ref": {
-        "id": 124,
-        "href": "/api/v2/factfinds/ff-456/clients/124"
+      "frequency": "Monthly",
+      "type": "Indemnity",
+      "percentage": 2.5,
+      "amount": {
+        "amount": 3.75,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
       }
     }
   ],
-  "trustDetails": {
-    "inTrust": true,
-    "trustType": "SPLIT_TRUST",
-    "trustees": [
-      "Jane Smith",
-      "David Smith"
-    ],
-    "ihtBenefit": "Policy proceeds excluded from estate for IHT purposes"
-  },
-  "underwritingDetails": {
-    "underwritingType": "FULL_MEDICAL",
-    "loadings": [],
-    "exclusions": [],
-    "terms": "Standard Terms"
-  },
-  "adequacyCheck": {
-    "recommendedCover": {
-      "amount": 650000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "shortfall": {
-      "amount": 150000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "adequacyPercentage": 76.92
-  },
-  "concurrencyId": "j2g8h6f5-7k90-9j3g-4i8h-6f7g8h9i0j1k",
-  "createdAt": "2026-02-18T10:55:00Z",
-  "updatedAt": "2026-02-18T10:55:00Z",
-    "factfind": { "href": "/api/v2/factfinds/ff-456" },
-    "owner": { "href": "/api/v2/factfinds/ff-456/clients/123" },
-    "beneficiaries": { "href": "/api/v2/factfinds/ff-456/arrangements/arr-prot-006/beneficiaries" }
-  }
+  "protectionPayoutType": "Indemnity",
+  "concurrencyId": "f7a8b9c0-1234-5678-9abc-def012345678",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
 }
 ```
 
-**Protection Type Variations:**
+---
 
-**Critical Illness Cover:**
-```json
-{
-  "protectionType": "CRITICAL_ILLNESS",
-  "coverDetails": {
-    "conditionsCovered": 50,
-    "partialPayment": true,
-    "childrensCover": true
-  }
-}
+### 13.6 Get Personal Protection by ID
+
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/protections/{protectionId}`
+
+**Request:**
+
+```http
+GET /api/v2/factfinds/679/protections/15001
+Authorization: Bearer {token}
 ```
 
-**Income Protection:**
-```json
-{
-  "protectionType": "INCOME_PROTECTION",
-  "coverDetails": {
-    "monthlyBenefit": {
-      "amount": 3000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "deferredPeriod": {
-      "weeks": 13
-    },
-    "benefitPeriod": "AGE_65",
-    "indexation": true
-  }
-}
-```
-
-#### 11.6.2 General Insurance
-
-**Operations:**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance` | Create General Insurance | `arrangements:write` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance` | List General Insurance | `arrangements:read` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Get Insurance details | `arrangements:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Update Insurance | `arrangements:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/protections/general-insurance/{arrangementId}` | Delete Insurance | `arrangements:write` |
-
-**General Insurance Types:**
-- Buildings Insurance
-- Contents Insurance
-- Motor Insurance
-- Travel Insurance
-- Pet Insurance
-- Private Medical Insurance
-
-**Buildings Insurance Example:**
+**Response:** `200 OK`
 
 ```json
 {
-  "arrangementCategory": "GENERAL_INSURANCE",
-  "insuranceType": "BUILDINGS",
+  "id": 15001,
+  "href": "/api/v2/factfinds/679/protections/15001",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "sellingAdviser": {
+    "id": 123,
+    "href": "/api/v2/advisers/123",
+    "name": "Jane Financial Adviser"
+  },
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "name": "John Smith"
+    }
+  ],
   "provider": {
-    "name": "Aviva",
-    "reference": "AVIVA-UK-001"
+    "id": 456,
+    "href": "/api/v2/productproviders/456",
+    "name": "Legal & General"
   },
-  "policyNumber": "BLDG-456789",
-  "coverAmount": {
-    "amount": 425000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
+  "protectionCategory": "PersonalProtection",
+  "protectionType": {
+    "id": 123,
+    "href": "/api/v2/plantypes?filter=id eq 123",
+    "name": "Life and Critical Illness"
   },
-  "annualPremium": {
-    "amount": 285.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
+  "lifeCycle": {
+    "id": 45,
+    "href": "/api/v2/lifecycles/45",
+    "name": "Accumulation"
   },
-  "excess": {
-    "amount": 250.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "renewalDate": "2026-06-15",
-  "linkedAssetRef": {
-    "id": 1
-  }
-}
-```
-
-### 12.5 Arrangement Sub-Resources
-
-**Purpose:** Manage detailed transaction history and associated data for arrangements including contributions, withdrawals, beneficiaries, and valuations.
-
-#### 11.7.1 Contributions
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions`
-
-**Purpose:** Track contributions made to investment and pension arrangements.
-
-**Operations:**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | List contributions | `arrangements:read` |
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions` | Add contribution | `arrangements:write` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Get contribution details | `arrangements:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Update contribution | `arrangements:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions/{contributionId}` | Delete contribution | `arrangements:write` |
-
-**Create Contribution Request:**
-
-```json
-{
-  "contributionDate": "2026-02-15",
-  "contributionType": "REGULAR",
-  "grossAmount": {
-    "amount": 625.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "netAmount": {
-    "amount": 500.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "taxRelief": {
-    "amount": 125.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "employerContribution": {
-    "amount": 250.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "source": "SALARY",
-  "notes": "Standard monthly contribution"
-}
-```
-
-**Response (201 Created):**
-
-```json
-{
-  "id": 1,
-  "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/contributions/contrib-001",
-  "arrangement": {
-    "id": 3,
-    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
-  },
-  "contributionDate": "2026-02-15",
-  "contributionType": "REGULAR",
-  "grossAmount": {
-    "amount": 625.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "netAmount": {
-    "amount": 500.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "taxRelief": {
-    "amount": 125.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "employerContribution": {
-    "amount": 250.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "totalContribution": {
-    "amount": 875.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "source": "SALARY",
-  "taxYear": "2025/26",
-  "annualAllowanceUsed": {
-    "amount": 875.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "notes": "Standard monthly contribution",
-  "createdAt": "2026-02-18T11:00:00Z",
-  "updatedAt": "2026-02-18T11:00:00Z",
-    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
-    "factfind": { "href": "/api/v2/factfinds/ff-456" }
-  }
-}
-```
-
-**List Contributions Response:**
-
-```json
-{
-  "arrangement": {
-    "id": 3,
-    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
-  },
-  "contributions": [
+  "premiums": [
     {
-      "id": 1,
-      "contributionDate": "2026-02-15",
-      "grossAmount": {
-        "amount": 625.00,
-        "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-      },
-      "contributionType": "REGULAR"
-      }
-    },
-    {
-      "id": 2,
-      "contributionDate": "2026-01-15",
-      "grossAmount": {
-        "amount": 625.00,
-        "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-      },
-      "contributionType": "REGULAR"
-      }
-    }
-  ],
-  "summary": {
-    "totalContributions": 24,
-    "totalAmount": {
-      "amount": 21000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "thisYearContributions": {
-      "amount": 1750.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "annualAllowanceUsed": {
-      "amount": 1750.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    }
-  },
-  "totalCount": 24,
-    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
-  }
-}
-```
-
-**Query Parameters:**
-- `fromDate` - Filter contributions from this date
-- `toDate` - Filter contributions to this date
-- `contributionType` - Filter by type (REGULAR, AD_HOC, TRANSFER, EMPLOYER)
-- `taxYear` - Filter by tax year (e.g., "2025/26")
-
-#### 11.7.2 Withdrawals
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals`
-
-**Purpose:** Track withdrawals from investment, pension, and drawdown arrangements.
-
-**Operations:**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | List withdrawals | `arrangements:read` |
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals` | Add withdrawal | `arrangements:write` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Get withdrawal details | `arrangements:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Update withdrawal | `arrangements:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/withdrawals/{withdrawalId}` | Delete withdrawal | `arrangements:write` |
-
-**Create Withdrawal Request (Pension Drawdown):**
-
-```json
-{
-  "withdrawalDate": "2026-02-15",
-  "withdrawalType": "INCOME",
-  "grossAmount": {
-    "amount": 1000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "taxDeducted": {
-    "amount": 200.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "netAmount": {
-    "amount": 800.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "taxCode": "1257L",
-  "crystallisedFund": {
-    "amount": 1000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "uncrystallisedFund": {
-    "amount": 0.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "reason": "REGULAR_INCOME",
-  "notes": "Monthly drawdown payment"
-}
-```
-
-**Response (201 Created):**
-
-```json
-{
-  "id": 1,
-  "href": "/api/v2/factfinds/ff-456/arrangements/arr-dd-007/withdrawals/withdraw-001",
-  "arrangement": {
-    "id": 7,
-    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007"
-  },
-  "withdrawalDate": "2026-02-15",
-  "withdrawalType": "INCOME",
-  "grossAmount": {
-    "amount": 1000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "taxDeducted": {
-    "amount": 200.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "netAmount": {
-    "amount": 800.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "taxCode": "1257L",
-  "effectiveTaxRate": 20.0,
-  "crystallisedFund": {
-    "amount": 1000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "uncrystallisedFund": {
-    "amount": 0.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "taxYear": "2025/26",
-  "reason": "REGULAR_INCOME",
-  "notes": "Monthly drawdown payment",
-  "createdAt": "2026-02-18T11:05:00Z",
-  "updatedAt": "2026-02-18T11:05:00Z",
-    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/drawdown/arr-dd-007" },
-    "factfind": { "href": "/api/v2/factfinds/ff-456" }
-  }
-}
-```
-
-**Create Withdrawal Request (Investment Bond 5% Rule):**
-
-```json
-{
-  "withdrawalDate": "2026-02-15",
-  "withdrawalType": "TAX_DEFERRED",
-  "grossAmount": {
-    "amount": 3750.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "netAmount": {
-    "amount": 3750.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "fivePercentAllowanceUsed": {
-    "amount": 3750.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "cumulativeAllowanceRemaining": {
-    "amount": 15000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "taxYear": "2025/26",
-  "reason": "INCOME_REQUIREMENT"
-}
-```
-
-#### 11.7.3 Beneficiaries
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries`
-
-**Purpose:** Manage beneficiary designations for pensions and protection policies.
-
-**Operations:**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | List beneficiaries | `arrangements:read` |
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries` | Add beneficiary | `arrangements:write` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Get beneficiary details | `arrangements:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Update beneficiary | `arrangements:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries/{beneficiaryId}` | Delete beneficiary | `arrangements:write` |
-
-**Create Beneficiary Request:**
-
-```json
-{
-  "beneficiaryType": "PERSON",
-  "name": "Sarah Smith",
-  "relationship": "CHILD",
-  "dateOfBirth": "2005-08-15",
-  "percentage": 50.0,
-  "contingent": false,
-  "contactRef": {
-    "id": 789
-  },
-  "address": {
-    "line1": "123 High Street",
-    "city": "London",
-    "postcode": "SW1A 1AA"
-  },
-  "notes": "Primary beneficiary - daughter"
-}
-```
-
-**Response (201 Created):**
-
-```json
-{
-  "id": 2,
-  "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/beneficiaries/ben-002",
-  "arrangement": {
-    "id": 3,
-    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
-  },
-  "beneficiaryType": "PERSON",
-  "name": "Sarah Smith",
-  "relationship": "CHILD",
-  "dateOfBirth": "2005-08-15",
-  "age": 20,
-  "percentage": 50.0,
-  "contingent": false,
-  "contactRef": {
-    "id": 789,
-    "href": "/api/v2/factfinds/ff-456/clients/123/dependents/dependent-789"
-  },
-  "address": {
-    "line1": "123 High Street",
-    "city": "London",
-    "postcode": "SW1A 1AA"
-  },
-  "notes": "Primary beneficiary - daughter",
-  "createdAt": "2026-02-18T11:10:00Z",
-  "updatedAt": "2026-02-18T11:10:00Z",
-    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
-    "dependent": { "href": "/api/v2/factfinds/ff-456/clients/123/dependents/dependent-789" }
-  }
-}
-```
-
-**List Beneficiaries Response:**
-
-```json
-{
-  "arrangement": {
-    "id": 3,
-    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
-  },
-  "beneficiaries": [
-    {
-      "id": 2,
-      "name": "Sarah Smith",
-      "relationship": "CHILD",
-      "percentage": 50.0,
-      "contingent": false
-      }
-    },
-    {
-      "id": 3,
-      "name": "Michael Smith",
-      "relationship": "CHILD",
-      "percentage": 50.0,
-      "contingent": false
-      }
-    }
-  ],
-  "totalCount": 2,
-  "totalPercentage": 100.0,
-    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
-  }
-}
-```
-
-**Validation Rules:**
-- Total percentage for non-contingent beneficiaries must equal 100%
-- At least one beneficiary required for protection policies in trust
-- Beneficiary age restrictions apply for certain arrangements
-- Relationship to policyholder must be declared
-
-#### 11.7.4 Valuations
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations`
-
-**Purpose:** Track historical valuation of arrangements over time for performance analysis.
-
-**Operations:**
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | List valuations | `arrangements:read` |
-| POST | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations` | Add valuation | `arrangements:write` |
-| GET | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Get valuation details | `arrangements:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Update valuation | `arrangements:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/valuations/{valuationId}` | Delete valuation | `arrangements:write` |
-
-**Create Valuation Request:**
-
-```json
-{
-  "valuationDate": "2026-02-18",
-  "valuationType": "STATEMENT",
-  "value": {
-    "amount": 125000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "source": "PROVIDER",
-  "crystallisedValue": {
-    "amount": 0.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "uncrystallisedValue": {
-    "amount": 125000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "document": "statement-2026-02.pdf",
-  "notes": "Q4 2025/26 statement"
-}
-```
-
-**Response (201 Created):**
-
-```json
-{
-  "id": 1,
-  "href": "/api/v2/factfinds/ff-456/arrangements/arr-pp-003/valuations/val-001",
-  "arrangement": {
-    "id": 3,
-    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
-  },
-  "valuationDate": "2026-02-18",
-  "valuationType": "STATEMENT",
-  "value": {
-    "amount": 125000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "source": "PROVIDER",
-  "crystallisedValue": {
-    "amount": 0.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "uncrystallisedValue": {
-    "amount": 125000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "changeFromPrevious": {
-    "amount": 5000.00,
-    "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-  },
-  "percentageChange": 4.17,
-  "document": "statement-2026-02.pdf",
-  "notes": "Q4 2025/26 statement",
-  "createdAt": "2026-02-18T11:15:00Z",
-  "updatedAt": "2026-02-18T11:15:00Z",
-    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" },
-    "document": { "href": "/api/v2/factfinds/ff-456/documents/statement-2026-02.pdf" }
-  }
-}
-```
-
-**List Valuations Response:**
-
-```json
-{
-  "arrangement": {
-    "id": 3,
-    "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003"
-  },
-  "valuations": [
-    {
-      "id": 1,
-      "valuationDate": "2026-02-18",
+      "startsOn": "2024-01-01",
+      "stopsOn": null,
       "value": {
-        "amount": 125000.00,
+        "amount": 150.00,
         "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
       },
-      "valuationType": "STATEMENT",
-      "percentageChange": 4.17
-      }
-    },
-    {
-      "id": 2,
-      "valuationDate": "2025-11-18",
-      "value": {
-        "amount": 120000.00,
-        "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-      },
-      "valuationType": "STATEMENT",
-      "percentageChange": 3.45
+      "frequency": "Monthly",
+      "type": "Regular",
+      "contributorType": "Self",
+      "escalation": {
+        "type": "RPI",
+        "percentage": 0
       }
     }
   ],
-  "summary": {
-    "totalValuations": 8,
-    "latestValue": {
-      "amount": 125000.00,
+  "lifeCover": {
+    "term": "P25Y",
+    "sumAssured": {
+      "amount": 500000.00,
       "currency": {
         "code": "GBP",
         "display": "British Pound",
         "symbol": "£"
       }
     },
-    "earliestValue": {
-      "amount": 95000.00,
+    "premiumStructure": "Level",
+    "additionalCover": {
+      "amount": 0,
       "currency": {
         "code": "GBP",
         "display": "British Pound",
         "symbol": "£"
       }
     },
-    "totalGrowth": {
-      "amount": 30000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "totalGrowthPercentage": 31.58,
-    "annualizedReturn": 6.2
+    "paymentBasis": "FirstDeath",
+    "untilAge": 65
   },
-  "totalCount": 8,
-    "arrangement": { "href": "/api/v2/factfinds/ff-456/arrangements/pensions/personal-pension/arr-pp-003" }
-  }
+  "criticalIllnessCover": {
+    "premiumStructure": "Level",
+    "amount": {
+      "amount": 250000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "term": "P25Y",
+    "untilAge": 65
+  },
+  "benefitsPayable": {
+    "benefitFrequency": "Single",
+    "benefitPeriod": {
+      "value": "P12M",
+      "details": "12 months benefit period"
+    },
+    "benefitAmount": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "deferredPeriod": "P0D",
+    "qualificationPeriod": {
+      "isBackToDayOne": false,
+      "value": "P30D"
+    },
+    "splitBenefitFrequency": "None",
+    "splitBenefitValue": {
+      "amount": 0,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "splitDeferredPeriod": "P0D"
+  },
+  "indexType": "RPI",
+  "inTrust": true,
+  "inTrustToWhom": "Spouse and children",
+  "benefitOptions": ["Convertible"],
+  "isRated": false,
+  "isPremiumWaiverWoc": true,
+  "benefitSummary": "Level term life and critical illness cover with premium waiver",
+  "exclusionNotes": "",
+  "sumAssured": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "commissions": [
+    {
+      "frequency": "Monthly",
+      "type": "Indemnity",
+      "percentage": 2.5,
+      "amount": {
+        "amount": 3.75,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    }
+  ],
+  "protectionPayoutType": "Indemnity",
+  "concurrencyId": "f7a8b9c0-1234-5678-9abc-def012345678",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
 }
 ```
 
-**Query Parameters:**
-- `fromDate` - Filter valuations from this date
-- `toDate` - Filter valuations to this date
-- `valuationType` - Filter by type (STATEMENT, PROJECTION, ESTIMATE)
-- `sortBy` - Sort by date (asc/desc)
-
 ---
 
-## Regulatory Compliance
+### 13.7 Update Personal Protection
 
-### FCA Requirements
+**Endpoint:** `PATCH /api/v2/factfinds/{factfindId}/protections/{protectionId}`
 
-**COBS 9.2 - Suitability Assessment:**
-- All arrangements must be assessed for suitability
-- Client objectives, financial situation, and knowledge/experience must be considered
-- Suitability reports must reference specific arrangements
+**Request:**
 
-**COBS 13 - Periodic Reporting:**
-- Annual statements for investment-based products
-- Performance reporting against objectives
-- Cost and charges disclosure
-
-**COBS 19.1 - Pension Transfers:**
-- Transfer value analysis for defined benefit schemes
-- CETV must be clearly disclosed
-- Risk warnings mandatory for transfers exceeding £30,000
-
-**IDD Compliance:**
-- Insurance product governance
-- Target market assessment
-- Fair value assessment for protection products
-
-### Data Protection
-
-**GDPR Article 9 - Special Category Data:**
-- Health information for underwriting (protection policies)
-- Trade union membership (pension schemes)
-- Consent required for processing
-
-**Right to Erasure:**
-- Soft delete maintains audit trail
-- Regulatory retention periods respected (6 years minimum)
-
-### Anti-Money Laundering
-
-**MLR 2017:**
-- Source of wealth verification for large contributions
-- Enhanced due diligence for offshore arrangements
-- Politically Exposed Persons (PEP) screening
-
----
-
-## Error Responses
-
-**Standard Error Format (RFC 7807):**
+```http
+PATCH /api/v2/factfinds/679/protections/15001
+Authorization: Bearer {token}
+Content-Type: application/json
+If-Match: "f7a8b9c0-1234-5678-9abc-def012345678"
+```
 
 ```json
 {
-  "type": "https://api.factfind.com/errors/validation-error",
-  "title": "Validation Failed",
-  "status": 400,
-  "detail": "ISA allowance exceeded for tax year 2025/26",
-  "instance": "/api/v2/factfinds/ff-456/arrangements/investments/ISA/arr-isa-002",
-  "errors": [
+  "premiums": [
     {
-      "field": "isaAllowance.usedThisYear",
-      "message": "Contribution would exceed annual ISA allowance of £20,000",
-      "code": "ALLOWANCE_EXCEEDED",
-      "value": 21500.00,
-      "limit": 20000.00
+      "startsOn": "2024-01-01",
+      "stopsOn": null,
+      "value": {
+        "amount": 165.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": "Monthly",
+      "type": "Regular",
+      "contributorType": "Self",
+      "escalation": {
+        "type": "RPI",
+        "percentage": 0
+      }
     }
-  ]
+  ],
+  "benefitSummary": "Level term life and critical illness cover with premium waiver - premium increased following RPI adjustment"
 }
 ```
 
-**Common Error Codes:**
-- `ALLOWANCE_EXCEEDED` - Annual allowance limit breached
-- `INVALID_OWNER` - Owner does not exist in fact-find
-- `ARRANGEMENT_NOT_FOUND` - Arrangement ID not found
-- `DUPLICATE_POLICY` - Policy number already exists
-- `VALUATION_TOO_OLD` - Valuation date exceeds 12 months
-- `BENEFICIARY_PERCENTAGE_INVALID` - Beneficiary percentages do not sum to 100%
-- `TRANSFER_ADVICE_REQUIRED` - FCA advice mandatory (DB transfer > £30k)
-- `PROPERTY_NOT_FOUND` - Linked property asset not found (mortgages)
+**Response:** `200 OK`
+
+```json
+{
+  "id": 15001,
+  "href": "/api/v2/factfinds/679/protections/15001",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "sellingAdviser": {
+    "id": 123,
+    "href": "/api/v2/advisers/123",
+    "name": "Jane Financial Adviser"
+  },
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "name": "John Smith"
+    }
+  ],
+  "provider": {
+    "id": 456,
+    "href": "/api/v2/productproviders/456",
+    "name": "Legal & General"
+  },
+  "protectionCategory": "PersonalProtection",
+  "protectionType": {
+    "id": 123,
+    "href": "/api/v2/plantypes?filter=id eq 123",
+    "name": "Life and Critical Illness"
+  },
+  "lifeCycle": {
+    "id": 45,
+    "href": "/api/v2/lifecycles/45",
+    "name": "Accumulation"
+  },
+  "premiums": [
+    {
+      "startsOn": "2024-01-01",
+      "stopsOn": null,
+      "value": {
+        "amount": 165.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "frequency": "Monthly",
+      "type": "Regular",
+      "contributorType": "Self",
+      "escalation": {
+        "type": "RPI",
+        "percentage": 0
+      }
+    }
+  ],
+  "lifeCover": {
+    "term": "P25Y",
+    "sumAssured": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "premiumStructure": "Level",
+    "additionalCover": {
+      "amount": 0,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "paymentBasis": "FirstDeath",
+    "untilAge": 65
+  },
+  "criticalIllnessCover": {
+    "premiumStructure": "Level",
+    "amount": {
+      "amount": 250000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "term": "P25Y",
+    "untilAge": 65
+  },
+  "benefitsPayable": {
+    "benefitFrequency": "Single",
+    "benefitPeriod": {
+      "value": "P12M",
+      "details": "12 months benefit period"
+    },
+    "benefitAmount": {
+      "amount": 500000.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "deferredPeriod": "P0D",
+    "qualificationPeriod": {
+      "isBackToDayOne": false,
+      "value": "P30D"
+    },
+    "splitBenefitFrequency": "None",
+    "splitBenefitValue": {
+      "amount": 0,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "splitDeferredPeriod": "P0D"
+  },
+  "indexType": "RPI",
+  "inTrust": true,
+  "inTrustToWhom": "Spouse and children",
+  "benefitOptions": ["Convertible"],
+  "isRated": false,
+  "isPremiumWaiverWoc": true,
+  "benefitSummary": "Level term life and critical illness cover with premium waiver - premium increased following RPI adjustment",
+  "exclusionNotes": "",
+  "sumAssured": {
+    "amount": 500000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "commissions": [
+    {
+      "frequency": "Monthly",
+      "type": "Indemnity",
+      "percentage": 2.5,
+      "amount": {
+        "amount": 3.75,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      }
+    }
+  ],
+  "protectionPayoutType": "Indemnity",
+  "concurrencyId": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2025-01-10T14:25:00Z"
+}
+```
 
 ---
 
-## Total Endpoints Summary
+### 13.8 List Personal Protections
 
-**Investment Arrangements:** 35 endpoints (7 types × 5 operations)
-**Pension Arrangements:** 40 endpoints (8 types × 5 operations)
-**Mortgage Arrangements:** 5 endpoints
-**Protection Arrangements:** 10 endpoints (2 types × 5 operations)
-**Sub-Resources:** 20 endpoints (4 resources × 5 operations)
+**Endpoint:** `GET /api/v2/factfinds/{factfindId}/protections`
 
-**Total Arrangement Endpoints:** 110
+**Request:**
+
+```http
+GET /api/v2/factfinds/679/protections?page=1&pageSize=20
+Authorization: Bearer {token}
+```
+
+**Response:** `200 OK`
+
+```json
+{
+  "items": [
+    {
+      "id": 15001,
+      "href": "/api/v2/factfinds/679/protections/15001",
+      "factfind": {
+        "id": 679,
+        "href": "/api/v2/factfinds/679"
+      },
+      "owners": [
+        {
+          "id": 8496,
+          "href": "/api/v2/factfinds/679/clients/8496",
+          "name": "John Smith"
+        }
+      ],
+      "provider": {
+        "id": 456,
+        "href": "/api/v2/productproviders/456",
+        "name": "Legal & General"
+      },
+      "protectionCategory": "PersonalProtection",
+      "protectionType": {
+        "id": 123,
+        "href": "/api/v2/plantypes?filter=id eq 123",
+        "name": "Life and Critical Illness"
+      },
+      "sumAssured": {
+        "amount": 500000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "premiums": [
+        {
+          "value": {
+            "amount": 165.00,
+            "currency": {
+              "code": "GBP",
+              "display": "British Pound",
+              "symbol": "£"
+            }
+          },
+          "frequency": "Monthly"
+        }
+      ],
+      "inTrust": true
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "pageSize": 20
+}
+```
 
 ---
-## 13. Risk Profile API
 
-### 13.1 Overview
+### 13.9 Delete Personal Protection
+
+**Endpoint:** `DELETE /api/v2/factfinds/{factfindId}/protections/{protectionId}`
+
+**Request:**
+
+```http
+DELETE /api/v2/factfinds/679/protections/15001
+Authorization: Bearer {token}
+```
+
+**Response:** `204 No Content`
+
+**Note:** This operation performs a soft delete. The protection is marked as deleted but retained for audit purposes.
+
+---
+
+## 14. Risk Profile API
+
+### 14.1 Overview
 
 **Purpose:** Capture and manage client Attitude to Risk (ATR) assessment as an embedded part of the FactFind.
 
@@ -15974,7 +15709,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 - Consumer Duty (Understanding Customer Risk Tolerance)
 - GDPR Article 30 (Records of Processing - Audit Trail)
 
-### 13.2 Operations Summary
+### 14.2 Operations Summary
 
 **ATR Assessment Endpoints:**
 
@@ -15996,7 +15731,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 **Total Endpoints:** 8 (6 main operations + 2 reference data)
 
-### 13.3 Key Endpoints
+### 14.3 Key Endpoints
 
 #### 12.3.1 Get Current ATR Assessment
 
@@ -16891,7 +16626,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-### 13.4 ATR Templates Reference Data
+### 14.4 ATR Templates Reference Data
 
 **Purpose:** ATR questionnaire templates are system configuration and reference data. They are not managed via the main API but can be queried to see available templates.
 
@@ -17070,7 +16805,7 @@ The ATR Assessment is a critical component of the FactFind that captures:
 
 ---
 
-### 13.5 Risk Assessment History API
+### 14.5 Risk Assessment History API
 
 **Purpose:** Historical tracking and comparison of ATR assessments over time (Risk Replay).
 
@@ -17151,7 +16886,7 @@ See Section 12.3.4 for the main history endpoint.
 
 ---
 
-### 13.6 Integration with FactFind Workflow
+### 14.6 Integration with FactFind Workflow
 
 **ATR Assessment Lifecycle:**
 
@@ -17184,9 +16919,9 @@ See Section 12.3.4 for the main history endpoint.
 7. **Declarations Mandatory** - Both client and adviser declarations required before assessment is complete
 
 ---
-## 14. Reference Data API
+## 15. Reference Data API
 
-### 14.1 Performance Considerations
+### 15.1 Performance Considerations
 
 **Query Optimization:**
 - Index all foreign keys for fast joins
@@ -17206,7 +16941,7 @@ See Section 12.3.4 for the main history endpoint.
 - Default page size: 20
 - Maximum page size: 100
 
-### 14.2 Caching Strategy
+### 15.2 Caching Strategy
 
 **HTTP Caching:**
 - ETags for all GET requests on single resources
@@ -17226,7 +16961,7 @@ See Section 12.3.4 for the main history endpoint.
 - Publish cache invalidation events
 - Subscribers update local caches
 
-### 14.3 Rate Limiting
+### 15.3 Rate Limiting
 
 **Per-User Limits:**
 - 1,000 requests per hour per user
@@ -17258,7 +16993,7 @@ Retry-After: 3600
 }
 ```
 
-### 14.4 API Versioning
+### 15.4 API Versioning
 
 **Version Lifecycle:**
 1. **Development** - Not publicly available
@@ -17281,7 +17016,7 @@ Sunset: Sun, 01 Jul 2028 00:00:00 GMT
 Link: <https://docs.factfind.com/migration/v1-to-v2>; rel="deprecation"
 ```
 
-### 14.5 Security Best Practices
+### 15.5 Security Best Practices
 
 **Input Validation:**
 - Validate all inputs against schema
@@ -17309,7 +17044,7 @@ Link: <https://docs.factfind.com/migration/v1-to-v2>; rel="deprecation"
 ---
 
 
-## 15. Entity Contracts
+## 16. Entity Contracts
 
 This section defines the unified entity contracts used throughout the FactFind API. Following the **Single Contract Principle** (Section 1.7), each entity has one canonical contract used for both requests (POST, PUT, PATCH) and responses (GET).
 
@@ -17320,7 +17055,7 @@ Each field is annotated with its behavioral characteristics:
 - **write-once** - Can only be set on create, immutable thereafter
 - **updatable** - Can be modified via PUT/PATCH operations
 
-### 15.1 Client Contract
+### 16.1 Client Contract
 
 The `Client` contract represents a client entity (Person, Corporate, or Trust) with all demographic, regulatory, and preference information using a **composition pattern** with conditional types.
 
@@ -20022,7 +19757,7 @@ Content-Type: application/json
 
 ---
 
-### 15.2 FactFind Contract
+### 16.2 FactFind Contract
 
 
 **IMPORTANT NOTE:**
@@ -20815,7 +20550,7 @@ The `CompletionStatusValue` tracks the completion status of the fact find and as
 
 ---
 
-### 15.3 Address Contract
+### 16.3 Address Contract
 
 The `Address` contract represents a client's address with additional metadata for residency tracking. When an address needs independent lifecycle management (e.g., address history), it becomes a reference type with identity.
 
@@ -20874,7 +20609,7 @@ The `Address` contract represents a client's address with additional metadata fo
 
 ---
 
-### 15.4 Income Contract
+### 16.4 Income Contract
 
 The `Income` contract represents an income source within a FactFind.
 
@@ -21249,7 +20984,7 @@ Income types that typically do NOT have asset references:
 
 ---
 
-### 15.5 Arrangement Contract
+### 16.5 Arrangement Contract
 
 The `Arrangement` contract represents financial products (pensions, investments, protection, mortgages). This is a polymorphic contract with type-specific fields.
 
@@ -21355,7 +21090,7 @@ The `Arrangement` contract represents financial products (pensions, investments,
 
 ---
 
-### 15.6 Goal Contract
+### 16.6 Goal Contract
 
 The `Goal` contract represents a client's financial goal.
 
@@ -21442,7 +21177,7 @@ The `Goal` contract represents a client's financial goal.
 
 ---
 
-### 15.7 RiskProfile Contract
+### 16.7 RiskProfile Contract
 
 The `RiskProfile` contract represents a client's risk assessment and attitude to risk.
 
@@ -21518,7 +21253,7 @@ The `RiskProfile` contract represents a client's risk assessment and attitude to
 
 ---
 
-### 15.8 Investment Contract
+### 16.8 Investment Contract
 
 The `Investment` contract extends the Arrangement contract with investment-specific fields for ISAs, GIAs, Bonds, and Investment Trusts.
 
@@ -22311,7 +22046,7 @@ Only specified fields are updated. Returns complete contract with new holding ad
 
 ---
 
-### 15.9 Property Contract
+### 16.9 Property Contract
 
 The `Property` contract represents a property asset with valuation tracking, mortgage linking, and rental income management.
 
@@ -23112,7 +22847,7 @@ Only specified fields are updated. Server recalculates rental yield and net inco
 
 ---
 
-### 15.10 Equity Contract
+### 16.10 Equity Contract
 
 The `Equity` contract represents a direct stock holding with performance tracking and dividend history.
 
@@ -24002,7 +23737,7 @@ Only specified fields are updated. Server recalculates total dividends and yield
 
 ---
 
-### 15.11 IdentityVerification Contract
+### 16.11 IdentityVerification Contract
 
 The `IdentityVerification` contract represents identity verification status with KYC and AML checks.
 
@@ -24428,7 +24163,7 @@ Only specified fields are updated. Returns complete contract.
 
 ---
 
-### 15.12 Collection Response Wrapper
+### 16.12 Collection Response Wrapper
 
 All list/collection endpoints use a standard wrapper contract:
 
@@ -24459,7 +24194,7 @@ The `data` array contains complete entity contracts. Clients can use field selec
 
 ---
 
-### 15.13 Contract Extension for Other Entities
+### 16.13 Contract Extension for Other Entities
 
 All other entities in the FactFind system follow the same Single Contract Principle:
 
@@ -24476,7 +24211,7 @@ All other entities in the FactFind system follow the same Single Contract Princi
 
 ---
 
-## 16. Appendix A: Entity-to-Endpoint Mapping
+## 17. Appendix A: Entity-to-Endpoint Mapping
 
 This appendix provides the complete mapping between domain entities and their corresponding API endpoints under the context-based FactFind API Design.
   "consentWithdrawnDate": null,
