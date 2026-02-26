@@ -30,11 +30,10 @@ This directory contains comprehensive API design documents for each entity, incl
 21. [Mortgage API Design](./Mortgage-API-Design.md)
 22. [Net-Worth API Design](./Net-Worth-API-Design.md)
 23. [Note API Design](./Note-API-Design.md)
-24. [Pension API Design](./Pension-API-Design.md)
-25. [Protection API Design](./Protection-API-Design.md)
-26. [Reference-Data API Design](./Reference-Data-API-Design.md)
-27. [Relationship API Design](./Relationship-API-Design.md)
-28. [Vulnerability API Design](./Vulnerability-API-Design.md)
+24. [PersonalProtection API Design](./PersonalProtection-API-Design.md)
+25. [Reference-Data API Design](./Reference-Data-API-Design.md)
+26. [Relationship API Design](./Relationship-API-Design.md)
+27. [Vulnerability API Design](./Vulnerability-API-Design.md)
 
 ## Document Structure
 

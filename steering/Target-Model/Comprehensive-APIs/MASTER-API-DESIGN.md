@@ -1002,22 +1002,18 @@ This section provides navigation to all entity-specific API design documents, or
 **Entity APIs:**
 
 1. **[Investment API Design](./Investment-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/arrangements/investments`
-   - Investment arrangements (GIA, ISA, bonds, cash)
+   - Base Path: `/api/v2/factfinds/{factfindId}/investments`
+   - Investment products (GIA, ISA, bonds, cash)
 
-2. **[Pension API Design](./Pension-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/arrangements/pensions`
-   - Pension arrangements (personal, SIPP, final salary)
+2. **[Mortgage API Design](./Mortgage-API-Design.md)**
+   - Base Path: `/api/v2/factfinds/{factfindId}/mortgages`
+   - Mortgage products and lending
 
-3. **[Mortgage API Design](./Mortgage-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/arrangements/mortgages`
-   - Mortgage arrangements and lending products
+3. **[PersonalProtection API Design](./PersonalProtection-API-Design.md)**
+   - Base Path: `/api/v2/factfinds/{factfindId}/protections`
+   - Personal protection policies (life, CI, IP, expense, severity)
 
-4. **[Protection API Design](./Protection-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/arrangements/protection`
-   - Protection policies (life, CI, IP)
-
-5. **[Contribution API Design](./Contribution-API-Design.md)**
+4. **[Contribution API Design](./Contribution-API-Design.md)**
    - Base Path: `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions`
    - Contribution records for arrangements
 
