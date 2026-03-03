@@ -74,24 +74,18 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `additionalNotes` | string |  |  |
-| `adviser` | Reference Link |  | The adviser responsible for this client |
-| `assetHoldings` | Complex Data |  |  |
-| `atrAssessment` | Complex Data |  |  |
-| `client` | Reference Link |  |  |
-| `completionStatus` | Complex Data |  | Current status of the goal |
-| `createdAt` | date |  | When this record was created in the system |
-| `customQuestions` | List of Complex Data |  |  |
-| `factFindNumber` | string |  |  |
-| `financialSummary` | Complex Data |  |  |
 | `id` | integer | ✓ | Unique system identifier for this record |
-| `investmentCapacity` | Complex Data |  | City/town |
-| `jointClientRef` | Reference Link |  |  |
-| `meetingDetails` | Complex Data |  |  |
-| `notes` | string |  |  |
-| `updatedAt` | date |  | When this record was last modified |
+| `href` | string | ✓ | API link to this resource |
+| `meeting` | Complex Data |  | Meeting information including date, type, and attendees |
+| `products` | Complex Data |  | Products and services discussed during fact find (investments, pensions, mortgages, protections) |
+| `disclosureKeyfacts` | List of Complex Data |  | Disclosure documents issued to clients |
+| `employmentSummary` | List of Complex Data |  | Summary of client employment and income information |
+| `supplementaryQuestions` | List of Complex Data |  | Additional questions organized by category |
+| `assetsAndLiabilities` | Complex Data |  | Client asset and liability disclosures |
+| `creditHistory` | Complex Data |  | Client credit history information |
+| `estatePlanning` | Complex Data |  | Estate planning details including will, assets, and gifts |
 
-*Total: 16 properties*
+*Total: 10 properties*
 
 
 ### Related Resources

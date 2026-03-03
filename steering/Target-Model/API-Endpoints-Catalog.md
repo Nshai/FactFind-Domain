@@ -430,6 +430,16 @@
 | PATCH | `/api/v2/factfinds/{id}/pensions/personalpension/{pensionId}` | Update pension | ⭐ Partial updates |
 | DELETE | `/api/v2/factfinds/{id}/pensions/personalpension/{pensionId}` | Delete pension | ⭐ Soft delete |
 
+### Core State Pension Operations
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/pensions/statepension` | List all state pension records | ⭐ State pension entitlements |
+| POST | `/api/v2/factfinds/{id}/pensions/statepension` | Create state pension record | ⭐ Basic, additional, pension credit |
+| GET | `/api/v2/factfinds/{id}/pensions/statepension/{pensionId}` | Get state pension details | ⭐ Full state pension record |
+| PATCH | `/api/v2/factfinds/{id}/pensions/statepension/{pensionId}` | Update state pension | ⭐ Partial updates |
+| DELETE | `/api/v2/factfinds/{id}/pensions/statepension/{pensionId}` | Delete state pension | ⭐ Soft delete |
+
 **Pension Categories:**
 - **PensionContributionDrawdown** - Personal pensions with contribution and drawdown features
 
@@ -520,7 +530,7 @@
 - Benefit options (convertible, reviewable)
 - Waiting periods and exclusions
 
-**Total Endpoints:** 30 (5 investments + 5 final salary + 5 annuities + 5 personal pensions + 5 mortgages + 5 protections)
+**Total Endpoints:** 35 (5 investments + 5 final salary + 5 annuities + 5 personal pensions + 5 state pensions + 5 mortgages + 5 protections)
 
 ---
 
@@ -671,15 +681,15 @@
 | **2. Client Onboarding & KYC** | 105 | 94 ⭐ |
 | **3. Circumstances** | 26 | 26 ⭐ |
 | **4. Assets & Liabilities** | 23 | 23 ⭐ |
-| **5. Plans & Investments** | 30 | 30 ⭐ |
+| **5. Plans & Investments** | 35 | 35 ⭐ |
 | **6. Goals** | 31 | 31 ⭐ |
 | **7. ATR** | 8 | 8 ⭐ |
 | **8. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **258** | **230** |
+| **TOTAL** | **263** | **235** |
 
 **Notes:**
 - Arrangements context has been removed - all products now managed under specific contexts (Mortgages and Personal Protection under Plans & Investments)
-- Plans & Investments includes: 5 Investments + 5 Final Salary Pensions + 5 Annuities + 5 Personal Pensions + 5 Mortgages + 5 Personal Protections
+- Plans & Investments includes: 5 Investments + 5 Final Salary Pensions + 5 Annuities + 5 Personal Pensions + 5 State Pensions + 5 Mortgages + 5 Personal Protections
 
 
 ### Net Worth
@@ -699,12 +709,12 @@ Calculate and track client net worth.
 
 | Method | Count | Percentage |
 |--------|-------|------------|
-| GET | 150 | 48% |
-| POST | 72 | 23% |
-| PATCH | 75 | 24% |
+| GET | 152 | 48% |
+| POST | 73 | 23% |
+| PATCH | 76 | 24% |
 | PUT | 5 | 2% |
-| DELETE | 9 | 3% |
-| **TOTAL** | **311** | **100%** |
+| DELETE | 10 | 3% |
+| **TOTAL** | **316** | **100%** |
 
 ### Hierarchical Depth Analysis
 
@@ -810,5 +820,5 @@ Calculate and track client net worth.
 **Document End**
 
 **Version:** 3.0
-**Last Updated:** 2026-02-23
-**Total Endpoints:** 353
+**Last Updated:** 2026-03-03
+**Total Endpoints:** 358

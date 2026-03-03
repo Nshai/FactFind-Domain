@@ -68,6 +68,7 @@ Each contract section includes:
 - [13.42 Estate Planning - Trust Contract](#1342-estate-planning---trust-contract)
 - [13.43 Identity Verification Contract](#1343-identity-verification-contract)
 - [13.57 PersonalProtection Contract](#1357-personalprotection-contract)
+- [13.58 StatePension Contract](#1358-statepension-contract)
 
 ### Appendices
 - [Appendix A: Common Value Types](#appendix-a-common-value-types)
@@ -291,205 +292,207 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| additionalNotes | Text |  | None |
-| adviser | Reference Link | The adviser responsible for this client | Complex object |
-| assetHoldings | Complex Data |  | Complex object |
-| atrAssessment | Complex Data |  | Complex object |
-| client | Reference Link |  | Complex object |
-| completionStatus | Complex Data | Current status of the goal | Complex object |
-| createdAt | Date | When this record was created in the system | 2026-02-16T14:30:00Z |
-| customQuestions | List of Complex Data |  | List with 1 item(s) |
-| factFindNumber | Text |  | FF001234 |
-| financialSummary | Complex Data |  | Complex object |
-| id | Number | Unique system identifier for this record | 2405 |
-| investmentCapacity | Complex Data | City/town | Complex object |
-| jointClientRef | Reference Link |  | Complex object |
-| meetingDetails | Complex Data |  | Complex object |
-| notes | Text |  | Clients seeking to consolidate pensions and review... |
-| updatedAt | Date | When this record was last modified | 2026-02-16T15:45:00Z |
+| id | Number | Unique system identifier for this record | 679 |
+| href | Text | API link to this resource | /api/v2/factfinds/679 |
+| meeting | Complex Data | Meeting information including date, type, and attendees | Complex object |
+| products | Complex Data | Products and services discussed during fact find | Complex object |
+| disclosureKeyfacts | List of Complex Data | Disclosure documents issued | List with 1 item(s) |
+| employmentSummary | List of Complex Data | Summary of client employment and income | List with 1 item(s) |
+| supplementaryQuestions | List of Complex Data | Additional questions by category | List with 1 item(s) |
+| assetsAndLiabilities | Complex Data | Client asset and liability disclosures | Complex object |
+| creditHistory | Complex Data | Credit history information | Complex object |
+| estatePlanning | Complex Data | Estate planning details including will and gifts | Complex object |
 
 #### Nested Field Groups
 
-**adviser:**
+**meeting:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| code | Text | Standard Occupational Classification (SOC) code | ADV001 |
-| id | Number | Unique system identifier for this record | 8724 |
-| name | Text | First name (given name) | Jane Doe |
+| meetingOn | Date | Date when the meeting took place | 2026-02-16 |
+| meetingType | Selection | Type of meeting | FaceToFace |
+| clientsPresent | List of Reference Links | Clients who attended the meeting | List with 1 item(s) |
+| anyOtherAudience | Yes/No | Whether others were present | true |
+| notes | Text | Meeting notes | None |
 
-**assetHoldings:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| borrowing | Complex Data |  | Complex object |
-| hasEquityRelease | Yes/No |  | No |
-| hasMortgage | Yes/No | Current age (calculated from date of birth) | Yes |
-| hasOtherLiabilities | Yes/No |  | Yes |
-| credit | Complex Data |  | Complex object |
-| hasAdverseCredit | Yes/No |  | No |
-| hasBeenRefusedCredit | Yes/No |  | No |
-| employment | Complex Data | Current employment status | Complex object |
-| hasEmployments | Yes/No |  | Yes |
-| investments | Complex Data |  | Complex object |
-| hasInvestments | Yes/No |  | Yes |
-| hasSavings | Yes/No |  | Yes |
-| other | Complex Data |  | Complex object |
-| hasOtherAssets | Yes/No |  | Yes |
-| pensions | Complex Data |  | Complex object |
-| hasAnnuity | Yes/No |  | No |
-| hasDefinedBenefitPension | Yes/No |  | No |
-| hasMoneyPurchasePension | Yes/No |  | Yes |
-| hasPersonalPension | Yes/No |  | Yes |
-| protection | Complex Data | GDPR consent, data protection, and privacy management | Complex object |
-| hasProtection | Yes/No |  | Yes |
-
-**atrAssessment:**
+**meeting.clientsPresent[]:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| assessmentDate | Date |  | 2026-02-16T10:30:00Z |
-| capacityForLoss | Complex Data | City/town | Complex object |
-| assessmentNotes | Text |  | Client has adequate emergency fund and stable inco... |
-| canAffordLosses | Yes/No |  | Yes |
-| emergencyFundMonths | Number |  | 6 |
-| completedAt | Date |  | 2026-02-16T11:10:00Z |
-| declarations | Complex Data |  | Complex object |
-| adviserDeclaration | Complex Data |  | Complex object |
-| adviser | Complex Data | The adviser responsible for this client | Complex object |
-| agreed | Yes/No |  | Yes |
-| agreedAt | Date |  | 2026-02-16T11:00:00Z |
-| clientDeclaration | Complex Data |  | Complex object |
-| agreed | Yes/No |  | Yes |
-| agreedAt | Date |  | 2026-02-16T10:50:00Z |
-| nextReviewDate | Date |  | 2027-02-16 |
-| questions | List of Complex Data |  | List with 1 item(s) |
-| riskProfiles | Complex Data |  | Complex object |
-| chosen | Complex Data |  | Complex object |
-| chosenAt | Date |  | 2026-02-16T10:45:00Z |
-| chosenBy | Text |  | Client |
-| riskRating | Text |  | Balanced |
-| riskScore | Number |  | 45 |
-| generated | List of Complex Data |  | List with 3 item(s) |
-| supplementaryQuestions | List |  | Empty list |
-| templateRef | Complex Data |  | Complex object |
-| id | Number | Unique system identifier for this record | 483 |
-| name | Text | First name (given name) | FCA Standard ATR 2025 |
-| version | Text |  | 5.0 |
+| id | Number | Client identifier | 123 |
+| href | Text | Link to client resource | v2/factfinds/679/clients/123 |
+| name | Text | Client name | Jack Marias |
 
-**client:**
+**products:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientNumber | Text | Client reference number assigned by your organization | C00001234 |
-| id | Number | Unique system identifier for this record | 8496 |
-| name | Text | First name (given name) | John Smith |
-| type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
+| investments | Complex Data | Investment products information | Complex object |
+| pensions | Complex Data | Pension products information | Complex object |
+| mortgages | Complex Data | Mortgage products information | Complex object |
+| protections | Complex Data | Protection products information | Complex object |
 
-**completionStatus:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| completionDate | Text |  | None |
-| compliance | Complex Data |  | Complex object |
-| allChecksComplete | Yes/No |  | Yes |
-| amlCheckedDate | Date |  | 2026-02-16 |
-| idCheckedDate | Date | Unique system identifier for this record | 2026-02-16 |
-| declarationSignedDate | Text |  | None |
-| isComplete | Yes/No |  | No |
-| status | Text | Current status of the goal | INPROG |
-
-**financialSummary:**
+**products.investments:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| calculatedAt | Date | When these figures were calculated | 2026-02-16T15:45:00Z |
-| expenditure | Complex Data | Type of expenditure (Essential, Discretionary, etc.) | Complex object |
-| monthlyDisposable | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 3000.0 |
-| currency | Selection |  | Complex object |
-| monthlyTotal | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 4500.0 |
-| currency | Selection |  | Complex object |
-| income | Complex Data | Total gross annual income before tax | Complex object |
-| annualGross | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 120000.0 |
-| currency | Selection |  | Complex object |
-| monthlyNet | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 7500.0 |
-| currency | Selection |  | Complex object |
-| netRelevantEarnings | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 110000.0 |
-| currency | Selection |  | Complex object |
-| liquidity | Complex Data | Unique system identifier for this record | Complex object |
-| availableForAdvice | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 70000.0 |
-| currency | Selection |  | Complex object |
-| totalFundsAvailable | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 85000.0 |
-| currency | Selection |  | Complex object |
-| sourceOfFunds | Text |  | Savings from employment income over past 5 years |
-| taxation | Complex Data |  | Complex object |
-| highestRate | Selection |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | HIGHER |
-| display | Text |  | Higher Rate (40%) |
-| rate | Number | Company information (only for corporate clients) | 0.4 |
+| hasCash | Yes/No | Whether client has cash savings | true |
+| hasInvestments | Yes/No | Whether client has investments | true |
 
-**investmentCapacity:**
+**products.pensions:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| assessmentDate | Date |  | 2026-02-16 |
-| emergencyFund | Complex Data |  | Complex object |
-| committed | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 15000.0 |
-| currency | Selection |  | Complex object |
-| required | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 11400.0 |
-| currency | Selection |  | Complex object |
-| shortfall | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 0.0 |
-| currency | Selection |  | Complex object |
-| status | Text | Current status of the goal | Adequate |
-| futureChanges | Complex Data |  | Complex object |
-| details | Text |  | None |
-| expenditureChangesExpected | Yes/No |  | No |
-| incomeChangesExpected | Yes/No |  | No |
-| lumpSumInvestment | Complex Data |  | Complex object |
-| agreedAmount | Currency Amount | Amount spent | Complex object |
-| amount | Number | Amount spent | 50000.0 |
-| currency | Selection |  | Complex object |
-| sourceOfFunds | Text |  | Savings from employment |
-| regularContributions | Complex Data | Regular contributions being made | Complex object |
-| agreedMonthlyBudget | Currency Amount |  | Complex object |
-| amount | Number | Amount spent | 1000.0 |
-| currency | Selection |  | Complex object |
-| sustainabilityRating | Text |  | High |
+| hasEmployerPensionSchemes | Yes/No | Has employer pension schemes | true |
+| hasFinalSalary | Yes/No | Has final salary pensions | true |
+| hasMoneyPurchases | Yes/No | Has money purchase pensions | true |
+| hasPersonalPensions | Yes/No | Has personal pensions | true |
+| hasAnnuities | Yes/No | Has annuities | true |
+| existingEmployerPensionSchemes | List of Complex Data | Details of employer pension schemes | List with 1 item(s) |
 
-**jointClientRef:**
+**products.pensions.existingEmployerPensionSchemes[]:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientNumber | Text | Client reference number assigned by your organization | C00001235 |
-| id | Number | Unique system identifier for this record | 912 |
-| name | Text | First name (given name) | Sarah Smith |
-| type | Text | Type of client: Person (individual), Corporate (company), or Trust | Person |
+| owner | Reference Link | Client who owns this pension | Complex object |
+| isCurrentMember | Yes/No | Whether currently a member | true |
+| isProbablemember | Yes/No | Whether there are membership issues | true |
+| schemeJoinedOn | Date | Date joined the scheme | None |
+| details | Text | Additional scheme details | None |
 
-**meetingDetails:**
+**products.mortgages:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| clientsPresent | Text |  | BothClients |
-| meetingDate | Date |  | 2026-02-16 |
-| meetingType | Text |  | INIT |
-| othersPresent | Yes/No |  | No |
-| othersPresentDetails | Text |  | None |
-| scopeOfAdvice | Complex Data |  | Complex object |
-| estatePlanning | Yes/No | Will, power of attorney, gifts, trusts, and inheritance tax planning | No |
-| mortgage | Yes/No | Current age (calculated from date of birth) | No |
-| protection | Yes/No | GDPR consent, data protection, and privacy management | Yes |
-| retirementPlanning | Yes/No |  | Yes |
-| savingsAndInvestments | Yes/No |  | Yes |
+| hasMortgages | Yes/No | Whether client has mortgages | true |
+| hasEquityRelease | Yes/No | Whether client has equity release | true |
+
+**products.protections:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasProtection | Yes/No | Whether client has protection products | true |
+| lifeAndCriticalIllness | Complex Data | Life and critical illness cover details | Complex object |
+| incomeProtection | Complex Data | Income protection details | Complex object |
+| buildingsAndContent | Complex Data | Buildings and contents insurance | Complex object |
+
+**products.protections.lifeAndCriticalIllness:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasCoverForMortgageOrDebt | Selection | Cover for mortgage or debt (Yes/No/NotApplicable) | Yes |
+| hasCoverforDependantsDueToCritcalIllness | Selection | Cover for dependants due to critical illness | Yes |
+| hasCoverforDependantsUponDeath | Selection | Cover for dependants upon death | Yes |
+| haveReviewedCostofProtectionChange | Selection | Whether cost of protection change reviewed | Yes |
+| impactOnYou | Text | Impact on you if no cover | None |
+| impactOnDepandants | Text | Impact on dependants if no cover | None |
+| actionsToAddressImpacts | Text | Actions to address impacts | None |
+| reasonforNotReviewing | Text | Reason for not reviewing | None |
+
+**products.protections.incomeProtection:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasCoverDueToAccidentOrIllness | Yes/No | Cover for accident or illness | true |
+| hasCoverDueToUnemployment | Yes/No | Cover for unemployment | true |
+| impactOnYou | Text | Impact on you if no cover | None |
+| impactOnDepandants | Text | Impact on dependants if no cover | None |
+| actionsToAddressImpacts | Text | Actions to address impacts | None |
+| reasonforNotReviewing | Text | Reason for not reviewing | None |
+
+**products.protections.buildingsAndContent:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| haveExistingBuildingInsurance | Yes/No | Has building insurance | true |
+| haveExistingContentInsurance | Yes/No | Has contents insurance | true |
+| buyToLetProperties | Complex Data | Buy-to-let property insurance | Complex object |
+| haveSufficientCover | Yes/No | Whether cover is sufficient | true |
+| actionsToAddressImpacts | Text | Actions to address gaps | None |
+| whenDoyouWantToReviewProtection | Text | When to review protection | None |
+| reasonforNotReviewing | Text | Reason for not reviewing | None |
+
+**disclosureKeyfacts[]:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| Type | Selection | Type of disclosure document | CombinedDisclosureDocuments |
+| IssuedOn | Date | Date document was issued | None |
+
+**employmentSummary[]:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| client | Reference Link | Client this employment relates to | Complex object |
+| totalGrossAnnualIncome | Currency Amount | Total gross annual income (read-only calculated) | Complex object |
+| highestTaxRatepaid | Complex Data | Highest tax rate paid | Complex object |
+
+**employmentSummary[].highestTaxRatepaid:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| percentage | Number | Tax rate percentage (0,10,19,20,21,22,40,41,42,45,46,47,48) | 45 |
+
+**supplementaryQuestions[]:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| doBothClientsAgreeToAnswers | Yes/No | Whether both clients agree to answers | true |
+| type | Selection | Question category (Profile/Investments/pensions/protection/mortgage/EstatePlanning) | None |
+
+**assetsAndLiabilities:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| clientDisclosures | Complex Data | Client asset and liability disclosures | Complex object |
+
+**assetsAndLiabilities.clientDisclosures:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasAssets | Yes/No | Whether client has assets | true |
+| hasLiabilities | Yes/No | Whether client has liabilities | true |
+| reductionOfLiabilities | Complex Data | Liability reduction plans | Complex object |
+
+**assetsAndLiabilities.clientDisclosures.reductionOfLiabilities:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| isExpected | Yes/No | Whether reduction is expected | true |
+| nonReductionReason | Selection | Reason for not reducing (RetainControlOfCapital/PensionPlanning/Other) | RetainControlOfCapital |
+| details | Text | Additional details | None |
+
+**creditHistory:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasAdverseHistory | Yes/No | Whether client has adverse credit history | true |
+| refusedMortgageOrCredit | Yes/No | Whether refused mortgage or credit | true |
+| details | Text | Credit history details | None |
+
+**estatePlanning:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| will | Complex Data | Will information | Complex object |
+| totalAssets | Currency Amount | Total assets (read-only calculated) | Complex object |
+| jointTotalAssets | Currency Amount | Joint total assets (read-only calculated) | Complex object |
+| giftsDetails | Complex Data | Gift details | Complex object |
+
+**estatePlanning.will:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| details | Text | Will details | None |
+
+**estatePlanning.giftsDetails:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| inLast7Years | Text | Gifts made in last 7 years | None |
+| usedAnnualExeptionInCurrentOrPreviousTaxYears | Text | Annual exemption usage | None |
+| regularGiftsOutOfIncome | Text | Regular gifts from income | None |
+| expectingInheritanceOrGifts | Text | Expected inheritance or gifts | None |
 
 ---
 
@@ -497,20 +500,22 @@ Represents a complete fact finding exercise for one or more clients. Acts as the
 
 This contract connects to:
 
-- Contains one or more Clients
-- Contains multiple Goals/Objectives
-- Contains multiple financial products (Investments, Pensions, Mortgages, Protections)
-- Contains multiple Assets and Liabilities
-- Contains multiple Documents
-- Assigned to an Adviser
-- May be assigned to a Paraplanner
+- Links to one or more Clients via `meeting.clientsPresent`
+- References Clients in `employmentSummary`
+- Contains product information (Investments, Pensions, Mortgages, Protections)
+- Contains disclosure and keyfacts documents
+- Contains supplementary questions by category
+- Contains assets, liabilities, credit history, and estate planning information
 
 ### Business Validation Rules
 
-- Must have at least one client
-- Joint fact finds must have exactly two clients
-- FactFind number must be unique
-- Status must progress in valid sequence
+- Must have at least one client present in the meeting
+- `meetingType` must be one of: Electronic, ElectronicRecorded, Videocall, VideocallRecorded, FaceToFace, FaceToFaceRecorded, Telephone, TelephoneRecorded
+- `disclosureKeyfacts[].Type` must be one of: CombinedDisclosureDocuments, CombinedInitialDisclosureDocument, DisclosureDocument, KeyfactsAboutCostOfServices, KeyfactsAboutServices, ServiceCostDisclosureDocument, TermsRefundOfFees, TermsOfBusiness
+- `employmentSummary[].highestTaxRatepaid.percentage` must be one of: 0, 10, 19, 20, 21, 22, 40, 41, 42, 45, 46, 47, 48
+- `assetsAndLiabilities.clientDisclosures.reductionOfLiabilities.nonReductionReason` must be one of: RetainControlOfCapital, PensionPlanning, Other
+- `supplementaryQuestions[].type` must be one of: Profile, Investments, pensions, protection, mortgage, EstatePlanning
+- `totalGrossAnnualIncome`, `totalAssets`, and `jointTotalAssets` are read-only calculated fields
 
 ---
 
@@ -6586,6 +6591,302 @@ These are predefined selection lists used throughout the system.
 - **Half-Yearly**: Half-yearly (every 6 months)
 - **Annual**: Annual (yearly)
 - **One-off**: One-off (single payment)
+
+
+## 13.58 StatePension Contract
+
+### Business Purpose
+
+Represents State Pension entitlements including basic State Pension, additional State Pension (SERPS/S2P), new State Pension, Pension Credit, spouse pension inheritance, and BR19 projection data for retirement planning. This contract consolidates all State Pension information for comprehensive retirement income forecasting.
+
+### Key Features
+
+- **Dual System Support**: Handles both old State Pension (pre-2016) and new State Pension (post-2016) systems
+- **Component Breakdown**: Separate tracking of basic amount, additional pension, and means-tested benefits
+- **Pension Credit Integration**: Records Pension Credit (Guarantee and Savings Credit) entitlements
+- **Spouse Inheritance**: Tracks inherited State Pension rights from deceased spouse
+- **BR19 Integration**: Stores BR19 State Pension forecast reference and projection data
+- **Retirement Age Tracking**: Records individual's State Pension age based on birth date
+- **Single Owner**: State Pension is an individual entitlement (cannot be jointly owned)
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique system identifier | 1234 |
+| href | Text | Resource URI | /api/v2/factfinds/679/pensions/statepension/1234 |
+| factfind | Reference Link | Link to parent FactFind | { id: 679, href: "/api/v2/factfinds/679" } |
+| owner | Reference Link | Client who owns this state pension entitlement | { id: 8496, href: "/api/v2/factfinds/679/clients/8496", name: "Sarah Johnson" } |
+| retirementAge | Number | State Pension age for this individual (65-68) | 67 |
+| statePensionProvision | Complex Data | State Pension provision details | See StatePensionProvisionValue below |
+| spousePension | Currency Amount | Inherited spouse pension entitlement | { amount: 1250.00, currency: { code: "GBP", symbol: "£" } } |
+| br19Projection | Text | BR19 State Pension forecast reference or data | BR19 Reference: SP-2024-123456789 |
+| notes | Text | Additional notes and comments | Full new State Pension entitlement |
+| createdAt | Date and Time | Creation timestamp | 2024-11-15T10:00:00Z |
+| updatedAt | Date and Time | Last update timestamp | 2026-03-03T14:30:00Z |
+
+#### Nested Field Groups
+
+**StatePensionProvisionValue**:
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| basicAmount | Currency Amount | Basic State Pension or new State Pension amount | { amount: 11502.40, currency: { code: "GBP", symbol: "£" } } |
+| additionalAmount | Currency Amount | Additional State Pension (SERPS/S2P) for old system | { amount: 2450.00, currency: { code: "GBP", symbol: "£" } } |
+| benefitCredit | Currency Amount | Pension Credit entitlement (means-tested top-up) | { amount: 0.00, currency: { code: "GBP", symbol: "£" } } |
+
+**State Pension Components:**
+
+**Basic State Pension (Old System - Pre-2016):**
+- Basic State Pension for those who reached State Pension age before 6 April 2016
+- Maximum (2024/25): £169.50 per week (£8,814.00 per annum)
+- Qualifying Years: 30 for women, 44 for men born before 1945
+
+**New State Pension (Post-2016):**
+- New State Pension for those reaching State Pension age on or after 6 April 2016
+- Full Amount (2024/25): £221.20 per week (£11,502.40 per annum)
+- Minimum: 10 qualifying years needed to qualify
+- Maximum: 35 qualifying years for full entitlement
+
+**Additional State Pension (SERPS/S2P):**
+- State Earnings Related Pension Scheme (SERPS) or State Second Pension (S2P)
+- Applies to old State Pension system only
+- Reduced if previously contracted out via occupational or personal pension
+
+**Pension Credit:**
+- Means-tested benefit to top up pension income
+- Guarantee Credit: £218.15 per week (single) or £332.95 (couple) in 2024/25
+- Savings Credit: Only for those who reached State Pension age before 6 April 2016
+
+### Relationships
+
+**This contract connects to:**
+- **FactFind Contract** (parent) - State Pension is part of a fact find
+- **Client Contract** (owner) - Single client owns the State Pension entitlement
+
+### Business Rules
+
+1. **Required Fields**: Owner, retirement age, and basic amount must be specified
+2. **Single Owner**: State Pension cannot have multiple owners (individual entitlement only)
+3. **Retirement Age**: Must be between 65 and 68 (current range; subject to change)
+4. **Basic Amount Limits**:
+   - New State Pension: Should not exceed £11,502.40 per annum (£221.20 per week)
+   - Old State Pension: Should not exceed £8,814.00 per annum (£169.50 per week)
+5. **Additional Amount**: Only applicable for old State Pension (pre-2016) system
+6. **Pension Credit**: Only applicable if total income below Pension Credit threshold
+7. **Spouse Pension**: Only applicable if client is widow/widower under old State Pension system
+8. **BR19 Validity**: State Pension forecasts typically valid for 60 days
+
+### Example Usage
+
+**Example 1: New State Pension (Post-2016) with Full Entitlement:**
+
+```json
+{
+  "id": 1234,
+  "href": "/api/v2/factfinds/679/pensions/statepension/1234",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "owner": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Sarah Johnson"
+  },
+  "retirementAge": 67,
+  "statePensionProvision": {
+    "basicAmount": {
+      "amount": 11502.40,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "additionalAmount": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "benefitCredit": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "spousePension": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "br19Projection": "BR19 Reference: SP-2024-123456789 - Full new State Pension £221.20 per week (£11,502.40 per annum) at age 67. Based on 35 qualifying years.",
+  "notes": "Full new State Pension entitlement. 35 qualifying years achieved. State Pension age 67 (DOB: 15/08/1970).",
+  "createdAt": "2024-11-15T10:00:00Z",
+  "updatedAt": "2026-03-03T14:30:00Z"
+}
+```
+
+**Example 2: Old State Pension (Pre-2016) with Additional Pension and Spouse Inheritance:**
+
+```json
+{
+  "id": 1235,
+  "href": "/api/v2/factfinds/679/pensions/statepension/1235",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "owner": {
+    "id": 8497,
+    "href": "/api/v2/factfinds/679/clients/8497",
+    "name": "Margaret Thompson"
+  },
+  "retirementAge": 65,
+  "statePensionProvision": {
+    "basicAmount": {
+      "amount": 8814.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "additionalAmount": {
+      "amount": 2450.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "benefitCredit": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "spousePension": {
+    "amount": 1250.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "br19Projection": "BR19 Reference: SP-2015-987654321 - Basic State Pension £169.50 per week plus Additional Pension £47.12 per week. Spouse inheritance £24.04 per week.",
+  "notes": "Old State Pension system. 30 qualifying years. Additional SERPS pension accrued. Inherited 50% of late husband's Additional Pension.",
+  "createdAt": "2015-06-20T09:30:00Z",
+  "updatedAt": "2026-03-03T14:30:00Z"
+}
+```
+
+**Example 3: Reduced New State Pension with Pension Credit:**
+
+```json
+{
+  "id": 1236,
+  "href": "/api/v2/factfinds/679/pensions/statepension/1236",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "owner": {
+    "id": 8498,
+    "href": "/api/v2/factfinds/679/clients/8498",
+    "name": "David Williams"
+  },
+  "retirementAge": 66,
+  "statePensionProvision": {
+    "basicAmount": {
+      "amount": 7200.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "additionalAmount": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "benefitCredit": {
+      "amount": 4134.80,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "spousePension": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "br19Projection": "BR19 Reference: SP-2023-555666777 - Reduced new State Pension £138.46 per week (22 qualifying years). Eligible for Pension Credit top-up.",
+  "notes": "Incomplete NI record (22 qualifying years). Entitled to Pension Credit Guarantee Credit to top up to minimum income guarantee. Voluntary contributions may increase State Pension.",
+  "createdAt": "2023-09-10T11:00:00Z",
+  "updatedAt": "2026-03-03T14:30:00Z"
+}
+```
+
+### UK State Pension Regulations
+
+**State Pension Age:**
+- Current: 66 (for those born between 6 October 1954 and 5 April 1960)
+- Rising to 67: Between 2026 and 2028 (for those born between 6 April 1960 and 5 April 1977)
+- Rising to 68: Planned for 2044-2046 (subject to review)
+
+**National Insurance Qualifying Years:**
+- Employed: NI contributions automatically paid on earnings above £242 per week (2024/25)
+- Self-Employed: Class 2 and Class 4 NI contributions
+- Voluntary Contributions: Class 3 NI (£17.45 per week in 2024/25) to fill gaps
+- NI Credits: Automatic credits for unemployment, caring, illness
+
+**State Pension Increases (Triple Lock):**
+- Increases each April by the highest of:
+  - Earnings growth (average wage increase)
+  - Price inflation (CPI)
+  - 2.5%
+
+**Deferring State Pension:**
+- Old State Pension: Defer by at least 5 weeks; increases by 1% for every 5 weeks (10.4% per year)
+- New State Pension: Defer by at least 9 weeks; increases by 1% for every 9 weeks (5.8% per year)
+
+**Tax Treatment:**
+- State Pension is taxable income
+- No tax deducted at source
+- Tax collected through PAYE code on other income or self-assessment
+- Personal Allowance (£12,570 in 2024/25) may cover State Pension if only income
+
+### Related Contracts
+
+- **Client Contract** - Links to client record for date of birth and State Pension age calculation
+- **Income Contract** - State Pension counts as income for affordability assessments
+- **PersonalPension Contract** - Personal pensions that may have contracted out of Additional State Pension
+- **FinalSalaryPension Contract** - Occupational pensions that may have contracted out of SERPS/S2P
 
 
 ## 13.31 Net Worth

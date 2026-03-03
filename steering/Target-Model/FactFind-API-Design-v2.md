@@ -2154,27 +2154,19 @@ This section documents the core FactFind resource operations for managing the li
 {
   "data": [
     {
-      "id": 456,
-      "factFindNumber": "FF001234",
-      "status": "INP",
-      "client": {
-        "id": 123,
-        "href": "/api/v2/factfinds/456/clients/123",
-        "name": "John Smith",
-        "clientNumber": "C00001234"
-      },
-      "adviser": {
-        "id": 789,
-        "href": "/api/v2/advisers/789",
-        "name": "Jane Doe",
-        "code": "ADV001"
-      },
-      "meetingDetails": {
-        "meetingDate": "2026-02-16",
-        "meetingType": "INIT"
-      },
-      "createdAt": "2026-02-15T09:00:00Z",
-      "updatedAt": "2026-02-16T14:30:00Z"
+      "id": 679,
+      "href": "/api/v2/factfinds/679",
+      "meeting":{
+        "meetingOn": "",
+        "meetingType": "FaceToFace",
+        "clientsPresent":[{
+            "id": 123,
+            "href": "v2/factfinds/679/clients/123",
+            "name": "Jack Marias"
+        }],
+        "anyOtherAudience" : true,
+        "notes": ""
+      }
     }
   ],
   "pagination": {
@@ -2236,45 +2228,162 @@ Returns the complete FactFind contract (see Section 14.2 for full structure).
 
 ```json
 {
-  "id": 456,
-  "factFindNumber": "FF001234",
-  "status": "INP",
-  "client": {
-    "id": 123,
-    "href": "/api/v2/factfinds/456/clients/123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
+  "id": 679,
+  "href": "/api/v2/factfinds/679",
+
+  "meeting":{
+    "meetingOn": "",
+    "meetingType": "FaceToFace",
+    "clientsPresent":[{
+        "id": 123,
+        "href": "v2/factfinds/679/clients/123",
+        "name": "Jack Marias"
+    }],
+    "anyOtherAudience" : true,
+    "notes": ""
   },
-  "jointClientRef": {
-    "id": 124,
-    "href": "/api/v2/factfinds/456/clients/124",
-    "name": "Sarah Smith",
-    "clientNumber": "C00001235",
-    "type": "Person"
+
+  "products":{
+        "investments":{
+            "hasCash":true,
+            "hasInvestments":true
+        },
+
+        "pensions":{
+            "hasEmployerPensionSchemes": true,
+            "hasFinalSalary":true,
+            "hasMoneyPurchases":true,
+            "hasPersonalPensions":true,
+            "hasAnnuities":true,
+
+            "existingEmployerPensionSchemes":[{
+                "owner":{
+                    "id": 123,
+                    "href": "v2/factfinds/679/clients/123",
+                    "name": "Jack Marias"
+                },
+                "isCurrentMember": true,
+                "isProbablemember": true,
+                "schemeJoinedOn": "",
+                "details":""
+            }]
+        },
+
+        "mortgages":{
+            "hasMortgages":true,
+            "hasEquityRelease":true
+        },
+
+        "protections":{
+            "hasProtection": true,
+            "lifeAndCriticalIllness":{
+                "hasCoverForMortgageOrDebt":"Yes",
+                "hasCoverforDependantsDueToCritcalIllness": "Yes",
+                "hasCoverforDependantsUponDeath": "Yes",
+
+                "haveReviewedCostofProtectionChange": "Yes",
+                "impactOnYou": "",
+                "impactOnDepandants": "",
+                "actionsToAddressImpacts":"",
+                "reasonforNotReviewing": ""
+            },
+            "incomeProtection":{
+                "hasCoverDueToAccidentOrIllness": true,
+                "hasCoverDueToUnemployment": true,
+
+                "impactOnYou": "",
+                "impactOnDepandants": "",
+                "actionsToAddressImpacts":"",
+                "reasonforNotReviewing": ""
+            },
+            "buildingsAndContent":{
+                "haveExistingBuildingInsurance": true,
+                "haveExistingContentInsurance": true,
+                "buyToLetProperties":{
+                    "haveBuildingContentInsurance": true
+                },
+                "haveSufficientCover": true,
+                "actionsToAddressImpacts":"",
+                "whenDoyouWantToReviewProtection":"",
+                "reasonforNotReviewing": ""
+            }
+        }
   },
-  "adviser": {
-    "id": 789,
-    "href": "/api/v2/advisers/789",
-    "name": "Jane Doe",
-    "code": "ADV001"
+
+  "disclosureKeyfacts":[{
+        "Type": "CombinedDisclosureDocuments",
+        "IssuedOn": ""
+  }],
+
+  "employmentSummary":[{
+        "client": {
+            "id": 123,
+            "href": "v2/factfinds/679/clients/123",
+            "name": "Jack Marias"
+        },
+        "totalGrossAnnualIncome": {
+            "amount": 15000.00,
+            "currency": {
+              "code": "GBP",
+              "display": "British Pound",
+              "symbol": "£"
+            }
+        },
+        "highestTaxRatepaid":{
+            "percentage": 45
+        }
+  }],
+
+  "supplementaryQuestions":[{
+      "doBothClientsAgreeToAnswers": true,
+      "type":""
+  }],
+
+  "assetsAndLiabilities":{
+      "clientDisclosures":{
+          "hasAssets":true,
+          "hasLiabilities": true,
+          "reductionOfLiabilities": {
+              "isExpected": true,
+              "nonReductionReason":"RetainControlOfCapital",
+              "details": ""
+          }
+      }
   },
-  "meetingDetails": {
-    "meetingDate": "2026-02-16",
-    "meetingType": "INIT",
-    "clientsPresent": "BothClients",
-    "othersPresent": false,
-    "othersPresentDetails": null,
-    "scopeOfAdvice": {
-      "retirementPlanning": true,
-      "savingsAndInvestments": true,
-      "protection": true,
-      "mortgage": false,
-      "estatePlanning": false
-    }
+
+  "creditHistory":{
+      "hasAdverseHistory": true,
+      "refusedMortgageOrCredit": true,
+      "details":""
   },
-  "createdAt": "2026-02-15T09:00:00Z",
-  "updatedAt": "2026-02-15T09:00:00Z"
+
+  "estatePlanning":{
+      "will":{
+          "details":""
+      },
+      "totalAssets": {
+        "amount": 15000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "jointTotalAssets": {
+        "amount": 15000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "giftsDetails": {
+          "inLast7Years":"",
+          "usedAnnualExeptionInCurrentOrPreviousTaxYears":"",
+          "regularGiftsOutOfIncome":"",
+          "expectingInheritanceOrGifts": ""
+      }
+  }
 }
 ```
 
@@ -2307,43 +2416,162 @@ Returns the complete FactFind contract with all requested includes (see Section 
 
 ```json
 {
-  "id": 456,
-  "factFindNumber": "FF001234",
-  "status": "INP",
-  "client": {
-    "id": 123,
-    "href": "/api/v2/factfinds/456/clients/123",
-    "name": "John Smith",
-    "clientNumber": "C00001234",
-    "type": "Person"
+  "id": 679,
+  "href": "/api/v2/factfinds/679",
+
+  "meeting":{
+    "meetingOn": "",
+    "meetingType": "FaceToFace",
+    "clientsPresent":[{
+        "id": 123,
+        "href": "v2/factfinds/679/clients/123",
+        "name": "Jack Marias"
+    }],
+    "anyOtherAudience" : true,
+    "notes": ""
   },
-  "adviser": {
-    "id": 789,
-    "href": "/api/v2/advisers/789",
-    "name": "Jane Doe",
-    "code": "ADV001"
+
+  "products":{
+        "investments":{
+            "hasCash":true,
+            "hasInvestments":true
+        },
+
+        "pensions":{
+            "hasEmployerPensionSchemes": true,
+            "hasFinalSalary":true,
+            "hasMoneyPurchases":true,
+            "hasPersonalPensions":true,
+            "hasAnnuities":true,
+
+            "existingEmployerPensionSchemes":[{
+                "owner":{
+                    "id": 123,
+                    "href": "v2/factfinds/679/clients/123",
+                    "name": "Jack Marias"
+                },
+                "isCurrentMember": true,
+                "isProbablemember": true,
+                "schemeJoinedOn": "",
+                "details":""
+            }]
+        },
+
+        "mortgages":{
+            "hasMortgages":true,
+            "hasEquityRelease":true
+        },
+
+        "protections":{
+            "hasProtection": true,
+            "lifeAndCriticalIllness":{
+                "hasCoverForMortgageOrDebt":"Yes",
+                "hasCoverforDependantsDueToCritcalIllness": "Yes",
+                "hasCoverforDependantsUponDeath": "Yes",
+
+                "haveReviewedCostofProtectionChange": "Yes",
+                "impactOnYou": "",
+                "impactOnDepandants": "",
+                "actionsToAddressImpacts":"",
+                "reasonforNotReviewing": ""
+            },
+            "incomeProtection":{
+                "hasCoverDueToAccidentOrIllness": true,
+                "hasCoverDueToUnemployment": true,
+
+                "impactOnYou": "",
+                "impactOnDepandants": "",
+                "actionsToAddressImpacts":"",
+                "reasonforNotReviewing": ""
+            },
+            "buildingsAndContent":{
+                "haveExistingBuildingInsurance": true,
+                "haveExistingContentInsurance": true,
+                "buyToLetProperties":{
+                    "haveBuildingContentInsurance": true
+                },
+                "haveSufficientCover": true,
+                "actionsToAddressImpacts":"",
+                "whenDoyouWantToReviewProtection":"",
+                "reasonforNotReviewing": ""
+            }
+        }
   },
-  "meetingDetails": {
-    "meetingDate": "2026-02-16",
-    "meetingType": "INIT",
-    "clientsPresent": "BothClients"
-  },
-  "financialSummary": {
-    "income": {
-      "annualGross": {
-        "amount": 120000.00,
-        "currency": {"code": "GBP", "symbol": "£"}
+
+  "disclosureKeyfacts":[{
+        "Type": "CombinedDisclosureDocuments",
+        "IssuedOn": ""
+  }],
+
+  "employmentSummary":[{
+        "client": {
+            "id": 123,
+            "href": "v2/factfinds/679/clients/123",
+            "name": "Jack Marias"
+        },
+        "totalGrossAnnualIncome": {
+            "amount": 15000.00,
+            "currency": {
+              "code": "GBP",
+              "display": "British Pound",
+              "symbol": "£"
+            }
+        },
+        "highestTaxRatepaid":{
+            "percentage": 45
+        }
+  }],
+
+  "supplementaryQuestions":[{
+      "doBothClientsAgreeToAnswers": true,
+      "type":""
+  }],
+
+  "assetsAndLiabilities":{
+      "clientDisclosures":{
+          "hasAssets":true,
+          "hasLiabilities": true,
+          "reductionOfLiabilities": {
+              "isExpected": true,
+              "nonReductionReason":"RetainControlOfCapital",
+              "details": ""
+          }
       }
-    },
-    "expenditure": {
-      "monthlyTotal": {
-        "amount": 4500.00,
-        "currency": {"code": "GBP", "symbol": "£"}
-      }
-    }
   },
-  "createdAt": "2026-02-15T09:00:00Z",
-  "updatedAt": "2026-02-16T14:30:00Z"
+
+  "creditHistory":{
+      "hasAdverseHistory": true,
+      "refusedMortgageOrCredit": true,
+      "details":""
+  },
+
+  "estatePlanning":{
+      "will":{
+          "details":""
+      },
+      "totalAssets": {
+        "amount": 15000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "jointTotalAssets": {
+        "amount": 15000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "giftsDetails": {
+          "inLast7Years":"",
+          "usedAnnualExeptionInCurrentOrPreviousTaxYears":"",
+          "regularGiftsOutOfIncome":"",
+          "expectingInheritanceOrGifts": ""
+      }
+  }
 }
 ```
 
@@ -12329,6 +12557,7 @@ Authorization: Bearer {token}
 - Final Salary Pensions: `/api/v2/factfinds/{factfindId}/pensions/finalsalary`
 - Annuities: `/api/v2/factfinds/{factfindId}/pensions/annuities`
 - Personal Pensions: `/api/v2/factfinds/{factfindId}/pensions/personalpension`
+- State Pensions: `/api/v2/factfinds/{factfindId}/pensions/statepension`
 
 **Key Features:**
 
@@ -14217,6 +14446,393 @@ Authorization: Bearer {token}
 **Response:** `204 No Content`
 
 **Note:** This operation performs a soft delete. The pension is marked as deleted but retained for audit purposes.
+
+---
+
+### 11.5 State Pension API
+
+#### 11.5.1 Overview
+
+**Purpose:** Manage State Pension entitlements including basic State Pension, additional State Pension (SERPS/S2P), new State Pension, Pension Credit, and BR19 projection data for retirement planning.
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/pensions/statepension`
+
+**Key Features:**
+
+The State Pension API provides comprehensive management of State Pension entitlements:
+
+1. **Dual System Support** - Handles both old State Pension (pre-2016) and new State Pension (post-2016) systems
+2. **Component Breakdown** - Separate tracking of basic amount, additional pension, and means-tested benefits
+3. **Pension Credit Integration** - Records Pension Credit (Guarantee and Savings Credit) entitlements
+4. **Spouse Inheritance** - Tracks inherited State Pension rights from deceased spouse
+5. **BR19 Integration** - Stores BR19 State Pension forecast reference and projection data
+6. **Retirement Age Tracking** - Records individual's State Pension age based on birth date
+7. **National Insurance Record** - Links to NI qualifying years and contribution history
+8. **Contracting Out** - Identifies impact of contracting out on Additional State Pension
+
+**State Pension Categories:**
+- **Old State Pension** - For those reaching State Pension age before 6 April 2016
+- **New State Pension** - For those reaching State Pension age on or after 6 April 2016
+
+**State Pension Components:**
+- **Basic Amount** - Basic State Pension or new State Pension amount
+- **Additional Amount** - SERPS/S2P for old system only
+- **Benefit Credit** - Pension Credit top-up (means-tested)
+- **Spouse Pension** - Inherited Additional Pension from deceased spouse (old system only)
+
+**Regulatory Compliance:**
+- Pensions Act 2014 (New State Pension)
+- State Pension Regulations 2015
+- Pension Credit Act 2002
+- Social Security Administration Act 1992
+- Triple Lock Guarantee
+- GDPR (Data Protection for Pension Records)
+
+#### 11.5.2 Operations
+
+**Standard CRUD Operations:**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/v2/factfinds/{factfindId}/pensions/statepension` | List all state pension records | `pensions:read` |
+| POST | `/api/v2/factfinds/{factfindId}/pensions/statepension` | Create new state pension record | `pensions:write` |
+| GET | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Get state pension details | `pensions:read` |
+| PATCH | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Update state pension | `pensions:write` |
+| DELETE | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Delete state pension | `pensions:delete` |
+
+#### 11.5.3 Contract Schema
+
+**Core Fields:**
+
+```json
+{
+  "id": "integer",
+  "href": "string",
+  "factfind": {
+    "id": "integer",
+    "href": "string"
+  },
+  "owner": {
+    "id": "integer",
+    "href": "string",
+    "name": "string"
+  },
+  "retirementAge": "integer (65-68)",
+  "statePensionProvision": {
+    "basicAmount": {
+      "amount": "decimal",
+      "currency": {
+        "code": "string",
+        "display": "string",
+        "symbol": "string"
+      }
+    },
+    "additionalAmount": {
+      "amount": "decimal",
+      "currency": {
+        "code": "string",
+        "display": "string",
+        "symbol": "string"
+      }
+    },
+    "benefitCredit": {
+      "amount": "decimal",
+      "currency": {
+        "code": "string",
+        "display": "string",
+        "symbol": "string"
+      }
+    }
+  },
+  "spousePension": {
+    "amount": "decimal",
+    "currency": {
+      "code": "string",
+      "display": "string",
+      "symbol": "string"
+    }
+  },
+  "br19Projection": "string",
+  "notes": "string",
+  "createdAt": "timestamp",
+  "updatedAt": "timestamp"
+}
+```
+
+**Field Definitions:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | integer | Yes | Unique identifier for the state pension record |
+| `href` | string | Yes | Resource URL |
+| `factfind` | Reference Link | Yes | Link to parent FactFind |
+| `owner` | Reference Link | Yes | Client who owns this state pension entitlement (single owner only) |
+| `retirementAge` | integer | Yes | State Pension age for this individual (65-68) |
+| `statePensionProvision.basicAmount` | Money | Yes | Basic State Pension or new State Pension amount |
+| `statePensionProvision.additionalAmount` | Money | No | Additional State Pension (SERPS/S2P) for old system |
+| `statePensionProvision.benefitCredit` | Money | No | Pension Credit entitlement (means-tested) |
+| `spousePension` | Money | No | Inherited spouse pension entitlement |
+| `br19Projection` | string | No | BR19 State Pension forecast reference or data |
+| `notes` | string | No | Additional notes and comments |
+| `createdAt` | timestamp | Yes | When this record was created |
+| `updatedAt` | timestamp | Yes | When this record was last modified |
+
+#### 11.5.4 Example Contracts
+
+**Example 1: New State Pension (Post-2016) with Full Entitlement**
+
+Request:
+```http
+POST /api/v2/factfinds/679/pensions/statepension
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "owner": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Sarah Johnson"
+  },
+  "retirementAge": 67,
+  "statePensionProvision": {
+    "basicAmount": {
+      "amount": 11502.40,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "additionalAmount": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "benefitCredit": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "spousePension": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "br19Projection": "BR19 Reference: SP-2024-123456789 - Full new State Pension £221.20 per week (£11,502.40 per annum) at age 67. Based on 35 qualifying years.",
+  "notes": "Full new State Pension entitlement. 35 qualifying years achieved. State Pension age 67 (DOB: 15/08/1970)."
+}
+```
+
+Response:
+```json
+{
+  "id": 1234,
+  "href": "/api/v2/factfinds/679/pensions/statepension/1234",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "owner": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Sarah Johnson"
+  },
+  "retirementAge": 67,
+  "statePensionProvision": {
+    "basicAmount": {
+      "amount": 11502.40,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "additionalAmount": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "benefitCredit": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "spousePension": {
+    "amount": 0.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "br19Projection": "BR19 Reference: SP-2024-123456789 - Full new State Pension £221.20 per week (£11,502.40 per annum) at age 67. Based on 35 qualifying years.",
+  "notes": "Full new State Pension entitlement. 35 qualifying years achieved. State Pension age 67 (DOB: 15/08/1970).",
+  "createdAt": "2024-11-15T10:00:00Z",
+  "updatedAt": "2026-03-03T14:30:00Z"
+}
+```
+
+**Example 2: Old State Pension (Pre-2016) with Additional Pension and Spouse Inheritance**
+
+```json
+{
+  "id": 1235,
+  "href": "/api/v2/factfinds/679/pensions/statepension/1235",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "owner": {
+    "id": 8497,
+    "href": "/api/v2/factfinds/679/clients/8497",
+    "name": "Margaret Thompson"
+  },
+  "retirementAge": 65,
+  "statePensionProvision": {
+    "basicAmount": {
+      "amount": 8814.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "additionalAmount": {
+      "amount": 2450.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    },
+    "benefitCredit": {
+      "amount": 0.00,
+      "currency": {
+        "code": "GBP",
+        "display": "British Pound",
+        "symbol": "£"
+      }
+    }
+  },
+  "spousePension": {
+    "amount": 1250.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "br19Projection": "BR19 Reference: SP-2015-987654321 - Basic State Pension £169.50 per week plus Additional Pension £47.12 per week. Spouse inheritance £24.04 per week.",
+  "notes": "Old State Pension system. 30 qualifying years. Additional SERPS pension accrued. Inherited 50% of late husband's Additional Pension.",
+  "createdAt": "2015-06-20T09:30:00Z",
+  "updatedAt": "2026-03-03T14:30:00Z"
+}
+```
+
+#### 11.5.5 Business Rules
+
+1. **Single Owner**: State Pension entitlements are individual and cannot have multiple owners
+2. **Retirement Age**: Must be between 65 and 68 (current range; subject to government review)
+3. **Basic Amount Limits**:
+   - New State Pension: Maximum £11,502.40 per annum (£221.20 per week) for 2024/25
+   - Old State Pension: Maximum £8,814.00 per annum (£169.50 per week) for 2024/25
+4. **Additional Amount**: Only applicable for old State Pension (pre-2016) system
+5. **Pension Credit**: Only applicable if total income is below Pension Credit threshold
+6. **Spouse Pension**: Only applicable if client is widow/widower under old State Pension system (can inherit up to 50% of spouse's Additional Pension)
+7. **BR19 Validity**: State Pension forecasts are typically valid for 60 days from issue date
+8. **Qualifying Years**:
+   - Old State Pension: 30 qualifying years needed for full entitlement (women), 44 years (men born before 1945)
+   - New State Pension: 35 qualifying years for full entitlement, minimum 10 years to qualify
+
+#### 11.5.6 UK State Pension Regulations
+
+**State Pension Age:**
+- **Current**: 66 (for those born between 6 October 1954 and 5 April 1960)
+- **Rising to 67**: Between 2026 and 2028 (for those born between 6 April 1960 and 5 April 1977)
+- **Rising to 68**: Planned for 2044-2046 (subject to government review)
+
+**National Insurance Qualifying Years:**
+- **Employed**: NI contributions automatically paid on earnings above £242 per week (2024/25)
+- **Self-Employed**: Class 2 and Class 4 NI contributions
+- **Voluntary Contributions**: Class 3 NI (£17.45 per week in 2024/25) to fill gaps
+- **NI Credits**: Automatic credits for unemployment, caring responsibilities, illness
+
+**State Pension Increases (Triple Lock):**
+- Increases each April by the highest of:
+  - Earnings growth (average wage increase)
+  - Price inflation (CPI)
+  - 2.5%
+
+**Pension Credit (2024/25):**
+- **Guarantee Credit**: Tops up weekly income to £218.15 (single) or £332.95 (couple)
+- **Savings Credit**: Only for those who reached State Pension age before 6 April 2016
+- **Capital Limits**: Capital over £10,000 affects entitlement (£1 per week deduction for every £500 over £10,000)
+
+**Deferring State Pension:**
+- **Old State Pension**: Defer by at least 5 weeks; increases by 1% for every 5 weeks (10.4% per year)
+- **New State Pension**: Defer by at least 9 weeks; increases by 1% for every 9 weeks (5.8% per year)
+
+**Tax Treatment:**
+- State Pension is taxable income
+- No tax deducted at source
+- Tax collected through PAYE code on other income or self-assessment
+- Personal Allowance (£12,570 in 2024/25) may cover State Pension if only income
+
+#### 11.5.7 Query Parameters
+
+**List Operation:**
+
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `owner` | integer | Filter by owner client ID | `?owner=8496` |
+| `retirementAge` | integer | Filter by retirement age | `?retirementAge=67` |
+| `page` | integer | Page number (1-indexed) | `?page=1` |
+| `pageSize` | integer | Items per page (max 100) | `?pageSize=25` |
+| `sort` | string | Sort field and direction | `?sort=retirementAge:asc` |
+
+#### 11.5.8 HTTP Status Codes
+
+**Success Responses:**
+
+| Code | Description | Body |
+|------|-------------|------|
+| 200 OK | Resource retrieved successfully | StatePensionEntitlement or array |
+| 201 Created | Resource created successfully | StatePensionEntitlement |
+| 204 No Content | Resource deleted successfully | Empty |
+
+**Client Error Responses:**
+
+| Code | Description | When |
+|------|-------------|------|
+| 400 Bad Request | Invalid request format | Malformed JSON, invalid data types |
+| 401 Unauthorized | Authentication required | Missing or invalid auth token |
+| 403 Forbidden | Insufficient permissions | Missing required scope |
+| 404 Not Found | Resource not found | FactFind or StatePension ID doesn't exist |
+| 422 Unprocessable Entity | Business validation failed | Invalid retirement age, amounts exceed limits |
+
+**Server Error Responses:**
+
+| Code | Description | When |
+|------|-------------|------|
+| 500 Internal Server Error | Server error | Unexpected server issue |
+| 503 Service Unavailable | Service temporarily unavailable | Maintenance or overload |
 
 ---
 
