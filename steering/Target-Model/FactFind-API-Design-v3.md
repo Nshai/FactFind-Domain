@@ -17,12 +17,13 @@
 - v3.0 - Consolidated all comprehensive APIs with latest contracts (2026-03-03)
 
 **Changes in v3.0:**
-- Consolidated 34 comprehensive API designs into single specification
+- Consolidated 35 comprehensive API designs into single specification
 - Updated all contracts to align with FactFind-Contracts-Reference.md
 - Updated all endpoints to align with API-Endpoints-Catalog.md
 - Removed legacy arrangement and sub-arrangement APIs
-- Added State Pension API (Section 29)
-- Added Liability API (Section 23)
+- Added State Pension API (Section 30)
+- Added Liability API (Section 24)
+- Added Bank Account API (Section 18)
 - Updated all examples with latest contract schemas
 - Enhanced business rules and validation guidance
 - Improved regulatory compliance documentation
@@ -37,21 +38,21 @@ This document presents a comprehensive RESTful API design for the FactFind syste
 
 **Business Domain:** Wealth Management & Financial Advisory
 **Total Entities:** 50+ entities across 8 bounded contexts
-**Total API Endpoints:** 268 endpoints (was 263, added 5 liability endpoints)
-**Total API Sections:** 34 comprehensive API specifications
+**Total API Endpoints:** 273 endpoints (was 268, added 5 bank account endpoints)
+**Total API Sections:** 35 comprehensive API specifications
 **Total Fields:** 2,000+ business fields from domain specification
-**Regulatory Compliance:** FCA Handbook, MiFID II, IDD, Consumer Duty, GDPR, MLR 2017, PECR
+**Regulatory Compliance:** FCA Handbook, MiFID II, IDD, Consumer Duty, GDPR, MLR 2017, PECR, PSD2
 
 ### API Scope
 
 The FactFind API provides comprehensive digital capabilities for:
 
 1. **FactFind Root API** - Fact find lifecycle and aggregated views (11 endpoints)
-2. **Client Onboarding & KYC** - Client management, identity verification, regulatory compliance (105 endpoints)
-3. **Circumstances Context** - Employment, income, expenditure tracking (26 endpoints)
-4. **Assets & Liabilities** - Property, assets, liabilities management (23 endpoints)
+2. **Client Onboarding & KYC** - Client management, identity verification, bank accounts, regulatory compliance (110 endpoints)
+3. **Circumstances Context** - Employment, income, expenditure tracking (20 endpoints)
+4. **Assets & Liabilities** - Property, assets, liabilities management (15 endpoints)
 5. **Plans & Investments** - Pensions, investments, protection, mortgages (35 endpoints)
-6. **Goals & Objectives** - Financial goal setting and tracking (31 endpoints)
+6. **Goals & Objectives** - Financial goal setting and tracking (26 endpoints)
 7. **ATR Context** - Attitude to risk assessment (8 endpoints)
 8. **Reference Data API** - Centralized lookup data management (24 endpoints)
 
@@ -125,38 +126,39 @@ The FactFind API provides comprehensive digital capabilities for:
 15. [Financial Profile API](#15-financial-profile-api)
 16. [Marketing Preferences API](#16-marketing-preferences-api)
 17. [DPA Agreement API](#17-dpa-agreement-api)
+18. [Bank Account API](#18-bank-account-api)
 
 ### Part 3: Circumstances APIs
 
-18. [Employment API](#18-employment-api)
-19. [Income API](#19-income-api)
-20. [Expenditure API](#20-expenditure-api)
-21. [Affordability API](#21-affordability-api)
+19. [Employment API](#19-employment-api)
+20. [Income API](#20-income-api)
+21. [Expenditure API](#21-expenditure-api)
+22. [Affordability API](#22-affordability-api)
 
 ### Part 4: Assets & Liabilities APIs
 
-22. [Asset API](#22-asset-api)
-23. [Liability API](#23-liability-api)
-24. [Net Worth API](#24-net-worth-api)
+23. [Asset API](#23-asset-api)
+24. [Liability API](#24-liability-api)
+25. [Net Worth API](#25-net-worth-api)
 
 ### Part 5: Plans & Investments APIs
 
-25. [Investment API](#25-investment-api)
-26. [Final Salary Pension API](#26-final-salary-pension-api)
-27. [Annuity API](#27-annuity-api)
-28. [Personal Pension API](#28-personal-pension-api)
-29. [State Pension API](#29-state-pension-api)
-30. [Mortgage API](#30-mortgage-api)
-31. [Personal Protection API](#31-personal-protection-api)
+26. [Investment API](#26-investment-api)
+27. [Final Salary Pension API](#27-final-salary-pension-api)
+28. [Annuity API](#28-annuity-api)
+29. [Personal Pension API](#29-personal-pension-api)
+30. [State Pension API](#30-state-pension-api)
+31. [Mortgage API](#31-mortgage-api)
+32. [Personal Protection API](#32-personal-protection-api)
 
 ### Part 6: Goals & Risk APIs
 
-32. [Objectives API](#32-objectives-api)
-33. [ATR Assessment API](#33-atr-assessment-api)
+33. [Objectives API](#33-objectives-api)
+34. [ATR Assessment API](#34-atr-assessment-api)
 
 ### Part 7: Reference Data
 
-34. [Reference Data API](#34-reference-data-api)
+35. [Reference Data API](#35-reference-data-api)
 
 ### Appendices
 
@@ -5602,7 +5604,397 @@ Content-Type: application/json
 - [Identity Verification API](#13-identity-verification-api) - GDPR compliance notes
 
 ---
-## 18. Employment API
+
+## 18. Bank Account API
+
+### 18.1 Overview
+
+**Purpose:** The Bank Account API manages client bank account details including account holder information, bank details, account numbers, routing codes, and links to cash investment accounts for comprehensive financial tracking and payment processing.
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts`
+
+**Aggregate Root:** Client
+
+**Key Features:**
+- Multi-bank account tracking per client
+- Joint account support with multiple owners
+- Default account designation for payments/withdrawals
+- Bank details with full address information
+- Account number and routing code (sort code) storage
+- Integration with cash investment accounts
+- Secure handling of sensitive financial information
+- Support for UK and international bank accounts
+- IBAN and SWIFT/BIC code support
+
+### 18.2 Operations
+
+| Method | Endpoint | Description | Request Body | Success Response |
+|--------|----------|-------------|--------------|------------------|
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts` | List all bank accounts | N/A | 200 OK - BankAccount[] |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts` | Add new bank account | BankAccountRequest | 201 Created - BankAccount |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Get bank account details | N/A | 200 OK - BankAccount |
+| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Update bank account | BankAccountPatch | 200 OK - BankAccount |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Delete bank account | N/A | 204 No Content |
+
+**Total Operations:** 5 endpoints
+
+**Required Authorization Scopes:**
+- `client:read` - Read access to bank accounts
+- `client:write` - Create and update bank accounts
+- `client:delete` - Delete bank accounts
+
+### 18.3 Resource Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | Yes (response only) | Unique identifier for the bank account |
+| `href` | string | Yes (response only) | API link to this resource |
+| `factfind` | object | Yes (response only) | FactFind reference |
+| `client` | object | Yes (response only) | Client reference (primary owner) |
+| `owners` | array | No | Account owners (for joint accounts) |
+| `bank` | object | Yes | Bank details |
+| `bank.name` | string | Yes | Bank name (e.g., "Barclays Bank PLC") |
+| `bank.address` | object | Yes | Bank branch address |
+| `bank.address.line1` | string | Yes | Address line 1 |
+| `bank.address.line2` | string | No | Address line 2 |
+| `bank.address.city` | string | Yes | City/town |
+| `bank.address.county` | string | No | County/region |
+| `bank.address.postcode` | string | Yes | Postal/ZIP code |
+| `bank.address.country` | string | Yes | ISO 3166-1 alpha-2 country code |
+| `account` | object | Yes | Account details |
+| `account.name` | string | Yes | Account name/label |
+| `account.number` | string | Yes | Account number (last 4 digits visible only) |
+| `account.routing` | string | Yes | Sort code (UK) or routing number (US) |
+| `account.iban` | string | No | International Bank Account Number |
+| `account.swift` | string | No | SWIFT/BIC code for international transfers |
+| `isDefault` | boolean | Yes | Whether this is the default account for transactions |
+| `cashAccount` | object | No | Link to associated cash investment account |
+| `cashAccount.id` | integer | No | Investment ID |
+| `cashAccount.href` | string | No | Investment API link |
+| `cashAccount.reference` | string | No | Investment reference (read-only) |
+| `accountType` | enum | No | Account type (Current, Savings, ISA) |
+| `currency` | string | No | Account currency (ISO 4217 code, default: GBP) |
+| `createdAt` | datetime | Yes (response only) | When created |
+| `updatedAt` | datetime | Yes (response only) | Last updated |
+
+**Account Types:**
+- `CURRENT` - Current/checking account
+- `SAVINGS` - Savings account
+- `ISA` - Individual Savings Account (tax-efficient)
+- `BUSINESS` - Business account
+- `JOINT` - Joint account
+
+### 18.4 Contract Schema
+
+**Complete Bank Account Contract:**
+
+```json
+{
+  "id": 1234,
+  "href": "/api/v2/factfinds/679/clients/8496/bankaccounts/1234",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "John Smith"
+  },
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "name": "John Smith"
+    },
+    {
+      "id": 8497,
+      "href": "/api/v2/factfinds/679/clients/8497",
+      "name": "Jane Smith"
+    }
+  ],
+  "bank": {
+    "name": "Barclays Bank PLC",
+    "address": {
+      "line1": "123 High Street",
+      "line2": "Churchill Place",
+      "city": "London",
+      "county": "Greater London",
+      "postcode": "E14 5HP",
+      "country": "GB"
+    }
+  },
+  "account": {
+    "name": "Joint Current Account",
+    "number": "****5678",
+    "routing": "20-00-00",
+    "iban": "GB29 NWBK 6016 1331 9268 19",
+    "swift": "BARCGB22"
+  },
+  "isDefault": true,
+  "cashAccount": {
+    "id": 5001,
+    "href": "/api/v2/factfinds/679/investments/5001",
+    "reference": "ISA-2024-001"
+  },
+  "accountType": "CURRENT",
+  "currency": "GBP",
+  "createdAt": "2024-01-15T10:00:00Z",
+  "updatedAt": "2024-06-20T14:30:00Z"
+}
+```
+
+### 18.5 Complete Examples
+
+**Example 1: Personal Current Account (Default Account)**
+
+Request:
+```http
+POST /api/v2/factfinds/679/clients/8496/bankaccounts
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "owners": [
+    {
+      "id": 8496,
+      "name": "John Smith"
+    }
+  ],
+  "bank": {
+    "name": "HSBC UK Bank PLC",
+    "address": {
+      "line1": "8 Canada Square",
+      "line2": "Canary Wharf",
+      "city": "London",
+      "county": "Greater London",
+      "postcode": "E14 5HQ",
+      "country": "GB"
+    }
+  },
+  "account": {
+    "name": "Personal Current Account",
+    "number": "12345678",
+    "routing": "40-00-00",
+    "iban": "GB29 MIDL 4000 0012 3456 78",
+    "swift": "HBUKGB4B"
+  },
+  "isDefault": true,
+  "accountType": "CURRENT",
+  "currency": "GBP"
+}
+```
+
+Response: `201 Created` with complete BankAccount object (account.number masked as `****5678`)
+
+**Example 2: Joint Savings Account Linked to Cash ISA**
+
+```json
+{
+  "id": 1235,
+  "href": "/api/v2/factfinds/679/clients/8496/bankaccounts/1235",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "John Smith"
+  },
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "name": "John Smith"
+    },
+    {
+      "id": 8497,
+      "href": "/api/v2/factfinds/679/clients/8497",
+      "name": "Jane Smith"
+    }
+  ],
+  "bank": {
+    "name": "Nationwide Building Society",
+    "address": {
+      "line1": "Nationwide House",
+      "line2": "Pipers Way",
+      "city": "Swindon",
+      "county": "Wiltshire",
+      "postcode": "SN38 1NW",
+      "country": "GB"
+    }
+  },
+  "account": {
+    "name": "Joint Cash ISA",
+    "number": "****9012",
+    "routing": "07-00-00",
+    "iban": "GB15 NAIA 0700 0098 7654 32",
+    "swift": "NAIAGB21"
+  },
+  "isDefault": false,
+  "cashAccount": {
+    "id": 5010,
+    "href": "/api/v2/factfinds/679/investments/5010",
+    "reference": "ISA-2024-JNT-001"
+  },
+  "accountType": "ISA",
+  "currency": "GBP",
+  "createdAt": "2024-04-06T09:00:00Z",
+  "updatedAt": "2024-04-06T09:00:00Z"
+}
+```
+
+**Example 3: International Account (EUR)**
+
+```json
+{
+  "id": 1236,
+  "href": "/api/v2/factfinds/679/clients/8496/bankaccounts/1236",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "John Smith"
+  },
+  "owners": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "name": "John Smith"
+    }
+  ],
+  "bank": {
+    "name": "Deutsche Bank AG",
+    "address": {
+      "line1": "Taunusanlage 12",
+      "line2": "",
+      "city": "Frankfurt am Main",
+      "county": "Hessen",
+      "postcode": "60325",
+      "country": "DE"
+    }
+  },
+  "account": {
+    "name": "Euro Current Account",
+    "number": "****7890",
+    "routing": "500 700 10",
+    "iban": "DE89 3704 0044 0532 0130 00",
+    "swift": "DEUTDEFF"
+  },
+  "isDefault": false,
+  "cashAccount": null,
+  "accountType": "CURRENT",
+  "currency": "EUR",
+  "createdAt": "2024-02-10T11:30:00Z",
+  "updatedAt": "2024-02-10T11:30:00Z"
+}
+```
+
+### 18.6 Business Rules
+
+1. **Default Account:** Only one bank account per client can be marked as `isDefault: true`. Setting a new default automatically unsets the previous default
+2. **Account Number Masking:** Account numbers are masked in responses, showing only last 4 digits (e.g., `****5678`) for security. Full number stored encrypted
+3. **Joint Account Validation:** If multiple `owners` are specified, all referenced clients must exist in the same factfind
+4. **Cash Account Linking:** If `cashAccount` is provided, the referenced investment must exist and have `investmentCategory: CashBankAccount`
+5. **Sort Code Format:** UK sort codes must be in format `XX-XX-XX` (6 digits with hyphens)
+6. **IBAN Validation:** If provided, IBAN must be valid per ISO 13616 standard
+7. **Currency Default:** If `currency` not specified, defaults to `GBP` for UK clients
+8. **Bank Address Validation:** Bank address must include at minimum: line1, city, postcode, country
+
+### 18.7 Query Parameters
+
+**List Operation Query Parameters:**
+
+| Parameter | Type | Description | Example |
+|-----------|------|-------------|---------|
+| `isDefault` | boolean | Filter by default account | `?isDefault=true` |
+| `accountType` | enum | Filter by account type | `?accountType=CURRENT` |
+| `currency` | string | Filter by currency | `?currency=GBP` |
+| `bank` | string | Filter by bank name | `?bank=Barclays` |
+| `hasCashAccount` | boolean | Filter accounts linked to investments | `?hasCashAccount=true` |
+| `page` | integer | Page number (1-indexed) | `?page=1` |
+| `pageSize` | integer | Items per page (max 100) | `?pageSize=25` |
+| `sort` | string | Sort field and direction | `?sort=bank.name:asc` |
+
+**Sort Fields:**
+- `bank.name` - Bank name (alphabetical)
+- `account.name` - Account name (alphabetical)
+- `isDefault` - Default account first
+- `createdAt` - Creation date
+- `updatedAt` - Last modified date
+
+### 18.8 HTTP Status Codes
+
+| Code | Description | When Used |
+|------|-------------|-----------|
+| 200 OK | Success | GET, PATCH successful |
+| 201 Created | Resource created | POST successful |
+| 204 No Content | Success with no body | DELETE successful |
+| 400 Bad Request | Invalid syntax | Malformed JSON, invalid data types, invalid IBAN format |
+| 401 Unauthorized | Authentication required | Missing or invalid token |
+| 403 Forbidden | Insufficient permissions | Lacks `client:write` or `client:delete` scope |
+| 404 Not Found | Resource not found | Invalid bank account ID, client ID, or factfind ID |
+| 422 Unprocessable Entity | Validation failed | Invalid sort code format, invalid cash account reference, duplicate default account |
+| 500 Internal Server Error | Server error | Unexpected server issue |
+
+### 18.9 Regulatory Compliance
+
+**Payment Services Regulations 2017:**
+- Secure storage of account details
+- Strong customer authentication (SCA) for payment initiation
+- Data protection for sensitive financial information
+
+**GDPR Compliance:**
+- Bank account details are highly sensitive PII
+- Encryption at rest and in transit required
+- Access logging mandatory for all bank account access
+- Right to erasure with financial record retention exceptions (6 years)
+- Data minimization - only store necessary account details
+
+**FCA Handbook (CASS):**
+- Client money rules for holding client bank account details
+- Segregation of client accounts from firm accounts
+- Bank account verification for large payments
+
+**MLR 2017 (Money Laundering Regulations):**
+- Bank account verification as part of enhanced due diligence
+- Source of funds validation for high-value accounts
+- Ongoing monitoring of account activity
+
+**PSD2 (Payment Services Directive 2):**
+- Open banking integration for account verification
+- Secure API access with OAuth 2.0
+- Transaction data protection
+
+**Data Security Standards:**
+- PCI DSS compliance for account number storage
+- Encryption: AES-256 for account numbers at rest
+- TLS 1.3 for data in transit
+- Tokenization of sensitive account data
+
+**UK BACS Rules:**
+- Correct sort code and account number validation
+- Direct Debit indemnity scheme compliance
+
+### 18.10 Related APIs
+
+- **[Client Management API](#5-client-management-api)** - Parent resource, account ownership
+- **[Investment API](#25-investment-api)** - Linked cash bank accounts (CashBankAccount category)
+- **[Income API](#20-income-api)** - Salary payments, pension deposits
+- **[Expenditure API](#21-expenditure-api)** - Direct debits, standing orders
+- **[Mortgage API](#30-mortgage-api)** - Mortgage payment accounts
+- **[Personal Protection API](#31-personal-protection-api)** - Premium payment accounts
+- **[Estate Planning API](#12-estate-planning-api)** - Beneficiary account details
+- **[Identity Verification API](#13-identity-verification-api)** - Bank statement verification
+- **[FactFind Root API](#4-factfind-root-api)** - Parent aggregate root
+
+---
+
+## 19. Employment API
 
 ### 18.1 Overview
 
@@ -5973,9 +6365,9 @@ Content-Type: application/json
 
 ---
 
-## 19. Income API
+## 20. Income API
 
-### 19.1 Overview
+### 20.1 Overview
 
 **Purpose:** The Income API manages all income sources for clients including salary, dividends, rental income, pension income, and state benefits with frequency, tax treatment, and gross/net calculations.
 
@@ -5990,7 +6382,7 @@ Content-Type: application/json
 - Income period tracking (start/end dates)
 - Link to employment or assets generating income
 
-### 19.2 Operations
+### 20.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -6002,7 +6394,7 @@ Content-Type: application/json
 
 **Total Operations:** 5 endpoints
 
-### 19.3 Resource Properties
+### 20.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -6035,7 +6427,7 @@ Content-Type: application/json
 
 **Total Properties:** 24 properties (including nested)
 
-### 19.4 Contract Schema
+### 20.4 Contract Schema
 
 ```json
 {
@@ -6111,7 +6503,7 @@ Content-Type: application/json
 }
 ```
 
-### 19.5 Complete Examples
+### 20.5 Complete Examples
 
 #### Example 1: Add Employment Income
 
@@ -6272,7 +6664,7 @@ Content-Type: application/json
 }
 ```
 
-### 19.6 Business Rules
+### 20.6 Business Rules
 
 1. **Gross Amount Required:** All income must have `grossAmount`
 2. **Net Calculation:** If tax deducted provided, system can calculate net amount
@@ -6296,7 +6688,7 @@ Content-Type: application/json
    - Benefits: Some taxable, some not
 7. **Asset Link:** Rental and dividend income should link to generating asset
 
-### 19.7 Query Parameters
+### 20.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -6305,7 +6697,7 @@ Content-Type: application/json
 | `isOngoing` | boolean | Filter ongoing income | `isOngoing=true` |
 | `isPrimary` | boolean | Filter primary income | `isPrimary=true` |
 
-### 19.8 HTTP Status Codes
+### 20.8 HTTP Status Codes
 
 | Status Code | Description | When Used |
 |-------------|-------------|-----------|
@@ -6318,7 +6710,7 @@ Content-Type: application/json
 | 404 Not Found | Resource not found | Invalid income ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
-### 19.9 Regulatory Compliance
+### 20.9 Regulatory Compliance
 
 **FCA MCOB (Mortgage Affordability):**
 - All income sources must be verified
@@ -6332,7 +6724,7 @@ Content-Type: application/json
 - Rental: Property allowance £1,000 or expenses
 - Dividends: £500 allowance (2024/25)
 
-### 19.10 Related APIs
+### 20.10 Related APIs
 
 - [Client Management API](#5-client-management-api) - Parent resource
 - [Employment API](#18-employment-api) - Employment income link
@@ -6341,9 +6733,9 @@ Content-Type: application/json
 
 ---
 
-## 20. Expenditure API
+## 21. Expenditure API
 
-### 20.1 Overview
+### 21.1 Overview
 
 **Purpose:** The Expenditure API manages client outgoing payments and expenses categorized by type for budget planning and affordability assessments with essential/non-essential classification.
 
@@ -6358,7 +6750,7 @@ Content-Type: application/json
 - Liability linking (for debt payments)
 - Period tracking
 
-### 20.2 Operations
+### 21.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -6370,7 +6762,7 @@ Content-Type: application/json
 
 **Total Operations:** 5 endpoints
 
-### 20.3 Resource Properties
+### 21.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -6404,7 +6796,7 @@ Content-Type: application/json
 - **Quality of Living:** Clothing, Furniture, TV/Internet, Pension Contributions, Childcare
 - **Non-Essential:** Sports, Holidays, Entertainment, Investments, Credit Card payments
 
-### 20.4 Contract Schema
+### 21.4 Contract Schema
 
 ```json
 {
@@ -6452,7 +6844,7 @@ Content-Type: application/json
 }
 ```
 
-### 20.5 Complete Examples
+### 21.5 Complete Examples
 
 #### Example 1: Add Mortgage Expenditure
 
@@ -6580,7 +6972,7 @@ Content-Type: application/json
 }
 ```
 
-### 20.6 Business Rules
+### 21.6 Business Rules
 
 1. **Amount Required:** All expenditure must have positive amount
 2. **Essential Classification:** System automatically classifies based on category
@@ -6593,7 +6985,7 @@ Content-Type: application/json
    - Quality of Living: Typically included
    - Non-Essential: May be excluded in stress tests
 
-### 20.7 Query Parameters
+### 21.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -6602,7 +6994,7 @@ Content-Type: application/json
 | `isDiscretionary` | boolean | Filter discretionary | `isDiscretionary=true` |
 | `isConsolidated` | boolean | Filter consolidated debts | `isConsolidated=true` |
 
-### 20.8 HTTP Status Codes
+### 21.8 HTTP Status Codes
 
 | Status Code | Description | When Used |
 |-------------|-------------|-----------|
@@ -6615,7 +7007,7 @@ Content-Type: application/json
 | 404 Not Found | Resource not found | Invalid expenditure ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
-### 20.9 Regulatory Compliance
+### 21.9 Regulatory Compliance
 
 **FCA MCOB 11 (Responsible Lending):**
 - Thorough expenditure assessment required
@@ -6628,7 +7020,7 @@ Content-Type: application/json
 - Cannot pressure clients to understate expenditure
 - Must consider actual living costs
 
-### 20.10 Related APIs
+### 21.10 Related APIs
 
 - [Client Management API](#5-client-management-api) - Parent resource
 - [Affordability API](#21-affordability-api) - Uses expenditure for assessment
@@ -6636,9 +7028,9 @@ Content-Type: application/json
 
 ---
 
-## 21. Affordability API
+## 22. Affordability API
 
-### 21.1 Overview
+### 22.1 Overview
 
 **Purpose:** The Affordability API performs comprehensive affordability calculations for mortgage lending including income multiples, stress testing, and disposable income analysis in compliance with FCA MCOB 11.
 
@@ -6653,7 +7045,7 @@ Content-Type: application/json
 - Debt-to-income (DTI) ratios
 - Affordability history tracking
 
-### 21.2 Operations
+### 22.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -6663,7 +7055,7 @@ Content-Type: application/json
 
 **Total Operations:** 3 endpoints
 
-### 21.3 Resource Properties
+### 22.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -6695,7 +7087,7 @@ Content-Type: application/json
 
 **Total Properties:** 25 properties (including nested)
 
-### 21.4 Contract Schema
+### 22.4 Contract Schema
 
 ```json
 {
@@ -6784,7 +7176,7 @@ Content-Type: application/json
 }
 ```
 
-### 21.5 Complete Examples
+### 22.5 Complete Examples
 
 #### Example 1: Calculate Affordability
 
@@ -6913,7 +7305,7 @@ Content-Type: application/json
 }
 ```
 
-### 21.6 Business Rules
+### 22.6 Business Rules
 
 1. **FCA Stress Test:** Must apply 3% interest rate increase (or 1% above reversion rate if higher)
 2. **Income Multiples:**
@@ -6936,14 +7328,14 @@ Content-Type: application/json
    - Marginal: Borderline pass
    - Insufficient: Fails stress test
 
-### 21.7 Query Parameters
+### 22.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
 | `fromDate` | date | Filter history from date | `fromDate=2026-01-01` |
 | `toDate` | date | Filter history to date | `toDate=2026-12-31` |
 
-### 21.8 HTTP Status Codes
+### 22.8 HTTP Status Codes
 
 | Status Code | Description | When Used |
 |-------------|-------------|-----------|
@@ -6954,7 +7346,7 @@ Content-Type: application/json
 | 404 Not Found | Resource not found | Invalid client ID |
 | 422 Unprocessable Entity | Validation failed | Insufficient income data |
 
-### 21.9 Regulatory Compliance
+### 22.9 Regulatory Compliance
 
 **FCA MCOB 11 (Responsible Lending):**
 - Comprehensive affordability assessment required
@@ -6974,7 +7366,7 @@ Content-Type: application/json
 - Clear explanation of affordability results
 - Must not lend to clients who cannot afford
 
-### 21.10 Related APIs
+### 22.10 Related APIs
 
 - [Client Management API](#5-client-management-api) - Parent resource
 - [Income API](#19-income-api) - Income sources
@@ -6982,9 +7374,9 @@ Content-Type: application/json
 - [Mortgage API](#29-mortgage-api) - Mortgage applications
 
 ---
-## 22. Asset API
+## 23. Asset API
 
-### 22.1 Overview
+### 23.1 Overview
 
 **Purpose:** The Asset API manages client assets including property, businesses, cash, investments, and other valuables with ownership tracking, valuation management, and tax planning information.
 
@@ -6999,7 +7391,7 @@ Content-Type: application/json
 - Rental income linking
 - Purchase history and capital growth tracking
 
-### 22.2 Operations
+### 23.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -7011,7 +7403,7 @@ Content-Type: application/json
 
 **Total Operations:** 5 endpoints
 
-### 22.3 Resource Properties
+### 23.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -7047,7 +7439,7 @@ Content-Type: application/json
 
 **Total Properties:** 28 properties (including nested)
 
-### 22.4 Contract Schema
+### 23.4 Contract Schema
 
 ```json
 {
@@ -7118,7 +7510,7 @@ Content-Type: application/json
 }
 ```
 
-### 22.5 Complete Examples
+### 23.5 Complete Examples
 
 #### Example 1: Add Primary Residence Property
 
@@ -7320,7 +7712,7 @@ Content-Type: application/json
 }
 ```
 
-### 22.6 Business Rules
+### 23.6 Business Rules
 
 1. **Asset Type Validation:** Must be one of: PROPERTY, BUSINESS, CASH, INVESTMENT, OTHER
 2. **Current Value Required:** All assets must have a current value
@@ -7336,7 +7728,7 @@ Content-Type: application/json
 7. **Capital Growth Calculation:** `currentValue - originalValue` if both provided
 8. **Annualized Growth:** Calculated as CAGR if purchase date provided
 
-### 22.7 Query Parameters
+### 23.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -7346,7 +7738,7 @@ Content-Type: application/json
 | `minValue` | decimal | Minimum asset value | `minValue=100000` |
 | `maxValue` | decimal | Maximum asset value | `maxValue=1000000` |
 
-### 22.8 HTTP Status Codes
+### 23.8 HTTP Status Codes
 
 | Status Code | Description | When Used |
 |-------------|-------------|-----------|
@@ -7359,7 +7751,7 @@ Content-Type: application/json
 | 404 Not Found | Resource not found | Invalid asset ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
-### 22.9 Regulatory Compliance
+### 23.9 Regulatory Compliance
 
 **Inheritance Tax (IHT):**
 - Standard IHT: 40% on estate above nil rate band
@@ -7379,7 +7771,7 @@ Content-Type: application/json
 - Valuation evidence for properties (surveyor, estate agent)
 - Beneficial ownership disclosure
 
-### 22.10 Related APIs
+### 23.10 Related APIs
 
 - [FactFind Root API](#4-factfind-root-api) - Parent resource
 - [Net Worth API](#23-net-worth-api) - Asset aggregation
@@ -7388,9 +7780,9 @@ Content-Type: application/json
 
 ---
 
-## 23. Liability API
+## 24. Liability API
 
-### 23.1 Overview
+### 24.1 Overview
 
 **Purpose:** The Liability API manages client debt obligations including mortgages, loans, credit cards, hire purchase agreements, student loans, and maintenance payments with comprehensive tracking of repayment terms, protection coverage, and linked assets.
 
@@ -7409,7 +7801,7 @@ Content-Type: application/json
 - Credit limit tracking for revolving credit
 - Debt payment tracking linked to expenditure
 
-### 23.2 Operations
+### 24.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -7426,7 +7818,7 @@ Content-Type: application/json
 - `assets:write` - Create and update liabilities
 - `assets:delete` - Delete liabilities
 
-### 23.3 Resource Properties
+### 24.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -7486,7 +7878,7 @@ Content-Type: application/json
 - `CIC` - Critical illness cover only
 - `LIFE_AND_CIC` - Life and critical illness cover
 
-### 23.4 Contract Schema
+### 24.4 Contract Schema
 
 **Complete Liability Contract:**
 
@@ -7573,7 +7965,7 @@ Content-Type: application/json
 }
 ```
 
-### 23.5 Complete Examples
+### 24.5 Complete Examples
 
 **Example 1: Primary Residence Mortgage (Secured Against Property)**
 
@@ -7804,7 +8196,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 }
 ```
 
-### 23.6 Business Rules
+### 24.6 Business Rules
 
 1. **Linked Asset Validation:** If `linkedAssetRef` is provided, the referenced asset must exist in the same factfind and belong to one of the liability owners
 2. **Protection Arrangement Validation:** If `protected` is not `NOT_PROTECTED`, it is recommended (but not required) to provide `protectionArrangementRef`
@@ -7815,7 +8207,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 7. **Interest Rate Range:** Interest rate should be positive and typically between 0.5% and 30% (higher rates warrant review)
 8. **Repayment Date Logic:** If `endDate` is provided, it should be after `startDate` and calculated based on `loanTermYears`
 
-### 23.7 Query Parameters
+### 24.7 Query Parameters
 
 **List Operation Query Parameters:**
 
@@ -7842,7 +8234,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 - `lender` - Lender name (alphabetical)
 - `createdAt` - Creation date
 
-### 23.8 HTTP Status Codes
+### 24.8 HTTP Status Codes
 
 | Code | Description | When Used |
 |------|-------------|-----------|
@@ -7856,7 +8248,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 | 422 Unprocessable Entity | Validation failed | Business rule violation (e.g., invalid linked asset, creditLimit < amountOutstanding) |
 | 500 Internal Server Error | Server error | Unexpected server issue |
 
-### 23.9 Regulatory Compliance
+### 24.9 Regulatory Compliance
 
 **FCA MCOB 11 (Responsible Lending):**
 - Complete liability data required for affordability assessments
@@ -7896,7 +8288,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 - Repayment strategy verification required for interest-only
 - Debt consolidation must improve affordability position
 
-### 23.10 Related APIs
+### 24.10 Related APIs
 
 - **[Asset API](#22-asset-api)** - Linked assets for secured debts (property, vehicles)
 - **[Personal Protection API](#30-personal-protection-api)** - Linked protection policies (life insurance, critical illness)
@@ -7910,9 +8302,9 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 
 ---
 
-## 24. Net Worth API
+## 25. Net Worth API
 
-### 23.1 Overview
+### 24.1 Overview
 
 **Purpose:** The Net Worth API calculates and tracks client net worth (assets minus liabilities) with historical tracking, wealth progression analysis, and retirement gap calculations.
 
@@ -7927,7 +8319,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 - Asset allocation breakdown
 - Liquidity analysis
 
-### 23.2 Operations
+### 24.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -7939,7 +8331,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 
 **Total Operations:** 5 endpoints
 
-### 23.3 Resource Properties
+### 24.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -7984,7 +8376,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 
 **Total Properties:** 38 properties (including nested)
 
-### 23.4 Contract Schema
+### 24.4 Contract Schema
 
 ```json
 {
@@ -8115,7 +8507,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 }
 ```
 
-### 23.5 Complete Examples
+### 24.5 Complete Examples
 
 #### Example 1: Calculate Current Net Worth
 
@@ -8323,7 +8715,7 @@ Content-Type: application/json
 }
 ```
 
-### 23.6 Business Rules
+### 24.6 Business Rules
 
 1. **Net Worth Calculation:** `totalAssets - totalLiabilities`
 2. **Liquid Assets:** Cash, investments easily sold within 30 days
@@ -8339,7 +8731,7 @@ Content-Type: application/json
    - Assumes 5% growth, 2.5% inflation
 8. **Snapshot Frequency:** Recommended annual or semi-annual
 
-### 23.7 Query Parameters
+### 24.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -8349,7 +8741,7 @@ Content-Type: application/json
 | `fromDate` | date | Filter history from date | `fromDate=2024-01-01` |
 | `toDate` | date | Filter history to date | `toDate=2026-12-31` |
 
-### 23.8 HTTP Status Codes
+### 24.8 HTTP Status Codes
 
 | Status Code | Description | When Used |
 |-------------|-------------|-----------|
@@ -8362,7 +8754,7 @@ Content-Type: application/json
 | 404 Not Found | Resource not found | Invalid snapshot ID |
 | 422 Unprocessable Entity | Validation failed | Missing asset/liability data |
 
-### 23.9 Regulatory Compliance
+### 24.9 Regulatory Compliance
 
 **FCA Requirements:**
 - Net worth assessment for suitability of products
@@ -8379,7 +8771,7 @@ Content-Type: application/json
 - State Pension age: Currently 66, rising to 67 by 2028
 - Private pension needed for lifestyle above state pension
 
-### 23.10 Related APIs
+### 24.10 Related APIs
 
 - [FactFind Root API](#4-factfind-root-api) - Parent resource
 - [Asset API](#22-asset-api) - Asset details
@@ -8392,9 +8784,9 @@ Content-Type: application/json
 **End of Sections 14-23**
 
 ---
-## 25. Investment API
+## 26. Investment API
 
-### 25.1 Overview
+### 26.1 Overview
 
 **Purpose:** The Investment API manages investment products including Cash Bank Accounts, Collective Investments (ISAs, OEICs, Unit Trusts), and Life-Assured Investments (Investment Bonds) with fund holdings, contribution tracking, and maturity projections.
 
@@ -8409,7 +8801,7 @@ Content-Type: application/json
 - Low/medium/high maturity projections
 - Withdrawal and income tracking
 
-### 25.2 Operations
+### 26.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -8421,7 +8813,7 @@ Content-Type: application/json
 
 **Total Operations:** 5 endpoints
 
-### 25.3 Resource Properties
+### 26.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -8457,7 +8849,7 @@ Content-Type: application/json
 
 **Total Properties:** 28 properties (including nested)
 
-### 25.4 Contract Schema
+### 26.4 Contract Schema
 
 ```json
 {
@@ -8635,7 +9027,7 @@ Content-Type: application/json
 }
 ```
 
-### 25.5 Complete Examples
+### 26.5 Complete Examples
 
 See contract schema above for comprehensive investment example.
 
@@ -8671,7 +9063,7 @@ See contract schema above for comprehensive investment example.
 }
 ```
 
-### 25.6 Business Rules
+### 26.6 Business Rules
 
 1. **ISA Annual Allowance:** £20,000 per tax year (2024/25)
 2. **ISA Types:** Cash ISA, Stocks & Shares ISA, Lifetime ISA, Junior ISA
@@ -8684,7 +9076,7 @@ See contract schema above for comprehensive investment example.
 6. **Investment Bond Top Slicing:** Gains divided by number of complete years held to calculate tax
 7. **Chargeable Event:** Surrender, full withdrawal, death, or assignment triggers chargeable event
 
-### 25.7 Query Parameters
+### 26.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -8693,7 +9085,7 @@ See contract schema above for comprehensive investment example.
 | `isAdvised` | boolean | Filter advised | `isAdvised=true` |
 | `minValue` | decimal | Minimum value | `minValue=10000` |
 
-### 25.8 HTTP Status Codes
+### 26.8 HTTP Status Codes
 
 | Status Code | Description | When Used |
 |-------------|-------------|-----------|
@@ -8706,7 +9098,7 @@ See contract schema above for comprehensive investment example.
 | 404 Not Found | Resource not found | Invalid investment ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
-### 25.9 Regulatory Compliance
+### 26.9 Regulatory Compliance
 
 **FCA COBS 9 (Suitability):**
 - Advice must be suitable for client's circumstances
@@ -8724,7 +9116,7 @@ See contract schema above for comprehensive investment example.
 - Offshore Bond: Tax-deferred, 5% withdrawal rule
 - Onshore Bond: Basic rate tax already paid
 
-### 25.10 Related APIs
+### 26.10 Related APIs
 
 - [Client Management API](#5-client-management-api) - Client ownership
 - [ATR Assessment API](#32-atr-assessment-api) - Risk profiling
@@ -8733,9 +9125,9 @@ See contract schema above for comprehensive investment example.
 
 ---
 
-## 26. Final Salary Pension API
+## 27. Final Salary Pension API
 
-### 26.1 Overview
+### 27.1 Overview
 
 **Purpose:** The Final Salary Pension API manages Defined Benefit (DB) pension schemes including prospective benefits, Cash Equivalent Transfer Values (CETV), accrual tracking, death benefits, early retirement provisions, and Guaranteed Minimum Pension (GMP) tracking.
 
@@ -8751,7 +9143,7 @@ See contract schema above for comprehensive investment example.
 - GMP tracking (contracting-out periods)
 - Scheme indexation (CPI, RPI caps)
 
-### 26.2 Operations
+### 27.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -8763,7 +9155,7 @@ See contract schema above for comprehensive investment example.
 
 **Total Operations:** 5 endpoints
 
-### 26.3 Resource Properties
+### 27.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -8807,7 +9199,7 @@ See contract schema above for comprehensive investment example.
 
 **Total Properties:** 33 properties (including nested)
 
-### 26.4 Contract Schema
+### 27.4 Contract Schema
 
 ```json
 {
@@ -8895,11 +9287,11 @@ See contract schema above for comprehensive investment example.
 }
 ```
 
-### 26.5 Complete Examples
+### 27.5 Complete Examples
 
 See contract schema above for comprehensive example.
 
-### 26.6 Business Rules
+### 27.6 Business Rules
 
 1. **Accrual Rates:**
    - 1/60: Modern schemes (Teachers, Civil Service)
@@ -8913,7 +9305,7 @@ See contract schema above for comprehensive example.
 6. **Spouse Benefits:** Usually 50% or 66.67% of member's pension
 7. **Indexation:** Post-retirement increases (CPI capped, RPI, fixed %)
 
-### 26.7 Query Parameters
+### 27.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -8921,11 +9313,11 @@ See contract schema above for comprehensive example.
 | `isPreserved` | boolean | Filter preserved pensions | `isPreserved=true` |
 | `provider` | string | Filter by provider | `provider=NHS` |
 
-### 26.8 HTTP Status Codes
+### 27.8 HTTP Status Codes
 
 Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
-### 26.9 Regulatory Compliance
+### 27.9 Regulatory Compliance
 
 **Pension Schemes Act 2015:**
 - Statutory transfer rights
@@ -8944,7 +9336,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Sustainability of income in retirement
 - Comparison with DB benefits
 
-### 26.10 Related APIs
+### 27.10 Related APIs
 
 - [Client Management API](#5-client-management-api) - Scheme member
 - [Employment API](#18-employment-api) - Employment history
@@ -8952,9 +9344,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 27. Annuity API
+## 28. Annuity API
 
-### 27.1 Overview
+### 28.1 Overview
 
 **Purpose:** The Annuity API manages annuity products including lifetime, fixed-term, and joint-life annuities with level, escalating, or RPI/CPI linked income, guarantee periods, and spouse continuation options.
 
@@ -8970,7 +9362,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Enhanced/impaired life annuities
 - Value protection (return of capital)
 
-### 27.2 Operations
+### 28.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -8982,7 +9374,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Total Operations:** 5 endpoints
 
-### 27.3 Resource Properties
+### 28.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -9016,7 +9408,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Total Properties:** 27 properties (including nested)
 
-### 27.4 Contract Schema
+### 28.4 Contract Schema
 
 ```json
 {
@@ -9081,11 +9473,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 }
 ```
 
-### 27.5 Complete Examples
+### 28.5 Complete Examples
 
 See contract schema above for comprehensive example.
 
-### 27.6 Business Rules
+### 28.6 Business Rules
 
 1. **Annuity Purchase:** Typically purchased from pension fund at retirement
 2. **PCLS:** Usually 25% of fund taken as tax-free lump sum before annuity purchase
@@ -9098,7 +9490,7 @@ See contract schema above for comprehensive example.
 6. **Value Protection:** Return of remaining capital on death (reduces income)
 7. **Enhanced Annuities:** Higher income for health/lifestyle factors (10-40% uplift)
 
-### 27.7 Query Parameters
+### 28.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -9106,11 +9498,11 @@ See contract schema above for comprehensive example.
 | `isJointLife` | boolean | Filter joint-life | `isJointLife=true` |
 | `incomeType` | enum | Filter by income type | `incomeType=RPI_Linked` |
 
-### 27.8 HTTP Status Codes
+### 28.8 HTTP Status Codes
 
 Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
-### 27.9 Regulatory Compliance
+### 28.9 Regulatory Compliance
 
 **FCA COBS 19.3 (Pension Transfers):**
 - Annuity purchase vs drawdown comparison required
@@ -9122,7 +9514,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Annuity purchase irreversible
 - Alternative income options must be explained
 
-### 27.10 Related APIs
+### 28.10 Related APIs
 
 - [Personal Pension API](#27-personal-pension-api) - Source pension
 - [Client Management API](#5-client-management-api) - Annuity owner
@@ -9130,9 +9522,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 28. Personal Pension API
+## 29. Personal Pension API
 
-### 28.1 Overview
+### 29.1 Overview
 
 **Purpose:** The Personal Pension API manages Defined Contribution (DC) pensions including personal pensions, SIPPs, and drawdown arrangements with detailed fund holdings, crystallisation tracking, GAD compliance, PCLS management, and death benefits.
 
@@ -9149,7 +9541,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Death benefits (lump sum, drawdown pension)
 - Lifetime Allowance usage tracking
 
-### 28.2 Operations
+### 29.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -9161,7 +9553,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Total Operations:** 5 endpoints
 
-### 28.3 Resource Properties
+### 29.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -9202,7 +9594,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Total Properties:** 50+ properties (including nested)
 
-### 28.4 Contract Schema
+### 29.4 Contract Schema
 
 ```json
 {
@@ -9307,11 +9699,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 }
 ```
 
-### 28.5 Complete Examples
+### 29.5 Complete Examples
 
 See contract schema above for comprehensive example.
 
-### 28.6 Business Rules
+### 29.6 Business Rules
 
 1. **Annual Allowance:** £60,000 per tax year (2024/25)
 2. **Tax Relief:** Basic rate (20%) relief at source, higher rate claim via tax return
@@ -9325,7 +9717,7 @@ See contract schema above for comprehensive example.
    - Before 75: Tax-free
    - After 75: Taxed at beneficiary's marginal rate
 
-### 28.7 Query Parameters
+### 29.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -9333,11 +9725,11 @@ See contract schema above for comprehensive example.
 | `crystallisationStatus` | enum | Filter by status | `crystallisationStatus=Uncrystallised` |
 | `pensionArrangement` | enum | Filter by arrangement | `pensionArrangement=FlexiAccessDrawdown` |
 
-### 28.8 HTTP Status Codes
+### 29.8 HTTP Status Codes
 
 Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
-### 28.9 Regulatory Compliance
+### 29.9 Regulatory Compliance
 
 **Finance Act 2004:**
 - Annual Allowance rules
@@ -9355,7 +9747,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Appropriate pension transfer analysis
 - Retirement income comparison
 
-### 28.10 Related APIs
+### 29.10 Related APIs
 
 - [Client Management API](#5-client-management-api) - Pension owner
 - [Employment API](#18-employment-api) - Workplace pensions
@@ -9363,9 +9755,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - [Annuity API](#26-annuity-API) - Annuity purchase option
 
 ---
-## 29. State Pension API
+## 30. State Pension API
 
-### 29.1 Overview
+### 30.1 Overview
 
 **Purpose:** The State Pension API manages UK State Pension entitlements including old (pre-2016) and new (post-2016) State Pension systems, Additional Pension (SERPS/S2P), Pension Credit, spouse inheritance, and BR19 projections.
 
@@ -9381,7 +9773,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Triple Lock protection tracking
 - Spouse/civil partner inheritance
 
-### 29.2 Operations
+### 30.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -9391,7 +9783,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 | PATCH | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Update state pension | StatePensionPatch | 200 OK - StatePension |
 | DELETE | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Delete state pension | N/A | 204 No Content |
 
-### 29.3 Resource Properties
+### 30.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -9419,7 +9811,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 | `createdAt` | datetime | Yes (response only) | Creation timestamp |
 | `updatedAt` | datetime | Yes (response only) | Update timestamp |
 
-### 29.4 Contract Schema
+### 30.4 Contract Schema
 
 ```json
 {
@@ -9458,7 +9850,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 }
 ```
 
-### 29.5 Business Rules
+### 30.5 Business Rules
 
 1. **New State Pension:** £221.20 per week / £11,502.40 per year (2024/25)
 2. **Qualifying Years:** 35 years for full New State Pension, minimum 10 years
@@ -9469,18 +9861,18 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 7. **Spouse Inheritance:** Old system only, not new system
 8. **Deferral:** Can defer to get higher amount (1% increase per 9 weeks deferred)
 
-### 29.6 Query Parameters
+### 30.6 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
 | `statePensionType` | enum | Filter by type | `statePensionType=New` |
 | `isContractedOut` | boolean | Filter contracted-out | `isContractedOut=true` |
 
-### 29.7 HTTP Status Codes
+### 30.7 HTTP Status Codes
 
 Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
-### 29.8 Regulatory Compliance
+### 30.8 Regulatory Compliance
 
 **Pensions Act 2014:**
 - New State Pension from April 2016
@@ -9491,7 +9883,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Annual increase guarantee
 - Highest of: earnings growth, CPI inflation, 2.5%
 
-### 29.9 Related APIs
+### 30.9 Related APIs
 
 - [Client Management API](#5-client-management-api) - Pension recipient
 - [Personal Pension API](#27-personal-pension-api) - Private pension provision
@@ -9499,9 +9891,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 30. Mortgage API
+## 31. Mortgage API
 
-### 30.1 Overview
+### 31.1 Overview
 
 **Purpose:** The Mortgage API manages comprehensive mortgage arrangements including residential mortgages, buy-to-let, lifetime mortgages, and second charge mortgages with automatic LTV calculations, early repayment charges, and special features tracking.
 
@@ -9517,7 +9909,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Payment holiday and borrow-back features
 - Portability options
 
-### 30.2 Operations
+### 31.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -9527,9 +9919,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 | PATCH | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Update mortgage | MortgagePatch | 200 OK - Mortgage |
 | DELETE | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Delete mortgage | N/A | 204 No Content |
 
-### 30.3 Resource Properties (30 core properties - see Contract Schema for full structure)
+### 31.3 Resource Properties (30 core properties - see Contract Schema for full structure)
 
-### 30.4 Contract Schema
+### 31.4 Contract Schema
 
 ```json
 {
@@ -9640,7 +10032,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 }
 ```
 
-### 30.5 Business Rules
+### 31.5 Business Rules
 
 1. **LTV Calculation:** `LTV = (Current Balance / Property Value) × 100%`
 2. **Maximum LTV:** Typically 95% for first-time buyers, 90% standard, 75% BTL
@@ -9653,7 +10045,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
    - Interest-Only: Capital due at end (requires repayment vehicle)
    - Part-and-Part: Combination of both
 
-### 30.6 Query Parameters
+### 31.6 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -9661,11 +10053,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 | `rateType` | enum | Filter by rate type | `rateType=Fixed` |
 | `repaymentType` | enum | Filter by repayment | `repaymentType=Repayment` |
 
-### 30.7 HTTP Status Codes
+### 31.7 HTTP Status Codes
 
 Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
-### 30.8 Regulatory Compliance
+### 31.8 Regulatory Compliance
 
 **FCA MCOB (Mortgage Conduct of Business):**
 - Affordability assessment mandatory
@@ -9678,7 +10070,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Income and expenditure verification
 - Interest-only mortgages: credible repayment strategy required
 
-### 30.9 Related APIs
+### 31.9 Related APIs
 
 - [Asset API](#22-asset-api) - Linked property
 - [Affordability API](#21-affordability-api) - Affordability assessment
@@ -9686,9 +10078,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 31. Personal Protection API
+## 32. Personal Protection API
 
-### 31.1 Overview
+### 32.1 Overview
 
 **Purpose:** The Personal Protection API manages life assurance, critical illness, income protection, and expense cover policies with multi-cover support, premium structures, trust arrangements, and commission tracking.
 
@@ -9704,7 +10096,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Trust arrangements for IHT planning
 - Indexation (RPI, fixed percentage)
 
-### 31.2 Operations
+### 32.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -9714,9 +10106,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 | PATCH | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Update protection | PersonalProtectionPatch | 200 OK - PersonalProtection |
 | DELETE | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Delete protection | N/A | 204 No Content |
 
-### 31.3 Resource Properties (38 core properties - see Contract Schema)
+### 32.3 Resource Properties (38 core properties - see Contract Schema)
 
-### 31.4 Contract Schema
+### 32.4 Contract Schema
 
 ```json
 {
@@ -9800,7 +10192,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 }
 ```
 
-### 31.5 Business Rules
+### 32.5 Business Rules
 
 1. **Life Cover:** Pays lump sum on death
 2. **Critical Illness:** Pays on diagnosis of specified conditions (cancer, heart attack, stroke, etc.)
@@ -9816,7 +10208,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 6. **Indexation:** Annual benefit increase (RPI, CPI, fixed %)
 7. **Underwriting:** Medical underwriting, premium loadings for health conditions
 
-### 31.6 Query Parameters
+### 32.6 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -9824,11 +10216,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 | `inTrust` | boolean | Filter trust policies | `inTrust=true` |
 | `provider` | string | Filter by provider | `provider=L&G` |
 
-### 31.7 HTTP Status Codes
+### 32.7 HTTP Status Codes
 
 Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
-### 31.8 Regulatory Compliance
+### 32.8 Regulatory Compliance
 
 **FCA ICOBS (Insurance Conduct of Business):**
 - Demands and needs statement required
@@ -9839,7 +10231,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Commission disclosure requirements
 - Product sales reporting
 
-### 31.9 Related APIs
+### 32.9 Related APIs
 
 - [Client Management API](#5-client-management-api) - Policy owners
 - [Mortgage API](#29-mortgage-api) - Linked life cover
@@ -9847,9 +10239,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 32. Objectives API
+## 33. Objectives API
 
-### 32.1 Overview
+### 33.1 Overview
 
 **Purpose:** The Objectives API manages client financial goals and objectives across multiple domains (investment, pension, protection, mortgage, budget, estate-planning) with priority ranking, target dates, and needs analysis.
 
@@ -9863,7 +10255,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Needs analysis sub-resource
 - Goal dependencies
 
-### 32.2 Operations (26 total)
+### 33.2 Operations (26 total)
 
 **Base Operations (5):**
 - GET `/api/v2/factfinds/{factfindId}/objectives` - List all
@@ -9879,7 +10271,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 **Needs Sub-resource (3):**
 - GET needs, POST needs, DELETE needs
 
-### 32.3 Contract Schema
+### 33.3 Contract Schema
 
 ```json
 {
@@ -9918,7 +10310,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 }
 ```
 
-### 32.4 Business Rules
+### 33.4 Business Rules
 
 1. **Priority:** High, Medium, Low (affects recommendation order)
 2. **Status:** NotStarted, InProgress, Achieved, Abandoned
@@ -9926,15 +10318,15 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 4. **Target Date:** Must be in future
 5. **Dependencies:** Some goals may depend on others (e.g., mortgage payoff before retirement)
 
-### 32.5 Related APIs
+### 33.5 Related APIs
 
 All planning APIs feed into objectives
 
 ---
 
-## 33. ATR Assessment API
+## 34. ATR Assessment API
 
-### 33.1 Overview
+### 34.1 Overview
 
 **Purpose:** The ATR (Attitude to Risk) Assessment API manages comprehensive risk profiling questionnaires with 15 core questions, risk score calculation, capacity for loss assessment, and historical assessment tracking (Risk Replay).
 
@@ -9949,7 +10341,7 @@ All planning APIs feed into objectives
 - Risk profile comparison over time
 - Profile selection for investments
 
-### 33.2 Operations (6)
+### 34.2 Operations (6)
 
 - GET current assessment
 - POST create assessment
@@ -9958,7 +10350,7 @@ All planning APIs feed into objectives
 - GET compare assessments
 - PATCH update profile selection
 
-### 33.3 Contract Schema
+### 34.3 Contract Schema
 
 ```json
 {
@@ -9994,7 +10386,7 @@ All planning APIs feed into objectives
 }
 ```
 
-### 33.4 Business Rules
+### 34.4 Business Rules
 
 1. **Review Period:** ATR assessments valid for 12 months
 2. **Risk Ratings:** Defensive (1-2), Cautious (3-4), Balanced (5-6), Adventurous (7-8), Aggressive (9-10)
@@ -10002,16 +10394,16 @@ All planning APIs feed into objectives
 4. **Investment Suitability:** Risk profile must match investment risk rating
 5. **Regulatory Review:** Must be reviewed annually or on significant life event
 
-### 33.5 Related APIs
+### 34.5 Related APIs
 
 - [Financial Profile API](#15-financial-profile-api) - Investment experience
 - [Investment API](#24-investment-api) - Risk-rated investments
 
 ---
 
-## 34. Reference Data API
+## 35. Reference Data API
 
-### 34.1 Overview
+### 35.1 Overview
 
 **Purpose:** The Reference Data API provides enumeration values, lookup data, and reference entities for dropdown lists, validation, and data consistency across the application.
 
@@ -10023,7 +10415,7 @@ All planning APIs feed into objectives
 - Reference entities (providers, advisers)
 - Version tracking for data changes
 
-### 34.2 Operations (24 total)
+### 35.2 Operations (24 total)
 
 **Enumerations (14):**
 - GET /genders, /titles, /marital-statuses
@@ -10041,7 +10433,7 @@ All planning APIs feed into objectives
 - GET/POST providers, GET/POST/PATCH/DELETE provider
 - Similar for advisers
 
-### 34.3 Example Responses
+### 35.3 Example Responses
 
 **GET /api/v2/reference/genders:**
 ```json
@@ -10084,7 +10476,7 @@ All planning APIs feed into objectives
 }
 ```
 
-### 34.4 Business Rules
+### 35.4 Business Rules
 
 1. **ISO Standards:** Use ISO codes where applicable (ISO 3166 countries, ISO 4217 currencies)
 2. **Versioning:** Reference data changes tracked with version numbers
