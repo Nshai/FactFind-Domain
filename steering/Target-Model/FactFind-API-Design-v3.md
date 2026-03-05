@@ -1,32 +1,11 @@
 # FactFind System API Design Specification v3.0
 ## Comprehensive RESTful API for Wealth Management Platform
 
-**Date:** 2026-03-03
+**Date:** 2026-03-05
 **Status:** Active Specification
 **API Version:** v3
 **Base URL:** `https://api.factfind.com`
 **Document Version:** 3.0
-
----
-
-## Document Information
-
-**Previous Versions:**
-- v1.0 - Initial API design (2025-12-15)
-- v2.0 - Added comprehensive entity APIs (2026-02-19)
-- v3.0 - Consolidated all comprehensive APIs with latest contracts (2026-03-03)
-
-**Changes in v3.0:**
-- Consolidated 35 comprehensive API designs into single specification
-- Updated all contracts to align with FactFind-Contracts-Reference.md
-- Updated all endpoints to align with API-Endpoints-Catalog.md
-- Removed legacy arrangement and sub-arrangement APIs
-- Added State Pension API (Section 30)
-- Added Liability API (Section 24)
-- Added Bank Account API (Section 18)
-- Updated all examples with latest contract schemas
-- Enhanced business rules and validation guidance
-- Improved regulatory compliance documentation
 
 ---
 
@@ -860,111 +839,6 @@ GET /api/v3/factfinds/679/clients?orderBy=lastName asc,firstName asc
 ```
 
 ---
-
-[Document continues with detailed API sections...]
-
-## 4. FactFind Root API
-
-[Full FactFind API section to be added - referencing Comprehensive-APIs/FactFind-API-Design.md]
-
-## 5. Client Management API
-
-[Full Client API section to be added - referencing Comprehensive-APIs/Client-API-Design.md]
-
-[Additional sections to follow...]
-
----
-
-**End of Part 1**
-
-**Note:** This is a large comprehensive document. The full version 3.0 specification includes all 33 API sections with complete operation details, contract schemas, examples, business rules, and regulatory guidance. Each API section follows the same comprehensive structure as established in the Comprehensive-APIs folder.
-
-**Total Document Size:** Approximately 50,000+ lines
-**Recommended Usage:** Reference specific API sections as needed rather than reading sequentially.
-
----
-
-## Quick Reference: API Endpoint Summary
-
-### FactFind Root (11 endpoints)
-- Fact find CRUD operations
-- Aggregated views (complete, current position, net worth, etc.)
-
-### Client Onboarding & KYC (105 endpoints)
-- Client management
-- Addresses and contacts
-- Professional contacts
-- Relationships
-- Estate planning
-- DPA agreements
-- Vulnerabilities
-- Dependants
-- Identity verification
-- Credit history
-- Financial profile
-- Marketing preferences
-
-### Circumstances (26 endpoints)
-- Employment
-- Income
-- Expenditure
-- Income/expenditure changes
-- Budget summary
-- Affordability
-
-### Assets & Liabilities (23 endpoints)
-- Assets (property, other assets)
-- Liabilities
-- Property details
-- Net worth calculations
-
-### Plans & Investments (35 endpoints)
-- Investments (cash bank accounts, investment accounts, life-assured investments)
-- Final Salary Pensions
-- Annuities
-- Personal Pensions
-- State Pensions ⭐ NEW in v3.0
-- Mortgages
-- Personal Protection
-
-### Goals (31 endpoints)
-- Objectives by type (investment, pension, protection, mortgage, budget, estate planning)
-- Needs management
-
-### ATR (8 endpoints)
-- ATR assessment
-- Risk profile selection
-- Assessment history
-
-### Reference Data (24 endpoints)
-- Enumerations (genders, titles, statuses, etc.)
-- Lookups (countries, currencies, frequencies, etc.)
-- Reference entities (providers, advisers, product types)
-
-**Total: 263 endpoints**
-
----
-
-## Document Status
-
-**Version:** 3.0
-**Status:** Active
-**Last Updated:** 2026-03-03
-**Next Review:** 2026-06-03
-
-**Maintainers:**
-- API Architecture Team
-- Product Management
-- Compliance Team
-
-**Change Log:**
-- 2026-03-03: v3.0 - Consolidated comprehensive APIs, added State Pension API
-- 2026-02-19: v2.0 - Added comprehensive entity APIs
-- 2025-12-15: v1.0 - Initial API design
-
----
-
-**END OF DOCUMENT**
 ## 4. FactFind Root API
 
 ### Overview
@@ -1345,7 +1219,364 @@ Returns updated FactFind object.
 
 - [Client API](./Client-API-Design.md) - Client management and information
 - All other entity APIs depend on FactFind as root aggregate
-- See [Comprehensive FactFind API Design](../Comprehensive-APIs/FactFind-API-Design.md) for full specification
+- [Control Options API](#411-control-options-api) - Controls which FactFind sections are relevant
+
+---
+
+### 4.11 Control Options API
+
+The Control Options API provides management of high-level control flags that determine which sections of the FactFind are relevant to a client. These control options enable conditional logic in the data-gathering process, showing or hiding sections based on client circumstances.
+
+**Key Features:**
+- Singleton resource (one record per FactFind)
+- Section-based updates for different financial areas
+- Boolean flags for presence of financial products
+- Liability reduction planning options
+- Efficient data collection through section gating
+
+**Resource Model:**
+- ControlOptions (singleton per FactFind)
+- Six sections: investments, pensions, mortgages, protections, assets, liabilities
+- GET returns all sections combined
+- Six PUT endpoints for individual section updates
+
+#### Base URL Pattern
+
+```
+/api/v3/factfinds/{id}/controloptions
+```
+
+#### Operations
+
+**Get Control Options**
+```
+GET /api/v3/factfinds/{id}/controloptions
+```
+Retrieves the complete control options singleton.
+
+**Response:** 200 OK
+```json
+{
+  "href": "/api/v3/factfinds/679/controloptions",
+  "factfind": {
+    "id": 679,
+    "href": "/api/v3/factfinds/679"
+  },
+  "investments": {
+    "hasCash": true,
+    "hasInvestments": true
+  },
+  "pensions": {
+    "hasEmployerPensionSchemes": true,
+    "hasFinalSalary": false,
+    "hasMoneyPurchases": true,
+    "hasPersonalPensions": true,
+    "hasAnnuities": false
+  },
+  "mortgages": {
+    "hasMortgages": true,
+    "hasEquityRelease": false
+  },
+  "protections": {
+    "hasProtection": true
+  },
+  "assets": {
+    "hasAssets": true
+  },
+  "liabilities": {
+    "hasLiabilities": true,
+    "reductionOfLiabilities": {
+      "isExpected": false,
+      "nonReductionReason": "RetainControlOfCapital",
+      "details": "Client prefers to maintain liquidity for flexibility and investment opportunities."
+    }
+  }
+}
+```
+
+**Error Responses:**
+- `404 Not Found`: Control options not created yet
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+**Update Assets Section**
+```
+PUT /api/v3/factfinds/{id}/controloptions/assets
+```
+Creates or updates the assets section.
+
+**Request Body:**
+```json
+{
+  "hasAssets": true
+}
+```
+
+**Response:** 200 OK (or 201 Created for first PUT)
+Returns complete ControlOptions object (same structure as GET response).
+
+---
+
+**Update Liabilities Section**
+```
+PUT /api/v3/factfinds/{id}/controloptions/liabilities
+```
+Creates or updates the liabilities section.
+
+**Request Body:**
+```json
+{
+  "hasLiabilities": true,
+  "reductionOfLiabilities": {
+    "isExpected": false,
+    "nonReductionReason": "RetainControlOfCapital",
+    "details": "Client prefers to maintain liquidity for flexibility and investment opportunities."
+  }
+}
+```
+
+**Response:** 200 OK
+Returns complete ControlOptions object.
+
+---
+
+**Update Investments Section**
+```
+PUT /api/v3/factfinds/{id}/controloptions/investments
+```
+Creates or updates the investments section.
+
+**Request Body:**
+```json
+{
+  "hasCash": true,
+  "hasInvestments": true
+}
+```
+
+**Response:** 200 OK
+Returns complete ControlOptions object.
+
+---
+
+**Update Pensions Section**
+```
+PUT /api/v3/factfinds/{id}/controloptions/pensions
+```
+Creates or updates the pensions section.
+
+**Request Body:**
+```json
+{
+  "hasEmployerPensionSchemes": true,
+  "hasFinalSalary": false,
+  "hasMoneyPurchases": true,
+  "hasPersonalPensions": true,
+  "hasAnnuities": false
+}
+```
+
+**Response:** 200 OK
+Returns complete ControlOptions object.
+
+---
+
+**Update Protections Section**
+```
+PUT /api/v3/factfinds/{id}/controloptions/protections
+```
+Creates or updates the protections section.
+
+**Request Body:**
+```json
+{
+  "hasProtection": true
+}
+```
+
+**Response:** 200 OK
+Returns complete ControlOptions object.
+
+---
+
+**Update Mortgages Section**
+```
+PUT /api/v3/factfinds/{id}/controloptions/mortgages
+```
+Creates or updates the mortgages section.
+
+**Request Body:**
+```json
+{
+  "hasMortgages": true,
+  "hasEquityRelease": false
+}
+```
+
+**Response:** 200 OK
+Returns complete ControlOptions object.
+
+---
+
+#### Properties
+
+**ControlOptions Properties**
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| href | string | Yes | Yes | API resource link |
+| factfind | FactFindReference | Yes | Yes | FactFind reference (read-only) |
+| investments | Investments | No | No | Investments section |
+| pensions | Pensions | No | No | Pensions section |
+| mortgages | Mortgages | No | No | Mortgages section |
+| protections | Protections | No | No | Protections section |
+| assets | Assets | No | No | Assets section |
+| liabilities | Liabilities | No | No | Liabilities section |
+
+**Investments Properties**
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasCash | boolean | No | No | Has cash savings or bank accounts |
+| hasInvestments | boolean | No | No | Has investment products (ISAs, bonds, stocks, funds) |
+
+**Pensions Properties**
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasEmployerPensionSchemes | boolean | No | No | Has employer pension schemes |
+| hasFinalSalary | boolean | No | No | Has final salary (defined benefit) pensions |
+| hasMoneyPurchases | boolean | No | No | Has money purchase (defined contribution) pensions |
+| hasPersonalPensions | boolean | No | No | Has personal pensions (SIPPs, stakeholder) |
+| hasAnnuities | boolean | No | No | Has annuity products |
+
+**Mortgages Properties**
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasMortgages | boolean | No | No | Has residential mortgages |
+| hasEquityRelease | boolean | No | No | Has equity release products (lifetime mortgage, home reversion) |
+
+**Protections Properties**
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasProtection | boolean | No | No | Has protection products (life, critical illness, income protection) |
+
+**Assets Properties**
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasAssets | boolean | No | No | Has assets (property, vehicles, valuables, collectibles) |
+
+**Liabilities Properties**
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasLiabilities | boolean | No | No | Has liabilities (loans, credit cards, overdrafts) |
+| reductionOfLiabilities | ReductionOfLiabilities | No | No | Liability reduction planning |
+
+**ReductionOfLiabilities Properties**
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| isExpected | boolean | No | No | Whether reduction of liabilities is expected/planned |
+| nonReductionReason | enum | No | No | Reason for not reducing liabilities (RetainControlOfCapital, PensionPlanning, Other) |
+| details | string | No | No | Additional details about liability strategy (max 1000 chars) |
+
+#### Schema Definitions
+
+**NonReductionReason Enum:**
+- `RetainControlOfCapital` - Prefer to retain control of capital for flexibility
+- `PensionPlanning` - Using liabilities as part of pension planning strategy
+- `Other` - Other reason (explain in details field)
+
+#### Business Rules
+
+1. **Singleton Resource**: Only one control options record exists per FactFind. First PUT to any section creates the singleton.
+
+2. **Section Independence**: Each section can be updated independently. Updating one section does not affect others.
+
+3. **Full Response on PUT**: All PUT operations return complete ControlOptions object for UI refresh.
+
+4. **Boolean Field Defaults**: Boolean fields default to null/unset. Client can explicitly set true or false. Null indicates not yet determined.
+
+5. **Enum Value Validation**: nonReductionReason must be one of: RetainControlOfCapital, PensionPlanning, Other. Returns 400 Bad Request if invalid.
+
+6. **Details Field Length**: liabilities.reductionOfLiabilities.details maximum 1000 characters. Returns 400 Bad Request if exceeded.
+
+7. **Conditional Section Display**: If flag is false, system should hide corresponding section. If true, show section for data entry. Null/unset: visibility at system's discretion.
+
+8. **Liability Reduction Logic**: If hasLiabilities is false, reductionOfLiabilities is not applicable. If isExpected is false, nonReductionReason should be provided.
+
+9. **Pension Type Granularity**: Multiple pension flags can be true simultaneously for precise section gating.
+
+10. **Investment Type Distinction**: hasCash covers bank/savings accounts, hasInvestments covers stocks/bonds/funds. Both can be true or false independently.
+
+11. **FactFind Reference Immutable**: FactFind reference is read-only, populated automatically from URL path parameter.
+
+12. **Section Object Immutability**: When updating a section, entire section object is replaced. Cannot partially update section.
+
+#### Error Examples
+
+**Invalid Enum Value Error**
+```json
+{
+  "error": {
+    "code": "INVALID_ENUM_VALUE",
+    "message": "Invalid value for non-reduction reason",
+    "details": [
+      {
+        "field": "liabilities.reductionOfLiabilities.nonReductionReason",
+        "issue": "Value must be 'RetainControlOfCapital', 'PensionPlanning', or 'Other'",
+        "value": "InvestmentStrategy",
+        "allowedValues": ["RetainControlOfCapital", "PensionPlanning", "Other"]
+      }
+    ]
+  }
+}
+```
+
+**Text Field Too Long Error**
+```json
+{
+  "error": {
+    "code": "TEXT_TOO_LONG",
+    "message": "Field exceeds maximum length",
+    "details": [
+      {
+        "field": "liabilities.reductionOfLiabilities.details",
+        "issue": "Maximum 1000 characters allowed",
+        "length": 1247
+      }
+    ]
+  }
+}
+```
+
+#### Use Cases
+
+**Client Has No Investments:**
+- Adviser asks if client has cash savings or investments
+- Client responds: No
+- Set `investments.hasCash` and `investments.hasInvestments` to false
+- System hides investments section from FactFind
+- Adviser proceeds to next relevant area
+
+**Client Has Mortgages But No Equity Release:**
+- Client has residential mortgage
+- Client does not have equity release products
+- Set `mortgages.hasMortgages` to true, `mortgages.hasEquityRelease` to false
+- System shows mortgage section but hides equity release questions
+
+**Liability Reduction Planning:**
+- Client has liabilities but does not plan to reduce them
+- Reason: Retaining control of capital for flexibility
+- Set hasLiabilities=true, isExpected=false
+- Document reason in nonReductionReason and details fields
+- Adviser understands debt strategy
 
 ---
 ## 5. Client Management API
@@ -11182,13 +11413,13 @@ All planning APIs feed into objectives
 **END OF FACTFIND-API-DESIGN-V3.MD**
 
 **Document Statistics:**
-- **Sections:** 33 comprehensive API sections
+- **Sections:** 38 comprehensive API sections (including Control Options subsection)
 - **Appendices:** 4 detailed reference appendices
-- **Total Endpoints:** 263 REST API endpoints
-- **Total Lines:** 11,000+ lines
+- **Total Endpoints:** 276 REST API endpoints
+- **Total Lines:** 11,400+ lines
 - **Regulatory References:** FCA, GDPR, MLR 2017, Consumer Duty, PECR, MiFID II
 - **Version:** 3.0 Final
-- **Date:** March 2026
+- **Date:** 2026-03-05
 - **Status:** Production-Ready
 
 This comprehensive API specification provides complete documentation for implementing a regulatory-compliant UK financial advice system with full contract schemas, business rules, and compliance mappings.
