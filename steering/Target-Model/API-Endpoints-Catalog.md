@@ -212,7 +212,7 @@
 | GET | `/api/v3/factfinds/{id}/clients/{clientId}/pension-summary` | Get pension summary | ⭐ New in v3.0 |
 | POST | `/api/v3/factfinds/{id}/clients/{clientId}/pension-summary/calculate` | Calculate pension projection | ⭐ New in v3.0 |
 
-**Total Endpoints:** 102 (91 new in v3.0)
+**Total Endpoints:** 101
 
 ---
 
@@ -556,7 +556,6 @@
 
 **Total Endpoints:** 40 (5 investments + 5 final salary + 5 annuities + 5 personal pensions + 5 state pensions + 5 employer schemes + 5 mortgages + 5 protections)
 
-
 ### Protection Review
 
 | Method | Endpoint | Description | Notes |
@@ -565,6 +564,8 @@
 | PUT | `/api/v3/factfinds/{id}/protections/reviews/lifeAndCriticalIllness` | Update life & critical illness review | ⭐ Needs analysis |
 | PUT | `/api/v3/factfinds/{id}/protections/reviews/incomeProtection` | Update income protection review | ⭐ Accident/illness |
 | PUT | `/api/v3/factfinds/{id}/protections/reviews/buildingsAndContent` | Update buildings & content review | ⭐ Property insurance |
+
+**Total Endpoints:** 44 (40 plans + 4 protection review)
 
 ---
 
@@ -709,55 +710,36 @@
 
 ### Endpoints by Context
 
-| API Context | Total Endpoints | New in v3.0 |
-|-------------|-----------------|-------------|
-| **1. FactFind Root** | 17 | 17 ⭐ |
-| **2. Client Onboarding & KYC** | 101 | 91 ⭐ |
-| **3. Circumstances** | 28 | 28 ⭐ |
-| **4. Assets & Liabilities** | 23 | 23 ⭐ |
-| **5. Plans & Investments** | 44 | 40 ⭐ |
-| **6. Goals** | 31 | 31 ⭐ |
-| **7. ATR** | 8 | 8 ⭐ |
-| **8. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **276** | **245** |
+| API Context | Total Endpoints |
+|-------------|-----------------|
+| **1. FactFind Root** | 17 |
+| **2. Client Onboarding & KYC** | 101 |
+| **3. Circumstances** | 28 |
+| **4. Assets & Liabilities** | 23 |
+| **5. Plans & Investments** | 44 |
+| **6. Goals** | 31 |
+| **7. ATR** | 8 |
+| **8. Reference Data** | 24 |
+| **TOTAL** | **276** |
 
 **Notes:**
 - Arrangements context has been removed - all products now managed under specific contexts (Mortgages and Personal Protection under Plans & Investments)
-- Plans & Investments includes: 5 Investments + 5 Final Salary Pensions + 5 Annuities + 5 Personal Pensions + 5 State Pensions + 5 Employer Schemes + 5 Mortgages + 5 Personal Protections
-
-
-### Net Worth
-
-Calculate and track client net worth.
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | /api/v3/factfinds/{factfindId}/networth | List all net worth calculations |
-| POST | /api/v3/factfinds/{factfindId}/networth | Create net worth calculation |
-| GET | /api/v3/factfinds/{factfindId}/networth/{networthId} | Get specific net worth |
-| PATCH | /api/v3/factfinds/{factfindId}/networth/{networthId} | Update net worth |
-| DELETE | /api/v3/factfinds/{factfindId}/networth/{networthId} | Delete net worth |
-
+- Plans & Investments includes: 5 Investments + 5 Final Salary Pensions + 5 Annuities + 5 Personal Pensions + 5 State Pensions + 5 Employer Schemes + 5 Mortgages + 5 Personal Protections + 4 Protection Review
 
 ### HTTP Methods Distribution
 
+Based on the 243 endpoint operations documented in this catalog:
+
 | Method | Count | Percentage |
 |--------|-------|------------|
-| GET | 152 | 47% |
-| POST | 72 | 22% |
-| PATCH | 77 | 24% |
-| PUT | 13 | 4% |
-| DELETE | 12 | 4% |
-| **TOTAL** | **326** | **100%** |
+| GET | 120 | 49% |
+| POST | 40 | 16% |
+| PATCH | 31 | 13% |
+| PUT | 22 | 9% |
+| DELETE | 30 | 12% |
+| **TOTAL** | **243** | **100%** |
 
-### Hierarchical Depth Analysis
-
-| Depth Level | Example Path | Endpoints |
-|-------------|--------------|-----------|
-| **Level 1** | `/api/v3/factfinds` | 11 |
-| **Level 2** | `/api/v3/factfinds/{id}/clients` | 48 |
-| **Level 3** | `/api/v3/factfinds/{id}/clients/{clientId}/addresses` | 142 |
-| **Level 4** | `/api/v3/factfinds/{id}/clients/{clientId}/estate-planning/gifts/{giftId}` | 147 |
+Note: Total operations (243) differs from unique endpoint patterns (276) as some endpoints support multiple HTTP methods.
 
 ---
 
@@ -911,4 +893,5 @@ Resources include simple `href` properties for navigation:
 
 **Version:** 3.0
 **Last Updated:** 2026-03-05
-**Total Endpoints:** 368
+**Total Endpoints:** 276
+**Total HTTP Operations:** 243
