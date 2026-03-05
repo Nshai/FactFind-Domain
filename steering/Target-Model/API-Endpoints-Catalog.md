@@ -34,11 +34,10 @@
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds` | List all fact finds | Supports filtering, pagination |
-| POST | `/api/v2/factfinds` | Create new fact find | Returns factfindId |
-| GET | `/api/v2/factfinds/{id}` | Get fact find by ID | Core metadata only |
-| PATCH | `/api/v2/factfinds/{id}` | Partial update fact find | ⭐ Partial updates |
-| DELETE | `/api/v2/factfinds/{id}` | Delete fact find | Cascade delete all nested |
+| GET | `/api/v2/factfinds` | List all fact finds | ⭐ Supports filtering (e.g., ?filter=clients.id eq 123) |
+| POST | `/api/v2/factfinds` | Create new fact find | ⭐ Returns complete factfind with clients, meeting, disclosures |
+| GET | `/api/v2/factfinds/{id}` | Get fact find by ID | ⭐ Includes clients, meeting, disclosures |
+| PUT | `/api/v2/factfinds/{id}` | Update fact find | ⭐ Full update of factfind |
 
 ### Aggregated Views
 
@@ -51,7 +50,19 @@
 | GET | `/api/v2/factfinds/{id}/cash-flow` | Get cash flow analysis | Income - Expenditure |
 | GET | `/api/v2/factfinds/{id}/asset-allocation` | Get asset allocation | Portfolio breakdown |
 
-**Total Endpoints:** 11
+### Control Options
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/controloptions` | Get all control options | ⭐ Section gating |
+| PUT | `/api/v2/factfinds/{id}/controloptions/assets` | Update assets control options | ⭐ Has assets flag |
+| PUT | `/api/v2/factfinds/{id}/controloptions/liabilities` | Update liabilities control options | ⭐ Debt reduction strategy |
+| PUT | `/api/v2/factfinds/{id}/controloptions/investments` | Update investments control options | ⭐ Cash & investments |
+| PUT | `/api/v2/factfinds/{id}/controloptions/pensions` | Update pensions control options | ⭐ All pension types |
+| PUT | `/api/v2/factfinds/{id}/controloptions/protections` | Update protections control options | ⭐ Protection products |
+| PUT | `/api/v2/factfinds/{id}/controloptions/mortgages` | Update mortgages control options | ⭐ Mortgages & equity release |
+
+**Total Endpoints:** 17
 
 ---
 
@@ -105,14 +116,12 @@
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/estate-planning` | Get estate planning details | ⭐ Singleton per client |
-| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/estate-planning` | Update estate planning | ⭐ IHT planning |
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/estate-planning/gifts` | List all gifts | ⭐ PETs & trusts |
-| POST | `/api/v2/factfinds/{id}/clients/{clientId}/estate-planning/gifts` | Create new gift | ⭐ Record gifts |
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get specific gift | ⭐ View details |
-| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift | ⭐ Modify exemptions |
-| DELETE | `/api/v2/factfinds/{id}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift | ⭐ Remove record |
-
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/estateplanning` | Get estate planning singleton | ⭐ Includes gifts array |
+| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/estateplanning` | Update estate planning | ⭐ IHT planning |
+| POST | `/api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts` | Create new gift | ⭐ Record PETs |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Get specific gift | ⭐ View details |
+| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Update gift | ⭐ Modify exemptions |
+| DELETE | `/api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Delete gift | ⭐ Remove record |
 ### Relationships
 
 | Method | Endpoint | Description | Notes |
@@ -188,15 +197,12 @@
 
 | Method | Endpoint | Description | Notes |
 |--------|----------|-------------|-------|
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history` | Get credit history | ⭐ New in v3.0 |
-| POST | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history` | Add credit score | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history/{scoreId}` | Get credit score details | ⭐ New in v3.0 |
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history/status` | Get current credit status | ⭐ Latest score |
-| POST | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history/payment-events` | Record payment event | ⭐ Payment history |
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history/payment-events` | Get payment history | ⭐ Payment events |
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history/utilization` | Get credit utilization | ⭐ Calculated metric |
-| GET | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history/health-indicators` | Get credit health | ⭐ Health metrics |
-| POST | `/api/v2/factfinds/{id}/clients/{clientId}/credit-history/report-request` | Request credit report | ⭐ External API call |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/credithistory` | Get credit history | ⭐ Singleton per client |
+| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/credithistory` | Update credit history | ⭐ Adverse flags calculated |
+| POST | `/api/v2/factfinds/{id}/clients/{clientId}/credithistory/events` | Create adverse credit event | ⭐ CCJ, Default, IVA, etc. |
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` | Get adverse credit event | ⭐ Event details |
+| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` | Update adverse credit event | ⭐ Mark satisfied/cleared |
+| DELETE | `/api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` | Delete adverse credit event | ⭐ Remove event |
 
 ### Pension Summary
 
@@ -205,7 +211,7 @@
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/pension-summary` | Get pension summary | ⭐ New in v3.0 |
 | POST | `/api/v2/factfinds/{id}/clients/{clientId}/pension-summary/calculate` | Calculate pension projection | ⭐ New in v3.0 |
 
-**Total Endpoints:** 105 (94 new in v3.0)
+**Total Endpoints:** 102 (91 new in v3.0)
 
 ---
 
@@ -224,6 +230,13 @@
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/employment/{employmentId}` | Get employment details | ⭐ New in v3.0 |
 | PATCH | `/api/v2/factfinds/{id}/clients/{clientId}/employment/{employmentId}` | Update employment | ⭐ New in v3.0 |
 | DELETE | `/api/v2/factfinds/{id}/clients/{clientId}/employment/{employmentId}` | Delete employment | ⭐ New in v3.0 |
+
+### Employment Summary
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/clients/{clientId}/employments/summary` | Get employment summary | ⭐ Singleton per client |
+| PUT | `/api/v2/factfinds/{id}/clients/{clientId}/employments/summary` | Update employment summary | ⭐ Total income calculated |
 
 ### Income
 
@@ -271,7 +284,7 @@
 |--------|----------|-------------|-------|
 | GET | `/api/v2/factfinds/{id}/clients/{clientId}/budget` | Get budget summary | ⭐ Hierarchical |
 
-**Total Endpoints:** 26 (26 new in v3.0)
+**Total Endpoints:** 28 (28 new in v3.0)
 
 ---
 
@@ -440,6 +453,16 @@
 | PATCH | `/api/v2/factfinds/{id}/pensions/statepension/{pensionId}` | Update state pension | ⭐ Partial updates |
 | DELETE | `/api/v2/factfinds/{id}/pensions/statepension/{pensionId}` | Delete state pension | ⭐ Soft delete |
 
+### Core Employer Pension Scheme Operations
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/pensions/employerschemes` | List all employer pension schemes | ⭐ Workplace pensions |
+| POST | `/api/v2/factfinds/{id}/pensions/employerschemes` | Create employer pension scheme | ⭐ Current & deferred |
+| GET | `/api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` | Get employer scheme details | ⭐ Full scheme record |
+| PATCH | `/api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` | Update employer scheme | ⭐ Partial updates |
+| DELETE | `/api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` | Delete employer scheme | ⭐ Soft delete |
+
 **Pension Categories:**
 - **PensionContributionDrawdown** - Personal pensions with contribution and drawdown features
 
@@ -530,7 +553,17 @@
 - Benefit options (convertible, reviewable)
 - Waiting periods and exclusions
 
-**Total Endpoints:** 35 (5 investments + 5 final salary + 5 annuities + 5 personal pensions + 5 state pensions + 5 mortgages + 5 protections)
+**Total Endpoints:** 40 (5 investments + 5 final salary + 5 annuities + 5 personal pensions + 5 state pensions + 5 employer schemes + 5 mortgages + 5 protections)
+
+
+### Protection Review
+
+| Method | Endpoint | Description | Notes |
+|--------|----------|-------------|-------|
+| GET | `/api/v2/factfinds/{id}/protections/reviews/summary` | Get protection review summary | ⭐ All sections |
+| PUT | `/api/v2/factfinds/{id}/protections/reviews/lifeAndCriticalIllness` | Update life & critical illness review | ⭐ Needs analysis |
+| PUT | `/api/v2/factfinds/{id}/protections/reviews/incomeProtection` | Update income protection review | ⭐ Accident/illness |
+| PUT | `/api/v2/factfinds/{id}/protections/reviews/buildingsAndContent` | Update buildings & content review | ⭐ Property insurance |
 
 ---
 
@@ -677,19 +710,19 @@
 
 | API Context | Total Endpoints | New in v3.0 |
 |-------------|-----------------|-------------|
-| **1. FactFind Root** | 11 | 11 ⭐ |
-| **2. Client Onboarding & KYC** | 105 | 94 ⭐ |
-| **3. Circumstances** | 26 | 26 ⭐ |
+| **1. FactFind Root** | 17 | 17 ⭐ |
+| **2. Client Onboarding & KYC** | 101 | 91 ⭐ |
+| **3. Circumstances** | 28 | 28 ⭐ |
 | **4. Assets & Liabilities** | 23 | 23 ⭐ |
-| **5. Plans & Investments** | 35 | 35 ⭐ |
+| **5. Plans & Investments** | 44 | 40 ⭐ |
 | **6. Goals** | 31 | 31 ⭐ |
 | **7. ATR** | 8 | 8 ⭐ |
 | **8. Reference Data** | 24 | 7 ⭐ |
-| **TOTAL** | **263** | **235** |
+| **TOTAL** | **276** | **245** |
 
 **Notes:**
 - Arrangements context has been removed - all products now managed under specific contexts (Mortgages and Personal Protection under Plans & Investments)
-- Plans & Investments includes: 5 Investments + 5 Final Salary Pensions + 5 Annuities + 5 Personal Pensions + 5 State Pensions + 5 Mortgages + 5 Personal Protections
+- Plans & Investments includes: 5 Investments + 5 Final Salary Pensions + 5 Annuities + 5 Personal Pensions + 5 State Pensions + 5 Employer Schemes + 5 Mortgages + 5 Personal Protections
 
 
 ### Net Worth
@@ -709,12 +742,12 @@ Calculate and track client net worth.
 
 | Method | Count | Percentage |
 |--------|-------|------------|
-| GET | 152 | 48% |
-| POST | 73 | 23% |
-| PATCH | 76 | 24% |
-| PUT | 5 | 2% |
-| DELETE | 10 | 3% |
-| **TOTAL** | **316** | **100%** |
+| GET | 152 | 47% |
+| POST | 72 | 22% |
+| PATCH | 77 | 24% |
+| PUT | 13 | 4% |
+| DELETE | 12 | 4% |
+| **TOTAL** | **326** | **100%** |
 
 ### Hierarchical Depth Analysis
 
@@ -820,5 +853,5 @@ Calculate and track client net worth.
 **Document End**
 
 **Version:** 3.0
-**Last Updated:** 2026-03-03
-**Total Endpoints:** 358
+**Last Updated:** 2026-03-05
+**Total Endpoints:** 368

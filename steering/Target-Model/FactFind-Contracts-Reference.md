@@ -33,6 +33,7 @@ Each contract section includes:
 ### Contracts
 - [13.1 Client Contract](#131-client-contract)
 - [13.2 FactFind Contract](#132-factfind-contract)
+- [13.2.1 Control Options Contract](#1321-control-questions-contract)
 - [13.3 Address Contract](#133-address-contract)
 - [13.4 Income Contract](#134-income-contract)
 - [13.6 Goal Contract](#136-goal-contract)
@@ -44,6 +45,7 @@ Each contract section includes:
 - [13.17 Asset Contract](#1317-asset-contract)
 - [13.18 Liability Contract](#1318-liability-contract)
 - [13.19 Employment Contract](#1319-employment-contract)
+- [13.19.1 Employment Summary Contract](#13191-employment-summary-contract)
 - [13.20 Budget Contract](#1320-budget-contract)
 - [13.21 Expenditure Contract](#1321-expenditure-contract)
 - [13.23 Credit History Contract](#1323-credit-history-contract)
@@ -68,7 +70,9 @@ Each contract section includes:
 - [13.42 Estate Planning - Trust Contract](#1342-estate-planning---trust-contract)
 - [13.43 Identity Verification Contract](#1343-identity-verification-contract)
 - [13.57 PersonalProtection Contract](#1357-personalprotection-contract)
-- [13.58 StatePension Contract](#1358-statepension-contract)
+- [13.58 Protection Review Contract](#1358-protection-review-contract)
+- [13.59 StatePension Contract](#1359-statepension-contract)
+- [13.60 EmployerPensionScheme Contract](#1360-employerpensionscheme-contract)
 
 ### Appendices
 - [Appendix A: Common Value Types](#appendix-a-common-value-types)
@@ -276,249 +280,750 @@ This contract connects to:
 
 ### Business Purpose
 
-Represents a complete fact finding exercise for one or more clients. Acts as the container for all financial planning information.
+The FactFind contract represents the root aggregate for all client financial information and advice processes. A FactFind is a formal data-gathering exercise as part of the financial advice process, containing client associations, meeting details, and regulatory disclosure tracking. It serves as the gateway to all nested client financial data.
 
 ### Key Features
 
-- Can be individual or joint (for couples)
-- Tracks completion status and workflow
-- Links to all clients, financial products, goals, and documents
-- Maintains audit trail of creation and updates
+- **Root Aggregate** - Container for all client financial planning information
+- **Multi-Client Support** - Individual or joint FactFinds (couples, families, business partners)
+- **Meeting Tracking** - Records meeting details with recording compliance
+- **Disclosure Compliance** - Tracks regulatory disclosure documents issued to clients
+- **Client References** - Read-only client names populated from Client API
+- **Filtering Support** - OData-style filtering by client ID
+- **Audit Trail** - Creation and update timestamps
+
+### Common Scenarios
+
+**Single Client FactFind:**
+- Individual client meeting for financial advice
+- Record meeting details and type
+- Issue Combined Initial Disclosure Document and Terms of Business
+- Begin financial data gathering
+
+**Joint FactFind for Couple:**
+- Married couple or cohabiting partners
+- Both clients associated with FactFind
+- Both receive disclosure documents
+- Joint financial planning and advice
+- All clients have equal visibility to FactFind data
+
+**Recorded Meeting Compliance:**
+- Telephone or video meeting with recording
+- MeetingType includes "Recorded" suffix
+- Document client consent in meeting notes
+- FCA recording requirements compliance
+
+**Filter FactFinds by Client:**
+- Retrieve all FactFinds for specific client
+- Use filter: `?filter=clients.id eq 123`
+- Returns both individual and joint FactFinds
+- Useful for client history and review processes
 
 ### Fields
-
 
 #### Main Fields
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-| href | Text | API link to this resource | /api/v2/factfinds/679 |
-| meeting | Complex Data | Meeting information including date, type, and attendees | Complex object |
-| products | Complex Data | Products and services discussed during fact find | Complex object |
-| disclosureKeyfacts | List of Complex Data | Disclosure documents issued | List with 1 item(s) |
-| employmentSummary | List of Complex Data | Summary of client employment and income | List with 1 item(s) |
-| supplementaryQuestions | List of Complex Data | Additional questions by category | List with 1 item(s) |
-| assetsAndLiabilities | Complex Data | Client asset and liability disclosures | Complex object |
-| creditHistory | Complex Data | Credit history information | Complex object |
-| estatePlanning | Complex Data | Estate planning details including will and gifts | Complex object |
+| id | Number | Unique system identifier (READ-ONLY) | 679 |
+| href | Text | API link to this resource (READ-ONLY) | /api/v2/factfinds/679 |
+| clients | List of Reference Links | Associated clients (id EDITABLE, name READ-ONLY) | List with 2 items |
+| meeting | Complex Object | Meeting information including date, type, attendees, notes | Complex object |
+| disclosureKeyfacts | List of Complex Objects | Disclosure documents issued to clients | List with 2 items |
 
 #### Nested Field Groups
+
+**clients[] (each item):**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Client identifier (EDITABLE) | 123 |
+| href | Text | Link to client resource (READ-ONLY, populated by system) | /api/v2/factfinds/679/clients/123 |
+| name | Text | Client name (READ-ONLY, populated from Client API) | John Smith |
 
 **meeting:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| meetingOn | Date | Date when the meeting took place | 2026-02-16 |
-| meetingType | Selection | Type of meeting | FaceToFace |
-| clientsPresent | List of Reference Links | Clients who attended the meeting | List with 1 item(s) |
-| anyOtherAudience | Yes/No | Whether others were present | true |
-| notes | Text | Meeting notes | None |
+| meetingOn | Date | Date meeting occurred (ISO 8601: YYYY-MM-DD) | 2026-03-05 |
+| meetingType | Selection | Type of meeting (enum) | FaceToFace |
+| clientsPresent | List of Reference Links | Clients who attended the meeting | List with 2 items |
+| anyOtherAudience | Yes/No | Whether others were present (interpreter, family, etc.) | false |
+| notes | Text | Meeting notes (max 5000 chars) | Initial consultation to discuss retirement planning and mortgage options. |
 
-**meeting.clientsPresent[]:**
+**meeting.clientsPresent[] (each item):**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Client identifier | 123 |
-| href | Text | Link to client resource | v2/factfinds/679/clients/123 |
-| name | Text | Client name | Jack Marias |
+| href | Text | Link to client resource (READ-ONLY) | /api/v2/factfinds/679/clients/123 |
+| name | Text | Client name (READ-ONLY) | John Smith |
 
-**products:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| investments | Complex Data | Investment products information | Complex object |
-| pensions | Complex Data | Pension products information | Complex object |
-| mortgages | Complex Data | Mortgage products information | Complex object |
-| protections | Complex Data | Protection products information | Complex object |
-
-**products.investments:**
+**disclosureKeyfacts[] (each item):**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| hasCash | Yes/No | Whether client has cash savings | true |
-| hasInvestments | Yes/No | Whether client has investments | true |
+| Type | Selection | Disclosure document type (enum) | CombinedInitialDisclosureDocument |
+| IssuedOn | Date | Date document issued to client (ISO 8601: YYYY-MM-DD) | 2026-03-05 |
 
-**products.pensions:**
+### Usage Example
+
+```json
+{
+  "id": 679,
+  "href": "/api/v2/factfinds/679",
+  "clients": [
+    {
+      "id": 123,
+      "href": "/api/v2/factfinds/679/clients/123",
+      "name": "John Smith"
+    },
+    {
+      "id": 124,
+      "href": "/api/v2/factfinds/679/clients/124",
+      "name": "Jane Smith"
+    }
+  ],
+  "meeting": {
+    "meetingOn": "2026-03-05",
+    "meetingType": "FaceToFace",
+    "clientsPresent": [
+      {
+        "id": 123,
+        "href": "/api/v2/factfinds/679/clients/123",
+        "name": "John Smith"
+      },
+      {
+        "id": 124,
+        "href": "/api/v2/factfinds/679/clients/124",
+        "name": "Jane Smith"
+      }
+    ],
+    "anyOtherAudience": false,
+    "notes": "Initial consultation to discuss retirement planning and mortgage options."
+  },
+  "disclosureKeyfacts": [
+    {
+      "Type": "CombinedInitialDisclosureDocument",
+      "IssuedOn": "2026-03-05"
+    },
+    {
+      "Type": "TermsOfBusiness",
+      "IssuedOn": "2026-03-05"
+    }
+  ]
+}
+```
+
+### Business Validation Rules
+
+#### FactFind Creation Rules
+- FactFind must have at least one associated client
+- POST request must include clients array with at least one client ID
+- Returns 400 Bad Request if clients array empty or missing
+- All client IDs must exist in Client API (validated on creation)
+
+#### Client Reference Rules
+- Client name field is READ-ONLY
+- Populated automatically from Client API based on client ID
+- PUT requests can update client IDs but not names
+- Names refreshed on every GET request
+- Multiple clients can be associated (joint FactFinds)
+
+#### Meeting Rules
+- `meetingType` must be one of enum values (see Meeting Types below)
+- If meetingType includes "Recorded", must document client consent in notes
+- Clients in `clientsPresent` must be subset of `clients` array
+- Meeting notes maximum 5000 characters
+- Set `anyOtherAudience` to true if non-client present (interpreter, family member, solicitor)
+
+#### Disclosure Rules
+- `Type` must be one of enum values (see Disclosure Types below)
+- `IssuedOn` must be valid date in past or today (cannot be future)
+- Format: ISO 8601 (YYYY-MM-DD)
+- FCA requires Combined Initial Disclosure Document before providing advice
+- Once issued, disclosure documents should not be removed (maintains audit trail)
+
+#### Filtering Rules
+- GET list endpoint supports OData-style filter expressions
+- Most common: `?filter=clients.id eq 123` - returns all FactFinds where client 123 associated
+- Includes joint FactFinds
+- Invalid filter syntax returns 400 Bad Request
+
+### Enum Values
+
+#### Meeting Types
+
+| Value | Description |
+|---|---|
+| Electronic | Electronic meeting (e.g., email, online form) |
+| ElectronicRecorded | Electronic meeting with recording |
+| Videocall | Video call meeting |
+| VideocallRecorded | Video call with recording |
+| FaceToFace | In-person meeting |
+| FaceToFaceRecorded | In-person meeting with recording |
+| Telephone | Telephone call |
+| TelephoneRecorded | Telephone call with recording (client consent required) |
+
+#### Disclosure Types
+
+| Value | Description |
+|---|---|
+| CombinedDisclosureDocuments | Combined disclosure documents |
+| CombinedInitialDisclosureDocument | Combined initial disclosure document (CIDD) |
+| DisclosureDocument | General disclosure document |
+| KeyfactsAboutCostOfServices | Key facts about cost of services |
+| KeyfactsAboutServices | Key facts about services |
+| ServiceCostDisclosureDocument | Service cost disclosure document |
+| TermsRefundOfFees | Terms for refund of fees |
+| TermsOfBusiness | Terms of business (TOB) |
+
+### Understanding Meeting Types
+
+**Electronic vs Videocall vs Telephone:**
+- Electronic: Email, web form, messaging (asynchronous)
+- Videocall: Real-time video meeting (Zoom, Teams, etc.)
+- Telephone: Voice call only
+
+**Recording Compliance:**
+- MiFID firms must record certain telephone conversations and electronic communications
+- Client consent not strictly required for recording, but best practice to inform
+- Use "Recorded" suffix in meetingType to flag recordings for compliance
+- Document consent obtained in meeting notes
+- Recordings must be retained for 5-7 years
+
+**Best Practices:**
+- Always inform clients when recording
+- Document consent in meeting notes: "Client consented to call recording"
+- Use non-recorded types by default
+- Use recorded types when FCA requirements apply, complex advice given, or disputes anticipated
+
+### Understanding Disclosure Documents
+
+**Combined Initial Disclosure Document (CIDD):**
+- Must be provided before advice given
+- Explains firm's services, charges, and status
+- Required for independent and restricted advisers
+- Must issue to all new clients
+
+**Terms of Business (TOB):**
+- Contract between firm and client
+- Details services provided
+- Explains charging structure
+- Sets out client and adviser responsibilities
+
+**Key Facts About Services:**
+- Summary of services offered
+- Helps clients understand what firm provides
+- Required before providing advice
+
+**Service Cost Disclosure:**
+- Details of all charges client will pay
+- Must be clear and transparent
+- Required under Consumer Duty
+
+### Regulatory Context
+
+**FCA Handbook Requirements:**
+- Comprehensive data gathering required before providing advice
+- Suitability assessment based on FactFind information
+- Audit trail of when and how information collected
+
+**Consumer Duty:**
+- Ensure clients understand advice process
+- Clear disclosure of services and costs
+- Good customer outcomes
+- Act in client's best interests
+
+**COBS (Conduct of Business Sourcebook):**
+- Rules for disclosure documents
+- Requirements for client communications
+- Standards for advice process
+
+**Recording Rules:**
+- Certain firms must record telephone conversations
+- MiFID firms must record relevant conversations
+- Retain recordings for prescribed period
+- Secure storage and access controls
+
+### Related Contracts
+
+- [Client Contract](#131-client-contract) - Client information and management
+- All other contracts depend on FactFind as root aggregate
+- See individual entity contracts for detailed nested data
+
+### API Endpoints
+
+- `GET /api/v2/factfinds` - List all FactFinds (supports filtering)
+- `POST /api/v2/factfinds` - Create new FactFind
+- `GET /api/v2/factfinds/{id}` - Get specific FactFind
+- `PUT /api/v2/factfinds/{id}` - Update FactFind
+
+### Field-Level Guidance
+
+**id (READ-ONLY):**
+- System-generated unique identifier
+- Never changes once assigned
+- Used in all API operations
+- Referenced by all nested entities
+
+**href (READ-ONLY):**
+- API link to this specific FactFind resource
+- Format: `/api/v2/factfinds/{id}`
+- Included in all responses
+- Supports HATEOAS API pattern
+
+**clients (Array):**
+- At least one client required
+- Can include multiple clients (joint FactFinds)
+- On POST/PUT: provide client IDs only
+- On GET: system populates hrefs and names from Client API
+- Client names are READ-ONLY (sourced from Client API)
+- Common scenarios: individual (1 client), couple (2 clients), family (3+ clients)
+
+**meeting.meetingOn (Date):**
+- When the meeting occurred
+- Format: ISO 8601 (YYYY-MM-DD)
+- Should be past or today
+- Used for audit trail and compliance
+
+**meeting.meetingType (Enum):**
+- Must be one of specified values
+- Case-sensitive
+- Use "Recorded" variants when recording meetings
+- FCA requirement for certain firms
+
+**meeting.clientsPresent (Array):**
+- Which clients attended this specific meeting
+- Must be subset of `clients` array
+- Cannot include clients not associated with FactFind
+- On POST/PUT: provide client IDs only
+- On GET: system populates hrefs and names
+
+**meeting.anyOtherAudience (Boolean):**
+- Set to true if non-client present
+- Examples: interpreter, family member (not a client), solicitor, accountant
+- Document who was present in `notes` field
+- Important for understanding context of advice
+
+**meeting.notes (Text):**
+- Free-text meeting notes
+- Maximum 5000 characters
+- Use to document:
+  - Key topics discussed
+  - Client concerns or priorities
+  - Recording consent obtained
+  - Who else was present (if anyOtherAudience = true)
+  - Next steps or actions agreed
+
+**disclosureKeyfacts (Array):**
+- Regulatory disclosure documents issued to clients
+- Each has Type and IssuedOn date
+- Audit trail for FCA compliance
+- Should include CIDD and TOB as minimum
+- Once added, should not be removed (maintains compliance audit trail)
+- Can add additional disclosures over time via PUT
+
+**disclosureKeyfacts[].Type (Enum):**
+- Must be one of specified values
+- Case-sensitive
+- CIDD required before providing advice
+- Multiple types can be issued at different times
+
+**disclosureKeyfacts[].IssuedOn (Date):**
+- When document was issued to client
+- Format: ISO 8601 (YYYY-MM-DD)
+- Must be past or today (cannot be future)
+- Important for demonstrating compliance timeline
+
+---
+
+## 13.2.1 Control Options Contract
+
+### Business Purpose
+
+The Control Options contract represents high-level control flags that determine which sections of the FactFind are relevant to a client. These flags enable conditional logic in the data-gathering process, showing or hiding sections based on client circumstances. This improves efficiency and user experience by focusing only on applicable areas.
+
+### Key Features
+
+- **Singleton Resource** - One control options record per FactFind
+- **Section Gating** - Controls which FactFind sections are shown/hidden
+- **Section-Based Updates** - Six separate PUT endpoints for different areas
+- **Boolean Flags** - Simple yes/no indicators for product presence
+- **Liability Reduction Planning** - Captures debt reduction strategy
+- **Full Response** - All PUT operations return complete contract
+
+### Common Scenarios
+
+**Client Has No Investments:**
+- Set `investments.hasCash` and `investments.hasInvestments` to false
+- System hides investments section
+- Adviser skips to next relevant area
+- Efficient data gathering process
+
+**Complex Pension Portfolio:**
+- Client has employer schemes, money purchase, and personal pensions
+- Set corresponding pension flags to true
+- Set final salary and annuities to false
+- System shows relevant pension sections only
+
+**Liability Reduction Strategy:**
+- Client has mortgages and loans
+- Client does not plan to reduce liabilities
+- Reason: Retain control of capital for investment flexibility
+- Document strategy in `liabilities.reductionOfLiabilities`
+
+**Comprehensive Financial Situation:**
+- Client has assets, liabilities, investments, pensions, mortgages, and protections
+- All flags set to true
+- Full FactFind data gathering required
+- Complete financial planning approach
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| href | Text | API link to this resource (READ-ONLY) | /v2/factfinds/123/controloptions |
+| factfind | Reference Link | FactFind reference (READ-ONLY) | Complex object |
+| investments | Complex Object | Investment control flags | Complex object |
+| pensions | Complex Object | Pension control flags | Complex object |
+| mortgages | Complex Object | Mortgage control flags | Complex object |
+| protections | Complex Object | Protection control flags | Complex object |
+| assets | Complex Object | Asset control flags | Complex object |
+| liabilities | Complex Object | Liability control flags and reduction planning | Complex object |
+
+#### Nested Field Groups
+
+**factfind:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | FactFind identifier (READ-ONLY) | 123 |
+| href | Text | Link to FactFind resource (READ-ONLY) | /v2/factfinds/123 |
+
+**investments:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasCash | Yes/No | Has cash savings or accounts | true |
+| hasInvestments | Yes/No | Has investment products (ISAs, bonds, stocks, funds) | true |
+
+**pensions:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | hasEmployerPensionSchemes | Yes/No | Has employer pension schemes | true |
-| hasFinalSalary | Yes/No | Has final salary pensions | true |
-| hasMoneyPurchases | Yes/No | Has money purchase pensions | true |
-| hasPersonalPensions | Yes/No | Has personal pensions | true |
-| hasAnnuities | Yes/No | Has annuities | true |
-| existingEmployerPensionSchemes | List of Complex Data | Details of employer pension schemes | List with 1 item(s) |
+| hasFinalSalary | Yes/No | Has final salary (defined benefit) pensions | true |
+| hasMoneyPurchases | Yes/No | Has money purchase (defined contribution) pensions | true |
+| hasPersonalPensions | Yes/No | Has personal pensions (SIPPs, stakeholder) | true |
+| hasAnnuities | Yes/No | Has annuity products | true |
 
-**products.pensions.existingEmployerPensionSchemes[]:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| owner | Reference Link | Client who owns this pension | Complex object |
-| isCurrentMember | Yes/No | Whether currently a member | true |
-| isProbablemember | Yes/No | Whether there are membership issues | true |
-| schemeJoinedOn | Date | Date joined the scheme | None |
-| details | Text | Additional scheme details | None |
-
-**products.mortgages:**
+**mortgages:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| hasMortgages | Yes/No | Whether client has mortgages | true |
-| hasEquityRelease | Yes/No | Whether client has equity release | true |
+| hasMortgages | Yes/No | Has residential mortgages | true |
+| hasEquityRelease | Yes/No | Has equity release products | true |
 
-**products.protections:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| hasProtection | Yes/No | Whether client has protection products | true |
-| lifeAndCriticalIllness | Complex Data | Life and critical illness cover details | Complex object |
-| incomeProtection | Complex Data | Income protection details | Complex object |
-| buildingsAndContent | Complex Data | Buildings and contents insurance | Complex object |
-
-**products.protections.lifeAndCriticalIllness:**
+**protections:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| hasCoverForMortgageOrDebt | Selection | Cover for mortgage or debt (Yes/No/NotApplicable) | Yes |
-| hasCoverforDependantsDueToCritcalIllness | Selection | Cover for dependants due to critical illness | Yes |
-| hasCoverforDependantsUponDeath | Selection | Cover for dependants upon death | Yes |
-| haveReviewedCostofProtectionChange | Selection | Whether cost of protection change reviewed | Yes |
-| impactOnYou | Text | Impact on you if no cover | None |
-| impactOnDepandants | Text | Impact on dependants if no cover | None |
-| actionsToAddressImpacts | Text | Actions to address impacts | None |
-| reasonforNotReviewing | Text | Reason for not reviewing | None |
+| hasProtection | Yes/No | Has protection products (life, critical illness, income protection) | true |
 
-**products.protections.incomeProtection:**
+**assets:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| hasCoverDueToAccidentOrIllness | Yes/No | Cover for accident or illness | true |
-| hasCoverDueToUnemployment | Yes/No | Cover for unemployment | true |
-| impactOnYou | Text | Impact on you if no cover | None |
-| impactOnDepandants | Text | Impact on dependants if no cover | None |
-| actionsToAddressImpacts | Text | Actions to address impacts | None |
-| reasonforNotReviewing | Text | Reason for not reviewing | None |
+| hasAssets | Yes/No | Has assets (property, vehicles, valuables, collectibles) | true |
 
-**products.protections.buildingsAndContent:**
+**liabilities:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| haveExistingBuildingInsurance | Yes/No | Has building insurance | true |
-| haveExistingContentInsurance | Yes/No | Has contents insurance | true |
-| buyToLetProperties | Complex Data | Buy-to-let property insurance | Complex object |
-| haveSufficientCover | Yes/No | Whether cover is sufficient | true |
-| actionsToAddressImpacts | Text | Actions to address gaps | None |
-| whenDoyouWantToReviewProtection | Text | When to review protection | None |
-| reasonforNotReviewing | Text | Reason for not reviewing | None |
+| hasLiabilities | Yes/No | Has liabilities (loans, credit cards, overdrafts) | true |
+| reductionOfLiabilities | Complex Object | Liability reduction planning | Complex object |
 
-**disclosureKeyfacts[]:**
+**liabilities.reductionOfLiabilities:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| Type | Selection | Type of disclosure document | CombinedDisclosureDocuments |
-| IssuedOn | Date | Date document was issued | None |
+| isExpected | Yes/No | Whether reduction of liabilities is expected/planned | false |
+| nonReductionReason | Selection | Reason for not reducing liabilities (enum) | RetainControlOfCapital |
+| details | Text | Additional details about liability strategy (max 1000 chars) | Client prefers to maintain liquidity for flexibility. |
 
-**employmentSummary[]:**
+### Usage Example
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| client | Reference Link | Client this employment relates to | Complex object |
-| totalGrossAnnualIncome | Currency Amount | Total gross annual income (read-only calculated) | Complex object |
-| highestTaxRatepaid | Complex Data | Highest tax rate paid | Complex object |
-
-**employmentSummary[].highestTaxRatepaid:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| percentage | Number | Tax rate percentage (0,10,19,20,21,22,40,41,42,45,46,47,48) | 45 |
-
-**supplementaryQuestions[]:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| doBothClientsAgreeToAnswers | Yes/No | Whether both clients agree to answers | true |
-| type | Selection | Question category (Profile/Investments/pensions/protection/mortgage/EstatePlanning) | None |
-
-**assetsAndLiabilities:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| clientDisclosures | Complex Data | Client asset and liability disclosures | Complex object |
-
-**assetsAndLiabilities.clientDisclosures:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| hasAssets | Yes/No | Whether client has assets | true |
-| hasLiabilities | Yes/No | Whether client has liabilities | true |
-| reductionOfLiabilities | Complex Data | Liability reduction plans | Complex object |
-
-**assetsAndLiabilities.clientDisclosures.reductionOfLiabilities:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| isExpected | Yes/No | Whether reduction is expected | true |
-| nonReductionReason | Selection | Reason for not reducing (RetainControlOfCapital/PensionPlanning/Other) | RetainControlOfCapital |
-| details | Text | Additional details | None |
-
-**creditHistory:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| hasAdverseHistory | Yes/No | Whether client has adverse credit history | true |
-| refusedMortgageOrCredit | Yes/No | Whether refused mortgage or credit | true |
-| details | Text | Credit history details | None |
-
-**estatePlanning:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| will | Complex Data | Will information | Complex object |
-| totalAssets | Currency Amount | Total assets (read-only calculated) | Complex object |
-| jointTotalAssets | Currency Amount | Joint total assets (read-only calculated) | Complex object |
-| giftsDetails | Complex Data | Gift details | Complex object |
-
-**estatePlanning.will:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| details | Text | Will details | None |
-
-**estatePlanning.giftsDetails:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| inLast7Years | Text | Gifts made in last 7 years | None |
-| usedAnnualExeptionInCurrentOrPreviousTaxYears | Text | Annual exemption usage | None |
-| regularGiftsOutOfIncome | Text | Regular gifts from income | None |
-| expectingInheritanceOrGifts | Text | Expected inheritance or gifts | None |
-
----
-
-### Relationships
-
-This contract connects to:
-
-- Links to one or more Clients via `meeting.clientsPresent`
-- References Clients in `employmentSummary`
-- Contains product information (Investments, Pensions, Mortgages, Protections)
-- Contains disclosure and keyfacts documents
-- Contains supplementary questions by category
-- Contains assets, liabilities, credit history, and estate planning information
+```json
+{
+  "href": "/v2/factfinds/123/controloptions",
+  "factfind": {
+    "id": 123,
+    "href": "/v2/factfinds/123"
+  },
+  "investments": {
+    "hasCash": true,
+    "hasInvestments": true
+  },
+  "pensions": {
+    "hasEmployerPensionSchemes": true,
+    "hasFinalSalary": false,
+    "hasMoneyPurchases": true,
+    "hasPersonalPensions": true,
+    "hasAnnuities": false
+  },
+  "mortgages": {
+    "hasMortgages": true,
+    "hasEquityRelease": false
+  },
+  "protections": {
+    "hasProtection": true
+  },
+  "assets": {
+    "hasAssets": true
+  },
+  "liabilities": {
+    "hasLiabilities": true,
+    "reductionOfLiabilities": {
+      "isExpected": false,
+      "nonReductionReason": "RetainControlOfCapital",
+      "details": "Client prefers to maintain liquidity for flexibility and investment opportunities."
+    }
+  }
+}
+```
 
 ### Business Validation Rules
 
-- Must have at least one client present in the meeting
-- `meetingType` must be one of: Electronic, ElectronicRecorded, Videocall, VideocallRecorded, FaceToFace, FaceToFaceRecorded, Telephone, TelephoneRecorded
-- `disclosureKeyfacts[].Type` must be one of: CombinedDisclosureDocuments, CombinedInitialDisclosureDocument, DisclosureDocument, KeyfactsAboutCostOfServices, KeyfactsAboutServices, ServiceCostDisclosureDocument, TermsRefundOfFees, TermsOfBusiness
-- `employmentSummary[].highestTaxRatepaid.percentage` must be one of: 0, 10, 19, 20, 21, 22, 40, 41, 42, 45, 46, 47, 48
-- `assetsAndLiabilities.clientDisclosures.reductionOfLiabilities.nonReductionReason` must be one of: RetainControlOfCapital, PensionPlanning, Other
-- `supplementaryQuestions[].type` must be one of: Profile, Investments, pensions, protection, mortgage, EstatePlanning
-- `totalGrossAnnualIncome`, `totalAssets`, and `jointTotalAssets` are read-only calculated fields
+#### Singleton Resource Rules
+- Only one control options record exists per FactFind
+- First PUT to any section creates the singleton
+- Subsequent PUTs update individual sections independently
+- GET returns all sections combined
+- All PUT operations return complete ControlOptions object
+
+#### Field Validation Rules
+- Boolean fields default to null/unset (indicates not yet determined)
+- Client can explicitly set true or false
+- `nonReductionReason` must be one of: RetainControlOfCapital, PensionPlanning, Other
+- `details` field maximum 1000 characters
+- Returns 400 Bad Request if validation fails
+
+#### Business Logic Rules
+- If flag is false, system should hide corresponding section
+- If flag is true, system should show corresponding section for data entry
+- If `hasLiabilities` is false, `reductionOfLiabilities` is not applicable
+- If `isExpected` is false, `nonReductionReason` should be provided
+- If `nonReductionReason` is "Other", `details` should explain reason
+- Multiple pension flags can be true simultaneously
+
+#### Data Integrity Rules
+- FactFind reference is READ-ONLY (cannot be changed after creation)
+- When updating a section, entire section object is replaced
+- Section independence: updating one section does not affect others
+
+### Enum Values
+
+#### Non-Reduction Reason
+
+| Value | Description |
+|---|---|
+| RetainControlOfCapital | Prefer to retain control of capital for flexibility |
+| PensionPlanning | Using liabilities as part of pension planning strategy |
+| Other | Other reason (explain in details field) |
+
+### Understanding Section Gating
+
+**Purpose of Control Options:**
+- Improve user experience by showing only relevant sections
+- Reduce data entry burden on advisers
+- Focus on client's actual financial situation
+- Enable progressive disclosure of complexity
+
+**Implementation Pattern:**
+- Ask high-level questions first ("Do you have investments?")
+- Based on answers, show/hide detailed sections
+- Example: If hasCash=false and hasInvestments=false, hide entire investments section
+
+**Benefits:**
+- Faster FactFind completion
+- Reduced cognitive load
+- Better client experience (fewer irrelevant questions)
+- More focused advice conversations
+
+### Understanding Investment Types
+
+**Cash:**
+- Bank accounts, current accounts
+- Savings accounts
+- Cash ISAs
+- Instant access or fixed-term deposits
+
+**Investments:**
+- Stocks and shares
+- Investment ISAs
+- Bonds (corporate, government)
+- Investment funds and unit trusts
+- Investment trusts
+- ETFs (Exchange Traded Funds)
+
+**Both can be true:** Client has both cash savings and investment products
+
+### Understanding Pension Types
+
+**Employer Pension Schemes:**
+- Workplace pensions provided by employer
+- Auto-enrolment pensions
+- Group personal pensions
+- Group stakeholder pensions
+
+**Final Salary (Defined Benefit):**
+- Guaranteed income based on salary and service
+- Index-linked increases
+- Typically public sector or older private sector schemes
+
+**Money Purchase (Defined Contribution):**
+- Investment-based pensions
+- Value depends on contributions and investment performance
+- Most modern workplace pensions
+
+**Personal Pensions:**
+- Individual arrangements outside employment
+- SIPPs (Self-Invested Personal Pensions)
+- Stakeholder pensions
+
+**Annuities:**
+- Guaranteed income for life purchased with pension savings
+- Fixed or escalating payments
+
+### Understanding Liability Reduction Strategies
+
+**When Clients Plan to Reduce Liabilities (isExpected=true):**
+- Standard debt reduction approach
+- Pay down high-interest debt first
+- Mortgage overpayments
+- Clear credit cards and loans
+
+**When Clients Do Not Plan to Reduce Liabilities (isExpected=false):**
+
+**RetainControlOfCapital:**
+- Keep liabilities at current level
+- Prefer liquidity and investment flexibility
+- Low-interest debt provides leverage
+- Can respond to opportunities
+
+**PensionPlanning:**
+- Using mortgage interest for tax relief (if applicable)
+- Balancing debt reduction vs pension contributions
+- Maximizing pension tax relief instead of debt repayment
+
+**Other:**
+- Business investment priorities
+- Education funding
+- Property portfolio growth
+- Document specific reason in details field
+
+### Related Contracts
+
+- [FactFind Contract](#132-factfind-contract) - Parent container
+- [Investment Contract](#138-investment-contract) - Detailed investment data
+- [Pension Contracts](#13-pension-contracts) - Pension product details
+- [Mortgage Contract](#1321-mortgage-contract) - Mortgage details
+- [PersonalProtection Contract](#1357-personalprotection-contract) - Protection policies
+- [Asset Contract](#1317-asset-contract) - Asset details
+- [Liability Contract](#1318-liability-contract) - Liability details
+
+### API Endpoints
+
+- `GET /api/v2/factfinds/{id}/controloptions` - Retrieve complete control options
+- `PUT /api/v2/factfinds/{id}/controloptions/assets` - Update assets section
+- `PUT /api/v2/factfinds/{id}/controloptions/liabilities` - Update liabilities section
+- `PUT /api/v2/factfinds/{id}/controloptions/investments` - Update investments section
+- `PUT /api/v2/factfinds/{id}/controloptions/pensions` - Update pensions section
+- `PUT /api/v2/factfinds/{id}/controloptions/protections` - Update protections section
+- `PUT /api/v2/factfinds/{id}/controloptions/mortgages` - Update mortgages section
+
+### Field-Level Guidance
+
+**href (READ-ONLY):**
+- API link to this specific Control Options resource
+- Format: `/api/v2/factfinds/{id}/controloptions`
+- Included in all responses
+
+**factfind (READ-ONLY):**
+- Reference to parent FactFind
+- Populated automatically from URL path parameter
+- Cannot be changed after creation
+
+**investments.hasCash (Boolean):**
+- Set to true if client has any cash savings or bank accounts
+- Set to false if client has no cash holdings
+- Null indicates not yet determined
+
+**investments.hasInvestments (Boolean):**
+- Set to true if client has investment products
+- Includes: ISAs, stocks, bonds, funds, investment trusts
+- Set to false if client has no investments
+
+**pensions.hasEmployerPensionSchemes (Boolean):**
+- True if client has any workplace pensions
+- Includes auto-enrolment, group personal, group stakeholder
+
+**pensions.hasFinalSalary (Boolean):**
+- True if client has defined benefit pensions
+- Typically public sector or older private sector schemes
+
+**pensions.hasMoneyPurchases (Boolean):**
+- True if client has defined contribution pensions
+- Most modern workplace pensions
+
+**pensions.hasPersonalPensions (Boolean):**
+- True if client has individual pension arrangements
+- Includes SIPPs and stakeholder pensions
+
+**pensions.hasAnnuities (Boolean):**
+- True if client has purchased annuities
+- Guaranteed income products
+
+**mortgages.hasMortgages (Boolean):**
+- True if client has residential mortgages
+- Includes primary residence and buy-to-let mortgages
+
+**mortgages.hasEquityRelease (Boolean):**
+- True if client has equity release products
+- Lifetime mortgages or home reversion plans
+
+**protections.hasProtection (Boolean):**
+- True if client has any protection products
+- Includes: life insurance, critical illness, income protection
+
+**assets.hasAssets (Boolean):**
+- True if client has assets beyond primary residence
+- Includes: investment property, vehicles, valuables, collectibles
+
+**liabilities.hasLiabilities (Boolean):**
+- True if client has any liabilities
+- Includes: loans, credit cards, overdrafts, mortgages
+
+**liabilities.reductionOfLiabilities.isExpected (Boolean):**
+- True if client plans to reduce liabilities over time
+- False if client intends to maintain current liability levels
+- Null indicates not yet discussed
+
+**liabilities.reductionOfLiabilities.nonReductionReason (Enum):**
+- Required if isExpected is false
+- Explains why client not planning to reduce liabilities
+- Must be one of: RetainControlOfCapital, PensionPlanning, Other
+
+**liabilities.reductionOfLiabilities.details (Text):**
+- Optional additional details about liability strategy
+- Maximum 1000 characters
+- Useful for documenting specific client circumstances
+- Especially important if nonReductionReason is "Other"
 
 ---
-
 
 ## 13.3 Address Contract
 ### Overview
@@ -2792,6 +3297,207 @@ Average Income = (Year 1 Total + Year 2 Total) / 2
 ---
 
 
+## 13.19.1 Employment Summary Contract
+
+### Business Purpose
+
+The Employment Summary contract aggregates a client's employment and income information into a single summary view, providing calculated total gross annual income and the client's highest marginal tax rate. This singleton resource (one per client) supports mortgage affordability assessments, tax planning, and financial overview reporting.
+
+### Key Features
+
+- **Singleton Resource** - One employment summary per client
+- **Automatic Calculation** - Total income automatically calculated from all income sources
+- **Tax Position Tracking** - Records client's highest marginal tax rate
+- **Read-Only Income** - Total income is calculated, not manually entered
+- **Support for All UK Tax Rates** - Covers England, Wales, Northern Ireland, and Scottish tax bands
+
+### Common Scenarios
+
+**Mortgage Application:**
+- Quick access to total gross annual income for affordability calculations
+- Tax rate informs net income calculations
+- Used by lenders to determine maximum borrowing capacity
+
+**Tax Planning:**
+- Adviser understands client's current tax bracket
+- Informs tax-efficient investment recommendations
+- Identifies opportunities for tax optimization
+
+**Annual Reviews:**
+- Track income progression year-over-year
+- Monitor tax position changes
+- Update after significant life events (promotions, job changes)
+
+**Financial Planning:**
+- Input to cash flow and budget calculations
+- Capacity for loss assessments
+- Retirement income gap analysis
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| factfind | Reference Link | Link to parent fact find | Complex object |
+| client | Reference Link | Link to client | Complex object |
+| totalGrossAnnualIncome | Currency Amount | Total annual income from all sources (calculated automatically) | £75,000.00 GBP |
+| highestTaxRatePaid | Tax Rate | Client's highest marginal tax rate | 40% |
+
+#### Nested Field Groups
+
+**factfind:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | FactFind identifier | 679 |
+| href | Text | Link to FactFind resource | /api/v2/factfinds/679 |
+
+**client:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Client identifier | 8496 |
+| href | Text | Link to client resource | /api/v2/factfinds/679/clients/8496 |
+| name | Text | Client display name | Jack Marias |
+
+**totalGrossAnnualIncome:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| amount | Number | Annual income amount (2 decimal places) | 75000.00 |
+| currency | Complex Data | Currency information | Complex object |
+
+**totalGrossAnnualIncome.currency:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| code | Text | ISO 4217 currency code | GBP |
+| display | Text | Human-readable currency name | British Pound |
+| symbol | Text | Currency symbol | £ |
+
+**highestTaxRatePaid:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| percentage | Number | Tax rate as a percentage | 40 |
+
+### Usage Example
+
+```json
+{
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Jack Marias"
+  },
+  "totalGrossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "highestTaxRatePaid": {
+    "percentage": 40
+  }
+}
+```
+
+### Business Validation Rules
+
+- Singleton resource - only one employment summary per client
+- `highestTaxRatePaid.percentage` must be one of: 0, 10, 19, 20, 21, 22, 40, 41, 42, 45, 46, 47, 48
+- `totalGrossAnnualIncome` is read-only and calculated automatically from all income sources
+- Client must exist within the specified fact find
+- Cannot manually set `totalGrossAnnualIncome` - it's derived from income records
+
+### UK Tax Rate Reference
+
+**England, Wales & Northern Ireland:**
+- 0% - Personal Allowance (£0 - £12,570)
+- 20% - Basic Rate (£12,571 - £50,270)
+- 40% - Higher Rate (£50,271 - £125,140)
+- 45% - Additional Rate (Over £125,140)
+
+**Scotland:**
+- 0% - Personal Allowance (£0 - £12,570)
+- 19% - Starter Rate
+- 20% - Basic Rate
+- 21% - Intermediate Rate
+- 42% - Higher Rate (historical/alternative)
+- 45% - Advanced Rate
+- 48% - Top Rate (current)
+
+**Historical Rates:**
+- 10%, 22%, 41%, 46%, 47% - Included for backwards compatibility with older fact finds
+
+### Calculation Logic
+
+**Total Gross Annual Income Calculation:**
+1. System aggregates all income sources for the client from:
+   - Employment income (salary, bonuses, commissions)
+   - Self-employment income
+   - Rental income
+   - Investment income (dividends, interest)
+   - Pension income
+   - State benefits
+   - Other income sources
+
+2. All income amounts are annualized based on frequency:
+   - Monthly income × 12
+   - Weekly income × 52
+   - Quarterly income × 4
+   - One-off income counted as received
+
+3. Currency conversion applied if income sources are in different currencies (using current exchange rates)
+
+4. Calculation updates automatically when:
+   - New income source is added
+   - Existing income source is updated
+   - Income source is deleted
+
+### Related Contracts
+
+- [Client Contract](#131-client-contract) - Client information
+- [Employment Contract](#1319-employment-contract) - Detailed employment records
+- [Income Contract](#134-income-contract) - Income sources feeding the calculation
+- [Affordability Contract](#1330-affordability-contract) - Uses employment summary for calculations
+
+### API Endpoints
+
+- `GET /api/v2/factfinds/{id}/clients/{clientId}/employments/summary` - Retrieve employment summary
+- `PUT /api/v2/factfinds/{id}/clients/{clientId}/employments/summary` - Create or update employment summary
+
+### Field-Level Guidance
+
+**totalGrossAnnualIncome:**
+- Read-only field, automatically calculated
+- Includes all income sources registered for the client
+- Annualized to provide consistent annual figure
+- Used for mortgage affordability (typically 4.5× income = maximum mortgage)
+- Tax calculations performed separately using `highestTaxRatePaid`
+
+**highestTaxRatePaid:**
+- Editable field - adviser/system must set this
+- Should reflect the client's highest marginal rate across all income sources
+- Used for tax planning and tax-efficient investment advice
+- Consider Scottish vs rest-of-UK rates based on client residence
+- Review annually as tax bands change
+
+**Why Track Both?**
+- Gross income drives lending capacity
+- Tax rate informs net income and tax planning
+- Together provide complete income position picture
+
+---
+
+
 ## 13.20 Budget Contract
 ### Overview
 The `Budget` contract represents a client's budgeted/planned monthly expenditure by category.
@@ -3003,341 +3709,372 @@ This contract connects to:
 
 ## 13.23 Credit History Contract
 
-### Overview
-The `CreditHistory` contract represents a comprehensive record of a client's credit history, including credit scores from Credit Reference Agencies (CRAs), adverse credit events, payment history, and mortgage lending suitability assessments. This information is essential for affordability assessments and mortgage lending decisions, ensuring compliance with FCA regulations.
+### Business Purpose
 
-**Business Purpose:**
-- Record credit scores from major providers (Experian, Equifax, TransUnion)
-- Track adverse credit events (CCJs, defaults, IVA, bankruptcy, arrears)
-- Assess mortgage suitability based on credit profile
-- Support FCA-compliant affordability assessments for mortgage lending
-- Document payment history and creditworthiness
+The Credit History contract represents a singleton record per client of their credit history, including adverse credit events and automatic flag calculation. This information is essential for mortgage applications, lending decisions, and FCA-compliant affordability assessments.
+
+### Key Features
+
+- **Singleton Resource** - One credit history record per client
+- **Automatic Flag Calculation** - Read-only flags (hasAdverseCredit, hasCCJ, hasDefault, etc.) automatically derived from adverse credit events
+- **Adverse Event Tracking** - Detailed tracking of CCJs, defaults, IVAs, bankruptcy, arrears, and repossessions
+- **Mortgage Suitability** - Essential for mortgage underwriting and lending criteria
+- **Event Lifecycle Management** - Track registration, satisfaction/clearance, and discharge dates
+- **Link to Liabilities** - Connect adverse events to related liability records
+
+### Common Scenarios
+
+**Clean Credit History:**
+- No adverse events recorded
+- All flags (hasAdverseCredit, hasCCJ, etc.) automatically set to false
+- Eligible for mainstream mortgage lending
+
+**Satisfied CCJ:**
+- CCJ recorded with registration and satisfied dates
+- `hasCCJ` = true, `hasAdverseCredit` = true automatically
+- Sub-prime lending options available
+
+**Active IVA:**
+- IVA event with registration date, no discharge date yet
+- `ivaHistory` = true, `hasAdverseCredit` = true automatically
+- Very limited lending options until discharged
+
+**Historical Defaults:**
+- Old defaults marked as satisfied
+- Impact reduces over time (3+ years better)
+- Expanding lending options as events age
 
 ### Fields
 
-#### Identification
+#### Main Fields
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique system identifier for this credit history record | 334 |
-| href | Text | Web link to access this credit history record | /api/v2/factfinds/679/clients/346/credit-history/334 |
-| factfind | Reference Link | Link to the FactFind this credit history belongs to | See factfindRef below |
-| client | Reference Link | Link to the client this credit history belongs to | See client below |
+| id | Number | Unique system identifier | 334 |
+| href | Text | API link to this resource | /api/v2/factfinds/679/clients/8496/credithistory |
+| client | Reference Link | Client reference | Complex object |
+| factfind | Reference Link | FactFind reference | Complex object |
+| hasAdverseCredit | Yes/No | Any adverse credit exists (READ-ONLY, calculated from events) | true |
+| hasCCJ | Yes/No | Has County Court Judgement (READ-ONLY, calculated from events) | false |
+| hasBeenRefusedCredit | Yes/No | Has been refused credit (READ-ONLY, calculated from events and refusedMortgageOrCredit) | true |
+| ivaHistory | Yes/No | Has IVA history (READ-ONLY, calculated from events) | false |
+| hasDefault | Yes/No | Has default history (READ-ONLY, calculated from events) | true |
+| hasBankruptcyHistory | Yes/No | Has bankruptcy history (READ-ONLY, calculated from events) | false |
+| hasArrears | Yes/No | Has arrears history (READ-ONLY, calculated from events) | false |
+| refusedMortgageOrCredit | Yes/No | Client-declared credit refusal (EDITABLE) | true |
+| details | Text | Additional details (max 2000 characters, EDITABLE) | Credit card default in 2020, settled in full. |
+| adverseCreditEvents | List | Collection of adverse credit events (READ-ONLY, managed via events API) | List with items |
+| createdAt | Date/Time | Creation timestamp | 2026-01-15T10:00:00Z |
+| updatedAt | Date/Time | Last update timestamp | 2026-01-15T10:30:00Z |
 
-#### Credit Score Assessment
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| creditScore | Complex Data | Credit score information from Credit Reference Agency | See creditScore below |
-
-**creditScore:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| score | Number | Credit score value (0-999 for Experian, 0-700 for Equifax, 0-710 for TransUnion) | 780 |
-| maxScore | Number | Maximum possible score for this provider | 999 |
-| rating | Selection | Credit rating category: Excellent, Good, Fair, Poor, Very Poor | Excellent |
-| provider | Selection | Credit Reference Agency: Experian, Equifax, TransUnion | Experian |
-| checkedDate | Date | Date when credit score was obtained | 2026-01-15 |
-
-#### Adverse Credit Indicators (Summary)
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| hasAdverseCredit | Yes/No | Does the client have any adverse credit events on their record? | No |
-| hasCCJ | Yes/No | Does the client have any County Court Judgments? | No |
-| hasBeenRefusedCredit | Yes/No | Has the client been refused credit in the past? | No |
-| ivaHistory | Yes/No | Does the client have an Individual Voluntary Arrangement (IVA) history? | No |
-| hasDefault | Yes/No | Does the client have any defaults registered on their credit file? | No |
-| hasBankruptcyHistory | Yes/No | Does the client have bankruptcy history? | No |
-| hasArrears | Yes/No | Does the client currently have or have had payment arrears? | No |
-
-#### Adverse Credit Events (Detailed Records)
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| adverseCreditEvents | List of Events | Detailed list of adverse credit events with financial and timeline information | See adverseCreditEvents below |
-
-**Each Adverse Credit Event contains:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| type | Selection | Type of adverse event: CCJ, Default, IVA, Bankruptcy, Arrears, Repossession, Debt Relief Order | Default |
-| registeredOn | Date/Time | Date and time when event was registered with Credit Reference Agencies | 2020-06-15T00:00:00Z |
-| satisfiedOrClearedOn | Date/Time | Date and time when the debt was satisfied or cleared | 2023-12-20T00:00:00Z |
-| reposessedOn | Date/Time | Date of property repossession (if applicable) | 2022-08-10T00:00:00Z |
-| dischargedOn | Date/Time | Date when bankruptcy or IVA was discharged | 2023-12-20T00:00:00Z |
-| amountRegistered | Currency Amount | Original amount registered when event occurred | £5,000.00 |
-| amountOutstanding | Currency Amount | Current outstanding amount (if any) | £3,500.00 |
-| isDebtOutstanding | Yes/No | Is the debt still outstanding or has it been fully paid? | Yes |
-| numberOfPaymentsMissed | Number | Total number of payments missed for this event | 2 |
-| consecutivePaymentsMissed | Number | Maximum number of consecutive payments missed | 2 |
-| numberOfPaymentsInArrears | Number | Number of payments currently in arrears | 1 |
-| isArrearsClearedUponCompletion | Yes/No | Were arrears cleared when arrangement completed? | Yes |
-| yearsMaintained | Number | Number of years successfully maintained after event (for IVA/payment plans) | 5 |
-| lender | Text | Name of lender or creditor involved in the adverse event | High Street Bank |
-| liability | Reference Link | Link to related liability record (if applicable) | /api/v2/clients/456/liabilities/1001 |
-| concurrencyId | Number | System version control number (automatic) | 12 |
-| createdAt | Date/Time | When this event record was created in the system | 2026-01-15T10:30:00Z |
-| lastUpdatedAt | Date/Time | When this event record was last modified | 2026-01-29T14:45:00Z |
-
-#### Missed Payments Summary
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| missedPayments | Complex Data | Summary of missed payment history | See missedPayments below |
-
-**missedPayments:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| last12Months | Number | Count of missed payments in the last 12 months (0 = clean record) | 0 |
-| last6Years | Number | Count of missed payments in the last 6 years (used for mortgage affordability) | 0 |
-
-#### Mortgage Suitability Assessment
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| mortgageSuitability | Complex Data | Automated assessment of mortgage lending eligibility | See mortgageSuitability below |
-
-**mortgageSuitability:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| isEligible | Yes/No | Is the client eligible for standard mortgage products? (automatically calculated) | Yes |
-| factors | List of Text | List of factors affecting mortgage suitability (positive or negative) | ["Good credit score (780)", "No adverse credit", "No missed payments"] |
-
-#### Additional Information
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| notes | Text | Free-text notes about credit history, mitigating circumstances, or additional context (max 2000 characters) | Excellent credit history - eligible for best mortgage rates |
-
-#### System Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| createdAt | Date/Time | When this credit history record was created in the system | 2026-01-15T10:00:00Z |
-| updatedAt | Date/Time | When this credit history record was last modified | 2026-01-15T10:00:00Z |
-
-#### Reference Link Structures
-
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique identifier for the FactFind | 679 |
-| href | Text | Web link to the FactFind | /api/v2/factfinds/679 |
+#### Nested Field Groups
 
 **client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique identifier for the client | 1234 |
-| href | Text | Web link to the client record | /api/v2/factfinds/679/clients/1234 |
+| id | Number | Client identifier | 8496 |
+| clientNumber | Text | Client reference number | C00001234 |
+| name | Text | Client display name | John Smith |
+
+**factfind:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | FactFind identifier | 679 |
+| factFindNumber | Text | FactFind reference number | FF-2025-00123 |
+
+**adverseCreditEvents[] (each item):**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique event identifier | 123 |
+| href | Text | API link to this event | /api/v2/factfinds/679/clients/8496/credithistory/events/123 |
+| type | Selection | Event type: CCJ, Default, Arrears, IVA, Bankruptcy, Repossession | Default |
+| registeredOn | Date/Time | Date event was registered | 2020-06-15T00:00:00Z |
+| satisfiedOrClearedOn | Date/Time | Date satisfied/cleared (optional) | 2021-03-20T00:00:00Z |
+| reposessedOn | Date/Time | Date repossessed (optional, for Repossession type) | null |
+| dischargedOn | Date/Time | Date discharged (optional, for IVA/Bankruptcy) | null |
+| amountRegistered | Currency Amount | Original amount registered | £5,000.00 GBP |
+| amountOutstanding | Currency Amount | Current amount outstanding | £0.00 GBP |
+| isDebtOutstanding | Yes/No | Whether debt is still outstanding | false |
+| numberOfPaymentsMissed | Number | Total payments missed | 2 |
+| consecutivePaymentsMissed | Number | Consecutive payments missed | 2 |
+| numberOfPaymentsInArrears | Number | Payments currently in arrears | 0 |
+| isArrearsClearedUponCompletion | Yes/No | Arrears cleared on completion | true |
+| yearsMaintained | Number | Years maintained | 0 |
+| lender | Text | Lender/creditor name | High Street Bank |
+| liability | Reference Link | Link to related liability (optional) | Complex object |
+| concurrencyId | Number | Optimistic concurrency control | 1 |
+| createdAt | Date/Time | Event creation timestamp | 2026-01-15T10:30:00Z |
+| lastUpdatedAt | Date/Time | Event last update timestamp | 2026-01-15T10:30:00Z |
+
+**adverseCreditEvents[].liability (if present):**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Liability identifier | 1001 |
+| href | Text | Link to liability resource | /api/v2/factfinds/679/liabilities/1001 |
+| description | Text | Liability description | Credit Card Debt |
+
+### Usage Example
+
+```json
+{
+  "id": 334,
+  "href": "/api/v2/factfinds/679/clients/8496/credithistory",
+  "client": {
+    "id": 8496,
+    "clientNumber": "C00001234",
+    "name": "John Smith"
+  },
+  "factfind": {
+    "id": 679,
+    "factFindNumber": "FF-2025-00123"
+  },
+  "hasAdverseCredit": true,
+  "hasCCJ": false,
+  "hasBeenRefusedCredit": true,
+  "ivaHistory": false,
+  "hasDefault": true,
+  "hasBankruptcyHistory": false,
+  "hasArrears": false,
+  "refusedMortgageOrCredit": true,
+  "details": "Credit card default in 2020, settled in full. Application for mortgage refused by mainstream lender in 2021.",
+  "adverseCreditEvents": [
+    {
+      "id": 123,
+      "href": "/api/v2/factfinds/679/clients/8496/credithistory/events/123",
+      "type": "Default",
+      "registeredOn": "2020-06-15T00:00:00Z",
+      "satisfiedOrClearedOn": "2021-03-20T00:00:00Z",
+      "reposessedOn": null,
+      "dischargedOn": null,
+      "amountRegistered": {
+        "amount": 5000.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "amountOutstanding": {
+        "amount": 0.00,
+        "currency": {
+          "code": "GBP",
+          "display": "British Pound",
+          "symbol": "£"
+        }
+      },
+      "isDebtOutstanding": false,
+      "numberOfPaymentsMissed": 2,
+      "consecutivePaymentsMissed": 2,
+      "numberOfPaymentsInArrears": 0,
+      "isArrearsClearedUponCompletion": true,
+      "yearsMaintained": 0,
+      "lender": "High Street Bank",
+      "liability": {
+        "id": 1001,
+        "href": "/api/v2/factfinds/679/liabilities/1001",
+        "description": "Credit Card Debt"
+      },
+      "concurrencyId": 1,
+      "createdAt": "2026-01-15T10:30:00Z",
+      "lastUpdatedAt": "2026-01-15T10:30:00Z"
+    }
+  ],
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-01-15T10:30:00Z"
+}
+```
 
 ### Business Validation Rules
 
-#### Credit Score Validations
-- Credit score must be between 0 and the maximum score for the provider
-- Experian: 0-999 (max: 999)
-- Equifax: 0-700 (max: 700)
-- TransUnion: 0-710 (max: 710)
-- Credit score check date cannot be in the future
+#### Singleton Resource Rules
+- Only one credit history record exists per client
+- Use PUT to create or update the singleton
+- GET returns 404 if not yet created
 
-#### Adverse Credit Logic
-- If "Has Adverse Credit" is Yes, there must be at least one adverse credit event recorded
-- If there are adverse credit events recorded, "Has Adverse Credit" must be Yes
-- Specific indicators (Has CCJ, Has Default, etc.) should match the types of events recorded
-- If "Has CCJ" is Yes, there should be at least one event of type "CCJ"
-- If "Has Default" is Yes, there should be at least one event of type "Default"
+#### Read-Only Fields (Automatic Calculation)
+- `hasAdverseCredit` = true if any adverse events exist in `adverseCreditEvents` array
+- `hasCCJ` = true if any event with type="CCJ" exists
+- `hasDefault` = true if any event with type="Default" exists
+- `ivaHistory` = true if any event with type="IVA" exists
+- `hasBankruptcyHistory` = true if any event with type="Bankruptcy" exists
+- `hasArrears` = true if any event with type="Arrears" exists
+- `hasBeenRefusedCredit` = true if `refusedMortgageOrCredit` is true OR any adverse events exist
+- These flags CANNOT be set manually - they are automatically recalculated when events are added, updated, or deleted
+
+#### Editable Fields
+- `refusedMortgageOrCredit` - Must be explicitly set to true or false
+- `details` - Optional, max 2000 characters, should explain credit circumstances
 
 #### Adverse Credit Event Rules
-- Event type is required for every adverse credit event
-- Registration date cannot be in the future
-- If debt is satisfied/cleared, the satisfied date must be after the registration date
-- Outstanding amount cannot be more than the originally registered amount
-- If debt is not outstanding, the outstanding amount should be £0
-- Number of consecutive payments missed cannot exceed total payments missed
-- Years maintained must be zero or positive
-
-#### Date and Time Rules
-- All dates use standard format (YYYY-MM-DD for dates, YYYY-MM-DDTHH:mm:ssZ for date/times)
-- Historical dates should not be in the future
-- Satisfaction/discharge dates should be after registration dates
+- `type` must be one of: CCJ, Default, Arrears, IVA, Bankruptcy, Repossession
+- `registeredOn` is required and must be in the past
+- `amountRegistered` must be positive (> 0)
+- `amountOutstanding` must be ≥ 0 and ≤ `amountRegistered`
+- `satisfiedOrClearedOn` must be after `registeredOn`
+- `dischargedOn` must be after `registeredOn`
+- `consecutivePaymentsMissed` cannot exceed `numberOfPaymentsMissed`
+- If `isDebtOutstanding` = false, `amountOutstanding` should be 0
+- If `amountOutstanding` = 0, should have `satisfiedOrClearedOn` date
+- `reposessedOn` is required if type = Repossession
+- `dischargedOn` is applicable for IVA and Bankruptcy types
 
 ### Understanding Adverse Credit Events
 
-#### CCJ (County Court Judgment)
-**What it is:** A court order requiring you to repay a debt to a creditor.
+#### CCJ (County Court Judgement)
+**What it is:** Court order requiring debt repayment to a creditor.
 
-**Impact on Lending:**
+**Impact Timeline:**
 - Stays on credit file for 6 years from judgment date
-- Can be marked as "satisfied" when paid, which looks better but still shows on file
-- CCJs over £500 within the last 3 years typically exclude standard mortgage applications
-- May need specialist lender if CCJ is recent or large
+- Can be marked "satisfied" when paid (improves prospects but still shows)
 
-**Mortgage Implications:**
+**Lending Impact:**
+- CCJs > £500 within 3 years: Typically exclude mainstream mortgages
 - CCJs older than 3 years: Many mainstream lenders will consider
-- CCJs under 3 years old: Likely need specialist lender
-- Multiple CCJs: Significantly reduced lender options
 - Satisfied CCJs: Better than unsatisfied, but still visible
 
 #### Default
-**What it is:** Creditor has officially written off the debt after typically 3-6 months of missed payments.
+**What it is:** Creditor officially writes off debt after 3-6 months of missed payments.
 
-**Impact on Lending:**
+**Impact Timeline:**
 - Stays on credit file for 6 years from default date
-- Even if paid in full, it remains on the file
-- Indicates serious payment difficulties
-- Multiple defaults severely restrict lending options
+- Remains on file even if paid in full
 
-**Mortgage Implications:**
-- Recent defaults (under 2 years): Very difficult, specialist lenders only
-- Defaults 2-3 years old: Some specialist lenders available
-- Defaults 3+ years old: More mainstream options become available
-- Satisfied defaults: Better than unsatisfied, shows responsibility
+**Lending Impact:**
+- Recent defaults (< 2 years): Specialist lenders only
+- Defaults 2-3 years old: Some specialist lenders
+- Defaults 3+ years old: Mainstream options increasing
+- Satisfied defaults: Shows responsibility
 
 #### IVA (Individual Voluntary Arrangement)
-**What it is:** Formal agreement with creditors to pay reduced debt over time (typically 5-6 years).
+**What it is:** Formal agreement with creditors to pay reduced debt over 5-6 years.
 
-**Impact on Lending:**
+**Impact Timeline:**
 - Stays on credit file for 6 years from approval date
 - Alternative to bankruptcy
-- Shows formal debt management
-- Must be disclosed to lenders
 
-**Mortgage Implications:**
-- During IVA: Usually no mortgage applications possible
-- After 3 years with good payment record: Some specialist lenders
-- After IVA completion: Gradually more options
-- Rebuilding credit after IVA essential
+**Lending Impact:**
+- During IVA: Usually no mortgage possible
+- 3 years with good payment record: Some specialist lenders
+- After completion: Gradually more options
 
 #### Bankruptcy
 **What it is:** Legal process to write off unaffordable debts.
 
-**Impact on Lending:**
+**Impact Timeline:**
 - Typically discharged after 12 months
 - Stays on credit file for 6 years from bankruptcy order date
-- Most severe form of insolvency
 - Public record
 
-**Mortgage Implications:**
-- Discharged less than 3 years: Extremely difficult, very limited specialist lenders
-- Discharged 3-6 years: Some specialist lenders with higher rates
+**Lending Impact:**
+- Discharged < 3 years: Very limited specialist lenders
+- Discharged 3-6 years: Some specialist lenders, higher rates
 - After 6 years: Returns to normal consideration
-- May always need to disclose to certain lenders
 
 #### Arrears
-**What it is:** Being behind on contractual payments (mortgage, loans, credit cards).
+**What it is:** Being behind on contractual payments.
 
-**Impact on Lending:**
-- Current arrears: Major red flag for lenders
-- Historical arrears (cleared): Impact reduces over time
-- 2+ months in arrears triggers serious lender concerns
-- Pattern of arrears worse than one-off issues
+**Impact Timeline:**
+- Current arrears: Major red flag
+- Historical arrears: Impact reduces over time
 
-**Mortgage Implications:**
-- Current arrears: Extremely difficult to get new mortgage
-- Recent arrears (within 12 months): Specialist lenders only
-- Arrears cleared for 12+ months: More options available
-- Demonstrated ability to maintain payments essential
+**Lending Impact:**
+- Current arrears: Extremely difficult for new mortgage
+- Recent arrears (< 12 months): Specialist lenders only
+- Arrears cleared 12+ months: More options available
 
 #### Repossession
-**What it is:** Property has been taken back by the lender due to non-payment.
+**What it is:** Property taken back by lender due to non-payment.
 
-**Impact on Lending:**
+**Impact Timeline:**
 - Stays on file for 6 years
 - Extremely serious adverse event
-- Shows total payment breakdown
-- Very difficult to explain to lenders
 
-**Mortgage Implications:**
+**Lending Impact:**
 - Within 3 years: Almost impossible to obtain mortgage
-- 3-6 years: Very limited specialist lenders, very high rates
-- Often requires large deposit (25%+ equity)
-- May never access best rates
+- 3-6 years: Very limited specialists, very high rates
+- Often requires 25%+ deposit
 
-### Credit Score Rating Guide
+### Credit File Retention Periods
 
-#### Experian (0-999)
-- **Excellent (961-999):** Best mortgage rates and terms available
-- **Good (881-960):** Access to most standard mortgage products
-- **Fair (721-880):** May face some restrictions or higher rates
-- **Poor (561-720):** Limited to specialist lenders
-- **Very Poor (0-560):** Very difficult to obtain mortgage
+All adverse credit events remain on credit files for **6 years**:
+- **CCJs:** 6 years from registration date
+- **Defaults:** 6 years from default date
+- **IVAs:** 6 years from approval date
+- **Bankruptcy:** 6 years from discharge date (note: discharge is typically 12 months after bankruptcy order)
+- **Repossessions:** 6 years
+- **Arrears:** 6 years from when arrears occurred
 
-#### Equifax (0-700)
-- **Excellent (466-700):** Best mortgage rates and terms available
-- **Good (420-465):** Access to most standard mortgage products
-- **Fair (380-419):** May face some restrictions or higher rates
-- **Poor (280-379):** Limited to specialist lenders
-- **Very Poor (0-279):** Very difficult to obtain mortgage
+### Regulatory Context
 
-#### TransUnion (0-710)
-- **Excellent (628-710):** Best mortgage rates and terms available
-- **Good (604-627):** Access to most standard mortgage products
-- **Fair (566-603):** May face some restrictions or higher rates
-- **Poor (551-565):** Limited to specialist lenders
-- **Very Poor (0-550):** Very difficult to obtain mortgage
+**FCA MCOB (Mortgage Conduct of Business) Requirements:**
+- Creditworthiness assessment required before lending
+- Credit Reference Agency checks mandatory for mortgages
+- Adverse credit must be considered in affordability assessment
+- Advisers must explain how credit history affects mortgage options
+- Responsible lending: cannot ignore adverse credit
 
-### Mortgage Suitability Factors
+**MLR 2017 (Money Laundering Regulations):**
+- Credit checks part of client due diligence
+- Enhanced due diligence for adverse credit clients
+- Document source of funds for large transactions
 
-The mortgage suitability assessment considers:
+### Related Contracts
 
-1. **Credit Score Level**
-   - 650+: Generally eligible for standard mortgages
-   - 550-649: May need specialist lender
-   - Below 550: Very limited options
+- [Client Contract](#131-client-contract) - Client information
+- [FactFind Contract](#132-factfind-contract) - Parent container
+- [Liability Contract](#1318-liability-contract) - Liabilities linked to adverse events
 
-2. **Adverse Credit Recency**
-   - CCJs older than 3 years: Better prospects
-   - Defaults satisfied for 3+ years: Improving situation
-   - Recent adverse events (under 2 years): Significant restrictions
+### API Endpoints
 
-3. **Payment History**
-   - No missed payments in 12 months: Ideal
-   - 1-2 missed payments in 12 months: Some lenders may accept
-   - 3+ missed payments in 12 months: Specialist lenders only
+- `GET /api/v2/factfinds/{id}/clients/{clientId}/credithistory` - Retrieve credit history singleton
+- `PUT /api/v2/factfinds/{id}/clients/{clientId}/credithistory` - Create or update credit history
+- `POST /api/v2/factfinds/{id}/clients/{clientId}/credithistory/events` - Create adverse credit event
+- `GET /api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Get adverse credit event
+- `PUT /api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Update adverse credit event
+- `DELETE /api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Delete adverse credit event
 
-4. **Outstanding Adverse Debt**
-   - No outstanding adverse debt: Positive factor
-   - Outstanding adverse debt: May need settlement before mortgage
+### Field-Level Guidance
 
-5. **Bankruptcy/IVA Status**
-   - Discharged 3+ years: Some options available
-   - Discharged less than 3 years: Very limited options
-   - Currently in IVA/bankruptcy: Generally no mortgage available
+**hasAdverseCredit, hasCCJ, hasDefault, etc. (Read-Only Flags):**
+- Automatically calculated by system
+- Cannot be manually set
+- Recalculated whenever events are added, updated, or deleted
+- Provide quick summary view without needing to examine all events
 
-### Regulatory Context (FCA Requirements)
+**refusedMortgageOrCredit (Editable):**
+- Client's declaration of credit refusal
+- Should be set to true if client reports being refused
+- Contributes to `hasBeenRefusedCredit` calculation
 
-Under FCA MCOB (Mortgage Conduct of Business) rules:
+**details (Editable):**
+- Free-text field for context and mitigating circumstances
+- Useful for documenting reasons behind adverse events
+- Helps advisers understand full situation
+- Examples: "Default due to job loss, now re-employed", "CCJ satisfied within 3 months of registration"
 
-- **Creditworthiness Assessment Required:** Lenders must assess creditworthiness comprehensively before lending
-- **Credit Reference Agency Checks Mandatory:** All mortgage applications require CRA searches
-- **Adverse Credit Must Be Considered:** Impact on affordability must be assessed
-- **Consumer Awareness:** Advisers must explain how credit history affects mortgage options
-- **Responsible Lending:** Lenders cannot ignore adverse credit or poor payment history
+**adverseCreditEvents (Read-Only Collection):**
+- Managed via dedicated events API endpoints
+- Cannot add/modify events directly on credit history PUT
+- Use POST to `/credithistory/events` to add new events
+- Use PUT to `/credithistory/events/{id}` to update events
+- Use DELETE to `/credithistory/events/{id}` to remove events
 
-**Affordability Assessment Requirements:**
-- Credit history is key component of affordability assessment
-- Pattern of payments indicates future payment reliability
-- Adverse credit suggests higher lending risk
-- Consumer must demonstrate ability to maintain payments despite past issues
+**amountRegistered vs amountOutstanding:**
+- `amountRegistered`: Original debt amount when event occurred
+- `amountOutstanding`: Current remaining debt (can decrease over time)
+- When debt fully paid: `amountOutstanding` = 0, set `satisfiedOrClearedOn` date
+- Outstanding amount should never exceed registered amount
 
-### Best Practices for Advisers
-
-1. **Check Credit Early:** Obtain credit report 3-6 months before mortgage application to identify and address issues
-2. **Correct Errors:** Challenge any incorrect information on credit files immediately
-3. **Allow Time:** Adverse events have less impact as they age (3+ years is significantly better)
-4. **Build Positive History:** Encourage clients to build positive payment history after adverse events
-5. **Set Expectations:** Manage client expectations about lender options and likely interest rates
-6. **Document Circumstances:** Record mitigating circumstances for adverse events in notes
-7. **Consider Specialists:** Don't assume adverse credit means no mortgage - specialist lenders exist
-8. **Review All Three CRAs:** Credit scores can vary between agencies - check all three
+**satisfiedOrClearedOn vs dischargedOn:**
+- `satisfiedOrClearedOn`: Used for CCJs, Defaults, Arrears when debt fully paid/cleared
+- `dischargedOn`: Used specifically for IVA and Bankruptcy when legally discharged
+- Both indicate positive resolution but have different legal meanings
 
 ---
-
 ## 13.24 Property Detail Contract
 ### Overview
 The `PropertyDetail` contract represents detailed property information including physical characteristics, construction details, and tenure information.
@@ -5395,24 +6132,53 @@ Client relationships affect:
 
 ## 13.39 Estate Planning Contract
 
-### Overview
-The `EstatePlanning` contract represents a comprehensive overview of a client's estate planning arrangements. This is a singleton resource - each client has exactly one estate planning record that captures will details, asset values, inheritance tax planning, and associated gifts.
-
 ### Business Purpose
-- Provide centralized estate planning information for IHT calculations
-- Track will details and beneficiary arrangements
-- Record gifts made and planned (PETs, trusts, exemptions)
-- Calculate inheritance tax liability and available reliefs
-- Support estate planning advice and recommendations
+
+The Estate Planning contract represents a singleton record per client containing estate planning information, will details, inheritance expectations, and gift tracking for UK Inheritance Tax (IHT) planning purposes. This enables advisers to provide comprehensive estate and succession planning advice while tracking Potentially Exempt Transfers (PETs) and annual exemptions.
 
 ### Key Features
-- Singleton resource per client
-- Captures will details in free text format
-- Tracks total assets and joint assets for IHT calculations
-- Records gift history (last 7 years, recent, regular)
-- Supports inheritance tax reliefs (RNRB, widow's relief, business asset relief)
-- Includes gifts collection as sub-resource
-- Supports both standard gifts and trust-based arrangements
+
+- **Singleton Resource** - One estate planning record per client
+- **Automatic Asset Calculation** - Read-only `totalAssets` and `totalJointAssets` calculated from Asset API
+- **Gift Tracking** - Track gifts for seven-year IHT rule (Potentially Exempt Transfers)
+- **UK IHT Rules** - Support for annual exemptions, regular gifts from income, and PETs
+- **Will Documentation** - Record will details, executors, guardians
+- **Inheritance Expectations** - Document expected inheritances from others
+- **Seven-Year Tracking** - Monitor gifts within seven-year IHT window
+
+### Common Scenarios
+
+**Simple Estate - Mirror Wills:**
+- Client and spouse have mirror wills
+- Estate passes to spouse, then children equally
+- No large gifts, using annual exemptions only
+- Clear succession plan documented
+
+**Complex Estate - IHT Planning:**
+- Estate value exceeds nil-rate band (£325,000)
+- Strategic gifting to reduce IHT liability
+- Mix of annual exemption gifts and PETs
+- Regular gifts from surplus income
+- Track all gifts for seven-year rule
+
+**Large Gift (PET) Tracking:**
+- Client gifts £100,000 to child for house deposit
+- Not within any exemption (Potentially Exempt Transfer)
+- Track for seven years from gift date
+- Becomes fully exempt if client survives seven years
+- Taper relief applies if death within 3-7 years
+
+**Annual Exemption Strategy:**
+- Client and spouse each gift £3,000 per year to each child
+- Total £12,000 per year (4 × £3,000)
+- Fully exempt from IHT immediately
+- Track usage of annual exemptions
+
+**Regular Gifts from Income:**
+- Client has surplus income after living expenses
+- Makes monthly £500 gifts to grandchildren's savings
+- Pattern established and maintained
+- Fully exempt from IHT regardless of seven-year rule
 
 ### Fields
 
@@ -5420,24 +6186,19 @@ The `EstatePlanning` contract represents a comprehensive overview of a client's 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| href | Text | Resource URL for this estate planning record | v2/factfinds/345/clients/456/estate-planning |
+| href | Text | API link to this resource | /v2/factfinds/679/clients/8496/estateplanning |
 | client | Reference Link | Client reference | Complex object |
 | factfind | Reference Link | FactFind reference | Complex object |
-| willDetails | Text | Free-text description of will arrangements | Standard will with spouse as primary beneficiary... |
-| totalAssets | Currency Amount | Total value of client's estate | Complex object |
-| totalJointAssets | Currency Amount | Total value of jointly owned assets | Complex object |
-| giftInLast7YearsDetails | Text | Description of gifts made in last 7 years | Gifted £10,000 to daughter in 2020 for house deposit |
-| recentGiftDetails | Text | Description of recent gifts (current tax year) | Used £3,000 annual exemption this tax year... |
-| regularGiftDetails | Text | Description of regular gifts from income | £200 monthly to grandchildren from income since 2022 |
-| expectingInheritanceDetails | Text | Description of expected inheritance | Expecting £50,000 from father's estate... |
-| propertyAdditionalNrb | Currency Amount | Residence nil rate band (max £175,000) | Complex object |
-| taxYearWhenPropertySold | Number | Tax year when main residence was sold (if applicable) | 2023 |
-| widowsReliefNrbDeceasedPercentage | Number (Percentage) | Percentage of deceased spouse's NRB available to transfer | 50.00 |
-| widowsReliefPropertyAdditionalNrbDeceasedPercentage | Number (Percentage) | Percentage of deceased spouse's RNRB available to transfer | 50.00 |
-| businessAssetRelief | Currency Amount | Business property relief available | Complex object |
-| gifts | List of Complex Data | Collection of gifts (see Gift contract) | List with 2 item(s) |
-| createdAt | Date and Time | When this record was created (read-only) | 2026-01-15T09:00:00Z |
-| updatedAt | Date and Time | When this record was last updated (read-only) | 2026-02-23T14:30:00Z |
+| willDetails | Text | Will and estate planning details (EDITABLE, max 2000 chars) | Mirror wills in place with spouse. Estate passes to spouse on first death, then to children equally. |
+| totalAssets | Currency Amount | Total asset value (READ-ONLY, calculated from Asset API) | £850,000.00 GBP |
+| totalJointAssets | Currency Amount | Total jointly-owned assets (READ-ONLY, calculated as 50% of joint assets) | £425,000.00 GBP |
+| giftInLast7YearsDetails | Text | Summary of gifts in last 7 years (EDITABLE, max 2000 chars) | Annual exemption gifts to both children (£3,000 per year each) |
+| recentGiftDetails | Text | Details of recent gifts (EDITABLE, max 1000 chars) | £3,000 to daughter Emily (annual exemption 2025/26) |
+| regularGiftDetails | Text | Details of regular gifts from income (EDITABLE, max 1000 chars) | Monthly £250 into each child's Junior ISA from surplus income |
+| expectingInheritanceDetails | Text | Expected inheritance details (EDITABLE, max 1000 chars) | Potential inheritance from parents' estate (estimated £200,000) |
+| gifts | List | Collection of gift records (READ-ONLY, managed via gifts API) | List with items |
+| createdAt | Date/Time | Record creation timestamp | 2020-01-15T10:30:00Z |
+| updatedAt | Date/Time | Last update timestamp | 2026-03-01T14:20:00Z |
 
 #### Nested Field Groups
 
@@ -5445,483 +6206,331 @@ The `EstatePlanning` contract represents a comprehensive overview of a client's 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique client identifier | 456 |
-| href | Text | Client resource URL | v2/factfinds/345/clients/456 |
-| name | Text | Client name | John Smith |
+| id | Number | Client identifier | 8496 |
+| href | Text | Link to client resource | /v2/factfinds/679/clients/8496 |
+| name | Text | Client display name | John Smith |
 
 **factfind:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| id | Number | Unique FactFind identifier | 345 |
-| href | Text | FactFind resource URL | v2/factfinds/345 |
+| id | Number | FactFind identifier | 679 |
 
-**Currency Amount Structure (applies to totalAssets, totalJointAssets, propertyAdditionalNrb, businessAssetRelief):**
+**gifts[] (each item):**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| currency | Text | ISO currency code | GBP |
-| amount | Number | The monetary value | 500000.00 |
+| id | Number | Unique gift identifier | 1 |
+| href | Text | API link to this gift | /v2/factfinds/679/clients/8496/estateplanning/gifts/1 |
+| giftedOn | Date | Date gift was made | 2025-04-10 |
+| recipient | Text | Name of gift recipient (max 100 chars) | Emily Rose Smith |
+| relationship | Text | Relationship to client (max 50 chars) | Daughter |
+| value | Currency Amount | Gift value | £3,000.00 GBP |
+| description | Text | Gift description/notes (max 500 chars) | Annual exemption gift for tax year 2025/26 |
+| isRegularGiftFromIncome | Yes/No | Gift qualifies as regular from surplus income (IHT exempt) | false |
+| isWithinAnnualExemption | Yes/No | Gift uses annual exemption (£3,000 per year) | true |
 
-**Gift Item Structure (gifts array):**
+### Usage Example
 
-See section 13.41 Estate Planning - Gift Contract for full gift structure.
+```json
+{
+  "href": "/v2/factfinds/679/clients/8496/estateplanning",
+  "client": {
+    "id": 8496,
+    "href": "/v2/factfinds/679/clients/8496",
+    "name": "John Smith"
+  },
+  "factfind": {
+    "id": 679
+  },
+  "willDetails": "Mirror wills in place with spouse. Estate passes to spouse on first death, then to children equally. Executors: spouse and solicitor. Guardians appointed for children under 18.",
+  "totalAssets": {
+    "amount": 850000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "totalJointAssets": {
+    "amount": 425000.00,
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
+  },
+  "giftInLast7YearsDetails": "Annual exemption gifts to both children (£3,000 per year each)",
+  "recentGiftDetails": "£3,000 to daughter Emily (annual exemption 2025/26)",
+  "regularGiftDetails": "Monthly £250 into each child's Junior ISA from surplus income",
+  "expectingInheritanceDetails": "Potential inheritance from parents' estate (estimated £200,000)",
+  "gifts": [
+    {
+      "id": 1,
+      "href": "/v2/factfinds/679/clients/8496/estateplanning/gifts/1",
+      "giftedOn": "2025-04-10",
+      "recipient": "Emily Rose Smith",
+      "relationship": "Daughter",
+      "value": {
+        "amount": 3000.00,
+        "currency": {
+          "code": "GBP",
+          "symbol": "£"
+        }
+      },
+      "description": "Annual exemption gift for tax year 2025/26",
+      "isRegularGiftFromIncome": false,
+      "isWithinAnnualExemption": true
+    }
+  ],
+  "createdAt": "2020-01-15T10:30:00Z",
+  "updatedAt": "2026-03-01T14:20:00Z"
+}
+```
 
-### Validation Rules
-- All text fields are optional, max 2000 characters
-- Currency amounts must include both currency and amount if provided
-- `taxYearWhenPropertySold` - Must be a valid tax year (e.g., 2023) if provided
-- `widowsReliefNrbDeceasedPercentage` - Must be between 0 and 100 if provided
-- `widowsReliefPropertyAdditionalNrbDeceasedPercentage` - Must be between 0 and 100 if provided
-- `propertyAdditionalNrb` - Maximum £175,000 per person (2024/25 tax year)
-- `totalJointAssets` - Should be included in `totalAssets` value
+### Business Validation Rules
 
-### Business Rules
-- Estate planning is a singleton per client
-- Total assets should include all property, investments, pensions, savings, etc.
-- Total joint assets represents portion of total assets owned jointly
-- Gifts are managed as sub-resource via separate API endpoints
-- Property additional NRB (RNRB) applies only if main residence left to direct descendants
-- RNRB tapers away for estates over £2 million
-- Widow's relief allows transfer of unused NRB/RNRB from deceased spouse
-- Business asset relief provides 50% or 100% relief on qualifying business property
-- Gifts in last 7 years affect IHT calculation (taper relief applies years 3-7)
+#### Singleton Resource Rules
+- Only one estate planning record exists per client
+- Use PUT to create or update the singleton
+- GET returns 404 if not yet created
+- Estate planning singleton must exist before gifts can be added
 
-### IHT Planning Notes
+#### Read-Only Fields (Automatic Calculation)
+- `totalAssets` is automatically calculated from all client assets (property, investments, pensions, bank accounts)
+- Updated whenever asset records are modified
+- Cannot be manually set via API
+- `totalJointAssets` is 50% of jointly-owned assets (where ownership type is "Joint")
+- Updated automatically with asset changes
+- Cannot be manually set via API
+- `gifts` collection is read-only, managed via separate gifts API endpoints
 
-**Nil Rate Band (NRB):**
-- £325,000 per person (frozen until 2030)
-- Transferable to surviving spouse/civil partner
-- Applies to lifetime gifts and death estate
+#### Editable Fields
+- `willDetails` - Optional, max 2000 characters, documents will arrangements, executors, guardians
+- `giftInLast7YearsDetails` - Optional, max 2000 characters, summary of gifts within seven-year IHT window
+- `recentGiftDetails` - Optional, max 1000 characters, recent gift activity
+- `regularGiftDetails` - Optional, max 1000 characters, patterns of regular gifts from income
+- `expectingInheritanceDetails` - Optional, max 1000 characters, expected inheritances from others
 
-**Residence Nil Rate Band (RNRB):**
-- Additional £175,000 per person (2024/25)
-- Only if main residence left to direct descendants
-- Tapers for estates over £2 million (£1 lost per £2 over threshold)
-- Transferable to surviving spouse/civil partner
+#### Gift Validation Rules
+- `giftedOn` must be a valid date in the past or today (cannot be in the future)
+- `value.amount` must be positive (> 0), no maximum limit
+- `recipient` must be non-empty string (min 2 chars, max 100 chars)
+- `relationship` is optional, max 50 characters
+- `description` is optional, max 500 characters
+- Gifts are tracked for seven years from gift date for IHT purposes
 
-**Potentially Exempt Transfers (PETs):**
-- Gifts to individuals become exempt after 7 years
-- Taper relief applies if donor dies within 3-7 years
-- Full IHT at 40% if donor dies within 3 years
+### Understanding UK Inheritance Tax and Gift Tracking
+
+#### UK Inheritance Tax (IHT) Overview
+
+**What it is:** Tax on estate value above the nil-rate band when someone dies.
+
+**Nil-Rate Band (2025/26):**
+- £325,000 per person
+- Transferable to surviving spouse (up to £650,000 combined)
+- Residence Nil-Rate Band: additional £175,000 for main home passing to direct descendants
+- Combined maximum: £1,000,000 for married couple with property
+
+**IHT Rate:**
+- 40% on estate value above nil-rate band
+- 36% reduced rate if 10%+ of estate left to charity
+
+#### Gift Exemptions
+
+**Annual Exemption:**
+- £3,000 per person per tax year (6 April to 5 April)
+- Can carry forward unused exemption from previous year only
+- Can combine with other exemptions
+- Example: Client gives £3,000 to son (fully exempt immediately)
+
+**Small Gifts:**
+- £250 per recipient per tax year
+- Cannot combine with annual exemption for same person
+- Unlimited number of recipients
+- Example: £250 birthday gifts to multiple grandchildren
 
 **Regular Gifts from Income:**
-- Exempt if from surplus income (not capital)
-- Must be regular pattern of giving
-- Must not affect donor's standard of living
-- No limit on amount
-
-**Annual Exemptions:**
-- £3,000 per tax year
-- Can carry forward one year if unused
-- Plus £250 small gifts exemption per recipient
-
-### Usage Scenarios
-
-**Scenario 1: Initial estate planning discussion**
-- Capture will details and beneficiary wishes
-- Record total estate value and joint assets
-- Document any gifts made or planned
-- Calculate potential IHT liability
-
-**Scenario 2: IHT calculation**
-- Use total assets to determine estate value
-- Apply NRB and RNRB allowances
-- Factor in widow's relief if applicable
-- Deduct business asset relief
-- Account for gifts in last 7 years with taper relief
-
-**Scenario 3: Widow with transferred allowances**
-- Widow has 50% of deceased husband's NRB unused
-- Set `widowsReliefNrbDeceasedPercentage: 50`
-- Total NRB available: £325k + £162.5k = £487,500
-
-**Scenario 4: Downsizing**
-- Client sold main residence in 2023
-- May still claim RNRB if downsized
-- Record `taxYearWhenPropertySold: 2023`
-- RNRB available if meets downsizing rules
-
----
-
-## 13.40 Estate Planning - Will Contract
-### Overview
-The `Will` contract represents a client's last will and testament details.
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| client | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2026-01-10T10:00:00Z |
-| executors | List of Complex Data |  | List with 2 item(s) |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| hasResidenceNilRateBand | Yes/No | Unique system identifier for this record | Yes |
-| hasWill | Yes/No |  | Yes |
-| id | Number | Unique system identifier for this record | 7777 |
-| isMirrorWill | Yes/No |  | Yes |
-| lastReviewedDate | Date |  | 2025-12-10 |
-| mainBeneficiaries | List of str | List of trust beneficiaries | List with 2 item(s) |
-| mirrorWillClientRef | Reference Link |  | Complex object |
-| needsUpdate | Yes/No |  | No |
-| nextReviewDate | Date |  | 2026-12-10 |
-| notes | Text |  | Will reviewed in December 2025 - no changes requir... |
-| updateReason | Text |  | None |
-| updatedAt | Date | When this record was last modified | 2026-02-10T09:00:00Z |
-| willDate | Date |  | 2023-06-15 |
-| willLocation | Complex Data |  | Complex object |
-| willType | Text |  | MIRROR_WILL |
-
-#### Nested Field Groups
-
-**client:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
-
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-
-**mirrorWillClientRef:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 912 |
-
-**willLocation:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| address | Text | List of all addresses for this client (current and historical) | 45 Legal Square, London, EC4A 1BR |
-| heldBy | Text |  | Williams & Associates Solicitors |
-| notes | Text |  | Original will held by solicitor - copy at home |
-
----
-
-## 13.40 Estate Planning - Lasting Power of Attorney (LPA) Contract
-### Overview
-The `LastingPowerOfAttorney` contract represents a client's LPA arrangements.
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| attorneys | List of Complex Data |  | List with 2 item(s) |
-| certificateProvider | Complex Data | Unique system identifier for this record | Complex object |
-| client | Reference Link |  | Complex object |
-| createdAt | Date | When this record was created in the system | 2023-09-25T10:00:00Z |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| guidance | Text | Unique system identifier for this record | Preference to remain at home as long as possible |
-| hasLPA | Yes/No |  | Yes |
-| id | Number | Unique system identifier for this record | 8888 |
-| isRegistered | Yes/No |  | Yes |
-| lpaLocation | Complex Data |  | Complex object |
-| lpaType | Text |  | PROPERTY_FINANCIAL |
-| needsUpdate | Yes/No |  | No |
-| notes | Text |  | Property and Financial Affairs LPA registered with... |
-| registrationDate | Date |  | 2023-09-20 |
-| registrationNumber | Text | Companies House registration number | LPA-2023-987654 |
-| restrictions | Text |  | Attorney must consult with family before selling p... |
-| updatedAt | Date | When this record was last modified | 2026-01-15T09:00:00Z |
-
-#### Nested Field Groups
-
-**certificateProvider:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| contactDetails | Complex Data |  | Complex object |
-| phone | Text |  | 020 7456 7890 |
-| name | Text | First name (given name) | Dr. Michael Brown |
-| relationship | Text |  | GP |
-
-**client:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
-
-**factfind:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
-
-**lpaLocation:**
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| heldBy | Text |  | Home Safe |
-| notes | Text |  | Original registered LPA stored in home safe. Copy ... |
-
----
-
-## 13.41 Estate Planning - Gift Contract
-### Overview
-The `Gift` contract represents gifts made or planned by the client for inheritance tax (IHT) planning. Gifts can be either standard potentially exempt transfers (PETs) or trust-based gifts such as loan trusts and discounted gift trusts.
-
-### Fields
-
-#### Main Fields
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| description | Text | Description of the gift | Cash gift to help with house deposit |
-| discountValue | Currency Amount | **Trust gifts only.** The discount value for discounted gift trusts | Complex object |
-| exemption1 | Text | Primary exemption applied to the gift | AnnualExemption |
-| exemption2 | Text | Secondary exemption applied to the gift (optional) | SmallGiftExemption |
-| exemption3 | Text | Tertiary exemption applied to the gift (optional) | NoExemption |
-| giftType | Text | Type of gift for IHT planning purposes | PotentiallyExemptTransfer |
-| giftValue | Currency Amount | **Standard gifts only.** The monetary value of the gift | Complex object |
-| href | Text | API resource link | v2/factfinds/345/clients/456/estate-planning/gifts/gift-001 |
-| id | Text | Unique identifier for this gift | gift-001 |
-| income | Currency Amount | **Trust gifts only.** Annual income generated by the trust | Complex object |
-| incomeStartYear | Number | **Trust gifts only.** Year when income payments begin | 2024 |
-| isTrust | Yes/No | Indicates whether this is a trust-based gift | No |
-| originalInvestmentAmount | Currency Amount | **Trust gifts only.** Original amount invested in the trust | Complex object |
-| repeatGiftYears | Number | **Trust gifts only.** Number of years the gift is repeated | 10 |
-
-### Gift Types
-
-| Gift Type | Description |
-|---|---|
-| **PotentiallyExemptTransfer** | Standard gift that becomes exempt if donor survives 7 years |
-| **LoanTrust** | Loan trust arrangement where capital can be reclaimed |
-| **DiscountedGiftTrust** | Gift with retained income rights, reducing IHT value |
-| **BareGift** | Simple outright gift with no strings attached |
-| **GiftWithReservation** | Gift where donor retains benefit (counted in estate) |
-| **ChritableGift** | Gift to registered charity (immediately exempt) |
-| **PoliticalGift** | Gift to registered political party (immediately exempt) |
-
-### Gift Exemptions
-
-| Exemption | Annual Limit | Description |
-|---|---|---|
-| **NoExemption** | N/A | No exemption claimed for this gift |
-| **AnnualExemption** | £3,000 | Annual gift exemption (can carry forward 1 year) |
-| **SmallGiftExemption** | £250 | Small gifts to any number of people (cannot combine with annual exemption to same person) |
-| **MarriageExemption** | £5,000 / £2,500 / £1,000 | Wedding/civil partnership gifts (varies by relationship) |
-| **RegularGiftsFromIncome** | Unlimited | Regular gifts from surplus income that don't affect living standards |
-| **MaintenancePayments** | Unlimited | Maintenance for dependent relatives |
-| **NormalExpenditure** | Unlimited | Normal expenditure from income patterns |
-
-#### Nested Field Groups
-
-**giftValue** (for standard gifts):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Monetary value of the gift | 50000.00 |
-| currency | Text | Currency code | GBP |
-
-**originalInvestmentAmount** (for trust gifts):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Original amount invested | 200000.00 |
-| currency | Text | Currency code | GBP |
-
-**discountValue** (for discounted gift trusts):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Discount applied to gift value | 80000.00 |
-| currency | Text | Currency code | GBP |
-
-**income** (for trust gifts with income):
-
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| amount | Number | Annual income amount | 12000.00 |
-| currency | Text | Currency code | GBP |
-
-### Gift Structure Patterns
-
-#### Standard Gift (PET)
-Standard gifts use the `giftValue` field and typically qualify for annual or small gift exemptions:
-
-```json
-{
-  "id": "gift-001",
-  "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-001",
-  "description": "Cash gift to help with house deposit",
-  "giftType": "PotentiallyExemptTransfer",
-  "isTrust": false,
-  "giftValue": {"currency": "GBP", "amount": 50000.00},
-  "exemption1": "AnnualExemption",
-  "exemption2": "SmallGiftExemption",
-  "exemption3": "NoExemption"
-}
-```
-
-#### Loan Trust Gift
-Loan trusts use trust-specific fields and typically have no exemptions as the capital can be reclaimed:
-
-```json
-{
-  "id": "gift-002",
-  "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-002",
-  "description": "Loan trust for estate planning",
-  "giftType": "LoanTrust",
-  "isTrust": true,
-  "originalInvestmentAmount": {"currency": "GBP", "amount": 200000.00},
-  "income": {"currency": "GBP", "amount": 12000.00},
-  "incomeStartYear": 2024,
-  "repeatGiftYears": 10,
-  "exemption1": "NoExemption",
-  "exemption2": "NoExemption",
-  "exemption3": "NoExemption"
-}
-```
-
-#### Discounted Gift Trust
-Discounted gift trusts include a discount value based on retained income rights:
-
-```json
-{
-  "id": "gift-003",
-  "href": "v2/factfinds/345/clients/456/estate-planning/gifts/gift-003",
-  "description": "Discounted gift trust with retained income",
-  "giftType": "DiscountedGiftTrust",
-  "isTrust": true,
-  "originalInvestmentAmount": {"currency": "GBP", "amount": 300000.00},
-  "discountValue": {"currency": "GBP", "amount": 100000.00},
-  "income": {"currency": "GBP", "amount": 15000.00},
-  "incomeStartYear": 2024,
-  "exemption1": "NoExemption",
-  "exemption2": "NoExemption",
-  "exemption3": "NoExemption"
-}
-```
-
-### Business Rules
-
-1. **Gift Type and Fields:**
-   - Standard gifts (`isTrust: false`) MUST have `giftValue`
-   - Trust gifts (`isTrust: true`) MUST have `originalInvestmentAmount`
-   - Discounted gift trusts MUST have `discountValue`
-   - Standard gifts MUST NOT have trust-specific fields (originalInvestmentAmount, discountValue, income, incomeStartYear, repeatGiftYears)
-
-2. **Exemption Rules:**
-   - `exemption1` is required (use `NoExemption` if no exemption applies)
-   - `exemption2` and `exemption3` are optional additional exemptions
-   - Annual exemption (£3,000) can be carried forward one year if unused
-   - Small gift exemption (£250) cannot be combined with annual exemption for same recipient
-   - Marriage exemption varies by relationship: £5,000 (child), £2,500 (grandchild), £1,000 (other)
-
-3. **Trust Gift Taxation:**
-   - Loan trusts: Capital can be reclaimed, so not immediately chargeable
-   - Discounted gift trusts: Only discounted value (original - discount) is potentially exempt
-   - Income retained from discounted gift trusts does not add to estate value
-
-4. **PET Rules:**
-   - Potentially exempt transfers become fully exempt after 7 years
-   - Taper relief applies to PETs between 3-7 years if donor dies
-   - Taper relief: 3-4 years (20% relief), 4-5 years (40%), 5-6 years (60%), 6-7 years (80%)
-
-### IHT Planning Considerations
+- Must be from surplus income after tax (not capital)
+- Must not reduce donor's standard of living
+- Must establish regular and habitual pattern
+- Fully exempt from IHT immediately
+- Example: Monthly £500 to grandchildren's savings accounts
+
+**Gifts to Spouse:**
+- Unlimited exemption for gifts to UK-domiciled spouse
+- £325,000 total exemption for non-UK-domiciled spouse
+
+**Wedding Gifts:**
+- £5,000 from parent to child
+- £2,500 from grandparent to grandchild
+- £1,000 from anyone else
+
+#### Potentially Exempt Transfers (PETs)
+
+**What they are:** Gifts that don't qualify for immediate exemption.
 
 **Seven-Year Rule:**
-- Gifts become exempt if donor survives 7 years
-- Taper relief applies between years 3-7
-- Important to track gift dates for estate planning
+- Gift becomes fully exempt if donor survives seven years
+- If donor dies within seven years, gift included in estate for IHT
+- Taper relief applies if death occurs 3-7 years after gift:
+  - 3-4 years: 80% of tax charged
+  - 4-5 years: 60% of tax charged
+  - 5-6 years: 40% of tax charged
+  - 6-7 years: 20% of tax charged
+  - 7+ years: 0% (fully exempt)
 
-**Annual Exemptions Strategy:**
-- Use £3,000 annual exemption each year
-- Carry forward unused exemption from previous year
-- Combine with small gift exemption (£250) for multiple recipients
+**Example:**
+- Client gifts £100,000 to daughter in 2025
+- Not within any exemption (PET)
+- If client survives to 2032: gift fully exempt
+- If client dies in 2029 (4 years later): £100,000 added to estate, 60% taper relief applies
 
-**Trust-Based Gifts:**
-- Loan trusts allow capital access while removing growth from estate
-- Discounted gift trusts provide income while reducing estate value
-- Trust gifts typically more complex but offer flexibility
+#### Gift Tracking Strategy
 
-**Regular Gifts from Income:**
-- Immediately exempt if from surplus income
-- Must not reduce donor's living standards
-- Must establish pattern of regular gifts
-- Documentation critical for claiming exemption
+**Why Track Gifts:**
+- Monitor seven-year windows for PETs
+- Track usage of annual exemptions
+- Demonstrate patterns for regular gifts from income
+- Calculate potential IHT liability
+- Plan future gifting strategy
 
----
+**What to Track:**
+- Date of each gift (critical for seven-year calculation)
+- Recipient and relationship
+- Gift value
+- Type of exemption (annual, regular income, PET)
+- Description and context
 
-## 13.42 Estate Planning - Trust Contract
-### Overview
-The `Trust` contract represents trusts established by or benefiting the client.
+### Will Planning Considerations
 
-### Fields
+**Essential Elements:**
+- Named executors (who will administer estate)
+- Distribution of assets (who gets what)
+- Guardians for children under 18
+- Funeral wishes
+- Specific legacies (items for specific people)
 
-#### Main Fields
+**Mirror Wills:**
+- Common for married couples/civil partners
+- Matching wills with similar provisions
+- Estate passes to survivor first, then to children
+- Consider survivorship clause (what if both die together)
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| beneficiaries | List of Complex Data | List of trust beneficiaries | List with 2 item(s) |
-| client | Reference Link |  | Complex object |
-| clientRole | Text |  | SETTLOR |
-| createdAt | Date | When this record was created in the system | 2020-03-20T10:00:00Z |
-| establishedDate | Date | Date the trust was established | 2020-03-15 |
-| factfind | Reference Link | Link to the FactFind that this client belongs to | Complex object |
-| id | Number | Unique system identifier for this record | 10001 |
-| lastReviewDate | Date | When these figures were last reviewed | 2025-06-15 |
-| nextReviewDate | Date |  | 2026-06-15 |
-| notes | Text |  | Discretionary trust established for children's ben... |
-| taxTreatment | Complex Data |  | Complex object |
-| trustAssets | Complex Data |  | Complex object |
-| trustDeedLocation | Complex Data | Reference to the trust deed document | Complex object |
-| trustName | Text | Name of the trust | The Smith Family Discretionary Trust |
-| trustType | Text | Type of trust (Discretionary, Bare, Interest in Possession, etc.) | DISCRETIONARY_TRUST |
-| trustees | List of Complex Data | List of trustees | List with 2 item(s) |
-| updatedAt | Date | When this record was last modified | 2026-02-01T09:00:00Z |
+**Trust Provisions:**
+- Nil-rate band discretionary trust (use spouse's allowance)
+- Life interest trusts (spouse can use assets, children inherit)
+- Vulnerable beneficiary trusts (protect disabled beneficiaries)
 
-#### Nested Field Groups
+**Will Review Triggers:**
+- Marriage or divorce (wills often invalidated)
+- Birth of children or grandchildren
+- Death of executor or beneficiary
+- Significant change in assets
+- Change in tax laws
+- Every 3-5 years as good practice
 
-**client:**
+### Regulatory Context
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 8496 |
+**FCA Requirements:**
+- Holistic advice should consider estate planning
+- Pension death benefits and IHT implications
+- Investment bond planning for IHT
+- Trust arrangements for asset protection
 
-**factfind:**
+**Data Protection:**
+- Estate planning contains sensitive family information
+- GDPR compliance for processing personal data
+- Secure storage of will information
+- Client consent for data processing
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| id | Number | Unique system identifier for this record | 679 |
+**Professional Standards:**
+- Advisers should identify estate planning needs
+- Refer to specialist solicitors for complex estates
+- Document gift tracking for client records
+- Regular reviews of estate plans
 
-**taxTreatment:**
+### Related Contracts
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| dividendTaxRate | Number | Unique system identifier for this record | 39.35 |
-| lastTaxReturn | Date |  | 2025-10-31 |
-| nextTaxReturnDue | Date |  | 2026-10-31 |
-| taxYear | Text |  | 2025/26 |
-| trustTaxRate | Number |  | 45 |
+- [Client Contract](#131-client-contract) - Client information
+- [FactFind Contract](#132-factfind-contract) - Parent container
+- [Asset Contract](#1314-asset-contract) - Source of totalAssets calculation
+- [Beneficiary Contract](#1315-beneficiary-contract) - Beneficiaries for policies and pensions
 
-**trustAssets:**
+### API Endpoints
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| assetTypes | List of str |  | List with 2 item(s) |
-| currentValue | Currency Amount | Current value of the arrangement | Complex object |
-| amount | Number | Amount spent | 150000.0 |
-| currency | Complex Data |  | Complex object |
-| code | Text | Standard Occupational Classification (SOC) code | GBP |
-| symbol | Text |  | £ |
-| lastValuationDate | Date |  | 2026-01-31 |
+- `GET /api/v2/factfinds/{id}/clients/{clientId}/estateplanning` - Retrieve estate planning singleton
+- `PUT /api/v2/factfinds/{id}/clients/{clientId}/estateplanning` - Create or update estate planning
+- `POST /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts` - Create gift record
+- `GET /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Get gift
+- `PUT /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Update gift
+- `DELETE /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Delete gift
 
-**trustDeedLocation:**
+### Field-Level Guidance
 
-| Field Name | Type | Description | Example Value |
-|---|---|---|---|
-| address | Text | List of all addresses for this client (current and historical) | 45 Legal Square, London, EC4A 1BR |
-| heldBy | Text |  | Williams & Associates Solicitors |
+**willDetails (Editable):**
+- Document current will arrangements
+- Include executor names and roles
+- Note guardians for minor children
+- Mention any trust provisions
+- Record when will was last updated
+- Maximum 2000 characters
+
+**totalAssets (Read-Only):**
+- Automatically calculated from Asset API
+- Includes all asset types: property, investments, pensions, bank accounts, other assets
+- Updated whenever assets are added, modified, or deleted
+- Provides snapshot for estate planning discussions
+- Cannot be manually overridden
+
+**totalJointAssets (Read-Only):**
+- Automatically calculated as 50% of jointly-owned assets
+- Relevant for estate planning (client's share only)
+- Updated automatically with asset ownership changes
+- Cannot be manually overridden
+
+**giftInLast7YearsDetails (Editable):**
+- Summary of all gifts within seven-year IHT window
+- Include PETs (large gifts outside exemptions)
+- Note patterns of annual exemption usage
+- Maximum 2000 characters
+- Helps establish complete picture for IHT planning
+
+**recentGiftDetails (Editable):**
+- Focus on most recent gift activity
+- Include amounts, recipients, dates
+- Note which exemptions used
+- Maximum 1000 characters
+- Useful for quick reference
+
+**regularGiftDetails (Editable):**
+- Document patterns of regular gifts from surplus income
+- Include frequency, amounts, recipients
+- Establish pattern for IHT exemption
+- Maximum 1000 characters
+- Important evidence if claiming regular income exemption
+
+**expectingInheritanceDetails (Editable):**
+- Document expected inheritances from others
+- Include estimated amounts, sources, timing
+- Relevant for future estate planning
+- Maximum 1000 characters
+- Helps plan for future wealth transfer
+
+**gifts Collection (Read-Only):**
+- Managed via dedicated gifts API endpoints
+- Cannot add/modify gifts directly on estate planning PUT
+- Use POST to `/estateplanning/gifts` to add new gifts
+- Use PUT to `/estateplanning/gifts/{id}` to update gifts
+- Use DELETE to `/estateplanning/gifts/{id}` to remove gifts
+- Each gift tracks date, recipient, value, exemption type
+
+**Gift Fields:**
+- `giftedOn`: Critical for seven-year tracking (must be past or today)
+- `recipient`: Who received the gift (required, max 100 chars)
+- `relationship`: Relationship to client (optional, max 50 chars)
+- `value`: Gift amount (required, must be positive)
+- `description`: Context and notes (optional, max 500 chars)
+- `isRegularGiftFromIncome`: Flag for surplus income exemption
+- `isWithinAnnualExemption`: Flag for £3,000 annual exemption usage
 
 ---
 
@@ -6593,7 +7202,397 @@ These are predefined selection lists used throughout the system.
 - **One-off**: One-off (single payment)
 
 
-## 13.58 StatePension Contract
+## 13.58 Protection Review Contract
+
+### Business Purpose
+
+The Protection Review contract represents a singleton record per FactFind containing protection needs analysis across three key areas: Life & Critical Illness, Income Protection, and Buildings & Contents insurance. This enables advisers to document protection review outcomes, identify coverage gaps, assess financial impacts, and plan actions to address inadequate protection. Essential for FCA suitability requirements and Consumer Duty compliance.
+
+### Key Features
+
+- **Singleton Resource** - One protection review record per FactFind
+- **Three Protection Areas** - Life & Critical Illness, Income Protection, Buildings & Content
+- **Section-Based Updates** - Update each area independently via separate PUT endpoints
+- **Summary Endpoint** - Get all sections in single response
+- **Impact Assessment** - Document financial impacts on client and dependants
+- **Action Planning** - Record specific actions to address protection gaps
+- **Compliance Documentation** - Capture reasons for not reviewing (client-led decisions)
+- **Enum and Boolean Fields** - Structured data for coverage status
+
+### Common Scenarios
+
+**Adequate Protection Coverage:**
+- Client has life cover for mortgage debt
+- Critical illness and income protection in place
+- Buildings and contents insurance adequate
+- All protection areas reviewed and documented
+- No gaps identified, regular review schedule planned
+
+**Protection Gaps Identified:**
+- Client has mortgage but no life cover
+- No critical illness cover despite dependants
+- No income protection despite sole earner status
+- Document impacts on client and dependants
+- Plan actions: obtain quotes, increase cover, review budget
+
+**Client Declined Review:**
+- Client chooses not to review protection at this time
+- Document reason for not reviewing
+- Compliance evidence of client-led decision
+- Schedule future review when client ready
+
+**Partial Review:**
+- Client reviews life cover and buildings insurance
+- Defers income protection review
+- Document completed sections
+- Record reason for deferring other areas
+
+**Buy-to-Let Property Owner:**
+- Additional consideration for investment properties
+- Specialist landlord insurance required
+- Document buy-to-let property insurance status
+- Ensure adequate coverage distinct from residential
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| href | Text | API link to this resource | /v2/factfinds/679/protections/reviews/summary |
+| lifeAndCriticalIllness | Complex Object | Life and critical illness review section | Complex object |
+| incomeProtection | Complex Object | Income protection review section | Complex object |
+| buildingsAndContent | Complex Object | Buildings and content review section | Complex object |
+
+#### Life And Critical Illness Section
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasCoverForMortgageOrDebt | Selection | Life cover for mortgage/debt (enum: Yes, No, NotApplicable) | Yes |
+| hasCoverforDependantsDueToCritcalIllness | Selection | Critical illness cover for dependants (enum: Yes, No) | No |
+| hasCoverforDependantsUponDeath | Selection | Life cover for dependants (enum: Yes, No, NotApplicable) | Yes |
+| hasReviewedCostofProtectionChange | Selection | Reviewed cost of protection change (enum: Yes, No) | Yes |
+| impactOnYou | Text | Financial impact on client (max 2000 chars) | If critically ill, mortgage payments difficult without cover. May need to sell property. |
+| impactOnDepandants | Text | Financial impact on dependants (max 2000 chars) | Children would need financial support. Spouse return to work immediately. |
+| actionsToAddressImpacts | Text | Actions to address gaps (max 2000 chars) | Obtain critical illness quote for £250,000. Review existing life cover. |
+| reasonforNotReviewing | Text | Reason for not reviewing (max 1000 chars) | Client declined to review at this time. |
+
+#### Income Protection Section
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasCoverDueToAccidentOrIllness | Yes/No | Income protection for accident/illness | false |
+| hasCoverDueToUnemployment | Yes/No | Income protection for unemployment | false |
+| impactOnYou | Text | Financial impact on client (max 2000 chars) | No income for 6 months would deplete emergency fund. |
+| impactOnDepandants | Text | Financial impact on dependants (max 2000 chars) | Family would need to reduce living standards significantly. |
+| actionsToAddressImpacts | Text | Actions to address gaps (max 2000 chars) | Get income protection quote. Consider 3-month deferred period. |
+| reasonforNotReviewing | Text | Reason for not reviewing (max 1000 chars) | Client has substantial emergency fund, will reconsider later. |
+
+#### Buildings And Content Section
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| hasExistingBuildingInsurance | Yes/No | Has buildings insurance | true |
+| hasExistingContentInsurance | Yes/No | Has contents insurance | true |
+| buyToLetProperties | Complex Object | Buy-to-let property insurance | Complex object |
+| hasSufficientCover | Yes/No | Has sufficient insurance cover | true |
+| actionsToAddressImpacts | Text | Actions to address gaps (max 2000 chars) | Annual review at renewal. |
+| whenDoyouWantToReviewProtection | Text | When to review protection (max 500 chars) | Annual review at renewal in September |
+| reasonforNotReviewing | Text | Reason for not reviewing (max 1000 chars) | Cover is adequate, no changes needed. |
+
+#### Buy To Let Properties (nested within Buildings And Content)
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| haveBuildingContentInsurance | Yes/No | Has building & content insurance for buy-to-let properties | true |
+
+### Usage Example
+
+```json
+{
+  "href": "/v2/factfinds/679/protections/reviews/summary",
+  "lifeAndCriticalIllness": {
+    "hasCoverForMortgageOrDebt": "Yes",
+    "hasCoverforDependantsDueToCritcalIllness": "No",
+    "hasCoverforDependantsUponDeath": "Yes",
+    "hasReviewedCostofProtectionChange": "Yes",
+    "impactOnYou": "If critically ill, mortgage payments would be difficult without cover. May need to sell property.",
+    "impactOnDepandants": "Children would need financial support. Spouse would need to return to work immediately.",
+    "actionsToAddressImpacts": "Obtain critical illness quote for £250,000. Review existing life cover adequacy. Consider family income benefit.",
+    "reasonforNotReviewing": ""
+  },
+  "incomeProtection": {
+    "hasCoverDueToAccidentOrIllness": false,
+    "hasCoverDueToUnemployment": false,
+    "impactOnYou": "No income for 6 months would deplete emergency fund. Would need to use credit cards.",
+    "impactOnDepandants": "Family would need to reduce living standards significantly. May need to move house.",
+    "actionsToAddressImpacts": "Get income protection quote. Consider 3-month deferred period to reduce premium. Review emergency fund target.",
+    "reasonforNotReviewing": ""
+  },
+  "buildingsAndContent": {
+    "hasExistingBuildingInsurance": true,
+    "hasExistingContentInsurance": true,
+    "buyToLetProperties": {
+      "haveBuildingContentInsurance": true
+    },
+    "hasSufficientCover": true,
+    "actionsToAddressImpacts": "",
+    "whenDoyouWantToReviewProtection": "Annual review at renewal in September",
+    "reasonforNotReviewing": ""
+  }
+}
+```
+
+### Business Validation Rules
+
+#### Singleton Resource Rules
+- Only one protection review record exists per FactFind (not per client)
+- First PUT to any section creates the singleton
+- Subsequent PUTs update individual sections independently
+- GET summary endpoint returns all three sections combined
+
+#### Enum Field Validation
+- `hasCoverForMortgageOrDebt` must be: Yes, No, or NotApplicable
+- `hasCoverforDependantsDueToCritcalIllness` must be: Yes or No
+- `hasCoverforDependantsUponDeath` must be: Yes, No, or NotApplicable
+- `hasReviewedCostofProtectionChange` must be: Yes or No
+- Invalid enum values return 400 Bad Request error
+
+#### Boolean Field Defaults
+- Boolean fields default to null/unset if not provided
+- Client can explicitly set true or false
+- Null indicates field not yet reviewed
+
+#### Text Field Length Limits
+- Impact fields (`impactOnYou`, `impactOnDepandants`): 2000 characters maximum
+- Action fields (`actionsToAddressImpacts`): 2000 characters maximum
+- Reason fields (`reasonforNotReviewing`): 1000 characters maximum
+- Review timing field (`whenDoyouWantToReviewProtection`): 500 characters maximum
+- Exceeding limits returns 400 Bad Request error
+
+#### NotApplicable Usage
+- Use NotApplicable when protection not relevant to client situation
+- Example: No mortgage = hasCoverForMortgageOrDebt: "NotApplicable"
+- Example: No dependants = hasCoverforDependantsUponDeath: "NotApplicable"
+- Distinguishes between "No cover" (gap) and "Not needed" (appropriate)
+
+#### Impact Assessment Requirements
+- If cover inadequate (No), should document impacts
+- `impactOnYou` captures financial/lifestyle effects on client
+- `impactOnDepandants` captures effects on family members
+- Helps client understand importance of protection
+- Required for demonstrating client understanding per Consumer Duty
+
+#### Action Planning Requirements
+- If gaps identified, should document specific actions
+- Actions should be actionable and measurable
+- Examples: "Obtain quote from 3 providers", "Increase cover to £300,000", "Review at next annual meeting"
+- Demonstrates adviser's recommendations and next steps
+
+#### Reason for Not Reviewing
+- If client declines review, must document reason
+- Required for FCA suitability and compliance
+- Demonstrates client-led decision making
+- Examples: "Client prioritizing investments first", "Will review in 12 months", "Adequate emergency fund in place"
+
+### Understanding Protection Types
+
+#### Life Cover
+**Purpose:** Provides lump sum on death to repay debts, support dependants, maintain lifestyle.
+
+**Types:**
+- **Level Term**: Fixed sum for fixed period (e.g., £300,000 for 25 years)
+- **Decreasing Term**: Sum reduces over time (matches repayment mortgage)
+- **Family Income Benefit**: Regular income instead of lump sum (cost-effective)
+
+**When Needed:**
+- Mortgage or other debts
+- Dependants (spouse, children)
+- Income protection for family
+- Funeral costs and final expenses
+
+#### Critical Illness Cover
+**Purpose:** Provides lump sum on diagnosis of specified critical illnesses (cancer, heart attack, stroke, etc.).
+
+**Key Features:**
+- Covers major illnesses that don't result in death
+- Allows mortgage repayment or income replacement during treatment
+- Often added to life cover as combined policy
+- More expensive than life cover alone
+
+**When Needed:**
+- Mortgage to repay if unable to work
+- Self-employed (no employer sick pay)
+- Sole earner with dependants
+- Limited savings to cover extended illness
+
+#### Income Protection
+**Purpose:** Pays regular income (typically 50-70% of salary) if unable to work due to illness or accident.
+
+**Key Features:**
+- Deferred period: waiting time before payments start (1, 3, 6, 12 months)
+- Benefit period: how long payments continue (to age 65, 2 years, 5 years)
+- Indexation: benefits increase with inflation
+- Own occupation vs any occupation definitions
+
+**When Needed:**
+- Limited employer sick pay
+- Self-employed
+- Sole earner with dependants
+- Limited emergency fund
+
+#### Buildings & Contents Insurance
+**Purpose:** Protects property structure and possessions.
+
+**Buildings Insurance:**
+- Required by mortgage lender
+- Covers structure, permanent fixtures, outbuildings
+- Based on rebuild cost (not market value)
+- Includes alternative accommodation if uninhabitable
+
+**Contents Insurance:**
+- Covers possessions, furniture, valuables
+- Based on replacement cost
+- May include accidental damage cover
+- Consider high-value items separately
+
+**Buy-to-Let Considerations:**
+- Requires specialist landlord insurance
+- Covers property when rented
+- Public liability for tenant injuries
+- Loss of rent cover available
+
+### FCA Suitability and Consumer Duty
+
+**Suitability Documentation:**
+- Protection review is part of suitability assessment
+- Document whether client has reviewed protection needs
+- Capture client decisions (accepting or declining recommendations)
+- Record client understanding of financial impacts
+
+**Consumer Duty Requirements:**
+- Help clients make informed decisions about protection
+- Ensure clients understand consequences of inadequate cover
+- Document that impacts have been explained
+- Evidence client-led decisions about priorities
+- Enhanced duty of care for vulnerable customers
+
+**Vulnerable Customers:**
+- Pay particular attention to dependants' circumstances
+- Identify if dependants are vulnerable (children, disabled, elderly)
+- Enhanced impact assessment for vulnerable families
+- Document extra care taken in advice process
+
+### Related Contracts
+
+- [FactFind Contract](#132-factfind-contract) - Parent container
+- [PersonalProtection Contract](#1357-personalprotection-contract) - Actual protection policies
+- [Mortgage Contract](#1321-mortgage-contract) - Mortgage debt requiring life cover
+- [Client Contract](#131-client-contract) - Client and dependant information
+
+### API Endpoints
+
+- `GET /api/v2/factfinds/{id}/protections/reviews/summary` - Retrieve complete protection review
+- `PUT /api/v2/factfinds/{id}/protections/reviews/lifeAndCriticalIllness` - Update life & critical illness section
+- `PUT /api/v2/factfinds/{id}/protections/reviews/incomeProtection` - Update income protection section
+- `PUT /api/v2/factfinds/{id}/protections/reviews/buildingsAndContent` - Update buildings & content section
+
+### Field-Level Guidance
+
+**hasCoverForMortgageOrDebt (Enum):**
+- Yes = Client has adequate life cover to repay mortgage/debts on death
+- No = Client lacks adequate life cover (gap identified)
+- NotApplicable = Client has no mortgage or significant debts (not needed)
+- Important: Distinguish between gap (No) and not applicable
+
+**hasCoverforDependantsDueToCritcalIllness (Enum):**
+- Yes = Client has critical illness cover adequate for dependants' needs
+- No = Client lacks critical illness cover or it's inadequate
+- Critical illness pays lump sum on diagnosis (cancer, heart attack, stroke, etc.)
+- Allows mortgage repayment or income replacement during treatment
+
+**hasCoverforDependantsUponDeath (Enum):**
+- Yes = Client has life cover adequate for dependants upon death
+- No = Client lacks life cover or it's inadequate for dependants
+- NotApplicable = Client has no dependants (single, no children)
+- Consider spouse, children, elderly parents, disabled family members
+
+**hasReviewedCostofProtectionChange (Enum):**
+- Yes = Client has reviewed how much protection costs would change
+- No = Client has not reviewed cost implications
+- Important for client decision making about affordability
+
+**hasCoverDueToAccidentOrIllness (Boolean):**
+- true = Client has income protection for accident or illness
+- false = Client lacks income protection
+- null = Not yet reviewed
+- Income protection pays regular income (typically 50-70% of salary)
+
+**hasCoverDueToUnemployment (Boolean):**
+- true = Client has insurance covering unemployment
+- false = Client lacks unemployment cover
+- null = Not yet reviewed
+- Less common, often mortgage payment protection insurance (MPPI)
+
+**impactOnYou (Text):**
+- Document financial impact on client if protection gap exists
+- Examples: "Mortgage would default", "Would need to sell house", "Living standards would drop significantly"
+- Be specific about financial consequences
+- Maximum 2000 characters
+
+**impactOnDepandants (Text):**
+- Document financial impact on dependants (spouse, children, etc.)
+- Examples: "Children would need to change schools", "Spouse would need to work full-time immediately", "Family would lose home"
+- Consider vulnerable dependants (young children, disabled family members)
+- Maximum 2000 characters
+
+**actionsToAddressImpacts (Text):**
+- Document specific actions to address protection gaps
+- Should be actionable and measurable
+- Examples: "Obtain term life quote for £300,000", "Increase critical illness cover by £100,000", "Review income protection with 3-month deferred period"
+- Include timescales and next steps
+- Maximum 2000 characters
+
+**reasonforNotReviewing (Text):**
+- Document why client chose not to review protection
+- Required for compliance if client declines recommendations
+- Examples: "Client prioritizing pension contributions first", "Will review in 12 months when remortgaging", "Client has substantial emergency fund and feels adequate"
+- Demonstrates client-led decision making
+- Maximum 1000 characters
+
+**hasExistingBuildingInsurance (Boolean):**
+- true = Client has buildings insurance in place
+- false = Client lacks buildings insurance (serious gap - required by lender)
+- null = Not yet reviewed
+- Required by mortgage lender
+
+**hasExistingContentInsurance (Boolean):**
+- true = Client has contents insurance
+- false = Client lacks contents insurance
+- null = Not yet reviewed
+- Covers possessions, furniture, valuables
+
+**buyToLetProperties.haveBuildingContentInsurance (Boolean):**
+- true = Client has insurance for buy-to-let properties
+- false = Client lacks buy-to-let insurance (requires specialist landlord cover)
+- null = Not yet reviewed or not applicable
+- Standard residential insurance won't cover rented properties
+
+**hasSufficientCover (Boolean):**
+- true = Client's existing insurance cover is adequate
+- false = Client's cover is inadequate (sum insured too low, wrong type, etc.)
+- null = Not yet reviewed
+- Consider rebuild cost (often higher than market value)
+
+**whenDoyouWantToReviewProtection (Text):**
+- Document when client wants to review protection again
+- Examples: "Annual review at renewal in November", "Review in 6 months after remortgage", "Review when children born"
+- Helps schedule future reviews
+- Maximum 500 characters
+
+---
+
+## 13.59 StatePension Contract
 
 ### Business Purpose
 
@@ -6887,6 +7886,158 @@ Represents State Pension entitlements including basic State Pension, additional 
 - **Income Contract** - State Pension counts as income for affordability assessments
 - **PersonalPension Contract** - Personal pensions that may have contracted out of Additional State Pension
 - **FinalSalaryPension Contract** - Occupational pensions that may have contracted out of SERPS/S2P
+
+
+## 13.60 EmployerPensionScheme Contract
+
+### Business Purpose
+
+The EmployerPensionScheme contract records employer-sponsored pension schemes from current or previous employment. These include workplace pensions, occupational schemes, and auto-enrolment pensions that clients may have accumulated throughout their career.
+
+### Key Features
+
+- **Current and Deferred Schemes** - Track both active and paid-up employer pensions
+- **Problem Scheme Flagging** - Identify lost, untraceable, or problematic pensions
+- **Employment Integration** - Link schemes to employment history
+- **Consolidation Planning** - Support pension consolidation analysis
+- **Join Date Tracking** - Record when client joined each scheme
+
+### Common Scenarios
+
+**Active Employee:**
+- Record current employer's auto-enrolment pension
+- Track contribution levels (employee and employer)
+- Monitor ongoing scheme performance
+
+**Job Changes:**
+- Identify deferred schemes from previous employers
+- Assess whether to consolidate or leave in place
+- Transfer value analysis
+
+**Lost Pensions:**
+- Flag schemes where client has lost contact with provider
+- Document Pension Tracing Service searches
+- Record investigation progress
+
+**Retirement Planning:**
+- Include all employer schemes in retirement income projections
+- Evaluate benefits of consolidation
+- Plan optimal drawdown strategy
+
+### Fields
+
+#### Main Fields
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Unique system identifier for this record | 1234 |
+| href | Text | API link to this resource | /api/v2/factfinds/679/pensions/employerschemes/1234 |
+| owner | Reference Link | Client who owns this scheme | Complex object |
+| isCurrentMember | Yes/No | Whether client is currently contributing to this scheme | true |
+| isProblemMember | Yes/No | Whether there are issues with this scheme (lost, disputed, incomplete info) | false |
+| schemeJoinedOn | Date | Date client joined the scheme | 2015-06-01 |
+| details | Text | Additional details about the scheme (provider, policy number, notes) | Acme Corp Group Personal Pension - Scottish Widows |
+
+#### Nested Field Groups
+
+**owner:**
+
+| Field Name | Type | Description | Example Value |
+|---|---|---|---|
+| id | Number | Client identifier | 8496 |
+| href | Text | Link to client resource | /api/v2/factfinds/679/clients/8496 |
+| name | Text | Client display name | Jack Marias |
+
+### Usage Example
+
+```json
+{
+  "id": 1234,
+  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "owner": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Jack Marias"
+  },
+  "isCurrentMember": true,
+  "isProblemMember": false,
+  "schemeJoinedOn": "2015-06-01",
+  "details": "Acme Corp Group Personal Pension - auto-enrolment scheme. Employee contributes 5%, employer contributes 3%. Scottish Widows platform."
+}
+```
+
+### Business Validation Rules
+
+- Owner must reference a valid client within the same fact find
+- `isCurrentMember` and `isProblemMember` must be explicitly set to true or false (no null values)
+- `schemeJoinedOn` must be a valid date in the past or present (cannot be in the future)
+- `schemeJoinedOn` format must be ISO 8601 (YYYY-MM-DD)
+- `details` field has a maximum length of 2000 characters
+- When `isProblemMember` is true, `details` should explain the issue
+
+### Related Contracts
+
+- [Client Contract](#131-client-contract) - Scheme owner
+- [Employment Contract](#1319-employment-contract) - Employment generating the scheme
+- [PersonalPension Contract](#1329-personalpension-contract) - Personal pensions (non-employer)
+- [FinalSalaryPension Contract](#1327-finalsalarypension-contract) - Defined benefit employer schemes (if exists)
+- [FactFind Contract](#132-factfind-contract) - Parent container
+
+### API Endpoints
+
+- `GET /api/v2/factfinds/{id}/pensions/employerschemes` - List all employer pension schemes
+- `POST /api/v2/factfinds/{id}/pensions/employerschemes` - Create new employer pension scheme
+- `GET /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` - Get specific scheme details
+- `PATCH /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` - Update employer pension scheme
+- `DELETE /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` - Delete employer pension scheme
+
+### Field-Level Guidance
+
+**isCurrentMember:**
+- `true` = Client is actively contributing (scheme is with current employer)
+- `false` = Deferred/paid-up scheme (previous employer)
+- Should align with client's current employment status
+
+**isProblemMember:**
+- `true` = Scheme has issues requiring investigation:
+  - Lost or untraceable pensions
+  - Missing policy documents
+  - Disputes with provider
+  - Unclear benefit entitlement
+  - Provider contact lost
+- `false` = Scheme information is complete and accessible
+- When flagged true, use `details` to document the issue and investigation steps
+
+**schemeJoinedOn:**
+- Helps determine:
+  - Length of service
+  - Potential accrued benefits
+  - Transfer value estimates
+  - Priority for investigation (older schemes more likely to be lost)
+
+**details:**
+- Should include:
+  - Employer name
+  - Scheme type (auto-enrolment, occupational, group personal pension)
+  - Provider name and policy number
+  - Contribution rates if known
+  - Platform/website access details
+  - For problem schemes: nature of issue and investigation progress
+
+### Compliance Notes
+
+**Pension Tracing Service:**
+- Problem schemes may require Pension Tracing Service search
+- Document all attempts to locate lost pensions in `details` field
+
+**Transfer Analysis:**
+- Deferred schemes may benefit from consolidation
+- Consider transfer value analysis
+- Document advice given
+
+**Auto-Enrolment Regulations:**
+- Current employer schemes subject to auto-enrolment requirements
+- Minimum contribution levels apply (8% total, 5% employer + 3% employee minimum)
 
 
 ## 13.31 Net Worth

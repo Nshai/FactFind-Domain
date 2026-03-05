@@ -38,8 +38,8 @@ This document presents a comprehensive RESTful API design for the FactFind syste
 
 **Business Domain:** Wealth Management & Financial Advisory
 **Total Entities:** 50+ entities across 8 bounded contexts
-**Total API Endpoints:** 273 endpoints (was 268, added 5 bank account endpoints)
-**Total API Sections:** 35 comprehensive API specifications
+**Total API Endpoints:** 276 endpoints (added protection review +4, -1 from FactFind Root))
+**Total API Sections:** 38 comprehensive API specifications
 **Total Fields:** 2,000+ business fields from domain specification
 **Regulatory Compliance:** FCA Handbook, MiFID II, IDD, Consumer Duty, GDPR, MLR 2017, PECR, PSD2
 
@@ -47,11 +47,11 @@ This document presents a comprehensive RESTful API design for the FactFind syste
 
 The FactFind API provides comprehensive digital capabilities for:
 
-1. **FactFind Root API** - Fact find lifecycle and aggregated views (11 endpoints)
-2. **Client Onboarding & KYC** - Client management, identity verification, bank accounts, regulatory compliance (110 endpoints)
-3. **Circumstances Context** - Employment, income, expenditure tracking (20 endpoints)
+1. **FactFind Root API** - Fact find lifecycle, aggregated views, and control questions (17 endpoints)
+2. **Client Onboarding & KYC** - Client management, identity verification, bank accounts, regulatory compliance (107 endpoints)
+3. **Circumstances Context** - Employment, income, expenditure tracking (22 endpoints)
 4. **Assets & Liabilities** - Property, assets, liabilities management (15 endpoints)
-5. **Plans & Investments** - Pensions, investments, protection, mortgages (35 endpoints)
+5. **Plans & Investments** - Pensions, investments, protection, mortgages (40 endpoints)
 6. **Goals & Objectives** - Financial goal setting and tracking (26 endpoints)
 7. **ATR Context** - Attitude to risk assessment (8 endpoints)
 8. **Reference Data API** - Centralized lookup data management (24 endpoints)
@@ -113,6 +113,7 @@ The FactFind API provides comprehensive digital capabilities for:
 ### Part 2: Core APIs
 
 4. [FactFind Root API](#4-factfind-root-api)
+   - 4.11 [Control Options API](#411-control-questions-api)
 5. [Client Management API](#5-client-management-api)
 6. [Address API](#6-address-api)
 7. [Contact API](#7-contact-api)
@@ -131,34 +132,37 @@ The FactFind API provides comprehensive digital capabilities for:
 ### Part 3: Circumstances APIs
 
 19. [Employment API](#19-employment-api)
-20. [Income API](#20-income-api)
-21. [Expenditure API](#21-expenditure-api)
-22. [Affordability API](#22-affordability-api)
+20. [Employment Summary API](#20-employment-summary-api)
+21. [Income API](#21-income-api)
+22. [Expenditure API](#22-expenditure-api)
+23. [Affordability API](#23-affordability-api)
 
 ### Part 4: Assets & Liabilities APIs
 
-23. [Asset API](#23-asset-api)
-24. [Liability API](#24-liability-api)
-25. [Net Worth API](#25-net-worth-api)
+24. [Asset API](#24-asset-api)
+25. [Liability API](#25-liability-api)
+26. [Net Worth API](#26-net-worth-api)
 
 ### Part 5: Plans & Investments APIs
 
-26. [Investment API](#26-investment-api)
-27. [Final Salary Pension API](#27-final-salary-pension-api)
-28. [Annuity API](#28-annuity-api)
-29. [Personal Pension API](#29-personal-pension-api)
-30. [State Pension API](#30-state-pension-api)
-31. [Mortgage API](#31-mortgage-api)
-32. [Personal Protection API](#32-personal-protection-api)
+27. [Investment API](#27-investment-api)
+28. [Final Salary Pension API](#28-final-salary-pension-api)
+29. [Annuity API](#29-annuity-api)
+30. [Personal Pension API](#30-personal-pension-api)
+31. [State Pension API](#31-state-pension-api)
+32. [Employer Pension Scheme API](#32-employer-pension-scheme-api)
+33. [Mortgage API](#33-mortgage-api)
+34. [Personal Protection API](#34-personal-protection-api)
+35. [Protection Review API](#35-protection-review-api)
 
 ### Part 6: Goals & Risk APIs
 
-33. [Objectives API](#33-objectives-api)
-34. [ATR Assessment API](#34-atr-assessment-api)
+36. [Objectives API](#36-objectives-api)
+37. [ATR Assessment API](#37-atr-assessment-api)
 
 ### Part 7: Reference Data
 
-35. [Reference Data API](#35-reference-data-api)
+38. [Reference Data API](#38-reference-data-api)
 
 ### Appendices
 
@@ -1074,509 +1078,374 @@ PATCH /api/v2/factfinds/679/clients/batch
 **END OF DOCUMENT**
 ## 4. FactFind Root API
 
-### 4.1 Overview
+### Overview
 
-**Purpose:** The FactFind API manages the lifecycle of financial planning fact finds and provides aggregated views of complete client financial information.
-
-**Base Path:** `/api/v2/factfinds`
+The FactFind API manages the root aggregate for all client financial information and advice processes. A FactFind represents a formal data-gathering exercise as part of the financial advice process, containing client associations, meeting details, and regulatory disclosure tracking.
 
 **Key Features:**
-- Complete fact find CRUD operations
-- Aggregated financial views (complete, net worth, current position)
-- Meeting and disclosure tracking
-- Product summary management
-- Multi-client support (individual and joint fact finds)
+- FactFind CRUD operations with filtering support
+- Multi-client support (individual and joint FactFinds)
+- Meeting details and recording compliance tracking
+- Regulatory disclosure document tracking
+- OData-style filtering (e.g., by client ID)
 
-### 4.2 Operations
+**Resource Model:**
+- FactFind (root aggregate) - Gateway to all client financial data
+- Client references (read-only names populated from Client API)
+- Meeting object (date, type, attendees, notes)
+- Disclosure keyfacts array (regulatory documents issued)
 
-| Method | Endpoint | Description | Request Body | Success Response |
-|--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds` | List all fact finds | N/A | 200 OK - FactFind[] |
-| POST | `/api/v2/factfinds` | Create new fact find | FactFindRequest | 201 Created - FactFind |
-| GET | `/api/v2/factfinds/{id}` | Get fact find by ID | N/A | 200 OK - FactFind |
-| PATCH | `/api/v2/factfinds/{id}` | Partial update fact find | FactFindPatch | 200 OK - FactFind |
-| DELETE | `/api/v2/factfinds/{id}` | Delete fact find | N/A | 204 No Content |
-| GET | `/api/v2/factfinds/{id}/complete` | Get complete fact find with all nested data | N/A | 200 OK - FactFindComplete |
-| GET | `/api/v2/factfinds/{id}/current-position` | Get current financial position summary | N/A | 200 OK - CurrentPosition |
-| GET | `/api/v2/factfinds/{id}/net-worth` | Get net worth breakdown | N/A | 200 OK - NetWorth |
-| GET | `/api/v2/factfinds/{id}/financial-health` | Get financial health score and metrics | N/A | 200 OK - FinancialHealth |
-| GET | `/api/v2/factfinds/{id}/cash-flow` | Get cash flow analysis | N/A | 200 OK - CashFlow |
-| GET | `/api/v2/factfinds/{id}/asset-allocation` | Get asset allocation breakdown | N/A | 200 OK - AssetAllocation |
+### Base URL Pattern
 
-**Total Operations:** 11 endpoints
+```
+/api/v2/factfinds
+```
 
-### 4.3 Resource Properties
+### Operations
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `id` | integer | Yes (response only) | Unique system identifier |
-| `href` | string | Yes (response only) | API link to this resource |
-| `meeting` | object | No | Meeting information including date, type, and attendees |
-| `meeting.meetingOn` | date | No | Date when the meeting took place |
-| `meeting.meetingType` | enum | No | Type of meeting (FaceToFace, Electronic, Telephone, etc.) |
-| `meeting.clientsPresent` | array | No | List of clients who attended the meeting |
-| `meeting.anyOtherAudience` | boolean | No | Whether others were present |
-| `meeting.notes` | string | No | Meeting notes |
-| `products` | object | No | Products and services discussed during fact find |
-| `products.investments` | object | No | Investment products information |
-| `products.pensions` | object | No | Pension products information |
-| `products.mortgages` | object | No | Mortgage products information |
-| `products.protections` | object | No | Protection products information |
-| `disclosureKeyfacts` | array | No | Disclosure documents issued to clients |
-| `employmentSummary` | array | No | Summary of client employment and income information |
-| `supplementaryQuestions` | array | No | Additional questions organized by category |
-| `assetsAndLiabilities` | object | No | Client asset and liability disclosures |
-| `creditHistory` | object | No | Client credit history information |
-| `estatePlanning` | object | No | Estate planning details including will, assets, and gifts |
+#### Core FactFind Operations
 
-**Total Properties:** 19 core properties with nested structures
+**List FactFinds**
+```
+GET /api/v2/factfinds
+```
+Retrieves list of FactFinds with optional filtering.
 
-### 4.4 Contract Schema
+**Query Parameters:**
+- `filter` (string, optional): OData-style filter expression
+  - Example: `?filter=clients.id eq 123` - Filter by client ID
 
+**Response:** 200 OK
 ```json
-{
-  "id": 679,
-  "href": "/api/v2/factfinds/679",
-  "meeting": {
-    "meetingOn": "2026-02-16",
-    "meetingType": "FaceToFace",
-    "clientsPresent": [
+[
+  {
+    "id": 679,
+    "href": "/api/v2/factfinds/679",
+    "clients": [
       {
-        "id": 8496,
-        "href": "/api/v2/factfinds/679/clients/8496",
+        "id": 123,
+        "href": "/api/v2/factfinds/679/clients/123",
         "name": "John Smith"
       }
     ],
-    "anyOtherAudience": false,
-    "notes": "Initial fact find meeting"
-  },
-  "products": {
-    "investments": {
-      "hasCash": true,
-      "hasInvestments": true
-    },
-    "pensions": {
-      "hasEmployerPensionSchemes": true,
-      "hasFinalSalary": false,
-      "hasMoneyPurchases": true,
-      "hasPersonalPensions": true,
-      "hasAnnuities": false
-    },
-    "mortgages": {
-      "hasMortgages": true,
-      "hasEquityRelease": false
-    },
-    "protections": {
-      "hasProtection": true
-    }
-  },
-  "disclosureKeyfacts": [
-    {
-      "type": "CombinedDisclosureDocuments",
-      "issuedOn": "2026-02-16"
-    }
-  ],
-  "employmentSummary": [
-    {
-      "client": {
-        "id": 8496,
-        "href": "/api/v2/factfinds/679/clients/8496",
-        "name": "John Smith"
-      },
-      "totalGrossAnnualIncome": {
-        "amount": 75000.00,
-        "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+    "meeting": {
+      "meetingOn": "2026-03-05",
+      "meetingType": "FaceToFace",
+      "clientsPresent": [
+        {
+          "id": 123,
+          "href": "/api/v2/factfinds/679/clients/123",
+          "name": "John Smith"
         }
-      },
-      "highestTaxRatePaid": {
-        "percentage": 40
+      ],
+      "anyOtherAudience": false,
+      "notes": "Initial consultation."
+    },
+    "disclosureKeyfacts": [
+      {
+        "Type": "CombinedInitialDisclosureDocument",
+        "IssuedOn": "2026-03-05"
       }
+    ]
+  }
+]
+```
+
+**Error Responses:**
+- `400 Bad Request`: Invalid filter syntax
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+**Create FactFind**
+```
+POST /api/v2/factfinds
+```
+Creates a new FactFind record.
+
+**Request Body:**
+```json
+{
+  "clients": [
+    {
+      "id": 123
+    },
+    {
+      "id": 124
     }
   ],
-  "assetsAndLiabilities": {
-    "clientDisclosures": {
-      "hasAssets": true,
-      "hasLiabilities": true,
-      "reductionOfLiabilities": {
-        "isExpected": false,
-        "nonReductionReason": "RetainControlOfCapital",
-        "details": "Client prefers to maintain liquidity"
-      }
-    }
-  },
-  "creditHistory": {
-    "hasAdverseHistory": false,
-    "refusedMortgageOrCredit": false,
-    "details": null
-  },
-  "estatePlanning": {
-    "will": {
-      "details": "Mirror wills in place, updated 2024"
-    },
-    "totalAssets": {
-      "amount": 850000.00,
-      "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
-      }
-    },
-    "giftsDetails": {
-      "inLast7Years": "Annual exemption gifts to children",
-      "usedAnnualExemptionInCurrentOrPreviousTaxYears": "Yes",
-      "regularGiftsOutOfIncome": "Monthly contributions to children's ISAs",
-      "expectingInheritanceOrGifts": "Potential inheritance from parents"
-    }
-  }
-}
-```
-
-### 4.5 Complete Examples
-
-#### Example 1: Create Individual Fact Find
-
-**Request:**
-```http
-POST /api/v2/factfinds
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
   "meeting": {
-    "meetingOn": "2026-03-01",
-    "meetingType": "FaceToFace",
-    "anyOtherAudience": false,
-    "notes": "Initial consultation for retirement planning"
-  },
-  "products": {
-    "investments": {
-      "hasCash": true,
-      "hasInvestments": false
-    },
-    "pensions": {
-      "hasEmployerPensionSchemes": true,
-      "hasFinalSalary": false,
-      "hasMoneyPurchases": true,
-      "hasPersonalPensions": false,
-      "hasAnnuities": false
-    },
-    "mortgages": {
-      "hasMortgages": true,
-      "hasEquityRelease": false
-    },
-    "protections": {
-      "hasProtection": false
-    }
-  }
-}
-```
-
-**Response:**
-```http
-HTTP/1.1 201 Created
-Content-Type: application/json
-Location: /api/v2/factfinds/680
-
-{
-  "id": 680,
-  "href": "/api/v2/factfinds/680",
-  "meeting": {
-    "meetingOn": "2026-03-01",
-    "meetingType": "FaceToFace",
-    "clientsPresent": [],
-    "anyOtherAudience": false,
-    "notes": "Initial consultation for retirement planning"
-  },
-  "products": {
-    "investments": {
-      "hasCash": true,
-      "hasInvestments": false
-    },
-    "pensions": {
-      "hasEmployerPensionSchemes": true,
-      "hasFinalSalary": false,
-      "hasMoneyPurchases": true,
-      "hasPersonalPensions": false,
-      "hasAnnuities": false
-    },
-    "mortgages": {
-      "hasMortgages": true,
-      "hasEquityRelease": false
-    },
-    "protections": {
-      "hasProtection": false
-    }
-  },
-  "disclosureKeyfacts": [],
-  "employmentSummary": [],
-  "assetsAndLiabilities": null,
-  "creditHistory": null,
-  "estatePlanning": null,
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/680",
-      "method": "GET"
-    },
-    "update": {
-      "href": "/api/v2/factfinds/680",
-      "method": "PATCH"
-    },
-    "delete": {
-      "href": "/api/v2/factfinds/680",
-      "method": "DELETE"
-    },
-    "complete": {
-      "href": "/api/v2/factfinds/680/complete",
-      "method": "GET"
-    },
-    "clients": {
-      "href": "/api/v2/factfinds/680/clients",
-      "method": "GET"
-    }
-  }
-}
-```
-
-#### Example 2: Get Complete Fact Find
-
-**Request:**
-```http
-GET /api/v2/factfinds/679/complete
-Authorization: Bearer {token}
-```
-
-**Response:**
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "id": 679,
-  "href": "/api/v2/factfinds/679",
-  "meeting": {
-    "meetingOn": "2026-02-16",
+    "meetingOn": "2026-03-05",
     "meetingType": "FaceToFace",
     "clientsPresent": [
       {
-        "id": 8496,
-        "href": "/api/v2/factfinds/679/clients/8496",
-        "name": "John Smith"
-      }
-    ]
-  },
-  "clients": [
-    {
-      "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
-      "clientNumber": "C00001234",
-      "clientType": "Person",
-      "personValue": {
-        "firstName": "John",
-        "lastName": "Smith",
-        "dateOfBirth": "1980-05-15",
-        "age": 45,
-        "gender": "M",
-        "maritalStatus": {
-          "code": "MAR",
-          "display": "Married"
-        }
-      }
-    }
-  ],
-  "assets": [
-    {
-      "id": 5001,
-      "href": "/api/v2/factfinds/679/assets/5001",
-      "assetType": "Property",
-      "currentValue": {
-        "amount": 425000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      }
-    }
-  ],
-  "investments": [],
-  "pensions": [],
-  "mortgages": [],
-  "protections": [],
-  "netWorth": {
-    "totalAssets": {
-      "amount": 850000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "totalLiabilities": {
-      "amount": 240000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "netWorthAmount": {
-      "amount": 610000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    }
-  }
-}
-```
-
-#### Example 3: Get Net Worth Breakdown
-
-**Request:**
-```http
-GET /api/v2/factfinds/679/net-worth
-Authorization: Bearer {token}
-```
-
-**Response:**
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-  "factfindId": 679,
-  "calculatedOn": "2026-03-03T10:30:00Z",
-  "assets": {
-    "property": {
-      "amount": 425000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "investments": {
-      "amount": 185000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "pensions": {
-      "amount": 200000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "cash": {
-      "amount": 40000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "totalAssets": {
-      "amount": 850000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    }
-  },
-  "liabilities": {
-    "mortgages": {
-      "amount": 200000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "loans": {
-      "amount": 30000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "creditCards": {
-      "amount": 10000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    },
-    "totalLiabilities": {
-      "amount": 240000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
-    }
-  },
-  "netWorth": {
-    "amount": 610000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-  "equityByAsset": [
-    {
-      "assetId": 5001,
-      "assetType": "Property",
-      "assetValue": {
-        "amount": 425000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "id": 123
       },
-      "mortgageBalance": {
-        "amount": 200000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      },
-      "equity": {
-        "amount": 225000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
-      },
-      "equityPercentage": 52.94
+      {
+        "id": 124
+      }
+    ],
+    "anyOtherAudience": false,
+    "notes": "Initial consultation to discuss retirement planning and mortgage options."
+  },
+  "disclosureKeyfacts": [
+    {
+      "Type": "CombinedInitialDisclosureDocument",
+      "IssuedOn": "2026-03-05"
+    },
+    {
+      "Type": "TermsOfBusiness",
+      "IssuedOn": "2026-03-05"
     }
   ]
 }
 ```
 
-### 4.6 Business Rules
+**Response:** 201 Created
+```json
+{
+  "id": 679,
+  "href": "/api/v2/factfinds/679",
+  "clients": [
+    {
+      "id": 123,
+      "href": "/api/v2/factfinds/679/clients/123",
+      "name": "John Smith"
+    },
+    {
+      "id": 124,
+      "href": "/api/v2/factfinds/679/clients/124",
+      "name": "Jane Smith"
+    }
+  ],
+  "meeting": {
+    "meetingOn": "2026-03-05",
+    "meetingType": "FaceToFace",
+    "clientsPresent": [
+      {
+        "id": 123,
+        "href": "/api/v2/factfinds/679/clients/123",
+        "name": "John Smith"
+      },
+      {
+        "id": 124,
+        "href": "/api/v2/factfinds/679/clients/124",
+        "name": "Jane Smith"
+      }
+    ],
+    "anyOtherAudience": false,
+    "notes": "Initial consultation to discuss retirement planning and mortgage options."
+  },
+  "disclosureKeyfacts": [
+    {
+      "Type": "CombinedInitialDisclosureDocument",
+      "IssuedOn": "2026-03-05"
+    },
+    {
+      "Type": "TermsOfBusiness",
+      "IssuedOn": "2026-03-05"
+    }
+  ]
+}
+```
 
-1. **Meeting Date Validation:** `meeting.meetingOn` cannot be in the future
-2. **Meeting Type Validation:** Must be one of: FaceToFace, FaceToFaceRecorded, Electronic, ElectronicRecorded, Videocall, VideocallRecorded, Telephone, TelephoneRecorded
-3. **Disclosure Type Validation:** Must be one of: CombinedDisclosureDocuments, CombinedInitialDisclosureDocument, DisclosureDocument, KeyfactsAboutCostOfServices, KeyfactsAboutServices, ServiceCostDisclosureDocument, TermsRefundOfFees, TermsOfBusiness
-4. **Tax Rate Validation:** `employmentSummary[].highestTaxRatePaid.percentage` must be one of: 0, 10, 19, 20, 21, 22, 40, 41, 42, 45, 46, 47, 48
-5. **Calculated Fields:** `totalGrossAnnualIncome`, `totalAssets`, and `jointTotalAssets` are read-only calculated fields
-6. **Cascade Delete:** Deleting a fact find will cascade delete all nested resources (clients, assets, investments, etc.)
-7. **Required Disclosure:** At least one disclosure document must be issued before fact find completion
+**Error Responses:**
+- `400 Bad Request`: Invalid data (missing clients, invalid enum values)
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
 
-### 4.7 Query Parameters
+---
 
-**List Fact Finds (`GET /api/v2/factfinds`):**
+**Get FactFind**
+```
+GET /api/v2/factfinds/{id}
+```
+Retrieves a specific FactFind by ID.
 
-| Parameter | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `page` | integer | Page number (1-indexed) | `page=1` |
-| `pageSize` | integer | Items per page (max 100) | `pageSize=25` |
-| `sortBy` | string | Sort field | `sortBy=meetingOn:desc` |
-| `meetingDateFrom` | date | Filter by meeting date range (from) | `meetingDateFrom=2026-01-01` |
-| `meetingDateTo` | date | Filter by meeting date range (to) | `meetingDateTo=2026-12-31` |
-| `hasPensions` | boolean | Filter by pension products | `hasPensions=true` |
-| `hasInvestments` | boolean | Filter by investment products | `hasInvestments=true` |
-| `hasProtection` | boolean | Filter by protection products | `hasProtection=true` |
+**Path Parameters:**
+- `id` (integer, required): FactFind identifier
 
-### 4.8 HTTP Status Codes
+**Response:** 200 OK
+Returns complete FactFind object (same structure as Create response).
 
-| Status Code | Description | When Used |
-|-------------|-------------|-----------|
-| 200 OK | Success | GET requests successful |
-| 201 Created | Resource created | POST successful |
-| 204 No Content | Success with no body | DELETE successful |
-| 400 Bad Request | Invalid syntax | Malformed JSON |
-| 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
-| 404 Not Found | Resource not found | Invalid fact find ID |
-| 409 Conflict | Concurrency conflict | ETag mismatch |
-| 422 Unprocessable Entity | Validation failed | Business rule violation |
-| 500 Internal Server Error | Unexpected error | System failure |
+**Error Responses:**
+- `404 Not Found`: FactFind not found
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
 
-### 4.9 Regulatory Compliance
+---
 
-**FCA Handbook COBS 9.2 - Assessing Suitability:**
-- Fact find must capture sufficient information to assess suitability
-- Knowledge and experience must be documented
-- Financial situation must be recorded
-- Investment objectives must be captured
+**Update FactFind**
+```
+PUT /api/v2/factfinds/{id}
+```
+Updates an existing FactFind record.
 
-**FCA Consumer Duty:**
-- Clear disclosure of services and costs
-- Evidence of understanding client needs
-- Documentation of advice process
-- Fair and reasonable outcomes
+**Path Parameters:**
+- `id` (integer, required): FactFind identifier
 
-**GDPR Compliance:**
-- Data processing consent required
-- Right to access (export fact find data)
-- Right to erasure (delete fact find)
-- Data retention policies (7 years minimum for financial advice)
+**Request Body:**
+Complete FactFind object with updates.
 
-**MLR 2017 (Money Laundering Regulations):**
-- Identity verification required
-- Source of funds documentation
-- Enhanced due diligence for high-risk clients
-- Ongoing monitoring requirements
+**Response:** 200 OK
+Returns updated FactFind object.
 
-### 4.10 Related APIs
+**Error Responses:**
+- `400 Bad Request`: Invalid data
+- `404 Not Found`: FactFind not found
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+- `409 Conflict`: Concurrent modification detected
 
-**Child Resources:**
-- [Client Management API](#5-client-management-api) - `/api/v2/factfinds/{id}/clients`
-- [Asset API](#22-asset-api) - `/api/v2/factfinds/{id}/assets`
-- [Investment API](#24-investment-api) - `/api/v2/factfinds/{id}/investments`
-- [Pension APIs](#25-29) - `/api/v2/factfinds/{id}/pensions/*`
-- [Mortgage API](#29-mortgage-api) - `/api/v2/factfinds/{id}/mortgages`
-- [Protection API](#30-personal-protection-api) - `/api/v2/factfinds/{id}/protections`
-- [Objectives API](#31-objectives-api) - `/api/v2/factfinds/{id}/objectives`
-- [ATR Assessment API](#32-atr-assessment-api) - `/api/v2/factfinds/{id}/atr-assessment`
+---
+
+### Properties
+
+#### FactFind Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| id | integer | Yes | Yes | Unique system identifier |
+| href | string | Yes | Yes | API resource link |
+| clients | ClientReference[] | Yes | Partial | Array of associated clients (id required, name read-only) |
+| meeting | Meeting | No | No | Meeting details |
+| disclosureKeyfacts | DisclosureKeyfact[] | No | No | Array of issued disclosure documents |
+
+#### ClientReference Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| id | integer | Yes | No | Client identifier |
+| href | string | No | Yes | Link to client resource (populated by system) |
+| name | string | No | Yes | Client name (populated from Client API) |
+
+#### Meeting Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| meetingOn | date | No | No | Date meeting occurred (ISO 8601: YYYY-MM-DD) |
+| meetingType | enum | No | No | Type of meeting (see MeetingType enum) |
+| clientsPresent | ClientReference[] | No | Partial | Clients present at meeting |
+| anyOtherAudience | boolean | No | No | Whether other audience present (interpreter, family, etc.) |
+| notes | string | No | No | Meeting notes (max 5000 chars) |
+
+#### DisclosureKeyfact Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| Type | enum | Yes | No | Disclosure document type (see DisclosureType enum) |
+| IssuedOn | date | Yes | No | Date document issued to client (ISO 8601: YYYY-MM-DD) |
+
+### Schema Definitions
+
+**MeetingType Enum:**
+- `Electronic` - Electronic meeting (e.g., email, online form)
+- `ElectronicRecorded` - Electronic meeting with recording
+- `Videocall` - Video call meeting
+- `VideocallRecorded` - Video call with recording
+- `FaceToFace` - In-person meeting
+- `FaceToFaceRecorded` - In-person meeting with recording
+- `Telephone` - Telephone call
+- `TelephoneRecorded` - Telephone call with recording (client consent required)
+
+**DisclosureType Enum:**
+- `CombinedDisclosureDocuments` - Combined disclosure documents
+- `CombinedInitialDisclosureDocument` - Combined initial disclosure document (CIDD)
+- `DisclosureDocument` - General disclosure document
+- `KeyfactsAboutCostOfServices` - Key facts about cost of services
+- `KeyfactsAboutServices` - Key facts about services
+- `ServiceCostDisclosureDocument` - Service cost disclosure document
+- `TermsRefundOfFees` - Terms for refund of fees
+- `TermsOfBusiness` - Terms of business (TOB)
+
+### Business Rules
+
+1. **Client Association Required**: FactFind must have at least one associated client. POST request must include clients array with at least one client ID.
+
+2. **Read-Only Client Names**: Client name field is read-only. Populated automatically from Client API based on client ID. PUT requests can update client IDs but not names.
+
+3. **Meeting Type Enum Validation**: meetingType must be one of specified enum values. Returns 400 Bad Request if invalid.
+
+4. **Recording Consent**: If meetingType includes "Recorded", must document client consent in meeting notes. FCA requirement for call/meeting recording.
+
+5. **Clients Present Validation**: Clients in clientsPresent array must be subset of clients array. Cannot have client present who is not associated with FactFind.
+
+6. **Meeting Notes Length**: Meeting notes maximum 5000 characters. Returns 400 Bad Request if exceeded.
+
+7. **Other Audience Flag**: Set anyOtherAudience to true if non-client present (e.g., interpreter, family member, solicitor). Document in notes who was present.
+
+8. **Disclosure Type Enum Validation**: Type must be one of specified enum values. Returns 400 Bad Request if invalid.
+
+9. **Issuance Date Validation**: IssuedOn must be valid date in past or today. Cannot be in the future. Format: ISO 8601 (YYYY-MM-DD).
+
+10. **CIDD Requirement**: FCA requires Combined Initial Disclosure Document or equivalent before providing advice. Audit trail via disclosureKeyfacts array.
+
+11. **OData Filter Syntax**: Filter parameter supports OData-style expressions. Example: `clients.id eq 123`. Invalid syntax returns 400 Bad Request.
+
+12. **Joint FactFinds**: Multiple clients can be associated with one FactFind. Common for couples, families, business partners. All associated clients have equal visibility to FactFind data.
+
+### Error Examples
+
+**Invalid Meeting Type Error**
+```json
+{
+  "error": {
+    "code": "INVALID_MEETING_TYPE",
+    "message": "Invalid meeting type value",
+    "details": [
+      {
+        "field": "meeting.meetingType",
+        "issue": "Value must be one of: Electronic, ElectronicRecorded, Videocall, VideocallRecorded, FaceToFace, FaceToFaceRecorded, Telephone, TelephoneRecorded",
+        "value": "Zoom"
+      }
+    ]
+  }
+}
+```
+
+**Client Not Found Error**
+```json
+{
+  "error": {
+    "code": "CLIENT_NOT_FOUND",
+    "message": "Referenced client does not exist",
+    "details": [
+      {
+        "field": "clients[0].id",
+        "issue": "Client ID not found in system",
+        "value": 99999
+      }
+    ]
+  }
+}
+```
+
+### FCA Compliance Notes
+
+**Disclosure Requirements:**
+- Combined Initial Disclosure Document (CIDD) must be provided before advice
+- Terms of Business (TOB) establishes contract between firm and client
+- Key Facts About Services explains what firm provides
+- Service Cost Disclosure details all charges
+
+**Recording Rules:**
+- MiFID firms must record relevant telephone conversations
+- Client consent not strictly required but best practice to inform and document
+- Use "Recorded" meeting types to flag recordings for compliance
+- Recordings must be retained for 5-7 years
+
+**Joint FactFinds:**
+- Common for married couples, cohabiting partners, business partners
+- All associated clients must consent to advice
+- Both receive disclosure documents
+- Equal visibility to all FactFind data
+
+### Related APIs
+
+- [Client API](./Client-API-Design.md) - Client management and information
+- All other entity APIs depend on FactFind as root aggregate
+- See [Comprehensive FactFind API Design](../Comprehensive-APIs/FactFind-API-Design.md) for full specification
 
 ---
 ## 5. Client Management API
@@ -3654,79 +3523,45 @@ Content-Type: application/json
 
 ## 12. Estate Planning API
 
-### 12.1 Overview
+### Overview
 
-**Purpose:** The Estate Planning API manages client estate planning information including wills, lasting powers of attorney (LPAs), trusts, and gifts for inheritance tax planning.
-
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+The Estate Planning API manages client estate planning information, including will details, inheritance expectations, and gift tracking for UK Inheritance Tax (IHT) planning. The API follows a singleton pattern for the main estate planning record (one per client) with a separate sub-collection for individual gift records.
 
 **Key Features:**
-- Will arrangement tracking
-- Lasting Power of Attorney (LPA) management
-- Gift recording (7-year rule tracking)
-- IHT allowance calculations (NRB, RNRB)
-- Trust arrangement documentation
+- Singleton estate planning record per client
+- Automatic calculation of total assets from Asset API
+- Gift tracking for seven-year IHT rule (Potentially Exempt Transfers)
+- Annual exemption and regular gifts from income tracking
+- Will details and inheritance expectations
+- UK IHT rules and exemptions support
 
-### 12.2 Operations
+**Resource Model:**
+- EstatePlanning (singleton per client) - Contains will details, asset totals, gift summaries
+- Gift (collection) - Individual gift records for IHT tracking
 
-| Method | Endpoint | Description | Request Body | Success Response |
-|--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Get estate planning details | N/A | 200 OK - EstatePlanning |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning` | Update estate planning | EstatePlanningRequest | 200 OK - EstatePlanning |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | List all gifts | N/A | 200 OK - Gift[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts` | Create new gift | GiftRequest | 201 Created - Gift |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Get specific gift | N/A | 200 OK - Gift |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Update gift | GiftRequest | 200 OK - Gift |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning/gifts/{giftId}` | Delete gift | N/A | 204 No Content |
+### Base URL Pattern
 
-**Total Operations:** 7 endpoints
+```
+/api/v2/factfinds/{factfindId}/clients/{clientId}/estateplanning
+```
 
-### 12.3 Resource Properties
+### Operations
 
-#### Estate Planning Properties
+#### Estate Planning Singleton Operations
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `href` | string | Yes (response only) | Resource URL for this estate planning record |
-| `client` | object | Yes (response only) | Client reference |
-| `factfind` | object | Yes (response only) | FactFind reference |
-| `willDetails` | string | No | Free-text description of will arrangements |
-| `totalAssets` | money | No | Total value of client's estate |
-| `totalJointAssets` | money | No | Total value of jointly owned assets |
-| `giftInLast7YearsDetails` | string | No | Description of gifts made in last 7 years |
-| `recentGiftDetails` | string | No | Description of recent gifts (current tax year) |
-| `regularGiftDetails` | string | No | Description of regular gifts from income |
-| `expectingInheritanceDetails` | string | No | Description of expected inheritance |
-| `propertyAdditionalNrb` | money | No | Residence nil rate band (max £175,000) |
-| `taxYearWhenPropertySold` | integer | No | Tax year when main residence was sold (if applicable) |
-| `widowsReliefNrbDeceasedPercentage` | decimal | No | Percentage of deceased spouse's NRB available to transfer (0-100) |
-| `widowsReliefPropertyAdditionalNrbDeceasedPercentage` | decimal | No | Percentage of deceased spouse's RNRB available to transfer (0-100) |
-| `businessAssetRelief` | money | No | Business property relief available |
-| `gifts` | array | No | Collection of gifts |
-| `createdAt` | datetime | Yes (response only) | When this record was created |
-| `updatedAt` | datetime | Yes (response only) | When this record was last updated |
+**Get Estate Planning**
+```
+GET /api/v2/factfinds/{id}/clients/{clientId}/estateplanning
+```
+Retrieves the estate planning singleton record for a client, including embedded gifts array.
 
-#### Gift Properties
-
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `id` | integer | Yes (response only) | Unique gift identifier |
-| `giftDate` | date | Yes | Date gift was made |
-| `recipient` | string | Yes | Name of recipient |
-| `relationship` | string | No | Relationship to client |
-| `amount` | money | Yes | Value of gift |
-| `description` | string | No | Description of gift |
-| `isRegularGiftFromIncome` | boolean | No | Whether this is a regular gift from surplus income |
-| `isWithinAnnualExemption` | boolean | No | Whether covered by £3,000 annual exemption |
-
-### 12.4 Contract Schema
-
+**Response:** 200 OK
 ```json
 {
-  "href": "/api/v2/factfinds/679/clients/8496/estate-planning",
+  "href": "/v2/factfinds/679/clients/8496/estateplanning",
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/v2/factfinds/679/clients/8496",
     "name": "John Smith"
   },
   "factfind": {
@@ -3751,30 +3586,14 @@ Content-Type: application/json
   "recentGiftDetails": "£3,000 to daughter Emily (annual exemption 2025/26)",
   "regularGiftDetails": "Monthly £250 into each child's Junior ISA from surplus income",
   "expectingInheritanceDetails": "Potential inheritance from parents' estate (estimated £200,000)",
-  "propertyAdditionalNrb": {
-    "amount": 175000.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
-  "taxYearWhenPropertySold": null,
-  "widowsReliefNrbDeceasedPercentage": null,
-  "widowsReliefPropertyAdditionalNrbDeceasedPercentage": null,
-  "businessAssetRelief": {
-    "amount": 0.00,
-    "currency": {
-      "code": "GBP",
-      "symbol": "£"
-    }
-  },
   "gifts": [
     {
       "id": 1,
-      "giftDate": "2025-04-10",
+      "href": "/v2/factfinds/679/clients/8496/estateplanning/gifts/1",
+      "giftedOn": "2025-04-10",
       "recipient": "Emily Rose Smith",
       "relationship": "Daughter",
-      "amount": {
+      "value": {
         "amount": 3000.00,
         "currency": {
           "code": "GBP",
@@ -3791,164 +3610,345 @@ Content-Type: application/json
 }
 ```
 
-### 12.5 Complete Examples
+**Error Responses:**
+- `404 Not Found`: Estate planning record doesn't exist yet
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
 
-#### Example 1: Update Estate Planning Details
+---
 
-**Request:**
-```http
-PUT /api/v2/factfinds/679/clients/8496/estate-planning
-Content-Type: application/json
-Authorization: Bearer {token}
+**Update Estate Planning**
+```
+PUT /api/v2/factfinds/{id}/clients/{clientId}/estateplanning
+```
+Creates or updates the estate planning singleton record. First PUT creates the record (201 Created), subsequent PUTs update it (200 OK).
 
+**Request Body:**
+```json
 {
-  "willDetails": "Mirror wills updated January 2026. Estate passes to spouse on first death, then to children equally. Executors: spouse and solicitor.",
-  "totalAssets": {
-    "amount": 850000.00,
-    "currency": {
-      "code": "GBP"
-    }
-  },
-  "totalJointAssets": {
-    "amount": 425000.00,
-    "currency": {
-      "code": "GBP"
-    }
-  },
-  "propertyAdditionalNrb": {
-    "amount": 175000.00,
-    "currency": {
-      "code": "GBP"
-    }
-  },
-  "giftInLast7YearsDetails": "Annual exemption gifts to both children",
-  "regularGiftDetails": "Monthly £250 into each child's Junior ISA"
+  "willDetails": "Mirror wills updated in 2026. Estate passes to spouse, then children equally. Executors: spouse and professional executor service.",
+  "giftInLast7YearsDetails": "Annual exemption gifts to children, total £6,000 per year",
+  "recentGiftDetails": "£3,000 to each child for tax year 2025/26",
+  "regularGiftDetails": "Monthly £250 to each child's Junior ISA (£500 total per month)",
+  "expectingInheritanceDetails": "Expected inheritance from mother's estate, estimated £150,000-£200,000"
 }
 ```
 
-**Response:**
-```http
-HTTP/1.1 200 OK
-Content-Type: application/json
+**Response:** 200 OK (update) or 201 Created (first time)
+Returns complete EstatePlanning object with read-only fields populated.
 
-{
-  "href": "/api/v2/factfinds/679/clients/8496/estate-planning",
-  "willDetails": "Mirror wills updated January 2026. Estate passes to spouse on first death, then to children equally. Executors: spouse and solicitor.",
-  "totalAssets": {
-    "amount": 850000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-  "totalJointAssets": {
-    "amount": 425000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-  "propertyAdditionalNrb": {
-    "amount": 175000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-  "updatedAt": "2026-03-03T10:30:00Z"
-}
+**Error Responses:**
+- `400 Bad Request`: Invalid data (e.g., text field too long)
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+- `409 Conflict`: Concurrent modification detected
+
+---
+
+#### Gift Sub-Collection Operations
+
+**Create Gift**
 ```
+POST /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts
+```
+Creates a new gift record for IHT tracking. Estate planning singleton must exist before gifts can be added.
 
-#### Example 2: Record Gift
-
-**Request:**
-```http
-POST /api/v2/factfinds/679/clients/8496/estate-planning/gifts
-Content-Type: application/json
-Authorization: Bearer {token}
-
+**Request Body:**
+```json
 {
-  "giftDate": "2025-04-10",
-  "recipient": "Emily Rose Smith",
-  "relationship": "Daughter",
-  "amount": {
+  "giftedOn": "2026-04-06",
+  "recipient": "Thomas James Smith",
+  "relationship": "Son",
+  "value": {
     "amount": 3000.00,
     "currency": {
-      "code": "GBP"
+      "code": "GBP",
+      "symbol": "£"
     }
   },
-  "description": "Annual exemption gift for tax year 2025/26",
+  "description": "Annual exemption gift for tax year 2026/27",
   "isRegularGiftFromIncome": false,
   "isWithinAnnualExemption": true
 }
 ```
 
-**Response:**
-```http
-HTTP/1.1 201 Created
-Content-Type: application/json
-
+**Response:** 201 Created
+```json
 {
-  "id": 1,
-  "href": "/api/v2/factfinds/679/clients/8496/estate-planning/gifts/1",
-  "giftDate": "2025-04-10",
-  "recipient": "Emily Rose Smith",
-  "relationship": "Daughter",
-  "amount": {
+  "id": 2,
+  "href": "/v2/factfinds/679/clients/8496/estateplanning/gifts/2",
+  "giftedOn": "2026-04-06",
+  "recipient": "Thomas James Smith",
+  "relationship": "Son",
+  "value": {
     "amount": 3000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": {
+      "code": "GBP",
+      "symbol": "£"
+    }
   },
-  "description": "Annual exemption gift for tax year 2025/26",
+  "description": "Annual exemption gift for tax year 2026/27",
   "isRegularGiftFromIncome": false,
-  "isWithinAnnualExemption": true,
-  "createdAt": "2026-03-03T10:30:00Z",
-  "updatedAt": "2026-03-03T10:30:00Z"
+  "isWithinAnnualExemption": true
 }
 ```
 
-### 12.6 Business Rules
-
-1. **NRB (Nil Rate Band):** Standard £325,000 (frozen until April 2028)
-2. **RNRB (Residence Nil Rate Band):** Up to £175,000 when main residence passes to direct descendants
-3. **Transferable allowances:** Widow/widower can inherit unused NRB and RNRB from deceased spouse
-4. **RNRB taper:** Reduces £1 for every £2 over £2 million estate value
-5. **7-year rule:** Gifts made more than 7 years before death are IHT-free
-6. **Annual exemption:** £3,000 per year (can carry forward one unused year)
-7. **Regular gifts from income:** Immediately exempt if from surplus income
-
-### 12.7 Query Parameters
-
-| Parameter | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `giftDateFrom` | date | Filter gifts from date | `giftDateFrom=2020-01-01` |
-| `giftDateTo` | date | Filter gifts to date | `giftDateTo=2026-12-31` |
-| `within7Years` | boolean | Filter gifts within 7 years | `within7Years=true` |
-
-### 12.8 HTTP Status Codes
-
-| Status Code | Description | When Used |
-|-------------|-------------|-----------|
-| 200 OK | Success | GET, PUT successful |
-| 201 Created | Resource created | POST successful (gift) |
-| 204 No Content | Success with no body | DELETE successful |
-| 400 Bad Request | Invalid syntax | Malformed request |
-| 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
-| 404 Not Found | Resource not found | Invalid gift ID |
-| 422 Unprocessable Entity | Validation failed | Business rule violation |
-
-### 12.9 Regulatory Compliance
-
-**UK Inheritance Tax:**
-- IHT charged at 40% on estates above nil rate band
-- Reduced to 36% if 10%+ of estate left to charity
-- Potentially Exempt Transfers (PETs) within 7 years
-
-**Estate Planning Best Practices:**
-- Wills should be reviewed every 5 years
-- LPAs should be in place (Property & Affairs, Health & Welfare)
-- Regular gift recording for IHT planning
-- Consider trust arrangements for asset protection
-
-### 12.10 Related APIs
-
-- [Client Management API](#5-client-management-api) - Parent resource
-- [Asset API](#22-asset-api) - Estate valuation
-- [Professional Contact API](#8-professional-contact-api) - Solicitor details
+**Error Responses:**
+- `400 Bad Request`: Invalid gift data (future date, negative value, missing recipient)
+- `404 Not Found`: Estate planning record doesn't exist
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
 
 ---
 
+**Get Gift**
+```
+GET /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
+```
+Retrieves a specific gift record.
+
+**Response:** 200 OK
+Returns Gift object.
+
+**Error Responses:**
+- `404 Not Found`: Gift not found
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+**Update Gift**
+```
+PUT /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
+```
+Updates an existing gift record.
+
+**Request Body:**
+Complete Gift object with modifications.
+
+**Response:** 200 OK
+Returns updated Gift object.
+
+**Error Responses:**
+- `400 Bad Request`: Invalid gift data
+- `404 Not Found`: Gift not found
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+**Delete Gift**
+```
+DELETE /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
+```
+Removes a gift record from tracking.
+
+**Response:** 204 No Content
+
+**Error Responses:**
+- `404 Not Found`: Gift not found
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+### Properties
+
+#### EstatePlanning Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| href | string | Yes | Yes | API resource link |
+| client | ClientReference | Yes | Yes | Client reference with id, href, name |
+| factfind | FactFindReference | Yes | Yes | FactFind reference with id |
+| willDetails | string | No | No | Will and estate planning details (max 2000 chars) |
+| totalAssets | Money | No | Yes | Total asset value calculated from Asset API |
+| totalJointAssets | Money | No | Yes | Total jointly-owned assets (50% of joint assets) |
+| giftInLast7YearsDetails | string | No | No | Summary of gifts in last 7 years for IHT (max 2000 chars) |
+| recentGiftDetails | string | No | No | Details of recent gifts (max 1000 chars) |
+| regularGiftDetails | string | No | No | Details of regular gifts from income (max 1000 chars) |
+| expectingInheritanceDetails | string | No | No | Expected inheritance details (max 1000 chars) |
+| gifts | Gift[] | No | Yes | Collection of gift records (managed via gifts API) |
+| createdAt | datetime | Yes | Yes | Record creation timestamp (ISO 8601) |
+| updatedAt | datetime | Yes | Yes | Last update timestamp (ISO 8601) |
+
+#### Gift Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| id | integer | Yes | Yes | Unique gift identifier |
+| href | string | Yes | Yes | API resource link |
+| giftedOn | date | Yes | No | Date gift was made (ISO 8601, must be past or today) |
+| recipient | string | Yes | No | Name of gift recipient (max 100 chars) |
+| relationship | string | No | No | Relationship to client (max 50 chars) |
+| value | Money | Yes | No | Gift value (must be positive) |
+| description | string | No | No | Gift description/notes (max 500 chars) |
+| isRegularGiftFromIncome | boolean | No | No | Gift qualifies as regular from surplus income (IHT exempt) |
+| isWithinAnnualExemption | boolean | No | No | Gift uses annual exemption (£3,000 per year) |
+
+### Schema Definitions
+
+**ClientReference**
+```json
+{
+  "id": 8496,
+  "href": "/v2/factfinds/679/clients/8496",
+  "name": "John Smith"
+}
+```
+
+**FactFindReference**
+```json
+{
+  "id": 679
+}
+```
+
+**Money**
+```json
+{
+  "amount": 3000.00,
+  "currency": {
+    "code": "GBP",
+    "symbol": "£"
+  }
+}
+```
+
+### Business Rules
+
+#### Singleton Resource Rules
+
+1. **One Record Per Client**: Only one estate planning record exists per client. First PUT creates it (201 Created), subsequent PUTs update it (200 OK). GET returns 404 if not yet created.
+
+2. **Parent Record Required**: Estate planning singleton must be created before gifts can be added. POST to `/gifts` returns 404 if estate planning doesn't exist.
+
+#### Read-Only Field Rules
+
+3. **Automatic Asset Calculation**: `totalAssets` is automatically calculated from all client assets (property, investments, pensions, bank accounts). Updated whenever asset records are modified. Cannot be manually set via API.
+
+4. **Joint Asset Calculation**: `totalJointAssets` is 50% of jointly-owned assets. Calculated from assets where ownership type is "Joint". Updated automatically with asset changes. Cannot be manually set via API.
+
+#### Gift Validation Rules
+
+5. **Gift Date Validation**: `giftedOn` must be a valid date in the past or today. Cannot be in the future. Format: ISO 8601 (YYYY-MM-DD).
+
+6. **Gift Value Validation**: `value.amount` must be positive (> 0). No maximum limit. Currency must be valid ISO 4217 code.
+
+7. **Recipient Required**: `recipient` must be non-empty string. Minimum 2 characters, maximum 100 characters.
+
+8. **Seven-Year Tracking**: Gifts are tracked for IHT purposes for seven years from gift date. Gifts older than seven years may be archived automatically.
+
+#### UK IHT Rules (Informational)
+
+9. **Annual Exemption**: £3,000 annual gift allowance per person per tax year. Can carry forward unused exemption from previous year only. `isWithinAnnualExemption` flag helps track usage.
+
+10. **Regular Gifts from Income**: Gifts made regularly from surplus income are IHT exempt. Must be from after-tax income, not capital. Pattern must be established and maintained. `isRegularGiftFromIncome` flag identifies these gifts.
+
+11. **Seven-Year Rule (PETs)**: Potentially Exempt Transfers become exempt after 7 years. If donor dies within 7 years, gift counts toward estate. Taper relief applies years 3-7: 80%, 60%, 40%, 20%.
+
+12. **Nil-Rate Band (2025/26)**: £325,000 per person, transferable to surviving spouse (up to £650,000). Residence Nil-Rate Band: additional £175,000 for main home passing to direct descendants.
+
+#### Text Field Limits
+
+13. **Field Length Limits**:
+    - `willDetails`: 2000 characters maximum
+    - `giftInLast7YearsDetails`: 2000 characters maximum
+    - `recentGiftDetails`: 1000 characters maximum
+    - `regularGiftDetails`: 1000 characters maximum
+    - `expectingInheritanceDetails`: 1000 characters maximum
+    - `gift.recipient`: 100 characters maximum
+    - `gift.relationship`: 50 characters maximum
+    - `gift.description`: 500 characters maximum
+
+### Error Examples
+
+**Future Gift Date Error**
+```json
+{
+  "error": {
+    "code": "INVALID_GIFT_DATE",
+    "message": "Gift date cannot be in the future",
+    "details": [
+      {
+        "field": "giftedOn",
+        "issue": "Date must be today or in the past",
+        "value": "2027-12-25"
+      }
+    ]
+  }
+}
+```
+
+**Negative Gift Value Error**
+```json
+{
+  "error": {
+    "code": "INVALID_GIFT_VALUE",
+    "message": "Gift value must be positive",
+    "details": [
+      {
+        "field": "value.amount",
+        "issue": "Amount must be greater than zero",
+        "value": "-1000.00"
+      }
+    ]
+  }
+}
+```
+
+**Text Field Too Long Error**
+```json
+{
+  "error": {
+    "code": "TEXT_TOO_LONG",
+    "message": "Field exceeds maximum length",
+    "details": [
+      {
+        "field": "willDetails",
+        "issue": "Maximum 2000 characters allowed",
+        "length": 2347
+      }
+    ]
+  }
+}
+```
+
+### UK IHT Exemptions Summary
+
+**Annual Exemption:**
+- £3,000 per person per tax year
+- Can carry forward unused exemption from previous year only
+- Can combine with other exemptions
+
+**Small Gifts:**
+- £250 per recipient per tax year
+- Cannot combine with annual exemption for same person
+- Unlimited number of recipients
+
+**Regular Gifts from Income:**
+- Must be from surplus income (not capital)
+- Must not reduce donor's standard of living
+- Must be regular and habitual pattern
+- Fully exempt from IHT
+
+**Gifts to Spouse:**
+- Unlimited exemption for gifts to UK-domiciled spouse
+- £325,000 total exemption for non-UK-domiciled spouse
+
+**Seven-Year Rule (PETs):**
+- Potentially Exempt Transfers become exempt after 7 years
+- If donor dies within 7 years, gift included in estate
+- Taper relief years 3-7: 80%, 60%, 40%, 20% of tax liability
+
+### Related APIs
+
+- [Client API](./Client-API-Design.md) - Client management
+- [FactFind API](./FactFind-API-Design.md) - Parent container
+- [Asset API](./Asset-API-Design.md) - Source of totalAssets calculation
+- [Beneficiary API](./Beneficiary-API-Design.md) - Beneficiary management for policies/pensions
+
+---
 ## 13. Identity Verification API
 
 ### 13.1 Overview
@@ -4319,75 +4319,88 @@ None (singleton resource)
 
 ### 14.1 Overview
 
-**Purpose:** The Credit History API manages comprehensive credit history records including credit scores, adverse credit events, payment history, and mortgage suitability assessments to support FCA-compliant affordability assessments.
+**Purpose:** The Credit History API manages client credit history including adverse credit events (CCJs, defaults, IVAs, bankruptcy, arrears, repossessions) with automatic flag calculation for mortgage and lending applications.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory`
 
 **Key Features:**
-- Credit score tracking from major CRAs (Experian, Equifax, TransUnion)
-- Adverse credit event management (CCJs, defaults, IVA, bankruptcy, arrears)
-- Payment history tracking (12-month and 6-year history)
-- Automated mortgage suitability assessment
-- Credit report request management
-- Credit utilization calculations
-- Credit health indicators
+- Singleton credit history per client with automatic adverse flags
+- Detailed adverse credit event tracking
+- Automatic calculation of hasAdverseCredit, hasCCJ, hasDefault, etc.
+- Event-level management (create, update, delete)
+- Link adverse events to liabilities
+- Support for satisfied/cleared dates and outstanding amounts
 
 ### 14.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history` | Get complete credit history | N/A | 200 OK - CreditHistory |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/score` | Record new credit score | CreditScoreRequest | 201 Created - CreditScore |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/status` | Get current credit status summary | N/A | 200 OK - CreditStatus |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/payment-events` | Record payment event | PaymentEventRequest | 201 Created - PaymentEvent |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/utilization` | Get credit utilization analysis | N/A | 200 OK - CreditUtilization |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/health-indicators` | Get credit health indicators | N/A | 200 OK - HealthIndicators |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/report-request` | Request credit report from CRA | ReportRequest | 202 Accepted - RequestStatus |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history` | Update credit history details | CreditHistoryUpdate | 200 OK - CreditHistory |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history/adverse-events` | Add adverse credit event | AdverseEventRequest | 201 Created - AdverseEvent |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory` | Get credit history singleton | N/A | 200 OK - CreditHistory |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory` | Update credit history | CreditHistoryUpdate | 200 OK - CreditHistory |
+| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory/events` | Create adverse credit event | AdverseCreditEventRequest | 201 Created - AdverseCreditEvent |
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Get adverse credit event | N/A | 200 OK - AdverseCreditEvent |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Update adverse credit event | AdverseCreditEventUpdate | 200 OK - AdverseCreditEvent |
+| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Delete adverse credit event | N/A | 204 No Content |
 
-**Total Operations:** 9 endpoints
+**Total Operations:** 6 endpoints
 
 ### 14.3 Resource Properties
 
+**CreditHistory (Singleton):**
+
+| Property | Type | Required | Description | Read-only |
+|----------|------|----------|-------------|-----------|
+| `id` | integer | Yes | Unique system identifier | Yes |
+| `href` | string | Yes | API link to this resource | Yes |
+| `client` | ClientReference | Yes | Client reference | Yes |
+| `factfind` | FactFindReference | Yes | FactFind reference | Yes |
+| `hasAdverseCredit` | boolean | Yes | Any adverse credit exists | Yes (calculated) |
+| `hasCCJ` | boolean | Yes | Has County Court Judgement | Yes (calculated) |
+| `hasBeenRefusedCredit` | boolean | Yes | Has been refused credit | Yes (calculated) |
+| `ivaHistory` | boolean | Yes | Has IVA history | Yes (calculated) |
+| `hasDefault` | boolean | Yes | Has default history | Yes (calculated) |
+| `hasBankruptcyHistory` | boolean | Yes | Has bankruptcy history | Yes (calculated) |
+| `hasArrears` | boolean | Yes | Has arrears history | Yes (calculated) |
+| `refusedMortgageOrCredit` | boolean | Yes | Client-declared credit refusal | No (editable) |
+| `details` | string | No | Additional details (max 2000 chars) | No (editable) |
+| `adverseCreditEvents` | array | Yes | Collection of adverse events | Yes (via events API) |
+| `createdAt` | datetime | Yes | Creation timestamp | Yes |
+| `updatedAt` | datetime | Yes | Last update timestamp | Yes |
+
+**AdverseCreditEvent (Collection Item):**
+
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| `id` | integer | Yes (response only) | Unique system identifier |
-| `href` | string | Yes (response only) | API link to this resource |
-| `client` | object | Yes (response only) | Client reference |
-| `factfind` | object | Yes (response only) | FactFind reference |
-| `creditScore` | object | No | Current credit score information |
-| `creditScore.score` | integer | Yes | Credit score value (provider-specific range) |
-| `creditScore.maxScore` | integer | Yes | Maximum possible score |
-| `creditScore.rating` | enum | Yes | Excellent, Good, Fair, Poor, Very Poor |
-| `creditScore.provider` | enum | Yes | Experian, Equifax, TransUnion |
-| `creditScore.checkedDate` | date | Yes | When score was obtained |
-| `hasAdverseCredit` | boolean | No | Whether client has adverse credit events |
-| `hasCCJ` | boolean | No | Has County Court Judgments |
-| `hasBeenRefusedCredit` | boolean | No | Has been refused credit |
-| `ivaHistory` | boolean | No | Has IVA history |
-| `hasDefault` | boolean | No | Has default records |
-| `hasBankruptcyHistory` | boolean | No | Has bankruptcy history |
-| `hasArrears` | boolean | No | Has payment arrears |
-| `adverseCreditEvents` | array | No | Detailed adverse credit event records |
-| `missedPayments` | object | No | Missed payment summary |
-| `missedPayments.last12Months` | integer | No | Count in last 12 months |
-| `missedPayments.last6Years` | integer | No | Count in last 6 years |
-| `mortgageSuitability` | object | No | Automated suitability assessment |
-| `mortgageSuitability.isEligible` | boolean | No (calculated) | Eligible for standard mortgages |
-| `mortgageSuitability.factors` | array | No | List of influencing factors |
-| `notes` | string | No | Additional context (max 2000 characters) |
-| `createdAt` | datetime | Yes (response only) | When record was created |
-| `updatedAt` | datetime | Yes (response only) | When record was last updated |
+| `id` | integer | Yes | Unique system identifier |
+| `href` | string | Yes | API link to this resource |
+| `type` | enum | Yes | CCJ, Default, Arrears, IVA, Bankruptcy, Repossession |
+| `registeredOn` | datetime | Yes | Date event registered |
+| `satisfiedOrClearedOn` | datetime | No | Date satisfied/cleared |
+| `reposessedOn` | datetime | No | Date repossessed (Repossession type) |
+| `dischargedOn` | datetime | No | Date discharged (IVA/Bankruptcy) |
+| `amountRegistered` | MoneyAmount | Yes | Original amount |
+| `amountOutstanding` | MoneyAmount | Yes | Current outstanding |
+| `isDebtOutstanding` | boolean | Yes | Is debt still outstanding |
+| `numberOfPaymentsMissed` | integer | No | Total payments missed |
+| `consecutivePaymentsMissed` | integer | No | Consecutive payments missed |
+| `numberOfPaymentsInArrears` | integer | No | Payments in arrears |
+| `isArrearsClearedUponCompletion` | boolean | No | Arrears cleared flag |
+| `yearsMaintained` | integer | No | Years maintained |
+| `lender` | string | No | Lender/creditor name |
+| `liability` | LiabilityReference | No | Link to liability |
+| `concurrencyId` | integer | Yes | For optimistic concurrency |
+| `createdAt` | datetime | Yes | Creation timestamp |
+| `lastUpdatedAt` | datetime | Yes | Last update timestamp |
 
-**Total Properties:** 27 properties (including nested)
+**Total Properties:** 32 properties (16 credit history + 16 adverse event)
 
 ### 14.4 Contract Schema
 
+**Credit History Response:**
 ```json
 {
   "id": 334,
-  "href": "/api/v2/factfinds/679/clients/8496/credit-history/334",
+  "href": "/api/v2/factfinds/679/clients/8496/credithistory",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -4397,142 +4410,58 @@ None (singleton resource)
     "id": 679,
     "factFindNumber": "FF-2025-00123"
   },
-  "creditScore": {
-    "score": 780,
-    "maxScore": 999,
-    "rating": "Excellent",
-    "provider": "Experian",
-    "checkedDate": "2026-01-15"
-  },
-  "hasAdverseCredit": false,
+  "hasAdverseCredit": true,
   "hasCCJ": false,
-  "hasBeenRefusedCredit": false,
+  "hasBeenRefusedCredit": true,
   "ivaHistory": false,
-  "hasDefault": false,
+  "hasDefault": true,
   "hasBankruptcyHistory": false,
   "hasArrears": false,
-  "adverseCreditEvents": [],
-  "missedPayments": {
-    "last12Months": 0,
-    "last6Years": 0
-  },
-  "mortgageSuitability": {
-    "isEligible": true,
-    "factors": [
-      "Good credit score (780)",
-      "No adverse credit",
-      "No missed payments",
-      "Clean payment history for 6+ years"
-    ]
-  },
-  "notes": "Excellent credit history - eligible for best mortgage rates",
+  "refusedMortgageOrCredit": true,
+  "details": "Credit card default in 2020, settled in full.",
+  "adverseCreditEvents": [
+    {
+      "id": 123,
+      "href": "/api/v2/factfinds/679/clients/8496/credithistory/events/123",
+      "type": "Default",
+      "registeredOn": "2020-06-15T00:00:00Z",
+      "satisfiedOrClearedOn": "2021-03-20T00:00:00Z",
+      "amountRegistered": {
+        "amount": 5000.00,
+        "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+      },
+      "amountOutstanding": {
+        "amount": 0.00,
+        "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+      },
+      "isDebtOutstanding": false,
+      "numberOfPaymentsMissed": 2,
+      "consecutivePaymentsMissed": 2,
+      "lender": "High Street Bank",
+      "concurrencyId": 1,
+      "createdAt": "2026-01-15T10:30:00Z",
+      "lastUpdatedAt": "2026-01-15T10:30:00Z"
+    }
+  ],
   "createdAt": "2026-01-15T10:00:00Z",
-  "updatedAt": "2026-01-15T10:00:00Z"
+  "updatedAt": "2026-01-15T10:30:00Z"
 }
 ```
 
 ### 14.5 Complete Examples
 
-#### Example 1: Record Credit Score
+#### Example 1: Update Credit History Singleton
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/credit-history/score
+PUT /api/v2/factfinds/679/clients/8496/credithistory
 Content-Type: application/json
 Authorization: Bearer {token}
 
 {
-  "score": 780,
-  "maxScore": 999,
-  "rating": "Excellent",
-  "provider": "Experian",
-  "checkedDate": "2026-01-15"
+  "refusedMortgageOrCredit": true,
+  "details": "Mortgage application refused by mainstream lender in 2021 due to credit history."
 }
-```
-
-**Response:**
-```http
-HTTP/1.1 201 Created
-Content-Type: application/json
-
-{
-  "id": 1,
-  "score": 780,
-  "maxScore": 999,
-  "rating": "Excellent",
-  "provider": "Experian",
-  "checkedDate": "2026-01-15",
-  "scorePercentile": 78,
-  "ratingDescription": "You have an excellent credit score and should qualify for the best rates and terms",
-  "createdAt": "2026-03-03T10:30:00Z"
-}
-```
-
-#### Example 2: Add Adverse Credit Event (Default)
-
-**Request:**
-```http
-POST /api/v2/factfinds/679/clients/8496/credit-history/adverse-events
-Content-Type: application/json
-Authorization: Bearer {token}
-
-{
-  "type": "Default",
-  "registeredOn": "2020-06-15T00:00:00Z",
-  "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
-  "amountRegistered": {
-    "amount": 5000.00,
-    "currency": {
-      "code": "GBP"
-    }
-  },
-  "amountOutstanding": {
-    "amount": 0.00,
-    "currency": {
-      "code": "GBP"
-    }
-  },
-  "isDebtOutstanding": false,
-  "lender": "High Street Bank",
-  "notes": "Credit card default from 2020, fully settled December 2023"
-}
-```
-
-**Response:**
-```http
-HTTP/1.1 201 Created
-Content-Type: application/json
-
-{
-  "id": 1,
-  "type": "Default",
-  "registeredOn": "2020-06-15T00:00:00Z",
-  "satisfiedOrClearedOn": "2023-12-20T00:00:00Z",
-  "amountRegistered": {
-    "amount": 5000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-  "amountOutstanding": {
-    "amount": 0.00,
-    "currency": { "code": "GBP", "symbol": "£" }
-  },
-  "isDebtOutstanding": false,
-  "lender": "High Street Bank",
-  "yearsOnFile": 3,
-  "yearsRemaining": 3,
-  "removalDate": "2026-06-15",
-  "impactLevel": "Moderate",
-  "impactNotes": "Default older than 3 years and satisfied - minimal impact on mortgage applications",
-  "createdAt": "2026-03-03T10:35:00Z"
-}
-```
-
-#### Example 3: Get Credit Health Indicators
-
-**Request:**
-```http
-GET /api/v2/factfinds/679/clients/8496/credit-history/health-indicators
-Authorization: Bearer {token}
 ```
 
 **Response:**
@@ -4541,153 +4470,136 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "overallHealth": "Excellent",
-  "healthScore": 92,
-  "indicators": {
-    "creditScore": {
-      "status": "Excellent",
-      "value": 780,
-      "maxValue": 999,
-      "percentile": 78,
-      "impact": "Positive"
-    },
-    "paymentHistory": {
-      "status": "Clean",
-      "missedPaymentsLast12Months": 0,
-      "missedPaymentsLast6Years": 0,
-      "impact": "Positive"
-    },
-    "adverseCredit": {
-      "status": "None",
-      "hasAdverseCredit": false,
-      "impact": "Positive"
-    },
-    "creditAge": {
-      "status": "Mature",
-      "oldestAccountYears": 15,
-      "averageAccountYears": 8,
-      "impact": "Positive"
-    },
-    "creditUtilization": {
-      "status": "Low",
-      "utilizationPercentage": 15,
-      "recommendedMaximum": 30,
-      "impact": "Positive"
-    },
-    "recentApplications": {
-      "status": "Stable",
-      "last6Months": 0,
-      "last12Months": 1,
-      "impact": "Neutral"
-    }
-  },
-  "recommendations": [
-    "Continue maintaining excellent payment history",
-    "Keep credit utilization below 30%",
-    "Avoid multiple credit applications in short period"
-  ],
-  "calculatedOn": "2026-03-03T10:30:00Z"
+  "id": 334,
+  "href": "/api/v2/factfinds/679/clients/8496/credithistory",
+  "client": {"id": 8496, "clientNumber": "C00001234", "name": "John Smith"},
+  "factfind": {"id": 679, "factFindNumber": "FF-2025-00123"},
+  "hasAdverseCredit": true,
+  "hasCCJ": false,
+  "hasBeenRefusedCredit": true,
+  "refusedMortgageOrCredit": true,
+  "details": "Mortgage application refused by mainstream lender in 2021 due to credit history.",
+  "adverseCreditEvents": []
+}
+```
+
+#### Example 2: Create Adverse Credit Event (CCJ)
+
+**Request:**
+```http
+POST /api/v2/factfinds/679/clients/8496/credithistory/events
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "type": "CCJ",
+  "registeredOn": "2019-03-15T00:00:00Z",
+  "satisfiedOrClearedOn": "2019-06-20T00:00:00Z",
+  "amountRegistered": {"amount": 2500.00, "currency": {"code": "GBP"}},
+  "amountOutstanding": {"amount": 0.00, "currency": {"code": "GBP"}},
+  "isDebtOutstanding": false,
+  "lender": "County Court"
+}
+```
+
+**Response:**
+```http
+HTTP/1.1 201 Created
+Location: /api/v2/factfinds/679/clients/8496/credithistory/events/123
+Content-Type: application/json
+
+{
+  "id": 123,
+  "href": "/api/v2/factfinds/679/clients/8496/credithistory/events/123",
+  "type": "CCJ",
+  "registeredOn": "2019-03-15T00:00:00Z",
+  "satisfiedOrClearedOn": "2019-06-20T00:00:00Z",
+  "amountRegistered": {"amount": 2500.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+  "amountOutstanding": {"amount": 0.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+  "isDebtOutstanding": false,
+  "lender": "County Court",
+  "concurrencyId": 1,
+  "createdAt": "2026-03-05T10:30:00Z",
+  "lastUpdatedAt": "2026-03-05T10:30:00Z"
 }
 ```
 
 ### 14.6 Business Rules
 
-1. **Credit Score Ranges:**
-   - Experian: 0-999 (Excellent: 961-999, Good: 881-960, Fair: 721-880, Poor: 561-720, Very Poor: 0-560)
-   - Equifax: 0-700 (Excellent: 466-700, Good: 420-465, Fair: 380-419, Poor: 280-379, Very Poor: 0-279)
-   - TransUnion: 0-710 (Excellent: 628-710, Good: 604-627, Fair: 566-603, Poor: 551-565, Very Poor: 0-550)
+**Validation Rules:**
+1. Credit history is a singleton - only one per client
+2. Read-only flags (hasAdverseCredit, hasCCJ, etc.) are automatically calculated from events
+3. Event type must be: CCJ, Default, Arrears, IVA, Bankruptcy, or Repossession
+4. `registeredOn` is required and must be in the past
+5. `amountRegistered` must be positive
+6. `amountOutstanding` must be ≥ 0 and ≤ `amountRegistered`
+7. If `isDebtOutstanding` = false, `amountOutstanding` should be 0
 
-2. **Adverse Credit Retention:** All adverse credit events remain on file for 6 years from registration date
+**Automatic Flag Calculation:**
+- `hasAdverseCredit` = true if any adverse events exist
+- `hasCCJ` = true if any CCJ events exist
+- `hasDefault` = true if any Default events exist
+- `ivaHistory` = true if any IVA events exist
+- `hasBankruptcyHistory` = true if any Bankruptcy events exist
+- `hasArrears` = true if any Arrears events exist
+- `hasBeenRefusedCredit` = true if refusedMortgageOrCredit is true OR any adverse events exist
 
-3. **Mortgage Suitability Calculation:**
-   - Credit score 650+: Generally eligible for standard mortgages
-   - No adverse credit in last 3 years: Preferred
-   - No missed payments in last 12 months: Required for best rates
-   - Outstanding adverse debt: May need settlement before mortgage
-
-4. **CCJ Impact Rules:**
-   - CCJs over £500 within 3 years: Typically excludes standard mortgages
-   - Satisfied CCJs: Better than unsatisfied but still visible
-   - Multiple CCJs: Significantly reduced lender options
-
-5. **Default Rules:**
-   - Registration date cannot be in future
-   - Satisfied date must be after registration date
-   - Outstanding amount cannot exceed registered amount
-   - If not outstanding, amount outstanding must be £0
-
-6. **Payment History Tracking:**
-   - Last 12 months: Critical for current creditworthiness
-   - Last 6 years: Full FCA affordability assessment requirement
-
-7. **Bankruptcy/IVA Rules:**
-   - Typically discharged after 12 months (bankruptcy)
-   - IVA typically 5-6 years duration
-   - Must record discharge/completion dates
+**Credit File Retention:**
+- CCJs: 6 years from registration date
+- Defaults: 6 years from default date
+- IVAs: 6 years from approval date
+- Bankruptcy: 6 years from discharge date
+- Repossessions: 6 years
 
 ### 14.7 Query Parameters
 
-| Parameter | Type | Description | Example |
-|-----------|------|-------------|---------|
-| `provider` | enum | Filter by credit score provider | `provider=Experian` |
-| `includeHistory` | boolean | Include historical scores | `includeHistory=true` |
-| `adverseOnly` | boolean | Return only adverse events | `adverseOnly=true` |
-| `from` | date | Filter events from date | `from=2020-01-01` |
-| `to` | date | Filter events to date | `to=2026-12-31` |
+No query parameters for singleton resource. Events are embedded in the parent response.
 
 ### 14.8 HTTP Status Codes
 
-| Status Code | Description | When Used |
-|-------------|-------------|-----------|
-| 200 OK | Success | GET, PUT successful |
-| 201 Created | Resource created | POST successful |
-| 202 Accepted | Request accepted | Credit report request queued |
-| 400 Bad Request | Invalid syntax | Invalid score range |
-| 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
-| 404 Not Found | Resource not found | Invalid client ID |
-| 422 Unprocessable Entity | Validation failed | Business rule violation |
+**Success Codes:**
+- `200 OK` - Successful GET or PUT
+- `201 Created` - Successful POST (event creation)
+- `204 No Content` - Successful DELETE
+- `404 Not Found` - Credit history not yet created (use PUT to create)
+
+**Client Error Codes:**
+- `400 Bad Request` - Invalid request body or validation errors
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind, client, or event not found
+- `409 Conflict` - Concurrency conflict
+- `422 Unprocessable Entity` - Business rule violations (e.g., trying to set read-only flags)
+
+**Server Error Codes:**
+- `500 Internal Server Error` - Unexpected server error
+- `503 Service Unavailable` - Service temporarily unavailable
 
 ### 14.9 Regulatory Compliance
 
-**FCA MCOB (Mortgage Conduct of Business):**
-- Creditworthiness assessment required before lending
-- Credit Reference Agency checks mandatory
-- Adverse credit must be considered in affordability
-- Pattern of payments indicates future reliability
-
 **MLR 2017 (Money Laundering Regulations):**
-- Credit checks support identity verification
-- Helps establish financial profile
-- Part of customer due diligence
+- Credit checks required for client due diligence
+- Enhanced due diligence for adverse credit clients
+- Document source of funds for large transactions
 
-**Consumer Credit Act 1974:**
-- Right to view credit file
-- Right to correct errors
-- Right to explanation of credit decisions
+**FCA Conduct of Business:**
+- Fair treatment of customers
+- Suitability assessments must consider creditworthiness
+- Clear disclosure of credit status to lenders
 
-**GDPR:**
-- Credit data is personal data
-- Lawful basis required for processing
-- Data minimization applies
-- Retention limited to regulatory requirements
-
-**Integration with Credit Reference Agencies:**
-- **Experian:** Via Experian Connect API
-- **Equifax:** Via Equifax API Gateway
-- **TransUnion:** Via TransUnion Credit Vision API
-- Soft credit checks for fact-finding (no impact on score)
-- Hard credit checks for applications (temporary score impact)
+**Mortgage Conduct of Business (MCOB):**
+- Credit history essential for mortgage affordability
+- Adverse credit impacts lending criteria
+- Disclosure requirements to mortgage lenders
 
 ### 14.10 Related APIs
 
-- [Client Management API](#5-client-management-api) - Parent resource
-- [Affordability API](#21-affordability-api) - Uses credit history for assessment
-- [Mortgage API](#29-mortgage-api) - Credit history informs mortgage suitability
-- [Financial Profile API](#15-financial-profile-api) - Includes credit sophistication
+- [Client Management API](#5-client-management-api) - Client information
+- [Liability API](#25-liability-api) - Liabilities linked to adverse events
+- [Affordability API](#23-affordability-api) - Credit history impacts affordability
+- [Mortgage API](#33-mortgage-api) - Credit history critical for mortgage applications
 
 ---
-
 ## 15. Financial Profile API
 
 ### 15.1 Overview
@@ -6365,9 +6277,197 @@ Content-Type: application/json
 
 ---
 
-## 20. Income API
+## 20. Employment Summary API
 
 ### 20.1 Overview
+
+**Purpose:** The Employment Summary API manages aggregated employment and income information for each client, providing a singleton resource that summarizes total income and tax position.
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/summary`
+
+**Key Features:**
+- Automatic calculation of total gross annual income from all sources
+- Tax rate tracking for client's highest marginal tax rate
+- Singleton resource (one per client)
+- Support for mortgage affordability and tax planning
+- Read-only income calculation with manual tax rate setting
+
+### 20.2 Operations
+
+| Method | Endpoint | Description | Request Body | Success Response |
+|--------|----------|-------------|--------------|------------------|
+| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/summary` | Get employment summary | N/A | 200 OK - EmploymentSummary |
+| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/summary` | Update employment summary | EmploymentSummaryRequest | 200 OK - EmploymentSummary |
+
+**Total Operations:** 2 endpoints
+
+### 20.3 Resource Properties
+
+| Property | Type | Required | Description | Read-only |
+|----------|------|----------|-------------|-----------|
+| `factfind` | FactFindReference | Yes | Parent fact find reference | Yes |
+| `client` | ClientReference | Yes | Client reference | Yes |
+| `totalGrossAnnualIncome` | MoneyAmount | Yes | Total annual income from all sources | Yes |
+| `highestTaxRatePaid` | TaxRate | Yes | Client's highest marginal tax rate | No |
+
+**Total Properties:** 4 core properties
+
+### 21.4 Contract Schema
+
+```json
+{
+  "factfind": {
+    "id": 679,
+    "href": "/api/v2/factfinds/679"
+  },
+  "client": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Jack Marias"
+  },
+  "totalGrossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {
+      "code": "GBP",
+      "display": "British Pound",
+      "symbol": "£"
+    }
+  },
+  "highestTaxRatePaid": {
+    "percentage": 40
+  }
+}
+```
+
+### 21.5 Complete Examples
+
+#### Example 1: Get Employment Summary
+
+**Request:**
+```http
+GET /api/v2/factfinds/679/clients/8496/employments/summary
+Authorization: Bearer {token}
+```
+
+**Response:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "client": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Jack Marias"
+  },
+  "totalGrossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+  },
+  "highestTaxRatePaid": {"percentage": 40},
+  "_links": {
+    "self": {
+      "href": "/api/v2/factfinds/679/clients/8496/employments/summary"
+    },
+    "employments": {
+      "href": "/api/v2/factfinds/679/clients/8496/employment"
+    },
+    "income": {
+      "href": "/api/v2/factfinds/679/clients/8496/income"
+    }
+  }
+}
+```
+
+#### Example 2: Update Tax Rate
+
+**Request:**
+```http
+PUT /api/v2/factfinds/679/clients/8496/employments/summary
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "highestTaxRatePaid": {
+    "percentage": 40
+  }
+}
+```
+
+**Response:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "client": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Jack Marias"
+  },
+  "totalGrossAnnualIncome": {
+    "amount": 75000.00,
+    "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+  },
+  "highestTaxRatePaid": {"percentage": 40}
+}
+```
+
+### 21.6 Business Rules
+
+**Validation Rules:**
+1. Singleton resource - only one employment summary per client
+2. `highestTaxRatePaid.percentage` must be one of: 0, 10, 19, 20, 21, 22, 40, 41, 42, 45, 46, 47, 48
+3. `totalGrossAnnualIncome` is read-only and cannot be set manually
+4. Client must exist in the specified fact find
+
+**Calculation Logic:**
+- `totalGrossAnnualIncome` is automatically calculated from all income sources
+- Includes employment, self-employment, rental, investment, pension, and other income
+- Annualized based on income frequency
+- Updated automatically when income records change
+
+**Tax Rates:**
+- **0%** - No taxable income or within personal allowance
+- **19-22%** - Basic/starter rates (UK & Scottish variations)
+- **40-42%** - Higher rates (UK & Scottish variations)
+- **45-48%** - Additional/top rates (UK & Scottish variations)
+
+### 21.7 Query Parameters
+
+No query parameters supported (singleton resource).
+
+### 21.8 HTTP Status Codes
+
+**Success Codes:**
+- `200 OK` - Successful GET or PUT
+- `404 Not Found` - Employment summary not yet created (use PUT to create)
+
+**Client Error Codes:**
+- `400 Bad Request` - Invalid request body or tax rate
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - FactFind or client not found
+- `422 Unprocessable Entity` - Attempt to set read-only field
+
+**Server Error Codes:**
+- `500 Internal Server Error` - Unexpected server error
+- `503 Service Unavailable` - Service temporarily unavailable
+
+### 20.9 Related APIs
+
+- [Client Management API](#5-client-management-api) - Client information
+- [Employment API](#19-employment-api) - Detailed employment records
+- [Income API](#21-income-api) - Income sources feeding the calculation
+- [Affordability API](#23-affordability-api) - Uses summary for calculations
+
+---
+
+## 21. Income API
+
+### 21.1 Overview
 
 **Purpose:** The Income API manages all income sources for clients including salary, dividends, rental income, pension income, and state benefits with frequency, tax treatment, and gross/net calculations.
 
@@ -6382,7 +6482,7 @@ Content-Type: application/json
 - Income period tracking (start/end dates)
 - Link to employment or assets generating income
 
-### 20.2 Operations
+### 21.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -6394,7 +6494,7 @@ Content-Type: application/json
 
 **Total Operations:** 5 endpoints
 
-### 20.3 Resource Properties
+### 21.3 Resource Properties
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
@@ -6427,7 +6527,7 @@ Content-Type: application/json
 
 **Total Properties:** 24 properties (including nested)
 
-### 20.4 Contract Schema
+### 21.4 Contract Schema
 
 ```json
 {
@@ -6503,7 +6603,7 @@ Content-Type: application/json
 }
 ```
 
-### 20.5 Complete Examples
+### 21.5 Complete Examples
 
 #### Example 1: Add Employment Income
 
@@ -6664,7 +6764,7 @@ Content-Type: application/json
 }
 ```
 
-### 20.6 Business Rules
+### 21.6 Business Rules
 
 1. **Gross Amount Required:** All income must have `grossAmount`
 2. **Net Calculation:** If tax deducted provided, system can calculate net amount
@@ -6688,7 +6788,7 @@ Content-Type: application/json
    - Benefits: Some taxable, some not
 7. **Asset Link:** Rental and dividend income should link to generating asset
 
-### 20.7 Query Parameters
+### 21.7 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -6697,7 +6797,7 @@ Content-Type: application/json
 | `isOngoing` | boolean | Filter ongoing income | `isOngoing=true` |
 | `isPrimary` | boolean | Filter primary income | `isPrimary=true` |
 
-### 20.8 HTTP Status Codes
+### 21.8 HTTP Status Codes
 
 | Status Code | Description | When Used |
 |-------------|-------------|-----------|
@@ -6710,7 +6810,7 @@ Content-Type: application/json
 | 404 Not Found | Resource not found | Invalid income ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
-### 20.9 Regulatory Compliance
+### 21.9 Regulatory Compliance
 
 **FCA MCOB (Mortgage Affordability):**
 - All income sources must be verified
@@ -6724,7 +6824,7 @@ Content-Type: application/json
 - Rental: Property allowance £1,000 or expenses
 - Dividends: £500 allowance (2024/25)
 
-### 20.10 Related APIs
+### 21.10 Related APIs
 
 - [Client Management API](#5-client-management-api) - Parent resource
 - [Employment API](#18-employment-api) - Employment income link
@@ -6733,7 +6833,7 @@ Content-Type: application/json
 
 ---
 
-## 21. Expenditure API
+## 22. Expenditure API
 
 ### 21.1 Overview
 
@@ -7028,7 +7128,7 @@ Content-Type: application/json
 
 ---
 
-## 22. Affordability API
+## 23. Affordability API
 
 ### 22.1 Overview
 
@@ -7374,7 +7474,7 @@ Content-Type: application/json
 - [Mortgage API](#29-mortgage-api) - Mortgage applications
 
 ---
-## 23. Asset API
+## 24. Asset API
 
 ### 23.1 Overview
 
@@ -7780,7 +7880,7 @@ Content-Type: application/json
 
 ---
 
-## 24. Liability API
+## 25. Liability API
 
 ### 24.1 Overview
 
@@ -8302,7 +8402,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 
 ---
 
-## 25. Net Worth API
+## 26. Net Worth API
 
 ### 24.1 Overview
 
@@ -8784,7 +8884,7 @@ Content-Type: application/json
 **End of Sections 14-23**
 
 ---
-## 26. Investment API
+## 27. Investment API
 
 ### 26.1 Overview
 
@@ -9125,7 +9225,7 @@ See contract schema above for comprehensive investment example.
 
 ---
 
-## 27. Final Salary Pension API
+## 28. Final Salary Pension API
 
 ### 27.1 Overview
 
@@ -9344,7 +9444,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 28. Annuity API
+## 29. Annuity API
 
 ### 28.1 Overview
 
@@ -9522,7 +9622,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 29. Personal Pension API
+## 30. Personal Pension API
 
 ### 29.1 Overview
 
@@ -9755,7 +9855,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - [Annuity API](#26-annuity-API) - Annuity purchase option
 
 ---
-## 30. State Pension API
+## 31. State Pension API
 
 ### 30.1 Overview
 
@@ -9891,9 +9991,218 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 31. Mortgage API
+## 32. Employer Pension Scheme API
 
 ### 31.1 Overview
+
+**Purpose:** The Employer Pension Scheme API manages employer-sponsored pension schemes from current or previous employment, including workplace pensions, occupational schemes, and auto-enrolment pensions.
+
+**Base Path:** `/api/v2/factfinds/{factfindId}/pensions/employerschemes`
+
+**Key Features:**
+- Current and deferred employer schemes
+- Problem scheme flagging for lost or untraceable pensions
+- Integration with employment history
+- Scheme join date tracking
+- Support for consolidation analysis
+
+### 31.2 Operations
+
+| Method | Endpoint | Description | Request Body | Success Response |
+|--------|----------|-------------|--------------|------------------|
+| GET | `/api/v2/factfinds/{factfindId}/pensions/employerschemes` | List all employer pension schemes | N/A | 200 OK - EmployerPensionScheme[] |
+| POST | `/api/v2/factfinds/{factfindId}/pensions/employerschemes` | Create employer pension scheme | EmployerPensionSchemeRequest | 201 Created - EmployerPensionScheme |
+| GET | `/api/v2/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Get scheme by ID | N/A | 200 OK - EmployerPensionScheme |
+| PATCH | `/api/v2/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Update scheme | EmployerPensionSchemePatch | 200 OK - EmployerPensionScheme |
+| DELETE | `/api/v2/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Delete scheme | N/A | 204 No Content |
+
+**Total Operations:** 5 endpoints
+
+### 31.3 Resource Properties
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `id` | integer | Yes (response only) | Unique system identifier |
+| `href` | string | Yes (response only) | API link to this resource |
+| `owner` | ClientReference | Yes | Client who owns this scheme |
+| `isCurrentMember` | boolean | Yes | Whether client is currently contributing |
+| `isProblemMember` | boolean | Yes | Whether there are issues with this scheme |
+| `schemeJoinedOn` | date | No | Date client joined the scheme |
+| `details` | string | No | Additional details about the scheme |
+
+**Total Properties:** 7 core properties
+
+### 31.4 Contract Schema
+
+```json
+{
+  "id": 1234,
+  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "owner": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Jack Marias"
+  },
+  "isCurrentMember": true,
+  "isProblemMember": false,
+  "schemeJoinedOn": "2015-06-01",
+  "details": "Acme Corp Group Personal Pension - auto-enrolment scheme"
+}
+```
+
+### 31.5 Complete Examples
+
+#### Example 1: Create Active Employer Scheme
+
+**Request:**
+```http
+POST /api/v2/factfinds/679/pensions/employerschemes
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "owner": {
+    "id": 8496
+  },
+  "isCurrentMember": true,
+  "isProblemMember": false,
+  "schemeJoinedOn": "2020-03-01",
+  "details": "TechCorp Ltd Group Personal Pension - Scottish Widows. Employee contributes 5%, employer contributes 3%."
+}
+```
+
+**Response:**
+```http
+HTTP/1.1 201 Created
+Content-Type: application/json
+Location: /api/v2/factfinds/679/pensions/employerschemes/1234
+
+{
+  "id": 1234,
+  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "owner": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Jack Marias"
+  },
+  "isCurrentMember": true,
+  "isProblemMember": false,
+  "schemeJoinedOn": "2020-03-01",
+  "details": "TechCorp Ltd Group Personal Pension - Scottish Widows. Employee contributes 5%, employer contributes 3%.",
+  "_links": {
+    "self": {
+      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+    },
+    "factfind": {
+      "href": "/api/v2/factfinds/679"
+    },
+    "owner": {
+      "href": "/api/v2/factfinds/679/clients/8496"
+    }
+  }
+}
+```
+
+#### Example 2: Flag Problem Scheme
+
+**Request:**
+```http
+PATCH /api/v2/factfinds/679/pensions/employerschemes/1235
+Content-Type: application/json
+Authorization: Bearer {token}
+
+{
+  "isProblemMember": true,
+  "details": "Previous employer scheme - unable to locate policy documents. Pension Tracing Service search initiated."
+}
+```
+
+**Response:**
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "id": 1235,
+  "href": "/api/v2/factfinds/679/pensions/employerschemes/1235",
+  "owner": {
+    "id": 8496,
+    "href": "/api/v2/factfinds/679/clients/8496",
+    "name": "Jack Marias"
+  },
+  "isCurrentMember": false,
+  "isProblemMember": true,
+  "schemeJoinedOn": "2008-03-15",
+  "details": "Previous employer scheme - unable to locate policy documents. Pension Tracing Service search initiated."
+}
+```
+
+### 31.6 Business Rules
+
+**Validation Rules:**
+1. Owner must reference a valid client within the same fact find
+2. `isCurrentMember` and `isProblemMember` must be explicitly set to true or false
+3. `schemeJoinedOn` must be a valid date in the past or present (not future)
+4. `details` field has a maximum length of 2000 characters
+5. When `isProblemMember` is true, `details` should explain the issue
+
+**Business Logic:**
+- `isCurrentMember = true` indicates active contributions are ongoing
+- `isCurrentMember = false` indicates deferred/paid-up scheme
+- `isProblemMember = true` flags schemes requiring investigation (lost pensions, disputes, incomplete information)
+
+**Compliance:**
+- Problem schemes may require Pension Tracing Service search
+- Consider transfer value analysis for deferred schemes
+- Auto-enrolment regulations apply to current employer schemes
+
+### 31.7 Query Parameters
+
+**Filtering:**
+- `ownerId` - Filter by owner client ID
+- `isCurrentMember` - Filter by current member status
+- `isProblemMember` - Filter by problem flag
+
+**Pagination:**
+- `page` - Page number (1-indexed, default: 1)
+- `pageSize` - Items per page (default: 25, max: 100)
+
+**Sorting:**
+- `sortBy` - Sort field (default: schemeJoinedOn)
+- `sortOrder` - Sort direction: asc or desc (default: desc)
+
+### 31.8 HTTP Status Codes
+
+**Success Codes:**
+- `200 OK` - Successful GET or PATCH
+- `201 Created` - Successful POST with Location header
+- `204 No Content` - Successful DELETE
+
+**Client Error Codes:**
+- `400 Bad Request` - Invalid request body or parameters
+- `401 Unauthorized` - Missing or invalid authentication
+- `403 Forbidden` - Insufficient permissions
+- `404 Not Found` - Resource not found
+- `409 Conflict` - Version conflict (optimistic concurrency)
+- `422 Unprocessable Entity` - Business rule violations
+
+**Server Error Codes:**
+- `500 Internal Server Error` - Unexpected server error
+- `503 Service Unavailable` - Service temporarily unavailable
+
+### 31.9 Related APIs
+
+- [Client Management API](#5-client-management-api) - Scheme owner
+- [Employment API](#19-employment-api) - Employment history generating schemes
+- [Personal Pension API](#29-personal-pension-api) - Personal pensions (non-employer)
+- [Final Salary Pension API](#27-final-salary-pension-api) - Defined benefit employer schemes
+- [Control Options API](#411-control-questions-api) - Controls pension section display
+
+---
+
+## 33. Mortgage API
+
+### 32.1 Overview
 
 **Purpose:** The Mortgage API manages comprehensive mortgage arrangements including residential mortgages, buy-to-let, lifetime mortgages, and second charge mortgages with automatic LTV calculations, early repayment charges, and special features tracking.
 
@@ -10078,9 +10387,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 32. Personal Protection API
+## 34. Personal Protection API
 
-### 32.1 Overview
+### 33.1 Overview
 
 **Purpose:** The Personal Protection API manages life assurance, critical illness, income protection, and expense cover policies with multi-cover support, premium structures, trust arrangements, and commission tracking.
 
@@ -10096,7 +10405,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Trust arrangements for IHT planning
 - Indexation (RPI, fixed percentage)
 
-### 32.2 Operations
+### 36.2 Operations
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
@@ -10106,9 +10415,9 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 | PATCH | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Update protection | PersonalProtectionPatch | 200 OK - PersonalProtection |
 | DELETE | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Delete protection | N/A | 204 No Content |
 
-### 32.3 Resource Properties (38 core properties - see Contract Schema)
+### 36.3 Resource Properties (38 core properties - see Contract Schema)
 
-### 32.4 Contract Schema
+### 36.4 Contract Schema
 
 ```json
 {
@@ -10192,7 +10501,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 }
 ```
 
-### 32.5 Business Rules
+### 36.5 Business Rules
 
 1. **Life Cover:** Pays lump sum on death
 2. **Critical Illness:** Pays on diagnosis of specified conditions (cancer, heart attack, stroke, etc.)
@@ -10208,7 +10517,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 6. **Indexation:** Annual benefit increase (RPI, CPI, fixed %)
 7. **Underwriting:** Medical underwriting, premium loadings for health conditions
 
-### 32.6 Query Parameters
+### 35.6 Query Parameters
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -10216,11 +10525,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 | `inTrust` | boolean | Filter trust policies | `inTrust=true` |
 | `provider` | string | Filter by provider | `provider=L&G` |
 
-### 32.7 HTTP Status Codes
+### 35.7 HTTP Status Codes
 
 Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
-### 32.8 Regulatory Compliance
+### 33.8 Regulatory Compliance
 
 **FCA ICOBS (Insurance Conduct of Business):**
 - Demands and needs statement required
@@ -10231,7 +10540,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Commission disclosure requirements
 - Product sales reporting
 
-### 32.9 Related APIs
+### 33.9 Related APIs
 
 - [Client Management API](#5-client-management-api) - Policy owners
 - [Mortgage API](#29-mortgage-api) - Linked life cover
@@ -10239,9 +10548,346 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 ---
 
-## 33. Objectives API
+## 35. Protection Review API
 
-### 33.1 Overview
+### Overview
+
+The Protection Review API manages protection needs analysis and review information within the FactFind system. It captures whether clients have adequate protection coverage across three key areas: Life & Critical Illness, Income Protection, and Buildings & Contents insurance. The API uses a singleton pattern with section-based updates.
+
+**Key Features:**
+- Singleton protection review per FactFind
+- Three protection areas: Life & Critical Illness, Income Protection, Buildings & Content
+- Section-based updates via separate PUT endpoints
+- Summary endpoint returns all sections
+- Impact assessment and action planning
+- Compliance documentation for FCA suitability
+
+**Resource Model:**
+- ProtectionReviewSummary (singleton per FactFind) - Contains all three protection review sections
+- LifeAndCriticalIllness - Death and critical illness coverage review
+- IncomeProtection - Income replacement coverage review
+- BuildingsAndContent - Property insurance review
+
+### Base URL Pattern
+
+```
+/api/v2/factfinds/{factfindId}/protections/reviews
+```
+
+### Operations
+
+#### Get Protection Review Summary
+
+**Get Protection Review Summary**
+```
+GET /api/v2/factfinds/{id}/protections/reviews/summary
+```
+Retrieves the complete protection review summary including all three sections.
+
+**Response:** 200 OK
+```json
+{
+  "href": "/v2/factfinds/679/protections/reviews/summary",
+  "lifeAndCriticalIllness": {
+    "hasCoverForMortgageOrDebt": "Yes",
+    "hasCoverforDependantsDueToCritcalIllness": "No",
+    "hasCoverforDependantsUponDeath": "Yes",
+    "hasReviewedCostofProtectionChange": "Yes",
+    "impactOnYou": "If critically ill, mortgage payments would be difficult without cover. May need to sell property.",
+    "impactOnDepandants": "Children would need financial support. Spouse would need to return to work immediately.",
+    "actionsToAddressImpacts": "Obtain critical illness quote for £250,000. Review existing life cover adequacy. Consider family income benefit.",
+    "reasonforNotReviewing": ""
+  },
+  "incomeProtection": {
+    "hasCoverDueToAccidentOrIllness": false,
+    "hasCoverDueToUnemployment": false,
+    "impactOnYou": "No income for 6 months would deplete emergency fund. Would need to use credit cards.",
+    "impactOnDepandants": "Family would need to reduce living standards significantly. May need to move house.",
+    "actionsToAddressImpacts": "Get income protection quote. Consider 3-month deferred period to reduce premium. Review emergency fund target.",
+    "reasonforNotReviewing": ""
+  },
+  "buildingsAndContent": {
+    "hasExistingBuildingInsurance": true,
+    "hasExistingContentInsurance": true,
+    "buyToLetProperties": {
+      "haveBuildingContentInsurance": true
+    },
+    "hasSufficientCover": true,
+    "actionsToAddressImpacts": "",
+    "whenDoyouWantToReviewProtection": "Annual review at renewal in September",
+    "reasonforNotReviewing": ""
+  }
+}
+```
+
+**Error Responses:**
+- `404 Not Found`: Protection review doesn't exist
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+#### Update Life & Critical Illness Review
+
+**Update Life & Critical Illness**
+```
+PUT /api/v2/factfinds/{id}/protections/reviews/lifeAndCriticalIllness
+```
+Creates or updates the Life & Critical Illness section of the protection review.
+
+**Request Body:**
+```json
+{
+  "hasCoverForMortgageOrDebt": "Yes",
+  "hasCoverforDependantsDueToCritcalIllness": "No",
+  "hasCoverforDependantsUponDeath": "Yes",
+  "hasReviewedCostofProtectionChange": "Yes",
+  "impactOnYou": "If critically ill, mortgage payments would be difficult without cover. May need to sell property.",
+  "impactOnDepandants": "Children would need financial support. Spouse would need to return to work immediately.",
+  "actionsToAddressImpacts": "Obtain critical illness quote for £250,000. Review existing life cover adequacy. Consider family income benefit.",
+  "reasonforNotReviewing": ""
+}
+```
+
+**Response:** 200 OK (update) or 201 Created (first time)
+Returns the updated LifeAndCriticalIllness object.
+
+**Error Responses:**
+- `400 Bad Request`: Invalid data (invalid enum value, text too long)
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+#### Update Income Protection Review
+
+**Update Income Protection**
+```
+PUT /api/v2/factfinds/{id}/protections/reviews/incomeProtection
+```
+Creates or updates the Income Protection section of the protection review.
+
+**Request Body:**
+```json
+{
+  "hasCoverDueToAccidentOrIllness": false,
+  "hasCoverDueToUnemployment": false,
+  "impactOnYou": "No income for 6 months would deplete emergency fund. Would need to use credit cards.",
+  "impactOnDepandants": "Family would need to reduce living standards significantly. May need to move house.",
+  "actionsToAddressImpacts": "Get income protection quote. Consider 3-month deferred period to reduce premium. Review emergency fund target.",
+  "reasonforNotReviewing": ""
+}
+```
+
+**Response:** 200 OK (update) or 201 Created (first time)
+Returns the updated IncomeProtection object.
+
+**Error Responses:**
+- `400 Bad Request`: Invalid data (text too long)
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+#### Update Buildings & Content Review
+
+**Update Buildings & Content**
+```
+PUT /api/v2/factfinds/{id}/protections/reviews/buildingsAndContent
+```
+Creates or updates the Buildings & Content section of the protection review.
+
+**Request Body:**
+```json
+{
+  "hasExistingBuildingInsurance": true,
+  "hasExistingContentInsurance": true,
+  "buyToLetProperties": {
+    "haveBuildingContentInsurance": true
+  },
+  "hasSufficientCover": true,
+  "actionsToAddressImpacts": "",
+  "whenDoyouWantToReviewProtection": "Annual review at renewal in September",
+  "reasonforNotReviewing": ""
+}
+```
+
+**Response:** 200 OK (update) or 201 Created (first time)
+Returns the updated BuildingsAndContent object.
+
+**Error Responses:**
+- `400 Bad Request`: Invalid data (text too long)
+- `401 Unauthorized`: Authentication required
+- `403 Forbidden`: Insufficient permissions
+
+---
+
+### Properties
+
+#### ProtectionReviewSummary Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| href | string | Yes | Yes | API resource link |
+| lifeAndCriticalIllness | LifeAndCriticalIllness | No | No | Life & critical illness review section |
+| incomeProtection | IncomeProtection | No | No | Income protection review section |
+| buildingsAndContent | BuildingsAndContent | No | No | Buildings & content review section |
+
+#### LifeAndCriticalIllness Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasCoverForMortgageOrDebt | enum | No | No | Has life cover for mortgage/debt (Yes, No, NotApplicable) |
+| hasCoverforDependantsDueToCritcalIllness | enum | No | No | Has critical illness cover for dependants (Yes, No) |
+| hasCoverforDependantsUponDeath | enum | No | No | Has life cover for dependants (Yes, No, NotApplicable) |
+| hasReviewedCostofProtectionChange | enum | No | No | Has reviewed cost of protection change (Yes, No) |
+| impactOnYou | string | No | No | Financial impact on client (max 2000 chars) |
+| impactOnDepandants | string | No | No | Financial impact on dependants (max 2000 chars) |
+| actionsToAddressImpacts | string | No | No | Planned actions to address gaps (max 2000 chars) |
+| reasonforNotReviewing | string | No | No | Reason for not reviewing (max 1000 chars) |
+
+#### IncomeProtection Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasCoverDueToAccidentOrIllness | boolean | No | No | Has income protection for accident/illness |
+| hasCoverDueToUnemployment | boolean | No | No | Has income protection for unemployment |
+| impactOnYou | string | No | No | Financial impact on client (max 2000 chars) |
+| impactOnDepandants | string | No | No | Financial impact on dependants (max 2000 chars) |
+| actionsToAddressImpacts | string | No | No | Planned actions to address gaps (max 2000 chars) |
+| reasonforNotReviewing | string | No | No | Reason for not reviewing (max 1000 chars) |
+
+#### BuildingsAndContent Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| hasExistingBuildingInsurance | boolean | No | No | Has buildings insurance |
+| hasExistingContentInsurance | boolean | No | No | Has contents insurance |
+| buyToLetProperties | BuyToLetProperties | No | No | Buy-to-let property insurance details |
+| hasSufficientCover | boolean | No | No | Has sufficient insurance cover |
+| actionsToAddressImpacts | string | No | No | Planned actions (max 2000 chars) |
+| whenDoyouWantToReviewProtection | string | No | No | When to review (max 500 chars) |
+| reasonforNotReviewing | string | No | No | Reason for not reviewing (max 1000 chars) |
+
+#### BuyToLetProperties Properties
+
+| Property | Type | Required | Read-Only | Description |
+|----------|------|----------|-----------|-------------|
+| haveBuildingContentInsurance | boolean | No | No | Has building & content insurance for buy-to-let properties |
+
+### Schema Definitions
+
+**CoverageStatus Enum** (Life & Critical Illness):
+- `Yes` - Has adequate cover
+- `No` - Does not have cover or inadequate
+- `NotApplicable` - Not applicable to client situation
+
+**ReviewStatus Enum**:
+- `Yes` - Has reviewed
+- `No` - Has not reviewed
+
+### Business Rules
+
+#### Singleton Resource Rules
+
+1. **One Record Per FactFind**: Only one protection review record exists per FactFind. First PUT to any section creates the singleton. Subsequent PUTs update individual sections. GET returns all sections combined.
+
+2. **Section Independence**: Each section can be updated independently via separate PUT endpoints. Updating one section does not affect others. Partial completion is permitted.
+
+#### Field Validation Rules
+
+3. **Enum Value Validation**: Life & critical illness coverage fields must use: Yes, No, or NotApplicable. Review status fields must use: Yes or No. Invalid enum values return 400 Bad Request.
+
+4. **Boolean Field Defaults**: Boolean fields (income protection, buildings & content) default to null/unset. Client can explicitly set true or false. Null indicates not yet reviewed.
+
+5. **Text Field Limits**: Impact and action fields: 2000 characters maximum. Reason for not reviewing: 1000 characters maximum. Review timing field: 500 characters maximum. Exceeding limits returns 400 Bad Request.
+
+#### Business Logic Rules
+
+6. **NotApplicable Usage**: NotApplicable valid when client has no mortgage/debt or no dependants. Example: Single client, no debt = hasCoverForMortgageOrDebt: "NotApplicable". Allows distinction between "No cover" and "Not needed".
+
+7. **Reason for Not Reviewing**: If client declines review, document reason in reasonforNotReviewing field. Required for compliance and future reference. Demonstrates client-led decision making.
+
+8. **Impact Assessment**: If cover inadequate (No), should document impacts in impactOnYou and impactOnDepandants. Helps client understand importance of protection.
+
+9. **Action Planning**: If gaps identified, should document actions in actionsToAddressImpacts. Actions should be specific and actionable (e.g., "Obtain quote", "Increase cover amount").
+
+#### FCA Compliance Rules
+
+10. **Suitability Documentation**: Protection review forms part of suitability assessment. Document client decisions (reviewing or declining). Capture rationale for recommendations. Record client understanding of impacts.
+
+11. **Vulnerable Customers**: Pay particular attention to impactOnDepandants field. Identify if dependants are vulnerable (children, disabled, elderly). Enhanced duty of care under Consumer Duty.
+
+12. **Consumer Duty**: Ensure clients understand consequences of inadequate protection. Document that impacts have been explained and understood. Capture client-led decisions about protection priorities.
+
+### Error Examples
+
+**Invalid Enum Value Error**
+```json
+{
+  "error": {
+    "code": "INVALID_ENUM_VALUE",
+    "message": "Invalid value for coverage status field",
+    "details": [
+      {
+        "field": "hasCoverforDependantsUponDeath",
+        "issue": "Value must be 'Yes', 'No', or 'NotApplicable'",
+        "value": "Unknown",
+        "allowedValues": ["Yes", "No", "NotApplicable"]
+      }
+    ]
+  }
+}
+```
+
+**Text Field Too Long Error**
+```json
+{
+  "error": {
+    "code": "TEXT_TOO_LONG",
+    "message": "Field exceeds maximum length",
+    "details": [
+      {
+        "field": "impactOnYou",
+        "issue": "Maximum 2000 characters allowed",
+        "length": 2347
+      }
+    ]
+  }
+}
+```
+
+### Protection Review Guidance
+
+**Life & Critical Illness:**
+- Review when mortgage balance changes
+- Review when dependants are born or circumstances change
+- Consider level term, decreasing term, or family income benefit
+- Critical illness cover important for mortgage protection
+
+**Income Protection:**
+- Calculate essential monthly expenditure
+- Consider deferred period (1, 3, 6, 12 months)
+- Check employer sick pay provision
+- Review against emergency fund
+
+**Buildings & Content:**
+- Review annually at renewal
+- Ensure rebuild cost adequate (not market value)
+- Contents cover should reflect replacement value
+- Buy-to-let requires specialist landlord insurance
+
+### Related APIs
+
+- [FactFind API](./FactFind-API-Design.md) - Parent container
+- [Personal Protection API](./PersonalProtection-API-Design.md) - Actual protection policies
+- [Mortgage API](./Mortgage-API-Design.md) - Mortgage debt requiring life cover
+- [Client API](./Client-API-Design.md) - Client and dependant information
+
+---
+## 36. Objectives API
+
+### 34.1 Overview
 
 **Purpose:** The Objectives API manages client financial goals and objectives across multiple domains (investment, pension, protection, mortgage, budget, estate-planning) with priority ranking, target dates, and needs analysis.
 
@@ -10255,7 +10901,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 - Needs analysis sub-resource
 - Goal dependencies
 
-### 33.2 Operations (26 total)
+### 36.2 Operations (26 total)
 
 **Base Operations (5):**
 - GET `/api/v2/factfinds/{factfindId}/objectives` - List all
@@ -10324,9 +10970,9 @@ All planning APIs feed into objectives
 
 ---
 
-## 34. ATR Assessment API
+## 37. ATR Assessment API
 
-### 34.1 Overview
+### 35.1 Overview
 
 **Purpose:** The ATR (Attitude to Risk) Assessment API manages comprehensive risk profiling questionnaires with 15 core questions, risk score calculation, capacity for loss assessment, and historical assessment tracking (Risk Replay).
 
@@ -10341,7 +10987,7 @@ All planning APIs feed into objectives
 - Risk profile comparison over time
 - Profile selection for investments
 
-### 34.2 Operations (6)
+### 36.2 Operations (6)
 
 - GET current assessment
 - POST create assessment
@@ -10401,9 +11047,9 @@ All planning APIs feed into objectives
 
 ---
 
-## 35. Reference Data API
+## 38. Reference Data API
 
-### 35.1 Overview
+### 36.1 Overview
 
 **Purpose:** The Reference Data API provides enumeration values, lookup data, and reference entities for dropdown lists, validation, and data consistency across the application.
 
@@ -10415,7 +11061,7 @@ All planning APIs feed into objectives
 - Reference entities (providers, advisers)
 - Version tracking for data changes
 
-### 35.2 Operations (24 total)
+### 36.2 Operations (24 total)
 
 **Enumerations (14):**
 - GET /genders, /titles, /marital-statuses

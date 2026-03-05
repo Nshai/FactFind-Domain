@@ -1,7 +1,7 @@
 # Comprehensive Entity API Designs - Index
 
-**Date:** 2026-02-25
-**Total APIs:** 28
+**Date:** 2026-03-05
+**Total APIs:** 32
 
 This directory contains comprehensive API design documents for each entity, including complete specifications for all operations, data models, business rules, and examples.
 
@@ -15,25 +15,30 @@ This directory contains comprehensive API design documents for each entity, incl
 6. [Client API Design](./Client-API-Design.md)
 7. [Contact API Design](./Contact-API-Design.md)
 8. [Contribution API Design](./Contribution-API-Design.md)
-9. [Credit-History API Design](./Credit-History-API-Design.md)
-10. [Custom-Question API Design](./Custom-Question-API-Design.md)
-11. [DPA-Agreement API Design](./DPA-Agreement-API-Design.md)
-12. [Dependant API Design](./Dependant-API-Design.md)
-13. [Employment API Design](./Employment-API-Design.md)
-14. [Estate-Planning API Design](./Estate-Planning-API-Design.md)
-15. [Expenditure API Design](./Expenditure-API-Design.md)
-16. [FactFind API Design](./FactFind-API-Design.md)
-17. [Financial-Profile API Design](./Financial-Profile-API-Design.md)
-18. [Identity-Verification API Design](./Identity-Verification-API-Design.md)
-19. [Income API Design](./Income-API-Design.md)
-20. [Investment API Design](./Investment-API-Design.md)
-21. [Mortgage API Design](./Mortgage-API-Design.md)
-22. [Net-Worth API Design](./Net-Worth-API-Design.md)
-23. [Note API Design](./Note-API-Design.md)
-24. [PersonalProtection API Design](./PersonalProtection-API-Design.md)
-25. [Reference-Data API Design](./Reference-Data-API-Design.md)
-26. [Relationship API Design](./Relationship-API-Design.md)
-27. [Vulnerability API Design](./Vulnerability-API-Design.md)
+9. [ControlOptions API Design](./ControlOptions-API-Design.md)
+10. [Credit-History API Design](./Credit-History-API-Design.md)
+11. [Custom-Question API Design](./Custom-Question-API-Design.md)
+12. [DPA-Agreement API Design](./DPA-Agreement-API-Design.md)
+13. [Dependant API Design](./Dependant-API-Design.md)
+14. [Employment API Design](./Employment-API-Design.md)
+15. [EmploymentSummary API Design](./EmploymentSummary-API-Design.md)
+16. [EmployerPensionScheme API Design](./EmployerPensionScheme-API-Design.md)
+17. [Estate-Planning API Design](./Estate-Planning-API-Design.md)
+18. [Expenditure API Design](./Expenditure-API-Design.md)
+19. [FactFind API Design](./FactFind-API-Design.md)
+20. [Financial-Profile API Design](./Financial-Profile-API-Design.md)
+21. [Identity-Verification API Design](./Identity-Verification-API-Design.md)
+22. [Income API Design](./Income-API-Design.md)
+23. [Investment API Design](./Investment-API-Design.md)
+24. [Mortgage API Design](./Mortgage-API-Design.md)
+25. [Net-Worth API Design](./Net-Worth-API-Design.md)
+26. [Note API Design](./Note-API-Design.md)
+27. [PersonalProtection API Design](./PersonalProtection-API-Design.md)
+28. [ProtectionReview API Design](./ProtectionReview-API-Design.md)
+29. [Reference-Data API Design](./Reference-Data-API-Design.md)
+30. [Relationship API Design](./Relationship-API-Design.md)
+31. [Vulnerability API Design](./Vulnerability-API-Design.md)
+32. (Additional APIs as needed)
 
 ## Document Structure
 
@@ -62,5 +67,5 @@ Each comprehensive API design document includes:
 
 ---
 
-**Version:** 2.0
-**Last Updated:** 2026-02-25
+**Version:** 2.1
+**Last Updated:** 2026-03-05
