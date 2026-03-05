@@ -23,7 +23,7 @@
 | **Entity Name** | Contact |
 | **Domain** | Client Management |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,9 +51,9 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact methods | Query params | Contact[] | 200, 401, 403, 404 | Contact, List |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact method | ContactRequest | Contact | 201, 400, 401, 403, 404, 422 | Contact, Create |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Delete contact method | Path params | None | 204, 401, 403, 404, 422 | Contact, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact methods | Query params | Contact[] | 200, 401, 403, 404 | Contact, List |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact method | ContactRequest | Contact | 201, 400, 401, 403, 404, 422 | Contact, Create |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Delete contact method | Path params | None | 204, 401, 403, 404, 422 | Contact, Delete |
 
 
 ### Authorization

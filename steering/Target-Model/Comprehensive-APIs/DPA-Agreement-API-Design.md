@@ -23,7 +23,7 @@
 | **Entity Name** | DPA-Agreement |
 | **Domain** | Client Management |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/...` |
+| **Base Path** | `/api/v3/...` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -226,10 +226,10 @@ This entity supports compliance with:
 
 **1. Client Onboarding:**
 ```
-1. Retrieve current DPA policy (GET /api/v2/dpa-policies/current)
+1. Retrieve current DPA policy (GET /api/v3/dpa-policies/current)
 2. Present policy and statements to client
 3. Client accepts all statements
-4. Create DPA agreement (POST /api/v2/factfinds/{id}/clients/{id}/dpa-agreements)
+4. Create DPA agreement (POST /api/v3/factfinds/{id}/clients/{id}/dpa-agreements)
 5. Store agreement ID for audit trail
 ```
 

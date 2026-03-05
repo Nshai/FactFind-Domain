@@ -23,7 +23,7 @@
 | **Entity Name** | Net-Worth |
 | **Domain** | Assets & Liabilities |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/...` |
+| **Base Path** | `/api/v3/...` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -317,12 +317,12 @@ For common business rules applicable to all entities, refer to **[Master API Des
 {
   "factfind": {
     "id": 456,
-    "href": "/api/v2/factfinds/456"
+    "href": "/api/v3/factfinds/456"
   },
   "clients": [
     {
       "id": 789,
-      "href": "/api/v2/factfinds/456/clients/789"
+      "href": "/api/v3/factfinds/456/clients/789"
     }
   ],
   "notes": "Net worth calculated at point of initial fact-find"
@@ -336,93 +336,82 @@ For common business rules applicable to all entities, refer to **[Master API Des
 ```json
 {
   "id": 123,
-  "href": "/api/v2/factfinds/456/net-worth/123",
+  "href": "/api/v3/factfinds/456/net-worth/123",
   "factfind": {
     "id": 456,
-    "href": "/api/v2/factfinds/456"
+    "href": "/api/v3/factfinds/456"
   },
   "clients": [
     {
       "id": 789,
-      "href": "/api/v2/factfinds/456/clients/789"
+      "href": "/api/v3/factfinds/456/clients/789"
     }
   ],
   "calculatedOn": "2026-02-25T10:00:00Z",
   "property": {
     "amount": 350000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "pensions": {
     "amount": 185000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "investments": {
     "amount": 75000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "cash": {
     "amount": 25000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "other": {
     "amount": 15000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalAssets": {
     "amount": 650000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "mortgages": {
     "amount": 180000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "loans": {
     "amount": 12000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "creditCards": {
     "amount": 3000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalLiabilities": {
     "amount": 195000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "netWorth": {
     "amount": 455000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "notes": "Net worth calculated at point of initial fact-find",

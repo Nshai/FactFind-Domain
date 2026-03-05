@@ -23,7 +23,7 @@
 | **Entity Name** | Annuity |
 | **Domain** | Plans |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/pensions/annuities` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/pensions/annuities` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/pensions/annuities` | List all annuities | Query params | Annuity[] | 200, 401, 403 | Annuity, List |
-| POST | `/api/v2/factfinds/{factfindId}/pensions/annuities` | Create annuity | AnnuityRequest | Annuity | 201, 400, 401, 403, 422 | Annuity, Create |
-| GET | `/api/v2/factfinds/{factfindId}/pensions/annuities/{annuityId}` | Get annuity by ID | Path params | Annuity | 200, 401, 403, 404 | Annuity, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/pensions/annuities/{annuityId}` | Update annuity | AnnuityPatch | Annuity | 200, 400, 401, 403, 404, 422 | Annuity, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/pensions/annuities/{annuityId}` | Delete annuity | Path params | None | 204, 401, 403, 404, 422 | Annuity, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/annuities` | List all annuities | Query params | Annuity[] | 200, 401, 403 | Annuity, List |
+| POST | `/api/v3/factfinds/{factfindId}/pensions/annuities` | Create annuity | AnnuityRequest | Annuity | 201, 400, 401, 403, 422 | Annuity, Create |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/annuities/{annuityId}` | Get annuity by ID | Path params | Annuity | 200, 401, 403, 404 | Annuity, Retrieve |
+| PATCH | `/api/v3/factfinds/{factfindId}/pensions/annuities/{annuityId}` | Update annuity | AnnuityPatch | Annuity | 200, 400, 401, 403, 404, 422 | Annuity, Update |
+| DELETE | `/api/v3/factfinds/{factfindId}/pensions/annuities/{annuityId}` | Delete annuity | Path params | None | 204, 401, 403, 404, 422 | Annuity, Delete |
 
 
 ### Authorization
@@ -130,7 +130,7 @@ Clients who own this annuity:
 | Field | Type | Description |
 |-------|------|-------------|
 | id | integer | Client unique identifier |
-| href | string | API link to client resource (e.g., /api/v2/factfinds/679/clients/8496) |
+| href | string | API link to client resource (e.g., /api/v3/factfinds/679/clients/8496) |
 | name | string | Client full name |
 
 **Note:** Annuities typically have a single owner (the annuitant) or joint annuitants for joint life policies.
@@ -142,7 +142,7 @@ Annuity provider/insurance company:
 | Field | Type | Description |
 |-------|------|-------------|
 | id | integer | Product provider unique identifier |
-| href | string | API link to product provider resource (e.g., /api/v2/productproviders/456) |
+| href | string | API link to product provider resource (e.g., /api/v3/productproviders/456) |
 | name | string | Provider name (e.g., Aviva, Legal & General) |
 
 **Common Annuity Providers:**
@@ -160,7 +160,7 @@ Annuity lifecycle stage reference:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Lifecycle unique identifier |
-| `href` | string | API link to lifecycle resource (e.g., `/api/v2/lifecycles/45`) |
+| `href` | string | API link to lifecycle resource (e.g., `/api/v3/lifecycles/45`) |
 | `name` | string | Lifecycle stage name (e.g., "In Payment") |
 
 **Lifecycle Stages for Annuities:**
@@ -175,7 +175,7 @@ Platform or wrap account details:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Platform/wrap account identifier |
-| `href` | string | API link to investment resource (e.g., `/api/v2/factfinds/679/investments/234`) |
+| `href` | string | API link to investment resource (e.g., `/api/v3/factfinds/679/investments/234`) |
 | `reference` | string | Platform account reference number |
 
 **Use Cases:**
@@ -190,7 +190,7 @@ Specific annuity type/plan details:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Plan type unique identifier |
-| `href` | string | API link to plan type resource (e.g., `/api/v2/plantypes?filter=id eq 123`) |
+| `href` | string | API link to plan type resource (e.g., `/api/v3/plantypes?filter=id eq 123`) |
 | `name` | string | Pension type name (e.g., "Lifetime Annuity", "Enhanced Annuity") |
 
 **Common Annuity Types:**
@@ -359,43 +359,43 @@ Additional protection benefits overlaid on the annuity:
 ```json
 {
   "id": 15001,
-  "href": "/api/v2/factfinds/679/pensions/annuities/15001",
+  "href": "/api/v3/factfinds/679/pensions/annuities/15001",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith",
       "ownershipPercentage": 100.0
     }
   ],
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   },
   "provider": {
     "id": 456,
-    "href": "/api/v2/productproviders/456",
+    "href": "/api/v3/productproviders/456",
     "name": "Aviva"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "In Payment"
   },
   "wrap": {
     "id": 234,
-    "href": "/api/v2/factfinds/679/investments/234",
+    "href": "/api/v3/factfinds/679/investments/234",
     "reference": "WRAP-ANN-123456"
   },
   "pensionCategory": "Annuity",
   "pensionType": {
     "id": 123,
-    "href": "/api/v2/plantypes?filter=id eq 123",
+    "href": "/api/v3/plantypes?filter=id eq 123",
     "name": "Lifetime Annuity"
   },
   "policyNumber": "ANN-123456789",
@@ -403,18 +403,14 @@ Additional protection benefits overlaid on the annuity:
   "agencyStatusDate": "2023-01-15",
   "productName": "Guaranteed Lifetime Annuity",
   "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
+    "code": "GBP"
   },
   "startDate": "2023-01-15",
   "annuityType": "LIFETIME",
   "totalPurchaseAmount": {
     "amount": 250000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "premiumStartDate": "2023-01-15",
@@ -422,9 +418,7 @@ Additional protection benefits overlaid on the annuity:
     "value": {
       "amount": 18500.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "frequency": "Monthly",
@@ -438,9 +432,7 @@ Additional protection benefits overlaid on the annuity:
     "value": {
       "amount": 62500.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "paidBy": "Originating Scheme"
@@ -450,9 +442,7 @@ Additional protection benefits overlaid on the annuity:
     "amount": {
       "amount": 9250.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
@@ -463,9 +453,7 @@ Additional protection benefits overlaid on the annuity:
   "guaranteedMinimumPensionAnnual": {
     "amount": 18500.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "overlayBenefits": {
@@ -473,9 +461,7 @@ Additional protection benefits overlaid on the annuity:
     "protectedCapital": {
       "amount": 250000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "hasGuaranteePeriod": true,
@@ -492,51 +478,47 @@ Additional protection benefits overlaid on the annuity:
 ```json
 {
   "id": 15002,
-  "href": "/api/v2/factfinds/679/pensions/annuities/15002",
+  "href": "/api/v3/factfinds/679/pensions/annuities/15002",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith",
       "ownershipPercentage": 100.0
     }
   ],
   "provider": {
     "id": 789,
-    "href": "/api/v2/productproviders/789",
+    "href": "/api/v3/productproviders/789",
     "name": "Just Retirement"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "In Payment"
   },
   "pensionCategory": "Annuity",
   "pensionType": {
     "id": 125,
-    "href": "/api/v2/plantypes?filter=id eq 125",
+    "href": "/api/v3/plantypes?filter=id eq 125",
     "name": "Enhanced Annuity"
   },
   "policyNumber": "ENH-987654321",
   "agencyStatus": "NOT_UNDER_AGENCY",
   "productName": "Enhanced Lifetime Income",
   "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
+    "code": "GBP"
   },
   "startDate": "2024-03-01",
   "annuityType": "LIFETIME",
   "totalPurchaseAmount": {
     "amount": 135000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "premiumStartDate": "2024-03-01",
@@ -544,9 +526,7 @@ Additional protection benefits overlaid on the annuity:
     "value": {
       "amount": 10530.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "frequency": "Monthly",
@@ -557,9 +537,7 @@ Additional protection benefits overlaid on the annuity:
     "value": {
       "amount": 45000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "paidBy": "Originating Scheme"
@@ -579,57 +557,53 @@ Additional protection benefits overlaid on the annuity:
 ```json
 {
   "id": 15003,
-  "href": "/api/v2/factfinds/679/pensions/annuities/15003",
+  "href": "/api/v3/factfinds/679/pensions/annuities/15003",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith",
       "ownershipPercentage": 50.0
     },
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "name": "Jane Smith",
       "ownershipPercentage": 50.0
     }
   ],
   "provider": {
     "id": 234,
-    "href": "/api/v2/productproviders/234",
+    "href": "/api/v3/productproviders/234",
     "name": "Legal & General"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "In Payment"
   },
   "pensionCategory": "Annuity",
   "pensionType": {
     "id": 126,
-    "href": "/api/v2/plantypes?filter=id eq 126",
+    "href": "/api/v3/plantypes?filter=id eq 126",
     "name": "Joint Life Annuity"
   },
   "policyNumber": "JL-456789123",
   "agencyStatus": "NOT_UNDER_AGENCY",
   "productName": "Joint Life with Escalation",
   "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
+    "code": "GBP"
   },
   "startDate": "2021-06-01",
   "annuityType": "JOINT_LIFE",
   "totalPurchaseAmount": {
     "amount": 225000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "premiumStartDate": "2021-06-01",
@@ -637,9 +611,7 @@ Additional protection benefits overlaid on the annuity:
     "value": {
       "amount": 10125.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "frequency": "Monthly",
@@ -653,9 +625,7 @@ Additional protection benefits overlaid on the annuity:
     "value": {
       "amount": 75000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "paidBy": "Originating Scheme"
@@ -665,9 +635,7 @@ Additional protection benefits overlaid on the annuity:
     "amount": {
       "amount": 5062.50,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },

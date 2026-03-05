@@ -191,16 +191,16 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 
 | Operation | Method | Endpoint | Description |
 |---|---|---|---|
-| Get Estate Planning | GET | `/v2/factfinds/{id}/clients/{clientId}/estateplanning` | Retrieve singleton |
-| Update Estate Planning | PUT | `/v2/factfinds/{id}/clients/{clientId}/estateplanning` | Create/update singleton |
-| Create Gift | POST | `/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts` | Add new gift |
-| Get Gift | GET | `/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Retrieve gift |
-| Update Gift | PUT | `/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Modify gift |
-| Delete Gift | DELETE | `/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Remove gift |
+| Get Estate Planning | GET | `/v3/factfinds/{id}/clients/{clientId}/estateplanning` | Retrieve singleton |
+| Update Estate Planning | PUT | `/v3/factfinds/{id}/clients/{clientId}/estateplanning` | Create/update singleton |
+| Create Gift | POST | `/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts` | Add new gift |
+| Get Gift | GET | `/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Retrieve gift |
+| Update Gift | PUT | `/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Modify gift |
+| Delete Gift | DELETE | `/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` | Remove gift |
 
 ### 5.2 Get Estate Planning
 
-**Endpoint:** `GET /v2/factfinds/{id}/clients/{clientId}/estateplanning`
+**Endpoint:** `GET /v3/factfinds/{id}/clients/{clientId}/estateplanning`
 
 **Description:** Retrieves the estate planning singleton record for a client.
 
@@ -218,7 +218,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 
 ### 5.3 Update Estate Planning
 
-**Endpoint:** `PUT /v2/factfinds/{id}/clients/{clientId}/estateplanning`
+**Endpoint:** `PUT /v3/factfinds/{id}/clients/{clientId}/estateplanning`
 
 **Description:** Creates or updates the estate planning singleton record.
 
@@ -240,7 +240,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 
 ### 5.4 Create Gift
 
-**Endpoint:** `POST /v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts`
+**Endpoint:** `POST /v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts`
 
 **Description:** Creates a new gift record for IHT tracking.
 
@@ -261,7 +261,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 
 ### 5.5 Get Gift
 
-**Endpoint:** `GET /v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}`
+**Endpoint:** `GET /v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}`
 
 **Description:** Retrieves a specific gift record.
 
@@ -280,7 +280,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 
 ### 5.6 Update Gift
 
-**Endpoint:** `PUT /v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}`
+**Endpoint:** `PUT /v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}`
 
 **Description:** Updates an existing gift record.
 
@@ -302,7 +302,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 
 ### 5.7 Delete Gift
 
-**Endpoint:** `DELETE /v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}`
+**Endpoint:** `DELETE /v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}`
 
 **Description:** Removes a gift record from tracking.
 
@@ -327,10 +327,10 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 
 ```json
 {
-  "href": "/v2/factfinds/679/clients/8496/estateplanning",
+  "href": "/v3/factfinds/679/clients/8496/estateplanning",
   "client": {
     "id": 8496,
-    "href": "/v2/factfinds/679/clients/8496",
+    "href": "/v3/factfinds/679/clients/8496",
     "name": "John Smith"
   },
   "factfind": {
@@ -340,15 +340,13 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
   "totalAssets": {
     "amount": 850000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalJointAssets": {
     "amount": 425000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "giftInLast7YearsDetails": "Annual exemption gifts to both children (£3,000 per year each)",
@@ -358,15 +356,14 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
   "gifts": [
     {
       "id": 1,
-      "href": "/v2/factfinds/679/clients/8496/estateplanning/gifts/1",
+      "href": "/v3/factfinds/679/clients/8496/estateplanning/gifts/1",
       "giftedOn": "2025-04-10",
       "recipient": "Emily Rose Smith",
       "relationship": "Daughter",
       "value": {
         "amount": 3000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "description": "Annual exemption gift for tax year 2025/26",
@@ -401,8 +398,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
   "value": {
     "amount": 3000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "description": "Annual exemption gift for tax year 2026/27",
@@ -416,15 +412,14 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 ```json
 {
   "id": 2,
-  "href": "/v2/factfinds/679/clients/8496/estateplanning/gifts/2",
+  "href": "/v3/factfinds/679/clients/8496/estateplanning/gifts/2",
   "giftedOn": "2026-04-06",
   "recipient": "Thomas James Smith",
   "relationship": "Son",
   "value": {
     "amount": 3000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "description": "Annual exemption gift for tax year 2026/27",
@@ -475,7 +470,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 ```json
 {
   "id": 8496,
-  "href": "/v2/factfinds/679/clients/8496",
+  "href": "/v3/factfinds/679/clients/8496",
   "name": "John Smith"
 }
 ```
@@ -492,8 +487,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
 {
   "amount": 3000.00,
   "currency": {
-    "code": "GBP",
-    "symbol": "£"
+    "code": "GBP"
   }
 }
 ```
@@ -865,7 +859,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
   "relationship": "Daughter",
   "value": {
     "amount": 3000.00,
-    "currency": {"code": "GBP", "symbol": "£"}
+    "currency": { "code": "GBP" }
   },
   "description": "Annual exemption 2025/26",
   "isRegularGiftFromIncome": false,
@@ -881,7 +875,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
   "relationship": "Son",
   "value": {
     "amount": 75000.00,
-    "currency": {"code": "GBP", "symbol": "£"}
+    "currency": { "code": "GBP" }
   },
   "description": "Deposit gift for house purchase",
   "isRegularGiftFromIncome": false,
@@ -897,7 +891,7 @@ Client (1) ──→ (N) Asset [source for totalAssets calculation]
   "relationship": "Grandchildren",
   "value": {
     "amount": 500.00,
-    "currency": {"code": "GBP", "symbol": "£"}
+    "currency": { "code": "GBP" }
   },
   "description": "Monthly Junior ISA contributions (total for all grandchildren)",
   "isRegularGiftFromIncome": true,

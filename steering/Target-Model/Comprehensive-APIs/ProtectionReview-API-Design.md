@@ -199,14 +199,14 @@ FactFind (1) ──→ (N) Client [individuals covered]
 
 | Operation | Method | Endpoint | Description |
 |---|---|---|---|
-| Get Protection Review Summary | GET | `/v2/factfinds/{id}/protections/reviews/summary` | Retrieve complete protection review |
-| Update Life & Critical Illness | PUT | `/v2/factfinds/{id}/protections/reviews/lifeAndCriticalIllness` | Update life & critical illness section |
-| Update Income Protection | PUT | `/v2/factfinds/{id}/protections/reviews/incomeProtection` | Update income protection section |
-| Update Buildings & Content | PUT | `/v2/factfinds/{id}/protections/reviews/buildingsAndContent` | Update buildings & content section |
+| Get Protection Review Summary | GET | `/v3/factfinds/{id}/protections/reviews/summary` | Retrieve complete protection review |
+| Update Life & Critical Illness | PUT | `/v3/factfinds/{id}/protections/reviews/lifeAndCriticalIllness` | Update life & critical illness section |
+| Update Income Protection | PUT | `/v3/factfinds/{id}/protections/reviews/incomeProtection` | Update income protection section |
+| Update Buildings & Content | PUT | `/v3/factfinds/{id}/protections/reviews/buildingsAndContent` | Update buildings & content section |
 
 ### 5.2 Get Protection Review Summary
 
-**Endpoint:** `GET /v2/factfinds/{id}/protections/reviews/summary`
+**Endpoint:** `GET /v3/factfinds/{id}/protections/reviews/summary`
 
 **Description:** Retrieves the complete protection review summary including all three sections.
 
@@ -223,7 +223,7 @@ FactFind (1) ──→ (N) Client [individuals covered]
 
 ### 5.3 Update Life & Critical Illness
 
-**Endpoint:** `PUT /v2/factfinds/{id}/protections/reviews/lifeAndCriticalIllness`
+**Endpoint:** `PUT /v3/factfinds/{id}/protections/reviews/lifeAndCriticalIllness`
 
 **Description:** Creates or updates the Life & Critical Illness section of the protection review.
 
@@ -243,7 +243,7 @@ FactFind (1) ──→ (N) Client [individuals covered]
 
 ### 5.4 Update Income Protection
 
-**Endpoint:** `PUT /v2/factfinds/{id}/protections/reviews/incomeProtection`
+**Endpoint:** `PUT /v3/factfinds/{id}/protections/reviews/incomeProtection`
 
 **Description:** Creates or updates the Income Protection section of the protection review.
 
@@ -263,7 +263,7 @@ FactFind (1) ──→ (N) Client [individuals covered]
 
 ### 5.5 Update Buildings & Content
 
-**Endpoint:** `PUT /v2/factfinds/{id}/protections/reviews/buildingsAndContent`
+**Endpoint:** `PUT /v3/factfinds/{id}/protections/reviews/buildingsAndContent`
 
 **Description:** Creates or updates the Buildings & Content section of the protection review.
 
@@ -289,7 +289,7 @@ FactFind (1) ──→ (N) Client [individuals covered]
 
 ```json
 {
-  "href": "/v2/factfinds/679/protections/reviews/summary",
+  "href": "/v3/factfinds/679/protections/reviews/summary",
   "lifeAndCriticalIllness": {
     "hasCoverForMortgageOrDebt": "Yes",
     "hasCoverforDependantsDueToCritcalIllness": "No",

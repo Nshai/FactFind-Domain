@@ -3,7 +3,7 @@
 
 **Date:** 2026-03-03
 **Status:** Active Specification
-**API Version:** v2
+**API Version:** v3
 **Base URL:** `https://api.factfind.com`
 **Document Version:** 3.0
 
@@ -102,13 +102,9 @@ The FactFind API provides comprehensive digital capabilities for:
 
 3. [Common Patterns](#3-common-patterns)
    - 3.1 Pagination
-   - 3.2 Filtering & Sorting
-   - 3.3 Field Selection
-   - 3.4 Resource Expansion
-   - 3.5 Optimistic Concurrency Control
-   - 3.6 Batch Operations
-   - 3.7 HATEOAS Controls
-   - 3.8 Data Types
+   - 3.2 Filtering & Ordering
+   - 3.3 Simple Hypermedia
+   - 3.4 Data Types
 
 ### Part 2: Core APIs
 
@@ -180,7 +176,7 @@ The FactFind API provides comprehensive digital capabilities for:
 The FactFind API follows REST (Representational State Transfer) architectural principles:
 
 **Resource-Oriented Design:**
-- Resources are identified by URIs (e.g., `/api/v2/factfinds/{id}`)
+- Resources are identified by URIs (e.g., `/api/v3/factfinds/{id}`)
 - Resources have representations (typically JSON)
 - Resources support standard HTTP methods (GET, POST, PATCH, DELETE)
 
@@ -192,7 +188,7 @@ The FactFind API follows REST (Representational State Transfer) architectural pr
 **Hierarchical Structure:**
 - Resources are organized in a logical hierarchy
 - Parent-child relationships reflected in URI paths
-- Example: `/api/v2/factfinds/{id}/clients/{clientId}/addresses/{addressId}`
+- Example: `/api/v3/factfinds/{id}/clients/{clientId}/addresses/{addressId}`
 
 **Standard HTTP Methods:**
 - `GET` - Retrieve resources (safe, idempotent)
@@ -213,7 +209,7 @@ The FactFind API follows REST (Representational State Transfer) architectural pr
 - Use hyphens (-) to separate words, not underscores
 - Use plural nouns for collections: `/clients`, `/addresses`, `/investments`
 - Use singular nouns for singleton resources: `/estate-planning`, `/financial-profile`
-- No trailing slashes: `/api/v2/clients` not `/api/v2/clients/`
+- No trailing slashes: `/api/v3/clients` not `/api/v3/clients/`
 
 **JSON Field Naming:**
 - Use camelCase for field names: `firstName`, `dateOfBirth`, `retirementAge`
@@ -221,20 +217,20 @@ The FactFind API follows REST (Representational State Transfer) architectural pr
 - Avoid abbreviations unless industry-standard (e.g., `NI` for National Insurance)
 
 **Query Parameters:**
-- Use camelCase: `?pageSize=25`, `?sortBy=lastName`
+- Use $top/$skip: `?$top=25&$skip=0`, `?orderBy=lastName`
 - Boolean flags without `is` prefix: `?active=true` not `?isActive=true`
 
 **Examples:**
 ```
 Good:
-- /api/v2/factfinds/{id}/clients/{clientId}/employment
-- /api/v2/factfinds/{id}/pensions/statepension
-- /api/v2/factfinds/{id}/estate-planning
+- /api/v3/factfinds/{id}/clients/{clientId}/employment
+- /api/v3/factfinds/{id}/pensions/statepension
+- /api/v3/factfinds/{id}/estate-planning
 
 Avoid:
-- /api/v2/factfinds/{id}/client (singular for collection)
-- /api/v2/factfinds/{id}/clients/{clientId}/Employment (uppercase)
-- /api/v2/factfinds/{id}/clients/{clientId}/employment/ (trailing slash)
+- /api/v3/factfinds/{id}/client (singular for collection)
+- /api/v3/factfinds/{id}/clients/{clientId}/Employment (uppercase)
+- /api/v3/factfinds/{id}/clients/{clientId}/employment/ (trailing slash)
 ```
 
 ### 1.3 HTTP Methods & Status Codes
@@ -286,7 +282,7 @@ All error responses follow RFC 7807 (Problem Details for HTTP APIs):
   "title": "Validation Failed",
   "status": 422,
   "detail": "One or more validation errors occurred",
-  "instance": "/api/v2/factfinds/679/clients/8496",
+  "instance": "/api/v3/factfinds/679/clients/8496",
   "traceId": "00-4bf92f3577b34da6a3ce929d0e0e4736-00",
   "errors": [
     {
@@ -321,7 +317,7 @@ The FactFind API uses a hierarchical structure that reflects the domain model:
 
 **FactFind as Root:**
 ```
-/api/v2/factfinds/{factfindId}
+/api/v3/factfinds/{factfindId}
   ├── /clients/{clientId}
   │   ├── /addresses/{addressId}
   │   ├── /contacts/{contactId}
@@ -351,8 +347,8 @@ The FactFind API uses a hierarchical structure that reflects the domain model:
 ### 1.6 Versioning Strategy
 
 **URI Versioning:**
-- Version included in URI path: `/api/v2/...`
-- Major version only (v1, v2, v3)
+- Version included in URI path: `/api/v3/...`
+- Major version only (v1, v2, v3, v4)
 - Breaking changes require new major version
 
 **What Constitutes a Breaking Change:**
@@ -396,22 +392,22 @@ Each entity has **one unified contract** used for:
 **Example:**
 
 ```json
-// POST /api/v2/factfinds/{id}/clients
+// POST /api/v3/factfinds/{id}/clients
 {
   "firstName": "John",
   "lastName": "Smith",
   "dateOfBirth": "1980-05-15"
 }
 
-// PATCH /api/v2/factfinds/{id}/clients/{clientId}
+// PATCH /api/v3/factfinds/{id}/clients/{clientId}
 {
   "email": "john.smith@example.com"
 }
 
-// GET /api/v2/factfinds/{id}/clients/{clientId}
+// GET /api/v3/factfinds/{id}/clients/{clientId}
 {
   "id": 8496,
-  "href": "/api/v2/factfinds/679/clients/8496",
+  "href": "/api/v3/factfinds/679/clients/8496",
   "firstName": "John",
   "lastName": "Smith",
   "dateOfBirth": "1980-05-15",
@@ -454,7 +450,7 @@ The API uses two approaches for representing related data:
 {
   "adviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   }
 }
@@ -515,7 +511,7 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=client_credentials&
 client_id={clientId}&
 client_secret={clientSecret}&
-scope=factfind:read factfind:write
+scope=factfind
 ```
 
 Response:
@@ -524,7 +520,7 @@ Response:
   "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "Bearer",
   "expires_in": 3600,
-  "scope": "factfind:read factfind:write"
+  "scope": "factfind"
 }
 ```
 
@@ -536,7 +532,7 @@ Response:
 **Using Access Token:**
 
 ```http
-GET /api/v2/factfinds/679/clients/8496
+GET /api/v3/factfinds/679/clients/8496
 Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
@@ -549,7 +545,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
   "aud": "https://api.factfind.com",
   "exp": 1640995200,
   "iat": 1640991600,
-  "scope": "factfind:read factfind:write client:read",
+  "scope": "factfind",
   "tenant_id": "acme-wealth-mgmt",
   "roles": ["adviser", "paraplanner"]
 }
@@ -557,40 +553,28 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### 2.2 Authorization Scopes
 
-**Scope Naming Convention:** `{resource}:{action}`
+**Unified Scope:**
 
-**Core Scopes:**
+The API uses a single unified scope for all FactFind operations:
 
 | Scope | Description |
 |-------|-------------|
-| `factfind:read` | Read fact finds and summary data |
-| `factfind:write` | Create and update fact finds |
-| `factfind:delete` | Delete fact finds |
-| `client:read` | Read client information |
-| `client:write` | Create and update clients |
-| `client:admin` | RTBF and administrative functions |
-| `circumstances:read` | Read employment, income, expenditure |
-| `circumstances:write` | Manage circumstances data |
-| `assets:read` | Read assets and liabilities |
-| `assets:write` | Manage assets and liabilities |
-| `investments:read` | Read investments and plans |
-| `investments:write` | Manage investments and plans |
-| `pensions:read` | Read pension data |
-| `pensions:write` | Manage pension data |
-| `pensions:delete` | Delete pension records |
-| `objectives:read` | Read objectives and goals |
-| `objectives:write` | Manage objectives and goals |
-| `atr:read` | Read ATR assessments |
-| `atr:write` | Submit and update ATR assessments |
-| `credit:read` | Read credit history |
-| `credit:write` | Add credit scores |
-| `reference:read` | Read reference data |
-| `reference:admin` | Manage reference data |
+| `factfind` | Full access to all FactFind API operations including read, write, and delete across all resources (clients, assets, liabilities, investments, pensions, employment, income, expenditure, goals, ATR, etc.) |
 
-**Scope Hierarchy:**
-- `{resource}:admin` implies `{resource}:write` and `{resource}:read`
-- `{resource}:write` implies `{resource}:read`
-- `{resource}:delete` requires `{resource}:write`
+**Scope Usage:**
+- All authenticated users with the `factfind` scope have full access to FactFind operations within their tenant
+- Fine-grained permissions are managed at the application/tenant level, not via OAuth scopes
+- The scope grants access to all endpoints documented in this API specification
+
+**Token Example:**
+```json
+{
+  "sub": "user-123",
+  "tenant_id": "org-456",
+  "scope": "factfind",
+  "exp": 1640995200
+}
+```
 
 ### 2.3 Multi-Tenancy
 
@@ -603,7 +587,7 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
 **Tenant ID in Requests:**
 
 ```http
-GET /api/v2/factfinds
+GET /api/v3/factfinds
 Authorization: Bearer {token}
 X-Tenant-ID: acme-wealth-mgmt
 ```
@@ -655,7 +639,7 @@ X-Tenant-ID: acme-wealth-mgmt
   "userId": "jane.adviser@acme.com",
   "tenantId": "acme-wealth-mgmt",
   "method": "PATCH",
-  "path": "/api/v2/factfinds/679/clients/8496",
+  "path": "/api/v3/factfinds/679/clients/8496",
   "statusCode": 200,
   "ipAddress": "203.0.113.45",
   "changes": {
@@ -682,29 +666,33 @@ X-Tenant-ID: acme-wealth-mgmt
 
 All list/collection endpoints follow Intelliflo's standard collection structure with pagination links at the root level.
 
+**Pagination Parameters:**
+- `$top` (integer, optional) - Number of items to return (default: 25, max: 100)
+- `$skip` (integer, optional) - Number of items to skip (default: 0)
+
 Request:
 ```http
-GET /api/v2/factfinds/679/clients?page=1&pageSize=25
+GET /api/v3/factfinds/679/clients?$top=25&$skip=0
 ```
 
 Response:
 ```json
 {
-  "href": "/api/v2/factfinds/679/clients?page=1&pageSize=25",
-  "first_href": "/api/v2/factfinds/679/clients?page=1&pageSize=25",
-  "last_href": "/api/v2/factfinds/679/clients?page=6&pageSize=25",
-  "next_href": "/api/v2/factfinds/679/clients?page=2&pageSize=25",
+  "href": "/api/v3/factfinds/679/clients?$top=25&$skip=0",
+  "first_href": "/api/v3/factfinds/679/clients?$top=25&$skip=0",
+  "last_href": "/api/v3/factfinds/679/clients?$top=25&$skip=125",
+  "next_href": "/api/v3/factfinds/679/clients?$top=25&$skip=25",
   "prev_href": null,
   "items": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "firstName": "John",
       "lastName": "Smith"
     },
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "firstName": "Jane",
       "lastName": "Smith"
     }
@@ -714,37 +702,57 @@ Response:
 ```
 
 **Collection Fields:**
-- `href` (string) - URL of the current page
-- `first_href` (string) - URL of the first page
-- `last_href` (string) - URL of the last page
-- `next_href` (string | null) - URL of the next page, null if on last page
-- `prev_href` (string | null) - URL of the previous page, null if on first page
+- `href` (string) - URL of the current page with current $top and $skip values
+- `first_href` (string) - URL of the first page ($skip=0)
+- `last_href` (string) - URL of the last page (calculated based on total count)
+- `next_href` (string | null) - URL of the next page with updated $skip, null if on last page
+- `prev_href` (string | null) - URL of the previous page with updated $skip, null if on first page
 - `items` (array) - Array of resource objects for the current page
 - `count` (integer) - Total count of items across all pages
 
-**Query Parameters:**
-- `page` (integer) - Page number (1-indexed, default: 1)
-- `pageSize` (integer) - Items per page (default: 25, max: 100)
+**Pagination Examples:**
+
+First page (items 1-25):
+```http
+GET /api/v3/factfinds?$top=25&$skip=0
+```
+
+Second page (items 26-50):
+```http
+GET /api/v3/factfinds?$top=25&$skip=25
+```
+
+Third page (items 51-75):
+```http
+GET /api/v3/factfinds?$top=25&$skip=50
+```
+
+Custom page size (items 1-50):
+```http
+GET /api/v3/factfinds?$top=50&$skip=0
+```
 
 **Navigation:**
 - Use `next_href` to navigate to the next page (check if not null)
 - Use `prev_href` to navigate to the previous page (check if not null)
 - Use `first_href` and `last_href` to jump to first or last page
-- All pagination URLs include filter parameters if applied
+- All pagination URLs include filter and orderBy parameters if applied
+- Client applications should use the href values directly rather than calculating skip values
 
 **Performance Considerations:**
-- Default page size is 25 items
-- Maximum page size is 100 items to prevent performance issues
+- Default $top is 25 items if not specified
+- Maximum $top is 100 items to prevent performance issues
 - Total count is calculated efficiently and cached where possible
 - For very large datasets (>10,000 items), consider filtering to reduce result set
+- Use appropriate $skip values to avoid scanning large numbers of rows
 
-### 3.2 Filtering & Sorting
+### 3.2 Filtering & Ordering
 
 **Simple Filtering:**
 
 ```http
-GET /api/v2/factfinds/679/clients?lastName=Smith&status=Active
-GET /api/v2/factfinds/679/income?incomeType=Employment&minAmount=30000
+GET /api/v3/factfinds/679/clients?lastName=Smith&status=Active
+GET /api/v3/factfinds/679/income?incomeType=Employment&minAmount=30000
 ```
 
 **Advanced Filtering (QueryLang - Intelliflo Standard):**
@@ -752,8 +760,8 @@ GET /api/v2/factfinds/679/income?incomeType=Employment&minAmount=30000
 QueryLang syntax: `field operator value` with `and` to chain expressions
 
 ```http
-GET /api/v2/factfinds/679/clients?filter=age gt 30 and status eq 'Active'
-GET /api/v2/factfinds?filter=clients.id eq 123
+GET /api/v3/factfinds/679/clients?filter=age gt 30 and status eq 'Active'
+GET /api/v3/factfinds?filter=clients.id eq 123
 ```
 
 **Supported Operators:**
@@ -762,211 +770,56 @@ GET /api/v2/factfinds?filter=clients.id eq 123
 - String: `startswith` (e.g., `lastName startswith 'Sm'`)
 - Logical: `and` (chain multiple conditions)
 
-**Sorting:**
+**Ordering:**
+
+Syntax: `?orderBy=fieldName asc|desc`
 
 ```http
-GET /api/v2/factfinds/679/clients?sort=lastName:asc,firstName:asc
-GET /api/v2/factfinds/679/assets?sort=currentValue:desc
+GET /api/v3/factfinds/679/clients?orderBy=lastName asc
+GET /api/v3/factfinds/679/clients?orderBy=lastName desc
+GET /api/v3/factfinds/679/assets?orderBy=currentValue desc
 ```
 
-**Sort Direction:**
-- `asc` - Ascending (default)
-- `desc` - Descending
+**Order Direction:**
+- `asc` - Ascending order (A-Z, 0-9, oldest to newest) - default if not specified
+- `desc` - Descending order (Z-A, 9-0, newest to oldest)
 
-### 3.3 Field Selection (Sparse Fieldsets)
-
-**Select Specific Fields:**
-
+**Multiple Fields:**
+For multiple sort fields, use comma-separated values:
 ```http
-GET /api/v2/factfinds/679/clients/8496?fields=id,firstName,lastName,email
+GET /api/v3/factfinds/679/clients?orderBy=lastName asc,firstName asc
 ```
 
-Response:
+**Notes:**
+- If no direction is specified, `asc` is assumed
+- Use URL encoding for spaces: `orderBy=lastName%20asc`
+
+### 3.3 Simple Hypermedia
+
+**All resources include href properties for navigation:**
+
 ```json
 {
   "id": 8496,
+  "href": "/api/v3/factfinds/679/clients/8496",
   "firstName": "John",
   "lastName": "Smith",
-  "email": "john.smith@example.com"
-}
-```
-
-**Benefits:**
-- Reduced payload size
-- Improved performance
-- Lower bandwidth usage
-- Faster client-side processing
-
-### 3.4 Resource Expansion
-
-**Expand Related Resources:**
-
-```http
-GET /api/v2/factfinds/679/clients/8496?expand=addresses,contacts
-```
-
-Response includes full nested resources instead of just references:
-```json
-{
-  "id": 8496,
-  "firstName": "John",
-  "lastName": "Smith",
-  "addresses": [
-    {
-      "id": 1001,
-      "line1": "123 Main Street",
-      "city": "London",
-      "postcode": "SW1A 1AA"
-    }
-  ],
-  "contacts": [
-    {
-      "id": 2001,
-      "type": "Email",
-      "value": "john.smith@example.com"
-    }
-  ]
-}
-```
-
-**Multi-level Expansion:**
-
-```http
-GET /api/v2/factfinds/679?expand=clients.addresses,clients.contacts
-```
-
-### 3.5 Optimistic Concurrency Control
-
-**ETag-based Concurrency:**
-
-Request:
-```http
-GET /api/v2/factfinds/679/clients/8496
-```
-
-Response:
-```http
-HTTP/1.1 200 OK
-ETag: "33a64df551425fcc55e4d42a148795d9"
-
-{
-  "id": 8496,
-  "firstName": "John",
-  ...
-}
-```
-
-Update with ETag:
-```http
-PATCH /api/v2/factfinds/679/clients/8496
-If-Match: "33a64df551425fcc55e4d42a148795d9"
-
-{
-  "email": "new.email@example.com"
-}
-```
-
-**Conflict Response:**
-```http
-HTTP/1.1 409 Conflict
-
-{
-  "type": "https://api.factfind.com/errors/concurrency-conflict",
-  "title": "Concurrency Conflict",
-  "status": 409,
-  "detail": "The resource has been modified by another user",
-  "instance": "/api/v2/factfinds/679/clients/8496"
-}
-```
-
-### 3.6 Batch Operations
-
-**Batch Create:**
-
-```http
-POST /api/v2/factfinds/679/clients/batch
-Content-Type: application/json
-
-{
-  "items": [
-    { "firstName": "John", "lastName": "Smith" },
-    { "firstName": "Jane", "lastName": "Doe" }
-  ]
-}
-```
-
-Response:
-```json
-{
-  "results": [
-    {
-      "status": "success",
-      "statusCode": 201,
-      "resource": { "id": 8496, ... }
-    },
-    {
-      "status": "success",
-      "statusCode": 201,
-      "resource": { "id": 8497, ... }
-    }
-  ]
-}
-```
-
-**Batch Update:**
-
-```http
-PATCH /api/v2/factfinds/679/clients/batch
-
-{
-  "updates": [
-    { "id": 8496, "email": "john@example.com" },
-    { "id": 8497, "email": "jane@example.com" }
-  ]
-}
-```
-
-### 3.7 HATEOAS (Hypermedia Controls)
-
-**All responses include hypermedia links:**
-
-```json
-{
-  "id": 8496,
-  "firstName": "John",
-  "lastName": "Smith",
-  "_links": {
-    "self": {
-      "href": "/api/v2/factfinds/679/clients/8496",
-      "method": "GET"
-    },
-    "update": {
-      "href": "/api/v2/factfinds/679/clients/8496",
-      "method": "PATCH"
-    },
-    "delete": {
-      "href": "/api/v2/factfinds/679/clients/8496",
-      "method": "DELETE"
-    },
-    "addresses": {
-      "href": "/api/v2/factfinds/679/clients/8496/addresses",
-      "method": "GET"
-    },
-    "contacts": {
-      "href": "/api/v2/factfinds/679/clients/8496/contacts",
-      "method": "GET"
-    }
+  "factfind": {
+    "id": 679,
+    "href": "/api/v3/factfinds/679"
   }
 }
 ```
 
 **Benefits:**
-- API discoverability
-- Reduced client coupling
-- Version-safe evolution
-- Self-documenting responses
+- Simple and intuitive navigation
+- Self-documenting resource relationships
+- No need for complex link structures
+- Clear resource URLs for API consumers
 
-### 3.8 Data Types
+---
+
+### 3.4 Data Types
 
 **Standard JSON Types:**
 
@@ -978,7 +831,7 @@ PATCH /api/v2/factfinds/679/clients/batch
 | Boolean | boolean | `true` | Lowercase only |
 | Date | string | `"2024-01-15"` | ISO 8601 (YYYY-MM-DD) |
 | DateTime | string | `"2024-01-15T10:30:00Z"` | ISO 8601 with timezone |
-| Money | object | `{"amount": 50000.00, "currency": {...}}` | Amount + currency |
+| Money | object | `{"amount": 50000.00, "currency": {"code": "GBP"}}` | Amount + currency code |
 | Duration | string | `"P10Y"` | ISO 8601 duration |
 
 **Money Type:**
@@ -987,19 +840,21 @@ PATCH /api/v2/factfinds/679/clients/batch
 {
   "amount": 50000.00,
   "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
+    "code": "GBP"
   }
 }
 ```
+
+**Notes:**
+- `amount` is a decimal number with up to 2 decimal places
+- `currency.code` is an ISO 4217 three-letter currency code (e.g., GBP, USD, EUR)
 
 **Reference Link Type:**
 
 ```json
 {
   "id": 123,
-  "href": "/api/v2/advisers/123",
+  "href": "/api/v3/advisers/123",
   "name": "Jane Adviser"
 }
 ```
@@ -1132,7 +987,7 @@ The FactFind API manages the root aggregate for all client financial information
 ### Base URL Pattern
 
 ```
-/api/v2/factfinds
+/api/v3/factfinds
 ```
 
 ### Operations
@@ -1141,7 +996,7 @@ The FactFind API manages the root aggregate for all client financial information
 
 **List FactFinds**
 ```
-GET /api/v2/factfinds
+GET /api/v3/factfinds
 ```
 Retrieves list of FactFinds with optional filtering and pagination.
 
@@ -1149,25 +1004,25 @@ Retrieves list of FactFinds with optional filtering and pagination.
 - `filter` (string, optional): QueryLang filter expression (Intelliflo standard)
   - Syntax: `field operator value` with `and` to chain
   - Example: `?filter=clients.id eq 123` - Filter by client ID
-- `page` (integer, optional): Page number (1-indexed, default: 1)
-- `pageSize` (integer, optional): Items per page (default: 25, max: 100)
+- `$top` (integer, optional): Number of items to return (default: 25, max: 100)
+- `$skip` (integer, optional): Number of items to skip (default: 0)
 
 **Response:** 200 OK
 ```json
 {
-  "href": "/api/v2/factfinds?page=1&pageSize=25",
-  "first_href": "/api/v2/factfinds?page=1&pageSize=25",
-  "last_href": "/api/v2/factfinds?page=1&pageSize=25",
+  "href": "/api/v3/factfinds?$top=25&$skip=0",
+  "first_href": "/api/v3/factfinds?$top=25&$skip=0",
+  "last_href": "/api/v3/factfinds?$top=25&$skip=0",
   "next_href": null,
   "prev_href": null,
   "items": [
     {
       "id": 679,
-      "href": "/api/v2/factfinds/679",
+      "href": "/api/v3/factfinds/679",
       "clients": [
         {
           "id": 123,
-          "href": "/api/v2/factfinds/679/clients/123",
+          "href": "/api/v3/factfinds/679/clients/123",
           "name": "John Smith"
         }
       ],
@@ -1177,7 +1032,7 @@ Retrieves list of FactFinds with optional filtering and pagination.
         "clientsPresent": [
           {
             "id": 123,
-            "href": "/api/v2/factfinds/679/clients/123",
+            "href": "/api/v3/factfinds/679/clients/123",
             "name": "John Smith"
           }
         ],
@@ -1205,7 +1060,7 @@ Retrieves list of FactFinds with optional filtering and pagination.
 
 **Create FactFind**
 ```
-POST /api/v2/factfinds
+POST /api/v3/factfinds
 ```
 Creates a new FactFind record.
 
@@ -1251,16 +1106,16 @@ Creates a new FactFind record.
 ```json
 {
   "id": 679,
-  "href": "/api/v2/factfinds/679",
+  "href": "/api/v3/factfinds/679",
   "clients": [
     {
       "id": 123,
-      "href": "/api/v2/factfinds/679/clients/123",
+      "href": "/api/v3/factfinds/679/clients/123",
       "name": "John Smith"
     },
     {
       "id": 124,
-      "href": "/api/v2/factfinds/679/clients/124",
+      "href": "/api/v3/factfinds/679/clients/124",
       "name": "Jane Smith"
     }
   ],
@@ -1270,12 +1125,12 @@ Creates a new FactFind record.
     "clientsPresent": [
       {
         "id": 123,
-        "href": "/api/v2/factfinds/679/clients/123",
+        "href": "/api/v3/factfinds/679/clients/123",
         "name": "John Smith"
       },
       {
         "id": 124,
-        "href": "/api/v2/factfinds/679/clients/124",
+        "href": "/api/v3/factfinds/679/clients/124",
         "name": "Jane Smith"
       }
     ],
@@ -1304,7 +1159,7 @@ Creates a new FactFind record.
 
 **Get FactFind**
 ```
-GET /api/v2/factfinds/{id}
+GET /api/v3/factfinds/{id}
 ```
 Retrieves a specific FactFind by ID.
 
@@ -1323,7 +1178,7 @@ Returns complete FactFind object (same structure as Create response).
 
 **Update FactFind**
 ```
-PUT /api/v2/factfinds/{id}
+PUT /api/v3/factfinds/{id}
 ```
 Updates an existing FactFind record.
 
@@ -1499,7 +1354,7 @@ Returns updated FactFind object.
 
 **Purpose:** The Client Management API handles core client identity, profile management, and demographic information for individuals, companies, and trusts receiving financial advice.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients`
 
 **Key Features:**
 - Multi-type client support (Person, Corporate, Trust)
@@ -1513,11 +1368,11 @@ Returns updated FactFind object.
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients` | List all clients in factfind | N/A | 200 OK - Client[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients` | Create new client | ClientRequest | 201 Created - Client |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Get client by ID | N/A | 200 OK - Client |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Update client details | ClientPatch | 200 OK - Client |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Delete client | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients` | List all clients in factfind | N/A | 200 OK - Client[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients` | Create new client | ClientRequest | 201 Created - Client |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}` | Get client by ID | N/A | 200 OK - Client |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}` | Update client details | ClientPatch | 200 OK - Client |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}` | Delete client | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -1605,7 +1460,7 @@ Returns updated FactFind object.
 ```json
 {
   "id": 8496,
-  "href": "/api/v2/factfinds/679/clients/8496",
+  "href": "/api/v3/factfinds/679/clients/8496",
   "clientNumber": "C00001234",
   "clientType": "Person",
   "clientCategory": "HighNetWorth",
@@ -1619,7 +1474,7 @@ Returns updated FactFind object.
   "matchingServicePropositionReason": null,
   "spouseRef": {
     "id": 8497,
-    "href": "/api/v2/factfinds/679/clients/8497",
+    "href": "/api/v3/factfinds/679/clients/8497",
     "clientNumber": "C00001235",
     "name": "Sarah Smith",
     "type": "Person"
@@ -1731,7 +1586,7 @@ Returns updated FactFind object.
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients
+POST /api/v3/factfinds/679/clients
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -1773,11 +1628,11 @@ Authorization: Bearer {token}
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
-Location: /api/v2/factfinds/679/clients/8496
+Location: /api/v3/factfinds/679/clients/8496
 
 {
   "id": 8496,
-  "href": "/api/v2/factfinds/679/clients/8496",
+  "href": "/api/v3/factfinds/679/clients/8496",
   "clientNumber": "C00001234",
   "clientType": "Person",
   "serviceStatus": "Prospect",
@@ -1823,19 +1678,19 @@ Location: /api/v2/factfinds/679/clients/8496
   "updatedAt": "2026-03-03T10:30:00Z",
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/clients/8496"
+      "href": "/api/v3/factfinds/679/clients/8496"
     },
     "addresses": {
-      "href": "/api/v2/factfinds/679/clients/8496/addresses"
+      "href": "/api/v3/factfinds/679/clients/8496/addresses"
     },
     "contacts": {
-      "href": "/api/v2/factfinds/679/clients/8496/contacts"
+      "href": "/api/v3/factfinds/679/clients/8496/contacts"
     },
     "employment": {
-      "href": "/api/v2/factfinds/679/clients/8496/employment"
+      "href": "/api/v3/factfinds/679/clients/8496/employment"
     },
     "income": {
-      "href": "/api/v2/factfinds/679/clients/8496/income"
+      "href": "/api/v3/factfinds/679/clients/8496/income"
     }
   }
 }
@@ -1845,7 +1700,7 @@ Location: /api/v2/factfinds/679/clients/8496
 
 **Request:**
 ```http
-PATCH /api/v2/factfinds/679/clients/8496
+PATCH /api/v3/factfinds/679/clients/8496
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -1867,7 +1722,7 @@ Content-Type: application/json
 
 {
   "id": 8496,
-  "href": "/api/v2/factfinds/679/clients/8496",
+  "href": "/api/v3/factfinds/679/clients/8496",
   "clientNumber": "C00001234",
   "clientType": "Person",
   "personValue": {
@@ -1891,7 +1746,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients
+POST /api/v3/factfinds/679/clients
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -1922,17 +1777,17 @@ Authorization: Bearer {token}
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
-Location: /api/v2/factfinds/679/clients/8497
+Location: /api/v3/factfinds/679/clients/8497
 
 {
   "id": 8497,
-  "href": "/api/v2/factfinds/679/clients/8497",
+  "href": "/api/v3/factfinds/679/clients/8497",
   "clientNumber": "C00001235",
   "clientType": "Person",
   "isJoint": true,
   "spouseRef": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "clientNumber": "C00001234",
     "name": "John Smith",
     "type": "Person"
@@ -1978,7 +1833,7 @@ Location: /api/v2/factfinds/679/clients/8497
 
 ### 5.7 Query Parameters
 
-**List Clients (`GET /api/v2/factfinds/{factfindId}/clients`):**
+**List Clients (`GET /api/v3/factfinds/{factfindId}/clients`):**
 
 | Parameter | Type | Description | Example |
 |-----------|------|-------------|---------|
@@ -1986,7 +1841,7 @@ Location: /api/v2/factfinds/679/clients/8497
 | `serviceStatus` | enum | Filter by service status | `serviceStatus=Active` |
 | `isJoint` | boolean | Filter joint clients | `isJoint=true` |
 | `clientSegment` | enum | Filter by segment | `clientSegment=A` |
-| `sortBy` | string | Sort field and direction | `sortBy=lastName:asc` |
+| `orderBy` | string | Order field and direction | `orderBy=lastName asc` |
 | `fields` | string | Sparse fieldsets | `fields=id,firstName,lastName` |
 
 ### 5.8 HTTP Status Codes
@@ -1998,7 +1853,7 @@ Location: /api/v2/factfinds/679/clients/8497
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed JSON, invalid data types |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks `client:write` scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid client ID |
 | 409 Conflict | Concurrency conflict | ETag mismatch |
 | 422 Unprocessable Entity | Validation failed | Business rule violations |
@@ -2035,20 +1890,20 @@ Location: /api/v2/factfinds/679/clients/8497
 ### 5.10 Related APIs
 
 **Child Resources:**
-- [Address API](#6-address-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses`
-- [Contact API](#7-contact-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts`
-- [Professional Contact API](#8-professional-contact-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/professional-contacts`
-- [Client Relationship API](#9-client-relationship-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships`
-- [Dependant API](#10-dependant-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants`
-- [Vulnerability API](#11-vulnerability-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
-- [Estate Planning API](#12-estate-planning-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
-- [Identity Verification API](#13-identity-verification-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification`
-- [Employment API](#18-employment-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
-- [Income API](#19-income-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/income`
-- [Expenditure API](#20-expenditure-api) - `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
+- [Address API](#6-address-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses`
+- [Contact API](#7-contact-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts`
+- [Professional Contact API](#8-professional-contact-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/professional-contacts`
+- [Client Relationship API](#9-client-relationship-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/relationships`
+- [Dependant API](#10-dependant-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/dependants`
+- [Vulnerability API](#11-vulnerability-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
+- [Estate Planning API](#12-estate-planning-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+- [Identity Verification API](#13-identity-verification-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/id-verification`
+- [Employment API](#18-employment-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/employment`
+- [Income API](#19-income-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/income`
+- [Expenditure API](#20-expenditure-api) - `/api/v3/factfinds/{factfindId}/clients/{clientId}/expenditure`
 
 **Parent Resources:**
-- [FactFind Root API](#4-factfind-root-api) - `/api/v2/factfinds`
+- [FactFind Root API](#4-factfind-root-api) - `/api/v3/factfinds`
 
 ---
 ## 6. Address API
@@ -2057,7 +1912,7 @@ Location: /api/v2/factfinds/679/clients/8497
 
 **Purpose:** The Address API manages client address information including current and historical addresses for KYC/AML compliance and correspondence purposes.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses`
 
 **Key Features:**
 - Current and historical address tracking
@@ -2070,11 +1925,11 @@ Location: /api/v2/factfinds/679/clients/8497
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | N/A | 200 OK - Address[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | Add new address | AddressRequest | 201 Created - Address |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Get address by ID | N/A | 200 OK - Address |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Update address | AddressPatch | 200 OK - Address |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Delete address | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | N/A | 200 OK - Address[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses` | Add new address | AddressRequest | 201 Created - Address |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Get address by ID | N/A | 200 OK - Address |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Update address | AddressPatch | 200 OK - Address |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Delete address | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -2110,7 +1965,7 @@ Location: /api/v2/factfinds/679/clients/8497
 ```json
 {
   "id": 1392,
-  "href": "/api/v2/factfinds/679/clients/8496/addresses/1392",
+  "href": "/api/v3/factfinds/679/clients/8496/addresses/1392",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -2149,7 +2004,7 @@ Location: /api/v2/factfinds/679/clients/8497
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/addresses
+POST /api/v3/factfinds/679/clients/8496/addresses
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -2176,11 +2031,11 @@ Authorization: Bearer {token}
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
-Location: /api/v2/factfinds/679/clients/8496/addresses/1392
+Location: /api/v3/factfinds/679/clients/8496/addresses/1392
 
 {
   "id": 1392,
-  "href": "/api/v2/factfinds/679/clients/8496/addresses/1392",
+  "href": "/api/v3/factfinds/679/clients/8496/addresses/1392",
   "addressType": "Residential",
   "address": {
     "line1": "123 High Street",
@@ -2206,7 +2061,7 @@ Location: /api/v2/factfinds/679/clients/8496/addresses/1392
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/addresses
+POST /api/v3/factfinds/679/clients/8496/addresses
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -2233,7 +2088,7 @@ Content-Type: application/json
 
 {
   "id": 1393,
-  "href": "/api/v2/factfinds/679/clients/8496/addresses/1393",
+  "href": "/api/v3/factfinds/679/clients/8496/addresses/1393",
   "addressType": "Previous",
   "address": {
     "line1": "45 Oak Avenue",
@@ -2268,7 +2123,7 @@ Content-Type: application/json
 |-----------|------|-------------|---------|
 | `addressType` | enum | Filter by address type | `addressType=Residential` |
 | `current` | boolean | Filter current addresses only | `current=true` |
-| `sortBy` | string | Sort field | `sortBy=startDate:desc` |
+| `orderBy` | string | Order field | `orderBy=startDate desc` |
 
 ### 6.8 HTTP Status Codes
 
@@ -2279,7 +2134,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid address ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -2308,7 +2163,7 @@ Content-Type: application/json
 
 **Purpose:** The Contact API manages client contact methods including email, phone, and mobile numbers for communication and marketing purposes.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts`
 
 **Key Features:**
 - Multiple contact methods per client
@@ -2321,11 +2176,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact methods | N/A | 200 OK - Contact[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact method | ContactRequest | 201 Created - Contact |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Get contact by ID | N/A | 200 OK - Contact |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Update contact | ContactPatch | 200 OK - Contact |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Delete contact | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts` | List contact methods | N/A | 200 OK - Contact[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts` | Add contact method | ContactRequest | 201 Created - Contact |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Get contact by ID | N/A | 200 OK - Contact |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Update contact | ContactPatch | 200 OK - Contact |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts/{contactId}` | Delete contact | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -2356,7 +2211,7 @@ Content-Type: application/json
 ```json
 {
   "id": 2001,
-  "href": "/api/v2/factfinds/679/clients/8496/contacts/2001",
+  "href": "/api/v3/factfinds/679/clients/8496/contacts/2001",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -2388,7 +2243,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/contacts
+POST /api/v3/factfinds/679/clients/8496/contacts
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -2408,7 +2263,7 @@ Content-Type: application/json
 
 {
   "id": 2001,
-  "href": "/api/v2/factfinds/679/clients/8496/contacts/2001",
+  "href": "/api/v3/factfinds/679/clients/8496/contacts/2001",
   "contactType": "Email",
   "value": "john.smith@example.com",
   "isPrimary": true,
@@ -2425,7 +2280,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/contacts
+POST /api/v3/factfinds/679/clients/8496/contacts
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -2444,7 +2299,7 @@ Content-Type: application/json
 
 {
   "id": 2002,
-  "href": "/api/v2/factfinds/679/clients/8496/contacts/2002",
+  "href": "/api/v3/factfinds/679/clients/8496/contacts/2002",
   "contactType": "Mobile",
   "value": "+44 7700 900123",
   "isPrimary": true,
@@ -2483,7 +2338,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Invalid email/phone format |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid contact ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -2514,7 +2369,7 @@ Content-Type: application/json
 
 **Purpose:** The Professional Contact API manages references to the client's professional advisers including solicitors, accountants, and other professional relationships.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/professional-contacts`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/professional-contacts`
 
 **Key Features:**
 - Solicitor contact details
@@ -2527,11 +2382,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/professional-contacts` | List professional contacts | N/A | 200 OK - ProfessionalContact[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/professional-contacts` | Add professional contact | ProfessionalContactRequest | 201 Created - ProfessionalContact |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/professional-contacts/{contactId}` | Get professional contact by ID | N/A | 200 OK - ProfessionalContact |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/professional-contacts/{contactId}` | Update professional contact | ProfessionalContactPatch | 200 OK - ProfessionalContact |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/professional-contacts/{contactId}` | Delete professional contact | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/professional-contacts` | List professional contacts | N/A | 200 OK - ProfessionalContact[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/professional-contacts` | Add professional contact | ProfessionalContactRequest | 201 Created - ProfessionalContact |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/professional-contacts/{contactId}` | Get professional contact by ID | N/A | 200 OK - ProfessionalContact |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/professional-contacts/{contactId}` | Update professional contact | ProfessionalContactPatch | 200 OK - ProfessionalContact |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/professional-contacts/{contactId}` | Delete professional contact | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -2560,7 +2415,7 @@ Content-Type: application/json
 ```json
 {
   "id": 3001,
-  "href": "/api/v2/factfinds/679/clients/8496/professional-contacts/3001",
+  "href": "/api/v3/factfinds/679/clients/8496/professional-contacts/3001",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -2595,7 +2450,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/professional-contacts
+POST /api/v3/factfinds/679/clients/8496/professional-contacts
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -2622,7 +2477,7 @@ Content-Type: application/json
 
 {
   "id": 3001,
-  "href": "/api/v2/factfinds/679/clients/8496/professional-contacts/3001",
+  "href": "/api/v3/factfinds/679/clients/8496/professional-contacts/3001",
   "professionalType": "Solicitor",
   "firmName": "Smith & Jones Solicitors",
   "contactName": "Alice Williams",
@@ -2644,7 +2499,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/professional-contacts
+POST /api/v3/factfinds/679/clients/8496/professional-contacts
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -2664,7 +2519,7 @@ Content-Type: application/json
 
 {
   "id": 3002,
-  "href": "/api/v2/factfinds/679/clients/8496/professional-contacts/3002",
+  "href": "/api/v3/factfinds/679/clients/8496/professional-contacts/3002",
   "professionalType": "Accountant",
   "firmName": "ABC Accountants Ltd",
   "contactName": "Robert Brown",
@@ -2699,7 +2554,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid contact ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -2727,7 +2582,7 @@ Content-Type: application/json
 
 **Purpose:** The Client Relationship API manages relationships between clients including family connections, partners, and permissions for data access.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/relationships`
 
 **Key Features:**
 - Family relationship tracking
@@ -2740,11 +2595,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | List relationships | N/A | 200 OK - Relationship[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships` | Create relationship | RelationshipRequest | 201 Created - Relationship |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Get relationship by ID | N/A | 200 OK - Relationship |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Update relationship | RelationshipPatch | 200 OK - Relationship |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Delete relationship | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/relationships` | List relationships | N/A | 200 OK - Relationship[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/relationships` | Create relationship | RelationshipRequest | 201 Created - Relationship |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Get relationship by ID | N/A | 200 OK - Relationship |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Update relationship | RelationshipPatch | 200 OK - Relationship |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/relationships/{relationshipId}` | Delete relationship | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -2776,10 +2631,10 @@ Content-Type: application/json
 ```json
 {
   "id": 4001,
-  "href": "/api/v2/factfinds/679/clients/8496/relationships/4001",
+  "href": "/api/v3/factfinds/679/clients/8496/relationships/4001",
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "clientNumber": "C00001234",
     "name": "John Smith",
     "type": "Person"
@@ -2791,7 +2646,7 @@ Content-Type: application/json
   },
   "relatedClient": {
     "id": 8497,
-    "href": "/api/v2/factfinds/679/clients/8497",
+    "href": "/api/v3/factfinds/679/clients/8497",
     "clientNumber": "C00001235",
     "name": "Sarah Smith",
     "type": "Person"
@@ -2816,7 +2671,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/relationships
+POST /api/v3/factfinds/679/clients/8496/relationships
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -2839,7 +2694,7 @@ Content-Type: application/json
 
 {
   "id": 4001,
-  "href": "/api/v2/factfinds/679/clients/8496/relationships/4001",
+  "href": "/api/v3/factfinds/679/clients/8496/relationships/4001",
   "client": {
     "id": 8496,
     "name": "John Smith"
@@ -2864,7 +2719,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/relationships
+POST /api/v3/factfinds/679/clients/8496/relationships
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -2886,7 +2741,7 @@ Content-Type: application/json
 
 {
   "id": 4002,
-  "href": "/api/v2/factfinds/679/clients/8496/relationships/4002",
+  "href": "/api/v3/factfinds/679/clients/8496/relationships/4002",
   "client": {
     "id": 8496,
     "name": "John Smith"
@@ -2932,7 +2787,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid relationship ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -2961,7 +2816,7 @@ Content-Type: application/json
 
 **Purpose:** The Dependant API manages information about persons financially dependent on the client, including children, elderly relatives, and others requiring support.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/dependants`
 
 **Key Features:**
 - Financial dependency tracking
@@ -2974,11 +2829,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | List dependants | N/A | 200 OK - Dependant[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants` | Add dependant | DependantRequest | 201 Created - Dependant |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | N/A | 200 OK - Dependant |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Update dependant | DependantPatch | 200 OK - Dependant |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Delete dependant | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dependants` | List dependants | N/A | 200 OK - Dependant[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dependants` | Add dependant | DependantRequest | 201 Created - Dependant |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Get dependant details | N/A | 200 OK - Dependant |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Update dependant | DependantPatch | 200 OK - Dependant |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dependants/{dependantId}` | Delete dependant | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -3027,16 +2882,16 @@ Content-Type: application/json
 ```json
 {
   "id": 999,
-  "href": "/api/v2/factfinds/679/clients/8496/dependants/999",
+  "href": "/api/v3/factfinds/679/clients/8496/dependants/999",
   "clients": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     },
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "name": "Sarah Smith"
     }
   ],
@@ -3056,15 +2911,13 @@ Content-Type: application/json
     "annualCost": {
       "amount": 9600.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "monthlyCost": {
       "amount": 800.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "estimatedDependencyEndAge": 21,
@@ -3077,8 +2930,7 @@ Content-Type: application/json
     "estimatedEducationCosts": {
       "amount": 50000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
@@ -3103,7 +2955,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/dependants
+POST /api/v3/factfinds/679/clients/8496/dependants
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -3149,7 +3001,7 @@ Content-Type: application/json
 
 {
   "id": 999,
-  "href": "/api/v2/factfinds/679/clients/8496/dependants/999",
+  "href": "/api/v3/factfinds/679/clients/8496/dependants/999",
   "clients": [
     {
       "id": 8496,
@@ -3168,11 +3020,11 @@ Content-Type: application/json
   "dependencyDetails": {
     "annualCost": {
       "amount": 9600.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "monthlyCost": {
       "amount": 800.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "estimatedDependencyEndAge": 21,
     "estimatedDependencyEndDate": "2036-08-20"
@@ -3183,7 +3035,7 @@ Content-Type: application/json
     "plannedHigherEducation": true,
     "estimatedEducationCosts": {
       "amount": 50000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "livingArrangements": {
@@ -3199,7 +3051,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/dependants
+POST /api/v3/factfinds/679/clients/8496/dependants
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -3238,7 +3090,7 @@ Content-Type: application/json
 
 {
   "id": 1000,
-  "href": "/api/v2/factfinds/679/clients/8496/dependants/1000",
+  "href": "/api/v3/factfinds/679/clients/8496/dependants/1000",
   "firstName": "Margaret",
   "lastName": "Smith",
   "fullName": "Margaret Smith",
@@ -3250,11 +3102,11 @@ Content-Type: application/json
   "dependencyDetails": {
     "annualCost": {
       "amount": 36000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "monthlyCost": {
       "amount": 3000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "healthDetails": {
@@ -3298,7 +3150,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid dependant ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -3328,7 +3180,7 @@ Content-Type: application/json
 
 **Purpose:** The Vulnerability API manages client vulnerability assessments as required by FCA Consumer Duty regulations.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
 
 **Key Features:**
 - FCA vulnerability category tracking
@@ -3341,11 +3193,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | List all client vulnerabilities | N/A | 200 OK - Vulnerability[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | Create a vulnerability | VulnerabilityRequest | 201 Created - Vulnerability |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{vulnerabilityId}` | Get vulnerability by ID | N/A | 200 OK - Vulnerability |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{vulnerabilityId}` | Update a vulnerability | VulnerabilityRequest | 200 OK - Vulnerability |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{vulnerabilityId}` | Delete a vulnerability | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | List all client vulnerabilities | N/A | 200 OK - Vulnerability[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/vulnerabilities` | Create a vulnerability | VulnerabilityRequest | 201 Created - Vulnerability |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{vulnerabilityId}` | Get vulnerability by ID | N/A | 200 OK - Vulnerability |
+| PUT | `/api/v3/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{vulnerabilityId}` | Update a vulnerability | VulnerabilityRequest | 200 OK - Vulnerability |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/vulnerabilities/{vulnerabilityId}` | Delete a vulnerability | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -3381,7 +3233,7 @@ Content-Type: application/json
 ```json
 {
   "id": 5001,
-  "href": "/api/v2/factfinds/679/clients/8496/vulnerabilities/5001",
+  "href": "/api/v3/factfinds/679/clients/8496/vulnerabilities/5001",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -3413,7 +3265,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/vulnerabilities
+POST /api/v3/factfinds/679/clients/8496/vulnerabilities
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -3439,7 +3291,7 @@ Content-Type: application/json
 
 {
   "id": 5001,
-  "href": "/api/v2/factfinds/679/clients/8496/vulnerabilities/5001",
+  "href": "/api/v3/factfinds/679/clients/8496/vulnerabilities/5001",
   "hasVulnerability": "Yes",
   "type": "Temporary",
   "categories": [
@@ -3460,7 +3312,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8497/vulnerabilities
+POST /api/v3/factfinds/679/clients/8497/vulnerabilities
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -3486,7 +3338,7 @@ Content-Type: application/json
 
 {
   "id": 5002,
-  "href": "/api/v2/factfinds/679/clients/8497/vulnerabilities/5002",
+  "href": "/api/v3/factfinds/679/clients/8497/vulnerabilities/5002",
   "hasVulnerability": "Yes",
   "type": "Permanent",
   "categories": [
@@ -3535,7 +3387,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid vulnerability ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -3587,7 +3439,7 @@ The Estate Planning API manages client estate planning information, including wi
 ### Base URL Pattern
 
 ```
-/api/v2/factfinds/{factfindId}/clients/{clientId}/estateplanning
+/api/v3/factfinds/{factfindId}/clients/{clientId}/estateplanning
 ```
 
 ### Operations
@@ -3596,17 +3448,17 @@ The Estate Planning API manages client estate planning information, including wi
 
 **Get Estate Planning**
 ```
-GET /api/v2/factfinds/{id}/clients/{clientId}/estateplanning
+GET /api/v3/factfinds/{id}/clients/{clientId}/estateplanning
 ```
 Retrieves the estate planning singleton record for a client, including embedded gifts array.
 
 **Response:** 200 OK
 ```json
 {
-  "href": "/v2/factfinds/679/clients/8496/estateplanning",
+  "href": "/v3/factfinds/679/clients/8496/estateplanning",
   "client": {
     "id": 8496,
-    "href": "/v2/factfinds/679/clients/8496",
+    "href": "/v3/factfinds/679/clients/8496",
     "name": "John Smith"
   },
   "factfind": {
@@ -3616,15 +3468,13 @@ Retrieves the estate planning singleton record for a client, including embedded 
   "totalAssets": {
     "amount": 850000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalJointAssets": {
     "amount": 425000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "giftInLast7YearsDetails": "Annual exemption gifts to both children (£3,000 per year each)",
@@ -3634,15 +3484,14 @@ Retrieves the estate planning singleton record for a client, including embedded 
   "gifts": [
     {
       "id": 1,
-      "href": "/v2/factfinds/679/clients/8496/estateplanning/gifts/1",
+      "href": "/v3/factfinds/679/clients/8496/estateplanning/gifts/1",
       "giftedOn": "2025-04-10",
       "recipient": "Emily Rose Smith",
       "relationship": "Daughter",
       "value": {
         "amount": 3000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "description": "Annual exemption gift for tax year 2025/26",
@@ -3664,7 +3513,7 @@ Retrieves the estate planning singleton record for a client, including embedded 
 
 **Update Estate Planning**
 ```
-PUT /api/v2/factfinds/{id}/clients/{clientId}/estateplanning
+PUT /api/v3/factfinds/{id}/clients/{clientId}/estateplanning
 ```
 Creates or updates the estate planning singleton record. First PUT creates the record (201 Created), subsequent PUTs update it (200 OK).
 
@@ -3694,7 +3543,7 @@ Returns complete EstatePlanning object with read-only fields populated.
 
 **Create Gift**
 ```
-POST /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts
+POST /api/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts
 ```
 Creates a new gift record for IHT tracking. Estate planning singleton must exist before gifts can be added.
 
@@ -3707,8 +3556,7 @@ Creates a new gift record for IHT tracking. Estate planning singleton must exist
   "value": {
     "amount": 3000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "description": "Annual exemption gift for tax year 2026/27",
@@ -3721,15 +3569,14 @@ Creates a new gift record for IHT tracking. Estate planning singleton must exist
 ```json
 {
   "id": 2,
-  "href": "/v2/factfinds/679/clients/8496/estateplanning/gifts/2",
+  "href": "/v3/factfinds/679/clients/8496/estateplanning/gifts/2",
   "giftedOn": "2026-04-06",
   "recipient": "Thomas James Smith",
   "relationship": "Son",
   "value": {
     "amount": 3000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "description": "Annual exemption gift for tax year 2026/27",
@@ -3748,7 +3595,7 @@ Creates a new gift record for IHT tracking. Estate planning singleton must exist
 
 **Get Gift**
 ```
-GET /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
+GET /api/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
 ```
 Retrieves a specific gift record.
 
@@ -3764,7 +3611,7 @@ Returns Gift object.
 
 **Update Gift**
 ```
-PUT /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
+PUT /api/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
 ```
 Updates an existing gift record.
 
@@ -3784,7 +3631,7 @@ Returns updated Gift object.
 
 **Delete Gift**
 ```
-DELETE /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
+DELETE /api/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}
 ```
 Removes a gift record from tracking.
 
@@ -3837,7 +3684,7 @@ Removes a gift record from tracking.
 ```json
 {
   "id": 8496,
-  "href": "/v2/factfinds/679/clients/8496",
+  "href": "/v3/factfinds/679/clients/8496",
   "name": "John Smith"
 }
 ```
@@ -3854,8 +3701,7 @@ Removes a gift record from tracking.
 {
   "amount": 3000.00,
   "currency": {
-    "code": "GBP",
-    "symbol": "£"
+    "code": "GBP"
   }
 }
 ```
@@ -4000,7 +3846,7 @@ Removes a gift record from tracking.
 
 **Purpose:** The Identity Verification API manages KYC/AML identity verification records as required by UK Money Laundering Regulations 2017.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/id-verification`
 
 **Key Features:**
 - Document verification tracking (passport, driving licence, etc.)
@@ -4013,8 +3859,8 @@ Removes a gift record from tracking.
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get identity verification details | N/A | 200 OK - IdentityVerification |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/id-verification` | Update identity verification details | IdentityVerificationRequest | 200 OK - IdentityVerification |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/id-verification` | Get identity verification details | N/A | 200 OK - IdentityVerification |
+| PUT | `/api/v3/factfinds/{factfindId}/clients/{clientId}/id-verification` | Update identity verification details | IdentityVerificationRequest | 200 OK - IdentityVerification |
 
 **Total Operations:** 2 endpoints (singleton resource)
 
@@ -4051,10 +3897,10 @@ Removes a gift record from tracking.
 
 ```json
 {
-  "href": "/api/v2/factfinds/679/clients/8496/id-verification",
+  "href": "/api/v3/factfinds/679/clients/8496/id-verification",
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "title": "MR",
     "firstName": "John",
     "middleName": "Michael",
@@ -4126,16 +3972,16 @@ Removes a gift record from tracking.
   "supportingDocuments": [
     {
       "id": 9001,
-      "href": "/api/v2/documents/9001"
+      "href": "/api/v3/documents/9001"
     },
     {
       "id": 9002,
-      "href": "/api/v2/documents/9002"
+      "href": "/api/v3/documents/9002"
     }
   ],
   "adviser": {
     "id": 8724,
-    "href": "/api/v2/advisers/8724"
+    "href": "/api/v3/advisers/8724"
   },
   "verification": {
     "witness": {
@@ -4156,7 +4002,7 @@ Removes a gift record from tracking.
     "verifiedOn": "2026-02-16T10:30:00Z",
     "certificateDocument": {
       "id": 9003,
-      "href": "/api/v2/documents/9003"
+      "href": "/api/v3/documents/9003"
     },
     "createdAt": "2026-02-16T10:30:00Z",
     "updatedAt": "2026-02-16T10:30:00Z"
@@ -4175,7 +4021,7 @@ Removes a gift record from tracking.
 
 **Request:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/id-verification
+PUT /api/v3/factfinds/679/clients/8496/id-verification
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -4227,7 +4073,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "href": "/api/v2/factfinds/679/clients/8496/id-verification",
+  "href": "/api/v3/factfinds/679/clients/8496/id-verification",
   "client": {
     "id": 8496,
     "firstName": "John",
@@ -4271,7 +4117,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/id-verification
+PUT /api/v3/factfinds/679/clients/8496/id-verification
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -4292,7 +4138,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "href": "/api/v2/factfinds/679/clients/8496/id-verification",
+  "href": "/api/v3/factfinds/679/clients/8496/id-verification",
   "verificationResult": {
     "providerName": "GBG",
     "status": "Completed",
@@ -4330,7 +4176,7 @@ None (singleton resource)
 | 200 OK | Success | GET, PUT successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid client ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -4366,7 +4212,7 @@ None (singleton resource)
 
 **Purpose:** The Credit History API manages client credit history including adverse credit events (CCJs, defaults, IVAs, bankruptcy, arrears, repossessions) with automatic flag calculation for mortgage and lending applications.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/credithistory`
 
 **Key Features:**
 - Singleton credit history per client with automatic adverse flags
@@ -4380,12 +4226,12 @@ None (singleton resource)
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory` | Get credit history singleton | N/A | 200 OK - CreditHistory |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory` | Update credit history | CreditHistoryUpdate | 200 OK - CreditHistory |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory/events` | Create adverse credit event | AdverseCreditEventRequest | 201 Created - AdverseCreditEvent |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Get adverse credit event | N/A | 200 OK - AdverseCreditEvent |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Update adverse credit event | AdverseCreditEventUpdate | 200 OK - AdverseCreditEvent |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Delete adverse credit event | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/credithistory` | Get credit history singleton | N/A | 200 OK - CreditHistory |
+| PUT | `/api/v3/factfinds/{factfindId}/clients/{clientId}/credithistory` | Update credit history | CreditHistoryUpdate | 200 OK - CreditHistory |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/credithistory/events` | Create adverse credit event | AdverseCreditEventRequest | 201 Created - AdverseCreditEvent |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Get adverse credit event | N/A | 200 OK - AdverseCreditEvent |
+| PUT | `/api/v3/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Update adverse credit event | AdverseCreditEventUpdate | 200 OK - AdverseCreditEvent |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/credithistory/events/{eventId}` | Delete adverse credit event | N/A | 204 No Content |
 
 **Total Operations:** 6 endpoints
 
@@ -4445,7 +4291,7 @@ None (singleton resource)
 ```json
 {
   "id": 334,
-  "href": "/api/v2/factfinds/679/clients/8496/credithistory",
+  "href": "/api/v3/factfinds/679/clients/8496/credithistory",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -4467,17 +4313,17 @@ None (singleton resource)
   "adverseCreditEvents": [
     {
       "id": 123,
-      "href": "/api/v2/factfinds/679/clients/8496/credithistory/events/123",
+      "href": "/api/v3/factfinds/679/clients/8496/credithistory/events/123",
       "type": "Default",
       "registeredOn": "2020-06-15T00:00:00Z",
       "satisfiedOrClearedOn": "2021-03-20T00:00:00Z",
       "amountRegistered": {
         "amount": 5000.00,
-        "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+        "currency": {"code": "GBP"}
       },
       "amountOutstanding": {
         "amount": 0.00,
-        "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+        "currency": {"code": "GBP"}
       },
       "isDebtOutstanding": false,
       "numberOfPaymentsMissed": 2,
@@ -4499,7 +4345,7 @@ None (singleton resource)
 
 **Request:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/credithistory
+PUT /api/v3/factfinds/679/clients/8496/credithistory
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -4516,7 +4362,7 @@ Content-Type: application/json
 
 {
   "id": 334,
-  "href": "/api/v2/factfinds/679/clients/8496/credithistory",
+  "href": "/api/v3/factfinds/679/clients/8496/credithistory",
   "client": {"id": 8496, "clientNumber": "C00001234", "name": "John Smith"},
   "factfind": {"id": 679, "factFindNumber": "FF-2025-00123"},
   "hasAdverseCredit": true,
@@ -4532,7 +4378,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/credithistory/events
+POST /api/v3/factfinds/679/clients/8496/credithistory/events
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -4550,17 +4396,17 @@ Authorization: Bearer {token}
 **Response:**
 ```http
 HTTP/1.1 201 Created
-Location: /api/v2/factfinds/679/clients/8496/credithistory/events/123
+Location: /api/v3/factfinds/679/clients/8496/credithistory/events/123
 Content-Type: application/json
 
 {
   "id": 123,
-  "href": "/api/v2/factfinds/679/clients/8496/credithistory/events/123",
+  "href": "/api/v3/factfinds/679/clients/8496/credithistory/events/123",
   "type": "CCJ",
   "registeredOn": "2019-03-15T00:00:00Z",
   "satisfiedOrClearedOn": "2019-06-20T00:00:00Z",
-  "amountRegistered": {"amount": 2500.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
-  "amountOutstanding": {"amount": 0.00, "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}},
+  "amountRegistered": {"amount": 2500.00, "currency": {"code": "GBP"}},
+  "amountOutstanding": {"amount": 0.00, "currency": {"code": "GBP"}},
   "isDebtOutstanding": false,
   "lender": "County Court",
   "concurrencyId": 1,
@@ -4651,7 +4497,7 @@ No query parameters for singleton resource. Events are embedded in the parent re
 
 **Purpose:** The Financial Profile API manages the client's financial sophistication assessment, investment experience, and knowledge for FCA Appropriateness Test compliance.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/financial-profile`
 
 **Key Features:**
 - Investment experience tracking
@@ -4665,8 +4511,8 @@ No query parameters for singleton resource. Events are embedded in the parent re
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile` | Get financial profile | N/A | 200 OK - FinancialProfile |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile` | Update financial profile | FinancialProfileRequest | 200 OK - FinancialProfile |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/financial-profile` | Get financial profile | N/A | 200 OK - FinancialProfile |
+| PUT | `/api/v3/factfinds/{factfindId}/clients/{clientId}/financial-profile` | Update financial profile | FinancialProfileRequest | 200 OK - FinancialProfile |
 
 **Total Operations:** 2 endpoints (singleton resource)
 
@@ -4714,7 +4560,7 @@ No query parameters for singleton resource. Events are embedded in the parent re
 
 ```json
 {
-  "href": "/api/v2/factfinds/679/clients/8496/financial-profile",
+  "href": "/api/v3/factfinds/679/clients/8496/financial-profile",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -4748,22 +4594,19 @@ No query parameters for singleton resource. Events are embedded in the parent re
     "totalAnnualIncome": {
       "amount": 75000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "totalNetWorth": {
       "amount": 610000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "liquidAssets": {
       "amount": 40000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "incomeStability": "Stable"
@@ -4796,7 +4639,7 @@ No query parameters for singleton resource. Events are embedded in the parent re
 
 **Request:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/financial-profile
+PUT /api/v3/factfinds/679/clients/8496/financial-profile
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -4835,7 +4678,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "href": "/api/v2/factfinds/679/clients/8496/financial-profile",
+  "href": "/api/v3/factfinds/679/clients/8496/financial-profile",
   "investmentExperience": {
     "hasInvestedBefore": true,
     "yearsExperience": 10,
@@ -4867,7 +4710,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-PUT /api/v2/factfinds/679/clients/8497/financial-profile
+PUT /api/v3/factfinds/679/clients/8497/financial-profile
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -4900,7 +4743,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "href": "/api/v2/factfinds/679/clients/8497/financial-profile",
+  "href": "/api/v3/factfinds/679/clients/8497/financial-profile",
   "investmentExperience": {
     "hasInvestedBefore": false,
     "yearsExperience": 0,
@@ -4950,7 +4793,7 @@ None (singleton resource)
 | 200 OK | Success | GET, PUT successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid client ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -4988,7 +4831,7 @@ None (singleton resource)
 
 **Purpose:** The Marketing Preferences API manages client marketing consent for various communication channels in compliance with PECR and GDPR requirements.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/marketing-preferences`
 
 **Key Features:**
 - Channel-specific consent (email, phone, SMS, post)
@@ -5002,8 +4845,8 @@ None (singleton resource)
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get marketing preferences | N/A | 200 OK - MarketingPreferences |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update marketing preferences | MarketingPreferencesRequest | 200 OK - MarketingPreferences |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Get marketing preferences | N/A | 200 OK - MarketingPreferences |
+| PUT | `/api/v3/factfinds/{factfindId}/clients/{clientId}/marketing-preferences` | Update marketing preferences | MarketingPreferencesRequest | 200 OK - MarketingPreferences |
 
 **Total Operations:** 2 endpoints (singleton resource)
 
@@ -5051,7 +4894,7 @@ None (singleton resource)
 
 ```json
 {
-  "href": "/api/v2/factfinds/679/clients/8496/marketing-preferences",
+  "href": "/api/v3/factfinds/679/clients/8496/marketing-preferences",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -5105,7 +4948,7 @@ None (singleton resource)
 
 **Request:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/marketing-preferences
+PUT /api/v3/factfinds/679/clients/8496/marketing-preferences
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -5138,7 +4981,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "href": "/api/v2/factfinds/679/clients/8496/marketing-preferences",
+  "href": "/api/v3/factfinds/679/clients/8496/marketing-preferences",
   "email": {
     "optedIn": true,
     "consentDate": "2026-03-03T10:30:00Z",
@@ -5171,7 +5014,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/marketing-preferences
+PUT /api/v3/factfinds/679/clients/8496/marketing-preferences
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -5202,7 +5045,7 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "href": "/api/v2/factfinds/679/clients/8496/marketing-preferences",
+  "href": "/api/v3/factfinds/679/clients/8496/marketing-preferences",
   "email": {
     "optedIn": false,
     "lastUpdated": "2026-03-03T10:35:00Z"
@@ -5250,7 +5093,7 @@ None (singleton resource)
 | 200 OK | Success | GET, PUT successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid client ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -5290,7 +5133,7 @@ None (singleton resource)
 
 **Purpose:** The DPA Agreement API manages Data Processing Agreements and GDPR consent records including version tracking and consent withdrawal.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/dpa-agreements`
 
 **Key Features:**
 - Consent capture and tracking
@@ -5304,10 +5147,10 @@ None (singleton resource)
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | Create new DPA agreement | DPAAgreementRequest | 201 Created - DPAAgreement |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | List all DPA agreements | N/A | 200 OK - DPAAgreement[] |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/current` | Get current active agreement | N/A | 200 OK - DPAAgreement |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}` | Withdraw consent | N/A | 204 No Content |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | Create new DPA agreement | DPAAgreementRequest | 201 Created - DPAAgreement |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dpa-agreements` | List all DPA agreements | N/A | 200 OK - DPAAgreement[] |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/current` | Get current active agreement | N/A | 200 OK - DPAAgreement |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/dpa-agreements/{agreementId}` | Withdraw consent | N/A | 204 No Content |
 
 **Total Operations:** 4 endpoints
 
@@ -5348,7 +5191,7 @@ None (singleton resource)
 ```json
 {
   "id": 1001,
-  "href": "/api/v2/factfinds/679/clients/8496/dpa-agreements/1001",
+  "href": "/api/v3/factfinds/679/clients/8496/dpa-agreements/1001",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -5393,7 +5236,7 @@ None (singleton resource)
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/dpa-agreements
+POST /api/v3/factfinds/679/clients/8496/dpa-agreements
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -5419,11 +5262,11 @@ Authorization: Bearer {token}
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
-Location: /api/v2/factfinds/679/clients/8496/dpa-agreements/1001
+Location: /api/v3/factfinds/679/clients/8496/dpa-agreements/1001
 
 {
   "id": 1001,
-  "href": "/api/v2/factfinds/679/clients/8496/dpa-agreements/1001",
+  "href": "/api/v3/factfinds/679/clients/8496/dpa-agreements/1001",
   "agreementType": "DataProcessing",
   "version": "2.1",
   "consentDate": "2026-03-03T10:30:00Z",
@@ -5450,7 +5293,7 @@ Location: /api/v2/factfinds/679/clients/8496/dpa-agreements/1001
 
 **Request:**
 ```http
-DELETE /api/v2/factfinds/679/clients/8496/dpa-agreements/1001?reason=Client+request
+DELETE /api/v3/factfinds/679/clients/8496/dpa-agreements/1001?reason=Client+request
 Authorization: Bearer {token}
 ```
 
@@ -5463,7 +5306,7 @@ HTTP/1.1 204 No Content
 
 **Request:**
 ```http
-GET /api/v2/factfinds/679/clients/8496/dpa-agreements/current
+GET /api/v3/factfinds/679/clients/8496/dpa-agreements/current
 Authorization: Bearer {token}
 ```
 
@@ -5516,7 +5359,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid agreement ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -5568,7 +5411,7 @@ Content-Type: application/json
 
 **Purpose:** The Bank Account API manages client bank account details including account holder information, bank details, account numbers, routing codes, and links to cash investment accounts for comprehensive financial tracking and payment processing.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/bankaccounts`
 
 **Aggregate Root:** Client
 
@@ -5587,11 +5430,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts` | List all bank accounts | N/A | 200 OK - BankAccount[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts` | Add new bank account | BankAccountRequest | 201 Created - BankAccount |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Get bank account details | N/A | 200 OK - BankAccount |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Update bank account | BankAccountPatch | 200 OK - BankAccount |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Delete bank account | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/bankaccounts` | List all bank accounts | N/A | 200 OK - BankAccount[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/bankaccounts` | Add new bank account | BankAccountRequest | 201 Created - BankAccount |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Get bank account details | N/A | 200 OK - BankAccount |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Update bank account | BankAccountPatch | 200 OK - BankAccount |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/bankaccounts/{accountId}` | Delete bank account | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -5648,25 +5491,25 @@ Content-Type: application/json
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/clients/8496/bankaccounts/1234",
+  "href": "/api/v3/factfinds/679/clients/8496/bankaccounts/1234",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "John Smith"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     },
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "name": "Jane Smith"
     }
   ],
@@ -5691,7 +5534,7 @@ Content-Type: application/json
   "isDefault": true,
   "cashAccount": {
     "id": 5001,
-    "href": "/api/v2/factfinds/679/investments/5001",
+    "href": "/api/v3/factfinds/679/investments/5001",
     "reference": "ISA-2024-001"
   },
   "accountType": "CURRENT",
@@ -5707,7 +5550,7 @@ Content-Type: application/json
 
 Request:
 ```http
-POST /api/v2/factfinds/679/clients/8496/bankaccounts
+POST /api/v3/factfinds/679/clients/8496/bankaccounts
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -5749,25 +5592,25 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
 ```json
 {
   "id": 1235,
-  "href": "/api/v2/factfinds/679/clients/8496/bankaccounts/1235",
+  "href": "/api/v3/factfinds/679/clients/8496/bankaccounts/1235",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "John Smith"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     },
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "name": "Jane Smith"
     }
   ],
@@ -5792,7 +5635,7 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
   "isDefault": false,
   "cashAccount": {
     "id": 5010,
-    "href": "/api/v2/factfinds/679/investments/5010",
+    "href": "/api/v3/factfinds/679/investments/5010",
     "reference": "ISA-2024-JNT-001"
   },
   "accountType": "ISA",
@@ -5807,20 +5650,20 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
 ```json
 {
   "id": 1236,
-  "href": "/api/v2/factfinds/679/clients/8496/bankaccounts/1236",
+  "href": "/api/v3/factfinds/679/clients/8496/bankaccounts/1236",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "John Smith"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     }
   ],
@@ -5873,11 +5716,11 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
 | `currency` | string | Filter by currency | `?currency=GBP` |
 | `bank` | string | Filter by bank name | `?bank=Barclays` |
 | `hasCashAccount` | boolean | Filter accounts linked to investments | `?hasCashAccount=true` |
-| `page` | integer | Page number (1-indexed) | `?page=1` |
-| `pageSize` | integer | Items per page (max 100) | `?pageSize=25` |
-| `sort` | string | Sort field and direction | `?sort=bank.name:asc` |
+| `page` | integer | Page number (1-indexed) | `?$top=25&$skip=0` |
+| `$skip` | integer | Number of items to skip | `?$skip=0` |
+| `orderBy` | string | Order field and direction | `?orderBy=bank.name asc` |
 
-**Sort Fields:**
+**Order Fields:**
 - `bank.name` - Bank name (alphabetical)
 - `account.name` - Account name (alphabetical)
 - `isDefault` - Default account first
@@ -5893,7 +5736,7 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed JSON, invalid data types, invalid IBAN format |
 | 401 Unauthorized | Authentication required | Missing or invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks `client:write` or `client:delete` scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid bank account ID, client ID, or factfind ID |
 | 422 Unprocessable Entity | Validation failed | Invalid sort code format, invalid cash account reference, duplicate default account |
 | 500 Internal Server Error | Server error | Unexpected server issue |
@@ -5957,7 +5800,7 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
 
 **Purpose:** The Employment API manages client employment records including employed, self-employed, retired, and unemployed statuses with earnings, tax information, and Standard Occupational Classification (SOC) codes.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/employment`
 
 **Key Features:**
 - Multiple employment record tracking
@@ -5971,11 +5814,11 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | List all employment records | N/A | 200 OK - Employment[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment` | Create new employment record | EmploymentRequest | 201 Created - Employment |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Get employment details | N/A | 200 OK - Employment |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Update employment | EmploymentPatch | 200 OK - Employment |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Delete employment record | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employment` | List all employment records | N/A | 200 OK - Employment[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employment` | Create new employment record | EmploymentRequest | 201 Created - Employment |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Get employment details | N/A | 200 OK - Employment |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Update employment | EmploymentPatch | 200 OK - Employment |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employment/{employmentId}` | Delete employment record | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -6032,7 +5875,7 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
 ```json
 {
   "id": 8695,
-  "href": "/api/v2/factfinds/679/clients/8496/employment/8695",
+  "href": "/api/v3/factfinds/679/clients/8496/employment/8695",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -6060,22 +5903,19 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
     "grossAnnualSalary": {
       "amount": 75000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "netMonthlySalary": {
       "amount": 4583.33,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "bonusAmount": {
       "amount": 10000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "overtimeAmount": null,
@@ -6112,7 +5952,7 @@ Response: `201 Created` with complete BankAccount object (account.number masked 
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/employment
+POST /api/v3/factfinds/679/clients/8496/employment
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -6160,7 +6000,7 @@ Content-Type: application/json
 
 {
   "id": 8695,
-  "href": "/api/v2/factfinds/679/clients/8496/employment/8695",
+  "href": "/api/v3/factfinds/679/clients/8496/employment/8695",
   "employmentStatus": "Current",
   "employmentType": "Employed",
   "employerName": "Tech Corp Ltd",
@@ -6173,11 +6013,11 @@ Content-Type: application/json
   "earnings": {
     "grossAnnualSalary": {
       "amount": 75000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "bonusAmount": {
       "amount": 10000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "taxInformation": {
@@ -6195,7 +6035,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8497/employment
+POST /api/v3/factfinds/679/clients/8497/employment
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -6243,7 +6083,7 @@ Content-Type: application/json
 
 {
   "id": 8696,
-  "href": "/api/v2/factfinds/679/clients/8497/employment/8696",
+  "href": "/api/v3/factfinds/679/clients/8497/employment/8696",
   "employmentStatus": "Current",
   "employmentType": "SelfEmployed",
   "jobTitle": "Marketing Consultant",
@@ -6252,11 +6092,11 @@ Content-Type: application/json
     "businessType": "SoleTrader",
     "yearlyTurnover": {
       "amount": 85000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "netProfit": {
       "amount": 52000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "taxInformation": {
@@ -6298,7 +6138,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid employment ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -6328,7 +6168,7 @@ Content-Type: application/json
 
 **Purpose:** The Employment Summary API manages aggregated employment and income information for each client, providing a singleton resource that summarizes total income and tax position.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/summary`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments/summary`
 
 **Key Features:**
 - Automatic calculation of total gross annual income from all sources
@@ -6341,8 +6181,8 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/summary` | Get employment summary | N/A | 200 OK - EmploymentSummary |
-| PUT | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/summary` | Update employment summary | EmploymentSummaryRequest | 200 OK - EmploymentSummary |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments/summary` | Get employment summary | N/A | 200 OK - EmploymentSummary |
+| PUT | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments/summary` | Update employment summary | EmploymentSummaryRequest | 200 OK - EmploymentSummary |
 
 **Total Operations:** 2 endpoints
 
@@ -6363,19 +6203,17 @@ Content-Type: application/json
 {
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "totalGrossAnnualIncome": {
     "amount": 75000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "highestTaxRatePaid": {
@@ -6390,7 +6228,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-GET /api/v2/factfinds/679/clients/8496/employments/summary
+GET /api/v3/factfinds/679/clients/8496/employments/summary
 Authorization: Bearer {token}
 ```
 
@@ -6400,26 +6238,26 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v3/factfinds/679"},
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "totalGrossAnnualIncome": {
     "amount": 75000.00,
-    "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+    "currency": {"code": "GBP"}
   },
   "highestTaxRatePaid": {"percentage": 40},
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/clients/8496/employments/summary"
+      "href": "/api/v3/factfinds/679/clients/8496/employments/summary"
     },
     "employments": {
-      "href": "/api/v2/factfinds/679/clients/8496/employment"
+      "href": "/api/v3/factfinds/679/clients/8496/employment"
     },
     "income": {
-      "href": "/api/v2/factfinds/679/clients/8496/income"
+      "href": "/api/v3/factfinds/679/clients/8496/income"
     }
   }
 }
@@ -6429,7 +6267,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/employments/summary
+PUT /api/v3/factfinds/679/clients/8496/employments/summary
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -6446,15 +6284,15 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v3/factfinds/679"},
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "totalGrossAnnualIncome": {
     "amount": 75000.00,
-    "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+    "currency": {"code": "GBP"}
   },
   "highestTaxRatePaid": {"percentage": 40}
 }
@@ -6516,7 +6354,7 @@ No query parameters supported (singleton resource).
 
 **Purpose:** The Income API manages all income sources for clients including salary, dividends, rental income, pension income, and state benefits with frequency, tax treatment, and gross/net calculations.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/income`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/income`
 
 **Key Features:**
 - Multiple income source tracking
@@ -6531,11 +6369,11 @@ No query parameters supported (singleton resource).
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income` | List all income sources | N/A | 200 OK - Income[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income` | Create new income source | IncomeRequest | 201 Created - Income |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income/{incomeId}` | Get income details | N/A | 200 OK - Income |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income/{incomeId}` | Update income | IncomePatch | 200 OK - Income |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/income/{incomeId}` | Delete income source | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/income` | List all income sources | N/A | 200 OK - Income[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/income` | Create new income source | IncomeRequest | 201 Created - Income |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/income/{incomeId}` | Get income details | N/A | 200 OK - Income |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/income/{incomeId}` | Update income | IncomePatch | 200 OK - Income |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/income/{incomeId}` | Delete income source | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -6577,7 +6415,7 @@ No query parameters supported (singleton resource).
 ```json
 {
   "id": 5156,
-  "href": "/api/v2/factfinds/679/clients/8496/income/5156",
+  "href": "/api/v3/factfinds/679/clients/8496/income/5156",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -6595,37 +6433,28 @@ No query parameters supported (singleton resource).
     "amount": 75000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "netAmount": {
     "amount": 55000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "taxDeducted": {
     "amount": 15000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "nationalInsuranceDeducted": {
     "amount": 5000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "frequency": {
     "code": "A",
-    "display": "Annually",
     "periodsPerYear": 1
   },
   "incomePeriod": {
@@ -6654,7 +6483,7 @@ No query parameters supported (singleton resource).
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/income
+POST /api/v3/factfinds/679/clients/8496/income
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -6710,16 +6539,16 @@ Content-Type: application/json
 
 {
   "id": 5156,
-  "href": "/api/v2/factfinds/679/clients/8496/income/5156",
+  "href": "/api/v3/factfinds/679/clients/8496/income/5156",
   "incomeType": "Employment",
   "description": "Salary from Tech Corp Ltd",
   "grossAmount": {
     "amount": 75000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "netAmount": {
     "amount": 55000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "frequency": {
     "code": "A",
@@ -6737,7 +6566,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/income
+POST /api/v3/factfinds/679/clients/8496/income
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -6779,16 +6608,16 @@ Content-Type: application/json
 
 {
   "id": 5157,
-  "href": "/api/v2/factfinds/679/clients/8496/income/5157",
+  "href": "/api/v3/factfinds/679/clients/8496/income/5157",
   "incomeType": "Rental",
   "description": "Rental income from BTL property",
   "grossAmount": {
     "amount": 18000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "netAmount": {
     "amount": 14400.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "frequency": {
     "code": "A",
@@ -6800,7 +6629,7 @@ Content-Type: application/json
   "isOngoing": true,
   "asset": {
     "id": 5001,
-    "href": "/api/v2/factfinds/679/assets/5001",
+    "href": "/api/v3/factfinds/679/assets/5001",
     "assetType": "Property",
     "description": "Rental Property - 45 High Street, Manchester"
   },
@@ -6851,7 +6680,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid income ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -6884,7 +6713,7 @@ Content-Type: application/json
 
 **Purpose:** The Expenditure API manages client outgoing payments and expenses categorized by type for budget planning and affordability assessments with essential/non-essential classification.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/expenditure`
 
 **Key Features:**
 - Comprehensive expenditure tracking
@@ -6899,11 +6728,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure` | List all expenditure items | N/A | 200 OK - Expenditure[] |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure` | Create new expenditure | ExpenditureRequest | 201 Created - Expenditure |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{expenditureId}` | Get expenditure details | N/A | 200 OK - Expenditure |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{expenditureId}` | Update expenditure | ExpenditurePatch | 200 OK - Expenditure |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure/{expenditureId}` | Delete expenditure | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/expenditure` | List all expenditure items | N/A | 200 OK - Expenditure[] |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/expenditure` | Create new expenditure | ExpenditureRequest | 201 Created - Expenditure |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/expenditure/{expenditureId}` | Get expenditure details | N/A | 200 OK - Expenditure |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/expenditure/{expenditureId}` | Update expenditure | ExpenditurePatch | 200 OK - Expenditure |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/expenditure/{expenditureId}` | Delete expenditure | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -6946,7 +6775,7 @@ Content-Type: application/json
 ```json
 {
   "id": 1001,
-  "href": "/api/v2/factfinds/679/clients/8496/expenditure/1001",
+  "href": "/api/v3/factfinds/679/clients/8496/expenditure/1001",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -6961,8 +6790,7 @@ Content-Type: application/json
   "amount": {
     "amount": 1500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "frequency": {
@@ -6980,7 +6808,7 @@ Content-Type: application/json
   "isLiabilityToBeRepaid": true,
   "liability": {
     "id": 5001,
-    "href": "/api/v2/factfinds/679/liabilities/5001",
+    "href": "/api/v3/factfinds/679/liabilities/5001",
     "description": "Residential Mortgage - Main Home"
   },
   "notes": "Fixed rate until 2027",
@@ -6995,7 +6823,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/expenditure
+POST /api/v3/factfinds/679/clients/8496/expenditure
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -7031,12 +6859,12 @@ Content-Type: application/json
 
 {
   "id": 1001,
-  "href": "/api/v2/factfinds/679/clients/8496/expenditure/1001",
+  "href": "/api/v3/factfinds/679/clients/8496/expenditure/1001",
   "category": "Mortgage",
   "description": "Monthly mortgage payment",
   "amount": {
     "amount": 1500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "frequency": {
     "code": "M",
@@ -7045,7 +6873,7 @@ Content-Type: application/json
   },
   "annualAmount": {
     "amount": 18000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "isEssential": true,
   "isDiscretionary": false,
@@ -7063,7 +6891,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/expenditure
+POST /api/v3/factfinds/679/clients/8496/expenditure
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -7094,12 +6922,12 @@ Content-Type: application/json
 
 {
   "id": 1002,
-  "href": "/api/v2/factfinds/679/clients/8496/expenditure/1002",
+  "href": "/api/v3/factfinds/679/clients/8496/expenditure/1002",
   "category": "Entertainment",
   "description": "Dining out and cinema",
   "amount": {
     "amount": 300.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "frequency": {
     "code": "M",
@@ -7108,7 +6936,7 @@ Content-Type: application/json
   },
   "annualAmount": {
     "amount": 3600.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "isEssential": false,
   "isDiscretionary": true,
@@ -7148,7 +6976,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid expenditure ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -7179,7 +7007,7 @@ Content-Type: application/json
 
 **Purpose:** The Affordability API performs comprehensive affordability calculations for mortgage lending including income multiples, stress testing, and disposable income analysis in compliance with FCA MCOB 11.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/affordability`
 
 **Key Features:**
 - Income multiple calculations (3x, 4x, 4.5x income)
@@ -7194,9 +7022,9 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability` | Get affordability assessment | N/A | 200 OK - Affordability |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/calculate` | Calculate affordability | AffordabilityRequest | 200 OK - AffordabilityResult |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability/history` | Get calculation history | N/A | 200 OK - AffordabilityHistory[] |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/affordability` | Get affordability assessment | N/A | 200 OK - Affordability |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/affordability/calculate` | Calculate affordability | AffordabilityRequest | 200 OK - AffordabilityResult |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/affordability/history` | Get calculation history | N/A | 200 OK - AffordabilityHistory[] |
 
 **Total Operations:** 3 endpoints
 
@@ -7236,7 +7064,7 @@ Content-Type: application/json
 
 ```json
 {
-  "href": "/api/v2/factfinds/679/clients/8496/affordability",
+  "href": "/api/v3/factfinds/679/clients/8496/affordability",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -7249,43 +7077,37 @@ Content-Type: application/json
   "totalAnnualIncome": {
     "amount": 75000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalMonthlyIncome": {
     "amount": 6250.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalCommittedExpenditure": {
     "amount": 2500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalDiscretionaryExpenditure": {
     "amount": 800.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "netDisposableIncome": {
     "amount": 2950.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "maxLoanAmount": {
     "amount": 337500.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "incomeMultiple": 4.5,
@@ -7296,15 +7118,15 @@ Content-Type: application/json
     "stressedRate": 8.5,
     "proposedPayment": {
       "amount": 1850.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "stressedPayment": {
       "amount": 2350.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "remainingIncome": {
       "amount": 1400.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "passes": true
   },
@@ -7327,7 +7149,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8496/affordability/calculate
+POST /api/v3/factfinds/679/clients/8496/affordability/calculate
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -7353,12 +7175,12 @@ Content-Type: application/json
   "affordabilityResult": "Affordable",
   "proposedLoan": {
     "amount": 300000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "proposedRate": 5.5,
   "monthlyPayment": {
     "amount": 1850.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "incomeMultiple": 4.0,
   "loanToIncomeRatio": 4.0,
@@ -7366,11 +7188,11 @@ Content-Type: application/json
     "stressedRate": 8.5,
     "stressedPayment": {
       "amount": 2350.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "remainingIncome": {
       "amount": 1400.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "passes": true
   },
@@ -7390,7 +7212,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/clients/8497/affordability/calculate
+POST /api/v3/factfinds/679/clients/8497/affordability/calculate
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -7416,12 +7238,12 @@ Content-Type: application/json
   "affordabilityResult": "NotAffordable",
   "proposedLoan": {
     "amount": 400000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "proposedRate": 5.5,
   "monthlyPayment": {
     "amount": 2467.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "incomeMultiple": 5.33,
   "loanToIncomeRatio": 5.33,
@@ -7429,11 +7251,11 @@ Content-Type: application/json
     "stressedRate": 8.5,
     "stressedPayment": {
       "amount": 3133.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "remainingIncome": {
       "amount": -383.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "passes": false
   },
@@ -7487,7 +7309,7 @@ Content-Type: application/json
 | 200 OK | Success | GET, POST successful |
 | 400 Bad Request | Invalid syntax | Invalid calculation parameters |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid client ID |
 | 422 Unprocessable Entity | Validation failed | Insufficient income data |
 
@@ -7525,7 +7347,7 @@ Content-Type: application/json
 
 **Purpose:** The Asset API manages client assets including property, businesses, cash, investments, and other valuables with ownership tracking, valuation management, and tax planning information.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/assets`
+**Base Path:** `/api/v3/factfinds/{factfindId}/assets`
 
 **Key Features:**
 - Multi-type asset management (Property, Business, Cash, Investment, Other)
@@ -7540,11 +7362,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/assets` | List all assets | N/A | 200 OK - Asset[] |
-| POST | `/api/v2/factfinds/{factfindId}/assets` | Create new asset | AssetRequest | 201 Created - Asset |
-| GET | `/api/v2/factfinds/{factfindId}/assets/{assetId}` | Get asset details | N/A | 200 OK - Asset |
-| PATCH | `/api/v2/factfinds/{factfindId}/assets/{assetId}` | Update asset | AssetPatch | 200 OK - Asset |
-| DELETE | `/api/v2/factfinds/{factfindId}/assets/{assetId}` | Delete asset | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/assets` | List all assets | N/A | 200 OK - Asset[] |
+| POST | `/api/v3/factfinds/{factfindId}/assets` | Create new asset | AssetRequest | 201 Created - Asset |
+| GET | `/api/v3/factfinds/{factfindId}/assets/{assetId}` | Get asset details | N/A | 200 OK - Asset |
+| PATCH | `/api/v3/factfinds/{factfindId}/assets/{assetId}` | Update asset | AssetPatch | 200 OK - Asset |
+| DELETE | `/api/v3/factfinds/{factfindId}/assets/{assetId}` | Delete asset | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -7589,7 +7411,7 @@ Content-Type: application/json
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/assets/1234",
+  "href": "/api/v3/factfinds/679/assets/1234",
   "factfind": {
     "id": 679,
     "factFindNumber": "FF-2025-00123",
@@ -7600,15 +7422,13 @@ Content-Type: application/json
   "currentValue": {
     "amount": 450000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "originalValue": {
     "amount": 325000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "purchasedOn": "2018-05-10",
@@ -7661,7 +7481,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/assets
+POST /api/v3/factfinds/679/assets
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -7716,24 +7536,24 @@ Authorization: Bearer {token}
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
-Location: /api/v2/factfinds/679/assets/1234
+Location: /api/v3/factfinds/679/assets/1234
 
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/assets/1234",
+  "href": "/api/v3/factfinds/679/assets/1234",
   "assetType": "PROPERTY",
   "description": "Primary Residence - 123 Main Street",
   "currentValue": {
     "amount": 450000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "originalValue": {
     "amount": 325000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "capitalGrowth": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "capitalGrowthPercentage": 38.46,
   "annualizedGrowth": 4.21,
@@ -7747,7 +7567,7 @@ Location: /api/v2/factfinds/679/assets/1234
   "updatedAt": "2026-03-03T10:30:00Z",
   "_links": {
     "property": {
-      "href": "/api/v2/factfinds/679/assets/1234/property"
+      "href": "/api/v3/factfinds/679/assets/1234/property"
     }
   }
 }
@@ -7757,7 +7577,7 @@ Location: /api/v2/factfinds/679/assets/1234
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/assets
+POST /api/v3/factfinds/679/assets
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -7789,12 +7609,12 @@ Content-Type: application/json
 
 {
   "id": 1235,
-  "href": "/api/v2/factfinds/679/assets/1235",
+  "href": "/api/v3/factfinds/679/assets/1235",
   "assetType": "BUSINESS",
   "description": "Smith & Co Limited - Software Consultancy",
   "currentValue": {
     "amount": 250000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "ownership": {
     "ownershipType": "SOLE",
@@ -7813,7 +7633,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/assets
+POST /api/v3/factfinds/679/assets
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -7841,12 +7661,12 @@ Content-Type: application/json
 
 {
   "id": 1236,
-  "href": "/api/v2/factfinds/679/assets/1236",
+  "href": "/api/v3/factfinds/679/assets/1236",
   "assetType": "CASH",
   "description": "Emergency fund - instant access savings",
   "currentValue": {
     "amount": 25000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "ownership": {
     "ownershipType": "SOLE",
@@ -7892,7 +7712,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid asset ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -7931,7 +7751,7 @@ Content-Type: application/json
 
 **Purpose:** The Liability API manages client debt obligations including mortgages, loans, credit cards, hire purchase agreements, student loans, and maintenance payments with comprehensive tracking of repayment terms, protection coverage, and linked assets.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/liabilities`
+**Base Path:** `/api/v3/factfinds/{factfindId}/liabilities`
 
 **Aggregate Root:** FactFind
 
@@ -7950,11 +7770,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/liabilities` | List all liabilities | N/A | 200 OK - Liability[] |
-| POST | `/api/v2/factfinds/{factfindId}/liabilities` | Add new liability | LiabilityRequest | 201 Created - Liability |
-| GET | `/api/v2/factfinds/{factfindId}/liabilities/{liabilityId}` | Get liability details | N/A | 200 OK - Liability |
-| PATCH | `/api/v2/factfinds/{factfindId}/liabilities/{liabilityId}` | Update liability | LiabilityPatch | 200 OK - Liability |
-| DELETE | `/api/v2/factfinds/{factfindId}/liabilities/{liabilityId}` | Delete liability | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/liabilities` | List all liabilities | N/A | 200 OK - Liability[] |
+| POST | `/api/v3/factfinds/{factfindId}/liabilities` | Add new liability | LiabilityRequest | 201 Created - Liability |
+| GET | `/api/v3/factfinds/{factfindId}/liabilities/{liabilityId}` | Get liability details | N/A | 200 OK - Liability |
+| PATCH | `/api/v3/factfinds/{factfindId}/liabilities/{liabilityId}` | Update liability | LiabilityPatch | 200 OK - Liability |
+| DELETE | `/api/v3/factfinds/{factfindId}/liabilities/{liabilityId}` | Delete liability | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -8030,15 +7850,15 @@ Content-Type: application/json
 ```json
 {
   "id": 789,
-  "href": "/api/v2/factfinds/679/liabilities/789",
+  "href": "/api/v3/factfinds/679/liabilities/789",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "client": {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     }
   },
@@ -8050,24 +7870,18 @@ Content-Type: application/json
     "amount": 250000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "amountOutstanding": {
     "amount": 180000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "creditLimit": {
     "amount": 0.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "interestRate": 3.5,
@@ -8077,8 +7891,6 @@ Content-Type: application/json
     "amount": 1200.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "loanTermYears": 25,
@@ -8088,18 +7900,16 @@ Content-Type: application/json
     "amount": 5000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "protected": "LIFE_AND_CIC",
   "linkedAssetRef": {
     "id": 1234,
-    "href": "/api/v2/factfinds/679/assets/1234"
+    "href": "/api/v3/factfinds/679/assets/1234"
   },
   "protectionArrangementRef": {
     "id": 555,
-    "href": "/api/v2/factfinds/679/protections/555"
+    "href": "/api/v3/factfinds/679/protections/555"
   },
   "isToBeRepaid": false,
   "consolidate": false,
@@ -8116,7 +7926,7 @@ Content-Type: application/json
 
 Request:
 ```http
-POST /api/v2/factfinds/679/liabilities
+POST /api/v3/factfinds/679/liabilities
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -8134,15 +7944,13 @@ Authorization: Bearer {token}
   "originalLoanAmount": {
     "amount": 250000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "amountOutstanding": {
     "amount": 180000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "interestRate": 3.5,
@@ -8151,8 +7959,7 @@ Authorization: Bearer {token}
   "paymentAmount": {
     "amount": 1200.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "loanTermYears": 25,
@@ -8161,8 +7968,7 @@ Authorization: Bearer {token}
   "earlyRedemptionCharge": {
     "amount": 5000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "protected": "LIFE_AND_CIC",
@@ -8185,15 +7991,15 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 ```json
 {
   "id": 790,
-  "href": "/api/v2/factfinds/679/liabilities/790",
+  "href": "/api/v3/factfinds/679/liabilities/790",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "client": {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     }
   },
@@ -8205,24 +8011,18 @@ Response: `201 Created` with complete Liability object including `id` and `href`
     "amount": 15000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "amountOutstanding": {
     "amount": 12500.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "creditLimit": {
     "amount": 0.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "interestRate": 6.9,
@@ -8232,8 +8032,6 @@ Response: `201 Created` with complete Liability object including `id` and `href`
     "amount": 280.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "loanTermYears": 5,
@@ -8243,15 +8041,13 @@ Response: `201 Created` with complete Liability object including `id` and `href`
     "amount": 0.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "protected": "LIFE",
   "linkedAssetRef": null,
   "protectionArrangementRef": {
     "id": 556,
-    "href": "/api/v2/factfinds/679/protections/556"
+    "href": "/api/v3/factfinds/679/protections/556"
   },
   "isToBeRepaid": true,
   "consolidate": false,
@@ -8267,15 +8063,15 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 ```json
 {
   "id": 791,
-  "href": "/api/v2/factfinds/679/liabilities/791",
+  "href": "/api/v3/factfinds/679/liabilities/791",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "client": {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     }
   },
@@ -8287,24 +8083,18 @@ Response: `201 Created` with complete Liability object including `id` and `href`
     "amount": 8000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "amountOutstanding": {
     "amount": 8000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "creditLimit": {
     "amount": 12000.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "interestRate": 21.9,
@@ -8314,8 +8104,6 @@ Response: `201 Created` with complete Liability object including `id` and `href`
     "amount": 160.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "loanTermYears": 0,
@@ -8325,8 +8113,6 @@ Response: `201 Created` with complete Liability object including `id` and `href`
     "amount": 0.00,
     "currency": {
       "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
     }
   },
   "protected": "NOT_PROTECTED",
@@ -8367,11 +8153,11 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 | `consolidate` | boolean | Filter by consolidation flag | `?consolidate=true` |
 | `protected` | enum | Filter by protection type | `?protected=LIFE_AND_CIC` |
 | `rateType` | enum | Filter by rate type | `?rateType=FIXED` |
-| `page` | integer | Page number (1-indexed) | `?page=1` |
-| `pageSize` | integer | Items per page (max 100) | `?pageSize=25` |
-| `sort` | string | Sort field and direction | `?sort=amountOutstanding:desc` |
+| `page` | integer | Page number (1-indexed) | `?$top=25&$skip=0` |
+| `$skip` | integer | Number of items to skip | `?$skip=0` |
+| `orderBy` | string | Order field and direction | `?orderBy=amountOutstanding desc` |
 
-**Sort Fields:**
+**Order Fields:**
 - `amountOutstanding` - Outstanding balance
 - `interestRate` - Interest rate percentage
 - `paymentAmount` - Monthly payment amount
@@ -8453,7 +8239,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 
 **Purpose:** The Net Worth API calculates and tracks client net worth (assets minus liabilities) with historical tracking, wealth progression analysis, and retirement gap calculations.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/net-worth`
+**Base Path:** `/api/v3/factfinds/{factfindId}/net-worth`
 
 **Key Features:**
 - Current net worth calculation
@@ -8468,11 +8254,11 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/net-worth` | Get current net worth | N/A | 200 OK - NetWorth |
-| POST | `/api/v2/factfinds/{factfindId}/net-worth/calculate` | Calculate net worth | N/A | 201 Created - NetWorthSnapshot |
-| GET | `/api/v2/factfinds/{factfindId}/net-worth/history` | Get historical snapshots | N/A | 200 OK - NetWorthHistory[] |
-| PATCH | `/api/v2/factfinds/{factfindId}/net-worth/{snapshotId}` | Update snapshot | NetWorthPatch | 200 OK - NetWorthSnapshot |
-| DELETE | `/api/v2/factfinds/{factfindId}/net-worth/{snapshotId}` | Delete snapshot | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/net-worth` | Get current net worth | N/A | 200 OK - NetWorth |
+| POST | `/api/v3/factfinds/{factfindId}/net-worth/calculate` | Calculate net worth | N/A | 201 Created - NetWorthSnapshot |
+| GET | `/api/v3/factfinds/{factfindId}/net-worth/history` | Get historical snapshots | N/A | 200 OK - NetWorthHistory[] |
+| PATCH | `/api/v3/factfinds/{factfindId}/net-worth/{snapshotId}` | Update snapshot | NetWorthPatch | 200 OK - NetWorthSnapshot |
+| DELETE | `/api/v3/factfinds/{factfindId}/net-worth/{snapshotId}` | Delete snapshot | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -8525,7 +8311,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 
 ```json
 {
-  "href": "/api/v2/factfinds/679/net-worth",
+  "href": "/api/v3/factfinds/679/net-worth",
   "factfind": {
     "id": 679,
     "factFindNumber": "FF-2025-00123",
@@ -8535,80 +8321,75 @@ Response: `201 Created` with complete Liability object including `id` and `href`
   "totalAssets": {
     "amount": 850000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalLiabilities": {
     "amount": 240000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "netWorth": {
     "amount": 610000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "assetBreakdown": {
     "property": {
       "amount": 450000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "investments": {
       "amount": 185000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "pensions": {
       "amount": 175000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "business": {
       "amount": 0.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "cash": {
       "amount": 40000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "other": {
       "amount": 0.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "liabilityBreakdown": {
     "mortgages": {
       "amount": 200000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "loans": {
       "amount": 30000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "creditCards": {
       "amount": 10000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "other": {
       "amount": 0.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "liquidAssets": {
     "amount": 225000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "illiquidAssets": {
     "amount": 625000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "liquidityRatio": 26.47,
@@ -8616,11 +8397,11 @@ Response: `201 Created` with complete Liability object including `id` and `href`
   "wealthProgression": {
     "previousNetWorth": {
       "amount": 575000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "change": {
       "amount": 35000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "changePercentage": 6.09,
     "periodMonths": 12
@@ -8631,19 +8412,19 @@ Response: `201 Created` with complete Liability object including `id` and `href`
     "yearsToRetirement": 20,
     "requiredNetWorth": {
       "amount": 1200000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "currentNetWorth": {
       "amount": 610000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "shortfall": {
       "amount": 590000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "monthlyContributionRequired": {
       "amount": 1750.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "notes": "Strong wealth progression. Property value growth main driver.",
@@ -8658,7 +8439,7 @@ Response: `201 Created` with complete Liability object including `id` and `href`
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/net-worth/calculate
+POST /api/v3/factfinds/679/net-worth/calculate
 Authorization: Bearer {token}
 ```
 
@@ -8669,50 +8450,50 @@ Content-Type: application/json
 
 {
   "id": 1,
-  "href": "/api/v2/factfinds/679/net-worth/1",
+  "href": "/api/v3/factfinds/679/net-worth/1",
   "calculatedOn": "2026-03-03T10:30:00Z",
   "totalAssets": {
     "amount": 850000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "totalLiabilities": {
     "amount": 240000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "netWorth": {
     "amount": 610000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "assetBreakdown": {
     "property": {
       "amount": 450000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "investments": {
       "amount": 185000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "pensions": {
       "amount": 175000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "cash": {
       "amount": 40000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "liabilityBreakdown": {
     "mortgages": {
       "amount": 200000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "loans": {
       "amount": 30000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "creditCards": {
       "amount": 10000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "liquidityRatio": 26.47,
@@ -8725,7 +8506,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-GET /api/v2/factfinds/679/net-worth/history
+GET /api/v3/factfinds/679/net-worth/history
 Authorization: Bearer {token}
 ```
 
@@ -8742,15 +8523,15 @@ Content-Type: application/json
       "calculatedOn": "2026-03-03T10:30:00Z",
       "netWorth": {
         "amount": 610000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "totalAssets": {
         "amount": 850000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "totalLiabilities": {
         "amount": 240000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     {
@@ -8758,15 +8539,15 @@ Content-Type: application/json
       "calculatedOn": "2025-03-01T10:00:00Z",
       "netWorth": {
         "amount": 575000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "totalAssets": {
         "amount": 810000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "totalLiabilities": {
         "amount": 235000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     {
@@ -8774,15 +8555,15 @@ Content-Type: application/json
       "calculatedOn": "2024-03-01T10:00:00Z",
       "netWorth": {
         "amount": 540000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "totalAssets": {
         "amount": 775000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "totalLiabilities": {
         "amount": 235000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     }
   ],
@@ -8791,7 +8572,7 @@ Content-Type: application/json
     "latestSnapshot": "2026-03-03T10:30:00Z",
     "totalIncrease": {
       "amount": 70000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "percentageIncrease": 12.96,
     "annualizedGrowth": 6.21
@@ -8803,7 +8584,7 @@ Content-Type: application/json
 
 **Request:**
 ```http
-GET /api/v2/factfinds/679/net-worth?includeRetirementGap=true&targetRetirementAge=65&requiredIncome=40000
+GET /api/v3/factfinds/679/net-worth?includeRetirementGap=true&targetRetirementAge=65&requiredIncome=40000
 Authorization: Bearer {token}
 ```
 
@@ -8813,10 +8594,10 @@ HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
-  "href": "/api/v2/factfinds/679/net-worth",
+  "href": "/api/v3/factfinds/679/net-worth",
   "netWorth": {
     "amount": 610000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "retirementGap": {
     "targetRetirementAge": 65,
@@ -8824,31 +8605,31 @@ Content-Type: application/json
     "yearsToRetirement": 20,
     "requiredAnnualIncome": {
       "amount": 40000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "estimatedStatePension": {
       "amount": 11502.40,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "requiredPrivateIncome": {
       "amount": 28497.60,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "requiredNetWorth": {
       "amount": 1200000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "currentNetWorth": {
       "amount": 610000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "shortfall": {
       "amount": 590000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "monthlyContributionRequired": {
       "amount": 1750.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "assumptions": {
       "annualReturnRate": 5.0,
@@ -8895,7 +8676,7 @@ Content-Type: application/json
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Invalid parameters |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid snapshot ID |
 | 422 Unprocessable Entity | Validation failed | Missing asset/liability data |
 
@@ -8935,7 +8716,7 @@ Content-Type: application/json
 
 **Purpose:** The Investment API manages investment products including Cash Bank Accounts, Collective Investments (ISAs, OEICs, Unit Trusts), and Life-Assured Investments (Investment Bonds) with fund holdings, contribution tracking, and maturity projections.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/investments`
+**Base Path:** `/api/v3/factfinds/{factfindId}/investments`
 
 **Key Features:**
 - Multi-category support (CashBankAccount, Investment, LifeAssuredInvestment)
@@ -8950,11 +8731,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/investments` | List all investments | N/A | 200 OK - Investment[] |
-| POST | `/api/v2/factfinds/{factfindId}/investments` | Create new investment | InvestmentRequest | 201 Created - Investment |
-| GET | `/api/v2/factfinds/{factfindId}/investments/{investmentId}` | Get investment by ID | N/A | 200 OK - Investment |
-| PATCH | `/api/v2/factfinds/{factfindId}/investments/{investmentId}` | Update investment | InvestmentPatch | 200 OK - Investment |
-| DELETE | `/api/v2/factfinds/{factfindId}/investments/{investmentId}` | Delete investment | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/investments` | List all investments | N/A | 200 OK - Investment[] |
+| POST | `/api/v3/factfinds/{factfindId}/investments` | Create new investment | InvestmentRequest | 201 Created - Investment |
+| GET | `/api/v3/factfinds/{factfindId}/investments/{investmentId}` | Get investment by ID | N/A | 200 OK - Investment |
+| PATCH | `/api/v3/factfinds/{factfindId}/investments/{investmentId}` | Update investment | InvestmentPatch | 200 OK - Investment |
+| DELETE | `/api/v3/factfinds/{factfindId}/investments/{investmentId}` | Delete investment | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -8999,7 +8780,7 @@ Content-Type: application/json
 ```json
 {
   "id": 9140,
-  "href": "/api/v2/factfinds/679/investments/9140",
+  "href": "/api/v3/factfinds/679/investments/9140",
   "factfind": {
     "id": 679,
     "factFindNumber": "FF-2025-00123"
@@ -9023,8 +8804,7 @@ Content-Type: application/json
   "currentValue": {
     "amount": 185000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "valuationDate": "2026-02-16",
@@ -9047,11 +8827,11 @@ Content-Type: application/json
       "units": 15234.56,
       "pricePerUnit": {
         "amount": 9.85,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "currentValue": {
         "amount": 150061.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "percentage": 81.1
     },
@@ -9062,11 +8842,11 @@ Content-Type: application/json
       "units": 7856.23,
       "pricePerUnit": {
         "amount": 4.45,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "currentValue": {
         "amount": 34960.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "percentage": 18.9
     }
@@ -9077,7 +8857,7 @@ Content-Type: application/json
       "type": "REGULAR",
       "amount": {
         "amount": 500.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "frequency": "MONTHLY",
       "startDate": "2020-04-06",
@@ -9092,11 +8872,11 @@ Content-Type: application/json
     "totalExpenseRatio": 0.40,
     "transactionFees": {
       "amount": 0.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "exitFees": {
       "amount": 0.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "assetAllocation": {
@@ -9104,28 +8884,28 @@ Content-Type: application/json
       "percentage": 65.0,
       "value": {
         "amount": 120250.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     "bonds": {
       "percentage": 25.0,
       "value": {
         "amount": 46250.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     "cash": {
       "percentage": 5.0,
       "value": {
         "amount": 9250.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     "alternatives": {
       "percentage": 5.0,
       "value": {
         "amount": 9250.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     }
   },
@@ -9134,35 +8914,35 @@ Content-Type: application/json
       "percentage": 30.0,
       "value": {
         "amount": 55500.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     "northAmerica": {
       "percentage": 45.0,
       "value": {
         "amount": 83250.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     "europe": {
       "percentage": 15.0,
       "value": {
         "amount": 27750.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     "asiaPacific": {
       "percentage": 8.0,
       "value": {
         "amount": 14800.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     },
     "emergingMarkets": {
       "percentage": 2.0,
       "value": {
         "amount": 3700.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     }
   },
@@ -9186,12 +8966,12 @@ See contract schema above for comprehensive investment example.
   "taxWrapperType": "OFFSHORE_BOND",
   "currentValue": {
     "amount": 250000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "lifeCover": {
     "sumAssured": {
       "amount": 252500.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "coverPercentage": 101.0
   },
@@ -9239,7 +9019,7 @@ See contract schema above for comprehensive investment example.
 | 204 No Content | Success with no body | DELETE successful |
 | 400 Bad Request | Invalid syntax | Malformed request |
 | 401 Unauthorized | Authentication required | Missing/invalid token |
-| 403 Forbidden | Insufficient permissions | Lacks required scope |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope |
 | 404 Not Found | Resource not found | Invalid investment ID |
 | 422 Unprocessable Entity | Validation failed | Business rule violation |
 
@@ -9276,7 +9056,7 @@ See contract schema above for comprehensive investment example.
 
 **Purpose:** The Final Salary Pension API manages Defined Benefit (DB) pension schemes including prospective benefits, Cash Equivalent Transfer Values (CETV), accrual tracking, death benefits, early retirement provisions, and Guaranteed Minimum Pension (GMP) tracking.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/pensions/finalsalary`
+**Base Path:** `/api/v3/factfinds/{factfindId}/pensions/finalsalary`
 
 **Key Features:**
 - Final Salary, CARE, and Hybrid scheme support
@@ -9292,11 +9072,11 @@ See contract schema above for comprehensive investment example.
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/pensions/finalsalary` | List all final salary pensions | N/A | 200 OK - FinalSalaryPension[] |
-| POST | `/api/v2/factfinds/{factfindId}/pensions/finalsalary` | Create final salary pension | FinalSalaryPensionRequest | 201 Created - FinalSalaryPension |
-| GET | `/api/v2/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Get pension by ID | N/A | 200 OK - FinalSalaryPension |
-| PATCH | `/api/v2/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Update pension | FinalSalaryPensionPatch | 200 OK - FinalSalaryPension |
-| DELETE | `/api/v2/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Delete pension | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/finalsalary` | List all final salary pensions | N/A | 200 OK - FinalSalaryPension[] |
+| POST | `/api/v3/factfinds/{factfindId}/pensions/finalsalary` | Create final salary pension | FinalSalaryPensionRequest | 201 Created - FinalSalaryPension |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Get pension by ID | N/A | 200 OK - FinalSalaryPension |
+| PATCH | `/api/v3/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Update pension | FinalSalaryPensionPatch | 200 OK - FinalSalaryPension |
+| DELETE | `/api/v3/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Delete pension | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -9349,7 +9129,7 @@ See contract schema above for comprehensive investment example.
 ```json
 {
   "id": 101,
-  "href": "/api/v2/factfinds/679/pensions/finalsalary/101",
+  "href": "/api/v3/factfinds/679/pensions/finalsalary/101",
   "factfind": {
     "id": 679,
     "factFindNumber": "FF-2025-00123"
@@ -9374,23 +9154,22 @@ See contract schema above for comprehensive investment example.
   "pensionableSalary": {
     "amount": 55000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "accrualRate": "1/80",
   "pensionAtRetirement": {
     "prospectiveWithNoLumpsumTaken": {
       "amount": 24063.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "prospectiveWithLumpsumTaken": {
       "amount": 18047.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "prospectiveLumpSum": {
       "amount": 54141.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "isIndexed": true,
@@ -9399,19 +9178,19 @@ See contract schema above for comprehensive investment example.
   "transferValue": {
     "cashEquivalentValue": {
       "amount": 850000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "expiryOn": "2026-06-01"
   },
   "gmpAmount": {
     "amount": 3500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "deathInService": {
     "lumpsumMultiple": 2.0,
     "lumpsumAmount": {
       "amount": 110000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "earlyRetirement": {
@@ -9495,7 +9274,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Purpose:** The Annuity API manages annuity products including lifetime, fixed-term, and joint-life annuities with level, escalating, or RPI/CPI linked income, guarantee periods, and spouse continuation options.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/pensions/annuity`
+**Base Path:** `/api/v3/factfinds/{factfindId}/pensions/annuity`
 
 **Key Features:**
 - Lifetime and fixed-term annuities
@@ -9511,11 +9290,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/pensions/annuity` | List all annuities | N/A | 200 OK - Annuity[] |
-| POST | `/api/v2/factfinds/{factfindId}/pensions/annuity` | Create annuity | AnnuityRequest | 201 Created - Annuity |
-| GET | `/api/v2/factfinds/{factfindId}/pensions/annuity/{annuityId}` | Get annuity by ID | N/A | 200 OK - Annuity |
-| PATCH | `/api/v2/factfinds/{factfindId}/pensions/annuity/{annuityId}` | Update annuity | AnnuityPatch | 200 OK - Annuity |
-| DELETE | `/api/v2/factfinds/{factfindId}/pensions/annuity/{annuityId}` | Delete annuity | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/annuity` | List all annuities | N/A | 200 OK - Annuity[] |
+| POST | `/api/v3/factfinds/{factfindId}/pensions/annuity` | Create annuity | AnnuityRequest | 201 Created - Annuity |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/annuity/{annuityId}` | Get annuity by ID | N/A | 200 OK - Annuity |
+| PATCH | `/api/v3/factfinds/{factfindId}/pensions/annuity/{annuityId}` | Update annuity | AnnuityPatch | 200 OK - Annuity |
+| DELETE | `/api/v3/factfinds/{factfindId}/pensions/annuity/{annuityId}` | Delete annuity | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -9558,7 +9337,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 ```json
 {
   "id": 201,
-  "href": "/api/v2/factfinds/679/pensions/annuity/201",
+  "href": "/api/v3/factfinds/679/pensions/annuity/201",
   "factfind": {
     "id": 679,
     "factFindNumber": "FF-2025-00123"
@@ -9579,8 +9358,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
   "purchasePrice": {
     "amount": 200000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "purchaseDate": "2025-05-15",
@@ -9588,11 +9366,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
   "escalationRate": null,
   "initialAnnualIncome": {
     "amount": 9500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "currentAnnualIncome": {
     "amount": 9738.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "paymentFrequency": "Monthly",
   "isJointLife": true,
@@ -9602,7 +9380,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
   "pcls": {
     "amount": {
       "amount": 50000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "percentage": 25.0
   },
@@ -9673,7 +9451,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Purpose:** The Personal Pension API manages Defined Contribution (DC) pensions including personal pensions, SIPPs, and drawdown arrangements with detailed fund holdings, crystallisation tracking, GAD compliance, PCLS management, and death benefits.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/pensions/personalpension`
+**Base Path:** `/api/v3/factfinds/{factfindId}/pensions/personalpension`
 
 **Key Features:**
 - Personal Pension, SIPP, Stakeholder support
@@ -9690,11 +9468,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/pensions/personalpension` | List all personal pensions | N/A | 200 OK - PersonalPension[] |
-| POST | `/api/v2/factfinds/{factfindId}/pensions/personalpension` | Create personal pension | PersonalPensionRequest | 201 Created - PersonalPension |
-| GET | `/api/v2/factfinds/{factfindId}/pensions/personalpension/{pensionId}` | Get pension by ID | N/A | 200 OK - PersonalPension |
-| PATCH | `/api/v2/factfinds/{factfindId}/pensions/personalpension/{pensionId}` | Update pension | PersonalPensionPatch | 200 OK - PersonalPension |
-| DELETE | `/api/v2/factfinds/{factfindId}/pensions/personalpension/{pensionId}` | Delete pension | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/personalpension` | List all personal pensions | N/A | 200 OK - PersonalPension[] |
+| POST | `/api/v3/factfinds/{factfindId}/pensions/personalpension` | Create personal pension | PersonalPensionRequest | 201 Created - PersonalPension |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/personalpension/{pensionId}` | Get pension by ID | N/A | 200 OK - PersonalPension |
+| PATCH | `/api/v3/factfinds/{factfindId}/pensions/personalpension/{pensionId}` | Update pension | PersonalPensionPatch | 200 OK - PersonalPension |
+| DELETE | `/api/v3/factfinds/{factfindId}/pensions/personalpension/{pensionId}` | Delete pension | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -9744,7 +9522,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 ```json
 {
   "id": 301,
-  "href": "/api/v2/factfinds/679/pensions/personalpension/301",
+  "href": "/api/v3/factfinds/679/pensions/personalpension/301",
   "factfind": {
     "id": 679,
     "factFindNumber": "FF-2025-00123"
@@ -9767,8 +9545,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
   "currentValue": {
     "amount": 175000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "valuationDate": "2026-02-16",
@@ -9784,7 +9561,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
       "type": "Regular",
       "amount": {
         "amount": 500.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "frequency": "Monthly",
       "contributorType": "Self",
@@ -9792,15 +9569,15 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
       "endDate": null,
       "netAmount": {
         "amount": 500.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "taxReliefAmount": {
         "amount": 125.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "grossAmount": {
         "amount": 625.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     }
   ],
@@ -9812,11 +9589,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
       "units": 17856.34,
       "pricePerUnit": {
         "amount": 9.80,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "currentValue": {
         "amount": 175000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "percentage": 100.0
     }
@@ -9906,7 +9683,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Purpose:** The State Pension API manages UK State Pension entitlements including old (pre-2016) and new (post-2016) State Pension systems, Additional Pension (SERPS/S2P), Pension Credit, spouse inheritance, and BR19 projections.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/pensions/statepension`
+**Base Path:** `/api/v3/factfinds/{factfindId}/pensions/statepension`
 
 **Key Features:**
 - Old State Pension (pre-April 2016) and New State Pension (post-April 2016)
@@ -9922,11 +9699,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/pensions/statepension` | List all state pensions | N/A | 200 OK - StatePension[] |
-| POST | `/api/v2/factfinds/{factfindId}/pensions/statepension` | Create state pension | StatePensionRequest | 201 Created - StatePension |
-| GET | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Get state pension by ID | N/A | 200 OK - StatePension |
-| PATCH | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Update state pension | StatePensionPatch | 200 OK - StatePension |
-| DELETE | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Delete state pension | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/statepension` | List all state pensions | N/A | 200 OK - StatePension[] |
+| POST | `/api/v3/factfinds/{factfindId}/pensions/statepension` | Create state pension | StatePensionRequest | 201 Created - StatePension |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Get state pension by ID | N/A | 200 OK - StatePension |
+| PATCH | `/api/v3/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Update state pension | StatePensionPatch | 200 OK - StatePension |
+| DELETE | `/api/v3/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Delete state pension | N/A | 204 No Content |
 
 ### 30.3 Resource Properties
 
@@ -9970,8 +9747,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
   "newStatePension": {
     "amount": 11502.40,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "qualifyingYears": 35,
@@ -9980,11 +9756,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
   "statePensionForecast": {
     "weeklyAmount": {
       "amount": 221.20,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "annualAmount": {
       "amount": 11502.40,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "forecastDate": "2026-01-15"
   },
@@ -10042,7 +9818,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Purpose:** The Employer Pension Scheme API manages employer-sponsored pension schemes from current or previous employment, including workplace pensions, occupational schemes, and auto-enrolment pensions.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/pensions/employerschemes`
+**Base Path:** `/api/v3/factfinds/{factfindId}/pensions/employerschemes`
 
 **Key Features:**
 - Current and deferred employer schemes
@@ -10055,11 +9831,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/pensions/employerschemes` | List all employer pension schemes | N/A | 200 OK - EmployerPensionScheme[] |
-| POST | `/api/v2/factfinds/{factfindId}/pensions/employerschemes` | Create employer pension scheme | EmployerPensionSchemeRequest | 201 Created - EmployerPensionScheme |
-| GET | `/api/v2/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Get scheme by ID | N/A | 200 OK - EmployerPensionScheme |
-| PATCH | `/api/v2/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Update scheme | EmployerPensionSchemePatch | 200 OK - EmployerPensionScheme |
-| DELETE | `/api/v2/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Delete scheme | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/employerschemes` | List all employer pension schemes | N/A | 200 OK - EmployerPensionScheme[] |
+| POST | `/api/v3/factfinds/{factfindId}/pensions/employerschemes` | Create employer pension scheme | EmployerPensionSchemeRequest | 201 Created - EmployerPensionScheme |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Get scheme by ID | N/A | 200 OK - EmployerPensionScheme |
+| PATCH | `/api/v3/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Update scheme | EmployerPensionSchemePatch | 200 OK - EmployerPensionScheme |
+| DELETE | `/api/v3/factfinds/{factfindId}/pensions/employerschemes/{schemeId}` | Delete scheme | N/A | 204 No Content |
 
 **Total Operations:** 5 endpoints
 
@@ -10082,10 +9858,10 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "href": "/api/v3/factfinds/679/pensions/employerschemes/1234",
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "isCurrentMember": true,
@@ -10101,7 +9877,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Request:**
 ```http
-POST /api/v2/factfinds/679/pensions/employerschemes
+POST /api/v3/factfinds/679/pensions/employerschemes
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -10120,14 +9896,14 @@ Authorization: Bearer {token}
 ```http
 HTTP/1.1 201 Created
 Content-Type: application/json
-Location: /api/v2/factfinds/679/pensions/employerschemes/1234
+Location: /api/v3/factfinds/679/pensions/employerschemes/1234
 
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "href": "/api/v3/factfinds/679/pensions/employerschemes/1234",
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "isCurrentMember": true,
@@ -10136,13 +9912,13 @@ Location: /api/v2/factfinds/679/pensions/employerschemes/1234
   "details": "TechCorp Ltd Group Personal Pension - Scottish Widows. Employee contributes 5%, employer contributes 3%.",
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234"
     },
     "factfind": {
-      "href": "/api/v2/factfinds/679"
+      "href": "/api/v3/factfinds/679"
     },
     "owner": {
-      "href": "/api/v2/factfinds/679/clients/8496"
+      "href": "/api/v3/factfinds/679/clients/8496"
     }
   }
 }
@@ -10152,7 +9928,7 @@ Location: /api/v2/factfinds/679/pensions/employerschemes/1234
 
 **Request:**
 ```http
-PATCH /api/v2/factfinds/679/pensions/employerschemes/1235
+PATCH /api/v3/factfinds/679/pensions/employerschemes/1235
 Content-Type: application/json
 Authorization: Bearer {token}
 
@@ -10169,10 +9945,10 @@ Content-Type: application/json
 
 {
   "id": 1235,
-  "href": "/api/v2/factfinds/679/pensions/employerschemes/1235",
+  "href": "/api/v3/factfinds/679/pensions/employerschemes/1235",
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "isCurrentMember": false,
@@ -10212,8 +9988,8 @@ Content-Type: application/json
 - `page` - Page number (1-indexed, default: 1)
 - `pageSize` - Items per page (default: 25, max: 100)
 
-**Sorting:**
-- `sortBy` - Sort field (default: schemeJoinedOn)
+**Ordering:**
+- `sortBy` - Order field (default: schemeJoinedOn)
 - `sortOrder` - Sort direction: asc or desc (default: desc)
 
 ### 31.8 HTTP Status Codes
@@ -10251,7 +10027,7 @@ Content-Type: application/json
 
 **Purpose:** The Mortgage API manages comprehensive mortgage arrangements including residential mortgages, buy-to-let, lifetime mortgages, and second charge mortgages with automatic LTV calculations, early repayment charges, and special features tracking.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/mortgages`
+**Base Path:** `/api/v3/factfinds/{factfindId}/mortgages`
 
 **Key Features:**
 - Fixed, Variable, Tracker, Discount, Capped rates
@@ -10267,11 +10043,11 @@ Content-Type: application/json
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/mortgages` | List all mortgages | N/A | 200 OK - Mortgage[] |
-| POST | `/api/v2/factfinds/{factfindId}/mortgages` | Create mortgage | MortgageRequest | 201 Created - Mortgage |
-| GET | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Get mortgage by ID | N/A | 200 OK - Mortgage |
-| PATCH | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Update mortgage | MortgagePatch | 200 OK - Mortgage |
-| DELETE | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Delete mortgage | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/mortgages` | List all mortgages | N/A | 200 OK - Mortgage[] |
+| POST | `/api/v3/factfinds/{factfindId}/mortgages` | Create mortgage | MortgageRequest | 201 Created - Mortgage |
+| GET | `/api/v3/factfinds/{factfindId}/mortgages/{mortgageId}` | Get mortgage by ID | N/A | 200 OK - Mortgage |
+| PATCH | `/api/v3/factfinds/{factfindId}/mortgages/{mortgageId}` | Update mortgage | MortgagePatch | 200 OK - Mortgage |
+| DELETE | `/api/v3/factfinds/{factfindId}/mortgages/{mortgageId}` | Delete mortgage | N/A | 204 No Content |
 
 ### 31.3 Resource Properties (30 core properties - see Contract Schema for full structure)
 
@@ -10303,20 +10079,20 @@ Content-Type: application/json
   "accountNumber": "MORT-12345678",
   "property": {
     "id": 1234,
-    "href": "/api/v2/factfinds/679/assets/1234",
+    "href": "/api/v3/factfinds/679/assets/1234",
     "currentValue": {
       "amount": 450000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     }
   },
   "loanAmounts": {
     "originalLoanAmount": {
       "amount": 360000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "currentBalance": {
       "amount": 340000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "originalLTV": 80.0,
     "currentLTV": 75.56
@@ -10334,19 +10110,19 @@ Content-Type: application/json
     "repaymentType": "Repayment",
     "monthlyPayment": {
       "amount": 1895.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "principalPayment": {
       "amount": 620.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "interestPayment": {
       "amount": 1275.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "overpaymentsMade": {
       "amount": 20000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "overpaymentAllowance": "10% per annum without penalty"
   },
@@ -10361,7 +10137,7 @@ Content-Type: application/json
   "redemptionTerms": {
     "earlyRepaymentCharge": {
       "amount": 13600.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "ercAppliesUntil": "2029-03-31",
     "ercPercentage": 4.0,
@@ -10376,7 +10152,7 @@ Content-Type: application/json
       "provider": "Legal & General",
       "coverAmount": {
         "amount": 340000.00,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       }
     }
   ],
@@ -10438,7 +10214,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 **Purpose:** The Personal Protection API manages life assurance, critical illness, income protection, and expense cover policies with multi-cover support, premium structures, trust arrangements, and commission tracking.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/protections`
+**Base Path:** `/api/v3/factfinds/{factfindId}/protections`
 
 **Key Features:**
 - Life Cover (term, whole-of-life, family income benefit)
@@ -10454,11 +10230,11 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
 
 | Method | Endpoint | Description | Request Body | Success Response |
 |--------|----------|-------------|--------------|------------------|
-| GET | `/api/v2/factfinds/{factfindId}/protections` | List all protections | N/A | 200 OK - PersonalProtection[] |
-| POST | `/api/v2/factfinds/{factfindId}/protections` | Create protection | PersonalProtectionRequest | 201 Created - PersonalProtection |
-| GET | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Get protection by ID | N/A | 200 OK - PersonalProtection |
-| PATCH | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Update protection | PersonalProtectionPatch | 200 OK - PersonalProtection |
-| DELETE | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Delete protection | N/A | 204 No Content |
+| GET | `/api/v3/factfinds/{factfindId}/protections` | List all protections | N/A | 200 OK - PersonalProtection[] |
+| POST | `/api/v3/factfinds/{factfindId}/protections` | Create protection | PersonalProtectionRequest | 201 Created - PersonalProtection |
+| GET | `/api/v3/factfinds/{factfindId}/protections/{protectionId}` | Get protection by ID | N/A | 200 OK - PersonalProtection |
+| PATCH | `/api/v3/factfinds/{factfindId}/protections/{protectionId}` | Update protection | PersonalProtectionPatch | 200 OK - PersonalProtection |
+| DELETE | `/api/v3/factfinds/{factfindId}/protections/{protectionId}` | Delete protection | N/A | 204 No Content |
 
 ### 36.3 Resource Properties (38 core properties - see Contract Schema)
 
@@ -10488,8 +10264,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
   "sumAssured": {
     "amount": 500000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "premiums": [
@@ -10498,7 +10273,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
       "stopsOn": "2049-04-01",
       "value": {
         "amount": 85.50,
-        "currency": { "code": "GBP", "symbol": "£" }
+        "currency": { "code": "GBP" }
       },
       "frequency": "Monthly",
       "type": "Regular",
@@ -10513,7 +10288,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
     "term": "P25Y",
     "sumAssured": {
       "amount": 500000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "premiumStructure": "Level",
     "paymentBasis": "FirstDeath",
@@ -10523,7 +10298,7 @@ Standard HTTP status codes (200, 201, 204, 400, 401, 403, 404, 422)
     "premiumStructure": "Level",
     "amount": {
       "amount": 500000.00,
-      "currency": { "code": "GBP", "symbol": "£" }
+      "currency": { "code": "GBP" }
     },
     "term": "P25Y",
     "untilAge": 70
@@ -10616,7 +10391,7 @@ The Protection Review API manages protection needs analysis and review informati
 ### Base URL Pattern
 
 ```
-/api/v2/factfinds/{factfindId}/protections/reviews
+/api/v3/factfinds/{factfindId}/protections/reviews
 ```
 
 ### Operations
@@ -10625,14 +10400,14 @@ The Protection Review API manages protection needs analysis and review informati
 
 **Get Protection Review Summary**
 ```
-GET /api/v2/factfinds/{id}/protections/reviews/summary
+GET /api/v3/factfinds/{id}/protections/reviews/summary
 ```
 Retrieves the complete protection review summary including all three sections.
 
 **Response:** 200 OK
 ```json
 {
-  "href": "/v2/factfinds/679/protections/reviews/summary",
+  "href": "/v3/factfinds/679/protections/reviews/summary",
   "lifeAndCriticalIllness": {
     "hasCoverForMortgageOrDebt": "Yes",
     "hasCoverforDependantsDueToCritcalIllness": "No",
@@ -10676,7 +10451,7 @@ Retrieves the complete protection review summary including all three sections.
 
 **Update Life & Critical Illness**
 ```
-PUT /api/v2/factfinds/{id}/protections/reviews/lifeAndCriticalIllness
+PUT /api/v3/factfinds/{id}/protections/reviews/lifeAndCriticalIllness
 ```
 Creates or updates the Life & Critical Illness section of the protection review.
 
@@ -10708,7 +10483,7 @@ Returns the updated LifeAndCriticalIllness object.
 
 **Update Income Protection**
 ```
-PUT /api/v2/factfinds/{id}/protections/reviews/incomeProtection
+PUT /api/v3/factfinds/{id}/protections/reviews/incomeProtection
 ```
 Creates or updates the Income Protection section of the protection review.
 
@@ -10738,7 +10513,7 @@ Returns the updated IncomeProtection object.
 
 **Update Buildings & Content**
 ```
-PUT /api/v2/factfinds/{id}/protections/reviews/buildingsAndContent
+PUT /api/v3/factfinds/{id}/protections/reviews/buildingsAndContent
 ```
 Creates or updates the Buildings & Content section of the protection review.
 
@@ -10936,7 +10711,7 @@ Returns the updated BuildingsAndContent object.
 
 **Purpose:** The Objectives API manages client financial goals and objectives across multiple domains (investment, pension, protection, mortgage, budget, estate-planning) with priority ranking, target dates, and needs analysis.
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/objectives`
+**Base Path:** `/api/v3/factfinds/{factfindId}/objectives`
 
 **Key Features:**
 - 6 objective types (investment, pension, protection, mortgage, budget, estate-planning)
@@ -10949,11 +10724,11 @@ Returns the updated BuildingsAndContent object.
 ### 36.2 Operations (26 total)
 
 **Base Operations (5):**
-- GET `/api/v2/factfinds/{factfindId}/objectives` - List all
-- POST `/api/v2/factfinds/{factfindId}/objectives` - Create
-- GET `/api/v2/factfinds/{factfindId}/objectives/{id}` - Get by ID
-- PATCH `/api/v2/factfinds/{factfindId}/objectives/{id}` - Update
-- DELETE `/api/v2/factfinds/{factfindId}/objectives/{id}` - Delete
+- GET `/api/v3/factfinds/{factfindId}/objectives` - List all
+- POST `/api/v3/factfinds/{factfindId}/objectives` - Create
+- GET `/api/v3/factfinds/{factfindId}/objectives/{id}` - Get by ID
+- PATCH `/api/v3/factfinds/{factfindId}/objectives/{id}` - Update
+- DELETE `/api/v3/factfinds/{factfindId}/objectives/{id}` - Delete
 
 **Type-Specific Operations (6 × 3 = 18):**
 - Each type (investment, pension, protection, mortgage, budget, estate-planning) has:
@@ -10977,22 +10752,22 @@ Returns the updated BuildingsAndContent object.
   "priority": "High",
   "targetAmount": {
     "amount": 500000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "targetDate": "2045-05-15",
   "currentSavings": {
     "amount": 125000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "monthlyContribution": {
     "amount": 500.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "yearsToGoal": 19,
   "isAchievable": false,
   "projectedShortfall": {
     "amount": 150000.00,
-    "currency": { "code": "GBP", "symbol": "£" }
+    "currency": { "code": "GBP" }
   },
   "status": "InProgress",
   "notes": "May need to increase contributions or adjust target date",
@@ -11021,7 +10796,7 @@ All planning APIs feed into objectives
 
 **Purpose:** The ATR (Attitude to Risk) Assessment API manages comprehensive risk profiling questionnaires with 15 core questions, risk score calculation, capacity for loss assessment, and historical assessment tracking (Risk Replay).
 
-**Base Path:** `/api/v2/factfinds/{factfindId}/clients/{clientId}/atr-assessment`
+**Base Path:** `/api/v3/factfinds/{factfindId}/clients/{clientId}/atr-assessment`
 
 **Key Features:**
 - 15 standardized ATR questions
@@ -11098,7 +10873,7 @@ All planning APIs feed into objectives
 
 **Purpose:** The Reference Data API provides enumeration values, lookup data, and reference entities for dropdown lists, validation, and data consistency across the application.
 
-**Base Path:** `/api/v2/reference`
+**Base Path:** `/api/v3/reference`
 
 **Key Features:**
 - Static enumerations (genders, titles, marital statuses)
@@ -11126,7 +10901,7 @@ All planning APIs feed into objectives
 
 ### 35.3 Example Responses
 
-**GET /api/v2/reference/genders:**
+**GET /api/v3/reference/genders:**
 ```json
 {
   "values": [
@@ -11138,28 +10913,25 @@ All planning APIs feed into objectives
 }
 ```
 
-**GET /api/v2/reference/currencies:**
+**GET /api/v3/reference/currencies:**
 ```json
 {
   "values": [
     {
       "code": "GBP",
       "display": "British Pound",
-      "symbol": "£",
       "numericCode": 826,
       "minorUnits": 2
     },
     {
       "code": "EUR",
       "display": "Euro",
-      "symbol": "€",
       "numericCode": 978,
       "minorUnits": 2
     },
     {
       "code": "USD",
       "display": "US Dollar",
-      "symbol": "$",
       "numericCode": 840,
       "minorUnits": 2
     }
@@ -11223,8 +10995,6 @@ All planning APIs feed into objectives
   "amount": 150000.00,
   "currency": {
     "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
   }
 }
 ```
@@ -11233,7 +11003,7 @@ All planning APIs feed into objectives
 ```json
 {
   "id": 8496,
-  "href": "/api/v2/factfinds/679/clients/8496",
+  "href": "/api/v3/factfinds/679/clients/8496",
   "name": "John Smith",
   "type": "Person"
 }
@@ -11292,7 +11062,7 @@ All planning APIs feed into objectives
 |------|------|-----------|---------------|
 | 400 Bad Request | Invalid syntax | Malformed JSON, invalid data types | Error details |
 | 401 Unauthorized | Authentication required | Missing/invalid token | Authentication challenge |
-| 403 Forbidden | Insufficient permissions | Lacks required scope | Permission error |
+| 403 Forbidden | Insufficient permissions | Lacks required factfind scope | Permission error |
 | 404 Not Found | Resource not found | Invalid ID, deleted resource | Error message |
 | 409 Conflict | Concurrency conflict | ETag mismatch, duplicate | Conflict details |
 | 422 Unprocessable Entity | Validation failed | Business rule violation | Validation errors |
@@ -11326,7 +11096,7 @@ All planning APIs feed into objectives
       }
     ],
     "timestamp": "2026-03-03T10:30:00Z",
-    "path": "/api/v2/factfinds/679/clients",
+    "path": "/api/v3/factfinds/679/clients",
     "requestId": "req-123456"
   }
 }

@@ -23,7 +23,7 @@
 | **Entity Name** | Investment |
 | **Domain** | Plans |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/investments` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/investments` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/investments` | List all investments | Query params | Investment[] | 200, 401, 403 | Investment, List |
-| POST | `/api/v2/factfinds/{factfindId}/investments` | Create investment | InvestmentRequest | Investment | 201, 400, 401, 403, 422 | Investment, Create |
-| GET | `/api/v2/factfinds/{factfindId}/investments/{investmentId}` | Get investment by ID | Path params | Investment | 200, 401, 403, 404 | Investment, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/investments/{investmentId}` | Update investment | InvestmentPatch | Investment | 200, 400, 401, 403, 404, 422 | Investment, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/investments/{investmentId}` | Delete investment | Path params | None | 204, 401, 403, 404, 422 | Investment, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/investments` | List all investments | Query params | Investment[] | 200, 401, 403 | Investment, List |
+| POST | `/api/v3/factfinds/{factfindId}/investments` | Create investment | InvestmentRequest | Investment | 201, 400, 401, 403, 422 | Investment, Create |
+| GET | `/api/v3/factfinds/{factfindId}/investments/{investmentId}` | Get investment by ID | Path params | Investment | 200, 401, 403, 404 | Investment, Retrieve |
+| PATCH | `/api/v3/factfinds/{factfindId}/investments/{investmentId}` | Update investment | InvestmentPatch | Investment | 200, 400, 401, 403, 404, 422 | Investment, Update |
+| DELETE | `/api/v3/factfinds/{factfindId}/investments/{investmentId}` | Delete investment | Path params | None | 204, 401, 403, 404, 422 | Investment, Delete |
 
 
 ### Authorization
@@ -126,7 +126,7 @@ Clients who own this investment:
 | Field | Type | Description |
 |-------|------|-------------|
 | \`id\` | integer | Client unique identifier |
-| \`href\` | string | API link to client resource (e.g., \`/api/v2/factfinds/679/clients/8496\`) |
+| \`href\` | string | API link to client resource (e.g., \`/api/v3/factfinds/679/clients/8496\`) |
 | \`name\` | string | Client full name |
 
 **Note:** Investments can have multiple owners (joint ownership).
@@ -138,7 +138,7 @@ Adviser who arranged this investment:
 | Field | Type | Description |
 |-------|------|-------------|
 | \`id\` | integer | Adviser unique identifier |
-| \`href\` | string | API link to adviser resource (e.g., \`/api/v2/advisers/123\`) |
+| \`href\` | string | API link to adviser resource (e.g., \`/api/v3/advisers/123\`) |
 | \`name\` | string | Adviser full name |
 
 #### provider (Product Provider Reference)
@@ -148,7 +148,7 @@ Product provider/company:
 | Field | Type | Description |
 |-------|------|-------------|
 | \`id\` | integer | Product provider unique identifier |
-| \`href\` | string | API link to product provider resource (e.g., \`/api/v2/productproviders/456\`) |
+| \`href\` | string | API link to product provider resource (e.g., \`/api/v3/productproviders/456\`) |
 | \`name\` | string | Product provider name (e.g., "Vanguard", "Aviva", "Fidelity") |
 
 **Common Product Providers:**
@@ -170,7 +170,7 @@ Investment lifecycle stage reference:
 | Field | Type | Description |
 |-------|------|-------------|
 | \`id\` | integer | Lifecycle unique identifier |
-| \`href\` | string | API link to lifecycle resource (e.g., \`/api/v2/lifecycles/45\`) |
+| \`href\` | string | API link to lifecycle resource (e.g., \`/api/v3/lifecycles/45\`) |
 | \`name\` | string | Lifecycle stage name (e.g., "Accumulation", "Decumulation") |
 
 **Lifecycle Stages:**
@@ -186,7 +186,7 @@ Specific investment type/plan details:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Plan type unique identifier |
-| `href` | string | API link to plan type resource (e.g., `/api/v2/plantypes?filter=id eq 123`) |
+| `href` | string | API link to plan type resource (e.g., `/api/v3/plantypes?filter=id eq 123`) |
 | `name` | string | Investment type name (e.g., "Stocks & Shares ISA", "OEIC", "Unit Trust") |
 
 **Common Investment Types:**
@@ -208,7 +208,7 @@ Platform or wrap account details:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Wrap account identifier |
-| `href` | string | Link to parent wrap account investment (e.g., `/api/v2/factfinds/679/investments/9001`) |
+| `href` | string | Link to parent wrap account investment (e.g., `/api/v3/factfinds/679/investments/9001`) |
 | `reference` | string | Wrap account reference number |
 
 **Use Cases:**
@@ -399,37 +399,37 @@ Detailed fund holdings with identification codes:
 ```json
 {
   "id": 15001,
-  "href": "/api/v2/factfinds/679/investments/15001",
+  "href": "/api/v3/factfinds/679/investments/15001",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     }
   ],
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   },
   "provider": {
     "id": 456,
-    "href": "/api/v2/productproviders/456",
+    "href": "/api/v3/productproviders/456",
     "name": "Vanguard"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "Accumulation"
   },
   "investmentCategory": "Investment",
   "investmentType": {
     "id": 123,
-    "href": "/api/v2/plantypes?filter=id eq 123",
+    "href": "/api/v3/plantypes?filter=id eq 123",
     "name": "Stocks & Shares ISA"
   },
   "policyNumber": "INV-123456789",
@@ -439,15 +439,14 @@ Detailed fund holdings with identification codes:
   "endsOn": "2035-06-15",
   "wrap": {
     "id": 9001,
-    "href": "/api/v2/factfinds/679/investments/9001",
+    "href": "/api/v3/factfinds/679/investments/9001",
     "reference": "WRAP-987654"
   },
   "valuation": {
     "currentValue": {
       "amount": 125000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "valuedOn": "2026-02-18"
@@ -457,22 +456,19 @@ Detailed fund holdings with identification codes:
     "lowMaturityValue": {
       "amount": 180000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "mediumMaturityValue": {
       "amount": 245000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "highMaturityValue": {
       "amount": 325000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "maturityValueProjectionDetails": "Projections based on 3%, 5%, and 7% annual growth rates"
@@ -480,8 +476,7 @@ Detailed fund holdings with identification codes:
   "monthlyIncome": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "isOriginalInvestmentProtected": false,
@@ -491,8 +486,7 @@ Detailed fund holdings with identification codes:
       "value": {
         "amount": 500.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "startedOn": "2020-06-15",
@@ -552,32 +546,32 @@ Detailed fund holdings with identification codes:
 ```json
 {
   "id": 15002,
-  "href": "/api/v2/factfinds/679/investments/15002",
+  "href": "/api/v3/factfinds/679/investments/15002",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     }
   ],
   "provider": {
     "id": 789,
-    "href": "/api/v2/productproviders/789",
+    "href": "/api/v3/productproviders/789",
     "name": "Nationwide Building Society"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "Accumulation"
   },
   "investmentCategory": "CashBankAccount",
   "investmentType": {
     "id": 456,
-    "href": "/api/v2/plantypes?filter=id eq 456",
+    "href": "/api/v3/plantypes?filter=id eq 456",
     "name": "Instant Access Savings"
   },
   "policyNumber": "ACC-987654321",
@@ -588,8 +582,7 @@ Detailed fund holdings with identification codes:
     "currentValue": {
       "amount": 25000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "valuedOn": "2026-02-18"
@@ -608,37 +601,37 @@ Detailed fund holdings with identification codes:
 ```json
 {
   "id": 15003,
-  "href": "/api/v2/factfinds/679/investments/15003",
+  "href": "/api/v3/factfinds/679/investments/15003",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     },
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "name": "Jane Smith"
     }
   ],
   "provider": {
     "id": 234,
-    "href": "/api/v2/productproviders/234",
+    "href": "/api/v3/productproviders/234",
     "name": "Aviva"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "Accumulation"
   },
   "investmentCategory": "lifeAssuredInvestment",
   "investmentType": {
     "id": 567,
-    "href": "/api/v2/plantypes?filter=id eq 567",
+    "href": "/api/v3/plantypes?filter=id eq 567",
     "name": "Investment Bond with Life Cover"
   },
   "policyNumber": "BOND-456789123",
@@ -650,8 +643,7 @@ Detailed fund holdings with identification codes:
     "currentValue": {
       "amount": 275000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "valuedOn": "2026-02-18"
@@ -661,22 +653,19 @@ Detailed fund holdings with identification codes:
     "lowMaturityValue": {
       "amount": 380000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "mediumMaturityValue": {
       "amount": 520000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "highMaturityValue": {
       "amount": 690000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "maturityValueProjectionDetails": "Projections based on 3%, 5%, and 7% annual growth rates with life cover charges deducted"
@@ -684,8 +673,7 @@ Detailed fund holdings with identification codes:
   "monthlyIncome": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "isOriginalInvestmentProtected": false,
@@ -694,8 +682,7 @@ Detailed fund holdings with identification codes:
       "sumAssured": {
         "amount": 250000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "termInYears": 20
@@ -704,8 +691,7 @@ Detailed fund holdings with identification codes:
       "sumAssured": {
         "amount": 250000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "termInYears": 20
@@ -723,7 +709,7 @@ Detailed fund holdings with identification codes:
       "gender": "Male",
       "client": {
         "id": 8496,
-        "href": "/api/v2/factfinds/679/clients/8496"
+        "href": "/api/v3/factfinds/679/clients/8496"
       }
     },
     {
@@ -734,7 +720,7 @@ Detailed fund holdings with identification codes:
       "gender": "Female",
       "client": {
         "id": 8497,
-        "href": "/api/v2/factfinds/679/clients/8497"
+        "href": "/api/v3/factfinds/679/clients/8497"
       }
     }
   ],
@@ -744,8 +730,7 @@ Detailed fund holdings with identification codes:
       "value": {
         "amount": 250000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "startedOn": "2019-09-01",

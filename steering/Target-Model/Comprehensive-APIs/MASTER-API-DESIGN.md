@@ -90,7 +90,7 @@ All APIs follow RESTful architectural principles:
 - **Stateless:** Each request contains all necessary information
 - **Standard HTTP methods:** GET, POST, PUT, PATCH, DELETE
 - **Standard response codes:** HTTP status codes with semantic meaning
-- **Versioned:** API version in URL path (`/api/v2/`)
+- **Versioned:** API version in URL path (`/api/v3/`)
 
 ### 2.3 Aggregate Roots
 
@@ -98,17 +98,17 @@ APIs are organized around three main aggregate roots:
 
 **FactFind Aggregate**
 ```
-/api/v2/factfinds/{factfindId}
+/api/v3/factfinds/{factfindId}
 ```
 
 **Client Aggregate**
 ```
-/api/v2/factfinds/{factfindId}/clients/{clientId}
+/api/v3/factfinds/{factfindId}/clients/{clientId}
 ```
 
 **Arrangement Aggregate**
 ```
-/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}
+/api/v3/factfinds/{factfindId}/arrangements/{arrangementId}
 ```
 
 ---
@@ -140,11 +140,11 @@ Standard HTTP methods with consistent semantics:
 
 **Examples:**
 ```
-GET    /api/v2/factfinds/{factfindId}/clients
-POST   /api/v2/factfinds/{factfindId}/clients
-GET    /api/v2/factfinds/{factfindId}/clients/{clientId}
-PATCH  /api/v2/factfinds/{factfindId}/clients/{clientId}
-DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}
+GET    /api/v3/factfinds/{factfindId}/clients
+POST   /api/v3/factfinds/{factfindId}/clients
+GET    /api/v3/factfinds/{factfindId}/clients/{clientId}
+PATCH  /api/v3/factfinds/{factfindId}/clients/{clientId}
+DELETE /api/v3/factfinds/{factfindId}/clients/{clientId}
 ```
 
 ### 3.3 HTTP Response Codes
@@ -175,7 +175,7 @@ DELETE /api/v2/factfinds/{factfindId}/clients/{clientId}
 
 ### 3.5 API Versioning
 
-**Version in URL path:** `/api/v2/`
+**Version in URL path:** `/api/v3/`
 
 **Current version:** v2.0
 
@@ -317,9 +317,7 @@ If-Match: <etag-value>
   "amount": {
     "amount": 50000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   }
 }
@@ -379,14 +377,14 @@ Last-Modified: Tue, 25 Feb 2026 10:30:00 GMT
 
 **For created resources (201):**
 ```http
-Location: /api/v2/factfinds/123/clients/456
+Location: /api/v3/factfinds/123/clients/456
 ```
 
 ### 5.5 Pagination
 
 **Query Parameters:**
 ```
-GET /api/v2/factfinds/{factfindId}/clients?limit=50&offset=100
+GET /api/v3/factfinds/{factfindId}/clients?limit=50&offset=100
 ```
 
 **Parameters:**
@@ -410,17 +408,17 @@ GET /api/v2/factfinds/{factfindId}/clients?limit=50&offset=100
 
 **Filtering:**
 ```
-GET /api/v2/factfinds/{factfindId}/clients?status=active&type=Person
+GET /api/v3/factfinds/{factfindId}/clients?status=active&type=Person
 ```
 
 **Sorting:**
 ```
-GET /api/v2/factfinds/{factfindId}/clients?sort=lastName:asc,created:desc
+GET /api/v3/factfinds/{factfindId}/clients?orderBy=lastName asc,created:desc
 ```
 
 **Search:**
 ```
-GET /api/v2/factfinds/{factfindId}/clients?search=smith
+GET /api/v3/factfinds/{factfindId}/clients?search=smith
 ```
 
 ---
@@ -914,51 +912,51 @@ This section provides navigation to all entity-specific API design documents, or
 **Entity APIs:**
 
 1. **[Client API Design](./Client-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients`
    - Core client identity and profile management
 
 2. **[Address API Design](./Address-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses`
    - Client address management (current and historical)
 
 3. **[Contact API Design](./Contact-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/contacts`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/contacts`
    - Contact information (phone, email)
 
 4. **[Relationship API Design](./Relationship-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/relationships`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/relationships`
    - Client-to-client relationships
 
 5. **[Note API Design](./Note-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/notes`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/notes`
    - Client notes and annotations
 
 6. **[Dependant API Design](./Dependant-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/dependants`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/dependants`
    - Financial dependants management
 
 7. **[Vulnerability API Design](./Vulnerability-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/vulnerabilities`
    - Client vulnerability tracking (Consumer Duty)
 
 8. **[Identity Verification API Design](./Identity-Verification-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/identity-verification`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/identity-verification`
    - KYC/AML identity verification (MLR 2017)
 
 9. **[Financial Profile API Design](./Financial-Profile-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/financial-profile`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/financial-profile`
    - Client financial profile summary
 
 10. **[DPA Agreement API Design](./DPA-Agreement-API-Design.md)**
-    - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/dpa-agreements`
+    - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/dpa-agreements`
     - Data Processing Agreements (GDPR)
 
 11. **[Estate Planning API Design](./Estate-Planning-API-Design.md)**
-    - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/estate-planning`
+    - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/estate-planning`
     - Estate planning, wills, gifts, IHT planning
 
 12. **[Custom Question API Design](./Custom-Question-API-Design.md)**
-    - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/custom-questions`
+    - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/custom-questions`
     - Custom and supplementary questions
 
 ---
@@ -972,23 +970,23 @@ This section provides navigation to all entity-specific API design documents, or
 **Entity APIs:**
 
 1. **[Employment API Design](./Employment-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments`
    - Employment history and current employment
 
 2. **[Income API Design](./Income-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/income`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/income`
    - Income sources and earnings tracking
 
 3. **[Expenditure API Design](./Expenditure-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/expenditure`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/expenditure`
    - Expenditure items and spending tracking
 
 4. **[Affordability API Design](./Affordability-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/affordability`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/affordability`
    - Affordability calculations and budget analysis
 
 5. **[Credit History API Design](./Credit-History-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/credit-history`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/credit-history`
    - Credit history, scores, payment records
 
 ---
@@ -1002,23 +1000,23 @@ This section provides navigation to all entity-specific API design documents, or
 **Entity APIs:**
 
 1. **[Investment API Design](./Investment-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/investments`
+   - Base Path: `/api/v3/factfinds/{factfindId}/investments`
    - Investment products (GIA, ISA, bonds, cash)
 
 2. **[Mortgage API Design](./Mortgage-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/mortgages`
+   - Base Path: `/api/v3/factfinds/{factfindId}/mortgages`
    - Mortgage products and lending
 
 3. **[PersonalProtection API Design](./PersonalProtection-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/protections`
+   - Base Path: `/api/v3/factfinds/{factfindId}/protections`
    - Personal protection policies (life, CI, IP, expense, severity)
 
 4. **[Contribution API Design](./Contribution-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/contributions`
+   - Base Path: `/api/v3/factfinds/{factfindId}/arrangements/{arrangementId}/contributions`
    - Contribution records for arrangements
 
 6. **[Beneficiary API Design](./Beneficiary-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries`
+   - Base Path: `/api/v3/factfinds/{factfindId}/arrangements/{arrangementId}/beneficiaries`
    - Beneficiary nominations for arrangements
 
 ---
@@ -1032,11 +1030,11 @@ This section provides navigation to all entity-specific API design documents, or
 **Entity APIs:**
 
 1. **[Asset API Design](./Asset-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/assets`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/assets`
    - Asset management (property, equities, valuables)
 
 2. **[Net Worth API Design](./Net-Worth-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/net-worth`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/net-worth`
    - Net worth calculations and tracking
 
 ---
@@ -1050,7 +1048,7 @@ This section provides navigation to all entity-specific API design documents, or
 **Entity APIs:**
 
 1. **[ATR Assessment API Design](./ATR-Assessment-API-Design.md)**
-   - Base Path: `/api/v2/factfinds/{factfindId}/clients/{clientId}/atr-assessment`
+   - Base Path: `/api/v3/factfinds/{factfindId}/clients/{clientId}/atr-assessment`
    - Attitude to Risk assessment and risk profiling
 
 ---
@@ -1064,7 +1062,7 @@ This section provides navigation to all entity-specific API design documents, or
 **Entity APIs:**
 
 1. **[FactFind API Design](./FactFind-API-Design.md)**
-   - Base Path: `/api/v2/factfinds`
+   - Base Path: `/api/v3/factfinds`
    - Root FactFind aggregate for fact-finding sessions
 
 ---
@@ -1078,7 +1076,7 @@ This section provides navigation to all entity-specific API design documents, or
 **Entity APIs:**
 
 1. **[Reference Data API Design](./Reference-Data-API-Design.md)**
-   - Base Path: `/api/v2/reference-data`
+   - Base Path: `/api/v3/reference-data`
    - Reference data, enumerations, lookup values
 
 ---

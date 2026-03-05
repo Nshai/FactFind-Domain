@@ -23,7 +23,7 @@
 | **Entity Name** | PersonalProtection |
 | **Domain** | Plans |
 | **Aggregate Root** | FactFind |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/protections` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/protections` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Endpoint | Description | Auth Scope |
 |--------|----------|-------------|------------|
-| POST | `/api/v2/factfinds/{factfindId}/protections` | Create new protection | `protections:write` |
-| GET | `/api/v2/factfinds/{factfindId}/protections` | List all protections | `protections:read` |
-| GET | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Get protection details | `protections:read` |
-| PATCH | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Update protection | `protections:write` |
-| DELETE | `/api/v2/factfinds/{factfindId}/protections/{protectionId}` | Delete protection (soft) | `protections:delete` |
+| POST | `/api/v3/factfinds/{factfindId}/protections` | Create new protection | `protections:write` |
+| GET | `/api/v3/factfinds/{factfindId}/protections` | List all protections | `protections:read` |
+| GET | `/api/v3/factfinds/{factfindId}/protections/{protectionId}` | Get protection details | `protections:read` |
+| PATCH | `/api/v3/factfinds/{factfindId}/protections/{protectionId}` | Update protection | `protections:write` |
+| DELETE | `/api/v3/factfinds/{factfindId}/protections/{protectionId}` | Delete protection (soft) | `protections:delete` |
 
 ### Authorization
 
@@ -376,37 +376,37 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ```json
 {
   "id": 15001,
-  "href": "/api/v2/factfinds/679/protections/15001",
+  "href": "/api/v3/factfinds/679/protections/15001",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     }
   ],
   "provider": {
     "id": 456,
-    "href": "/api/v2/productproviders/456",
+    "href": "/api/v3/productproviders/456",
     "name": "Legal & General"
   },
   "protectionCategory": "PersonalProtection",
   "protectionType": {
     "id": 123,
-    "href": "/api/v2/plantypes?filter=id eq 123",
+    "href": "/api/v3/plantypes?filter=id eq 123",
     "name": "Life and Critical Illness"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "Accumulation"
   },
   "premiums": [
@@ -416,9 +416,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
       "value": {
         "amount": 150.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "frequency": "Monthly",
@@ -435,18 +433,14 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "sumAssured": {
       "amount": 500000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "premiumStructure": "Level",
     "additionalCover": {
       "amount": 0,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "paymentBasis": "FirstDeath",
@@ -457,9 +451,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "amount": {
       "amount": 250000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "term": "P25Y",
@@ -474,9 +466,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "benefitAmount": {
       "amount": 500000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "deferredPeriod": "P0D",
@@ -488,9 +478,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "splitBenefitValue": {
       "amount": 0,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "splitDeferredPeriod": "P0D"
@@ -506,9 +494,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
   "sumAssured": {
     "amount": 500000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "commissions": [
@@ -519,9 +505,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
       "amount": {
         "amount": 3.75,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       }
     }
@@ -538,37 +522,37 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ```json
 {
   "id": 15002,
-  "href": "/api/v2/factfinds/679/protections/15002",
+  "href": "/api/v3/factfinds/679/protections/15002",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   },
   "owners": [
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "name": "Sarah Johnson"
     }
   ],
   "provider": {
     "id": 457,
-    "href": "/api/v2/productproviders/457",
+    "href": "/api/v3/productproviders/457",
     "name": "Royal London"
   },
   "protectionCategory": "PersonalProtection",
   "protectionType": {
     "id": 124,
-    "href": "/api/v2/plantypes?filter=id eq 124",
+    "href": "/api/v3/plantypes?filter=id eq 124",
     "name": "Income Protection"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "Accumulation"
   },
   "premiums": [
@@ -578,9 +562,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
       "value": {
         "amount": 85.50,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "frequency": "Monthly",
@@ -597,9 +579,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "amount": {
       "amount": 3000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "term": "P30Y",
@@ -614,9 +594,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "benefitAmount": {
       "amount": 3000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "deferredPeriod": "P90D",
@@ -628,9 +606,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "splitBenefitValue": {
       "amount": 0,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "splitDeferredPeriod": "P0D"
@@ -647,9 +623,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
   "sumAssured": {
     "amount": 72000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "commissions": [
@@ -660,9 +634,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
       "amount": {
         "amount": 2.57,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       }
     }
@@ -679,42 +651,42 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
 ```json
 {
   "id": 15003,
-  "href": "/api/v2/factfinds/679/protections/15003",
+  "href": "/api/v3/factfinds/679/protections/15003",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith"
     },
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "name": "Sarah Johnson"
     }
   ],
   "provider": {
     "id": 458,
-    "href": "/api/v2/productproviders/458",
+    "href": "/api/v3/productproviders/458",
     "name": "Aviva"
   },
   "protectionCategory": "PersonalProtection",
   "protectionType": {
     "id": 125,
-    "href": "/api/v2/plantypes?filter=id eq 125",
+    "href": "/api/v3/plantypes?filter=id eq 125",
     "name": "Family Protection Bundle"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "Accumulation"
   },
   "premiums": [
@@ -724,9 +696,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
       "value": {
         "amount": 275.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "frequency": "Monthly",
@@ -743,18 +713,14 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "sumAssured": {
       "amount": 750000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "premiumStructure": "Level",
     "additionalCover": {
       "amount": 50000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "paymentBasis": "FirstDeath",
@@ -765,9 +731,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "amount": {
       "amount": 300000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "term": "P20Y",
@@ -778,9 +742,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "amount": {
       "amount": 2500.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "term": "P20Y",
@@ -792,9 +754,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
       "amount": {
         "amount": 200000.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "term": "P20Y",
@@ -805,9 +765,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
       "amount": {
         "amount": 100000.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "term": "P20Y",
@@ -823,9 +781,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "benefitAmount": {
       "amount": 750000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "deferredPeriod": "P0D",
@@ -837,9 +793,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
     "splitBenefitValue": {
       "amount": 2500.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "splitDeferredPeriod": "P60D"
@@ -857,9 +811,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
   "sumAssured": {
     "amount": 750000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "commissions": [
@@ -870,9 +822,7 @@ Refer to **[Master API Design - Section 4](./MASTER-API-DESIGN.md#4-authenticati
       "amount": {
         "amount": 9.63,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       }
     }

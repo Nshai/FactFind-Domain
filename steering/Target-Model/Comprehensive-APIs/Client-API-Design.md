@@ -23,7 +23,7 @@
 | **Entity Name** | Client |
 | **Domain** | Client Management |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/clients` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/clients` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/clients` | List all clients in factfind | Query params | Client[] | 200, 401, 403 | Client, List |
-| POST | `/api/v2/factfinds/{factfindId}/clients` | Create new client | ClientRequest | Client | 201, 400, 401, 403, 422 | Client, Create |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Get client by ID | Path params | Client | 200, 401, 403, 404 | Client, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Update client details | ClientPatch | Client | 200, 400, 401, 403, 404, 422 | Client, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}` | Delete client | Path params | None | 204, 401, 403, 404, 422 | Client, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/clients` | List all clients in factfind | Query params | Client[] | 200, 401, 403 | Client, List |
+| POST | `/api/v3/factfinds/{factfindId}/clients` | Create new client | ClientRequest | Client | 201, 400, 401, 403, 422 | Client, Create |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}` | Get client by ID | Path params | Client | 200, 401, 403, 404 | Client, Retrieve |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}` | Update client details | ClientPatch | Client | 200, 400, 401, 403, 404, 422 | Client, Update |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}` | Delete client | Path params | None | 204, 401, 403, 404, 422 | Client, Delete |
 
 
 ### Authorization

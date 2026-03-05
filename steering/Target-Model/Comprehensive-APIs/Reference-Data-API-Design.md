@@ -23,7 +23,7 @@
 | **Entity Name** | Reference-Data |
 | **Domain** | Reference Data |
 | **Aggregate Root** | Reference |
-| **Base Path** | `/api/v2/...` |
+| **Base Path** | `/api/v3/...` |
 | **Resource Type** | Collection |
 
 ### Description

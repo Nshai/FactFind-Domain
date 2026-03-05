@@ -23,7 +23,7 @@
 | **Entity Name** | Mortgage |
 | **Domain** | Plans |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/mortgages` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/mortgages` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/mortgages` | List all mortgages | Query params | Mortgage[] | 200, 401, 403 | Mortgage, List |
-| POST | `/api/v2/factfinds/{factfindId}/mortgages` | Create mortgage | MortgageRequest | Mortgage | 201, 400, 401, 403, 422 | Mortgage, Create |
-| GET | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Get mortgage by ID | Path params | Mortgage | 200, 401, 403, 404 | Mortgage, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Update mortgage | MortgagePatch | Mortgage | 200, 400, 401, 403, 404, 422 | Mortgage, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/mortgages/{mortgageId}` | Delete mortgage | Path params | None | 204, 401, 403, 404, 422 | Mortgage, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/mortgages` | List all mortgages | Query params | Mortgage[] | 200, 401, 403 | Mortgage, List |
+| POST | `/api/v3/factfinds/{factfindId}/mortgages` | Create mortgage | MortgageRequest | Mortgage | 201, 400, 401, 403, 422 | Mortgage, Create |
+| GET | `/api/v3/factfinds/{factfindId}/mortgages/{mortgageId}` | Get mortgage by ID | Path params | Mortgage | 200, 401, 403, 404 | Mortgage, Retrieve |
+| PATCH | `/api/v3/factfinds/{factfindId}/mortgages/{mortgageId}` | Update mortgage | MortgagePatch | Mortgage | 200, 400, 401, 403, 404, 422 | Mortgage, Update |
+| DELETE | `/api/v3/factfinds/{factfindId}/mortgages/{mortgageId}` | Delete mortgage | Path params | None | 204, 401, 403, 404, 422 | Mortgage, Delete |
 
 
 ### Authorization
@@ -338,10 +338,10 @@ Mortgages link to:
 ```json
 {
   "id": 5001,
-  "href": "/api/v2/factfinds/679/mortgages/5001",
+  "href": "/api/v3/factfinds/679/mortgages/5001",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "arrangementCategory": "MORTGAGE",
   "accountNumber": "NBS-MORT-123456",
@@ -350,20 +350,20 @@ Mortgages link to:
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "fullName": "John Smith",
       "ownershipPercentage": 50.0
     },
     {
       "id": 8497,
-      "href": "/api/v2/factfinds/679/clients/8497",
+      "href": "/api/v3/factfinds/679/clients/8497",
       "fullName": "Jane Smith",
       "ownershipPercentage": 50.0
     }
   ],
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   },
   "productType": "FixedRateMortgage",
@@ -374,37 +374,31 @@ Mortgages link to:
     "originalLoanAmount": {
       "amount": 300000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "currentBalance": {
       "amount": 245000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "depositAmount": {
       "amount": 100000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "originalPropertyValuation": {
       "amount": 400000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "currentPropertyValuation": {
       "amount": 425000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "loanToValue": {
@@ -412,15 +406,13 @@ Mortgages link to:
       "propertyValue": {
         "amount": 400000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "loanAmount": {
         "amount": 300000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "calculatedOn": "2018-06-15"
@@ -430,15 +422,13 @@ Mortgages link to:
       "outstandingBalance": {
         "amount": 245000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "currentPropertyValue": {
         "amount": 425000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "calculatedOn": "2026-02-18"
@@ -463,8 +453,7 @@ Mortgages link to:
     "capitalRepaymentAmount": {
       "amount": 300000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "capitalTermYears": 25,
@@ -482,8 +471,7 @@ Mortgages link to:
     "lenderFees": {
       "amount": 999.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "ongoingContributions": null
@@ -511,16 +499,14 @@ Mortgages link to:
     "earlyRepaymentCharge": {
       "amount": 9800.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "earlyRepaymentChargeSecondCharge": null,
     "netProceedsOnRedemption": {
       "amount": 235200.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
@@ -540,11 +526,11 @@ Mortgages link to:
   },
   "propertyDetail": {
     "id": 1001,
-    "href": "/api/v2/factfinds/679/property-details/1001"
+    "href": "/api/v3/factfinds/679/property-details/1001"
   },
   "asset": {
     "id": 67890,
-    "href": "/api/v2/factfinds/679/assets/67890"
+    "href": "/api/v3/factfinds/679/assets/67890"
   },
   "linkedArrangements": [
     {
@@ -555,8 +541,7 @@ Mortgages link to:
       "sumAssured": {
         "amount": 300000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       }
     }
@@ -574,17 +559,17 @@ Mortgages link to:
 ```json
 {
   "id": 5002,
-  "href": "/api/v2/factfinds/679/mortgages/5002",
+  "href": "/api/v3/factfinds/679/mortgages/5002",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "arrangementCategory": "MORTGAGE",
   "accountNumber": "BTL-789456",
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "fullName": "John Smith",
       "ownershipPercentage": 100.0
     }
@@ -597,36 +582,31 @@ Mortgages link to:
     "originalLoanAmount": {
       "amount": 150000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "currentBalance": {
       "amount": 138000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "depositAmount": {
       "amount": 50000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "originalPropertyValuation": {
       "amount": 200000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "currentPropertyValuation": {
       "amount": 220000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "loanToValue": {
@@ -634,15 +614,13 @@ Mortgages link to:
       "propertyValue": {
         "amount": 200000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "loanAmount": {
         "amount": 150000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "calculatedOn": "2020-09-01"
@@ -652,15 +630,13 @@ Mortgages link to:
       "outstandingBalance": {
         "amount": 138000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "currentPropertyValue": {
         "amount": 220000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "calculatedOn": "2026-02-18"
@@ -682,8 +658,7 @@ Mortgages link to:
     "interestOnlyAmount": {
       "amount": 150000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "interestOnlyTermYears": 25,
@@ -709,15 +684,14 @@ Mortgages link to:
     "rentalIncome": {
       "amount": 950.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       },
       "frequency": "Monthly"
     }
   },
   "propertyDetail": {
     "id": 1002,
-    "href": "/api/v2/factfinds/679/property-details/1002"
+    "href": "/api/v3/factfinds/679/property-details/1002"
   },
   "agencyStatus": "NOT_UNDER_AGENCY",
   "notes": "BTL rental property. Current tenant lease expires Aug 2027. Rental yield 5.2%.",
@@ -731,17 +705,17 @@ Mortgages link to:
 ```json
 {
   "id": 5003,
-  "href": "/api/v2/factfinds/679/mortgages/5003",
+  "href": "/api/v3/factfinds/679/mortgages/5003",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "arrangementCategory": "MORTGAGE",
   "accountNumber": "EQR-456789",
   "owners": [
     {
       "id": 8498,
-      "href": "/api/v2/factfinds/679/clients/8498",
+      "href": "/api/v3/factfinds/679/clients/8498",
       "fullName": "Mary Johnson",
       "ownershipPercentage": 100.0
     }
@@ -754,36 +728,31 @@ Mortgages link to:
     "originalLoanAmount": {
       "amount": 75000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "currentBalance": {
       "amount": 95250.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "equityReleased": {
       "amount": 75000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "originalPropertyValuation": {
       "amount": 350000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "currentPropertyValuation": {
       "amount": 385000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "loanToValue": {
@@ -791,15 +760,13 @@ Mortgages link to:
       "propertyValue": {
         "amount": 350000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "loanAmount": {
         "amount": 75000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "calculatedOn": "2021-03-15"
@@ -809,15 +776,13 @@ Mortgages link to:
       "outstandingBalance": {
         "amount": 95250.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "currentPropertyValue": {
         "amount": 385000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "calculatedOn": "2026-02-18"
@@ -835,8 +800,7 @@ Mortgages link to:
     "interestOnlyAmount": {
       "amount": 75000.00,
       "currency": {
-        "code": "GBP",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "interestOnlyRepaymentVehicle": "Repayable on death or move to care"
@@ -862,15 +826,14 @@ Mortgages link to:
       "reserveAmount": {
         "amount": 25000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       }
     }
   },
   "propertyDetail": {
     "id": 1003,
-    "href": "/api/v2/factfinds/679/property-details/1003"
+    "href": "/api/v3/factfinds/679/property-details/1003"
   },
   "agencyStatus": "UNDER_AGENCY_SERVICING_AGENT",
   "agencyStatusDate": "2021-03-15",

@@ -23,7 +23,7 @@
 | **Entity Name** | Beneficiary |
 | **Domain** | Arrangements |
 | **Aggregate Root** | Arrangement |
-| **Base Path** | `/api/v2/...` |
+| **Base Path** | `/api/v3/...` |
 | **Resource Type** | Collection |
 
 ### Description

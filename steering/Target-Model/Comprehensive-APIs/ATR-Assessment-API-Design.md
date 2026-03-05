@@ -23,7 +23,7 @@
 | **Entity Name** | ATR-Assessment |
 | **Domain** | Risk Profiling |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/...` |
+| **Base Path** | `/api/v3/...` |
 | **Resource Type** | Collection |
 
 ### Description

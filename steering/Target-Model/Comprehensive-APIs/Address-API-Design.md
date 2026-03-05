@@ -23,7 +23,7 @@
 | **Entity Name** | Address |
 | **Domain** | Client Management |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | Query params | Address[] | 200, 401, 403, 404 | Address, List |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses` | Add new address | AddressRequest | Address | 201, 400, 401, 403, 404, 422 | Address, Create |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Get address by ID | Path params | Address | 200, 401, 403, 404 | Address, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Update address | AddressPatch | Address | 200, 400, 401, 403, 404, 422 | Address, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Delete address | Path params | None | 204, 401, 403, 404, 422 | Address, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses` | List client addresses | Query params | Address[] | 200, 401, 403, 404 | Address, List |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses` | Add new address | AddressRequest | Address | 201, 400, 401, 403, 404, 422 | Address, Create |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Get address by ID | Path params | Address | 200, 401, 403, 404 | Address, Retrieve |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Update address | AddressPatch | Address | 200, 400, 401, 403, 404, 422 | Address, Update |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/addresses/{addressId}` | Delete address | Path params | None | 204, 401, 403, 404, 422 | Address, Delete |
 
 
 ### Authorization

@@ -23,7 +23,7 @@
 | **Entity Name** | Employment |
 | **Domain** | Circumstances |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments` | List employment records | Query params | Employment[] | 200, 401, 403, 404 | Employment, List |
-| POST | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments` | Create employment record | EmploymentRequest | Employment | 201, 400, 401, 403, 404, 422 | Employment, Create |
-| GET | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Get employment by ID | Path params | Employment | 200, 401, 403, 404 | Employment, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Update employment | EmploymentPatch | Employment | 200, 400, 401, 403, 404, 422 | Employment, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Delete employment | Path params | None | 204, 401, 403, 404, 422 | Employment, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments` | List employment records | Query params | Employment[] | 200, 401, 403, 404 | Employment, List |
+| POST | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments` | Create employment record | EmploymentRequest | Employment | 201, 400, 401, 403, 404, 422 | Employment, Create |
+| GET | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Get employment by ID | Path params | Employment | 200, 401, 403, 404 | Employment, Retrieve |
+| PATCH | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Update employment | EmploymentPatch | Employment | 200, 400, 401, 403, 404, 422 | Employment, Update |
+| DELETE | `/api/v3/factfinds/{factfindId}/clients/{clientId}/employments/{employmentId}` | Delete employment | Path params | None | 204, 401, 403, 404, 422 | Employment, Delete |
 
 
 ### Authorization

@@ -224,14 +224,14 @@ FactFind (1) ──→ (N) PersonalProtection
 
 | Operation | Method | Endpoint | Description |
 |---|---|---|---|
-| Create FactFind | POST | `/v2/factfinds` | Create new FactFind |
-| List FactFinds | GET | `/v2/factfinds` | List all FactFinds (with filtering) |
-| Get FactFind | GET | `/v2/factfinds/{id}` | Retrieve specific FactFind |
-| Update FactFind | PUT | `/v2/factfinds/{id}` | Update FactFind |
+| Create FactFind | POST | `/v3/factfinds` | Create new FactFind |
+| List FactFinds | GET | `/v3/factfinds` | List all FactFinds (with filtering) |
+| Get FactFind | GET | `/v3/factfinds/{id}` | Retrieve specific FactFind |
+| Update FactFind | PUT | `/v3/factfinds/{id}` | Update FactFind |
 
 ### 5.2 Create FactFind
 
-**Endpoint:** `POST /v2/factfinds`
+**Endpoint:** `POST /v3/factfinds`
 
 **Description:** Creates a new FactFind record.
 
@@ -247,7 +247,7 @@ FactFind (1) ──→ (N) PersonalProtection
 
 ### 5.3 List FactFinds
 
-**Endpoint:** `GET /v2/factfinds`
+**Endpoint:** `GET /v3/factfinds`
 
 **Description:** Retrieves a list of FactFinds with optional filtering.
 
@@ -256,8 +256,8 @@ FactFind (1) ──→ (N) PersonalProtection
   - Example: `?filter=clients.id eq 123` - Filter FactFinds by client ID
   - Syntax: `field operator value` with `and` to chain expressions
   - Operators: `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `startswith`
-- `page` (integer, optional): Page number (1-indexed, default: 1)
-- `pageSize` (integer, optional): Items per page (default: 25, max: 100)
+- `$top` (integer, optional): Number of items to return (default: 25, max: 100)
+- `$skip` (integer, optional): Number of items to skip (default: 0)
 
 **Response Codes:**
 - `200 OK`: FactFinds retrieved successfully
@@ -276,7 +276,7 @@ FactFind (1) ──→ (N) PersonalProtection
 
 ### 5.4 Get FactFind
 
-**Endpoint:** `GET /v2/factfinds/{id}`
+**Endpoint:** `GET /v3/factfinds/{id}`
 
 **Description:** Retrieves a specific FactFind by ID.
 
@@ -293,7 +293,7 @@ FactFind (1) ──→ (N) PersonalProtection
 
 ### 5.5 Update FactFind
 
-**Endpoint:** `PUT /v2/factfinds/{id}`
+**Endpoint:** `PUT /v3/factfinds/{id}`
 
 **Description:** Updates an existing FactFind record.
 
@@ -360,16 +360,16 @@ FactFind (1) ──→ (N) PersonalProtection
 ```json
 {
   "id": 679,
-  "href": "/api/v2/factfinds/679",
+  "href": "/api/v3/factfinds/679",
   "clients": [
     {
       "id": 123,
-      "href": "/api/v2/factfinds/679/clients/123",
+      "href": "/api/v3/factfinds/679/clients/123",
       "name": "John Smith"
     },
     {
       "id": 124,
-      "href": "/api/v2/factfinds/679/clients/124",
+      "href": "/api/v3/factfinds/679/clients/124",
       "name": "Jane Smith"
     }
   ],
@@ -379,12 +379,12 @@ FactFind (1) ──→ (N) PersonalProtection
     "clientsPresent": [
       {
         "id": 123,
-        "href": "/api/v2/factfinds/679/clients/123",
+        "href": "/api/v3/factfinds/679/clients/123",
         "name": "John Smith"
       },
       {
         "id": 124,
-        "href": "/api/v2/factfinds/679/clients/124",
+        "href": "/api/v3/factfinds/679/clients/124",
         "name": "Jane Smith"
       }
     ],
@@ -409,16 +409,16 @@ FactFind (1) ──→ (N) PersonalProtection
 ```json
 {
   "id": 679,
-  "href": "/api/v2/factfinds/679",
+  "href": "/api/v3/factfinds/679",
   "clients": [
     {
       "id": 123,
-      "href": "/api/v2/factfinds/679/clients/123",
+      "href": "/api/v3/factfinds/679/clients/123",
       "name": "John Smith"
     },
     {
       "id": 124,
-      "href": "/api/v2/factfinds/679/clients/124",
+      "href": "/api/v3/factfinds/679/clients/124",
       "name": "Jane Smith"
     }
   ],
@@ -428,12 +428,12 @@ FactFind (1) ──→ (N) PersonalProtection
     "clientsPresent": [
       {
         "id": 123,
-        "href": "/api/v2/factfinds/679/clients/123",
+        "href": "/api/v3/factfinds/679/clients/123",
         "name": "John Smith"
       },
       {
         "id": 124,
-        "href": "/api/v2/factfinds/679/clients/124",
+        "href": "/api/v3/factfinds/679/clients/124",
         "name": "Jane Smith"
       }
     ],
@@ -457,19 +457,19 @@ FactFind (1) ──→ (N) PersonalProtection
 
 ```json
 {
-  "href": "/api/v2/factfinds?page=1&pageSize=25",
-  "first_href": "/api/v2/factfinds?page=1&pageSize=25",
-  "last_href": "/api/v2/factfinds?page=1&pageSize=25",
+  "href": "/api/v3/factfinds?$top=25&$skip=0",
+  "first_href": "/api/v3/factfinds?$top=25&$skip=0",
+  "last_href": "/api/v3/factfinds?$top=25&$skip=0",
   "next_href": null,
   "prev_href": null,
   "items": [
     {
       "id": 679,
-      "href": "/api/v2/factfinds/679",
+      "href": "/api/v3/factfinds/679",
       "clients": [
         {
           "id": 123,
-          "href": "/api/v2/factfinds/679/clients/123",
+          "href": "/api/v3/factfinds/679/clients/123",
           "name": "John Smith"
         }
       ],
@@ -479,7 +479,7 @@ FactFind (1) ──→ (N) PersonalProtection
         "clientsPresent": [
           {
             "id": 123,
-            "href": "/api/v2/factfinds/679/clients/123",
+            "href": "/api/v3/factfinds/679/clients/123",
             "name": "John Smith"
           }
         ],
@@ -495,11 +495,11 @@ FactFind (1) ──→ (N) PersonalProtection
     },
     {
       "id": 680,
-      "href": "/api/v2/factfinds/680",
+      "href": "/api/v3/factfinds/680",
       "clients": [
         {
           "id": 125,
-          "href": "/api/v2/factfinds/680/clients/125",
+          "href": "/api/v3/factfinds/680/clients/125",
           "name": "Alice Johnson"
         }
       ],
@@ -509,7 +509,7 @@ FactFind (1) ──→ (N) PersonalProtection
         "clientsPresent": [
           {
             "id": 125,
-            "href": "/api/v2/factfinds/680/clients/125",
+            "href": "/api/v3/factfinds/680/clients/125",
             "name": "Alice Johnson"
           }
         ],
@@ -532,30 +532,30 @@ FactFind (1) ──→ (N) PersonalProtection
 
 **Request:**
 ```
-GET /v2/factfinds?filter=clients.id eq 123
+GET /v3/factfinds?filter=clients.id eq 123
 ```
 
 **Response:** 200 OK
 ```json
 {
-  "href": "/api/v2/factfinds?filter=clients.id eq 123",
-  "first_href": "/api/v2/factfinds?filter=clients.id eq 123&page=1&pageSize=25",
-  "last_href": "/api/v2/factfinds?filter=clients.id eq 123&page=1&pageSize=25",
+  "href": "/api/v3/factfinds?filter=clients.id eq 123",
+  "first_href": "/api/v3/factfinds?filter=clients.id eq 123&$top=25&$skip=0",
+  "last_href": "/api/v3/factfinds?filter=clients.id eq 123&$top=25&$skip=0",
   "next_href": null,
   "prev_href": null,
   "items": [
     {
       "id": 679,
-      "href": "/api/v2/factfinds/679",
+      "href": "/api/v3/factfinds/679",
       "clients": [
         {
           "id": 123,
-          "href": "/api/v2/factfinds/679/clients/123",
+          "href": "/api/v3/factfinds/679/clients/123",
           "name": "John Smith"
         },
         {
           "id": 124,
-          "href": "/api/v2/factfinds/679/clients/124",
+          "href": "/api/v3/factfinds/679/clients/124",
           "name": "Jane Smith"
         }
       ],
@@ -565,7 +565,7 @@ GET /v2/factfinds?filter=clients.id eq 123
         "clientsPresent": [
           {
             "id": 123,
-            "href": "/api/v2/factfinds/679/clients/123",
+            "href": "/api/v3/factfinds/679/clients/123",
             "name": "John Smith"
           }
         ],
@@ -584,7 +584,7 @@ GET /v2/factfinds?filter=clients.id eq 123
 ```json
 {
   "id": 679,
-  "href": "/api/v2/factfinds/679",
+  "href": "/api/v3/factfinds/679",
   "clients": [
     {
       "id": 123

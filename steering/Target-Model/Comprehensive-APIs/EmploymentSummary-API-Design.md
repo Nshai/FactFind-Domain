@@ -4,7 +4,7 @@
 
 The Employment Summary API provides endpoints to manage aggregated employment and income information for each client within a fact find. This singleton resource per client summarizes total income and tax position.
 
-**Base Path:** `/api/v2/factfinds/{id}/clients/{clientId}/employments/summary`
+**Base Path:** `/api/v3/factfinds/{id}/clients/{clientId}/employments/summary`
 
 **Bounded Context:** Circumstances
 
@@ -42,7 +42,7 @@ The Employment Summary aggregates employment and income data into a single view:
 
 Retrieve the employment summary for a specific client.
 
-**Endpoint:** `GET /api/v2/factfinds/{id}/clients/{clientId}/employments/summary`
+**Endpoint:** `GET /api/v3/factfinds/{id}/clients/{clientId}/employments/summary`
 
 **Authorization:** Requires `factfind:read` scope
 
@@ -59,19 +59,17 @@ Retrieve the employment summary for a specific client.
 {
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "totalGrossAnnualIncome": {
     "amount": 75000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "highestTaxRatePaid": {
@@ -79,22 +77,22 @@ Retrieve the employment summary for a specific client.
   },
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/clients/8496/employments/summary"
+      "href": "/api/v3/factfinds/679/clients/8496/employments/summary"
     },
     "factfind": {
-      "href": "/api/v2/factfinds/679"
+      "href": "/api/v3/factfinds/679"
     },
     "client": {
-      "href": "/api/v2/factfinds/679/clients/8496"
+      "href": "/api/v3/factfinds/679/clients/8496"
     },
     "employments": {
-      "href": "/api/v2/factfinds/679/clients/8496/employment"
+      "href": "/api/v3/factfinds/679/clients/8496/employment"
     },
     "income": {
-      "href": "/api/v2/factfinds/679/clients/8496/income"
+      "href": "/api/v3/factfinds/679/clients/8496/income"
     },
     "update": {
-      "href": "/api/v2/factfinds/679/clients/8496/employments/summary"
+      "href": "/api/v3/factfinds/679/clients/8496/employments/summary"
     }
   }
 }
@@ -117,7 +115,7 @@ Retrieve the employment summary for a specific client.
 
 Update or create the employment summary for a specific client. This is a singleton resource, so PUT is used for both create and update operations.
 
-**Endpoint:** `PUT /api/v2/factfinds/{id}/clients/{clientId}/employments/summary`
+**Endpoint:** `PUT /api/v3/factfinds/{id}/clients/{clientId}/employments/summary`
 
 **Authorization:** Requires `factfind:write` scope
 
@@ -151,19 +149,17 @@ Update or create the employment summary for a specific client. This is a singlet
 {
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "totalGrossAnnualIncome": {
     "amount": 75000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "highestTaxRatePaid": {
@@ -184,19 +180,19 @@ Update or create the employment summary for a specific client. This is a singlet
   },
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/clients/8496/employments/summary"
+      "href": "/api/v3/factfinds/679/clients/8496/employments/summary"
     },
     "factfind": {
-      "href": "/api/v2/factfinds/679"
+      "href": "/api/v3/factfinds/679"
     },
     "client": {
-      "href": "/api/v2/factfinds/679/clients/8496"
+      "href": "/api/v3/factfinds/679/clients/8496"
     },
     "employments": {
-      "href": "/api/v2/factfinds/679/clients/8496/employment"
+      "href": "/api/v3/factfinds/679/clients/8496/employment"
     },
     "income": {
-      "href": "/api/v2/factfinds/679/clients/8496/income"
+      "href": "/api/v3/factfinds/679/clients/8496/income"
     }
   }
 }
@@ -339,20 +335,20 @@ Update or create the employment summary for a specific client. This is a singlet
 
 **Step 1: Create Income Sources**
 ```
-POST /api/v2/factfinds/{id}/clients/{clientId}/employment
-POST /api/v2/factfinds/{id}/clients/{clientId}/income
+POST /api/v3/factfinds/{id}/clients/{clientId}/employment
+POST /api/v3/factfinds/{id}/clients/{clientId}/income
 ```
 Create employment and income records first
 
 **Step 2: Retrieve Calculated Income**
 ```
-GET /api/v2/factfinds/{id}/clients/{clientId}/employments/summary
+GET /api/v3/factfinds/{id}/clients/{clientId}/employments/summary
 ```
 System automatically calculates total gross annual income
 
 **Step 3: Set Tax Rate**
 ```
-PUT /api/v2/factfinds/{id}/clients/{clientId}/employments/summary
+PUT /api/v3/factfinds/{id}/clients/{clientId}/employments/summary
 {
   "highestTaxRatePaid": {
     "percentage": 40
@@ -363,7 +359,7 @@ Update with client's highest marginal tax rate
 
 **Step 4: Use in Affordability Calculations**
 ```
-GET /api/v2/factfinds/{id}/clients/{clientId}/employments/summary
+GET /api/v3/factfinds/{id}/clients/{clientId}/employments/summary
 ```
 Use total income for mortgage affordability or budget planning
 
@@ -520,7 +516,7 @@ totalGrossAnnualIncome: {
 
 **Create Employment Summary:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/employments/summary
+PUT /api/v3/factfinds/679/clients/8496/employments/summary
 Content-Type: application/json
 
 {
@@ -533,15 +529,15 @@ Content-Type: application/json
 **Response:**
 ```json
 {
-  "factfind": {"id": 679, "href": "/api/v2/factfinds/679"},
+  "factfind": {"id": 679, "href": "/api/v3/factfinds/679"},
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "totalGrossAnnualIncome": {
     "amount": 35000.00,
-    "currency": {"code": "GBP", "display": "British Pound", "symbol": "£"}
+    "currency": { "code": "GBP" }
   },
   "highestTaxRatePaid": {"percentage": 20}
 }
@@ -551,7 +547,7 @@ Content-Type: application/json
 
 **Update for Higher Rate:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/employments/summary
+PUT /api/v3/factfinds/679/clients/8496/employments/summary
 Content-Type: application/json
 
 {
@@ -567,7 +563,7 @@ Content-Type: application/json
 
 **Set Scottish Intermediate Rate:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/employments/summary
+PUT /api/v3/factfinds/679/clients/8496/employments/summary
 Content-Type: application/json
 
 {
@@ -583,7 +579,7 @@ Content-Type: application/json
 
 **Retrieve Income Summary:**
 ```http
-GET /api/v2/factfinds/679/clients/8496/employments/summary
+GET /api/v3/factfinds/679/clients/8496/employments/summary
 ```
 
 **Response shows:**
@@ -595,7 +591,7 @@ GET /api/v2/factfinds/679/clients/8496/employments/summary
 
 **Set Zero Tax Rate:**
 ```http
-PUT /api/v2/factfinds/679/clients/8496/employments/summary
+PUT /api/v3/factfinds/679/clients/8496/employments/summary
 Content-Type: application/json
 
 {

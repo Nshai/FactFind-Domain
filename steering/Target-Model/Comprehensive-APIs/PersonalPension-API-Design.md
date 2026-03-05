@@ -23,7 +23,7 @@
 | **Entity Name** | PersonalPension |
 | **Domain** | Plans |
 | **Aggregate Root** | Client |
-| **Base Path** | /api/v2/factfinds/{factfindId}/pensions/personalpension |
+| **Base Path** | /api/v3/factfinds/{factfindId}/pensions/personalpension |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | /api/v2/factfinds/{factfindId}/pensions/personalpension | List all personal pensions | Query params | PersonalPension[] | 200, 401, 403 | PersonalPension, List |
-| POST | /api/v2/factfinds/{factfindId}/pensions/personalpension | Create personal pension | PersonalPensionRequest | PersonalPension | 201, 400, 401, 403, 422 | PersonalPension, Create |
-| GET | /api/v2/factfinds/{factfindId}/pensions/personalpension/{pensionId} | Get pension by ID | Path params | PersonalPension | 200, 401, 403, 404 | PersonalPension, Retrieve |
-| PATCH | /api/v2/factfinds/{factfindId}/pensions/personalpension/{pensionId} | Update pension | PersonalPensionPatch | PersonalPension | 200, 400, 401, 403, 404, 422 | PersonalPension, Update |
-| DELETE | /api/v2/factfinds/{factfindId}/pensions/personalpension/{pensionId} | Delete pension | Path params | None | 204, 401, 403, 404, 422 | PersonalPension, Delete |
+| GET | /api/v3/factfinds/{factfindId}/pensions/personalpension | List all personal pensions | Query params | PersonalPension[] | 200, 401, 403 | PersonalPension, List |
+| POST | /api/v3/factfinds/{factfindId}/pensions/personalpension | Create personal pension | PersonalPensionRequest | PersonalPension | 201, 400, 401, 403, 422 | PersonalPension, Create |
+| GET | /api/v3/factfinds/{factfindId}/pensions/personalpension/{pensionId} | Get pension by ID | Path params | PersonalPension | 200, 401, 403, 404 | PersonalPension, Retrieve |
+| PATCH | /api/v3/factfinds/{factfindId}/pensions/personalpension/{pensionId} | Update pension | PersonalPensionPatch | PersonalPension | 200, 400, 401, 403, 404, 422 | PersonalPension, Update |
+| DELETE | /api/v3/factfinds/{factfindId}/pensions/personalpension/{pensionId} | Delete pension | Path params | None | 204, 401, 403, 404, 422 | PersonalPension, Delete |
 
 
 ### Authorization
@@ -111,7 +111,7 @@ Clients who own this pension:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Client unique identifier |
-| `href` | string | API link to client resource (e.g., `/api/v2/factfinds/679/clients/8496`) |
+| `href` | string | API link to client resource (e.g., `/api/v3/factfinds/679/clients/8496`) |
 | `name` | string | Client full name |
 | `ownershipPercentage` | decimal | Ownership percentage (typically 100.0 for personal pensions) |
 
@@ -122,7 +122,7 @@ Adviser who arranged this pension:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Adviser unique identifier |
-| `href` | string | API link to adviser resource (e.g., `/api/v2/advisers/123`) |
+| `href` | string | API link to adviser resource (e.g., `/api/v3/advisers/123`) |
 | `name` | string | Adviser full name |
 
 #### provider (Pension Provider Reference)
@@ -132,7 +132,7 @@ Pension provider/company:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Product provider unique identifier |
-| `href` | string | API link to product provider resource (e.g., `/api/v2/productproviders/456`) |
+| `href` | string | API link to product provider resource (e.g., `/api/v3/productproviders/456`) |
 | `name` | string | Provider name |
 
 **Common Personal Pension Providers:**
@@ -153,7 +153,7 @@ Pension lifecycle stage reference:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Lifecycle unique identifier |
-| `href` | string | API link to lifecycle resource (e.g., `/api/v2/lifecycles/45`) |
+| `href` | string | API link to lifecycle resource (e.g., `/api/v3/lifecycles/45`) |
 | `name` | string | Lifecycle stage name |
 
 **Lifecycle Stages:**
@@ -169,7 +169,7 @@ Platform or wrap account details:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Platform/wrap account identifier |
-| `href` | string | API link to investment resource (e.g., `/api/v2/factfinds/679/investments/234`) |
+| `href` | string | API link to investment resource (e.g., `/api/v3/factfinds/679/investments/234`) |
 | `reference` | string | Platform account reference number |
 
 #### pensionType (Pension Type Reference)
@@ -179,7 +179,7 @@ Specific pension type/plan details:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Plan type unique identifier |
-| `href` | string | API link to plan type resource (e.g., `/api/v2/plantypes?filter=id eq 123`) |
+| `href` | string | API link to plan type resource (e.g., `/api/v3/plantypes?filter=id eq 123`) |
 | `name` | string | Pension type name |
 
 **Common Pension Types:**
@@ -372,43 +372,43 @@ Detailed fund holdings:
 ```json
 {
   "id": 15001,
-  "href": "/api/v2/factfinds/679/pensions/personalpension/15001",
+  "href": "/api/v3/factfinds/679/pensions/personalpension/15001",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith",
       "ownershipPercentage": 100.0
     }
   ],
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   },
   "provider": {
     "id": 456,
-    "href": "/api/v2/productproviders/456",
+    "href": "/api/v3/productproviders/456",
     "name": "Vanguard"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "Accumulation"
   },
   "wrap": {
     "id": 234,
-    "href": "/api/v2/factfinds/679/investments/234",
+    "href": "/api/v3/factfinds/679/investments/234",
     "reference": "WRAP-PP-123456"
   },
   "pensionCategory": "PensionContributionDrawdown",
   "pensionType": {
     "id": 123,
-    "href": "/api/v2/plantypes?filter=id eq 123",
+    "href": "/api/v3/plantypes?filter=id eq 123",
     "name": "Personal Pension"
   },
   "policyNumber": "PP-123456789",
@@ -416,9 +416,7 @@ Detailed fund holdings:
   "agencyStatusDate": "2023-01-15",
   "productName": "Vanguard Personal Pension",
   "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
+    "code": "GBP"
   },
   "startedOn": "2018-03-15",
   "employer": "ABC Corporation Ltd",
@@ -427,9 +425,7 @@ Detailed fund holdings:
     "currentValue": {
       "amount": 185000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "valuedOn": "2026-02-18"
@@ -440,9 +436,7 @@ Detailed fund holdings:
     "value": {
       "amount": 46250.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "paidBy": "Receiving Scheme"
@@ -460,9 +454,7 @@ Detailed fund holdings:
       "value": {
         "amount": 800.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "frequency": "Monthly",
@@ -475,9 +467,7 @@ Detailed fund holdings:
       "value": {
         "amount": 500.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "frequency": "Monthly",
@@ -555,42 +545,40 @@ Detailed fund holdings:
 ```json
 {
   "id": 15002,
-  "href": "/api/v2/factfinds/679/pensions/personalpension/15002",
+  "href": "/api/v3/factfinds/679/pensions/personalpension/15002",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith",
       "ownershipPercentage": 100.0
     }
   ],
   "provider": {
     "id": 789,
-    "href": "/api/v2/productproviders/789",
+    "href": "/api/v3/productproviders/789",
     "name": "AJ Bell"
   },
   "lifeCycle": {
     "id": 47,
-    "href": "/api/v2/lifecycles/47",
+    "href": "/api/v3/lifecycles/47",
     "name": "Decumulation"
   },
   "pensionCategory": "PensionContributionDrawdown",
   "pensionType": {
     "id": 125,
-    "href": "/api/v2/plantypes?filter=id eq 125",
+    "href": "/api/v3/plantypes?filter=id eq 125",
     "name": "SIPP"
   },
   "policyNumber": "SIPP-987654321",
   "agencyStatus": "NOT_UNDER_AGENCY",
   "productName": "AJ Bell Investcentre SIPP",
   "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
+    "code": "GBP"
   },
   "startedOn": "2010-06-01",
   "retirementAge": 67,
@@ -598,9 +586,7 @@ Detailed fund holdings:
     "currentValue": {
       "amount": 450000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "valuedOn": "2026-02-18"
@@ -611,9 +597,7 @@ Detailed fund holdings:
     "value": {
       "amount": 75000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "paidBy": "Receiving Scheme"
@@ -621,18 +605,14 @@ Detailed fund holdings:
   "enhancedTaxFreeCash": {
     "amount": 90000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "guaranteedAnnuityRate": "5.2% at age 65 for single life level annuity with 5-year guarantee",
   "deathBenefits": {
     "amount": 450000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "lifetimeAllowanceUsed": 52.5,
@@ -648,9 +628,7 @@ Detailed fund holdings:
       "value": {
         "amount": 125000.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "frequency": "One-off",
@@ -663,7 +641,7 @@ Detailed fund holdings:
         "transferType": "Cash",
         "ceedingPlan": {
           "id": 14001,
-          "href": "/api/v2/factfinds/679/pensions/personalpension/14001",
+          "href": "/api/v3/factfinds/679/pensions/personalpension/14001",
           "reference": "OLD-PP-555666"
         }
       }

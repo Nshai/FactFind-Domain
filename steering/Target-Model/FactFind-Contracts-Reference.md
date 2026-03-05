@@ -326,7 +326,7 @@ The FactFind contract represents the root aggregate for all client financial inf
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier (READ-ONLY) | 679 |
-| href | Text | API link to this resource (READ-ONLY) | /api/v2/factfinds/679 |
+| href | Text | API link to this resource (READ-ONLY) | /api/v3/factfinds/679 |
 | clients | List of Reference Links | Associated clients (id EDITABLE, name READ-ONLY) | List with 2 items |
 | meeting | Complex Object | Meeting information including date, type, attendees, notes | Complex object |
 | disclosureKeyfacts | List of Complex Objects | Disclosure documents issued to clients | List with 2 items |
@@ -338,7 +338,7 @@ The FactFind contract represents the root aggregate for all client financial inf
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Client identifier (EDITABLE) | 123 |
-| href | Text | Link to client resource (READ-ONLY, populated by system) | /api/v2/factfinds/679/clients/123 |
+| href | Text | Link to client resource (READ-ONLY, populated by system) | /api/v3/factfinds/679/clients/123 |
 | name | Text | Client name (READ-ONLY, populated from Client API) | John Smith |
 
 **meeting:**
@@ -356,7 +356,7 @@ The FactFind contract represents the root aggregate for all client financial inf
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Client identifier | 123 |
-| href | Text | Link to client resource (READ-ONLY) | /api/v2/factfinds/679/clients/123 |
+| href | Text | Link to client resource (READ-ONLY) | /api/v3/factfinds/679/clients/123 |
 | name | Text | Client name (READ-ONLY) | John Smith |
 
 **disclosureKeyfacts[] (each item):**
@@ -371,16 +371,16 @@ The FactFind contract represents the root aggregate for all client financial inf
 ```json
 {
   "id": 679,
-  "href": "/api/v2/factfinds/679",
+  "href": "/api/v3/factfinds/679",
   "clients": [
     {
       "id": 123,
-      "href": "/api/v2/factfinds/679/clients/123",
+      "href": "/api/v3/factfinds/679/clients/123",
       "name": "John Smith"
     },
     {
       "id": 124,
-      "href": "/api/v2/factfinds/679/clients/124",
+      "href": "/api/v3/factfinds/679/clients/124",
       "name": "Jane Smith"
     }
   ],
@@ -390,12 +390,12 @@ The FactFind contract represents the root aggregate for all client financial inf
     "clientsPresent": [
       {
         "id": 123,
-        "href": "/api/v2/factfinds/679/clients/123",
+        "href": "/api/v3/factfinds/679/clients/123",
         "name": "John Smith"
       },
       {
         "id": 124,
-        "href": "/api/v2/factfinds/679/clients/124",
+        "href": "/api/v3/factfinds/679/clients/124",
         "name": "Jane Smith"
       }
     ],
@@ -557,10 +557,10 @@ The FactFind contract represents the root aggregate for all client financial inf
 
 ### API Endpoints
 
-- `GET /api/v2/factfinds` - List all FactFinds (supports filtering)
-- `POST /api/v2/factfinds` - Create new FactFind
-- `GET /api/v2/factfinds/{id}` - Get specific FactFind
-- `PUT /api/v2/factfinds/{id}` - Update FactFind
+- `GET /api/v3/factfinds` - List all FactFinds (supports filtering)
+- `POST /api/v3/factfinds` - Create new FactFind
+- `GET /api/v3/factfinds/{id}` - Get specific FactFind
+- `PUT /api/v3/factfinds/{id}` - Update FactFind
 
 ### Field-Level Guidance
 
@@ -572,7 +572,7 @@ The FactFind contract represents the root aggregate for all client financial inf
 
 **href (READ-ONLY):**
 - API link to this specific FactFind resource
-- Format: `/api/v2/factfinds/{id}`
+- Format: `/api/v3/factfinds/{id}`
 - Included in all responses
 - Supports HATEOAS API pattern
 
@@ -688,7 +688,7 @@ The Control Options contract represents high-level control flags that determine 
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| href | Text | API link to this resource (READ-ONLY) | /v2/factfinds/123/controloptions |
+| href | Text | API link to this resource (READ-ONLY) | /v3/factfinds/123/controloptions |
 | factfind | Reference Link | FactFind reference (READ-ONLY) | Complex object |
 | investments | Complex Object | Investment control flags | Complex object |
 | pensions | Complex Object | Pension control flags | Complex object |
@@ -704,7 +704,7 @@ The Control Options contract represents high-level control flags that determine 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | FactFind identifier (READ-ONLY) | 123 |
-| href | Text | Link to FactFind resource (READ-ONLY) | /v2/factfinds/123 |
+| href | Text | Link to FactFind resource (READ-ONLY) | /v3/factfinds/123 |
 
 **investments:**
 
@@ -761,10 +761,10 @@ The Control Options contract represents high-level control flags that determine 
 
 ```json
 {
-  "href": "/v2/factfinds/123/controloptions",
+  "href": "/v3/factfinds/123/controloptions",
   "factfind": {
     "id": 123,
-    "href": "/v2/factfinds/123"
+    "href": "/v3/factfinds/123"
   },
   "investments": {
     "hasCash": true,
@@ -940,19 +940,19 @@ The Control Options contract represents high-level control flags that determine 
 
 ### API Endpoints
 
-- `GET /api/v2/factfinds/{id}/controloptions` - Retrieve complete control options
-- `PUT /api/v2/factfinds/{id}/controloptions/assets` - Update assets section
-- `PUT /api/v2/factfinds/{id}/controloptions/liabilities` - Update liabilities section
-- `PUT /api/v2/factfinds/{id}/controloptions/investments` - Update investments section
-- `PUT /api/v2/factfinds/{id}/controloptions/pensions` - Update pensions section
-- `PUT /api/v2/factfinds/{id}/controloptions/protections` - Update protections section
-- `PUT /api/v2/factfinds/{id}/controloptions/mortgages` - Update mortgages section
+- `GET /api/v3/factfinds/{id}/controloptions` - Retrieve complete control options
+- `PUT /api/v3/factfinds/{id}/controloptions/assets` - Update assets section
+- `PUT /api/v3/factfinds/{id}/controloptions/liabilities` - Update liabilities section
+- `PUT /api/v3/factfinds/{id}/controloptions/investments` - Update investments section
+- `PUT /api/v3/factfinds/{id}/controloptions/pensions` - Update pensions section
+- `PUT /api/v3/factfinds/{id}/controloptions/protections` - Update protections section
+- `PUT /api/v3/factfinds/{id}/controloptions/mortgages` - Update mortgages section
 
 ### Field-Level Guidance
 
 **href (READ-ONLY):**
 - API link to this specific Control Options resource
-- Format: `/api/v2/factfinds/{id}/controloptions`
+- Format: `/api/v3/factfinds/{id}/controloptions`
 - Included in all responses
 
 **factfind (READ-ONLY):**
@@ -1207,7 +1207,7 @@ The `Income` contract represents an income source within a FactFind.
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique identifier for the asset that generates this income | 5001 |
-| href | Text | Link to the asset resource | /api/v2/factfinds/679/assets/5001 |
+| href | Text | Link to the asset resource | /api/v3/factfinds/679/assets/5001 |
 | assetType | Text | Type of asset (Property, Investment, Business, Other) | Property |
 | description | Text | Description of the asset | Rental Property - 45 High Street, Manchester |-------------|-----------|-------------|
 | Rental Income | Property | Links to residential or commercial property generating rental income |
@@ -3111,7 +3111,7 @@ Represents comprehensive employment records for clients, including current and h
 
 | Field Name | Type | Description | Example Value |
 |------------|------|-------------|---------------|
-| **incomesHref** | Link | Link to related income records | /api/v2/factfinds/679/clients/456/incomes?filter=... |
+| **incomesHref** | Link | Link to related income records | /api/v3/factfinds/679/clients/456/incomes?filter=... |
 
 #### Audit Trail
 
@@ -3354,14 +3354,14 @@ The Employment Summary contract aggregates a client's employment and income info
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | FactFind identifier | 679 |
-| href | Text | Link to FactFind resource | /api/v2/factfinds/679 |
+| href | Text | Link to FactFind resource | /api/v3/factfinds/679 |
 
 **client:**
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Client identifier | 8496 |
-| href | Text | Link to client resource | /api/v2/factfinds/679/clients/8496 |
+| href | Text | Link to client resource | /api/v3/factfinds/679/clients/8496 |
 | name | Text | Client display name | Jack Marias |
 
 **totalGrossAnnualIncome:**
@@ -3391,19 +3391,17 @@ The Employment Summary contract aggregates a client's employment and income info
 {
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "client": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "totalGrossAnnualIncome": {
     "amount": 75000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "highestTaxRatePaid": {
@@ -3474,8 +3472,8 @@ The Employment Summary contract aggregates a client's employment and income info
 
 ### API Endpoints
 
-- `GET /api/v2/factfinds/{id}/clients/{clientId}/employments/summary` - Retrieve employment summary
-- `PUT /api/v2/factfinds/{id}/clients/{clientId}/employments/summary` - Create or update employment summary
+- `GET /api/v3/factfinds/{id}/clients/{clientId}/employments/summary` - Retrieve employment summary
+- `PUT /api/v3/factfinds/{id}/clients/{clientId}/employments/summary` - Create or update employment summary
 
 ### Field-Level Guidance
 
@@ -3566,7 +3564,7 @@ Represents a single expenditure item (outgoing payment) for a client, used for b
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
 | id | Number | Unique identifier for the expenditure | 1001 |
-| href | Text | Link to this expenditure resource | /api/v2/factfinds/234/clients/456/expenditures/1001 |
+| href | Text | Link to this expenditure resource | /api/v3/factfinds/234/clients/456/expenditures/1001 |
 | factfind | Link to FactFind | The fact-find that this expenditure belongs to | FactFind #234 |
 | client | Link to Client | The client who has this expenditure | Client #456 |
 | description | Text | Description of the expenditure | Monthly mortgage payment |
@@ -3589,14 +3587,14 @@ Represents a single expenditure item (outgoing payment) for a client, used for b
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
 | id | Number | FactFind identifier | 234 |
-| href | Text | Link to the fact-find | /api/v2/factfinds/234 |
+| href | Text | Link to the fact-find | /api/v3/factfinds/234 |
 
 **client:**
 
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
 | id | Number | Client identifier | 456 |
-| href | Text | Link to the client | /api/v2/factfinds/234/clients/456 |
+| href | Text | Link to the client | /api/v3/factfinds/234/clients/456 |
 
 **netAmount:**
 
@@ -3612,7 +3610,7 @@ Represents a single expenditure item (outgoing payment) for a client, used for b
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
 | id | Number | Liability identifier | 5001 |
-| href | Text | Link to the liability | /api/v2/factfinds/234/liabilities/5001 |
+| href | Text | Link to the liability | /api/v3/factfinds/234/liabilities/5001 |
 | description | Text | Description of the liability | Residential Mortgage - Main Home |
 
 ---
@@ -3754,7 +3752,7 @@ The Credit History contract represents a singleton record per client of their cr
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier | 334 |
-| href | Text | API link to this resource | /api/v2/factfinds/679/clients/8496/credithistory |
+| href | Text | API link to this resource | /api/v3/factfinds/679/clients/8496/credithistory |
 | client | Reference Link | Client reference | Complex object |
 | factfind | Reference Link | FactFind reference | Complex object |
 | hasAdverseCredit | Yes/No | Any adverse credit exists (READ-ONLY, calculated from events) | true |
@@ -3792,7 +3790,7 @@ The Credit History contract represents a singleton record per client of their cr
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique event identifier | 123 |
-| href | Text | API link to this event | /api/v2/factfinds/679/clients/8496/credithistory/events/123 |
+| href | Text | API link to this event | /api/v3/factfinds/679/clients/8496/credithistory/events/123 |
 | type | Selection | Event type: CCJ, Default, Arrears, IVA, Bankruptcy, Repossession | Default |
 | registeredOn | Date/Time | Date event was registered | 2020-06-15T00:00:00Z |
 | satisfiedOrClearedOn | Date/Time | Date satisfied/cleared (optional) | 2021-03-20T00:00:00Z |
@@ -3817,7 +3815,7 @@ The Credit History contract represents a singleton record per client of their cr
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Liability identifier | 1001 |
-| href | Text | Link to liability resource | /api/v2/factfinds/679/liabilities/1001 |
+| href | Text | Link to liability resource | /api/v3/factfinds/679/liabilities/1001 |
 | description | Text | Liability description | Credit Card Debt |
 
 ### Usage Example
@@ -3825,7 +3823,7 @@ The Credit History contract represents a singleton record per client of their cr
 ```json
 {
   "id": 334,
-  "href": "/api/v2/factfinds/679/clients/8496/credithistory",
+  "href": "/api/v3/factfinds/679/clients/8496/credithistory",
   "client": {
     "id": 8496,
     "clientNumber": "C00001234",
@@ -3847,7 +3845,7 @@ The Credit History contract represents a singleton record per client of their cr
   "adverseCreditEvents": [
     {
       "id": 123,
-      "href": "/api/v2/factfinds/679/clients/8496/credithistory/events/123",
+      "href": "/api/v3/factfinds/679/clients/8496/credithistory/events/123",
       "type": "Default",
       "registeredOn": "2020-06-15T00:00:00Z",
       "satisfiedOrClearedOn": "2021-03-20T00:00:00Z",
@@ -3856,17 +3854,13 @@ The Credit History contract represents a singleton record per client of their cr
       "amountRegistered": {
         "amount": 5000.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "amountOutstanding": {
         "amount": 0.00,
         "currency": {
-          "code": "GBP",
-          "display": "British Pound",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "isDebtOutstanding": false,
@@ -3878,7 +3872,7 @@ The Credit History contract represents a singleton record per client of their cr
       "lender": "High Street Bank",
       "liability": {
         "id": 1001,
-        "href": "/api/v2/factfinds/679/liabilities/1001",
+        "href": "/api/v3/factfinds/679/liabilities/1001",
         "description": "Credit Card Debt"
       },
       "concurrencyId": 1,
@@ -4033,12 +4027,12 @@ All adverse credit events remain on credit files for **6 years**:
 
 ### API Endpoints
 
-- `GET /api/v2/factfinds/{id}/clients/{clientId}/credithistory` - Retrieve credit history singleton
-- `PUT /api/v2/factfinds/{id}/clients/{clientId}/credithistory` - Create or update credit history
-- `POST /api/v2/factfinds/{id}/clients/{clientId}/credithistory/events` - Create adverse credit event
-- `GET /api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Get adverse credit event
-- `PUT /api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Update adverse credit event
-- `DELETE /api/v2/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Delete adverse credit event
+- `GET /api/v3/factfinds/{id}/clients/{clientId}/credithistory` - Retrieve credit history singleton
+- `PUT /api/v3/factfinds/{id}/clients/{clientId}/credithistory` - Create or update credit history
+- `POST /api/v3/factfinds/{id}/clients/{clientId}/credithistory/events` - Create adverse credit event
+- `GET /api/v3/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Get adverse credit event
+- `PUT /api/v3/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Update adverse credit event
+- `DELETE /api/v3/factfinds/{id}/clients/{clientId}/credithistory/events/{eventId}` - Delete adverse credit event
 
 ### Field-Level Guidance
 
@@ -4606,7 +4600,7 @@ The Affordability Contract evaluates a client's financial capacity to take on ne
 
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
-| href | Link | Web address for this assessment | /api/v2/factfinds/456/affordability |
+| href | Link | Web address for this assessment | /api/v3/factfinds/456/affordability |
 | factfind | Link to FactFind | The fact-find this assessment belongs to | FactFind #456 |
 | clients | List of Client Links | Clients included in this assessment (minimum 1) | Client #456, Client #457 |
 | incomes | List of Income Links | Income sources to include in calculation (minimum 1) | 3 income sources |
@@ -4988,7 +4982,7 @@ The Net Worth Contract provides a snapshot calculation of a client's total finan
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
 | id | Number | Unique identifier | 9001 |
-| href | Link | Web address for this net worth record | /api/v2/factfinds/456/networth/9001 |
+| href | Link | Web address for this net worth record | /api/v3/factfinds/456/networth/9001 |
 | factfind | Link to FactFind | The fact-find this belongs to | FactFind #456 |
 | clients | List of Client Links | Clients included in this calculation | Client #456, Client #457 |
 | calculatedOn | Date/Time | When this net worth was calculated | 2026-02-18T14:30:00Z |
@@ -5613,7 +5607,7 @@ The `Vulnerability` contract represents a client vulnerability indicator for Con
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 999 |
-| href | Text | Link to user resource | /api/v2/users/999 |
+| href | Text | Link to user resource | /api/v3/users/999 |
 
 ### Enumerations
 
@@ -6189,7 +6183,7 @@ The Estate Planning contract represents a singleton record per client containing
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| href | Text | API link to this resource | /v2/factfinds/679/clients/8496/estateplanning |
+| href | Text | API link to this resource | /v3/factfinds/679/clients/8496/estateplanning |
 | client | Reference Link | Client reference | Complex object |
 | factfind | Reference Link | FactFind reference | Complex object |
 | willDetails | Text | Will and estate planning details (EDITABLE, max 2000 chars) | Mirror wills in place with spouse. Estate passes to spouse on first death, then to children equally. |
@@ -6210,7 +6204,7 @@ The Estate Planning contract represents a singleton record per client containing
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Client identifier | 8496 |
-| href | Text | Link to client resource | /v2/factfinds/679/clients/8496 |
+| href | Text | Link to client resource | /v3/factfinds/679/clients/8496 |
 | name | Text | Client display name | John Smith |
 
 **factfind:**
@@ -6224,7 +6218,7 @@ The Estate Planning contract represents a singleton record per client containing
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique gift identifier | 1 |
-| href | Text | API link to this gift | /v2/factfinds/679/clients/8496/estateplanning/gifts/1 |
+| href | Text | API link to this gift | /v3/factfinds/679/clients/8496/estateplanning/gifts/1 |
 | giftedOn | Date | Date gift was made | 2025-04-10 |
 | recipient | Text | Name of gift recipient (max 100 chars) | Emily Rose Smith |
 | relationship | Text | Relationship to client (max 50 chars) | Daughter |
@@ -6237,10 +6231,10 @@ The Estate Planning contract represents a singleton record per client containing
 
 ```json
 {
-  "href": "/v2/factfinds/679/clients/8496/estateplanning",
+  "href": "/v3/factfinds/679/clients/8496/estateplanning",
   "client": {
     "id": 8496,
-    "href": "/v2/factfinds/679/clients/8496",
+    "href": "/v3/factfinds/679/clients/8496",
     "name": "John Smith"
   },
   "factfind": {
@@ -6250,15 +6244,13 @@ The Estate Planning contract represents a singleton record per client containing
   "totalAssets": {
     "amount": 850000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "totalJointAssets": {
     "amount": 425000.00,
     "currency": {
-      "code": "GBP",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "giftInLast7YearsDetails": "Annual exemption gifts to both children (£3,000 per year each)",
@@ -6268,15 +6260,14 @@ The Estate Planning contract represents a singleton record per client containing
   "gifts": [
     {
       "id": 1,
-      "href": "/v2/factfinds/679/clients/8496/estateplanning/gifts/1",
+      "href": "/v3/factfinds/679/clients/8496/estateplanning/gifts/1",
       "giftedOn": "2025-04-10",
       "recipient": "Emily Rose Smith",
       "relationship": "Daughter",
       "value": {
         "amount": 3000.00,
         "currency": {
-          "code": "GBP",
-          "symbol": "£"
+          "code": "GBP"
         }
       },
       "description": "Annual exemption gift for tax year 2025/26",
@@ -6460,12 +6451,12 @@ The Estate Planning contract represents a singleton record per client containing
 
 ### API Endpoints
 
-- `GET /api/v2/factfinds/{id}/clients/{clientId}/estateplanning` - Retrieve estate planning singleton
-- `PUT /api/v2/factfinds/{id}/clients/{clientId}/estateplanning` - Create or update estate planning
-- `POST /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts` - Create gift record
-- `GET /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Get gift
-- `PUT /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Update gift
-- `DELETE /api/v2/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Delete gift
+- `GET /api/v3/factfinds/{id}/clients/{clientId}/estateplanning` - Retrieve estate planning singleton
+- `PUT /api/v3/factfinds/{id}/clients/{clientId}/estateplanning` - Create or update estate planning
+- `POST /api/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts` - Create gift record
+- `GET /api/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Get gift
+- `PUT /api/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Update gift
+- `DELETE /api/v3/factfinds/{id}/clients/{clientId}/estateplanning/gifts/{giftId}` - Delete gift
 
 ### Field-Level Guidance
 
@@ -6720,14 +6711,14 @@ Represents personal protection arrangements including life cover, critical illne
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier | 15001 |
-| href | Text | Resource URI | /api/v2/factfinds/679/protections/15001 |
-| factfind | Reference Link | Link to parent FactFind | { id: 679, href: "/api/v2/factfinds/679" } |
-| sellingAdviser | Reference Link | Selling adviser reference | { id: 123, href: "/api/v2/advisers/123", name: "Jane Adviser" } |
-| owners | List of Reference Links | Policy owner(s) | [{ id: 8496, href: "/api/v2/factfinds/679/clients/8496", name: "John Smith" }] |
-| provider | Reference Link | Insurance provider | { id: 456, href: "/api/v2/productproviders/456", name: "Legal & General" } |
+| href | Text | Resource URI | /api/v3/factfinds/679/protections/15001 |
+| factfind | Reference Link | Link to parent FactFind | { id: 679, href: "/api/v3/factfinds/679" } |
+| sellingAdviser | Reference Link | Selling adviser reference | { id: 123, href: "/api/v3/advisers/123", name: "Jane Adviser" } |
+| owners | List of Reference Links | Policy owner(s) | [{ id: 8496, href: "/api/v3/factfinds/679/clients/8496", name: "John Smith" }] |
+| provider | Reference Link | Insurance provider | { id: 456, href: "/api/v3/productproviders/456", name: "Legal & General" } |
 | protectionCategory | Text | Protection category | PersonalProtection |
-| protectionType | Reference Link | Protection type reference | { id: 123, href: "/api/v2/plantypes?filter=id eq 123", name: "Life and Critical Illness" } |
-| lifeCycle | Reference Link | Life cycle stage | { id: 45, href: "/api/v2/lifecycles/45", name: "Accumulation" } |
+| protectionType | Reference Link | Protection type reference | { id: 123, href: "/api/v3/plantypes?filter=id eq 123", name: "Life and Critical Illness" } |
+| lifeCycle | Reference Link | Life cycle stage | { id: 45, href: "/api/v3/lifecycles/45", name: "Accumulation" } |
 | premiums | List of Complex Data | Premium details | List with premium entries |
 | lifeCover | Complex Data | Life cover details | See LifeCoverValue below |
 | criticalIllnessCover | Complex Data | Critical illness cover details | See CriticalIllnessCoverValue below |
@@ -6902,17 +6893,17 @@ Represents personal protection arrangements including life cover, critical illne
 ```json
 {
   "id": 15001,
-  "href": "/api/v2/factfinds/679/protections/15001",
-  "factfind": { "id": 679, "href": "/api/v2/factfinds/679" },
-  "sellingAdviser": { "id": 123, "href": "/api/v2/advisers/123", "name": "Jane Adviser" },
-  "owners": [{ "id": 8496, "href": "/api/v2/factfinds/679/clients/8496", "name": "John Smith" }],
-  "provider": { "id": 456, "href": "/api/v2/productproviders/456", "name": "Legal & General" },
+  "href": "/api/v3/factfinds/679/protections/15001",
+  "factfind": { "id": 679, "href": "/api/v3/factfinds/679" },
+  "sellingAdviser": { "id": 123, "href": "/api/v3/advisers/123", "name": "Jane Adviser" },
+  "owners": [{ "id": 8496, "href": "/api/v3/factfinds/679/clients/8496", "name": "John Smith" }],
+  "provider": { "id": 456, "href": "/api/v3/productproviders/456", "name": "Legal & General" },
   "protectionCategory": "PersonalProtection",
-  "protectionType": { "id": 123, "href": "/api/v2/plantypes?filter=id eq 123", "name": "Life and CI" },
-  "lifeCycle": { "id": 45, "href": "/api/v2/lifecycles/45", "name": "Accumulation" },
+  "protectionType": { "id": 123, "href": "/api/v3/plantypes?filter=id eq 123", "name": "Life and CI" },
+  "lifeCycle": { "id": 45, "href": "/api/v3/lifecycles/45", "name": "Accumulation" },
   "premiums": [{
     "startsOn": "2024-01-01",
-    "value": { "amount": 150.00, "currency": { "code": "GBP", "symbol": "£" } },
+    "value": { "amount": 150.00, "currency": { "code": "GBP" } },
     "frequency": "Monthly",
     "type": "Regular",
     "contributorType": "Self",
@@ -6920,20 +6911,20 @@ Represents personal protection arrangements including life cover, critical illne
   }],
   "lifeCover": {
     "term": "P25Y",
-    "sumAssured": { "amount": 500000.00, "currency": { "code": "GBP", "symbol": "£" } },
+    "sumAssured": { "amount": 500000.00, "currency": { "code": "GBP" } },
     "premiumStructure": "Level",
     "paymentBasis": "FirstDeath",
     "untilAge": 65
   },
   "criticalIllnessCover": {
     "premiumStructure": "Level",
-    "amount": { "amount": 250000.00, "currency": { "code": "GBP", "symbol": "£" } },
+    "amount": { "amount": 250000.00, "currency": { "code": "GBP" } },
     "term": "P25Y",
     "untilAge": 65
   },
   "benefitsPayable": {
     "benefitFrequency": "Single",
-    "benefitAmount": { "amount": 500000.00, "currency": { "code": "GBP", "symbol": "£" } },
+    "benefitAmount": { "amount": 500000.00, "currency": { "code": "GBP" } },
     "deferredPeriod": "P0D",
     "qualificationPeriod": { "isBackToDayOne": false, "value": "P30D" }
   },
@@ -6942,7 +6933,7 @@ Represents personal protection arrangements including life cover, critical illne
   "inTrustToWhom": "Spouse and children",
   "isRated": false,
   "isPremiumWaiverWoc": true,
-  "sumAssured": { "amount": 500000.00, "currency": { "code": "GBP", "symbol": "£" } },
+  "sumAssured": { "amount": 500000.00, "currency": { "code": "GBP" } },
   "protectionPayoutType": "Indemnity"
 }
 ```
@@ -6974,8 +6965,18 @@ Represents a monetary amount with currency.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| amount | Number | The numeric amount |
-| currency | CurrencyCode | Currency details (code, name, symbol) |
+| amount | Number | The numeric amount (decimal with up to 2 decimal places) |
+| currency | CurrencyCode | Currency details (ISO 4217 code only) |
+
+**Example:**
+```json
+{
+  "amount": 50000.00,
+  "currency": {
+    "code": "GBP"
+  }
+}
+```
 
 ### AddressValue
 
@@ -7021,13 +7022,13 @@ Represents a country using ISO standards.
 
 ### CurrencyCode
 
-Represents a currency using ISO standards.
+Represents a currency using ISO 4217 standard.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| code | Text | ISO 4217 currency code (e.g., GBP, USD, EUR) |
-| display | Text | Currency name (e.g., British Pound) |
-| symbol | Text | Currency symbol (e.g., £, $, €) |
+| code | Text | ISO 4217 three-letter currency code (e.g., GBP, USD, EUR) |
+
+**Note:** The currency code is the only field returned. Client applications can maintain their own mapping of currency codes to display names and symbols if needed for UI purposes.
 
 ### Reference
 
@@ -7262,7 +7263,7 @@ The Protection Review contract represents a singleton record per FactFind contai
 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
-| href | Text | API link to this resource | /v2/factfinds/679/protections/reviews/summary |
+| href | Text | API link to this resource | /v3/factfinds/679/protections/reviews/summary |
 | lifeAndCriticalIllness | Complex Object | Life and critical illness review section | Complex object |
 | incomeProtection | Complex Object | Income protection review section | Complex object |
 | buildingsAndContent | Complex Object | Buildings and content review section | Complex object |
@@ -7313,7 +7314,7 @@ The Protection Review contract represents a singleton record per FactFind contai
 
 ```json
 {
-  "href": "/v2/factfinds/679/protections/reviews/summary",
+  "href": "/v3/factfinds/679/protections/reviews/summary",
   "lifeAndCriticalIllness": {
     "hasCoverForMortgageOrDebt": "Yes",
     "hasCoverforDependantsDueToCritcalIllness": "No",
@@ -7495,10 +7496,10 @@ The Protection Review contract represents a singleton record per FactFind contai
 
 ### API Endpoints
 
-- `GET /api/v2/factfinds/{id}/protections/reviews/summary` - Retrieve complete protection review
-- `PUT /api/v2/factfinds/{id}/protections/reviews/lifeAndCriticalIllness` - Update life & critical illness section
-- `PUT /api/v2/factfinds/{id}/protections/reviews/incomeProtection` - Update income protection section
-- `PUT /api/v2/factfinds/{id}/protections/reviews/buildingsAndContent` - Update buildings & content section
+- `GET /api/v3/factfinds/{id}/protections/reviews/summary` - Retrieve complete protection review
+- `PUT /api/v3/factfinds/{id}/protections/reviews/lifeAndCriticalIllness` - Update life & critical illness section
+- `PUT /api/v3/factfinds/{id}/protections/reviews/incomeProtection` - Update income protection section
+- `PUT /api/v3/factfinds/{id}/protections/reviews/buildingsAndContent` - Update buildings & content section
 
 ### Field-Level Guidance
 
@@ -7618,9 +7619,9 @@ Represents State Pension entitlements including basic State Pension, additional 
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier | 1234 |
-| href | Text | Resource URI | /api/v2/factfinds/679/pensions/statepension/1234 |
-| factfind | Reference Link | Link to parent FactFind | { id: 679, href: "/api/v2/factfinds/679" } |
-| owner | Reference Link | Client who owns this state pension entitlement | { id: 8496, href: "/api/v2/factfinds/679/clients/8496", name: "Sarah Johnson" } |
+| href | Text | Resource URI | /api/v3/factfinds/679/pensions/statepension/1234 |
+| factfind | Reference Link | Link to parent FactFind | { id: 679, href: "/api/v3/factfinds/679" } |
+| owner | Reference Link | Client who owns this state pension entitlement | { id: 8496, href: "/api/v3/factfinds/679/clients/8496", name: "Sarah Johnson" } |
 | retirementAge | Number | State Pension age for this individual (65-68) | 67 |
 | statePensionProvision | Complex Data | State Pension provision details | See StatePensionProvisionValue below |
 | spousePension | Currency Amount | Inherited spouse pension entitlement | { amount: 1250.00, currency: { code: "GBP", symbol: "£" } } |
@@ -7688,14 +7689,14 @@ Represents State Pension entitlements including basic State Pension, additional 
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/pensions/statepension/1234",
+  "href": "/api/v3/factfinds/679/pensions/statepension/1234",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Sarah Johnson"
   },
   "retirementAge": 67,
@@ -7703,34 +7704,26 @@ Represents State Pension entitlements including basic State Pension, additional 
     "basicAmount": {
       "amount": 11502.40,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "additionalAmount": {
       "amount": 0.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "benefitCredit": {
       "amount": 0.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
   "spousePension": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "br19Projection": "BR19 Reference: SP-2024-123456789 - Full new State Pension £221.20 per week (£11,502.40 per annum) at age 67. Based on 35 qualifying years.",
@@ -7745,14 +7738,14 @@ Represents State Pension entitlements including basic State Pension, additional 
 ```json
 {
   "id": 1235,
-  "href": "/api/v2/factfinds/679/pensions/statepension/1235",
+  "href": "/api/v3/factfinds/679/pensions/statepension/1235",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "id": 8497,
-    "href": "/api/v2/factfinds/679/clients/8497",
+    "href": "/api/v3/factfinds/679/clients/8497",
     "name": "Margaret Thompson"
   },
   "retirementAge": 65,
@@ -7760,34 +7753,26 @@ Represents State Pension entitlements including basic State Pension, additional 
     "basicAmount": {
       "amount": 8814.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "additionalAmount": {
       "amount": 2450.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "benefitCredit": {
       "amount": 0.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
   "spousePension": {
     "amount": 1250.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "br19Projection": "BR19 Reference: SP-2015-987654321 - Basic State Pension £169.50 per week plus Additional Pension £47.12 per week. Spouse inheritance £24.04 per week.",
@@ -7802,14 +7787,14 @@ Represents State Pension entitlements including basic State Pension, additional 
 ```json
 {
   "id": 1236,
-  "href": "/api/v2/factfinds/679/pensions/statepension/1236",
+  "href": "/api/v3/factfinds/679/pensions/statepension/1236",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "id": 8498,
-    "href": "/api/v2/factfinds/679/clients/8498",
+    "href": "/api/v3/factfinds/679/clients/8498",
     "name": "David Williams"
   },
   "retirementAge": 66,
@@ -7817,34 +7802,26 @@ Represents State Pension entitlements including basic State Pension, additional 
     "basicAmount": {
       "amount": 7200.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "additionalAmount": {
       "amount": 0.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "benefitCredit": {
       "amount": 4134.80,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
   "spousePension": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "br19Projection": "BR19 Reference: SP-2023-555666777 - Reduced new State Pension £138.46 per week (22 qualifying years). Eligible for Pension Credit top-up.",
@@ -7934,7 +7911,7 @@ The EmployerPensionScheme contract records employer-sponsored pension schemes fr
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Unique system identifier for this record | 1234 |
-| href | Text | API link to this resource | /api/v2/factfinds/679/pensions/employerschemes/1234 |
+| href | Text | API link to this resource | /api/v3/factfinds/679/pensions/employerschemes/1234 |
 | owner | Reference Link | Client who owns this scheme | Complex object |
 | isCurrentMember | Yes/No | Whether client is currently contributing to this scheme | true |
 | isProblemMember | Yes/No | Whether there are issues with this scheme (lost, disputed, incomplete info) | false |
@@ -7948,7 +7925,7 @@ The EmployerPensionScheme contract records employer-sponsored pension schemes fr
 | Field Name | Type | Description | Example Value |
 |---|---|---|---|
 | id | Number | Client identifier | 8496 |
-| href | Text | Link to client resource | /api/v2/factfinds/679/clients/8496 |
+| href | Text | Link to client resource | /api/v3/factfinds/679/clients/8496 |
 | name | Text | Client display name | Jack Marias |
 
 ### Usage Example
@@ -7956,10 +7933,10 @@ The EmployerPensionScheme contract records employer-sponsored pension schemes fr
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "href": "/api/v3/factfinds/679/pensions/employerschemes/1234",
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "isCurrentMember": true,
@@ -7988,11 +7965,11 @@ The EmployerPensionScheme contract records employer-sponsored pension schemes fr
 
 ### API Endpoints
 
-- `GET /api/v2/factfinds/{id}/pensions/employerschemes` - List all employer pension schemes
-- `POST /api/v2/factfinds/{id}/pensions/employerschemes` - Create new employer pension scheme
-- `GET /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` - Get specific scheme details
-- `PATCH /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` - Update employer pension scheme
-- `DELETE /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}` - Delete employer pension scheme
+- `GET /api/v3/factfinds/{id}/pensions/employerschemes` - List all employer pension schemes
+- `POST /api/v3/factfinds/{id}/pensions/employerschemes` - Create new employer pension scheme
+- `GET /api/v3/factfinds/{id}/pensions/employerschemes/{schemeId}` - Get specific scheme details
+- `PATCH /api/v3/factfinds/{id}/pensions/employerschemes/{schemeId}` - Update employer pension scheme
+- `DELETE /api/v3/factfinds/{id}/pensions/employerschemes/{schemeId}` - Delete employer pension scheme
 
 ### Field-Level Guidance
 
@@ -8085,7 +8062,7 @@ The Net Worth contract calculates and tracks a client's overall financial positi
 | Field Name | Type | Description | Example Value |
 |-----------|------|-------------|---------------|
 | id | Number | Unique identifier | 9001 |
-| href | Link | Web address for this net worth calculation | /api/v2/factfinds/456/networth/9001 |
+| href | Link | Web address for this net worth calculation | /api/v3/factfinds/456/networth/9001 |
 | factfind | Link to FactFind | The fact-find this belongs to | FactFind #456 |
 | clients | List of Client Links | Clients included in this calculation | Client #456, Client #457 |
 | calculatedOn | Date/Time | When this net worth was calculated | 2026-02-18T14:30:00Z |

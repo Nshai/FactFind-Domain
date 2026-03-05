@@ -211,17 +211,17 @@ FactFind (1) ──→ (N) Liability [if liabilities flag true]
 
 | Operation | Method | Endpoint | Description |
 |---|---|---|---|
-| Get Control Options | GET | `/v2/factfinds/{id}/controloptions` | Retrieve complete control options |
-| Update Assets | PUT | `/v2/factfinds/{id}/controloptions/assets` | Update assets section |
-| Update Liabilities | PUT | `/v2/factfinds/{id}/controloptions/liabilities` | Update liabilities section |
-| Update Investments | PUT | `/v2/factfinds/{id}/controloptions/investments` | Update investments section |
-| Update Pensions | PUT | `/v2/factfinds/{id}/controloptions/pensions` | Update pensions section |
-| Update Protections | PUT | `/v2/factfinds/{id}/controloptions/protections` | Update protections section |
-| Update Mortgages | PUT | `/v2/factfinds/{id}/controloptions/mortgages` | Update mortgages section |
+| Get Control Options | GET | `/v3/factfinds/{id}/controloptions` | Retrieve complete control options |
+| Update Assets | PUT | `/v3/factfinds/{id}/controloptions/assets` | Update assets section |
+| Update Liabilities | PUT | `/v3/factfinds/{id}/controloptions/liabilities` | Update liabilities section |
+| Update Investments | PUT | `/v3/factfinds/{id}/controloptions/investments` | Update investments section |
+| Update Pensions | PUT | `/v3/factfinds/{id}/controloptions/pensions` | Update pensions section |
+| Update Protections | PUT | `/v3/factfinds/{id}/controloptions/protections` | Update protections section |
+| Update Mortgages | PUT | `/v3/factfinds/{id}/controloptions/mortgages` | Update mortgages section |
 
 ### 5.2 Get Control Options
 
-**Endpoint:** `GET /v2/factfinds/{id}/controloptions`
+**Endpoint:** `GET /v3/factfinds/{id}/controloptions`
 
 **Description:** Retrieves the complete control options singleton.
 
@@ -238,7 +238,7 @@ FactFind (1) ──→ (N) Liability [if liabilities flag true]
 
 ### 5.3 Update Assets
 
-**Endpoint:** `PUT /v2/factfinds/{id}/controloptions/assets`
+**Endpoint:** `PUT /v3/factfinds/{id}/controloptions/assets`
 
 **Description:** Creates or updates the assets section.
 
@@ -258,7 +258,7 @@ FactFind (1) ──→ (N) Liability [if liabilities flag true]
 
 ### 5.4 Update Liabilities
 
-**Endpoint:** `PUT /v2/factfinds/{id}/controloptions/liabilities`
+**Endpoint:** `PUT /v3/factfinds/{id}/controloptions/liabilities`
 
 **Description:** Creates or updates the liabilities section.
 
@@ -278,7 +278,7 @@ FactFind (1) ──→ (N) Liability [if liabilities flag true]
 
 ### 5.5 Update Investments
 
-**Endpoint:** `PUT /v2/factfinds/{id}/controloptions/investments`
+**Endpoint:** `PUT /v3/factfinds/{id}/controloptions/investments`
 
 **Description:** Creates or updates the investments section.
 
@@ -298,7 +298,7 @@ FactFind (1) ──→ (N) Liability [if liabilities flag true]
 
 ### 5.6 Update Pensions
 
-**Endpoint:** `PUT /v2/factfinds/{id}/controloptions/pensions`
+**Endpoint:** `PUT /v3/factfinds/{id}/controloptions/pensions`
 
 **Description:** Creates or updates the pensions section.
 
@@ -318,7 +318,7 @@ FactFind (1) ──→ (N) Liability [if liabilities flag true]
 
 ### 5.7 Update Protections
 
-**Endpoint:** `PUT /v2/factfinds/{id}/controloptions/protections`
+**Endpoint:** `PUT /v3/factfinds/{id}/controloptions/protections`
 
 **Description:** Creates or updates the protections section.
 
@@ -338,7 +338,7 @@ FactFind (1) ──→ (N) Liability [if liabilities flag true]
 
 ### 5.8 Update Mortgages
 
-**Endpoint:** `PUT /v2/factfinds/{id}/controloptions/mortgages`
+**Endpoint:** `PUT /v3/factfinds/{id}/controloptions/mortgages`
 
 **Description:** Creates or updates the mortgages section.
 
@@ -364,10 +364,10 @@ FactFind (1) ──→ (N) Liability [if liabilities flag true]
 
 ```json
 {
-  "href": "/v2/factfinds/123/controloptions",
+  "href": "/v3/factfinds/123/controloptions",
   "factfind": {
     "id": 123,
-    "href": "/v2/factfinds/123"
+    "href": "/v3/factfinds/123"
   },
   "investments": {
     "hasCash": true,

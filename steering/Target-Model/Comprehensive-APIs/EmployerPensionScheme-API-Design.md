@@ -4,7 +4,7 @@
 
 The Employer Pension Scheme API provides endpoints to manage employer-sponsored pension schemes that clients may have through current or previous employment. This includes workplace pensions, occupational schemes, and auto-enrolment pensions.
 
-**Base Path:** `/api/v2/factfinds/{id}/pensions/employerschemes`
+**Base Path:** `/api/v3/factfinds/{id}/pensions/employerschemes`
 
 **Bounded Context:** Plans & Investments
 
@@ -41,7 +41,7 @@ Employer pension schemes represent workplace pension arrangements provided by em
 
 Retrieve all employer pension schemes for a fact find.
 
-**Endpoint:** `GET /api/v2/factfinds/{id}/pensions/employerschemes`
+**Endpoint:** `GET /api/v3/factfinds/{id}/pensions/employerschemes`
 
 **Authorization:** Requires `factfind:read` scope
 
@@ -58,9 +58,9 @@ Retrieve all employer pension schemes for a fact find.
 | ownerId | integer | No | Filter by owner client ID | All owners |
 | isCurrentMember | boolean | No | Filter by current member status | All schemes |
 | isProblemMember | boolean | No | Filter by problem flag | All schemes |
-| page | integer | No | Page number (1-indexed) | 1 |
+| page | integer | No | Number of items to return (max 100) | 1 |
 | pageSize | integer | No | Items per page | 25 |
-| sortBy | string | No | Sort field | schemeJoinedOn |
+| sortBy | string | No | Order field | schemeJoinedOn |
 | sortOrder | string | No | Sort direction (asc/desc) | desc |
 
 **Success Response: 200 OK**
@@ -70,10 +70,10 @@ Retrieve all employer pension schemes for a fact find.
   "items": [
     {
       "id": 1234,
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234",
       "owner": {
         "id": 8496,
-        "href": "/api/v2/factfinds/679/clients/8496",
+        "href": "/api/v3/factfinds/679/clients/8496",
         "name": "Jack Marias"
       },
       "isCurrentMember": true,
@@ -83,10 +83,10 @@ Retrieve all employer pension schemes for a fact find.
     },
     {
       "id": 1235,
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1235",
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1235",
       "owner": {
         "id": 8496,
-        "href": "/api/v2/factfinds/679/clients/8496",
+        "href": "/api/v3/factfinds/679/clients/8496",
         "name": "Jack Marias"
       },
       "isCurrentMember": false,
@@ -103,13 +103,13 @@ Retrieve all employer pension schemes for a fact find.
   },
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes?page=1&pageSize=25"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes?$top=25&$skip=0"
     },
     "factfind": {
-      "href": "/api/v2/factfinds/679"
+      "href": "/api/v3/factfinds/679"
     },
     "create": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes"
     }
   }
 }
@@ -127,7 +127,7 @@ Retrieve all employer pension schemes for a fact find.
 
 Create a new employer pension scheme record.
 
-**Endpoint:** `POST /api/v2/factfinds/{id}/pensions/employerschemes`
+**Endpoint:** `POST /api/v3/factfinds/{id}/pensions/employerschemes`
 
 **Authorization:** Requires `factfind:write` scope
 
@@ -167,10 +167,10 @@ Create a new employer pension scheme record.
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "href": "/api/v3/factfinds/679/pensions/employerschemes/1234",
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "isCurrentMember": true,
@@ -179,19 +179,19 @@ Create a new employer pension scheme record.
   "details": "Acme Corp Group Personal Pension - auto-enrolment scheme",
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234"
     },
     "factfind": {
-      "href": "/api/v2/factfinds/679"
+      "href": "/api/v3/factfinds/679"
     },
     "owner": {
-      "href": "/api/v2/factfinds/679/clients/8496"
+      "href": "/api/v3/factfinds/679/clients/8496"
     },
     "update": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234"
     },
     "delete": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234"
     }
   }
 }
@@ -211,7 +211,7 @@ Create a new employer pension scheme record.
 
 Retrieve a specific employer pension scheme by ID.
 
-**Endpoint:** `GET /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}`
+**Endpoint:** `GET /api/v3/factfinds/{id}/pensions/employerschemes/{schemeId}`
 
 **Authorization:** Requires `factfind:read` scope
 
@@ -227,10 +227,10 @@ Retrieve a specific employer pension scheme by ID.
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "href": "/api/v3/factfinds/679/pensions/employerschemes/1234",
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "isCurrentMember": true,
@@ -252,22 +252,22 @@ Retrieve a specific employer pension scheme by ID.
   },
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234"
     },
     "factfind": {
-      "href": "/api/v2/factfinds/679"
+      "href": "/api/v3/factfinds/679"
     },
     "owner": {
-      "href": "/api/v2/factfinds/679/clients/8496"
+      "href": "/api/v3/factfinds/679/clients/8496"
     },
     "employment": {
-      "href": "/api/v2/factfinds/679/clients/8496/employment"
+      "href": "/api/v3/factfinds/679/clients/8496/employment"
     },
     "update": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234"
     },
     "delete": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234"
     }
   }
 }
@@ -285,7 +285,7 @@ Retrieve a specific employer pension scheme by ID.
 
 Update an existing employer pension scheme (partial update).
 
-**Endpoint:** `PATCH /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}`
+**Endpoint:** `PATCH /api/v3/factfinds/{id}/pensions/employerschemes/{schemeId}`
 
 **Authorization:** Requires `factfind:write` scope
 
@@ -322,10 +322,10 @@ Update an existing employer pension scheme (partial update).
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/pensions/employerschemes/1234",
+  "href": "/api/v3/factfinds/679/pensions/employerschemes/1234",
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Jack Marias"
   },
   "isCurrentMember": false,
@@ -347,13 +347,13 @@ Update an existing employer pension scheme (partial update).
   },
   "_links": {
     "self": {
-      "href": "/api/v2/factfinds/679/pensions/employerschemes/1234"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes/1234"
     },
     "factfind": {
-      "href": "/api/v2/factfinds/679"
+      "href": "/api/v3/factfinds/679"
     },
     "owner": {
-      "href": "/api/v2/factfinds/679/clients/8496"
+      "href": "/api/v3/factfinds/679/clients/8496"
     }
   }
 }
@@ -374,7 +374,7 @@ Update an existing employer pension scheme (partial update).
 
 Delete an employer pension scheme record.
 
-**Endpoint:** `DELETE /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}`
+**Endpoint:** `DELETE /api/v3/factfinds/{id}/pensions/employerschemes/{schemeId}`
 
 **Authorization:** Requires `factfind:write` scope
 
@@ -495,19 +495,19 @@ No response body.
 
 **Step 1: Discover Employment History**
 ```
-GET /api/v2/factfinds/{id}/clients/{clientId}/employment
+GET /api/v3/factfinds/{id}/clients/{clientId}/employment
 ```
 Identify all current and previous employers
 
 **Step 2: Record Employer Schemes**
 ```
-POST /api/v2/factfinds/{id}/pensions/employerschemes
+POST /api/v3/factfinds/{id}/pensions/employerschemes
 ```
 Create scheme record for each employer pension
 
 **Step 3: Flag Problem Schemes**
 ```
-PATCH /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}
+PATCH /api/v3/factfinds/{id}/pensions/employerschemes/{schemeId}
 {
   "isProblemMember": true,
   "details": "Unable to obtain policy documents from provider"
@@ -516,7 +516,7 @@ PATCH /api/v2/factfinds/{id}/pensions/employerschemes/{schemeId}
 
 **Step 4: Retrieve All Schemes**
 ```
-GET /api/v2/factfinds/{id}/pensions/employerschemes?ownerId={clientId}
+GET /api/v3/factfinds/{id}/pensions/employerschemes?ownerId={clientId}
 ```
 Get complete list for retirement planning
 
@@ -665,7 +665,7 @@ showActionRequired(problemSchemes);
 
 **Create Active Employer Scheme:**
 ```http
-POST /api/v2/factfinds/679/pensions/employerschemes
+POST /api/v3/factfinds/679/pensions/employerschemes
 Content-Type: application/json
 
 {
@@ -685,7 +685,7 @@ Content-Type: application/json
 
 **Create Problem Scheme:**
 ```http
-POST /api/v2/factfinds/679/pensions/employerschemes
+POST /api/v3/factfinds/679/pensions/employerschemes
 Content-Type: application/json
 
 {
@@ -705,7 +705,7 @@ Content-Type: application/json
 
 **List All Client Schemes:**
 ```http
-GET /api/v2/factfinds/679/pensions/employerschemes?ownerId=8496
+GET /api/v3/factfinds/679/pensions/employerschemes?ownerId=8496
 ```
 
 **Response shows:**
@@ -717,7 +717,7 @@ GET /api/v2/factfinds/679/pensions/employerschemes?ownerId=8496
 
 **Update to Reflect Transfer:**
 ```http
-PATCH /api/v2/factfinds/679/pensions/employerschemes/1234
+PATCH /api/v3/factfinds/679/pensions/employerschemes/1234
 Content-Type: application/json
 
 {

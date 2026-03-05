@@ -23,7 +23,7 @@
 | **Entity Name** | StatePension |
 | **Domain** | Plans |
 | **Aggregate Root** | FactFind |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/pensions/statepension` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/pensions/statepension` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/pensions/statepension` | List all state pension records | Query params | StatePensionEntitlement[] | 200, 401, 403 | StatePension, List |
-| POST | `/api/v2/factfinds/{factfindId}/pensions/statepension` | Create state pension record | StatePensionRequest | StatePensionEntitlement | 201, 400, 401, 403, 422 | StatePension, Create |
-| GET | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Get state pension by ID | Path params | StatePensionEntitlement | 200, 401, 403, 404 | StatePension, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Update state pension | StatePensionPatch | StatePensionEntitlement | 200, 400, 401, 403, 404, 422 | StatePension, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Delete state pension | Path params | None | 204, 401, 403, 404, 422 | StatePension, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/statepension` | List all state pension records | Query params | StatePensionEntitlement[] | 200, 401, 403 | StatePension, List |
+| POST | `/api/v3/factfinds/{factfindId}/pensions/statepension` | Create state pension record | StatePensionRequest | StatePensionEntitlement | 201, 400, 401, 403, 422 | StatePension, Create |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Get state pension by ID | Path params | StatePensionEntitlement | 200, 401, 403, 404 | StatePension, Retrieve |
+| PATCH | `/api/v3/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Update state pension | StatePensionPatch | StatePensionEntitlement | 200, 400, 401, 403, 404, 422 | StatePension, Update |
+| DELETE | `/api/v3/factfinds/{factfindId}/pensions/statepension/{pensionId}` | Delete state pension | Path params | None | 204, 401, 403, 404, 422 | StatePension, Delete |
 
 
 ### Authorization
@@ -111,7 +111,7 @@ Client who owns this state pension entitlement:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Client unique identifier |
-| `href` | string | API link to client resource (e.g., `/api/v2/factfinds/679/clients/8496`) |
+| `href` | string | API link to client resource (e.g., `/api/v3/factfinds/679/clients/8496`) |
 | `name` | string | Client full name |
 
 **Note:** State pensions are individual entitlements and cannot be jointly owned.
@@ -172,14 +172,14 @@ Standard money structure:
 ```json
 {
   "id": 1234,
-  "href": "/api/v2/factfinds/679/pensions/statepension/1234",
+  "href": "/api/v3/factfinds/679/pensions/statepension/1234",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "id": 8496,
-    "href": "/api/v2/factfinds/679/clients/8496",
+    "href": "/api/v3/factfinds/679/clients/8496",
     "name": "Sarah Johnson"
   },
   "retirementAge": 67,
@@ -187,34 +187,26 @@ Standard money structure:
     "basicAmount": {
       "amount": 11502.40,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "additionalAmount": {
       "amount": 0.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "benefitCredit": {
       "amount": 0.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
   "spousePension": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "br19Projection": "BR19 Reference: SP-2024-123456789 - Full new State Pension £221.20 per week (£11,502.40 per annum) at age 67. Based on 35 qualifying years.",
@@ -229,14 +221,14 @@ Standard money structure:
 ```json
 {
   "id": 1235,
-  "href": "/api/v2/factfinds/679/pensions/statepension/1235",
+  "href": "/api/v3/factfinds/679/pensions/statepension/1235",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "id": 8497,
-    "href": "/api/v2/factfinds/679/clients/8497",
+    "href": "/api/v3/factfinds/679/clients/8497",
     "name": "Margaret Thompson"
   },
   "retirementAge": 65,
@@ -244,34 +236,26 @@ Standard money structure:
     "basicAmount": {
       "amount": 8814.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "additionalAmount": {
       "amount": 2450.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "benefitCredit": {
       "amount": 0.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
   "spousePension": {
     "amount": 1250.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "br19Projection": "BR19 Reference: SP-2015-987654321 - Basic State Pension £169.50 per week plus Additional Pension £47.12 per week. Spouse inheritance £24.04 per week.",
@@ -286,14 +270,14 @@ Standard money structure:
 ```json
 {
   "id": 1236,
-  "href": "/api/v2/factfinds/679/pensions/statepension/1236",
+  "href": "/api/v3/factfinds/679/pensions/statepension/1236",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owner": {
     "id": 8498,
-    "href": "/api/v2/factfinds/679/clients/8498",
+    "href": "/api/v3/factfinds/679/clients/8498",
     "name": "David Williams"
   },
   "retirementAge": 66,
@@ -301,34 +285,26 @@ Standard money structure:
     "basicAmount": {
       "amount": 7200.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "additionalAmount": {
       "amount": 0.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "benefitCredit": {
       "amount": 4134.80,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
   "spousePension": {
     "amount": 0.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-        "symbol": "£"
+      "code": "GBP"
       }
   },
   "br19Projection": "BR19 Reference: SP-2023-555666777 - Reduced new State Pension £138.46 per week (22 qualifying years). Eligible for Pension Credit top-up.",
@@ -470,16 +446,16 @@ Standard money structure:
 ## Related APIs
 
 ### Client API
-- **GET** `/api/v2/factfinds/{factfindId}/clients/{clientId}` - Get client details including date of birth for State Pension age calculation
+- **GET** `/api/v3/factfinds/{factfindId}/clients/{clientId}` - Get client details including date of birth for State Pension age calculation
 
 ### Income API
-- **GET** `/api/v2/factfinds/{factfindId}/clients/{clientId}/income` - State Pension counts as income for affordability assessments
+- **GET** `/api/v3/factfinds/{factfindId}/clients/{clientId}/income` - State Pension counts as income for affordability assessments
 
 ### Personal Pension API
-- **GET** `/api/v2/factfinds/{factfindId}/pensions/personalpension` - Personal pensions that may have contracted out of Additional State Pension
+- **GET** `/api/v3/factfinds/{factfindId}/pensions/personalpension` - Personal pensions that may have contracted out of Additional State Pension
 
 ### Final Salary Pension API
-- **GET** `/api/v2/factfinds/{factfindId}/pensions/finalsalary` - Occupational pensions that may have contracted out of SERPS/S2P
+- **GET** `/api/v3/factfinds/{factfindId}/pensions/finalsalary` - Occupational pensions that may have contracted out of SERPS/S2P
 
 ---
 
@@ -491,9 +467,9 @@ Standard money structure:
 |-----------|------|-------------|---------|
 | `owner` | integer | Filter by owner client ID | `?owner=8496` |
 | `retirementAge` | integer | Filter by retirement age | `?retirementAge=67` |
-| `page` | integer | Page number (1-indexed) | `?page=1` |
-| `pageSize` | integer | Items per page (max 100) | `?pageSize=25` |
-| `sort` | string | Sort field and direction | `?sort=retirementAge:asc` |
+| `$top` | integer | Number of items to return (max 100) | `?$top=25&$skip=0` |
+| `$skip` | integer | Number of items to skip | `?pageSize=25` |
+| `orderBy` | string | Order field and direction | `?orderBy=retirementAge asc` |
 
 ---
 

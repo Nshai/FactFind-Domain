@@ -23,7 +23,7 @@
 | **Entity Name** | FinalSalaryPension |
 | **Domain** | Plans |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/factfinds/{factfindId}/pensions/finalsalary` |
+| **Base Path** | `/api/v3/factfinds/{factfindId}/pensions/finalsalary` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -51,11 +51,11 @@ This document contains **entity-specific** information only. For common standard
 
 | Method | Path | Description | Request | Response | Status Codes | Tags |
 |--------|------|-------------|---------|----------|--------------|------|
-| GET | `/api/v2/factfinds/{factfindId}/pensions/finalsalary` | List all final salary pensions | Query params | FinalSalaryPension[] | 200, 401, 403 | FinalSalaryPension, List |
-| POST | `/api/v2/factfinds/{factfindId}/pensions/finalsalary` | Create final salary pension | FinalSalaryPensionRequest | FinalSalaryPension | 201, 400, 401, 403, 422 | FinalSalaryPension, Create |
-| GET | `/api/v2/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Get pension by ID | Path params | FinalSalaryPension | 200, 401, 403, 404 | FinalSalaryPension, Retrieve |
-| PATCH | `/api/v2/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Update pension | FinalSalaryPensionPatch | FinalSalaryPension | 200, 400, 401, 403, 404, 422 | FinalSalaryPension, Update |
-| DELETE | `/api/v2/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Delete pension | Path params | None | 204, 401, 403, 404, 422 | FinalSalaryPension, Delete |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/finalsalary` | List all final salary pensions | Query params | FinalSalaryPension[] | 200, 401, 403 | FinalSalaryPension, List |
+| POST | `/api/v3/factfinds/{factfindId}/pensions/finalsalary` | Create final salary pension | FinalSalaryPensionRequest | FinalSalaryPension | 201, 400, 401, 403, 422 | FinalSalaryPension, Create |
+| GET | `/api/v3/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Get pension by ID | Path params | FinalSalaryPension | 200, 401, 403, 404 | FinalSalaryPension, Retrieve |
+| PATCH | `/api/v3/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Update pension | FinalSalaryPensionPatch | FinalSalaryPension | 200, 400, 401, 403, 404, 422 | FinalSalaryPension, Update |
+| DELETE | `/api/v3/factfinds/{factfindId}/pensions/finalsalary/{pensionId}` | Delete pension | Path params | None | 204, 401, 403, 404, 422 | FinalSalaryPension, Delete |
 
 
 ### Authorization
@@ -133,7 +133,7 @@ Clients who own this pension:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Client unique identifier |
-| `href` | string | API link to client resource (e.g., `/api/v2/factfinds/679/clients/8496`) |
+| `href` | string | API link to client resource (e.g., `/api/v3/factfinds/679/clients/8496`) |
 | `name` | string | Client full name |
 
 **Note:** Final salary pensions typically have a single owner (the scheme member).
@@ -145,7 +145,7 @@ Adviser who arranged this pension:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Adviser unique identifier |
-| `href` | string | API link to adviser resource (e.g., `/api/v2/advisers/123`) |
+| `href` | string | API link to adviser resource (e.g., `/api/v3/advisers/123`) |
 | `name` | string | Adviser full name |
 
 #### provider (Pension Provider Reference)
@@ -155,7 +155,7 @@ Pension scheme provider/company:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Product provider unique identifier |
-| `href` | string | API link to product provider resource (e.g., `/api/v2/productproviders/789`) |
+| `href` | string | API link to product provider resource (e.g., `/api/v3/productproviders/789`) |
 | `name` | string | Provider name (e.g., "NHS Pension Scheme", "Teachers Pension") |
 
 **Common Final Salary Pension Providers:**
@@ -177,7 +177,7 @@ Pension lifecycle stage reference:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Lifecycle unique identifier |
-| `href` | string | API link to lifecycle resource (e.g., `/api/v2/lifecycles/45`) |
+| `href` | string | API link to lifecycle resource (e.g., `/api/v3/lifecycles/45`) |
 | `name` | string | Lifecycle stage name (e.g., "Accumulation", "Preserved", "In Payment") |
 
 **Lifecycle Stages for Final Salary Pensions:**
@@ -193,7 +193,7 @@ Platform or wrap account details:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Platform/wrap account identifier |
-| `href` | string | API link to investment resource (e.g., `/api/v2/factfinds/679/investments/234`) |
+| `href` | string | API link to investment resource (e.g., `/api/v3/factfinds/679/investments/234`) |
 | `reference` | string | Platform account reference number |
 
 **Use Cases:**
@@ -214,7 +214,7 @@ Specific pension scheme details:
 | Field | Type | Description |
 |-------|------|-------------|
 | `id` | integer | Pension type unique identifier |
-| `href` | string | API link to pension type resource (e.g., `/api/v2/pensiontypes/301`) |
+| `href` | string | API link to pension type resource (e.g., `/api/v3/pensiontypes/301`) |
 | `name` | string | Pension scheme name (e.g., "NHS 1995 Section", "LGPS 2014 Scheme") |
 
 **Common Pension Type Examples:**
@@ -397,43 +397,43 @@ Additional defined contribution arrangement alongside DB pension:
 ```json
 {
   "id": 15001,
-  "href": "/api/v2/factfinds/679/pensions/finalsalary/15001",
+  "href": "/api/v3/factfinds/679/pensions/finalsalary/15001",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith",
       "ownershipPercentage": 100.0
     }
   ],
   "sellingAdviser": {
     "id": 123,
-    "href": "/api/v2/advisers/123",
+    "href": "/api/v3/advisers/123",
     "name": "Jane Financial Adviser"
   },
   "provider": {
     "id": 456,
-    "href": "/api/v2/productproviders/456",
+    "href": "/api/v3/productproviders/456",
     "name": "NHS Pensions"
   },
   "lifeCycle": {
     "id": 45,
-    "href": "/api/v2/lifecycles/45",
+    "href": "/api/v3/lifecycles/45",
     "name": "Accumulation"
   },
   "wrap": {
     "id": 234,
-    "href": "/api/v2/factfinds/679/investments/234",
+    "href": "/api/v3/factfinds/679/investments/234",
     "reference": "WRAP-ACC-123456"
   },
   "pensionCategory": "PensionDefinedBenefit",
   "pensionType": {
     "id": 123,
-    "href": "/api/v2/plantypes?filter=id eq 123",
+    "href": "/api/v3/plantypes?filter=id eq 123",
     "name": "Final Salary Pension"
   },
   "policyNumber": "NHS-DB-987654",
@@ -441,9 +441,7 @@ Additional defined contribution arrangement alongside DB pension:
   "agencyStatusDate": "2023-01-15",
   "productName": "NHS Pension Scheme (1995 Section)",
   "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
+    "code": "GBP"
   },
   "status": "ACTIVE",
   "employer": "Royal London Hospital Trust",
@@ -452,25 +450,19 @@ Additional defined contribution arrangement alongside DB pension:
     "prospectiveWithNoLumpsumTaken": {
       "amount": 45000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "prospectiveWithLumpsumTaken": {
       "amount": 33750.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "prospectiveLumpSum": {
       "amount": 135000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
@@ -481,9 +473,7 @@ Additional defined contribution arrangement alongside DB pension:
   "pensionableSalary": {
     "amount": 65000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "isIndexed": true,
@@ -493,9 +483,7 @@ Additional defined contribution arrangement alongside DB pension:
     "cashEquivalentValue": {
       "amount": 950000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "expiryOn": "2026-04-15"
@@ -503,9 +491,7 @@ Additional defined contribution arrangement alongside DB pension:
   "gmpAmount": {
     "amount": 1250.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "deathInService": {
@@ -540,42 +526,40 @@ Additional defined contribution arrangement alongside DB pension:
 ```json
 {
   "id": 15002,
-  "href": "/api/v2/factfinds/679/pensions/finalsalary/15002",
+  "href": "/api/v3/factfinds/679/pensions/finalsalary/15002",
   "factfind": {
     "id": 679,
-    "href": "/api/v2/factfinds/679"
+    "href": "/api/v3/factfinds/679"
   },
   "owners": [
     {
       "id": 8496,
-      "href": "/api/v2/factfinds/679/clients/8496",
+      "href": "/api/v3/factfinds/679/clients/8496",
       "name": "John Smith",
       "ownershipPercentage": 100.0
     }
   ],
   "provider": {
     "id": 789,
-    "href": "/api/v2/productproviders/789",
+    "href": "/api/v3/productproviders/789",
     "name": "Local Government Pension Scheme"
   },
   "lifeCycle": {
     "id": 46,
-    "href": "/api/v2/lifecycles/46",
+    "href": "/api/v3/lifecycles/46",
     "name": "Preservation"
   },
   "pensionCategory": "PensionDefinedBenefit",
   "pensionType": {
     "id": 124,
-    "href": "/api/v2/plantypes?filter=id eq 124",
+    "href": "/api/v3/plantypes?filter=id eq 124",
     "name": "Deferred Pension"
   },
   "policyNumber": "LGPS-DEF-456789",
   "agencyStatus": "NOT_UNDER_AGENCY",
   "productName": "LGPS 2008 Scheme",
   "currency": {
-    "code": "GBP",
-    "display": "British Pound",
-    "symbol": "£"
+    "code": "GBP"
   },
   "status": "DEFERRED",
   "employer": "Nottingham City Council",
@@ -584,25 +568,19 @@ Additional defined contribution arrangement alongside DB pension:
     "prospectiveWithNoLumpsumTaken": {
       "amount": 12500.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "prospectiveWithLumpsumTaken": {
       "amount": 9375.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "prospectiveLumpSum": {
       "amount": 37500.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     }
   },
@@ -613,9 +591,7 @@ Additional defined contribution arrangement alongside DB pension:
   "pensionableSalary": {
     "amount": 35000.00,
     "currency": {
-      "code": "GBP",
-      "display": "British Pound",
-      "symbol": "£"
+      "code": "GBP"
     }
   },
   "isIndexed": true,
@@ -625,9 +601,7 @@ Additional defined contribution arrangement alongside DB pension:
     "cashEquivalentValue": {
       "amount": 185000.00,
       "currency": {
-        "code": "GBP",
-        "display": "British Pound",
-        "symbol": "£"
+        "code": "GBP"
       }
     },
     "expiryOn": "2026-06-30"

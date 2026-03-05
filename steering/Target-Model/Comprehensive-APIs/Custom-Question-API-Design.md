@@ -23,7 +23,7 @@
 | **Entity Name** | Custom-Question |
 | **Domain** | Client Management |
 | **Aggregate Root** | Client |
-| **Base Path** | `/api/v2/...` |
+| **Base Path** | `/api/v3/...` |
 | **Resource Type** | Collection |
 
 ### Description
@@ -190,20 +190,18 @@ For common business rules applicable to all entities, refer to **[Master API Des
 {
   "factfind": {
     "id": 456,
-    "href": "/api/v2/factfinds/456"
+    "href": "/api/v3/factfinds/456"
   },
   "client": {
     "id": 789,
-    "href": "/api/v2/factfinds/456/clients/789"
+    "href": "/api/v3/factfinds/456/clients/789"
   },
   "category": {
-    "code": "LIFESTYLE",
-    "display": "Lifestyle"
+    "code": "LIFESTYLE"
   },
   "question": "Do you have any plans to relocate in the next 5 years?",
   "answerType": {
-    "code": "YES_NO",
-    "display": "Yes/No"
+    "code": "YES_NO"
   },
   "isRequired": true,
   "displayOrder": 10,
@@ -216,31 +214,29 @@ For common business rules applicable to all entities, refer to **[Master API Des
 ```json
 {
   "id": 123,
-  "href": "/api/v2/factfinds/456/custom-questions/123",
+  "href": "/api/v3/factfinds/456/custom-questions/123",
   "factfind": {
     "id": 456,
-    "href": "/api/v2/factfinds/456"
+    "href": "/api/v3/factfinds/456"
   },
   "client": {
     "id": 789,
-    "href": "/api/v2/factfinds/456/clients/789"
+    "href": "/api/v3/factfinds/456/clients/789"
   },
   "category": {
-    "code": "LIFESTYLE",
-    "display": "Lifestyle"
+    "code": "LIFESTYLE"
   },
   "question": "Do you have any plans to relocate in the next 5 years?",
   "answer": "No",
   "answerType": {
-    "code": "YES_NO",
-    "display": "Yes/No"
+    "code": "YES_NO"
   },
   "isRequired": true,
   "displayOrder": 10,
   "notes": "Important for long-term financial planning",
   "createdBy": {
     "id": 42,
-    "href": "/api/v2/users/42"
+    "href": "/api/v3/users/42"
   },
   "createdAt": "2026-02-25T10:00:00Z",
   "updatedAt": "2026-02-25T10:00:00Z"
