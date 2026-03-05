@@ -113,7 +113,7 @@ The FactFind API provides comprehensive digital capabilities for:
 ### Part 2: Core APIs
 
 4. [FactFind Root API](#4-factfind-root-api)
-   - 4.11 [Control Options API](#411-control-questions-api)
+   - 4.11 [Control Options API](#411-control-options-api)
 5. [Client Management API](#5-client-management-api)
 6. [Address API](#6-address-api)
 7. [Contact API](#7-contact-api)
@@ -678,7 +678,9 @@ X-Tenant-ID: acme-wealth-mgmt
 
 ### 3.1 Pagination
 
-**Offset-based Pagination:**
+**Collection Response Structure:**
+
+All list/collection endpoints follow Intelliflo's standard collection structure with pagination links at the root level.
 
 Request:
 ```http
@@ -688,45 +690,77 @@ GET /api/v2/factfinds/679/clients?page=1&pageSize=25
 Response:
 ```json
 {
-  "items": [...],
-  "pagination": {
-    "page": 1,
-    "pageSize": 25,
-    "totalItems": 150,
-    "totalPages": 6
-  },
-  "_links": {
-    "self": { "href": "/api/v2/factfinds/679/clients?page=1&pageSize=25" },
-    "first": { "href": "/api/v2/factfinds/679/clients?page=1&pageSize=25" },
-    "next": { "href": "/api/v2/factfinds/679/clients?page=2&pageSize=25" },
-    "last": { "href": "/api/v2/factfinds/679/clients?page=6&pageSize=25" }
-  }
+  "href": "/api/v2/factfinds/679/clients?page=1&pageSize=25",
+  "first_href": "/api/v2/factfinds/679/clients?page=1&pageSize=25",
+  "last_href": "/api/v2/factfinds/679/clients?page=6&pageSize=25",
+  "next_href": "/api/v2/factfinds/679/clients?page=2&pageSize=25",
+  "prev_href": null,
+  "items": [
+    {
+      "id": 8496,
+      "href": "/api/v2/factfinds/679/clients/8496",
+      "firstName": "John",
+      "lastName": "Smith"
+    },
+    {
+      "id": 8497,
+      "href": "/api/v2/factfinds/679/clients/8497",
+      "firstName": "Jane",
+      "lastName": "Smith"
+    }
+  ],
+  "count": 150
 }
 ```
 
-**Parameters:**
-- `page` - Page number (1-indexed, default: 1)
-- `pageSize` - Items per page (default: 25, max: 100)
+**Collection Fields:**
+- `href` (string) - URL of the current page
+- `first_href` (string) - URL of the first page
+- `last_href` (string) - URL of the last page
+- `next_href` (string | null) - URL of the next page, null if on last page
+- `prev_href` (string | null) - URL of the previous page, null if on first page
+- `items` (array) - Array of resource objects for the current page
+- `count` (integer) - Total count of items across all pages
+
+**Query Parameters:**
+- `page` (integer) - Page number (1-indexed, default: 1)
+- `pageSize` (integer) - Items per page (default: 25, max: 100)
+
+**Navigation:**
+- Use `next_href` to navigate to the next page (check if not null)
+- Use `prev_href` to navigate to the previous page (check if not null)
+- Use `first_href` and `last_href` to jump to first or last page
+- All pagination URLs include filter parameters if applied
 
 **Performance Considerations:**
-- Use cursor-based pagination for large datasets
-- Cache total counts when possible
-- Set reasonable page size limits
+- Default page size is 25 items
+- Maximum page size is 100 items to prevent performance issues
+- Total count is calculated efficiently and cached where possible
+- For very large datasets (>10,000 items), consider filtering to reduce result set
 
 ### 3.2 Filtering & Sorting
 
-**Filtering:**
+**Simple Filtering:**
 
 ```http
 GET /api/v2/factfinds/679/clients?lastName=Smith&status=Active
 GET /api/v2/factfinds/679/income?incomeType=Employment&minAmount=30000
 ```
 
-**Advanced Filtering (OData-style):**
+**Advanced Filtering (QueryLang - Intelliflo Standard):**
+
+QueryLang syntax: `field operator value` with `and` to chain expressions
 
 ```http
-GET /api/v2/factfinds/679/clients?$filter=age gt 30 and status eq 'Active'
+GET /api/v2/factfinds/679/clients?filter=age gt 30 and status eq 'Active'
+GET /api/v2/factfinds?filter=clients.id eq 123
 ```
+
+**Supported Operators:**
+- Comparison: `eq` (equal), `ne` (not equal), `gt` (greater than), `ge` (>=), `lt` (less than), `le` (<=)
+- List: `in` (intersection, e.g., `status in ('Active', 'Pending')`)
+- String: `startswith` (e.g., `lastName startswith 'Sm'`)
+- Logical: `and` (chain multiple conditions)
 
 **Sorting:**
 
@@ -1087,7 +1121,7 @@ The FactFind API manages the root aggregate for all client financial information
 - Multi-client support (individual and joint FactFinds)
 - Meeting details and recording compliance tracking
 - Regulatory disclosure document tracking
-- OData-style filtering (e.g., by client ID)
+- QueryLang filtering (Intelliflo standard, e.g., by client ID)
 
 **Resource Model:**
 - FactFind (root aggregate) - Gateway to all client financial data
@@ -1109,46 +1143,57 @@ The FactFind API manages the root aggregate for all client financial information
 ```
 GET /api/v2/factfinds
 ```
-Retrieves list of FactFinds with optional filtering.
+Retrieves list of FactFinds with optional filtering and pagination.
 
 **Query Parameters:**
-- `filter` (string, optional): OData-style filter expression
+- `filter` (string, optional): QueryLang filter expression (Intelliflo standard)
+  - Syntax: `field operator value` with `and` to chain
   - Example: `?filter=clients.id eq 123` - Filter by client ID
+- `page` (integer, optional): Page number (1-indexed, default: 1)
+- `pageSize` (integer, optional): Items per page (default: 25, max: 100)
 
 **Response:** 200 OK
 ```json
-[
-  {
-    "id": 679,
-    "href": "/api/v2/factfinds/679",
-    "clients": [
-      {
-        "id": 123,
-        "href": "/api/v2/factfinds/679/clients/123",
-        "name": "John Smith"
-      }
-    ],
-    "meeting": {
-      "meetingOn": "2026-03-05",
-      "meetingType": "FaceToFace",
-      "clientsPresent": [
+{
+  "href": "/api/v2/factfinds?page=1&pageSize=25",
+  "first_href": "/api/v2/factfinds?page=1&pageSize=25",
+  "last_href": "/api/v2/factfinds?page=1&pageSize=25",
+  "next_href": null,
+  "prev_href": null,
+  "items": [
+    {
+      "id": 679,
+      "href": "/api/v2/factfinds/679",
+      "clients": [
         {
           "id": 123,
           "href": "/api/v2/factfinds/679/clients/123",
           "name": "John Smith"
         }
       ],
-      "anyOtherAudience": false,
-      "notes": "Initial consultation."
-    },
-    "disclosureKeyfacts": [
-      {
-        "Type": "CombinedInitialDisclosureDocument",
-        "IssuedOn": "2026-03-05"
-      }
-    ]
-  }
-]
+      "meeting": {
+        "meetingOn": "2026-03-05",
+        "meetingType": "FaceToFace",
+        "clientsPresent": [
+          {
+            "id": 123,
+            "href": "/api/v2/factfinds/679/clients/123",
+            "name": "John Smith"
+          }
+        ],
+        "anyOtherAudience": false,
+        "notes": "Initial consultation."
+      },
+      "disclosureKeyfacts": [
+        {
+          "Type": "CombinedInitialDisclosureDocument",
+          "IssuedOn": "2026-03-05"
+        }
+      ]
+    }
+  ],
+  "count": 1
+}
 ```
 
 **Error Responses:**
@@ -1381,7 +1426,7 @@ Returns updated FactFind object.
 
 10. **CIDD Requirement**: FCA requires Combined Initial Disclosure Document or equivalent before providing advice. Audit trail via disclosureKeyfacts array.
 
-11. **OData Filter Syntax**: Filter parameter supports OData-style expressions. Example: `clients.id eq 123`. Invalid syntax returns 400 Bad Request.
+11. **QueryLang Filter Syntax**: Filter parameter supports QueryLang expressions (Intelliflo standard). Syntax: `field operator value` with `and` to chain. Example: `clients.id eq 123`. Operators: `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `startswith`. Invalid syntax returns 400 Bad Request.
 
 12. **Joint FactFinds**: Multiple clients can be associated with one FactFind. Common for couples, families, business partners. All associated clients have equal visibility to FactFind data.
 
@@ -10196,7 +10241,7 @@ Content-Type: application/json
 - [Employment API](#19-employment-api) - Employment history generating schemes
 - [Personal Pension API](#29-personal-pension-api) - Personal pensions (non-employer)
 - [Final Salary Pension API](#27-final-salary-pension-api) - Defined benefit employer schemes
-- [Control Options API](#411-control-questions-api) - Controls pension section display
+- [Control Options API](#411-control-options-api) - Controls pension section display
 
 ---
 

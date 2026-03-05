@@ -47,11 +47,13 @@ This API covers:
 ### 1.3 Conventions
 
 - **Singleton Resource**: One estate planning record per client, accessed via GET and updated via PUT
-- **Gifts Collection**: Managed through dedicated POST/GET/PUT/DELETE endpoints
+- **Gifts Collection**: Managed through dedicated POST/GET/PUT/DELETE endpoints with collection structure `{"items": [...], "count": N}`
+- **Simple Hypermedia**: Resources include `href` property for navigation
 - **Read-Only Fields**: `totalAssets` and `totalJointAssets` are automatically calculated
 - **UK IHT Context**: All gift tracking follows UK Inheritance Tax rules and exemptions
 - All monetary amounts use multi-currency format
 - All dates use ISO 8601 format (YYYY-MM-DD or full datetime)
+- **Intelliflo Standards**: Follows Intelliflo API design guidelines
 
 ---
 

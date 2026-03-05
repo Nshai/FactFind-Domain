@@ -47,7 +47,16 @@ This API covers:
 ### 1.3 Conventions
 
 - **Collection Resource**: Multiple FactFinds can exist per organization
-- **Filtering Support**: GET list endpoint supports OData-style filtering
+- **Collection Structure**: List responses use collection wrapper with pagination links at root level:
+  - `href` - current page URL
+  - `first_href` - first page URL
+  - `last_href` - last page URL
+  - `next_href` - next page URL (null if on last page)
+  - `prev_href` - previous page URL (null if on first page)
+  - `items` - array of resources
+  - `count` - total count of items across all pages
+- **Filtering Support**: GET list endpoint supports QueryLang filtering (Intelliflo standard)
+- **Simple Hypermedia**: Individual resources include `href` property for navigation
 - **Client References**: Clients array contains read-only references
 - **Meeting Recording**: Meeting type enum captures recording compliance
 - **Disclosure Tracking**: Array of issued disclosure documents with dates
@@ -243,8 +252,12 @@ FactFind (1) ──→ (N) PersonalProtection
 **Description:** Retrieves a list of FactFinds with optional filtering.
 
 **Query Parameters:**
-- `filter` (string, optional): OData-style filter expression
+- `filter` (string, optional): QueryLang filter expression
   - Example: `?filter=clients.id eq 123` - Filter FactFinds by client ID
+  - Syntax: `field operator value` with `and` to chain expressions
+  - Operators: `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `startswith`
+- `page` (integer, optional): Page number (1-indexed, default: 1)
+- `pageSize` (integer, optional): Items per page (default: 25, max: 100)
 
 **Response Codes:**
 - `200 OK`: FactFinds retrieved successfully
@@ -252,7 +265,14 @@ FactFind (1) ──→ (N) PersonalProtection
 - `401 Unauthorized`: Authentication required
 - `403 Forbidden`: Insufficient permissions
 
-**Response Body:** Array of FactFind objects
+**Response Body:** Collection object with pagination links at root level
+- `href` - current page URL
+- `first_href` - first page URL
+- `last_href` - last page URL
+- `next_href` - next page URL (null if no next page)
+- `prev_href` - previous page URL (null if no previous page)
+- `items` - array of FactFind objects
+- `count` - total count across all pages
 
 ### 5.4 Get FactFind
 
@@ -436,68 +456,76 @@ FactFind (1) ──→ (N) PersonalProtection
 ### 6.4 List FactFinds Response
 
 ```json
-[
-  {
-    "id": 679,
-    "href": "/api/v2/factfinds/679",
-    "clients": [
-      {
-        "id": 123,
-        "href": "/api/v2/factfinds/679/clients/123",
-        "name": "John Smith"
-      }
-    ],
-    "meeting": {
-      "meetingOn": "2026-03-05",
-      "meetingType": "FaceToFace",
-      "clientsPresent": [
+{
+  "href": "/api/v2/factfinds?page=1&pageSize=25",
+  "first_href": "/api/v2/factfinds?page=1&pageSize=25",
+  "last_href": "/api/v2/factfinds?page=1&pageSize=25",
+  "next_href": null,
+  "prev_href": null,
+  "items": [
+    {
+      "id": 679,
+      "href": "/api/v2/factfinds/679",
+      "clients": [
         {
           "id": 123,
           "href": "/api/v2/factfinds/679/clients/123",
           "name": "John Smith"
         }
       ],
-      "anyOtherAudience": false,
-      "notes": "Initial consultation."
+      "meeting": {
+        "meetingOn": "2026-03-05",
+        "meetingType": "FaceToFace",
+        "clientsPresent": [
+          {
+            "id": 123,
+            "href": "/api/v2/factfinds/679/clients/123",
+            "name": "John Smith"
+          }
+        ],
+        "anyOtherAudience": false,
+        "notes": "Initial consultation."
+      },
+      "disclosureKeyfacts": [
+        {
+          "Type": "CombinedInitialDisclosureDocument",
+          "IssuedOn": "2026-03-05"
+        }
+      ]
     },
-    "disclosureKeyfacts": [
-      {
-        "Type": "CombinedInitialDisclosureDocument",
-        "IssuedOn": "2026-03-05"
-      }
-    ]
-  },
-  {
-    "id": 680,
-    "href": "/api/v2/factfinds/680",
-    "clients": [
-      {
-        "id": 125,
-        "href": "/api/v2/factfinds/680/clients/125",
-        "name": "Alice Johnson"
-      }
-    ],
-    "meeting": {
-      "meetingOn": "2026-03-06",
-      "meetingType": "Videocall",
-      "clientsPresent": [
+    {
+      "id": 680,
+      "href": "/api/v2/factfinds/680",
+      "clients": [
         {
           "id": 125,
           "href": "/api/v2/factfinds/680/clients/125",
           "name": "Alice Johnson"
         }
       ],
-      "anyOtherAudience": false,
-      "notes": "Video consultation for investment review."
-    },
-    "disclosureKeyfacts": [
-      {
-        "Type": "DisclosureDocument",
-        "IssuedOn": "2026-03-06"
-      }
-    ]
-  }
-]
+      "meeting": {
+        "meetingOn": "2026-03-06",
+        "meetingType": "Videocall",
+        "clientsPresent": [
+          {
+            "id": 125,
+            "href": "/api/v2/factfinds/680/clients/125",
+            "name": "Alice Johnson"
+          }
+        ],
+        "anyOtherAudience": false,
+        "notes": "Video consultation for investment review."
+      },
+      "disclosureKeyfacts": [
+        {
+          "Type": "DisclosureDocument",
+          "IssuedOn": "2026-03-06"
+        }
+      ]
+    }
+  ],
+  "count": 2
+}
 ```
 
 ### 6.5 Filter FactFinds by Client Example
@@ -509,38 +537,46 @@ GET /v2/factfinds?filter=clients.id eq 123
 
 **Response:** 200 OK
 ```json
-[
-  {
-    "id": 679,
-    "href": "/api/v2/factfinds/679",
-    "clients": [
-      {
-        "id": 123,
-        "href": "/api/v2/factfinds/679/clients/123",
-        "name": "John Smith"
-      },
-      {
-        "id": 124,
-        "href": "/api/v2/factfinds/679/clients/124",
-        "name": "Jane Smith"
-      }
-    ],
-    "meeting": {
-      "meetingOn": "2026-03-05",
-      "meetingType": "FaceToFace",
-      "clientsPresent": [
+{
+  "href": "/api/v2/factfinds?filter=clients.id eq 123",
+  "first_href": "/api/v2/factfinds?filter=clients.id eq 123&page=1&pageSize=25",
+  "last_href": "/api/v2/factfinds?filter=clients.id eq 123&page=1&pageSize=25",
+  "next_href": null,
+  "prev_href": null,
+  "items": [
+    {
+      "id": 679,
+      "href": "/api/v2/factfinds/679",
+      "clients": [
         {
           "id": 123,
           "href": "/api/v2/factfinds/679/clients/123",
           "name": "John Smith"
+        },
+        {
+          "id": 124,
+          "href": "/api/v2/factfinds/679/clients/124",
+          "name": "Jane Smith"
         }
       ],
-      "anyOtherAudience": false,
-      "notes": "Annual review meeting."
-    },
-    "disclosureKeyfacts": []
-  }
-]
+      "meeting": {
+        "meetingOn": "2026-03-05",
+        "meetingType": "FaceToFace",
+        "clientsPresent": [
+          {
+            "id": 123,
+            "href": "/api/v2/factfinds/679/clients/123",
+            "name": "John Smith"
+          }
+        ],
+        "anyOtherAudience": false,
+        "notes": "Annual review meeting."
+      },
+      "disclosureKeyfacts": []
+    }
+  ],
+  "count": 1
+}
 ```
 
 ### 6.6 Update FactFind Request
@@ -725,15 +761,19 @@ GET /v2/factfinds?filter=clients.id eq 123
 
 ### 8.5 Filtering Rules
 
-**BR-FF-14: OData Filter Syntax**
-- Filter parameter supports OData-style expressions
+**BR-FF-14: QueryLang Filter Syntax**
+- Filter parameter supports QueryLang expressions (Intelliflo standard)
+- Format: `field operator value` with `and` to chain expressions
+- Operators: `eq` (equal), `ne` (not equal), `gt` (greater than), `ge` (greater than or equal), `lt` (less than), `le` (less than or equal), `in` (intersection), `startswith`
 - Example: `clients.id eq 123`
+- Example with chaining: `clients.id eq 123 and meeting.meetingOn gt 2026-01-01`
 - Invalid syntax returns 400 Bad Request
 
 **BR-FF-15: Filter by Client ID**
 - Most common filter: `filter=clients.id eq 123`
 - Returns all FactFinds where client 123 is associated
 - Includes joint FactFinds
+- Can combine with other filters using `and` operator
 
 ---
 
@@ -1082,7 +1122,7 @@ GET /v2/factfinds?filter=clients.id eq 123
 ### 13.2 External Standards
 
 - **ISO 8601**: Date format standard
-- **OData**: Query filter syntax
+- **QueryLang**: Intelliflo query filter syntax for filtering and searching
 - **REST API Design**: Standard HTTP methods and status codes
 - **GDPR**: Data protection and privacy requirements
 

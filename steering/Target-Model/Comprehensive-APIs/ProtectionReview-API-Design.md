@@ -49,9 +49,12 @@ This API covers:
 - **Singleton Resource**: One protection review record per FactFind (not per client)
 - **Section-Based Updates**: Three separate PUT endpoints for updating each protection area
 - **Summary Endpoint**: Single GET endpoint returns all sections
+- **Simple Hypermedia**: Resources include `href` property for navigation
 - **All Fields Optional**: Clients may not review all protection areas
 - All text fields support free-text entry for notes and reasoning
 - Enum fields use specific allowed values
+- All dates use ISO 8601 format (YYYY-MM-DD)
+- **Intelliflo Standards**: Follows Intelliflo API design guidelines
 
 ---
 

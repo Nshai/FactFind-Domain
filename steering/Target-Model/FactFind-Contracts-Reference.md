@@ -289,7 +289,7 @@ The FactFind contract represents the root aggregate for all client financial inf
 - **Meeting Tracking** - Records meeting details with recording compliance
 - **Disclosure Compliance** - Tracks regulatory disclosure documents issued to clients
 - **Client References** - Read-only client names populated from Client API
-- **Filtering Support** - OData-style filtering by client ID
+- **Filtering Support** - QueryLang filtering (Intelliflo standard) by client ID
 - **Audit Trail** - Creation and update timestamps
 
 ### Common Scenarios
@@ -445,8 +445,11 @@ The FactFind contract represents the root aggregate for all client financial inf
 - Once issued, disclosure documents should not be removed (maintains audit trail)
 
 #### Filtering Rules
-- GET list endpoint supports OData-style filter expressions
+- GET list endpoint supports QueryLang filter expressions (Intelliflo standard)
+- Syntax: `field operator value` with `and` to chain conditions
+- Operators: `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `startswith`
 - Most common: `?filter=clients.id eq 123` - returns all FactFinds where client 123 associated
+- Can chain: `?filter=clients.id eq 123 and meeting.meetingOn gt 2026-01-01`
 - Includes joint FactFinds
 - Invalid filter syntax returns 400 Bad Request
 

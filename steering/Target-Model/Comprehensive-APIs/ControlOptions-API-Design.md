@@ -48,8 +48,10 @@ This API covers:
 - **Singleton Resource**: One control options record per FactFind
 - **Section-Based Updates**: Six separate PUT endpoints for updating each area
 - **Summary Endpoint**: Single GET endpoint returns all sections
+- **Simple Hypermedia**: Resources include `href` property for navigation
 - **All Fields Boolean**: Most fields are simple yes/no flags
 - **Full Response**: All PUT operations return complete ControlOptions object
+- **Intelliflo Standards**: Follows Intelliflo API design guidelines
 
 ---
 
