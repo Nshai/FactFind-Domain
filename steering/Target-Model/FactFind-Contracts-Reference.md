@@ -1,4 +1,10 @@
 # FactFind Contracts Reference
+
+**API Version:** v3.0  
+**Date:** 2026-03-05  
+**Document Type:** Contract Reference  
+**Status:** Current
+
 ## Executive Summary
 This document provides a comprehensive, non-technical reference for all contracts (data structures) used in the FactFind API. Each contract defines what information can be captured and managed within the system.
 
@@ -15,6 +21,36 @@ Each contract section includes:
 - **Business Purpose**: Why this information is captured
 - **Field Table**: Detailed breakdown of all data fields
 - **Relationships**: How this contract connects to other contracts
+
+
+### API v3.0 Conventions
+
+This reference documents contracts for **FactFind API v3.0**. Key API conventions:
+
+**Base URL Pattern:** `/api/v3/...`
+
+**Collection Response Structure:**
+- All list endpoints return: `{"href": "...", "first_href": "...", "last_href": "...", "next_href": "...", "prev_href": "...", "items": [...], "count": N}`
+- Pagination: Use `$top` (max items) and `$skip` (offset) query parameters
+- Example: `GET /api/v3/factfinds?$top=25&$skip=0`
+
+**Filtering (QueryLang):**
+- Syntax: `field operator value` with `and` to chain conditions
+- Operators: `eq`, `ne`, `gt`, `ge`, `lt`, `le`, `in`, `startswith`
+- Example: `?filter=clients.id eq 123 and meeting.meetingOn gt 2026-01-01`
+
+**Ordering:**
+- Syntax: `?orderBy=fieldName asc|desc`
+- Example: `?orderBy=lastName asc,firstName asc`
+
+**Authorization:**
+- Single unified scope: `factfind` (grants full API access)
+- Fine-grained permissions managed at application/tenant level
+
+**Hypermedia:**
+- Resources include simple `href` properties for navigation
+- No complex `_links` structures
+
 
 ### Data Type Legend
 - **Text**: Any text value (names, descriptions, notes)

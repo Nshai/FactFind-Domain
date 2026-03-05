@@ -468,7 +468,7 @@ Standard money structure:
 | `owner` | integer | Filter by owner client ID | `?owner=8496` |
 | `retirementAge` | integer | Filter by retirement age | `?retirementAge=67` |
 | `$top` | integer | Number of items to return (max 100) | `?$top=25&$skip=0` |
-| `$skip` | integer | Number of items to skip | `?pageSize=25` |
+| `$skip` | integer | Number of items to skip | `?$skip=0` |
 | `orderBy` | string | Order field and direction | `?orderBy=retirementAge asc` |
 
 ---
