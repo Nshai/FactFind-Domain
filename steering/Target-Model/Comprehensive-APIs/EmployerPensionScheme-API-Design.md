@@ -1,3 +1,4 @@
+
 # Employer Pension Scheme API Design
 
 ## Overview
@@ -10,7 +11,7 @@ The Employer Pension Scheme API provides endpoints to manage employer-sponsored 
 
 **Aggregate Root:** FactFind
 
-**Version:** v2.0
+**Version:** v3.0
 
 **Status:** Active
 
@@ -58,9 +59,9 @@ Retrieve all employer pension schemes for a fact find.
 | ownerId | integer | No | Filter by owner client ID | All owners |
 | isCurrentMember | boolean | No | Filter by current member status | All schemes |
 | isProblemMember | boolean | No | Filter by problem flag | All schemes |
-| page | integer | No | Number of items to return (max 100) | 1 |
+| page | integer | No | Page number (1-indexed) | 1 |
 | pageSize | integer | No | Items per page | 25 |
-| sortBy | string | No | Order field | schemeJoinedOn |
+| sortBy | string | No | Sort field | schemeJoinedOn |
 | sortOrder | string | No | Sort direction (asc/desc) | desc |
 
 **Success Response: 200 OK**
@@ -103,7 +104,7 @@ Retrieve all employer pension schemes for a fact find.
   },
   "_links": {
     "self": {
-      "href": "/api/v3/factfinds/679/pensions/employerschemes?$top=25&$skip=0"
+      "href": "/api/v3/factfinds/679/pensions/employerschemes?page=1&pageSize=25"
     },
     "factfind": {
       "href": "/api/v3/factfinds/679"
